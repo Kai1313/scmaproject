@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\UserToken;
 use App\Models\User;
+use Carbon\Carbon;
 
 use Illuminate\Support\Facades\Log;
 
@@ -14,11 +15,13 @@ class SessionController extends Controller
     {
         $user_id    = $request->user_id;
         $user       = User::where('id_pengguna', $user_id)->first();
-        $token      = UserToken::where('id_pengguna', $user_id)->first();
+        $token      = UserToken::where('id_pengguna', $user_id)->whereDate('waktu_habis_token_pengguna', '>', Carbon::now())->first();
 
         if($user && $request->session()->has('token') == false){
             $request->session()->put('token', $token->nama_token_pengguna);
             $request->session()->put('user', $user);
+        }else{
+            $request->session()->flush();
         }
         
         if ($request->session()->has('token')) {
