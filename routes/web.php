@@ -11,6 +11,7 @@
 |
 */
 
-Route::get('/', function () {
-    return view('master');
-});
+use App\Http\Controllers\SessionController;
+
+Route::get('/dashboard/{user_id?}', 'SessionController@index');
+Route::get('/logout', 'SessionController@logout');

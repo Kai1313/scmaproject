@@ -25,7 +25,7 @@
                         <!-- The user image in the navbar-->
                         <img src="{{ asset('assets/dist/img/user2-160x160.jpg') }}" class="user-image" alt="User Image">
                         <!-- hidden-xs hides the username on small devices so only the image appears. -->
-                        <span class="hidden-xs">Alexander Pierce</span>
+                        <span class="hidden-xs">{{ Session::get('user')->nama_pengguna }}</span>
                     </a>
                     <ul class="dropdown-menu">
                         <!-- The user image in the menu -->
@@ -33,7 +33,7 @@
                             <img src="{{ asset('assets/dist/img/user2-160x160.jpg') }}" class="img-circle" alt="User Image">
 
                             <p>
-                                Alexander Pierce - Web Developer
+                                {{ Session::get('user')->nama_pengguna }}
                                 <small>Member since Nov. 2012</small>
                             </p>
                         </li>
