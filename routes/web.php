@@ -12,6 +12,15 @@
 */
 
 use App\Http\Controllers\SessionController;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/dashboard/{user_id?}', 'SessionController@index');
 Route::get('/logout', 'SessionController@logout');
+
+Route::get('/get-menu/{id}', 'DashboardController@getMenu')->name('get-menu');
+Route::get('/akun', function(){
+    return view('accounting.master.akun');
+});
+Route::get('/slip', function(){
+    return view('accounting.master.slip');
+});
