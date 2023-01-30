@@ -12,6 +12,8 @@
 */
 
 use App\Http\Controllers\SessionController;
+use App\Http\Controllers\MasterSlipController;
+use App\Http\Controllers\MasterCoaController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/dashboard/{user_id?}', 'SessionController@index');
@@ -24,3 +26,21 @@ Route::get('/akun', function(){
 Route::get('/slip', function(){
     return view('accounting.master.slip');
 });
+
+
+// Master
+Route::get('/master/slip', 'MasterSlipController@index')->name('master-slip');
+Route::get('/master/slip/form/create', 'MasterSlipController@create')->name('master-slip-create');
+Route::get('/master/slip/form/edit/{id}', 'MasterSlipController@edit')->name('master-slip-edit');
+Route::get('/master/slip/form/show/{id}', 'MasterSlipController@show')->name('master-slip-show');
+Route::post('/master/slip/store', 'MasterSlipController@store')->name('master-slip-store');
+Route::post('/master/slip/update', 'MasterSlipController@update')->name('master-slip-update');
+Route::get('/master/slip/destroy/{id}', 'MasterSlipController@destroy')->name('master-slip-destroy');
+Route::get('/master/coa', 'MasterCoaController@index')->name('master-coa');
+
+Route::get('/master/coa/form/create', 'MasterCoaController@create')->name('master-coa-create');
+Route::get('/master/coa/form/edit/{id}', 'MasterCoaController@edit')->name('master-coa-edit');
+Route::get('/master/coa/form/show/{id}', 'MasterCoaController@show')->name('master-coa-show');
+Route::post('/master/coa/store', 'MasterCoaController@store')->name('master-coa-store');
+Route::post('/master/coa/update', 'MasterCoaController@update')->name('master-coa-update');
+Route::get('/master/coa/destroy/{id}', 'MasterCoaController@destroy')->name('master-coa-destroy');
