@@ -26,7 +26,10 @@ class MasterCoaController extends Controller
      */
     public function create()
     {
-        //
+        $data = [
+            "pageTitle"=>"SCA Accounting | Master CoA | Create"
+        ];
+        return view('accounting.master.coa.form', $data);
     }
 
     /**
