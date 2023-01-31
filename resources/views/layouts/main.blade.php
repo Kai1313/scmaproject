@@ -11,6 +11,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <title>AdminLTE 2 | Starter</title>
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     @include('includes.styles')
+    @stack('styles')
 </head>
 
 <body class="hold-transition skin-blue sidebar-mini">
@@ -29,6 +30,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         <div class="control-sidebar-bg"></div>
     </div>
     @include('includes.scripts')
+    @stack('scripts')
 </body>
 
 </html>

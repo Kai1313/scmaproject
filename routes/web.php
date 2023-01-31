@@ -9,24 +9,32 @@
 | routes are loaded by the RouteServiceProvider within a group which
 | contains the "web" middleware group. Now create something great!
 |
-*/
+ */
 
-use App\Http\Controllers\SessionController;
-use App\Http\Controllers\MasterSlipController;
-use App\Http\Controllers\MasterCoaController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/dashboard/{user_id?}', 'SessionController@index');
 Route::get('/logout', 'SessionController@logout');
 
 Route::get('/get-menu/{id}', 'DashboardController@getMenu')->name('get-menu');
-Route::get('/akun', function(){
+Route::get('/akun', function () {
     return view('accounting.master.akun');
 });
-Route::get('/slip', function(){
+Route::get('/slip', function () {
     return view('accounting.master.slip');
 });
 
+Route::prefix('master-biaya')->group(function () {
+    Route::get('/', 'MasterBiayaController@index')->name('master-biaya-page');
+    Route::get('entry/{id?}', 'MasterBiayaController@entry')->name('master-biaya-entry');
+    Route::post('save-entry/{id}', 'MasterBiayaController@saveEntry')->name('master-biaya-save-entry');
+});
+
+Route::prefix('master-wrapper')->group(function () {
+    Route::get('/', 'MasterWrapperController@index')->name('master-wrapper-page');
+    Route::get('entry/{id?}', 'MasterWrapperController@entry')->name('master-wrapper-entry');
+    Route::post('save-entry/{id}', 'MasterWrapperController@saveEntry')->name('master-wrapper-save-entry');
+});
 
 // Master
 Route::get('/master/slip', 'MasterSlipController@index')->name('master-slip');
