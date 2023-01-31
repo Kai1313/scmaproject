@@ -13,7 +13,10 @@ class MasterCoaController extends Controller
      */
     public function index()
     {
-        //
+        $data = [
+            "pageTitle"=>"SCA Accounting | Master CoA | List"
+        ];
+        return view('accounting.master.coa.index', $data);
     }
 
     /**

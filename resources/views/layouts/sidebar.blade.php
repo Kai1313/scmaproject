@@ -14,8 +14,8 @@
                     </span>
                 </a>
                 <ul class="treeview-menu">
-                    <li class="active"><a href="#">Link in level 2</a></li>
-                    <li><a href="#">Link in level 2</a></li>
+                    <li class="active"><a href="#">Master CoA</a></li>
+                    <li><a href="#">Master Slip</a></li>
                 </ul>
             </li>
             <li class="treeview ">
