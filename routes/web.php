@@ -31,11 +31,11 @@ Route::get('/slip', function(){
 // Master
 Route::get('/master/slip', 'MasterSlipController@index')->name('master-slip');
 Route::get('/master/slip/form/create', 'MasterSlipController@create')->name('master-slip-create');
-Route::get('/master/slip/form/edit/{id}', 'MasterSlipController@edit')->name('master-slip-edit');
-Route::get('/master/slip/form/show/{id}', 'MasterSlipController@show')->name('master-slip-show');
+Route::get('/master/slip/form/edit/{id?}', 'MasterSlipController@edit')->name('master-slip-edit');
+Route::get('/master/slip/form/show/{id?}', 'MasterSlipController@show')->name('master-slip-show');
 Route::post('/master/slip/store', 'MasterSlipController@store')->name('master-slip-store');
 Route::post('/master/slip/update', 'MasterSlipController@update')->name('master-slip-update');
-Route::get('/master/slip/destroy/{id}', 'MasterSlipController@destroy')->name('master-slip-destroy');
+Route::get('/master/slip/destroy/{id?}', 'MasterSlipController@destroy')->name('master-slip-destroy');
 Route::get('/master/coa', 'MasterCoaController@index')->name('master-coa');
 
 Route::get('/master/coa/form/create', 'MasterCoaController@create')->name('master-coa-create');

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use DB;
 
 class MasterSlipController extends Controller
 {
@@ -13,7 +14,11 @@ class MasterSlipController extends Controller
      */
     public function index()
     {
-        return view('accounting.master.slip.index');
+        $data = [
+            "pageTitle"=>"SCA Accounting | Master Slip | List"
+        ];
+
+        return view('accounting.master.slip.index', $data);
     }
 
     /**
@@ -23,7 +28,14 @@ class MasterSlipController extends Controller
      */
     public function create()
     {
-        return view('accounting.master.slip.form');
+        $data_akun = DB::select('select * from master_akun');
+
+        $data = [
+            "pageTitle" => "SCA Accounting | Master Slip | Create",
+            "data_akun" => $data_akun
+        ];
+
+        return view('accounting.master.slip.form', $data);
     }
 
     /**
@@ -43,9 +55,13 @@ class MasterSlipController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($id = null)
     {
-        return view('accounting.master.slip.form');
+        $data = [
+            "pageTitle"=>"SCA Accounting | Master Slip | List"
+        ];
+
+        return view('accounting.master.slip.detail', $data);
     }
 
     /**
@@ -54,9 +70,16 @@ class MasterSlipController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit($id = null)
     {
-        return view('accounting.master.slip.form');
+        $data_akun = DB::select('select * from master_akun');
+
+        $data = [
+            "pageTitle" => "SCA Accounting | Master Slip | Create",
+            "data_akun" => $data_akun
+        ];
+
+        return view('accounting.master.slip.form', $data);
     }
 
     /**

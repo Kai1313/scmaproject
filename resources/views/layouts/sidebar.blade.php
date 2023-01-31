@@ -15,7 +15,7 @@
                 </a>
                 <ul class="treeview-menu">
                     <li class="active"><a href="{{ route('master-coa') }}">Master CoA</a></li>
-                    <li><a href="#">Master Slip</a></li>
+                    <li><a href="{{ route('master-slip') }}">Master Slip</a></li>
                 </ul>
             </li>
             <li class="treeview ">
