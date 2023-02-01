@@ -13,13 +13,12 @@ class MasterWrapperController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = MasterWrapper::select('*', 'dt_created as created_at')->latest()->get();
+            $data = DB::table('master_wrapper')->select('*', 'dt_created as created_at')->latest()->get();
             return Datatables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
-
-                    $btn = '<a href="' . route('master-wrapper-entry', $row->id_wrapper) . '" class="edit btn btn-warning btn-sm">Edit</a>';
-
+                    $btn = '<a href="' . route('master-wrapper-entry', $row->id_wrapper) . '" class="btn btn-warning btn-sm">Edit</a>';
+                    $btn .= '<a href="' . route('master-wrapper-delete', $row->id_wrapper) . '" class="btn btn-danger btn-sm btn-destroy">Delete</a>';
                     return $btn;
                 })
                 ->rawColumns(['action'])
@@ -27,11 +26,6 @@ class MasterWrapperController extends Controller
         }
 
         return view('ops.master.wrapper.index');
-    }
-
-    public function getDatatable(Request $request)
-    {
-
     }
 
     public function entry($id = 0)
@@ -48,13 +42,14 @@ class MasterWrapperController extends Controller
     public function saveEntry(Request $request, $id)
     {
         $paramValidate = [
+            'id_cabang' => 'required',
             'nama_wrapper' => 'required',
             'weight' => 'required',
         ];
 
         $valid = Validator::make($request->all(), $paramValidate);
         if ($valid->fails()) {
-            return redirect()->back()->withErrors($valid)->whiteInput($request->all());
+            return redirect()->back()->withErrors($valid)->withInput($request->all());
         }
 
         $data = MasterWrapper::find($id);
@@ -68,6 +63,20 @@ class MasterWrapperController extends Controller
         $data->fill($request->all());
         $data->save();
 
-        return redirect()->back();
+        $data->uploadfile($request, $data);
+
+        return redirect()->route('master-wrapper-entry', $data->id_wrapper);
+    }
+
+    public function destroy(Request $request, $id)
+    {
+        $data = MasterWrapper::find($id);
+        if (!$data) {
+            return response()->json(['message' => 'data tidak ditemukan'], 500);
+        }
+
+        $data->delete();
+
+        return redirect()->route('master-wrapper-page');
     }
 }

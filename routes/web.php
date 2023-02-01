@@ -28,12 +28,14 @@ Route::prefix('master-biaya')->group(function () {
     Route::get('/', 'MasterBiayaController@index')->name('master-biaya-page');
     Route::get('entry/{id?}', 'MasterBiayaController@entry')->name('master-biaya-entry');
     Route::post('save-entry/{id}', 'MasterBiayaController@saveEntry')->name('master-biaya-save-entry');
+    Route::post('delete/{id}', 'MasterBiayaController@destroy')->name('master-biaya-delete');
 });
 
 Route::prefix('master-wrapper')->group(function () {
     Route::get('/', 'MasterWrapperController@index')->name('master-wrapper-page');
     Route::get('entry/{id?}', 'MasterWrapperController@entry')->name('master-wrapper-entry');
     Route::post('save-entry/{id}', 'MasterWrapperController@saveEntry')->name('master-wrapper-save-entry');
+    Route::post('delete/{id}', 'MasterWrapperController@destroy')->name('master-wrapper-delete');
 });
 
 // Master
