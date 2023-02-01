@@ -25,7 +25,7 @@ class SessionController extends Controller
         }
         
         if ($request->session()->has('token')) {
-            return view('master')->with('user', $user);
+            return view('master')->with('user', $user)->with('pageTitle', 'dashboard');
         } else {
             return view('exceptions.forbidden');
         }

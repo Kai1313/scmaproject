@@ -50,6 +50,53 @@
                                     <label>Kode Akun</label>
                                     <input type="text" class="form-control" id="kodeAkun" placeholder="Masukkan kode akun">
                                 </div>
+                                <div class="form-group">
+                                    <label>Tipe Akun</label>
+                                    <select class="form-control select2" style="width: 100%;">
+                                        <option value="">Tanpa Tipe</option>
+                                        <option value="0">Neraca</option>
+                                        <option value="1">Laba Rugi</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Parent</label>
+                                    <select class="form-control select2" style="width: 100%;">
+                                        <option value="">Tanpa Parent</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Is Shown</label>
+                                    <select class="form-control select2" style="width: 100%;">
+                                        <option value="0">Tidak</option>
+                                        <option value="1">Tampil</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-xs-6">
+                                <div class="form-group">
+                                    <label>Header 1</label>
+                                    <select class="form-control select2" style="width: 100%;">
+                                        <option value="">Tanpa Header</option>
+                                        <option value="0">Neraca</option>
+                                        <option value="1">Laba Rugi</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Header 2</label>
+                                    <select class="form-control select2" style="width: 100%;">
+                                        <option value="">Tanpa Header</option>
+                                        <option value="0">Neraca</option>
+                                        <option value="1">Laba Rugi</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Header 3</label>
+                                    <select class="form-control select2" style="width: 100%;">
+                                        <option value="">Tanpa Header</option>
+                                        <option value="0">Neraca</option>
+                                        <option value="1">Laba Rugi</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </form>
