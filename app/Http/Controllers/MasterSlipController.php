@@ -12,13 +12,18 @@ class MasterSlipController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         $data = [
             "pageTitle"=>"SCA Accounting | Master Slip | List"
         ];
 
-        return view('accounting.master.slip.index', $data);
+        if ($request->session()->has('token')) {
+            return view('accounting.master.slip.index', $data);
+        }else{
+            return view('exceptions.forbidden');
+        }
+
     }
 
     /**
@@ -26,7 +31,7 @@ class MasterSlipController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
         $data_akun = DB::select('select * from master_akun');
 
@@ -35,7 +40,12 @@ class MasterSlipController extends Controller
             "data_akun" => $data_akun
         ];
 
-        return view('accounting.master.slip.form', $data);
+        if($request->session()->has('token')){
+            return view('accounting.master.slip.form', $data);
+        }else{
+            return view('exceptions.forbidden');
+        }
+
     }
 
     /**
@@ -55,13 +65,17 @@ class MasterSlipController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id = null)
+    public function show(Request $request, $id = null)
     {
         $data = [
             "pageTitle"=>"SCA Accounting | Master Slip | List"
         ];
 
-        return view('accounting.master.slip.detail', $data);
+        if($request->session()->has('token')){
+            return view('accounting.master.slip.detail', $data);
+        }else{
+            return view('exceptions.forbidden');
+        }
     }
 
     /**
@@ -70,7 +84,7 @@ class MasterSlipController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id = null)
+    public function edit(Request $request, $id = null)
     {
         $data_akun = DB::select('select * from master_akun');
 
@@ -79,7 +93,11 @@ class MasterSlipController extends Controller
             "data_akun" => $data_akun
         ];
 
-        return view('accounting.master.slip.form', $data);
+        if($request->session()->has('token')){
+            return view('accounting.master.slip.form', $data);
+        }else{
+            return view('exceptions.forbidden');
+        }
     }
 
     /**

@@ -16,8 +16,8 @@ use App\Http\Controllers\MasterSlipController;
 use App\Http\Controllers\MasterCoaController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/dashboard/{user_id?}', 'SessionController@index');
-Route::get('/logout', 'SessionController@logout');
+Route::get('/dashboard/{user_id?}', 'SessionController@index')->name('dashboard');
+Route::get('/logout', 'SessionController@logout')->name('logout');
 
 Route::get('/get-menu/{id}', 'DashboardController@getMenu')->name('get-menu');
 Route::get('/akun', function(){

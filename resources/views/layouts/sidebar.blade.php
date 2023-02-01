@@ -6,16 +6,20 @@
         <!-- Sidebar Menu -->
         <ul class="sidebar-menu" data-widget="tree">
             <li class="header">ACCOUNTING</li>
+            <li class="nav-item">
+                <a href="{{ route('dashboard') }}" class="{{ request()->segment(1) == 'dashboard' ? 'active' : null }}"><i class="fa fa-briefcase"></i> <span>Dashboard</span>
+                </a>
+            </li>
             <!-- Optionally, you can add icons to the links -->
-            <li class="treeview active">
+            <li class="treeview {{ request()->segment(1) == 'master' ? 'active' : null }}">
                 <a href="#"><i class="fa fa-link"></i> <span>Master</span>
                     <span class="pull-right-container">
                         <i class="fa fa-angle-left pull-right"></i>
                     </span>
                 </a>
                 <ul class="treeview-menu">
-                    <li class="active"><a href="{{ route('master-coa') }}">Master CoA</a></li>
-                    <li><a href="{{ route('master-slip') }}">Master Slip</a></li>
+                    <li class="{{ request()->segment(2) == 'coa' ? 'active' : null }}"><a href="{{ route('master-coa') }}">Master CoA</a></li>
+                    <li class="{{ request()->segment(2) == 'slip' ? 'active' : null }}"><a href="{{ route('master-slip') }}">Master Slip</a></li>
                 </ul>
             </li>
             <li class="treeview ">
