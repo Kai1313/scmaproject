@@ -1,10 +1,10 @@
-@extends('layouts.main')
+@extends('layouts.exception')
 
 @section('header')
 <section class="content-header">
     <h1>
-        Dashboard
-        <small>Welcome to SCA Accounting WebApp</small>
+        Thankyou
+        <small>For using SCA Accounting WebApp</small>
     </h1>
 </section>
 @endsection

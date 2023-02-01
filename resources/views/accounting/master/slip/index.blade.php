@@ -1,34 +1,105 @@
-<!DOCTYPE html>
-<!--
-This is a starter template page. Use this page to start your new project from
-scratch. This page gets rid of all links and provides the needed markup only.
--->
-<html>
-
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>SCA Accounting | Master Slip | List</title>
-    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-    @include('includes.styles')
-</head>
-
-<body class="hold-transition skin-blue sidebar-mini">
-    <div class="wrapper">
-        @include('layouts.navbar')
-        @include('layouts.sidebar')
-        <div class="content-wrapper">
-            @yield('header')
-
-            @yield('main-section')
+@extends('layouts.main')
+@section('addedStyles')
+    <!-- DataTables -->
+    <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css') }}">
+@endsection
+@section('header')
+    <section class="content-header">
+        <h1>
+            Master Slip
+            <small>Slip</small>
+        </h1>
+        <ol class="breadcrumb">
+            <li><a href="#"><i class="fa fa-dashboard"></i> Dashboard</a></li>
+            <li class="active">Master Slip</li>
+        </ol>
+    </section>
+@endsection
+@section('main-section')
+    <div class="content container-fluid">
+        <div class="row">
+            <div class="col-xs-12">
+                <a href="{{ route('master-slip-create') }}" class="btn btn-sm btn-success btn-flat pull-right"><span
+                        class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add Slip</a>
+            </div>
         </div>
-
-        @include('layouts.footer')
-        @include('layouts.control_sidebar')
-
-        <div class="control-sidebar-bg"></div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title">Slip List</h3>
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <table id="table_slip" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">Kode Slip</th>
+                                    <th class="text-center">Nama Slip</th>
+                                    <th class="text-center">Jenis Slip</th>
+                                    <th class="text-center">Akun COA</th>
+                                    <th class="text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>KAS-SBY xxx-xxx-xxx</td>
+                                    <td>KAS-SBY (AC: xxx-xxx-xxx)</td>
+                                    <td class="text-center">Kas</td>
+                                    <td>KAS-SBY (AC: xxx-xxx-xxx)</td>
+                                    <td class="text-center">
+                                        <a href="{{ route('master-slip-show') }}" class="btn btn-default">
+                                            <span class="glyphicon glyphicon-search" aria-hidden="true">
+                                        </a>
+                                        <a href="{{ route('master-slip-edit') }}" class="btn btn-warning">
+                                            <span class="glyphicon glyphicon-pencil" aria-hidden="true">
+                                        </a>
+                                        <a href="{{ route('master-slip-destroy') }}" class="btn btn-danger">
+                                            <span class="glyphicon glyphicon-trash" aria-hidden="true">
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>BCA-IDR xxx-xxx-xxx</td>
+                                    <td>BCA-IDR (AC: xxx-xxx-xxx)</td>
+                                    <td class="text-center">Bank</td>
+                                    <td>BCA-IDR (AC: xxx-xxx-xxx)</td>
+                                    <td class="text-center">
+                                        <a href="{{ route('master-slip-show') }}" class="btn btn-default">
+                                            <span class="glyphicon glyphicon-search" aria-hidden="true">
+                                        </a>
+                                        <a href="{{ route('master-slip-edit') }}" class="btn btn-warning">
+                                            <span class="glyphicon glyphicon-pencil" aria-hidden="true">
+                                        </a>
+                                        <a href="{{ route('master-slip-destroy') }}" class="btn btn-danger">
+                                            <span class="glyphicon glyphicon-trash" aria-hidden="true">
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+            </div>
+        </div>
     </div>
-    @include('includes.scripts')
-</body>
+@endsection
 
-</html>
+@section('addedScripts')
+    <!-- DataTables -->
+    <script src="{{ asset('assets/bower_components/datatables.net/js/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js') }}"></script>
+    <!-- SlimScroll -->
+    <script src="{{ asset('assets/bower_components/jquery-slimscroll/jquery.slimscroll.min.js') }}"></script>
+    <!-- FastClick -->
+    <script src="{{ asset('assets/bower_components/fastclick/lib/fastclick.js') }}"></script>
+@endsection
+
+@section('externalScripts')
+    <script>
+        $(function() {
+            $('#table_slip').DataTable()
+        })
+    </script>
+@endsection
