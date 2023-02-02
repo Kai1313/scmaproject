@@ -37,13 +37,9 @@
                                 <div class="form-group">
                                     <label>Cabang</label>
                                     <select class="form-control select2" style="width: 100%;">
-                                        <option selected="selected">Alabama</option>
-                                        <option>Alaska</option>
-                                        <option>California</option>
-                                        <option>Delaware</option>
-                                        <option>Tennessee</option>
-                                        <option>Texas</option>
-                                        <option>Washington</option>
+                                        @foreach ($data_cabang as $cabang)
+                                            <option value="{{ $cabang->id_cabang }}">{{ $cabang->kode_cabang.' - '.$cabang->nama_cabang }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
                                 <div class="form-group">
@@ -62,6 +58,9 @@
                                     <label>Parent</label>
                                     <select class="form-control select2" style="width: 100%;">
                                         <option value="">Tanpa Parent</option>
+                                        @foreach ($data_akun as $akun)
+                                            <option value="{{ $akun->id_akun }}">{{ $akun->kode_akun.' - '.$akun->nama_akun }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
                                 <div class="form-group">
@@ -115,6 +114,11 @@
 @section('externalScripts')
     <script>
         $(function () {
+            var select2Instance = $(selectNode).data('select2');
+            select2Instance.on('results:message', function(params){
+              this.dropdown._resizeDropdown();
+              this.dropdown._positionDropdown();
+            });
             $('.select2').select2()
         })
     </script>
