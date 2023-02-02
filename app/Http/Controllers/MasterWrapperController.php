@@ -13,7 +13,12 @@ class MasterWrapperController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = DB::table('master_wrapper')->select('*', 'dt_created as created_at')->latest()->get();
+            $data = DB::table('master_wrapper')->select('*', 'dt_created as created_at');
+            if (isset($request->c)) {
+                $data = $data->where('id_cabang', $request->c);
+            }
+
+            $data = $data->latest()->get();
             return Datatables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
@@ -25,7 +30,9 @@ class MasterWrapperController extends Controller
                 ->make(true);
         }
 
-        return view('ops.master.wrapper.index');
+        $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
+
+        return view('ops.master.wrapper.index', ['cabang' => $cabang]);
     }
 
     public function entry($id = 0)

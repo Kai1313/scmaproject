@@ -13,8 +13,13 @@
         <div class="panel-body">
             <div style="margin-bottom:10px;">
                 <a href="{{ route('master-wrapper-entry') }}" class="btn btn-primary">Tambah Data Pembungkus</a>
+                <br><br>
+                <select name="id_cabang" class="form-control" style="width:200px;">
+                    @foreach ($cabang as $branch)
+                        <option value="{{ $branch->id_cabang }}">{{ $branch->nama_cabang }}</option>
+                    @endforeach
+                </select>
             </div>
-
             <table class="table table-bordered data-table">
                 <thead>
                     <tr>
@@ -53,36 +58,38 @@
 @push('scripts')
     <script src="{{ asset('assets/bower_components/datatables.net/js/jquery.dataTables.min.js') }}"></script>
     <script>
-        $(function() {
-            var table = $('.data-table').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: "{{ route('master-wrapper-page') }}",
-                columns: [{
-                    data: 'nama_wrapper',
-                    name: 'nama_wrapper'
-                }, {
-                    data: 'weight',
-                    name: 'weight'
-                }, {
-                    data: 'path2',
-                    name: 'path2'
-                }, {
-                    data: 'catatan',
-                    name: 'catatan'
-                }, {
-                    data: 'action',
-                    name: 'action',
-                    orderable: false,
-                    searchable: false
-                }, ]
-            });
+        var table = $('.data-table').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: "{{ route('master-wrapper-page') }}" + "?c=" + $('[name="id_cabang"]').val(),
+            columns: [{
+                data: 'nama_wrapper',
+                name: 'nama_wrapper'
+            }, {
+                data: 'weight',
+                name: 'weight'
+            }, {
+                data: 'path2',
+                name: 'path2'
+            }, {
+                data: 'catatan',
+                name: 'catatan'
+            }, {
+                data: 'action',
+                name: 'action',
+                orderable: false,
+                searchable: false
+            }]
         });
 
         $(document).on('click', '.btn-destroy', function(e) {
             e.preventDefault()
             let route = $(this).prop('href')
             $('#approvalDelete').modal('show').find('form').attr('action', route)
+        })
+
+        $('[name="id_cabang"]').change(function() {
+            table.ajax.url("?c=" + $(this).val()).load()
         })
     </script>
 @endpush

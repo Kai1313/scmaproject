@@ -13,8 +13,13 @@
         <div class="panel-body">
             <div style="margin-bottom:10px;">
                 <a href="{{ route('master-biaya-entry') }}" class="btn btn-primary">Tambah Data Biaya</a>
+                <br><br>
+                <select name="id_cabang" class="form-control" style="width:200px;">
+                    @foreach ($cabang as $branch)
+                        <option value="{{ $branch->id_cabang }}">{{ $branch->nama_cabang }}</option>
+                    @endforeach
+                </select>
             </div>
-
             <table class="table table-bordered data-table">
                 <thead>
                     <tr>
@@ -56,45 +61,47 @@
 @push('scripts')
     <script src="{{ asset('assets/bower_components/datatables.net/js/jquery.dataTables.min.js') }}"></script>
     <script>
-        $(function() {
-            var table = $('.data-table').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: "{{ route('master-biaya-page') }}",
-                columns: [{
-                    data: 'nama_biaya',
-                    name: 'nama_biaya'
-                }, {
-                    data: 'akun_biaya',
-                    name: 'akun_biaya'
-                }, {
-                    data: 'isppn',
-                    name: 'isppn'
-                }, {
-                    data: 'ispph',
-                    name: 'ispph'
-                }, {
-                    data: 'value_pph',
-                    name: 'value_pph'
-                }, {
-                    data: 'akun_pph',
-                    name: 'akun_pph'
-                }, {
-                    data: 'aktif',
-                    name: 'aktif'
-                }, {
-                    data: 'action',
-                    name: 'action',
-                    orderable: false,
-                    searchable: false
-                }, ]
-            });
+        var table = $('.data-table').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: "{{ route('master-biaya-page') }}?c=" + $('[name="id_cabang"]').val(),
+            columns: [{
+                data: 'nama_biaya',
+                name: 'nama_biaya'
+            }, {
+                data: 'akun_biaya',
+                name: 'akun_biaya'
+            }, {
+                data: 'isppn',
+                name: 'isppn'
+            }, {
+                data: 'ispph',
+                name: 'ispph'
+            }, {
+                data: 'value_pph',
+                name: 'value_pph'
+            }, {
+                data: 'akun_pph',
+                name: 'akun_pph'
+            }, {
+                data: 'aktif',
+                name: 'aktif'
+            }, {
+                data: 'action',
+                name: 'action',
+                orderable: false,
+                searchable: false
+            }, ]
         });
 
         $(document).on('click', '.btn-destroy', function(e) {
             e.preventDefault()
             let route = $(this).prop('href')
             $('#approvalDelete').modal('show').find('form').attr('action', route)
+        })
+
+        $('[name="id_cabang"]').change(function() {
+            table.ajax.url("?c=" + $(this).val()).load()
         })
     </script>
 @endpush

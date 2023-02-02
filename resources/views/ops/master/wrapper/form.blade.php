@@ -60,6 +60,10 @@
                                     </div>
                                 </div>
                                 <div class="row">
+                                    @if ($data && $data->path)
+                                        {{ asset('storage/' . $data->path) }}
+                                        <img src="{{ asset('storage/' . $data->path) }}" alt="">
+                                    @endif
                                     <label class="col-md-3">Gambar</label>
                                     <div class="col-md-5">
                                         <input type="file" class="form-control" name="file_upload" accept=".png,.jpeg">

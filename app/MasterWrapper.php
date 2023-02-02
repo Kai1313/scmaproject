@@ -18,29 +18,20 @@ class MasterWrapper extends Model
     {
         if (isset($req->file_upload)) {
             $media = $req->file('file_upload');
-            // $size = $media->getClientSize();
-            // $type = explode('/', $media->getClientMimeType())[0];
             $name = date('Ymd') . str_random(4);
             $ext = strtolower($media->getClientOriginalExtension());
             $fileName = $name . '.' . $ext;
 
-            \Storage::disk('ftp')->put($fileName, fopen($media, 'r+'));
-            // $media->move($folder['folder_path'], $mainpath);
+            \Storage::put($fileName, file_get_contents($req->file_upload));
 
-            // $newpath = $folder['path'] . '/' . $mainpath;
-            // $res = $this->mediaSave($media, $type, $newpath, $size);
-            // $setCrops = Setting::where('type', 'handle-image')->where('status', '1')->get();
-            // if (sizeof($setCrops) > 0) {
-            //     foreach ($setCrops as $set) {
-            //         $newImg = \Image::make(public_path($newpath));
-            //         $path = $name . '-' . $set->key . '.' . $ext;
-            //         $un = unserialize($set->value);
-            //         $newImg->fit($un['width'], $un['height']);
-            //         $newImg->save($folder['folder_path'] . '/' . $path);
-            //     }
-            // }
+            // $fileName2 = $name . '-mini.' . $ext;
+            // $newImg = \Image::make($image)->fit(100, 100);
+            // \Storage::disk('public')->put($fileName2, $newImg);
+
+            // $newImg->save($folder['folder_path'] . '/' . $path);
 
             $data->path = $fileName;
+            // $data->path2 = $fileName2;
             $data->save();
         }
     }

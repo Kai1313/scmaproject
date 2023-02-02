@@ -15,8 +15,12 @@ class MasterBiayaController extends Controller
         if ($request->ajax()) {
             $data = DB::table('master_biaya as mb')->select('*', 'mb.dt_created as created_at', 'ma.nama_akun as akun_biaya', 'man.nama_akun as akun_pph')
                 ->leftJoin('master_akun as ma', 'id_akun_biaya', '=', 'ma.id_akun')
-                ->leftJoin('master_akun as man', 'id_akun_pph', '=', 'man.id_akun')
-                ->latest()->get();
+                ->leftJoin('master_akun as man', 'id_akun_pph', '=', 'man.id_akun');
+            if (isset($request->c)) {
+                $data = $data->where('mb.id_cabang', $request->c);
+            }
+
+            $data = $data->latest()->get();
             return Datatables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
@@ -37,7 +41,9 @@ class MasterBiayaController extends Controller
                 ->make(true);
         }
 
-        return view('ops.master.biaya.index');
+        $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
+
+        return view('ops.master.biaya.index', ['cabang' => $cabang]);
     }
 
     public function entry($id = 0)
@@ -97,6 +103,6 @@ class MasterBiayaController extends Controller
 
         $data->delete();
 
-        return redirect()->route('master-wrapper-page');
+        return redirect()->route('master-biaya-page');
     }
 }
