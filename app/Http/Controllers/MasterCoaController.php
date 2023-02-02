@@ -98,7 +98,20 @@ class MasterCoaController extends Controller
      */
     public function show($id)
     {
-        //
+        // Get data for select
+        $data_cabang = Cabang::all();
+        $data_akun = Akun::all();
+
+        // Get data akun
+        $akun = Akun::find($id);
+
+        $data = [
+            "pageTitle"=>"SCA Accounting | Master CoA | Show",
+            "data_cabang"=>$data_cabang,
+            "data_akun"=>$data_akun,
+            "akun"=>$akun
+        ];
+        return view('accounting.master.coa.form', $data);
     }
 
     /**
@@ -109,7 +122,20 @@ class MasterCoaController extends Controller
      */
     public function edit($id)
     {
-        //
+        // Get data for select
+        $data_cabang = Cabang::all();
+        $data_akun = Akun::all();
+
+        // Get data akun
+        $akun = Akun::find($id);
+
+        $data = [
+            "pageTitle"=>"SCA Accounting | Master CoA | Edit",
+            "data_cabang"=>$data_cabang,
+            "data_akun"=>$data_akun,
+            "akun"=>$akun
+        ];
+        return view('accounting.master.coa.form', $data);
     }
 
     /**
