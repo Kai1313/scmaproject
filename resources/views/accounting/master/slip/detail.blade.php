@@ -31,7 +31,7 @@
             <div class="col-xs-12">
                 <div class="box box-primary">
                     <div class="box-header">
-                        <h3 class="box-title">Slip <span class="text-muted">KAS-SBY xxx-xxx-xxx</span></h3>
+                        <h3 class="box-title">Slip <span class="text-muted">{{$data_slip->id_slip}}</span></h3>
                     </div>
                     <div class="box-body">
                         <div class="row">
@@ -41,7 +41,7 @@
                                         <label>Kode Slip</label>
                                     </div>
                                     <div class="col-md-9">
-                                        <p class="nomarg">KAS-SBY xxx-xxx-xxx</p>
+                                        <p class="nomarg">{{$data_slip->kode_slip}}</p>
                                     </div>
                                 </div>
                                 <div class="row">
@@ -49,7 +49,15 @@
                                         <label>Nama Slip</label>
                                     </div>
                                     <div class="col-md-9">
-                                        <p class="nomarg">KAS-SBY (AC: xxx-xxx-xxx)</p>
+                                        <p class="nomarg">{{$data_slip->nama_slip}}</p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <label>Cabang</label>
+                                    </div>
+                                    <div class="col-md-9">
+                                        <p class="nomarg">{{$data_slip->kode_cabang}} - {{ $data_slip->nama_cabang }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -59,7 +67,23 @@
                                         <label>Jenis Slip</label>
                                     </div>
                                     <div class="col-md-9">
-                                        <p class="nomarg">Kas</p>
+                                        <p class="nomarg">
+                                            @switch($data_slip->jenis_slip)
+                                                @case(0)
+                                                    Kas
+                                                    @break
+                                                @case(1)
+                                                    Bank
+                                                    @break
+                                                @case(2)
+                                                    Piutang Dagang
+                                                    @break
+                                                @case(3)
+                                                    Hutang Dagang
+                                                    @break
+                                                @default
+                                            @endswitch
+                                        </p>
                                     </div>
                                 </div>
                                 <div class="row">
@@ -67,7 +91,7 @@
                                         <label>Akun</label>
                                     </div>
                                     <div class="col-md-9">
-                                        <p class="nomarg">KAS-SBY (AC: xxx-xxx-xxx)</p>
+                                        <p class="nomarg">{{$data_slip->nama_akun}}</p>
                                     </div>
                                 </div>
                             </div>

@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Slip;
 use Illuminate\Http\Request;
 use DB;
+use Log;
 
 class MasterSlipController extends Controller
 {
@@ -14,16 +16,18 @@ class MasterSlipController extends Controller
      */
     public function index(Request $request)
     {
+        $data_slip = Slip::join('master_akun', 'master_slip.id_akun', '=', 'master_akun.id_akun')->select('master_slip.*', 'master_akun.nama_akun')->get();
+
         $data = [
-            "pageTitle"=>"SCA Accounting | Master Slip | List"
+            "pageTitle" => "SCA Accounting | Master Slip | List",
+            "data_slip" => $data_slip
         ];
 
         if ($request->session()->has('token')) {
             return view('accounting.master.slip.index', $data);
-        }else{
+        } else {
             return view('exceptions.forbidden');
         }
-
     }
 
     /**
@@ -34,18 +38,19 @@ class MasterSlipController extends Controller
     public function create(Request $request)
     {
         $data_akun = DB::select('select * from master_akun');
+        $data_cabang = DB::select('select * from cabang where status_cabang = 1');
 
         $data = [
             "pageTitle" => "SCA Accounting | Master Slip | Create",
-            "data_akun" => $data_akun
+            "data_akun" => $data_akun,
+            "data_cabang" => $data_cabang
         ];
 
-        if($request->session()->has('token')){
+        if ($request->session()->has('token')) {
             return view('accounting.master.slip.form', $data);
-        }else{
+        } else {
             return view('exceptions.forbidden');
         }
-
     }
 
     /**
@@ -56,7 +61,51 @@ class MasterSlipController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            //code...
+            DB::beginTransaction();
+            $request->validate([
+                'kode_slip' => 'required',
+                'nama_slip' => 'required',
+                'jenis_slip' => 'required',
+                'id_akun' => 'required',
+                'cabang_input' => 'required',
+            ]);
+
+            $new_slip = new Slip();
+            $new_slip->id_cabang = $request->cabang_input;
+            $new_slip->kode_slip = $request->kode_slip;
+            $new_slip->nama_slip = $request->nama_slip;
+            $new_slip->jenis_slip = $request->jenis_slip;
+            $new_slip->id_akun = $request->id_akun;
+
+            if (!$new_slip->save()) {
+                DB::rollback();
+                Log::error("Failed when saving data slip");
+                return response()->json([
+                    "result" => FALSE,
+                    "message" => "Error when saving data slip"
+                ]);
+            }
+
+            DB::commit();
+
+            $data = [
+                'result' => true,
+                'message' => 'Success save ' . $request->nama_slip
+            ];
+
+            return response()->json($data);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::debug(json_encode($request->all()));
+            $data = [
+                'result' => false,
+                'message' => 'Failed when saving data slip ' . $e
+            ];
+
+            return response()->json($data);
+        }
     }
 
     /**
@@ -67,13 +116,18 @@ class MasterSlipController extends Controller
      */
     public function show(Request $request, $id = null)
     {
+        $data_slip = Slip::join('master_akun', 'master_slip.id_akun', 'master_akun.id_akun')
+            ->join('cabang', 'cabang.id_cabang', 'master_slip.id_cabang')
+            ->where('id_slip', $id)
+            ->select('master_slip.*', 'master_akun.nama_akun', 'cabang.kode_cabang', 'cabang.nama_cabang')->first();
         $data = [
-            "pageTitle"=>"SCA Accounting | Master Slip | List"
+            "pageTitle" => "SCA Accounting | Master Slip | List",
+            "data_slip" => $data_slip
         ];
 
-        if($request->session()->has('token')){
+        if ($request->session()->has('token')) {
             return view('accounting.master.slip.detail', $data);
-        }else{
+        } else {
             return view('exceptions.forbidden');
         }
     }
@@ -87,15 +141,19 @@ class MasterSlipController extends Controller
     public function edit(Request $request, $id = null)
     {
         $data_akun = DB::select('select * from master_akun');
+        $data_slip = Slip::join('master_akun', 'master_slip.id_akun', 'master_akun.id_akun')->where('id_slip', $id)->select('master_slip.*', 'master_akun.nama_akun')->first();
+        $data_cabang = DB::select('select * from cabang where status_cabang = 1');
 
         $data = [
             "pageTitle" => "SCA Accounting | Master Slip | Create",
-            "data_akun" => $data_akun
+            "data_akun" => $data_akun,
+            "data_slip" => $data_slip,
+            "data_cabang" => $data_cabang
         ];
 
-        if($request->session()->has('token')){
+        if ($request->session()->has('token')) {
             return view('accounting.master.slip.form', $data);
-        }else{
+        } else {
             return view('exceptions.forbidden');
         }
     }
@@ -104,12 +162,63 @@ class MasterSlipController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+        // try {
+        //code...
+        DB::beginTransaction();
+        $request->validate([
+            'kode_slip' => 'required',
+            'nama_slip' => 'required',
+            'jenis_slip' => 'required',
+            'id_akun' => 'required',
+            'cabang_input' => 'required',
+        ]);
+
+        $new_slip = Slip::find($request->id_slip);
+        if ($new_slip) {
+            $new_slip->id_cabang = $request->cabang_input;
+            $new_slip->kode_slip = $request->kode_slip;
+            $new_slip->nama_slip = $request->nama_slip;
+            $new_slip->jenis_slip = $request->jenis_slip;
+            $new_slip->id_akun = $request->id_akun;
+
+            if (!$new_slip->save()) {
+                DB::rollback();
+                Log::error("Failed when saving data slip");
+                return response()->json([
+                    "result" => FALSE,
+                    "message" => "Error when saving data slip"
+                ]);
+            }
+
+            DB::commit();
+
+            $data = [
+                'result' => true,
+                'message' => 'Success save ' . $request->nama_slip
+            ];
+        } else {
+            DB::rollback();
+            $data = [
+                'result' => false,
+                'message' => "Can't find slip " . $request->id_slip
+            ];
+        }
+
+        return response()->json($data);
+        // } catch (\Exception $e) {
+        //     DB::rollback();
+        //     Log::debug(json_encode($request->all()));
+        //     $data = [
+        //         'result' => false,
+        //         'message' => 'Failed when saving data slip ' . $e
+        //     ];
+
+        //     return response()->json($data);
+        // }
     }
 
     /**
@@ -120,6 +229,112 @@ class MasterSlipController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $data_journal_header = DB::select('select * from jurnal_header where id_slip = ' . $id);
+        $data_slip = Slip::find($id);
+        if (!empty($data_journal_header)) {
+            return back()->with("failed", "Maaf, tidak bisa menghapus slip" . $data_slip->kode_slip . "karena sudah digunakan pada jurnal");
+        }
+
+        Slip::find($id)->delete();
+        return back()->with("success", "Berhasil menghapus slip " .  $data_slip->kode_slip);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function populate(Request $request)
+    {
+        $offset = $request->start;
+        $limit = $request->length;
+        $keyword = $request->search['value'];
+        $sort = [];
+
+        foreach($request->order as $key => $order){
+            $columnIdx = $order['column'];
+            $sortDir = $order['dir'];
+            $sort[] = [
+                'column' => $request->columns[$columnIdx]['name'],
+                'dir' => $sortDir
+            ];
+        }
+
+        $draw = $request->draw;
+        $current_page = $offset/$limit +1;
+
+        $data_slip = Slip::join('master_akun', 'master_akun.id_akun', 'master_slip.id_akun')
+                ->select('master_slip.*', 'master_akun.nama_akun', DB::raw('
+                    (CASE
+                        WHEN jenis_slip = 0 THEN "Kas"
+                        WHEN jenis_slip = 1 THEN "Bank"
+                        WHEN jenis_slip = 2 THEN "Piutang Dagang"
+                        WHEN jenis_slip = 3 THEN "Hutang Dagang"
+                    END) as jenis_name
+                '));
+
+        $data_slip_table = DB::table(DB::raw('(' . $data_slip->toSql() . ') as master_slip'));
+
+        Log::debug(json_encode($data_slip_table));
+
+        if(!empty($keyword)){
+            $data_slip_table->where(function ($query) use($keyword, $fields){
+                $query->orWhere('kode_slip', 'LIKE', "%$keyword%")
+                    ->orWhere('nama_slip', 'LIKE', "%$keyword%")
+                    ->orWhere('jenis_name', 'LIKE', "%$keyword%")
+                    ->orWhere('nama_akun', 'LIKE', "%$keyword%");
+            });
+        }
+
+        $filtered_data = $data_slip_table->get();
+
+        if($sort){
+            if(!is_array($sort)){
+                $message = "Invalid array for parameter sort";
+                $data = [
+                    'result' => false,
+                    'message' => $message
+                ];
+                return response()->json($data);
+            }
+
+            foreach($sort as $key => $s){
+                $column = $s['column'];
+                $directon = $s['dir'];
+                $data_slip_table->orderBy($column, $directon);
+            }
+        }else{
+            $data_slip_table->orderBy('kode_slip', 'ASC');
+        }
+
+        // pagination
+        if($current_page){
+            Log::debug('masuk sini');
+            $page = $current_page;
+            $limit_data = $data_slip_table->count();
+
+            if($limit){
+                $limit_data = $limit;
+            }
+
+            $offset = ($page - 1) * $limit_data;
+            if($offset < 0){
+                $offset = 0;
+            }
+
+            Log::debug($offset);
+            Log::debug($limit_data);
+
+            $data_slip_table->skip($offset)->take($limit_data);
+        }
+
+
+        $table['draw'] = $draw;
+        $table['recordsTotal'] = $data_slip_table->count();
+        $table['recordsFiltered'] = $filtered_data->count();
+        $table['data'] = $data_slip_table->get();
+
+        // Log::debug($data_slip_table->get());
+        return json_encode($table);
     }
 }
