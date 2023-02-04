@@ -278,7 +278,7 @@ class MasterSlipController extends Controller
         Log::debug(json_encode($data_slip_table));
 
         if(!empty($keyword)){
-            $data_slip_table->where(function ($query) use($keyword, $fields){
+            $data_slip_table->where(function ($query) use($keyword){
                 $query->orWhere('kode_slip', 'LIKE', "%$keyword%")
                     ->orWhere('nama_slip', 'LIKE', "%$keyword%")
                     ->orWhere('jenis_name', 'LIKE', "%$keyword%")
