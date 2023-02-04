@@ -19,6 +19,7 @@ class MasterWrapperController extends Controller
             }
 
             $data = $data->latest()->get();
+
             return Datatables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
@@ -26,7 +27,14 @@ class MasterWrapperController extends Controller
                     $btn .= '<a href="' . route('master-wrapper-delete', $row->id_wrapper) . '" class="btn btn-danger btn-sm btn-destroy">Delete</a>';
                     return $btn;
                 })
-                ->rawColumns(['action'])
+                ->editColumn('path2', function ($row) use ($request) {
+                    if ($request->show_img == "true") {
+                        return '<img src="' . env('FTP_GET_FILE') . $row->path . '" width="100">';
+                    } else {
+                        return '<span style="color:#a9a9a9;">Gambar tidak ditampilkan</span>';
+                    }
+                })
+                ->rawColumns(['action', 'path2'])
                 ->make(true);
         }
 
@@ -80,6 +88,13 @@ class MasterWrapperController extends Controller
         $data = MasterWrapper::find($id);
         if (!$data) {
             return response()->json(['message' => 'data tidak ditemukan'], 500);
+        }
+
+        if ($data && $data->path) {
+            $check = \Storage::exists($data->path);
+            if ($check) {
+                \Storage::delete($data->path);
+            }
         }
 
         $data->delete();

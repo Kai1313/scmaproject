@@ -19,14 +19,15 @@
                         <option value="{{ $branch->id_cabang }}">{{ $branch->nama_cabang }}</option>
                     @endforeach
                 </select>
+                Tampilkan Gambar <input type="checkbox" name="show_image">
             </div>
             <table class="table table-bordered data-table">
                 <thead>
                     <tr>
                         <th>Nama Pembungkus</th>
                         <th>Berat</th>
-                        <th>Gambar</th>
                         <th>Catatan</th>
+                        <th>Gambar</th>
                         <th width="150px">Action</th>
                     </tr>
                 </thead>
@@ -61,7 +62,8 @@
         var table = $('.data-table').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route('master-wrapper-page') }}" + "?c=" + $('[name="id_cabang"]').val(),
+            ajax: "{{ route('master-wrapper-page') }}" + "?c=" + $('[name="id_cabang"]').val() + '&show_img=' + $(
+                '[name="show_image"]').is(':checked'),
             columns: [{
                 data: 'nama_wrapper',
                 name: 'nama_wrapper'
@@ -69,11 +71,11 @@
                 data: 'weight',
                 name: 'weight'
             }, {
-                data: 'path2',
-                name: 'path2'
-            }, {
                 data: 'catatan',
                 name: 'catatan'
+            }, {
+                data: 'path2',
+                name: 'path2'
             }, {
                 data: 'action',
                 name: 'action',
@@ -89,7 +91,13 @@
         })
 
         $('[name="id_cabang"]').change(function() {
-            table.ajax.url("?c=" + $(this).val()).load()
+            table.ajax.url("?c=" + $('[name="id_cabang"]').val() + '&show_img=' + $('[name="show_image"]').is(
+                ':checked')).load()
+        })
+
+        $('[name="show_image"]').change(function() {
+            table.ajax.url("?c=" + $('[name="id_cabang"]').val() + '&show_img=' + $('[name="show_image"]').is(
+                ':checked')).load()
         })
     </script>
 @endpush

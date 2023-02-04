@@ -60,12 +60,12 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    @if ($data && $data->path)
-                                        {{ asset('storage/' . $data->path) }}
-                                        <img src="{{ asset('storage/' . $data->path) }}" alt="">
-                                    @endif
                                     <label class="col-md-3">Gambar</label>
                                     <div class="col-md-5">
+                                        @if ($data && $data->path)
+                                            <img src="{{ env('FTP_GET_FILE') . $data->path }}" alt="" width="100">
+                                        @endif
+                                        <br>
                                         <input type="file" class="form-control" name="file_upload" accept=".png,.jpeg">
                                     </div>
                                 </div>

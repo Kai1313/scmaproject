@@ -17,12 +17,21 @@ class MasterWrapper extends Model
     public function uploadfile($req, $data)
     {
         if (isset($req->file_upload)) {
-            $media = $req->file('file_upload');
-            $name = date('Ymd') . str_random(4);
-            $ext = strtolower($media->getClientOriginalExtension());
-            $fileName = $name . '.' . $ext;
+            // if ($data && $data->path) {
+            //     $check = \Storage::exists($data->path);
+            //     dd(Storage::disk('ftp')->exists($data->path));
 
-            \Storage::put($fileName, file_get_contents($req->file_upload));
+            //     if ($check) {
+            //         Storage::delete([$data->path, $data->path2]);
+            //     }
+            // }
+
+            $media = $req->file('file_upload');
+            $name = uniqid();
+            $ext = strtolower($media->getClientOriginalExtension());
+            $fileName = ($data->path ? $data->path : $name . '.' . $ext);
+
+            \Storage::put($fileName, fopen($media, 'r+'));
 
             // $fileName2 = $name . '-mini.' . $ext;
             // $newImg = \Image::make($image)->fit(100, 100);

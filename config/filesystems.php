@@ -69,7 +69,20 @@ return [
             'host' => env('FTP_HOST'),
             'username' => env('FTP_USERNAME'),
             'password' => env('FTP_PASSWORD'),
-            'root' => '/var/www/html/development/accounting/uploads', // for example: /var/www/html/dev/images
+            'root' => env('FTP_ROOT'),
+            'visibility' => 'public',
+            'permPublic' => 0555,
+            // 'permissions' => [
+            //     'file' => [
+            //         'public' => 0555,
+            //         'private' => 0555,
+            //     ],
+            //     'dir' => [
+            //         'public' => 0555,
+            //         'private' => 0555,
+            //     ],
+            // ],
+
         ],
 
     ],
