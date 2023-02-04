@@ -9,6 +9,13 @@
 @endsection
 
 @section('main-section')
+    @if (session()->has('success'))
+        <div class="alert alert-success">
+            <ul>
+                <li>{!! session()->get('success') !!}</li>
+            </ul>
+        </div>
+    @endif
     @if (count($errors) > 0)
         <div class="alert alert-danger">
             <strong>Whoops!</strong> There were some problems with your input.<br><br>

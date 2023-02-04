@@ -21,6 +21,13 @@
                 </select>
                 Tampilkan Gambar <input type="checkbox" name="show_image">
             </div>
+            @if (session()->has('success'))
+                <div class="alert alert-success">
+                    <ul>
+                        <li>{!! session()->get('success') !!}</li>
+                    </ul>
+                </div>
+            @endif
             <table class="table table-bordered data-table">
                 <thead>
                     <tr>

@@ -13,12 +13,13 @@ class MasterWrapperController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = DB::table('master_wrapper')->select('*', 'dt_created as created_at');
+            $data = DB::table('master_wrapper')
+                ->select('id_wrapper', 'nama_wrapper', 'weight', 'catatan', 'path2', 'path', 'dt_created as created_at');
             if (isset($request->c)) {
                 $data = $data->where('id_cabang', $request->c);
             }
 
-            $data = $data->latest()->get();
+            $data = $data->orderBy('master_wrapper.dt_created', 'desc');
 
             return Datatables::of($data)
                 ->addIndexColumn()
@@ -29,7 +30,7 @@ class MasterWrapperController extends Controller
                 })
                 ->editColumn('path2', function ($row) use ($request) {
                     if ($request->show_img == "true") {
-                        return '<img src="' . env('FTP_GET_FILE') . $row->path . '" width="100">';
+                        return '<img src="' . env('FTP_GET_FILE') . $row->path2 . '" width="100">';
                     } else {
                         return '<span style="color:#a9a9a9;">Gambar tidak ditampilkan</span>';
                     }
@@ -80,7 +81,9 @@ class MasterWrapperController extends Controller
 
         $data->uploadfile($request, $data);
 
-        return redirect()->route('master-wrapper-entry', $data->id_wrapper);
+        return redirect()
+            ->route('master-wrapper-entry', $data->id_wrapper)
+            ->with('success', 'Data berhasil tersimpan');
     }
 
     public function destroy(Request $request, $id)
@@ -91,14 +94,12 @@ class MasterWrapperController extends Controller
         }
 
         if ($data && $data->path) {
-            $check = \Storage::exists($data->path);
-            if ($check) {
-                \Storage::delete($data->path);
-            }
+            \Storage::delete([$data->path, $data->path2]);
         }
 
         $data->delete();
-
-        return redirect()->route('master-wrapper-page');
+        return redirect()
+            ->route('master-wrapper-page')
+            ->with('success', 'Data berhasil terhapus');
     }
 }

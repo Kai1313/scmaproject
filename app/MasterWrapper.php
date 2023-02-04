@@ -16,32 +16,27 @@ class MasterWrapper extends Model
 
     public function uploadfile($req, $data)
     {
-        if (isset($req->file_upload)) {
-            // if ($data && $data->path) {
-            //     $check = \Storage::exists($data->path);
-            //     dd(Storage::disk('ftp')->exists($data->path));
+        if ($req->image_path) {
+            if ($data->path) {
+                \Storage::delete([$data->path, $data->path2]);
+            }
 
-            //     if ($check) {
-            //         Storage::delete([$data->path, $data->path2]);
-            //     }
-            // }
-
-            $media = $req->file('file_upload');
+            $explode = explode(";base64,", $req->image_path);
+            $media = base64_decode($explode[1]);
+            $media2 = base64_decode($explode[1]);
             $name = uniqid();
-            $ext = strtolower($media->getClientOriginalExtension());
-            $fileName = ($data->path ? $data->path : $name . '.' . $ext);
+            $fileName = ($data->path ? $data->path : $name);
+            \Storage::put($fileName, $media);
 
-            \Storage::put($fileName, fopen($media, 'r+'));
-
-            // $fileName2 = $name . '-mini.' . $ext;
-            // $newImg = \Image::make($image)->fit(100, 100);
-            // \Storage::disk('public')->put($fileName2, $newImg);
-
-            // $newImg->save($folder['folder_path'] . '/' . $path);
+            $fileName2 = ($data->path2 ? $data->path2 : $name . '-thumbnail');
+            $newImg = \Image::make($media2)->fit(150);
+            \Storage::put($fileName2, (string) $newImg->encode());
 
             $data->path = $fileName;
-            // $data->path2 = $fileName2;
+            $data->path2 = $fileName2;
             $data->save();
         }
+
+        return ['status' => 'success'];
     }
 }

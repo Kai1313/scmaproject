@@ -7,6 +7,13 @@
 @section('main-section')
     <div class="panel">
         <div class="panel-body">
+            @if (session()->has('success'))
+                <div class="alert alert-success">
+                    <ul>
+                        <li>{!! session()->get('success') !!}</li>
+                    </ul>
+                </div>
+            @endif
             @if (count($errors) > 0)
                 <div class="alert alert-danger">
                     <strong>Whoops!</strong> There were some problems with your input.<br><br>
@@ -63,10 +70,17 @@
                                     <label class="col-md-3">Gambar</label>
                                     <div class="col-md-5">
                                         @if ($data && $data->path)
-                                            <img src="{{ env('FTP_GET_FILE') . $data->path }}" alt="" width="100">
+                                            <a href="{{ env('FTP_GET_FILE') . $data->path }}" target="_blank">
+                                                <img src="{{ env('FTP_GET_FILE') . $data->path2 }}" alt=""
+                                                    width="100" id="uploadPreview1">
+                                            </a>
+                                        @else
+                                            <img alt="" width="100" id="uploadPreview1">
                                         @endif
                                         <br>
-                                        <input type="file" class="form-control" name="file_upload" accept=".png,.jpeg">
+                                        <input id="f_image" type="file" class="form-control" name="file_upload"
+                                            accept=".png,.jpeg">
+                                        <input type="hidden" name="image_path">
                                     </div>
                                 </div>
                             </div>
@@ -83,3 +97,44 @@
     </div>
 
 @endsection
+
+@push('scripts')
+    <script>
+        $('[name="file_upload"]').change(function() {
+            let oFReader = new FileReader();
+            let file = document.getElementById("f_image").files[0];
+            if (file.type.match(/image.*/)) {
+                let reader = new FileReader();
+                reader.onload = function(readerEvent) {
+                    let image = new Image();
+                    image.onload = function(imageEvent) {
+                        let canvas = document.createElement('canvas'),
+                            max_size = 1000,
+                            width = image.width,
+                            height = image.height;
+                        if (width > height) {
+                            if (width > max_size) {
+                                height *= max_size / width;
+                                width = max_size;
+                            }
+                        } else {
+                            if (height > max_size) {
+                                width *= max_size / height;
+                                height = max_size;
+                            }
+                        }
+                        canvas.width = width;
+                        canvas.height = height;
+                        canvas.getContext('2d').drawImage(image, 0, 0, width, height);
+                        let dataUrl = canvas.toDataURL('image/jpeg');
+                        $('[name="image_path"]').val(dataUrl)
+                        $('[name="file_upload"]').val('')
+                        document.getElementById("uploadPreview1").src = dataUrl;
+                    }
+                    image.src = readerEvent.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        })
+    </script>
+@endpush

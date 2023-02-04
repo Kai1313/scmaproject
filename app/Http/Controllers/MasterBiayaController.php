@@ -13,14 +13,15 @@ class MasterBiayaController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = DB::table('master_biaya as mb')->select('*', 'mb.dt_created as created_at', 'ma.nama_akun as akun_biaya', 'man.nama_akun as akun_pph')
+            $data = DB::table('master_biaya as mb')
+                ->select('id_biaya', 'nama_biaya', 'ispph', 'isppn', 'value_pph', 'aktif', 'mb.dt_created as created_at', 'ma.nama_akun as akun_biaya', 'man.nama_akun as akun_pph')
                 ->leftJoin('master_akun as ma', 'id_akun_biaya', '=', 'ma.id_akun')
                 ->leftJoin('master_akun as man', 'id_akun_pph', '=', 'man.id_akun');
             if (isset($request->c)) {
                 $data = $data->where('mb.id_cabang', $request->c);
             }
 
-            $data = $data->latest()->get();
+            $data = $data->orderBy('created_at', 'asc');
             return Datatables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
@@ -91,7 +92,9 @@ class MasterBiayaController extends Controller
         $data['aktif'] = isset($request->aktif) ? $request->aktif : 0;
         $data->save();
 
-        return redirect()->route('master-biaya-entry', $data->id_biaya);
+        return redirect()
+            ->route('master-biaya-entry', $data->id_biaya)
+            ->with('success', 'Data berhasil tersimpan');
     }
 
     public function destroy(Request $request, $id)
@@ -103,6 +106,8 @@ class MasterBiayaController extends Controller
 
         $data->delete();
 
-        return redirect()->route('master-biaya-page');
+        return redirect()
+            ->route('master-biaya-page')
+            ->with('success', 'Data berhasil terhapus');
     }
 }
