@@ -20,7 +20,7 @@
 <section class="content container-fluid">
     <div class="row">
         <div class="col-xs-12">
-            <a href="{{ route('master-coa-create') }}" class="btn btn-sm btn-success btn-flat pull-right">Add CoA</a>
+            <a href="{{ route('master-coa-create') }}" class="btn btn-sm btn-success btn-flat pull-right">Tambah CoA</a>
         </div>
     </div>
     <div class="row">

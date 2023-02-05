@@ -42,5 +42,8 @@ Route::get('/master/coa/form/create', 'MasterCoaController@create')->name('maste
 Route::get('/master/coa/form/edit/{id}', 'MasterCoaController@edit')->name('master-coa-edit');
 Route::get('/master/coa/form/show/{id}', 'MasterCoaController@show')->name('master-coa-show');
 Route::post('/master/coa/store', 'MasterCoaController@store')->name('master-coa-store');
-Route::post('/master/coa/update', 'MasterCoaController@update')->name('master-coa-update');
+Route::post('/master/coa/update/{id}', 'MasterCoaController@update')->name('master-coa-update');
 Route::get('/master/coa/destroy/{id}', 'MasterCoaController@destroy')->name('master-coa-destroy');
+Route::get('/master/coa/get_header1', 'MasterCoaController@get_header1')->name('master-coa-header1');
+Route::get('/master/coa/get_header2', 'MasterCoaController@get_header2')->name('master-coa-header2');
+Route::get('/master/coa/get_header3', 'MasterCoaController@get_header3')->name('master-coa-header3');

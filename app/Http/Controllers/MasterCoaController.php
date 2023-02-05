@@ -33,7 +33,7 @@ class MasterCoaController extends Controller
         // Get data for select
         $data_cabang = Cabang::all();
         $data_akun = Akun::all();
-
+        // dd($akun);
         $data = [
             "pageTitle"=>"SCA Accounting | Master CoA | Create",
             "data_cabang"=>$data_cabang,
@@ -51,7 +51,7 @@ class MasterCoaController extends Controller
     public function store(Request $request)
     {
         try {
-            DB::begin_transaction();
+            DB::beginTransaction();
             // Init data
             $akun = new Akun;
             $akun->id_cabang = $request->cabang;
@@ -63,6 +63,7 @@ class MasterCoaController extends Controller
             $akun->header1 = $request->header1;
             $akun->header2 = $request->header2;
             $akun->header3 = $request->header3;
+            $akun->catatan = $request->notes;
 
             // Save data
             if (!$akun->save()) {
@@ -76,6 +77,7 @@ class MasterCoaController extends Controller
             DB::commit();
             return response()->json([
                 "result"=>TRUE,
+                "akun"=>$akun,
                 "message"=>"Successfully saving data akun"
             ]);
         } 
@@ -103,7 +105,7 @@ class MasterCoaController extends Controller
         $data_akun = Akun::all();
 
         // Get data akun
-        $akun = Akun::find($id);
+        $akun = Akun::where("id_akun", $id)->first();
 
         $data = [
             "pageTitle"=>"SCA Accounting | Master CoA | Show",
@@ -127,7 +129,7 @@ class MasterCoaController extends Controller
         $data_akun = Akun::all();
 
         // Get data akun
-        $akun = Akun::find($id);
+        $akun = Akun::where("id_akun", $id)->first();
 
         $data = [
             "pageTitle"=>"SCA Accounting | Master CoA | Edit",
@@ -148,9 +150,9 @@ class MasterCoaController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            DB::begin_transaction();
+            DB::beginTransaction();
             // Get akun data
-            $akun = Akun::find($id);
+            $akun = Akun::where("id_akun", $id)->first();
             if ($akun) {
                 // Init data
                 $akun->id_cabang = $request->cabang;
@@ -162,6 +164,8 @@ class MasterCoaController extends Controller
                 $akun->header1 = $request->header1;
                 $akun->header2 = $request->header2;
                 $akun->header3 = $request->header3;
+                $akun->catatan = $request->notes;
+                // $akun->dt_modified = date('Y-m-d H:i:s');
     
                 // Save data
                 if (!$akun->save()) {
@@ -175,6 +179,7 @@ class MasterCoaController extends Controller
                 DB::commit();
                 return response()->json([
                     "result"=>TRUE,
+                    "akun"=>$akun,
                     "message"=>"Successfully updating data akun"
                 ]);
             }
@@ -206,9 +211,9 @@ class MasterCoaController extends Controller
     public function destroy($id)
     {
         try {
-            DB::begin_transaction();
+            DB::beginTransaction();
             // Get akun data
-            $akun = Akun::find($id);
+            $akun = Akun::where("id_akun", $id)->first();
             if ($akun) {
                 // Delete data
                 if (!$akun->delete()) {
@@ -240,6 +245,66 @@ class MasterCoaController extends Controller
             return response()->json([
                 "result"=>FALSE,
                 "message"=>"Error when delete akun"
+            ]);
+        }
+    }
+
+    public function get_header1(Request $request)
+    {
+        try {
+            $data_header = Akun::distinct()->get(['header1']);
+            return response()->json([
+                "result"=>TRUE,
+                "message"=>"Successfully get header1",
+                "options"=>$data_header
+            ]);
+        } 
+        catch (\Exception $e) {
+            Log::error("Error when get header1");
+            Log::error($e);
+            return response()->json([
+                "result"=>FALSE,
+                "message"=>"Error when get header1"
+            ]);
+        }
+    }
+
+    public function get_header2(Request $request)
+    {
+        try {
+            $data_header = Akun::distinct()->get(['header2']);
+            return response()->json([
+                "result"=>TRUE,
+                "message"=>"Successfully get header2",
+                "options"=>$data_header
+            ]);
+        } 
+        catch (\Exception $e) {
+            Log::error("Error when get header2");
+            Log::error($e);
+            return response()->json([
+                "result"=>FALSE,
+                "message"=>"Error when get header2"
+            ]);
+        }
+    }
+
+    public function get_header3(Request $request)
+    {
+        try {
+            $data_header = Akun::distinct()->get(['header3']);
+            return response()->json([
+                "result"=>TRUE,
+                "message"=>"Successfully get header3",
+                "options"=>$data_header
+            ]);
+        } 
+        catch (\Exception $e) {
+            Log::error("Error when get header3");
+            Log::error($e);
+            return response()->json([
+                "result"=>FALSE,
+                "message"=>"Error when get header3"
             ]);
         }
     }
