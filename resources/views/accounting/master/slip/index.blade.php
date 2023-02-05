@@ -25,7 +25,11 @@
         <div class="row">
             <div class="col-xs-12">
                 <a href="{{ route('master-slip-create') }}" class="btn btn-sm btn-success btn-flat pull-right"><span
-                        class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add Slip</a>
+                        class="glyphicon glyphicon-plus" aria-hidden="true"></span> Tambah Slip</a>
+                <a href="#" class="btn btn-sm btn-info btn-flat pull-right mr-1"><span
+                        class="glyphicon glyphicon-copy" aria-hidden="true"></span> Copy Data</a>
+                <a href="#" class="btn btn-sm btn-info btn-flat pull-right mr-1"><span
+                        class="glyphicon glyphicon-export" aria-hidden="true"></span> Export Excel</a>
             </div>
         </div>
         <div class="row">
@@ -50,7 +54,6 @@
                         </button>
                     </div>
                     @endif
-                    <!-- /.box-header -->
                     <div class="box-body">
                         <table width="100%" id="table_slip" class="table table-bordered table-striped">
                             <thead>
@@ -62,33 +65,8 @@
                                     <th class="text-center">Action</th>
                                 </tr>
                             </thead>
-                            {{-- <tbody>
-                                @foreach ($data_slip as $slip)
-                                    <tr>
-                                        <td>{{ $slip->kode_slip }}</td>
-                                        <td>{{ $slip->nama_slip }}</td>
-                                        <td class="text-center">{{ $slip->jenis_slip }}</td>
-                                        <td>{{ $slip->nama_akun }}</td>
-                                        <td class="text-center">
-                                            <a href="{{ route('master-slip-show', $slip->id_slip) }}"
-                                                class="btn-sm btn-default">
-                                                <span class="glyphicon glyphicon-search" aria-hidden="true">
-                                            </a>
-                                            <a href="{{ route('master-slip-edit', $slip->id_slip) }}"
-                                                class="btn-sm btn-warning">
-                                                <span class="glyphicon glyphicon-pencil" aria-hidden="true">
-                                            </a>
-                                            <a href="{{ route('master-slip-destroy', $slip->id_slip) }}"
-                                                class="btn-sm btn-danger">
-                                                <span class="glyphicon glyphicon-trash" aria-hidden="true">
-                                            </a>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody> --}}
                         </table>
                     </div>
-                    <!-- /.box-body -->
                 </div>
             </div>
         </div>

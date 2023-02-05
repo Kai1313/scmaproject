@@ -38,13 +38,71 @@
             <div class="col-xs-12">
                 <div class="box box-primary">
                     <div class="box-header">
-                        <h3 class="box-title">Add Slip</h3>
+                        <h3 class="box-title">{{ (isset($data_slip)?'Edit':'Add') }} Slip</h3>
                     </div>
                     <div class="box-body">
-                        <form id="form_slip" class="form-horizontal" data-toggle="validator" enctype="multipart/form-data">
+                        <form id="form_slip" data-toggle="validator" enctype="multipart/form-data">
                             @csrf
                             <input type="hidden" name="id_slip" value="{{ old('id_slip', (isset($data_slip)) ? $data_slip->id_slip : '') }}">
-                            <div class="form-group form-group-sm">
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    <div class="form-group">
+                                        <label>Cabang</label>
+                                        <select name="cabang_input" id="cabang_input" class="form-control select2" style="width: 100%;">
+                                            @foreach ($data_cabang as $cabang)
+                                                <option value="{{ $cabang->id_cabang }}" {{ isset($data_slip->id_cabang)?(($data_slip->id_cabang == $cabang->id_cabang)?'selected':''):'' }}>{{ $cabang->kode_cabang.' - '.$cabang->nama_cabang }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Kode Slip</label>
+                                        <input type="text" class="form-control" id="kode_slip" name="kode_slip" placeholder="Masukkan kode slip" value="{{ isset($data_slip->kode_slip)?$data_slip->kode_slip:'' }}" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Nama Slip</label>
+                                        <input type="text" class="form-control" id="nama_slip" name="nama_slip" placeholder="Masukkan nama slip" value="{{ isset($data_slip->nama_slip)?$data_slip->nama_slip:'' }}" required>
+                                    </div>
+                                </div>
+                                <div class="col-xs-6">
+                                    <div class="form-group">
+                                        <label>Jenis Slip</label>
+                                        <select name="jenis_slip" class="form-control select2" id="jenis_slip"
+                                        data-error="Wajib isi" required>
+                                            <option value="">Pilih Slip</option>
+                                            <option value="0">Kas</option>
+                                            <option value="1">Bank</option>
+                                            <option value="2">Piutang Giro</option>
+                                            <option value="3">Hutang Giro</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Akun</label>
+                                        <select name="id_akun" class="form-control select2" id="id_akun"
+                                        data-error="Wajib isi" required>
+                                            <option value="">Pilih Akun</option>
+                                            @foreach ($data_akun as $akun)
+                                                <option value="{{ $akun->id_akun }}"
+                                                @if(isset($data_slip)) @if ($data_slip->id_akun == $akun->id_akun) selected @endif @endif>{{ $akun->nama_akun }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <button type="button" id="tombol_refresh" onclick="refresh()"
+                                    class="btn btn-default pull-left sr-only"><span class="glyphicon glyphicon-repeat"
+                                        aria-hidden="true"></span> Ulangi</button>
+                                    <button type="button" id="tombol_buat" onclick="save_data()"
+                                        class="btn btn-primary pull-right"><span class="glyphicon glyphicon-floppy-saved"
+                                            aria-hidden="true"></span> {{(isset($data_slip)) ? ' Ubah Data' : ' Simpan Data'}}</button>
+                                    <button type="button" id="tombol_ubah" onclick="ubah_data()"
+                                        class="btn btn-warning pull-right sr-only"><span class="glyphicon glyphicon-pencil"
+                                            aria-hidden="true"></span> Ubah Data</button>
+                                </div>
+                            </div>
+                            {{-- <div class="form-group form-group-sm">
                                 <label class="col-sm-2" for="cabang_input">Cabang*</label>
                                 <div class="col-sm-10">
                                     <select name="cabang_input" id="cabang_input" class="form-control input-sm select2">
@@ -56,8 +114,8 @@
                                     <small class="form-text text-muted sr-only">Keterangan tambahan untuk field Cabang</small>
                                     <div class="help-block with-errors"></div>
                                 </div>
-                            </div>
-                            <div class="form-group form-group-sm">
+                            </div> --}}
+                            {{-- <div class="form-group form-group-sm">
                                 <label class="col-sm-2" for="kode_slip">Kode Slip*</label>
                                 <div class="col-sm-10">
                                     <input type="text" class="form-control input-sm" id="kode_slip" name="kode_slip"
@@ -67,8 +125,8 @@
                                         Slip</small>
                                     <div class="help-block with-errors"></div>
                                 </div>
-                            </div>
-                            <div class="form-group form-group-sm">
+                            </div> --}}
+                            {{-- <div class="form-group form-group-sm">
                                 <label class="col-sm-2" for="nama_slip">Nama Slip*</label>
                                 <div class="col-sm-10">
                                     <input type="text" class="form-control input-sm" id="nama_slip" name="nama_slip"
@@ -79,8 +137,8 @@
                                         Slip</small>
                                     <div class="help-block with-errors"></div>
                                 </div>
-                            </div>
-                            <div class="form-group form-group-sm">
+                            </div> --}}
+                            {{-- <div class="form-group form-group-sm">
                                 <label class="col-sm-2" for="jenis_slip">Jenis Slip*</label>
                                 <div class="col-sm-10">
                                     <select name="jenis_slip" class="form-control input-sm select2" id="jenis_slip"
@@ -94,8 +152,8 @@
                                     <small class="form-text text-muted sr-only">Keterangan tambahan untuk field Slip</small>
                                     <div class="help-block with-errors"></div>
                                 </div>
-                            </div>
-                            <div class="form-group form-group-sm">
+                            </div> --}}
+                            {{-- <div class="form-group form-group-sm">
                                 <label class="col-sm-2" for="id_akun">Akun*</label>
                                 <div class="col-sm-10">
                                     <select name="id_akun" class="form-control input-sm select2" id="id_akun"
@@ -110,17 +168,7 @@
                                     <small class="form-text text-muted sr-only">Keterangan tambahan untuk field Akun</small>
                                     <div class="help-block with-errors"></div>
                                 </div>
-                            </div>
-
-                            <button type="button" id="tombol_refresh" onclick="refresh()"
-                                class="btn btn-default pull-left sr-only"><span class="glyphicon glyphicon-repeat"
-                                    aria-hidden="true"></span> Ulangi</button>
-                            <button type="button" id="tombol_buat" onclick="save_data()"
-                                class="btn btn-primary btn-flat pull-right"><span class="glyphicon glyphicon-plus"
-                                    aria-hidden="true"></span> {{(isset($data_slip)) ? 'Ubah Data' : 'Simpan Data'}}</button>
-                            <button type="button" id="tombol_ubah" onclick="ubah_data()"
-                                class="btn btn-warning pull-right sr-only"><span class="glyphicon glyphicon-pencil"
-                                    aria-hidden="true"></span> Ubah Data</button>
+                            </div> --}}
                         </form>
                     </div>
                 </div>
@@ -197,14 +245,5 @@
                 }
             })
         }
-
-        // $('form').submit(function() {
-        //     if (data.result) {
-        //         Swal.fire('Saved!', '', 'success')
-        //     } else {
-        //         Swal.fire('Changes are not saved', '', 'info')
-        //     }
-
-        // })
     </script>
 @endsection
