@@ -28,7 +28,7 @@
                         class="glyphicon glyphicon-plus" aria-hidden="true"></span> Tambah Slip</a>
                 <a href="#" class="btn btn-sm btn-info btn-flat pull-right mr-1"><span
                         class="glyphicon glyphicon-copy" aria-hidden="true"></span> Copy Data</a>
-                <a href="#" class="btn btn-sm btn-info btn-flat pull-right mr-1"><span
+                <a href="{{ route('master-slip-export-excel') }}" target="__blank" class="btn btn-sm btn-info btn-flat pull-right mr-1"><span
                         class="glyphicon glyphicon-export" aria-hidden="true"></span> Export Excel</a>
             </div>
         </div>
