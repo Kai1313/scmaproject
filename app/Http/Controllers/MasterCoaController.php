@@ -17,8 +17,17 @@ class MasterCoaController extends Controller
      */
     public function index()
     {
+        $data_akun_level1 = Akun::whereNull('header1')->whereNull('header2')->whereNull('header3')->get();
+        $data_akun_level2 = Akun::whereNotNull('header1')->whereNull('header2')->whereNull('header3')->get();
+        $data_akun_level3 = Akun::whereNotNull('header1')->whereNotNull('header2')->whereNull('header3')->get();
+        $data_akun_level4 = Akun::whereNotNull('header1')->whereNotNull('header2')->whereNotNull('header3')->get();
+
         $data = [
-            "pageTitle"=>"SCA Accounting | Master CoA | List"
+            "pageTitle"=>"SCA Accounting | Master CoA | List",
+            "data_akun_level1" => $data_akun_level1,
+            "data_akun_level2" => $data_akun_level2,
+            "data_akun_level3" => $data_akun_level3,
+            "data_akun_level4" => $data_akun_level4
         ];
         return view('accounting.master.coa.index', $data);
     }
@@ -80,7 +89,7 @@ class MasterCoaController extends Controller
                 "akun"=>$akun,
                 "message"=>"Successfully saving data akun"
             ]);
-        } 
+        }
         catch (\Exception $e) {
             DB::rollback();
             Log::error("Error when store akun");
@@ -166,7 +175,7 @@ class MasterCoaController extends Controller
                 $akun->header3 = $request->header3;
                 $akun->catatan = $request->notes;
                 // $akun->dt_modified = date('Y-m-d H:i:s');
-    
+
                 // Save data
                 if (!$akun->save()) {
                     DB::rollback();
@@ -190,7 +199,7 @@ class MasterCoaController extends Controller
                     "message"=>"Could not find akun with id ".$id
                 ]);
             }
-        } 
+        }
         catch (\Exception $e) {
             DB::rollback();
             Log::error("Error when update akun");
@@ -237,7 +246,7 @@ class MasterCoaController extends Controller
                     "message"=>"Could not find akun with id ".$id
                 ]);
             }
-        } 
+        }
         catch (\Exception $e) {
             DB::rollback();
             Log::error("Error when delete akun");
@@ -258,7 +267,7 @@ class MasterCoaController extends Controller
                 "message"=>"Successfully get header1",
                 "options"=>$data_header
             ]);
-        } 
+        }
         catch (\Exception $e) {
             Log::error("Error when get header1");
             Log::error($e);
@@ -278,7 +287,7 @@ class MasterCoaController extends Controller
                 "message"=>"Successfully get header2",
                 "options"=>$data_header
             ]);
-        } 
+        }
         catch (\Exception $e) {
             Log::error("Error when get header2");
             Log::error($e);
@@ -298,7 +307,7 @@ class MasterCoaController extends Controller
                 "message"=>"Successfully get header3",
                 "options"=>$data_header
             ]);
-        } 
+        }
         catch (\Exception $e) {
             Log::error("Error when get header3");
             Log::error($e);
