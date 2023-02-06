@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Slip;
+use App\Exports\SlipsExport;
 use Illuminate\Http\Request;
 use DB;
 use Log;
+use Excel;
 
 class MasterSlipController extends Controller
 {
@@ -336,5 +338,20 @@ class MasterSlipController extends Controller
 
         // Log::debug($data_slip_table->get());
         return json_encode($table);
+    }
+
+    public function export_excel(Request $request)
+    {
+        try {
+            return Excel::download(new SlipsExport, 'slips.xlsx');
+        }
+        catch (\Exception $e) {
+            Log::error("Error when export excel master slip");
+            Log::error($e);
+            return response()->json([
+                "result"=>FALSE,
+                "message"=>"Error when export excel master slip"
+            ]);
+        }
     }
 }

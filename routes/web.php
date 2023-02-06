@@ -37,8 +37,9 @@ Route::post('/master/slip/store', 'MasterSlipController@store')->name('master-sl
 Route::post('/master/slip/update', 'MasterSlipController@update')->name('master-slip-update');
 Route::get('/master/slip/destroy/{id?}', 'MasterSlipController@destroy')->name('master-slip-destroy');
 Route::get('/master/slip/populate', 'MasterSlipController@populate')->name('master-slip-populate');
-Route::get('/master/coa', 'MasterCoaController@index')->name('master-coa');
+Route::get('/master/slip/export/excel', 'MasterSlipController@export_excel')->name('master-slip-export-excel');
 
+Route::get('/master/coa', 'MasterCoaController@index')->name('master-coa');
 Route::get('/master/coa/form/create', 'MasterCoaController@create')->name('master-coa-create');
 Route::get('/master/coa/form/edit/{id}', 'MasterCoaController@edit')->name('master-coa-edit');
 Route::get('/master/coa/form/show/{id}', 'MasterCoaController@show')->name('master-coa-show');
@@ -48,3 +49,4 @@ Route::get('/master/coa/destroy/{id}', 'MasterCoaController@destroy')->name('mas
 Route::get('/master/coa/get_header1', 'MasterCoaController@get_header1')->name('master-coa-header1');
 Route::get('/master/coa/get_header2', 'MasterCoaController@get_header2')->name('master-coa-header2');
 Route::get('/master/coa/get_header3', 'MasterCoaController@get_header3')->name('master-coa-header3');
+Route::get('/master/coa/export/excel', 'MasterCoaController@export_excel')->name('master-coa-export-excel');

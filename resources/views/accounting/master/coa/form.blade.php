@@ -29,7 +29,7 @@
         <div class="col-xs-12">
             <div class="box box-primary">
                 <div class="box-header">
-                    <h3 class="box-title">Add Chart of Account</h3>
+                    <h3 class="box-title">{{ (isset($akun->id_akun)?'Edit':'Add') }} Chart of Account</h3>
                 </div>
                 <div class="box-body">
                     <form action="" id="form-akun" method="post" enctype="multipart/form-data">

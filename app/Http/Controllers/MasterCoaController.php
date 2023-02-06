@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Master\Akun;
 use App\Models\Master\Cabang;
+use App\Exports\AkunsExport;
 use Log;
 use DB;
+use Excel;
 
 class MasterCoaController extends Controller
 {
@@ -314,6 +316,21 @@ class MasterCoaController extends Controller
             return response()->json([
                 "result"=>FALSE,
                 "message"=>"Error when get header3"
+            ]);
+        }
+    }
+
+    public function export_excel(Request $request)
+    {
+        try {
+            return Excel::download(new AkunsExport, 'akuns.xlsx');
+        }
+        catch (\Exception $e) {
+            Log::error("Error when export excel master coa");
+            Log::error($e);
+            return response()->json([
+                "result"=>FALSE,
+                "message"=>"Error when export excel master coa"
             ]);
         }
     }
