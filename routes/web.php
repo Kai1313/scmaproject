@@ -16,6 +16,9 @@ use App\Http\Controllers\MasterSlipController;
 use App\Http\Controllers\MasterCoaController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/', function () {
+    return 'Hello World';
+});
 Route::get('/dashboard/{user_id?}', 'SessionController@index')->name('dashboard');
 Route::get('/logout', 'SessionController@logout')->name('logout');
 
