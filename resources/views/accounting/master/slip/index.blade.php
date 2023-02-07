@@ -2,6 +2,7 @@
 @section('addedStyles')
     <!-- DataTables -->
     <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css') }}">
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         .m-2{
             margin: 0.5rem;
@@ -22,21 +23,22 @@
 @endsection
 @section('main-section')
     <div class="content container-fluid">
-        <div class="row">
-            <div class="col-xs-12">
-                <a href="{{ route('master-slip-create') }}" class="btn btn-sm btn-success btn-flat pull-right"><span
-                        class="glyphicon glyphicon-plus" aria-hidden="true"></span> Tambah Slip</a>
-                <a href="#" class="btn btn-sm btn-info btn-flat pull-right mr-1"><span
-                        class="glyphicon glyphicon-copy" aria-hidden="true"></span> Copy Data</a>
-                <a href="{{ route('master-slip-export-excel') }}" target="__blank" class="btn btn-sm btn-info btn-flat pull-right mr-1"><span
-                        class="glyphicon glyphicon-export" aria-hidden="true"></span> Export Excel</a>
-            </div>
-        </div>
+        
         <div class="row">
             <div class="col-xs-12">
                 <div class="box">
                     <div class="box-header">
-                        <h3 class="box-title">Slip List</h3>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <h3 class="box-title">Slip List</h3>
+                                <a href="{{ route('master-slip-create') }}" class="btn btn-sm btn-success btn-flat pull-right"><span
+                                        class="glyphicon glyphicon-plus" aria-hidden="true"></span> Tambah Slip</a>
+                                <button id="btn-copy" type="button" class="btn btn-sm btn-info btn-flat pull-right mr-1"><span
+                                        class="glyphicon glyphicon-copy" aria-hidden="true"></span> Copy Data</button>
+                                <a href="{{ route('master-slip-export-excel') }}" target="__blank" class="btn btn-sm btn-info btn-flat pull-right mr-1"><span
+                                        class="glyphicon glyphicon-export" aria-hidden="true"></span> Export Excel</a>
+                            </div>
+                        </div>
                     </div>
                     @if (session('failed'))
                         <div class="alert alert-danger alert-dismissible" role="alert">
@@ -71,6 +73,45 @@
             </div>
         </div>
     </div>
+@endsection
+
+@section('modal-section')
+<div class="modal fade" id="modal-copy">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Copy Slip Data</h4>
+            </div>
+            <div class="modal-body">
+                <form id="form-copy" action="" method="post">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                <label>Dari Cabang</label>
+                                {{ csrf_field() }}
+                                <input type="hidden" id="id_cabang" name="id_cabang" value="{{ $cabang->id_cabang }}">
+                                <input type="text" class="form-control" id="nama_cabang" value="{{ $cabang->kode_cabang.' - '.$cabang->nama_cabang }}" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label>Ke Cabang</label>
+                                <select name="cabang" class="form-control select2" style="width: 100%;">
+                                    @foreach ($data_cabang as $cabang)
+                                        <option value="{{ $cabang->id_cabang }}" {{ isset($akun->id_cabang)?(($akun->id_cabang == $cabang->id_cabang)?'selected':''):'' }}>{{ $cabang->kode_cabang.' - '.$cabang->nama_cabang }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+                <button type="button" id="btn-copy-data" class="btn btn-primary">Copy Data Slip</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('addedScripts')
@@ -132,12 +173,46 @@
                     }
                 ]
             });
+
+            $("#btn-copy").on("click", function() {
+                $("#modal-copy").modal("show")
+            })
+
+            $("#btn-copy-data").on("click", function() {
+                $(this).html('<i class="fa fa-spinner fa-spin"></i>')
+                $.ajax({
+                    url: "{{ route('master-slip-copy-data') }}",
+                    type: "POST",
+                    data: $("#form-copy").serialize(),
+                    dataType: "JSON",
+                    success: function(data) {
+                        console.log(data)
+                        if (data.result) {
+                            Swal.fire({
+                                title: 'Success!',
+                                text: data.message,
+                                icon: 'success',
+                                confirmButtonText: 'Close'
+                            })
+                        }
+                        else {
+                            Swal.fire({
+                                title: 'Error!',
+                                text: data.message,
+                                icon: 'error',
+                                confirmButtonText: 'Close'
+                            })
+                        }
+                    }
+                })
+                $(this).html('Copy Data Slip')
+            })
         })
 
         window.getActions = function(data, row){
-            var action_btn = '<a href="' + base_url + '/master/slip/show/' + data + '" class="btn-sm m-2 btn-default"><span class="glyphicon glyphicon-search" aria-hidden="true"></a>' +
-                            '<a href="' + base_url + '/master/slip/form/edit/' + data + '" class="btn-sm m-2 btn-warning"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></a>' +
-                            '<a href="' + base_url + '/master/slip/destroy/' + data + '"  class="btn-sm m-2 btn-danger"><span class="glyphicon glyphicon-trash" aria-hidden="true"></a>';
+            var action_btn = '<a href="' + base_url + '/master/slip/show/' + data + '" class="btn btn-flat btn-sm m-2 btn-default"><span class="glyphicon glyphicon-search" aria-hidden="true"></a>' +
+                            '<a href="' + base_url + '/master/slip/form/edit/' + data + '" class="btn btn-flat btn-sm m-2 btn-warning"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></a>' +
+                            '<a href="' + base_url + '/master/slip/destroy/' + data + '"  class="btn btn-flat btn-sm m-2 btn-danger"><span class="glyphicon glyphicon-trash" aria-hidden="true"></a>';
             return action_btn;
         }
     </script>

@@ -42,7 +42,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
         @include('layouts.footer')
         @include('layouts.control_sidebar')
-
+        @yield('modal-section')
         <div class="control-sidebar-bg"></div>
     </div>
     @include('includes.scripts')

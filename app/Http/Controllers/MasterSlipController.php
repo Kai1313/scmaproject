@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Slip;
+use App\Models\Master\Cabang;
 use App\Exports\SlipsExport;
 use Illuminate\Http\Request;
 use DB;
@@ -19,9 +20,13 @@ class MasterSlipController extends Controller
     public function index(Request $request)
     {
         $data_slip = Slip::join('master_akun', 'master_slip.id_akun', '=', 'master_akun.id_akun')->select('master_slip.*', 'master_akun.nama_akun')->get();
+        $cabang = Cabang::find(1);
+        $data_cabang = Cabang::all();
 
         $data = [
             "pageTitle" => "SCA Accounting | Master Slip | List",
+            "cabang" => $cabang,
+            "data_cabang" => $data_cabang,
             "data_slip" => $data_slip
         ];
 
@@ -248,6 +253,8 @@ class MasterSlipController extends Controller
      */
     public function populate(Request $request)
     {
+        $cabang = Cabang::find(1);
+        // dd($cabang->id_cabang);
         $offset = $request->start;
         $limit = $request->length;
         $keyword = $request->search['value'];
@@ -276,6 +283,7 @@ class MasterSlipController extends Controller
                 '));
 
         $data_slip_table = DB::table(DB::raw('(' . $data_slip->toSql() . ') as master_slip'));
+        $data_slip_table = $data_slip_table->where('id_cabang', $cabang->id_cabang);
 
         Log::debug(json_encode($data_slip_table));
 
@@ -351,6 +359,61 @@ class MasterSlipController extends Controller
             return response()->json([
                 "result"=>FALSE,
                 "message"=>"Error when export excel master slip"
+            ]);
+        }
+    }
+
+    public function copy_data(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+            // Check if cabang destination == cabang source
+            $cabang_source = $request->id_cabang;
+            $cabang_dest = $request->cabang;
+            if ($cabang_source == $cabang_dest) {
+                DB::rollback();
+                return response()->json([
+                    "result"=>FALSE,
+                    "message"=>"Cabang asal dan cabang tujuan sama, pilih cabang tujuan yang lain"
+                ]);
+            }
+
+            // Get data slip from cabang source
+            $data_slip = Slip::where("id_cabang", $cabang_source)->get();
+            if ($data_slip) {
+                foreach ($data_slip as $slip) {
+                    // Check if already didnt exist
+                    $check_slip = Slip::where("id_cabang", $cabang_dest)->where("kode_slip", $slip->kode_slip)->where("nama_slip", $slip->nama_slip)->first();
+                    if (!$check_slip) {
+                        $ins_slip = new Slip;
+                        $ins_slip->id_cabang = $cabang_dest;
+                        $ins_slip->kode_slip = $slip->kode_slip;
+                        $ins_slip->nama_slip = $slip->nama_slip;
+                        $ins_slip->jenis_slip = $slip->jenis_slip;
+                        $ins_slip->id_akun = $slip->id_akun;
+                        if (!$ins_slip->save()) {
+                            DB::rollback();
+                            return response()->json([
+                                "result"=>FALSE,
+                                "message"=>"Error when save copy master slip"
+                            ]);
+                        }
+                    }
+                }
+            }
+            DB::commit();
+            return response()->json([
+                "result"=>TRUE,
+                "message"=>"Successfully copying master slip"
+            ]);
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            Log::error("Error when copy data master slip");
+            Log::error($e);
+            return response()->json([
+                "result"=>FALSE,
+                "message"=>"Error when copy data master slip"
             ]);
         }
     }

@@ -49,18 +49,17 @@
 <section class="content container-fluid">
     <div class="row">
         <div class="col-xs-12">
-            <a href="{{ route('master-coa-create') }}" class="btn btn-sm btn-success btn-flat pull-right">Tambah CoA</a>
-            <a href="#" class="btn btn-sm btn-info btn-flat pull-right mr-1"><span class="glyphicon glyphicon-copy" aria-hidden="true"></span> Copy Data</a>
-            <a href="{{ route('master-coa-export-excel') }}" target="__blank" class="btn btn-sm btn-info btn-flat pull-right mr-1"><span class="glyphicon glyphicon-export" aria-hidden="true"></span> Export Excel</a>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-xs-12">
             <div class="box">
                 <div class="box-header">
-                  <h3 class="box-title">Chart of Account List</h3>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <h3 class="box-title">Chart of Account List</h3>
+                            <a href="{{ route('master-coa-create') }}" class="btn btn-sm btn-success btn-flat pull-right">Tambah CoA</a>
+                            <a href="#" class="btn btn-sm btn-info btn-flat pull-right mr-1"><span class="glyphicon glyphicon-copy" aria-hidden="true"></span> Copy Data</a>
+                            <a href="{{ route('master-coa-export-excel') }}" target="__blank" class="btn btn-sm btn-info btn-flat pull-right mr-1"><span class="glyphicon glyphicon-export" aria-hidden="true"></span> Export Excel</a>
+                        </div>
+                    </div>
                 </div>
-                <!-- /.box-header -->
                 <div class="box-body">
                     <table id="table_master_akun" class="table table-bordered table-striped">
                         <thead>
@@ -170,7 +169,6 @@
                         </tbody>
                     </table>
                 </div>
-                <!-- /.box-body -->
               </div>
         </div>
     </div>
