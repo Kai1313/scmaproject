@@ -30,15 +30,15 @@
     <div class="content container-fluid">
         <div class="row">
             <div class="col-xs-12">
-                <a href="{{ route('master-slip') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right"><span
-                        class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Back</a>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-xs-12">
                 <div class="box box-primary">
                     <div class="box-header">
-                        <h3 class="box-title">{{ (isset($data_slip)?'Edit':'Add') }} Slip</h3>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <h3 class="box-title">{{ (isset($data_slip)?'Edit':'Add') }} Slip</h3>
+                                <a href="{{ route('master-slip') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right"><span
+                                        class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Back</a>
+                            </div>
+                        </div>
                     </div>
                     <div class="box-body">
                         <form id="form_slip" data-toggle="validator" enctype="multipart/form-data">
@@ -95,10 +95,10 @@
                                     class="btn btn-default pull-left sr-only"><span class="glyphicon glyphicon-repeat"
                                         aria-hidden="true"></span> Ulangi</button>
                                     <button type="button" id="tombol_buat" onclick="save_data()"
-                                        class="btn btn-primary pull-right"><span class="glyphicon glyphicon-floppy-saved"
+                                        class="btn btn-flat btn-primary pull-right"><span class="glyphicon glyphicon-floppy-saved"
                                             aria-hidden="true"></span> {{(isset($data_slip)) ? ' Ubah Data' : ' Simpan Data'}}</button>
                                     <button type="button" id="tombol_ubah" onclick="ubah_data()"
-                                        class="btn btn-warning pull-right sr-only"><span class="glyphicon glyphicon-pencil"
+                                        class="btn btn-flat btn-warning pull-right sr-only"><span class="glyphicon glyphicon-pencil"
                                             aria-hidden="true"></span> Ubah Data</button>
                                 </div>
                             </div>

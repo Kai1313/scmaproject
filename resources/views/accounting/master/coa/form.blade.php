@@ -22,14 +22,14 @@
 <section class="content container-fluid">
     <div class="row">
         <div class="col-xs-12">
-            <a href="{{ route('master-coa') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right">Back</a>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-xs-12">
             <div class="box box-primary">
                 <div class="box-header">
-                    <h3 class="box-title">{{ (isset($akun->id_akun)?'Edit':'Add') }} Chart of Account</h3>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <h3 class="box-title">{{ (isset($akun->id_akun)?'Edit':'Add') }} Chart of Account</h3>
+                            <a href="{{ route('master-coa') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right">Back</a>
+                        </div>
+                    </div>
                 </div>
                 <div class="box-body">
                     <form action="" id="form-akun" method="post" enctype="multipart/form-data">
@@ -109,9 +109,9 @@
                         <div class="row">
                             <div class="col-xs-12">
                                 @if (!isset($akun))
-                                    <button type="button" id="store-btn" class="btn btn-primary pull-right">Simpan</button>
+                                    <button type="button" id="store-btn" class="btn btn-flat btn-primary pull-right"><span class="glyphicon glyphicon-pencil"></span> Simpan</button>
                                 @else
-                                    <button type="button" id="update-btn" data-idakun="{{ $akun->id_akun }}" class="btn btn-primary pull-right">Update</button>    
+                                    <button type="button" id="update-btn" data-idakun="{{ $akun->id_akun }}" class="btn btn-flat btn-primary pull-right"><span class="glyphicon glyphicon-pencil"></span> Update</button>    
                                 @endif
                             </div>
                         </div>

@@ -24,8 +24,13 @@ class MasterCoaController extends Controller
         $data_akun_level3 = Akun::whereNotNull('header1')->whereNotNull('header2')->whereNull('header3')->get();
         $data_akun_level4 = Akun::whereNotNull('header1')->whereNotNull('header2')->whereNotNull('header3')->get();
 
+        $cabang = Cabang::find(1);
+        $data_cabang = Cabang::all();
+
         $data = [
             "pageTitle"=>"SCA Accounting | Master CoA | List",
+            "cabang" => $cabang,
+            "data_cabang" => $data_cabang,
             "data_akun_level1" => $data_akun_level1,
             "data_akun_level2" => $data_akun_level2,
             "data_akun_level3" => $data_akun_level3,

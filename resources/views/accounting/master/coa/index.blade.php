@@ -54,8 +54,8 @@
                     <div class="row">
                         <div class="col-xs-12">
                             <h3 class="box-title">Chart of Account List</h3>
-                            <a href="{{ route('master-coa-create') }}" class="btn btn-sm btn-success btn-flat pull-right">Tambah CoA</a>
-                            <a href="#" class="btn btn-sm btn-info btn-flat pull-right mr-1"><span class="glyphicon glyphicon-copy" aria-hidden="true"></span> Copy Data</a>
+                            <a href="{{ route('master-coa-create') }}" class="btn btn-sm btn-success btn-flat pull-right"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Tambah CoA</a>
+                            <button id="btn-copy" type="button" class="btn btn-sm btn-info btn-flat pull-right mr-1"><span class="glyphicon glyphicon-copy" aria-hidden="true"></span> Copy Data</button>
                             <a href="{{ route('master-coa-export-excel') }}" target="__blank" class="btn btn-sm btn-info btn-flat pull-right mr-1"><span class="glyphicon glyphicon-export" aria-hidden="true"></span> Export Excel</a>
                         </div>
                     </div>
@@ -175,6 +175,45 @@
 </section>
 @endsection
 
+@section('modal-section')
+<div class="modal fade" id="modal-copy">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Copy Data Akun</h4>
+            </div>
+            <div class="modal-body">
+                <form id="form-copy" action="" method="post">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                <label>Dari Cabang</label>
+                                {{ csrf_field() }}
+                                <input type="hidden" id="id_cabang" name="id_cabang" value="{{ $cabang->id_cabang }}">
+                                <input type="text" class="form-control" id="nama_cabang" value="{{ $cabang->kode_cabang.' - '.$cabang->nama_cabang }}" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label>Ke Cabang</label>
+                                <select name="cabang" class="form-control select2" style="width: 100%;">
+                                    @foreach ($data_cabang as $cabang)
+                                        <option value="{{ $cabang->id_cabang }}" {{ isset($akun->id_cabang)?(($akun->id_cabang == $cabang->id_cabang)?'selected':''):'' }}>{{ $cabang->kode_cabang.' - '.$cabang->nama_cabang }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+                <button type="button" id="btn-copy-data" class="btn btn-primary">Copy Data Akun</button>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+
 @section('addedScripts')
     <!-- DataTables -->
     <script src="{{ asset('assets/bower_components/datatables.net/js/jquery.dataTables.min.js') }}"></script>
@@ -192,6 +231,10 @@
         $(function () {
             // $('#example1').DataTable()
             $('#table_master_akun').treetable({expandable: true});
+
+            $("#btn-copy").on("click", function() {
+                $("#modal-copy").modal("show")
+            })
         })
     </script>
 @endsection
