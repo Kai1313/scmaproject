@@ -5,7 +5,7 @@
     <!-- Treetable -->
     <link rel="stylesheet" href="{{ asset('assets/bower_components/jquery-treetable/css/jquery.treetable.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/bower_components/jquery-treetable/css/jquery.treetable.theme.default.css') }}">
-
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         #table_master_akun th{
             text-align: center !important;
@@ -35,8 +35,8 @@
 @section('header')
 <section class="content-header">
     <h1>
-        Master CoA
-        <small>Chart of Account</small>
+        Master Chart of Account
+        <small></small>
     </h1>
     <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> Dashboard</a></li>
@@ -52,8 +52,17 @@
             <div class="box">
                 <div class="box-header">
                     <div class="row">
-                        <div class="col-xs-12">
-                            <h3 class="box-title">Chart of Account List</h3>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Cabang</label>
+                                <select name="cabang_table" id="cabang_table" class="form-control select2" style="width: 100%;">
+                                    @foreach ($data_cabang as $cabang)
+                                        <option value="{{ $cabang->id_cabang }}" {{ isset($data_slip->id_cabang)?(($data_slip->id_cabang == $cabang->id_cabang)?'selected':''):'' }}>{{ $cabang->kode_cabang.' - '.$cabang->nama_cabang }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
                             <a href="{{ route('master-coa-create') }}" class="btn btn-sm btn-success btn-flat pull-right"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Tambah CoA</a>
                             <button id="btn-copy" type="button" class="btn btn-sm btn-info btn-flat pull-right mr-1"><span class="glyphicon glyphicon-copy" aria-hidden="true"></span> Copy Data</button>
                             <a href="{{ route('master-coa-export-excel') }}" target="__blank" class="btn btn-sm btn-info btn-flat pull-right mr-1"><span class="glyphicon glyphicon-export" aria-hidden="true"></span> Export Excel</a>
@@ -190,8 +199,8 @@
                             <div class="form-group">
                                 <label>Dari Cabang</label>
                                 {{ csrf_field() }}
-                                <input type="hidden" id="id_cabang" name="id_cabang" value="{{ $cabang->id_cabang }}">
-                                <input type="text" class="form-control" id="nama_cabang" value="{{ $cabang->kode_cabang.' - '.$cabang->nama_cabang }}" readonly>
+                                <input type="hidden" id="id_cabang" name="id_cabang" value="{{ $cabang_user->id_cabang }}">
+                                <input type="text" class="form-control" id="nama_cabang" value="{{ $cabang_user->kode_cabang.' - '.$cabang_user->nama_cabang }}" readonly>
                             </div>
                             <div class="form-group">
                                 <label>Ke Cabang</label>
@@ -234,6 +243,36 @@
 
             $("#btn-copy").on("click", function() {
                 $("#modal-copy").modal("show")
+            })
+
+            $("#btn-copy-data").on("click", function() {
+                $(this).html('<i class="fa fa-spinner fa-spin"></i>')
+                $.ajax({
+                    url: "{{ route('master-coa-copy-data') }}",
+                    type: "POST",
+                    data: $("#form-copy").serialize(),
+                    dataType: "JSON",
+                    success: function(data) {
+                        console.log(data)
+                        if (data.result) {
+                            Swal.fire({
+                                title: 'Success!',
+                                text: data.message,
+                                icon: 'success',
+                                confirmButtonText: 'Close'
+                            })
+                        }
+                        else {
+                            Swal.fire({
+                                title: 'Error!',
+                                text: data.message,
+                                icon: 'error',
+                                confirmButtonText: 'Close'
+                            })
+                        }
+                    }
+                })
+                $(this).html('Copy Data Slip')
             })
         })
     </script>

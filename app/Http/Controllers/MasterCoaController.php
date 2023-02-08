@@ -19,17 +19,17 @@ class MasterCoaController extends Controller
      */
     public function index()
     {
-        $data_akun_level1 = Akun::whereNull('header1')->whereNull('header2')->whereNull('header3')->get();
-        $data_akun_level2 = Akun::whereNotNull('header1')->whereNull('header2')->whereNull('header3')->get();
-        $data_akun_level3 = Akun::whereNotNull('header1')->whereNotNull('header2')->whereNull('header3')->get();
-        $data_akun_level4 = Akun::whereNotNull('header1')->whereNotNull('header2')->whereNotNull('header3')->get();
-
+        
         $cabang = Cabang::find(1);
         $data_cabang = Cabang::all();
-
+        $data_akun_level1 = Akun::where("id_cabang", $cabang->id_cabang)->whereNull('header1')->whereNull('header2')->whereNull('header3')->get();
+        $data_akun_level2 = Akun::where("id_cabang", $cabang->id_cabang)->whereNotNull('header1')->whereNull('header2')->whereNull('header3')->get();
+        $data_akun_level3 = Akun::where("id_cabang", $cabang->id_cabang)->whereNotNull('header1')->whereNotNull('header2')->whereNull('header3')->get();
+        $data_akun_level4 = Akun::where("id_cabang", $cabang->id_cabang)->whereNotNull('header1')->whereNotNull('header2')->whereNotNull('header3')->get();
+        
         $data = [
             "pageTitle"=>"SCA Accounting | Master CoA | List",
-            "cabang" => $cabang,
+            "cabang_user" => $cabang,
             "data_cabang" => $data_cabang,
             "data_akun_level1" => $data_akun_level1,
             "data_akun_level2" => $data_akun_level2,
@@ -336,6 +336,66 @@ class MasterCoaController extends Controller
             return response()->json([
                 "result"=>FALSE,
                 "message"=>"Error when export excel master coa"
+            ]);
+        }
+    }
+
+    public function copy_data(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+            // Check if cabang destination == cabang source
+            $cabang_source = $request->id_cabang;
+            $cabang_dest = $request->cabang;
+            if ($cabang_source == $cabang_dest) {
+                DB::rollback();
+                return response()->json([
+                    "result"=>FALSE,
+                    "message"=>"Cabang asal dan cabang tujuan sama, pilih cabang tujuan yang lain"
+                ]);
+            }
+
+            // Get data akun from cabang source
+            $data_akun = Akun::where("id_cabang", $cabang_source)->get();
+            if ($data_akun) {
+                foreach ($data_akun as $akun) {
+                    // Check if already didnt exist
+                    $check_akun = Akun::where("id_cabang", $cabang_dest)->where("kode_akun", $akun->kode_akun)->where("nama_akun", $akun->nama_akun)->first();
+                    if (!$check_akun) {
+                        $ins_akun = new Akun;
+                        $ins_akun->id_cabang = $cabang_dest;
+                        $ins_akun->kode_akun = $akun->kode_akun;
+                        $ins_akun->nama_akun = $akun->nama_akun;
+                        $ins_akun->tipe_akun = $akun->tipe_akun;
+                        $ins_akun->id_parent = $akun->id_parent;
+                        $ins_akun->isshown = $akun->isshown;
+                        $ins_akun->catatan = $akun->catatan;
+                        $ins_akun->header1 = $akun->header1;
+                        $ins_akun->header2 = $akun->header2;
+                        $ins_akun->header3 = $akun->header3;
+                        if (!$ins_akun->save()) {
+                            DB::rollback();
+                            return response()->json([
+                                "result"=>FALSE,
+                                "message"=>"Error when save copy master akun"
+                            ]);
+                        }
+                    }
+                }
+            }
+            DB::commit();
+            return response()->json([
+                "result"=>TRUE,
+                "message"=>"Successfully copying master akun"
+            ]);
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            Log::error("Error when copy data master akun");
+            Log::error($e);
+            return response()->json([
+                "result"=>FALSE,
+                "message"=>"Error when copy data master akun"
             ]);
         }
     }

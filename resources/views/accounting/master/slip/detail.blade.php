@@ -9,7 +9,7 @@
     <section class="content-header">
         <h1>
             Master Slip
-            <small>Slip | Detail</small>
+            <small>| Detail</small>
         </h1>
         <ol class="breadcrumb">
             <li><a href="#"><i class="fa fa-dashboard"></i> Dashboard</a></li>
@@ -23,15 +23,11 @@
     <div class="content container-fluid">
         <div class="row">
             <div class="col-xs-12">
-                <a href="{{ route('master-slip') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right"><span
-                        class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Back</a>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-xs-12">
                 <div class="box box-primary">
                     <div class="box-header">
-                        <h3 class="box-title">Slip <span class="text-muted">{{$data_slip->id_slip}}</span></h3>
+                        <h3 class="box-title">Slip <span class="text-muted"></span></h3>
+                        <a href="{{ route('master-slip') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right"><span
+                                class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali</a>
                     </div>
                     <div class="box-body">
                         <div class="row">

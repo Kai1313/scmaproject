@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Slip;
 use App\Models\Master\Cabang;
+use App\Models\Master\Akun;
 use App\Exports\SlipsExport;
 use Illuminate\Http\Request;
 use DB;
@@ -32,7 +33,8 @@ class MasterSlipController extends Controller
 
         if ($request->session()->has('token')) {
             return view('accounting.master.slip.index', $data);
-        } else {
+        } 
+        else {
             return view('exceptions.forbidden');
         }
     }
@@ -44,7 +46,8 @@ class MasterSlipController extends Controller
      */
     public function create(Request $request)
     {
-        $data_akun = DB::select('select * from master_akun');
+        $cabang = Cabang::find(1);
+        $data_akun = Akun::where("isshown", 1)->where("id_cabang", $cabang->id_cabang)->get();//DB::select('select * from master_akun');
         $data_cabang = DB::select('select * from cabang where status_cabang = 1');
 
         $data = [
@@ -253,8 +256,8 @@ class MasterSlipController extends Controller
      */
     public function populate(Request $request)
     {
-        $cabang = Cabang::find(1);
-        // dd($cabang->id_cabang);
+        $cabang = $request->cabang;
+        // dd($cabang);
         $offset = $request->start;
         $limit = $request->length;
         $keyword = $request->search['value'];
@@ -283,7 +286,7 @@ class MasterSlipController extends Controller
                 '));
 
         $data_slip_table = DB::table(DB::raw('(' . $data_slip->toSql() . ') as master_slip'));
-        $data_slip_table = $data_slip_table->where('id_cabang', $cabang->id_cabang);
+        $data_slip_table = $data_slip_table->where('id_cabang', $cabang);
 
         Log::debug(json_encode($data_slip_table));
 

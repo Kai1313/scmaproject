@@ -16,7 +16,7 @@
     <section class="content-header">
         <h1>
             Master Slip
-            <small>Slip | Create</small>
+            <small>| Tambah</small>
         </h1>
         <ol class="breadcrumb">
             <li><a href="#"><i class="fa fa-dashboard"></i> Dashboard</a></li>
@@ -34,9 +34,9 @@
                     <div class="box-header">
                         <div class="row">
                             <div class="col-xs-12">
-                                <h3 class="box-title">{{ (isset($data_slip)?'Edit':'Add') }} Slip</h3>
+                                <h3 class="box-title">{{ (isset($data_slip)?'Ubah':'Tambah') }} Slip</h3>
                                 <a href="{{ route('master-slip') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right"><span
-                                        class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Back</a>
+                                        class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali</a>
                             </div>
                         </div>
                     </div>
@@ -197,6 +197,20 @@
         $(function() {
             $('.select2').select2({
                 width: '100%'
+            })
+
+            $(document).on('select2:open', () => {
+                document.querySelector('.select2-search__field').focus()
+            })
+            
+            $(document).on('focus', '.select2-selection.select2-selection--single', function (e) {
+                $(this).closest(".select2-container").siblings('select:enabled').select2('open')
+            })
+
+            $('select.select2').on('select2:closing', function (e) {
+                $(e.target).data("select2").$selection.one('focus focusin', function (e) {
+                    e.stopPropagation();
+                })
             })
 
             if(Object.keys(slip).length > 0){

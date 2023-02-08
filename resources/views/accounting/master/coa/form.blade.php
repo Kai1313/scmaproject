@@ -3,6 +3,7 @@
     <!-- Select2 -->
     <link rel="stylesheet" href="{{ asset('assets/bower_components/select2/dist/css/select2.min.css') }}">
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 @endsection
 @section('header')
 <section class="content-header">
@@ -143,6 +144,20 @@
 
             $("#header3").select2({
                 tags: true
+            })
+
+            $(document).on('select2:open', () => {
+                document.querySelector('.select2-search__field').focus()
+            })
+            
+            $(document).on('focus', '.select2-selection.select2-selection--single', function (e) {
+                $(this).closest(".select2-container").siblings('select:enabled').select2('open')
+            })
+
+            $('select.select2').on('select2:closing', function (e) {
+                $(e.target).data("select2").$selection.one('focus focusin', function (e) {
+                    e.stopPropagation();
+                })
             })
 
             let header1 = "{{ (isset($akun->header1))?$akun->header1:'' }}"
