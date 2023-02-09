@@ -2,11 +2,11 @@
 <header class="main-header">
 
     <!-- Logo -->
-    <a href="index2.html" class="logo">
+    <a href="{{ route('dashboard', 1) }}" class="logo" style="background-color: #fff;">
         <!-- mini logo for sidebar mini 50x50 pixels -->
-        <span class="logo-mini"><b>A</b>CC</span>
+        <span class="logo-mini"><img src="{{ asset('assets/img/logo.png') }}" alt="Logo"></span>
         <!-- logo for regular state and mobile devices -->
-        <span class="logo-lg"><b>SCA</b>ACC</span>
+        <span class="logo-lg"><img src="{{ asset('assets/img/logo_full.png') }}" alt="Logo"></span>
     </a>
 
     <!-- Header Navbar -->

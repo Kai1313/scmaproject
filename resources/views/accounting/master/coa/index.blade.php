@@ -78,14 +78,14 @@
                         <table id="table_master_akun" class="table table-bordered table-striped">
                             <thead>
                                 <tr>
-                                    <th class="bg-primary" width="20%">Kode Akun</th>
-                                    <th class="bg-primary" width="25%">Nama Akun</th>
-                                    <th class="bg-primary" width="5%">Level</th>
-                                    <th class="bg-primary" width="10%">Tipe</th>
-                                    <th class="bg-primary" width="10%">Header1</th>
-                                    <th class="bg-primary" width="10%">Header2</th>
-                                    <th class="bg-primary" width="10%">Header3</th>
-                                    <th class="bg-primary" width="15%">Actions</th>
+                                    <th style="background-color: #f39c12;" width="20%">Kode Akun</th>
+                                    <th style="background-color: #f39c12;" width="25%">Nama Akun</th>
+                                    <th style="background-color: #f39c12;" width="5%">Level</th>
+                                    <th style="background-color: #f39c12;" width="10%">Tipe</th>
+                                    <th style="background-color: #f39c12;" width="10%">Header1</th>
+                                    <th style="background-color: #f39c12;" width="10%">Header2</th>
+                                    <th style="background-color: #f39c12;" width="10%">Header3</th>
+                                    <th style="background-color: #f39c12;" width="15%">Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="coa_table">
@@ -194,7 +194,7 @@
                         }
                     }
                 })
-                $(this).html('Copy Data Slip')
+                $(this).html('Copy Data Akun')
             })
         })
 
@@ -275,5 +275,48 @@
                 .filter( key => predicate(obj[key]) )
                 .reduce( (res, key) => (res[key] = obj[key], res), {} );
 
+        function delete_slip(id) {
+            let url = "{{ route('master-coa-destroy', ":id") }}"
+            url = url.replace(':id', id)
+            Swal.fire({
+                title: 'Anda yakin ingin menghapus data ini?',
+                icon: 'info',
+                showDenyButton: true,
+                confirmButtonText: 'Yes',
+                denyButtonText: 'No',
+                reverseButtons: true,
+                customClass: {
+                    actions: 'my-actions',
+                    confirmButton: 'order-1',
+                    denyButton: 'order-3',
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: "GET",
+                        url: url,
+                        success: function(data) {
+                            if (data.result) {
+                                Swal.fire('Terhapus!', data.message, 'success').then((result) => {
+                                    if (result.isConfirmed) {
+                                        window.location.reload()
+                                    }
+                                })
+                            }
+                            else {
+                                Swal.fire("Gagal menghapus data. ", data.message, 'error')
+                            }
+
+                        },
+                        error: function(data) {
+                            Swal.fire("Gagal menghapus data. ", data.message, 'error')
+                        }
+                    });
+                }
+                else if (result.isDenied) {
+                    Swal.fire('Batal menghapus data', '', 'info')
+                }
+            })
+        }
     </script>
 @endsection

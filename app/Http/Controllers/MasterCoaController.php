@@ -84,6 +84,17 @@ class MasterCoaController extends Controller
     {
         try {
             DB::beginTransaction();
+            // Check if already exist
+            $check_akun = Akun::where("id_cabang", $request->cabang)->where("kode_akun", $request->kode)->where("nama_akun", $request->nama)->first();
+            if ($check_akun) {
+                DB::rollback();
+                return response()->json([
+                    "result"=>FALSE,
+                    "akun"=>NULL,
+                    "message"=>"Akun sudah pernah dibuat, cek kembali kode akun, cabang, dan nama akun"
+                ]);
+            }
+
             // Init data
             $akun = new Akun;
             $akun->id_cabang = $request->cabang;
@@ -103,6 +114,7 @@ class MasterCoaController extends Controller
                 Log::error("Error when saving data akun");
                 return response()->json([
                     "result"=>FALSE,
+                    "akun"=>$akun,
                     "message"=>"Error when saving data akun"
                 ]);
             }
@@ -119,6 +131,7 @@ class MasterCoaController extends Controller
             Log::error($e);
             return response()->json([
                 "result"=>FALSE,
+                "akun"=>NULL,
                 "message"=>"Error when store akun"
             ]);
         }

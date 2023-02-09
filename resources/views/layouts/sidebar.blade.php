@@ -6,8 +6,8 @@
         <!-- Sidebar Menu -->
         <ul class="sidebar-menu" data-widget="tree">
             <li class="header">ACCOUNTING</li>
-            <li class="nav-item">
-                <a href="{{ route('dashboard') }}" class="{{ request()->segment(1) == 'dashboard' ? 'active' : null }}"><i class="fa fa-briefcase"></i> <span>Dashboard</span>
+            <li  class="nav-item {{ request()->segment(1) == 'dashboard' ? 'active' : null }}">
+                <a href="{{ route('dashboard') }}"><i class="fa fa-briefcase"></i> <span>Dashboard</span>
                 </a>
             </li>
             <!-- Optionally, you can add icons to the links -->
