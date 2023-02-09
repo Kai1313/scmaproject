@@ -4,9 +4,9 @@
 <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css') }}">
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <style>
-    .m-2 {
+    /* .m-2 {
         margin: 0.5rem;
-    }
+    } */
 
     ul#horizontal-list {
         min-width: 200px;
@@ -242,7 +242,7 @@
 
     window.getActions = function(data, row) {
         let base_url = "{{ url('') }}"
-        var action_btn = '<ul id="horizontal-list"><li><a href="' + base_url + '/master/slip/show/' + data + '" class="btn btn-flat btn-xs m-2 btn-default"><span class="glyphicon glyphicon-search" aria-hidden="true"></span> Detail</a></li><li><a href="' + base_url + '/master/slip/form/edit/' + data + '" class="btn btn-flat btn-xs m-2 btn-warning"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Ubah</a></li><li><button type="button" id="delete-btn" data-ids="' + data + '" onclick="delete_slip(' + data + ')" class="btn btn-flat btn-xs m-2 btn-danger delete-btn"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Hapus</button</li></ul>';
+        var action_btn = '<ul id="horizontal-list"><li><a href="' + base_url + '/master/slip/show/' + data + '" class="btn btn-xs mr-1 mb-1 btn-default"><span class="glyphicon glyphicon-search" aria-hidden="true"></span> Detail</a></li><li><a href="' + base_url + '/master/slip/form/edit/' + data + '" class="btn btn-xs mr-1 mb-1 btn-warning"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Ubah</a></li><li><button type="button" id="delete-btn" data-ids="' + data + '" onclick="delete_slip(' + data + ')" class="btn btn-xs mr-1 mb-1 btn-danger delete-btn"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Hapus</button</li></ul>';
         return action_btn;
     }
 
@@ -268,18 +268,18 @@
                     url: url,
                     success: function(data) {
                         if (data.result) {
-                            Swal.fire('Saved!', data.message, 'success').then((result) => {
+                            Swal.fire('Terhapus!', data.message, 'success').then((result) => {
                                 if (result.isConfirmed) {
                                     populate_table()
                                 }
                             })
                         } else {
-                            Swal.fire("Sorry, Can't delete data. ", data.message, 'error')
+                            Swal.fire("Gagal menghapus data. ", data.message, 'error')
                         }
 
                     },
                     error: function(data) {
-                        Swal.fire("Sorry, Can't delete data. ", data.message, 'error')
+                        Swal.fire("Gagal menghapus data. ", data.message, 'error')
                     }
                 });
             } else if (result.isDenied) {
