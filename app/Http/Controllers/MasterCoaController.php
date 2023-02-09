@@ -19,24 +19,40 @@ class MasterCoaController extends Controller
      */
     public function index()
     {
-        
+
         $cabang = Cabang::find(1);
         $data_cabang = Cabang::all();
-        $data_akun_level1 = Akun::where("id_cabang", $cabang->id_cabang)->whereNull('header1')->whereNull('header2')->whereNull('header3')->get();
-        $data_akun_level2 = Akun::where("id_cabang", $cabang->id_cabang)->whereNotNull('header1')->whereNull('header2')->whereNull('header3')->get();
-        $data_akun_level3 = Akun::where("id_cabang", $cabang->id_cabang)->whereNotNull('header1')->whereNotNull('header2')->whereNull('header3')->get();
-        $data_akun_level4 = Akun::where("id_cabang", $cabang->id_cabang)->whereNotNull('header1')->whereNotNull('header2')->whereNotNull('header3')->get();
-        
         $data = [
             "pageTitle"=>"SCA Accounting | Master CoA | List",
             "cabang_user" => $cabang,
-            "data_cabang" => $data_cabang,
-            "data_akun_level1" => $data_akun_level1,
-            "data_akun_level2" => $data_akun_level2,
-            "data_akun_level3" => $data_akun_level3,
-            "data_akun_level4" => $data_akun_level4
+            "data_cabang" => $data_cabang
         ];
         return view('accounting.master.coa.index', $data);
+    }
+
+    /**
+     * Show populate form data.
+     *
+     * @param  int $id_cabang
+     * @return \Illuminate\Http\Response
+     */
+    public function populate($id_cabang){
+    //    try{
+            $coa = Akun::where('id_cabang', $id_cabang)->get();
+
+            $data = $this->buildTree($coa);
+
+            return response()->json([
+                "result" => true,
+                "data" => $data
+            ]);
+
+        // }catch (\Exception $e) {
+        //     return response()->json([
+        //         "result" => false,
+        //         "message" => "Error get data akun"
+        //     ]);
+        // }
     }
 
     /**
@@ -398,5 +414,21 @@ class MasterCoaController extends Controller
                 "message"=>"Error when copy data master akun"
             ]);
         }
+    }
+
+    private function buildTree($elements, $parentId = 0) {
+        $branch = array();
+
+        foreach ($elements as $element) {
+            if ($element->id_parent == $parentId) {
+                $children = $this->buildTree($elements, $element->id_akun);
+                if ($children) {
+                    $element->children = $children;
+                }
+                $branch[] = $element;
+            }
+        }
+
+        return $branch;
     }
 }
