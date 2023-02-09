@@ -8,8 +8,8 @@
 @section('header')
 <section class="content-header">
     <h1>
-        Master CoA
-        <small>Chart of Account | Create</small>
+        Master Chart of Account
+        <small>| Create</small>
     </h1>
     <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> Dashboard</a></li>
@@ -28,7 +28,7 @@
                     <div class="row">
                         <div class="col-xs-12">
                             <h3 class="box-title">{{ (isset($akun->id_akun)?'Edit':'Add') }} Chart of Account</h3>
-                            <a href="{{ route('master-coa') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right">Back</a>
+                            <a href="{{ route('master-coa') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right"><span class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali</a>
                         </div>
                     </div>
                 </div>
@@ -47,15 +47,15 @@
                                 </div>
                                 <div class="form-group">
                                     <label>Kode Akun</label>
-                                    <input type="text" class="form-control" id="kode" name="kode" placeholder="Masukkan kode akun" value="{{ isset($akun->kode_akun)?$akun->kode_akun:'' }}">
+                                    <input type="text" class="form-control" id="kode" name="kode" placeholder="Masukkan kode akun" value="{{ isset($akun->kode_akun)?$akun->kode_akun:'' }}" data-validation="[NOTEMPTY]" data-validation-message="Kode Akun tidak boleh kosong">
                                 </div>
                                 <div class="form-group">
                                     <label>Nama Akun</label>
-                                    <input type="text" class="form-control" id="nama" name="nama" placeholder="Masukkan nama akun" value="{{ isset($akun->nama_akun)?$akun->nama_akun:'' }}">
+                                    <input type="text" class="form-control" id="nama" name="nama" placeholder="Masukkan nama akun" value="{{ isset($akun->nama_akun)?$akun->nama_akun:'' }}" data-validation="[NOTEMPTY]" data-validation-message="Nama Akun tidak boleh kosong">
                                 </div>
                                 <div class="form-group">
                                     <label>Tipe Akun</label>
-                                    <select name="tipe" class="form-control select2" style="width: 100%;">
+                                    <select name="tipe" class="form-control select2" style="width: 100%;" data-validation="[NOTEMPTY]" data-validation-message="Tipe Akun tidak boleh kosong">
                                         <option value="">Tanpa Tipe</option>
                                         <option value="0" {{ (isset($akun->tipe_akun)?(($akun->tipe_akun == 0)?'selected':''):'') }}>Neraca</option>
                                         <option value="1" {{ (isset($akun->tipe_akun)?(($akun->tipe_akun == 1)?'selected':''):'') }}>Laba Rugi</option>
@@ -110,9 +110,9 @@
                         <div class="row">
                             <div class="col-xs-12">
                                 @if (!isset($akun))
-                                    <button type="button" id="store-btn" class="btn btn-flat btn-primary pull-right"><span class="glyphicon glyphicon-pencil"></span> Simpan</button>
+                                    <button type="submit" id="store-btn" class="btn btn-flat btn-primary pull-right"><span class="glyphicon glyphicon-pencil"></span> Simpan</button>
                                 @else
-                                    <button type="button" id="update-btn" data-idakun="{{ $akun->id_akun }}" class="btn btn-flat btn-primary pull-right"><span class="glyphicon glyphicon-pencil"></span> Update</button>    
+                                    <button type="submit" id="update-btn" data-idakun="{{ $akun->id_akun }}" class="btn btn-flat btn-primary pull-right"><span class="glyphicon glyphicon-pencil"></span> Update</button>    
                                 @endif
                             </div>
                         </div>
@@ -127,11 +127,50 @@
 @section('addedScripts')
     <!-- Select2 -->
     <script src="{{ asset('assets/bower_components/select2/dist/js/select2.full.min.js') }}"></script>
+    <script src="{{ asset('assets/plugins/jquery-form-validation-1.5.3/dist/jquery.validation.min.js') }}"></script>
 @endsection
 
 @section('externalScripts')
     <script>
+        var validateCoa = {
+            submit: {
+                settings: {
+                    form: '#form-akun',
+                    inputContainer: '.form-group',
+                    errorListClass: 'form-control-error',
+                    errorClass: 'has-error',
+                    allErrors: true,
+                    scrollToError: {
+                        offset: -100,
+                        duration: 500
+                    }
+                },
+                callback: {
+                    onSubmit: function(node, formData) {
+                        console.log(node.find(':submit'))
+                        let button_status = node.find(":submit").attr("id")
+                        console.log(button_status)
+                        if (button_status == "store-btn") {
+                            store_akun()
+                            // console.log('store')
+                        }
+                        else {
+                            update_akun(node.find(":submit").data("idakun"))
+                            // console.log('update')
+                        }
+                    }
+                }
+            },
+            dynamic: {
+                settings: {
+                    trigger: 'keyup',
+                    delay: 1000
+                },
+            }
+        }
         $(function () {
+            $.validate(validateCoa)
+
             $('.select2').select2()
 
             $("#header1").select2({
@@ -168,15 +207,6 @@
             get_header2(header2)
             get_header3(header3)
 
-            $("#store-btn").on("click", function(e) {
-                e.preventDefault()
-                store_akun()
-            })
-
-            $("#update-btn").on("click", function(e) {
-                e.preventDefault()
-                update_akun($("#update-btn").data("idakun"))
-            })
         })
 
         function store_akun() {
@@ -187,15 +217,23 @@
                 dataType: "JSON",
                 success: function(data) {
                     console.log(data)
-                    get_header1(data.akun.header1)
-                    get_header2(data.akun.header2)
-                    get_header3(data.akun.header3)
-                    Swal.fire({
-                        title: 'Success!',
-                        text: data.message,
-                        icon: 'success',
-                        confirmButtonText: 'Ok'
-                    })
+                    if (data.result) {
+                        Swal.fire('Tersimpan!', data.message, 'success').then((result) => {
+                            if (result.isConfirmed) {
+                                get_header1(data.akun.header1)
+                                get_header2(data.akun.header2)
+                                get_header3(data.akun.header3)
+                                window.location.href = "{{ route('master-coa') }}";
+                            }
+                        })
+                        
+                    }
+                    else {
+                        Swal.fire("Gagal Menyimpan Data. ", data.message, 'error')
+                    }
+                },
+                error: function(data) {
+                    Swal.fire("Gagal Menyimpan Data. ", data.responseJSON.message, 'error')
                 }
             })
         }
@@ -210,15 +248,23 @@
                 dataType: "JSON",
                 success: function(data) {
                     console.log(data)
-                    get_header1(data.akun.header1)
-                    get_header2(data.akun.header2)
-                    get_header3(data.akun.header3)
-                    Swal.fire({
-                        title: 'Success!',
-                        text: data.message,
-                        icon: 'success',
-                        confirmButtonText: 'Ok'
-                    })
+                    if (data.result) {
+                        Swal.fire('Tersimpan!', data.message, 'success').then((result) => {
+                            if (result.isConfirmed) {
+                                get_header1(data.akun.header1)
+                                get_header2(data.akun.header2)
+                                get_header3(data.akun.header3)
+                                window.location.href = "{{ route('master-coa') }}";
+                            }
+                        })
+                        
+                    }
+                    else {
+                        Swal.fire("Gagal Menyimpan Data. ", data.message, 'error')
+                    }
+                },
+                error: function(data) {
+                    Swal.fire("Gagal Menyimpan Data. ", data.responseJSON.message, 'error')
                 }
             })
         }

@@ -92,15 +92,16 @@
                                     <td>-</td>
                                     <td>-</td>
                                     <td class="btn-column">
-                                        <a href="{{ route('master-coa-show', $akun1->id_akun) }}" class="btn-sm btn-default">
+                                        {{-- <a href="{{ route('master-coa-show', $akun1->id_akun) }}" class="btn btn-xs btn-default">
                                             <span class="glyphicon glyphicon-search" aria-hidden="true">
-                                        </a>
-                                        <a href="{{ route('master-coa-edit', $akun1->id_akun) }}" class="btn-sm btn-warning">
+                                        </a> --}}
+                                        <a href="{{ route('master-coa-edit', $akun1->id_akun) }}" class="btn btn-xs btn-warning">
                                             <span class="glyphicon glyphicon-pencil" aria-hidden="true">
                                         </a>
-                                        <a href="{{ route('master-coa-destroy', $akun1->id_akun) }}" class="btn-sm btn-danger">
+                                        {{-- <a href="{{ route('master-coa-destroy', $akun1->id_akun) }}" class="btn-xs btn-danger">
                                             <span class="glyphicon glyphicon-trash" aria-hidden="true">
-                                        </a>
+                                        </a> --}}
+                                        <button type="button" id="delete-btn" onclick="delete_slip({{ $akun1->id_akun }})" class="btn btn-flat btn-xs m-2 btn-danger delete-btn"><span class="glyphicon glyphicon-trash" aria-hidden="true"></button>
                                     </td>
                                 </tr>
                                 @foreach ($data_akun_level2 as $akun2)
@@ -113,15 +114,16 @@
                                             <td>-</td>
                                             <td>-</td>
                                             <td class="btn-column">
-                                                <a href="{{ route('master-coa-show', $akun2->id_akun) }}" class="btn-sm btn-default">
+                                                {{-- <a href="{{ route('master-coa-show', $akun2->id_akun) }}" class="btn btn-xs btn-default">
                                                     <span class="glyphicon glyphicon-search" aria-hidden="true">
-                                                </a>
-                                                <a href="{{ route('master-coa-edit', $akun2->id_akun) }}" class="btn-sm btn-warning">
+                                                </a> --}}
+                                                <a href="{{ route('master-coa-edit', $akun2->id_akun) }}" class="btn btn-xs btn-warning">
                                                     <span class="glyphicon glyphicon-pencil" aria-hidden="true">
                                                 </a>
-                                                <a href="{{ route('master-coa-destroy', $akun2->id_akun) }}" class="btn-sm btn-danger">
+                                                {{-- <a href="{{ route('master-coa-destroy', $akun2->id_akun) }}" class="btn-xs btn-danger">
                                                     <span class="glyphicon glyphicon-trash" aria-hidden="true">
-                                                </a>
+                                                </a> --}}
+                                                <button type="button" id="delete-btn" onclick="delete_slip({{ $akun2->id_akun }})" class="btn btn-flat btn-xs m-2 btn-danger delete-btn"><span class="glyphicon glyphicon-trash" aria-hidden="true"></button>
                                             </td>
                                         </tr>
 
@@ -135,15 +137,16 @@
                                                     <td>{{ $akun3->header2 }}</td>
                                                     <td>-</td>
                                                     <td class="btn-column">
-                                                        <a href="{{ route('master-coa-show', $akun3->id_akun) }}" class="btn-sm btn-default">
+                                                        {{-- <a href="{{ route('master-coa-show', $akun3->id_akun) }}" class="btn btn-xs btn-default">
                                                             <span class="glyphicon glyphicon-search" aria-hidden="true">
-                                                        </a>
-                                                        <a href="{{ route('master-coa-edit', $akun3->id_akun) }}" class="btn-sm btn-warning">
+                                                        </a> --}}
+                                                        <a href="{{ route('master-coa-edit', $akun3->id_akun) }}" class="btn btn-xs btn-warning">
                                                             <span class="glyphicon glyphicon-pencil" aria-hidden="true">
                                                         </a>
-                                                        <a href="{{ route('master-coa-destroy', $akun3->id_akun) }}" class="btn-sm btn-danger">
+                                                        {{-- <a href="{{ route('master-coa-destroy', $akun3->id_akun) }}" class="btn btn-xs btn-danger">
                                                             <span class="glyphicon glyphicon-trash" aria-hidden="true">
-                                                        </a>
+                                                        </a> --}}
+                                                        <button type="button" id="delete-btn" onclick="delete_slip({{ $akun3->id_akun }})" class="btn btn-flat btn-xs m-2 btn-danger delete-btn"><span class="glyphicon glyphicon-trash" aria-hidden="true"></button>
                                                     </td>
                                                 </tr>
 
@@ -157,15 +160,16 @@
                                                             <td>{{ $akun4->header2 }}</td>
                                                             <td>{{ $akun4->header3 }}</td>
                                                             <td class="btn-column">
-                                                                <a href="{{ route('master-coa-show', $akun4->id_akun) }}" class="btn-sm btn-default">
+                                                                {{-- <a href="{{ route('master-coa-show', $akun4->id_akun) }}" class="btn btn-xs btn-default">
                                                                     <span class="glyphicon glyphicon-search" aria-hidden="true">
-                                                                </a>
-                                                                <a href="{{ route('master-coa-edit', $akun4->id_akun) }}" class="btn-sm btn-warning">
+                                                                </a> --}}
+                                                                <a href="{{ route('master-coa-edit', $akun4->id_akun) }}" class="btn btn-xs btn-warning">
                                                                     <span class="glyphicon glyphicon-pencil" aria-hidden="true">
                                                                 </a>
-                                                                <a href="{{ route('master-coa-destroy', $akun4->id_akun) }}" class="btn-sm btn-danger">
+                                                                {{-- <a href="{{ route('master-coa-destroy', $akun4->id_akun) }}" class="btn-xs btn-danger">
                                                                     <span class="glyphicon glyphicon-trash" aria-hidden="true">
-                                                                </a>
+                                                                </a> --}}
+                                                                <button type="button" id="delete-btn" onclick="delete_slip({{ $akun4->id_akun }})" class="btn btn-flat btn-xs m-2 btn-danger delete-btn"><span class="glyphicon glyphicon-trash" aria-hidden="true"></button>
                                                             </td>
                                                         </tr>
                                                     @endif
@@ -272,8 +276,52 @@
                         }
                     }
                 })
-                $(this).html('Copy Data Slip')
+                $(this).html('Copy Data Akun')
             })
         })
+
+        function delete_slip(id) {
+            let url = "{{ route('master-coa-destroy', ":id") }}"
+            url = url.replace(':id', id)
+            Swal.fire({
+                title: 'Anda yakin ingin menghapus data ini?',
+                icon: 'info',
+                showDenyButton: true,
+                confirmButtonText: 'Yes',
+                denyButtonText: 'No',
+                reverseButtons: true,
+                customClass: {
+                    actions: 'my-actions',
+                    confirmButton: 'order-1',
+                    denyButton: 'order-3',
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: "GET",
+                        url: url,
+                        success: function(data) {
+                            if (data.result) {
+                                Swal.fire('Terhapus!', data.message, 'success').then((result) => {
+                                    if (result.isConfirmed) {
+                                        window.location.reload()
+                                    }
+                                })
+                            } 
+                            else {
+                                Swal.fire("Gagal menghapus data. ", data.message, 'error')
+                            }
+
+                        },
+                        error: function(data) {
+                            Swal.fire("Gagal menghapus data. ", data.message, 'error')
+                        }
+                    });
+                } 
+                else if (result.isDenied) {
+                    Swal.fire('Batal menghapus data', '', 'info')
+                }
+            })
+        }
     </script>
 @endsection

@@ -191,7 +191,7 @@
         if (Object.keys(slip).length > 0) {
             save_route = "{{ route('master-slip-update') }}";
         }
-        var terminations = []
+
         var validateSlip = {
             submit: {
                 settings: {
