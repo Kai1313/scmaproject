@@ -30,6 +30,10 @@
         #table_master_akun td.btn-column span{
             padding: 2px !important;
         }
+
+        .dropdown-menu>li>a.text-danger{
+            color: #843534 !important;
+        }
     </style>
 @endsection
 @section('header')
@@ -70,117 +74,24 @@
                     </div>
                 </div>
                 <div class="box-body">
-                    <table id="table_master_akun" class="table table-bordered table-striped">
-                        <thead>
-                            <tr>
-                                <th class="bg-primary" style="background-color: #f39c12;" width="35%">Nama Akun</th>
-                                <th class="bg-primary" style="background-color: #f39c12;" width="15%">Kode Akun</th>
-                                <th class="bg-primary" style="background-color: #f39c12;" width="5%">Level</th>
-                                <th class="bg-primary" style="background-color: #f39c12;" width="10%">Header1</th>
-                                <th class="bg-primary" style="background-color: #f39c12;" width="10%">Header2</th>
-                                <th class="bg-primary" style="background-color: #f39c12;" width="10%">Header3</th>
-                                <th class="bg-primary" style="background-color: #f39c12;" width="15%">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($data_akun_level1 as $akun1)
-                                <tr data-tt-id="{{$akun1->id_akun}}">
-                                    <td>{{ $akun1->nama_akun }}</td>
-                                    <td>{{ $akun1->kode_akun }}</td>
-                                    <td>1</td>
-                                    <td>-</td>
-                                    <td>-</td>
-                                    <td>-</td>
-                                    <td class="btn-column">
-                                        {{-- <a href="{{ route('master-coa-show', $akun1->id_akun) }}" class="btn btn-xs btn-default">
-                                            <span class="glyphicon glyphicon-search" aria-hidden="true">
-                                        </a> --}}
-                                        <a href="{{ route('master-coa-edit', $akun1->id_akun) }}" class="btn btn-xs btn-warning">
-                                            <span class="glyphicon glyphicon-pencil" aria-hidden="true">
-                                        </a>
-                                        {{-- <a href="{{ route('master-coa-destroy', $akun1->id_akun) }}" class="btn-xs btn-danger">
-                                            <span class="glyphicon glyphicon-trash" aria-hidden="true">
-                                        </a> --}}
-                                        <button type="button" id="delete-btn" onclick="delete_slip({{ $akun1->id_akun }})" class="btn btn-flat btn-xs m-2 btn-danger delete-btn"><span class="glyphicon glyphicon-trash" aria-hidden="true"></button>
-                                    </td>
+                    <div class="table-responsive">
+                        <table id="table_master_akun" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th style="background-color: #f39c12;" width="20%">Kode Akun</th>
+                                    <th style="background-color: #f39c12;" width="25%">Nama Akun</th>
+                                    <th style="background-color: #f39c12;" width="5%">Level</th>
+                                    <th style="background-color: #f39c12;" width="10%">Tipe</th>
+                                    <th style="background-color: #f39c12;" width="10%">Header1</th>
+                                    <th style="background-color: #f39c12;" width="10%">Header2</th>
+                                    <th style="background-color: #f39c12;" width="10%">Header3</th>
+                                    <th style="background-color: #f39c12;" width="15%">Actions</th>
                                 </tr>
-                                @foreach ($data_akun_level2 as $akun2)
-                                    @if ($akun2->id_parent == $akun1->id_akun)
-                                        <tr data-tt-id="{{$akun2->id_akun}}" data-tt-parent-id="{{$akun1->id_akun}}">
-                                            <td>{{ $akun2->nama_akun }}</td>
-                                            <td>{{ $akun2->kode_akun }}</td>
-                                            <td>2</td>
-                                            <td>{{ $akun2->header1 }}</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td class="btn-column">
-                                                {{-- <a href="{{ route('master-coa-show', $akun2->id_akun) }}" class="btn btn-xs btn-default">
-                                                    <span class="glyphicon glyphicon-search" aria-hidden="true">
-                                                </a> --}}
-                                                <a href="{{ route('master-coa-edit', $akun2->id_akun) }}" class="btn btn-xs btn-warning">
-                                                    <span class="glyphicon glyphicon-pencil" aria-hidden="true">
-                                                </a>
-                                                {{-- <a href="{{ route('master-coa-destroy', $akun2->id_akun) }}" class="btn-xs btn-danger">
-                                                    <span class="glyphicon glyphicon-trash" aria-hidden="true">
-                                                </a> --}}
-                                                <button type="button" id="delete-btn" onclick="delete_slip({{ $akun2->id_akun }})" class="btn btn-flat btn-xs m-2 btn-danger delete-btn"><span class="glyphicon glyphicon-trash" aria-hidden="true"></button>
-                                            </td>
-                                        </tr>
-
-                                        @foreach ($data_akun_level3 as $akun3)
-                                            @if ($akun3->id_parent == $akun2->id_akun)
-                                                <tr data-tt-id="{{$akun3->id_akun}}" data-tt-parent-id="{{$akun2->id_akun}}">
-                                                    <td>{{ $akun3->nama_akun }}</td>
-                                                    <td>{{ $akun3->kode_akun }}</td>
-                                                    <td>3</td>
-                                                    <td>{{ $akun3->header1 }}</td>
-                                                    <td>{{ $akun3->header2 }}</td>
-                                                    <td>-</td>
-                                                    <td class="btn-column">
-                                                        {{-- <a href="{{ route('master-coa-show', $akun3->id_akun) }}" class="btn btn-xs btn-default">
-                                                            <span class="glyphicon glyphicon-search" aria-hidden="true">
-                                                        </a> --}}
-                                                        <a href="{{ route('master-coa-edit', $akun3->id_akun) }}" class="btn btn-xs btn-warning">
-                                                            <span class="glyphicon glyphicon-pencil" aria-hidden="true">
-                                                        </a>
-                                                        {{-- <a href="{{ route('master-coa-destroy', $akun3->id_akun) }}" class="btn btn-xs btn-danger">
-                                                            <span class="glyphicon glyphicon-trash" aria-hidden="true">
-                                                        </a> --}}
-                                                        <button type="button" id="delete-btn" onclick="delete_slip({{ $akun3->id_akun }})" class="btn btn-flat btn-xs m-2 btn-danger delete-btn"><span class="glyphicon glyphicon-trash" aria-hidden="true"></button>
-                                                    </td>
-                                                </tr>
-
-                                                @foreach ($data_akun_level4 as $akun4)
-                                                    @if ($akun4->id_parent == $akun3->id_akun)
-                                                        <tr data-tt-id="{{$akun4->id_akun}}" data-tt-parent-id="{{$akun3->id_akun}}">
-                                                            <td>{{ $akun4->nama_akun }}</td>
-                                                            <td>{{ $akun4->kode_akun }}</td>
-                                                            <td>4</td>
-                                                            <td>{{ $akun4->header1 }}</td>
-                                                            <td>{{ $akun4->header2 }}</td>
-                                                            <td>{{ $akun4->header3 }}</td>
-                                                            <td class="btn-column">
-                                                                {{-- <a href="{{ route('master-coa-show', $akun4->id_akun) }}" class="btn btn-xs btn-default">
-                                                                    <span class="glyphicon glyphicon-search" aria-hidden="true">
-                                                                </a> --}}
-                                                                <a href="{{ route('master-coa-edit', $akun4->id_akun) }}" class="btn btn-xs btn-warning">
-                                                                    <span class="glyphicon glyphicon-pencil" aria-hidden="true">
-                                                                </a>
-                                                                {{-- <a href="{{ route('master-coa-destroy', $akun4->id_akun) }}" class="btn-xs btn-danger">
-                                                                    <span class="glyphicon glyphicon-trash" aria-hidden="true">
-                                                                </a> --}}
-                                                                <button type="button" id="delete-btn" onclick="delete_slip({{ $akun4->id_akun }})" class="btn btn-flat btn-xs m-2 btn-danger delete-btn"><span class="glyphicon glyphicon-trash" aria-hidden="true"></button>
-                                                            </td>
-                                                        </tr>
-                                                    @endif
-                                                @endforeach
-                                            @endif
-                                        @endforeach
-                                    @endif
-                                @endforeach
-                            @endforeach
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody id="coa_table">
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
               </div>
         </div>
@@ -241,12 +152,19 @@
 
 @section('externalScripts')
     <script>
+        var body_coa = '';
+        var base_url = "{{ url('/') }}"
         $(function () {
             // $('#example1').DataTable()
-            $('#table_master_akun').treetable({expandable: true});
 
             $("#btn-copy").on("click", function() {
                 $("#modal-copy").modal("show")
+            })
+
+            getDataCoa($('#cabang_table').val());
+
+            $('#cabang_table').change(function(){
+                getDataCoa($(this).val())
             })
 
             $("#btn-copy-data").on("click", function() {
@@ -280,6 +198,83 @@
             })
         })
 
+        function getDataCoa(id_cabang){
+            $('#table_master_akun').treetable('destroy');
+            $.ajax({
+                url: "{{ route('master-coa-populate') }}/" + id_cabang,
+                type: "GET",
+                dataType: "JSON",
+                success: function(data) {
+                    if (data.result) {
+                        let data_coa = data.data;
+                        body_coa = '';
+                        if(jQuery.isEmptyObject(data_coa) == false){
+                            getTreetable(data_coa, 1);
+                            $('#coa_table').html(body_coa);
+                            $('#table_master_akun').treetable({expandable: true});
+                        }
+                        else{
+                            body_coa += '<tr><td colspan="8" class="text-center">Empty Data</td></tr>';
+                            $('#coa_table').html(body_coa);
+                        }
+                    }
+                    else {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: data.message,
+                            icon: 'error',
+                            confirmButtonText: 'Close'
+                        })
+                    }
+                }
+            })
+        }
+
+        function getTreetable(data, level){
+            let parent_level = level;
+            data.forEach(element => {
+                if(element.id_parent == null){
+                    body_coa += '<tr data-tt-id="' + element.id_akun + '">';
+                }else{
+                    body_coa += '<tr data-tt-id="' + element.id_akun + '" data-tt-parent-id="' + element.id_parent + '">';
+                }
+                body_coa += '<td>' + element.kode_akun + '</td>';
+                body_coa += '<td>' + element.nama_akun + '</td>';
+                body_coa += '<td>' + parent_level + '</td>';
+                if(element.tipe_akun == 0){
+                    body_coa += '<td>Neraca</td>';
+                }else if(element.tipe_akun == 1){
+                    body_coa += '<td>Laba Rugi</td>';
+                }else{
+                    body_coa += '<td>-</td>';
+                }
+                body_coa += '<td>' + ((element.header1 == null) ? '-' : element.header1) + '</td>';
+                body_coa += '<td>' + ((element.header2 == null) ? '-' : element.header2) + '</td>';
+                body_coa += '<td>' + ((element.header3 == null) ? '-' : element.header3) + '</td>';
+                body_coa += '<td class="btn-column">';
+                // body_coa += '<div class="btn-group" role="group"><button id="btnActionGroup" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Action</button>';
+                // body_coa += '<ul class="dropdown-menu" aria-labelledby="btnActionGroup">';
+                // body_coa += '<li class="dropdown-item"><a href="' + base_url + '/master/coa/form/show/' + element.id_akun + '">Detail</a></li>';
+                // body_coa += '<li class="dropdown-item"><a href="' + base_url + '/master/coa/form/edit/' + element.id_akun + '">Edit</a></li>';
+                // body_coa += '<li class="dropdown-item text-danger"><a href="' + base_url + '/master/coa/destory/' + element.id_akun + '">Delete</a></li>';
+                body_coa += '<a href="' + base_url + '/master/coa/form/show/' + element.id_akun + '" class="btn-sm btn-default"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a>';
+                body_coa += '<a href="' + base_url + '/master/coa/form/edit/' + element.id_akun + '" class="btn-sm btn-warning"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></a>';
+                body_coa += '<a href="' + base_url + '/master/coa/form/destory/' + element.id_akun + '" class="btn-sm btn-danger"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></a>';
+                // body_coa += '</ul></div>';
+                body_coa += '</td></tr>';
+                if(typeof(element.children) != "undefined"){
+                    getTreetable(element.children, (parent_level + 1));
+                }
+            });
+
+            // return html;
+        }
+
+        Object.filter = (obj, predicate) =>
+            Object.keys(obj)
+                .filter( key => predicate(obj[key]) )
+                .reduce( (res, key) => (res[key] = obj[key], res), {} );
+
         function delete_slip(id) {
             let url = "{{ route('master-coa-destroy', ":id") }}"
             url = url.replace(':id', id)
@@ -307,7 +302,7 @@
                                         window.location.reload()
                                     }
                                 })
-                            } 
+                            }
                             else {
                                 Swal.fire("Gagal menghapus data. ", data.message, 'error')
                             }
@@ -317,7 +312,7 @@
                             Swal.fire("Gagal menghapus data. ", data.message, 'error')
                         }
                     });
-                } 
+                }
                 else if (result.isDenied) {
                     Swal.fire('Batal menghapus data', '', 'info')
                 }

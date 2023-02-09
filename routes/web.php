@@ -44,6 +44,7 @@ Route::get('/master/slip/export/excel', 'MasterSlipController@export_excel')->na
 Route::post('/master/slip/copy/data', 'MasterSlipController@copy_data')->name('master-slip-copy-data');
 
 Route::get('/master/coa', 'MasterCoaController@index')->name('master-coa');
+Route::get('/master/coa/populate/{cabang?}', 'MasterCoaController@populate')->name('master-coa-populate');
 Route::get('/master/coa/form/create', 'MasterCoaController@create')->name('master-coa-create');
 Route::get('/master/coa/form/edit/{id}', 'MasterCoaController@edit')->name('master-coa-edit');
 Route::get('/master/coa/form/show/{id}', 'MasterCoaController@show')->name('master-coa-show');
