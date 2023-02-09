@@ -73,13 +73,13 @@
                     <table id="table_master_akun" class="table table-bordered table-striped">
                         <thead>
                             <tr>
-                                <th class="bg-primary" width="35%">Nama Akun</th>
-                                <th class="bg-primary" width="15%">Kode Akun</th>
-                                <th class="bg-primary" width="5%">Level</th>
-                                <th class="bg-primary" width="10%">Header1</th>
-                                <th class="bg-primary" width="10%">Header2</th>
-                                <th class="bg-primary" width="10%">Header3</th>
-                                <th class="bg-primary" width="15%">Actions</th>
+                                <th class="bg-primary" style="background-color: #f39c12;" width="35%">Nama Akun</th>
+                                <th class="bg-primary" style="background-color: #f39c12;" width="15%">Kode Akun</th>
+                                <th class="bg-primary" style="background-color: #f39c12;" width="5%">Level</th>
+                                <th class="bg-primary" style="background-color: #f39c12;" width="10%">Header1</th>
+                                <th class="bg-primary" style="background-color: #f39c12;" width="10%">Header2</th>
+                                <th class="bg-primary" style="background-color: #f39c12;" width="10%">Header3</th>
+                                <th class="bg-primary" style="background-color: #f39c12;" width="15%">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
