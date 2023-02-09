@@ -4,12 +4,7 @@
     <!-- Select2 -->
     <link rel="stylesheet" href="{{ asset('assets/bower_components/select2/dist/css/select2.min.css') }}">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.min.css" rel="stylesheet">
-
-    <style>
-        .wrapper-cabang {
-            margin-top: 1rem;
-        }
-    </style>
+    
 @endsection
 
 @section('header')
@@ -56,18 +51,18 @@
                                     </div>
                                     <div class="form-group">
                                         <label>Kode Slip</label>
-                                        <input type="text" class="form-control" id="kode_slip" name="kode_slip" placeholder="Masukkan kode slip" value="{{ isset($data_slip->kode_slip)?$data_slip->kode_slip:'' }}" required>
+                                        <input type="text" class="form-control" id="kode_slip" name="kode_slip" placeholder="Masukkan kode slip" value="{{ isset($data_slip->kode_slip)?$data_slip->kode_slip:'' }}" data-validation="[NOTEMPTY]" data-validation-message="Kode Slip tidak boleh kosong" required>
                                     </div>
                                     <div class="form-group">
                                         <label>Nama Slip</label>
-                                        <input type="text" class="form-control" id="nama_slip" name="nama_slip" placeholder="Masukkan nama slip" value="{{ isset($data_slip->nama_slip)?$data_slip->nama_slip:'' }}" required>
+                                        <input type="text" class="form-control" id="nama_slip" name="nama_slip" placeholder="Masukkan nama slip" value="{{ isset($data_slip->nama_slip)?$data_slip->nama_slip:'' }}" data-validation="[NOTEMPTY]" data-validation-message="Nama Slip tidak boleh kosong"  required>
                                     </div>
                                 </div>
                                 <div class="col-xs-6">
                                     <div class="form-group">
                                         <label>Jenis Slip</label>
                                         <select name="jenis_slip" class="form-control select2" id="jenis_slip"
-                                        data-error="Wajib isi" required>
+                                        data-error="Wajib isi" data-validation="[NOTEMPTY]" data-validation-message="Jenis Slip tidak boleh kosong"  required>
                                             <option value="">Pilih Slip</option>
                                             <option value="0">Kas</option>
                                             <option value="1">Bank</option>
@@ -78,11 +73,11 @@
                                     <div class="form-group">
                                         <label>Akun</label>
                                         <select name="id_akun" class="form-control select2" id="id_akun"
-                                        data-error="Wajib isi" required>
+                                        data-error="Wajib isi" data-validation="[NOTEMPTY]" data-validation-message="Akun tidak boleh kosong"  required>
                                             <option value="">Pilih Akun</option>
                                             @foreach ($data_akun as $akun)
                                                 <option value="{{ $akun->id_akun }}"
-                                                @if(isset($data_slip)) @if ($data_slip->id_akun == $akun->id_akun) selected @endif @endif>{{ $akun->nama_akun }}
+                                                @if(isset($data_slip)) @if ($data_slip->id_akun == $akun->id_akun) selected @endif @endif>{{ $akun->kode_akun.' - '.$akun->nama_akun }}
                                                 </option>
                                             @endforeach
                                         </select>
@@ -94,7 +89,10 @@
                                     <button type="button" id="tombol_refresh" onclick="refresh()"
                                     class="btn btn-default pull-left sr-only"><span class="glyphicon glyphicon-repeat"
                                         aria-hidden="true"></span> Ulangi</button>
-                                    <button type="button" id="tombol_buat" onclick="save_data()"
+                                    {{-- <button type="button" id="tombol_buat" onclick="save_data()"
+                                        class="btn btn-flat btn-primary pull-right"><span class="glyphicon glyphicon-floppy-saved"
+                                            aria-hidden="true"></span> {{(isset($data_slip)) ? ' Ubah Data' : ' Simpan Data'}}</button> --}}
+                                    <button type="submit" id="tombol_buat"
                                         class="btn btn-flat btn-primary pull-right"><span class="glyphicon glyphicon-floppy-saved"
                                             aria-hidden="true"></span> {{(isset($data_slip)) ? ' Ubah Data' : ' Simpan Data'}}</button>
                                     <button type="button" id="tombol_ubah" onclick="ubah_data()"
@@ -180,9 +178,9 @@
 @section('addedScripts')
     <!-- Select2 -->
     <script src="{{ asset('assets/bower_components/select2/dist/js/select2.full.min.js') }}"></script>
-
     {{-- Swal alert --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.all.min.js"></script>
+    <script src="{{ asset('assets/plugins/jquery-form-validation-1.5.3/dist/jquery.validation.min.js') }}"></script>
 @endsection
 
 @section('externalScripts')
@@ -193,8 +191,38 @@
         if (Object.keys(slip).length > 0) {
             save_route = "{{ route('master-slip-update') }}";
         }
+        var terminations = []
+        var validateSlip = {
+            submit: {
+                settings: {
+                    form: '#form_slip',
+                    inputContainer: '.form-group',
+                    // errorListContainer: 'help-block',
+                    errorListClass: 'form-control-error',
+                    errorClass: 'has-error',
+                    allErrors: true,
+                    scrollToError: {
+                        offset: -100,
+                        duration: 500
+                    }
+                },
+                callback: {
+                    onSubmit: function(node, formData) {
+                        console.log('hello')
+                        save_data()
+                    }
+                }
+            },
+            dynamic: {
+                settings: {
+                    trigger: 'keyup',
+                    delay: 1000
+                },
+            }
+        }
 
         $(function() {
+            $.validate(validateSlip)
             $('.select2').select2({
                 width: '100%'
             })

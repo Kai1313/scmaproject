@@ -14,6 +14,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
     @yield('addedStyles')
     <!-- Theme style -->
     <link rel="stylesheet" href="{{ asset('assets/dist/css/AdminLTE.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/dist/css/html5-form-validation.css') }}">
+    <style>
+        .wrapper-cabang {
+            margin-top: 1rem;
+        }
+    </style>
     <!-- AdminLTE Skins. We have chosen the skin-blue for this starter
             page. However, you can choose any other skin. Make sure you
             apply the skin class to the body tag so the changes take effect. -->
