@@ -247,7 +247,7 @@
     }
 
     function delete_slip(id) {
-        let url = "{{ route('master-slip-destroy', ": id ") }}"
+        let url = "{{ route('master-slip-destroy', ":id") }}"
         url = url.replace(':id', id)
         Swal.fire({
             title: 'Anda yakin ingin menghapus data ini?',

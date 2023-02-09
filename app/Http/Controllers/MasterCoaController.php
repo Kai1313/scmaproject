@@ -147,18 +147,23 @@ class MasterCoaController extends Controller
     {
         // Get data for select
         $data_cabang = Cabang::all();
-        $data_akun = Akun::all();
+        // $data_akun = Akun::all();
 
         // Get data akun
-        $akun = Akun::where("id_akun", $id)->first();
+        $data_akun = Akun::leftjoin('master_akun as parent', 'parent.id_akun', 'master_akun.id_parent')
+            ->join('cabang', 'cabang.id_cabang', 'master_akun.id_cabang')
+            ->where("master_akun.id_akun", $id)
+            ->select('master_akun.*', 'cabang.*', 'parent.kode_akun as kode_parent', 'parent.nama_akun as nama_parent')
+            ->first();
+
+        Log::debug(json_encode($data_akun));
 
         $data = [
-            "pageTitle"=>"SCA Accounting | Master CoA | Show",
+            "pageTitle"=>"SCA Accounting | Master CoA | Detail",
             "data_cabang"=>$data_cabang,
-            "data_akun"=>$data_akun,
-            "akun"=>$akun
+            "data_akun"=>$data_akun
         ];
-        return view('accounting.master.coa.form', $data);
+        return view('accounting.master.coa.detail', $data);
     }
 
     /**

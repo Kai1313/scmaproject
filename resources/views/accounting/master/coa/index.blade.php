@@ -16,11 +16,13 @@
 
         #table_master_akun td{
             font-size: 1.3rem !important;
-            padding: 1rem !important;
+            padding: 0.5rem !important;
         }
 
         #table_master_akun td.btn-column{
             text-align: center !important;
+            font-size: 12px;
+            padding: 8px;
         }
 
         #table_master_akun td.btn-column span{
@@ -31,8 +33,15 @@
             color: #843534 !important;
         }
 
-        .m-2{
-            margin: 0.5rem;
+        ul#horizontal-list {
+            min-width: 200px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        ul#horizontal-list li {
+            display: inline;
         }
     </style>
 @endsection
@@ -70,6 +79,8 @@
                             <a href="{{ route('master-coa-create') }}" class="btn btn-sm btn-success btn-flat pull-right"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Tambah CoA</a>
                             <button id="btn-copy" type="button" class="btn btn-sm btn-info btn-flat pull-right mr-1"><span class="glyphicon glyphicon-copy" aria-hidden="true"></span> Copy Data</button>
                             <a href="{{ route('master-coa-export-excel') }}" target="__blank" class="btn btn-sm btn-info btn-flat pull-right mr-1"><span class="glyphicon glyphicon-export" aria-hidden="true"></span> Export Excel</a>
+                            <a href="#" class="btn btn-sm btn-info btn-flat pull-right mr-1" onclick="jQuery('#table_master_akun').treetable('expandAll'); return false;"><span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span> Expand All</a>
+                            <a href="#" class="btn btn-sm btn-info btn-flat pull-right mr-1" onclick="jQuery('#table_master_akun').treetable('collapseAll'); return false;"><span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span> Collapse All</a>
                         </div>
                     </div>
                 </div>
@@ -78,14 +89,14 @@
                         <table id="table_master_akun" class="table table-bordered table-striped">
                             <thead>
                                 <tr>
-                                    <th style="background-color: #f39c12;" width="20%">Kode Akun</th>
-                                    <th style="background-color: #f39c12;" width="25%">Nama Akun</th>
+                                    <th style="background-color: #f39c12;" width="18%">Kode Akun</th>
+                                    <th style="background-color: #f39c12;" width="19%">Nama Akun</th>
                                     <th style="background-color: #f39c12;" width="5%">Level</th>
                                     <th style="background-color: #f39c12;" width="10%">Tipe</th>
                                     <th style="background-color: #f39c12;" width="10%">Header1</th>
                                     <th style="background-color: #f39c12;" width="10%">Header2</th>
                                     <th style="background-color: #f39c12;" width="10%">Header3</th>
-                                    <th style="background-color: #f39c12;" width="15%">Actions</th>
+                                    <th style="background-color: #f39c12;" width="18%">Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="coa_table">
@@ -240,26 +251,26 @@
                 }
                 body_coa += '<td>' + element.kode_akun + '</td>';
                 body_coa += '<td>' + element.nama_akun + '</td>';
-                body_coa += '<td>' + parent_level + '</td>';
+                body_coa += '<td class="text-center">' + parent_level + '</td>';
                 if(element.tipe_akun == 0){
-                    body_coa += '<td>Neraca</td>';
+                    body_coa += '<td class="text-center">Neraca</td>';
                 }else if(element.tipe_akun == 1){
-                    body_coa += '<td>Laba Rugi</td>';
+                    body_coa += '<td class="text-center">Laba Rugi</td>';
                 }else{
-                    body_coa += '<td>-</td>';
+                    body_coa += '<td class="text-center">-</td>';
                 }
                 body_coa += '<td>' + ((element.header1 == null) ? '-' : element.header1) + '</td>';
                 body_coa += '<td>' + ((element.header2 == null) ? '-' : element.header2) + '</td>';
                 body_coa += '<td>' + ((element.header3 == null) ? '-' : element.header3) + '</td>';
-                body_coa += '<td class="btn-column">';
+                body_coa += '<td class="btn-column"><ul id="horizontal-list">';
                 // body_coa += '<div class="btn-group" role="group"><button id="btnActionGroup" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Action</button>';
                 // body_coa += '<ul class="dropdown-menu" aria-labelledby="btnActionGroup">';
                 // body_coa += '<li class="dropdown-item"><a href="' + base_url + '/master/coa/form/show/' + element.id_akun + '">Detail</a></li>';
                 // body_coa += '<li class="dropdown-item"><a href="' + base_url + '/master/coa/form/edit/' + element.id_akun + '">Edit</a></li>';
                 // body_coa += '<li class="dropdown-item text-danger"><a href="' + base_url + '/master/coa/destory/' + element.id_akun + '">Delete</a></li>';
-                body_coa += '<a href="' + base_url + '/master/coa/form/show/' + element.id_akun + '" class="btn btn-flat btn-xs m-2 btn-default"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a>';
-                body_coa += '<a href="' + base_url + '/master/coa/form/edit/' + element.id_akun + '" class="btn btn-flat btn-xs m-2 btn-warning"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></a>';
-                body_coa += '<button type="button" id="delete-btn" onclick="delete_slip(' + element.id_akun +')" class="btn btn-flat btn-xs m-2 btn-danger delete-btn"><span class="glyphicon glyphicon-trash" aria-hidden="true"></button>';
+                body_coa += '<li><a href="' + base_url + '/master/coa/form/show/' + element.id_akun + '" class="btn btn-xs mr-1 mb-1 btn-default"><span class="glyphicon glyphicon-search" aria-hidden="true"></span> Detail</a></li>';
+                body_coa += '<li><a href="' + base_url + '/master/coa/form/edit/' + element.id_akun + '" class="btn btn-xs mr-1 mb-1 btn-warning"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Ubah</a></li>';
+                body_coa += '<li><button type="button" id="delete-btn" onclick="delete_slip(' + element.id_akun +')" class="btn btn-xs mb-1 btn-danger delete-btn"><span class="glyphicon glyphicon-trash" aria-hidden="true"> Hapus</button></li></ul>';
                 // body_coa += '</ul></div>';
                 body_coa += '</td></tr>';
                 if(typeof(element.children) != "undefined"){
