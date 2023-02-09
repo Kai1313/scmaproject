@@ -58,7 +58,8 @@ class MasterSlipController extends Controller
 
         if ($request->session()->has('token')) {
             return view('accounting.master.slip.form', $data);
-        } else {
+        } 
+        else {
             return view('exceptions.forbidden');
         }
     }
@@ -137,7 +138,8 @@ class MasterSlipController extends Controller
 
         if ($request->session()->has('token')) {
             return view('accounting.master.slip.detail', $data);
-        } else {
+        } 
+        else {
             return view('exceptions.forbidden');
         }
     }
@@ -163,7 +165,8 @@ class MasterSlipController extends Controller
 
         if ($request->session()->has('token')) {
             return view('accounting.master.slip.form', $data);
-        } else {
+        } 
+        else {
             return view('exceptions.forbidden');
         }
     }
@@ -241,12 +244,21 @@ class MasterSlipController extends Controller
     {
         $data_journal_header = DB::select('select * from jurnal_header where id_slip = ' . $id);
         $data_slip = Slip::find($id);
+        $kode_slip = $data_slip->kode_slip;
         if (!empty($data_journal_header)) {
-            return back()->with("failed", "Maaf, tidak bisa menghapus slip" . $data_slip->kode_slip . "karena sudah digunakan pada jurnal");
+            // return back()->with("failed", "Maaf, tidak bisa menghapus slip" . $data_slip->kode_slip . "karena sudah digunakan pada jurnal");
+            return response()->json([
+                "result"=>FALSE,
+                "message"=>"Maaf, tidak bisa menghapus slip dengan kode slip ".$kode_slip.", karena sudah digunakan pada jurnal"
+            ]);
         }
 
         Slip::find($id)->delete();
-        return back()->with("success", "Berhasil menghapus slip " .  $data_slip->kode_slip);
+        // return back()->with("success", "Berhasil menghapus slip " .  $data_slip->kode_slip);
+        return response()->json([
+            "result"=>TRUE,
+            "message"=>"Berhasil menghapus slip dengan kode slip ".$kode_slip
+        ]);
     }
 
     /**

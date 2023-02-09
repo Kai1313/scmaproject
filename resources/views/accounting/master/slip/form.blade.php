@@ -246,7 +246,7 @@
             }
         })
 
-        function save_data() {
+        function save_data_old() {
             Swal.fire({
                 title: 'Do you want to save the changes?',
                 icon: 'info',
@@ -284,6 +284,30 @@
                     });
                 } else if (result.isDenied) {
                     Swal.fire('Changes are not saved', '', 'info')
+                }
+            })
+        }
+
+        function save_data() {
+            $.ajax({
+                type: "POST",
+                url: save_route,
+                data: $('form').serialize(),
+                success: function(data) {
+                    if (data.result) {
+                        Swal.fire('Saved!', data.message, 'success').then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = data_route;
+                            }
+                        })
+                    } 
+                    else {
+                        Swal.fire("Sorry, Can't save data. ", data.message, 'error')
+                    }
+    
+                },
+                error: function(data) {
+                    Swal.fire("Sorry, Can't save data. ", data.responseJSON.message, 'error')
                 }
             })
         }

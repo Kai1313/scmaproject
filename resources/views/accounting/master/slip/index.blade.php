@@ -175,6 +175,12 @@
             $("#cabang_table").on("change", function() {
                 populate_table()
             })
+
+            $("#table-slip").on("click", ".delete-btn", function() {
+                let ids = $(this).data("ids")
+                console.log(ids)
+                delete_slip(ids)
+            })
         })
 
         function populate_table() {
@@ -230,9 +236,53 @@
         window.getActions = function(data, row){
             let base_url = "{{ url('') }}"
             var action_btn = '<a href="' + base_url + '/master/slip/show/' + data + '" class="btn btn-flat btn-xs m-2 btn-default"><span class="glyphicon glyphicon-search" aria-hidden="true"></a>' +
-                            '<a href="' + base_url + '/master/slip/form/edit/' + data + '" class="btn btn-flat btn-xs m-2 btn-warning"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></a>' +
-                            '<a href="' + base_url + '/master/slip/destroy/' + data + '"  class="btn btn-flat btn-xs m-2 btn-danger"><span class="glyphicon glyphicon-trash" aria-hidden="true"></a>';
+                '<a href="' + base_url + '/master/slip/form/edit/' + data + '" class="btn btn-flat btn-xs m-2 btn-warning"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></a>' +
+                '<button type="button" id="delete-btn" data-ids="'+data+'" onclick="delete_slip('+data+')" class="btn btn-flat btn-xs m-2 btn-danger delete-btn"><span class="glyphicon glyphicon-trash" aria-hidden="true"></button>';
             return action_btn;
+        }
+
+        function delete_slip(id) {
+            let url = "{{ route('master-slip-destroy', ":id") }}"
+            url = url.replace(':id', id)
+            Swal.fire({
+                title: 'Anda yakin ingin menghapus data ini?',
+                icon: 'info',
+                showDenyButton: true,
+                confirmButtonText: 'Yes',
+                denyButtonText: 'No',
+                reverseButtons: true,
+                customClass: {
+                    actions: 'my-actions',
+                    confirmButton: 'order-1',
+                    denyButton: 'order-3',
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: "GET",
+                        url: url,
+                        success: function(data) {
+                            if (data.result) {
+                                Swal.fire('Saved!', data.message, 'success').then((result) => {
+                                    if (result.isConfirmed) {
+                                        populate_table()
+                                    }
+                                })
+                            } 
+                            else {
+                                Swal.fire("Sorry, Can't delete data. ", data.message, 'error')
+                            }
+
+                        },
+                        error: function(data) {
+                            Swal.fire("Sorry, Can't delete data. ", data.message, 'error')
+                        }
+                    });
+                } 
+                else if (result.isDenied) {
+                    Swal.fire('Batal menghapus data', '', 'info')
+                }
+            })
         }
     </script>
 @endsection
