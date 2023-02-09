@@ -23,16 +23,16 @@
             text-align: center !important;
         }
 
-        #table_master_akun td.btn-column .btn-sm{
-            margin: 5px;
-        }
-
         #table_master_akun td.btn-column span{
             padding: 2px !important;
         }
 
         .dropdown-menu>li>a.text-danger{
             color: #843534 !important;
+        }
+
+        .m-2{
+            margin: 0.5rem;
         }
     </style>
 @endsection
@@ -257,9 +257,9 @@
                 // body_coa += '<li class="dropdown-item"><a href="' + base_url + '/master/coa/form/show/' + element.id_akun + '">Detail</a></li>';
                 // body_coa += '<li class="dropdown-item"><a href="' + base_url + '/master/coa/form/edit/' + element.id_akun + '">Edit</a></li>';
                 // body_coa += '<li class="dropdown-item text-danger"><a href="' + base_url + '/master/coa/destory/' + element.id_akun + '">Delete</a></li>';
-                body_coa += '<a href="' + base_url + '/master/coa/form/show/' + element.id_akun + '" class="btn-sm btn-default"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a>';
-                body_coa += '<a href="' + base_url + '/master/coa/form/edit/' + element.id_akun + '" class="btn-sm btn-warning"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></a>';
-                body_coa += '<a href="' + base_url + '/master/coa/form/destory/' + element.id_akun + '" class="btn-sm btn-danger"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></a>';
+                body_coa += '<a href="' + base_url + '/master/coa/form/show/' + element.id_akun + '" class="btn btn-flat btn-xs m-2 btn-default"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a>';
+                body_coa += '<a href="' + base_url + '/master/coa/form/edit/' + element.id_akun + '" class="btn btn-flat btn-xs m-2 btn-warning"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></a>';
+                body_coa += '<button type="button" id="delete-btn" onclick="delete_slip(' + element.id_akun +')" class="btn btn-flat btn-xs m-2 btn-danger delete-btn"><span class="glyphicon glyphicon-trash" aria-hidden="true"></button>';
                 // body_coa += '</ul></div>';
                 body_coa += '</td></tr>';
                 if(typeof(element.children) != "undefined"){
