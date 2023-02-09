@@ -18,6 +18,8 @@
     ul#horizontal-list li {
         display: inline;
     }
+
+    .mb-1 { margin-bottom:.25rem!important; }
 </style>
 @endsection
 @section('header')

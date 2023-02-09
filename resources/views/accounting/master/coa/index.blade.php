@@ -43,6 +43,8 @@
         ul#horizontal-list li {
             display: inline;
         }
+
+        .mb-1 { margin-bottom:.25rem!important; }
     </style>
 @endsection
 @section('header')
@@ -270,7 +272,7 @@
                 // body_coa += '<li class="dropdown-item text-danger"><a href="' + base_url + '/master/coa/destory/' + element.id_akun + '">Delete</a></li>';
                 body_coa += '<li><a href="' + base_url + '/master/coa/form/show/' + element.id_akun + '" class="btn btn-xs mr-1 mb-1 btn-default"><span class="glyphicon glyphicon-search" aria-hidden="true"></span> Detail</a></li>';
                 body_coa += '<li><a href="' + base_url + '/master/coa/form/edit/' + element.id_akun + '" class="btn btn-xs mr-1 mb-1 btn-warning"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Ubah</a></li>';
-                body_coa += '<li><button type="button" id="delete-btn" onclick="delete_slip(' + element.id_akun +')" class="btn btn-xs mb-1 btn-danger delete-btn"><span class="glyphicon glyphicon-trash" aria-hidden="true"> Hapus</button></li></ul>';
+                body_coa += '<li><button type="button" id="delete-btn" onclick="delete_slip(' + element.id_akun +')" class="btn btn-xs mr-1 mb-1 btn-danger delete-btn"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Hapus</button></li></ul>';
                 // body_coa += '</ul></div>';
                 body_coa += '</td></tr>';
                 if(typeof(element.children) != "undefined"){
