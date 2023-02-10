@@ -2,6 +2,11 @@
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('assets/bower_components/select2/dist/css/select2.min.css') }}">
+    <style>
+        label>span {
+            color: red;
+        }
+    </style>
 @endpush
 
 @section('header')
@@ -18,7 +23,6 @@
     @endif
     @if (count($errors) > 0)
         <div class="alert alert-danger">
-            <strong>Whoops!</strong> There were some problems with your input.<br><br>
             <ul>
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
@@ -32,7 +36,7 @@
                 <div class="row">
                     <div class="col-md-9">
                         <div class="row">
-                            <label class="col-md-3">Cabang</label>
+                            <label class="col-md-3">Cabang <span>*</span></label>
                             <div class="col-md-5 form-group">
                                 <select name="id_cabang" class="form-control select2">
                                     <option value="">Pilih Cabang</option>
@@ -45,21 +49,21 @@
                             </div>
                         </div>
                         <div class="row">
-                            <label class="col-md-3">Nama Biaya</label>
+                            <label class="col-md-3">Nama Biaya <span>*</span></label>
                             <div class="col-md-6 form-group">
                                 <input type="text" class="form-control" name="nama_biaya"
                                     value="{{ old('nama_biaya', $data ? $data->nama_biaya : '') }}">
                             </div>
                         </div>
                         <div class="row">
-                            <label class="col-md-3">Akun Biaya</label>
+                            <label class="col-md-3">Akun Biaya <span>*</span></label>
                             <div class="col-md-5 form-group">
                                 <select name="id_akun_biaya" class="form-control select2">
                                     <option value="">Pilih Akun Biaya</option>
                                     @foreach ($akunBiaya as $biaya)
                                         <option value="{{ $biaya->id_akun }}"
                                             {{ old('id_akun_biaya', $data ? $data->id_akun_biaya : '') == $biaya->id_akun ? 'selected' : '' }}>
-                                            {{ $biaya->nama_akun }}</option>
+                                            {{ $biaya->kode_akun }} - {{ $biaya->nama_akun }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -93,16 +97,16 @@
                                     @foreach ($akunBiaya as $pph)
                                         <option value="{{ $pph->id_akun }}"
                                             {{ old('id_akun_biaya', $data ? $data->id_akun_pph : '') == $pph->id_akun ? 'selected' : '' }}>
-                                            {{ $pph->nama_akun }}</option>
+                                            {{ $pph->kode_akun }} - {{ $pph->nama_akun }}</option>
                                     @endforeach
                                 </select>
                             </div>
                         </div>
                         <div class="row">
-                            <label class="col-md-3">Aktif</label>
+                            <label class="col-md-3">Aktif <span>*</span></label>
                             <div class="col-md-9 form-group">
                                 <input type="checkbox" name="aktif" value="1"
-                                    {{ old('aktif', $data ? $data->aktif : '') ? 'checked' : '' }}>
+                                    {{ old('aktif', $data ? $data->aktif : 1) ? 'checked' : '' }}>
                             </div>
                         </div>
                     </div>
@@ -124,7 +128,7 @@
             if ($(this).is(':checked')) {
                 $('.show-pph').prop('disabled', false)
             } else {
-                $('.show-pph').prop('disabled', true).val('')
+                $('.show-pph').prop('disabled', true).val('').trigger('change')
             }
         })
 

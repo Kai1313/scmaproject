@@ -68,12 +68,20 @@ class MasterBiayaController extends Controller
             'id_akun_biaya' => 'required',
         ];
 
+        $messages = [
+            'id_cabang.required' => 'Cabang harus diisi',
+            'nama_biaya.required' => 'Nama biaya harus diisi',
+            'id_akun_biaya.required' => 'Akun biaya harus diisi',
+        ];
+
         if (isset($request->ispph)) {
             $paramValidate['value_pph'] = 'required';
             $paramValidate['id_akun_pph'] = 'required';
+            $messages['value_pph.required'] = 'Nilai PPh harus diisi';
+            $messages['id_akun_pph.required'] = 'Akun PPh harus diisi';
         }
 
-        $valid = Validator::make($request->all(), $paramValidate);
+        $valid = Validator::make($request->all(), $paramValidate, $messages);
         if ($valid->fails()) {
             return redirect()->back()->withErrors($valid)->withInput($request->all());
         }

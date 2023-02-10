@@ -63,7 +63,13 @@ class MasterWrapperController extends Controller
             'weight' => 'required',
         ];
 
-        $valid = Validator::make($request->all(), $paramValidate);
+        $messages = [
+            'id_cabang.required' => 'Cabang harus diisi',
+            'nama_wrapper.required' => 'Nama Pembungkus harus diisi',
+            'weight.required' => 'Berat harus diisi',
+        ];
+
+        $valid = Validator::make($request->all(), $paramValidate, $messages);
         if ($valid->fails()) {
             return redirect()->back()->withErrors($valid)->withInput($request->all());
         }

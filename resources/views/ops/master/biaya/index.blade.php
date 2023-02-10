@@ -34,7 +34,7 @@
                         <th>Akun Biaya</th>
                         <th>PPn</th>
                         <th>PPh</th>
-                        <th>Nilai PPh</th>
+                        <th class="text-right">Nilai PPh</th>
                         <th>Akun PPh</th>
                         <th>Aktif</th>
                         <th width="150px">Action</th>
@@ -80,19 +80,23 @@
                 name: 'akun_biaya'
             }, {
                 data: 'isppn',
-                name: 'isppn'
+                name: 'isppn',
+                className: 'text-center'
             }, {
                 data: 'ispph',
-                name: 'ispph'
+                name: 'ispph',
+                className: 'text-center'
             }, {
                 data: 'value_pph',
-                name: 'value_pph'
+                name: 'value_pph',
+                className: 'text-right'
             }, {
                 data: 'akun_pph',
                 name: 'akun_pph'
             }, {
                 data: 'aktif',
-                name: 'aktif'
+                name: 'aktif',
+                className: 'text-center'
             }, {
                 data: 'action',
                 name: 'action',

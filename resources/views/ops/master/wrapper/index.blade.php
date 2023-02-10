@@ -32,7 +32,7 @@
                 <thead>
                     <tr>
                         <th>Nama Pembungkus</th>
-                        <th>Berat</th>
+                        <th class="text-right">Berat</th>
                         <th>Catatan</th>
                         <th>Gambar</th>
                         <th width="150px">Action</th>
@@ -76,7 +76,8 @@
                 name: 'nama_wrapper'
             }, {
                 data: 'weight',
-                name: 'weight'
+                name: 'weight',
+                className: "text-right"
             }, {
                 data: 'catatan',
                 name: 'catatan'
