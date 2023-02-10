@@ -231,7 +231,7 @@
                 },
                 {
                     data: 'id_slip',
-                    width: '5%',
+                    width: '15%',
                     'sClass': 'text-center',
                     render: function(data, row) {
                         return getActions(data, row);
