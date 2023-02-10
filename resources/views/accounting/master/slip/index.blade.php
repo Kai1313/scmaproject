@@ -8,6 +8,14 @@
         margin: 0.5rem;
     } */
 
+    table{
+        width: 100% !important;
+    }
+
+    .dataTables_scrollHeadInner{
+        width: 100% !important;
+    }
+
     ul#horizontal-list {
         min-width: 200px;
         list-style: none;
@@ -78,15 +86,16 @@
                 @endif
                 <div class="box-body">
                     <table id="table_slip" class="table table-bordered table-striped" style="width:100%">
-                        <thead>
+                        <thead width="100%">
                             <tr>
-                                <th class="text-center">Kode Slip</th>
-                                <th class="text-center">Nama Slip</th>
-                                <th class="text-center">Jenis Slip</th>
-                                <th class="text-center">Akun COA</th>
-                                <th class="text-center">Action</th>
+                                <th class="text-center" width="15%">Kode Slip</th>
+                                <th class="text-center" width="30%">Nama Slip</th>
+                                <th class="text-center" width="10%">Jenis Slip</th>
+                                <th class="text-center" width="30%">Akun COA</th>
+                                <th class="text-center" width="15%">Action</th>
                             </tr>
                         </thead>
+                        <tbody></tbody>
                     </table>
                 </div>
             </div>
