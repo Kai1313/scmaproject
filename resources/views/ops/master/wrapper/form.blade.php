@@ -1,5 +1,14 @@
 @extends('layouts.main')
 
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('assets/bower_components/select2/dist/css/select2.min.css') }}">
+    <style>
+        label>span {
+            color: red;
+        }
+    </style>
+@endpush
+
 @section('header')
     <p>{{ $data ? 'Edit' : 'Tambah' }} Master Wrapper</p>
 @endsection
@@ -16,7 +25,6 @@
             @endif
             @if (count($errors) > 0)
                 <div class="alert alert-danger">
-                    <strong>Whoops!</strong> There were some problems with your input.<br><br>
                     <ul>
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
@@ -31,7 +39,7 @@
                         <div class="row">
                             <div class="col-md-9">
                                 <div class="row">
-                                    <label class="col-md-3">Cabang</label>
+                                    <label class="col-md-3">Cabang <span>*</span></label>
                                     <div class="col-md-5 form-group">
                                         <select name="id_cabang" class="form-control select2">
                                             <option value="">Pilih Cabang</option>
@@ -44,14 +52,14 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <label class="col-md-3">Nama Pembungkus</label>
+                                    <label class="col-md-3">Nama Pembungkus <span>*</span></label>
                                     <div class="col-md-6 form-group">
                                         <input type="text" class="form-control" name="nama_wrapper"
                                             value="{{ old('nama_wrapper', $data ? $data->nama_wrapper : '') }}">
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <label class="col-md-3">Berat</label>
+                                    <label class="col-md-3">Berat <span>*</span></label>
                                     <div class="col-md-3 form-group">
                                         <div class="input-group">
                                             <input type="number" name="weight" class="form-control show-pph"
@@ -99,7 +107,10 @@
 @endsection
 
 @push('scripts')
+    <script src="{{ asset('assets/bower_components/select2/dist/js/select2.min.js') }}"></script>
     <script>
+        $('.select2').select2()
+
         $('[name="file_upload"]').change(function() {
             let oFReader = new FileReader();
             let file = document.getElementById("f_image").files[0];
