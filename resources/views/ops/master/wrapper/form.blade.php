@@ -1,13 +1,13 @@
 @extends('layouts.main')
 
-@push('styles')
+@section('addedStyles')
     <link rel="stylesheet" href="{{ asset('assets/bower_components/select2/dist/css/select2.min.css') }}">
     <style>
         label>span {
             color: red;
         }
     </style>
-@endpush
+@endsection
 
 @section('header')
     <p>{{ $data ? 'Edit' : 'Tambah' }} Master Wrapper</p>
@@ -87,7 +87,7 @@
                                         @endif
                                         <br>
                                         <input id="f_image" type="file" class="form-control" name="file_upload"
-                                            accept=".png,.jpeg">
+                                            accept=".png,.jpeg,.jpg">
                                         <input type="hidden" name="image_path">
                                     </div>
                                 </div>
@@ -95,7 +95,7 @@
                             <div class="col-md-3">
                                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                 <button class="btn btn-primary btn-block" type="submit">Simpan</button>
-                                <a href="{{ route('master-wrapper-page') }}" class="btn btn-default btn-block">Kembali</a>
+                                <a href="{{ route('master-wrapper') }}" class="btn btn-default btn-block">Kembali</a>
                             </div>
                         </div>
                     </div>
@@ -106,8 +106,11 @@
 
 @endsection
 
-@push('scripts')
+@section('addedScripts')
     <script src="{{ asset('assets/bower_components/select2/dist/js/select2.min.js') }}"></script>
+@endsection
+
+@section('externalScripts')
     <script>
         $('.select2').select2()
 
@@ -148,4 +151,4 @@
             }
         })
     </script>
-@endpush
+@endsection

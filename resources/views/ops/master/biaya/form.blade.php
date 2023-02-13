@@ -1,13 +1,13 @@
 @extends('layouts.main')
 
-@push('styles')
+@section('addedStyles')
     <link rel="stylesheet" href="{{ asset('assets/bower_components/select2/dist/css/select2.min.css') }}">
     <style>
         label>span {
             color: red;
         }
     </style>
-@endpush
+@endsection
 
 @section('header')
     <p>{{ $data ? 'Edit' : 'Tambah' }} Master Biaya</p>
@@ -113,7 +113,7 @@
                     <div class="col-md-3">
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
                         <button class="btn btn-primary btn-block" type="submit">Simpan</button>
-                        <a href="{{ route('master-biaya-page') }}" class="btn btn-default btn-block">Kembali</a>
+                        <a href="{{ route('master-biaya') }}" class="btn btn-default btn-block">Kembali</a>
                     </div>
                 </div>
             </div>
@@ -121,8 +121,11 @@
     </form>
 @endsection
 
-@push('scripts')
+@section('addedScripts')
     <script src="{{ asset('assets/bower_components/select2/dist/js/select2.min.js') }}"></script>
+@endsection
+
+@section('externalScripts')
     <script>
         $('[name="ispph"]').change(function() {
             if ($(this).is(':checked')) {
@@ -139,4 +142,4 @@
             $('.show-pph').prop('disabled', true)
         }
     </script>
-@endpush
+@endsection

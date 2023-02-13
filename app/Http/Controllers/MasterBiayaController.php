@@ -44,7 +44,10 @@ class MasterBiayaController extends Controller
 
         $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
 
-        return view('ops.master.biaya.index', ['cabang' => $cabang]);
+        return view('ops.master.biaya.index', [
+            'cabang' => $cabang,
+            "pageTitle"=>"SCA OPS | Master Biaya | List",
+        ]);
     }
 
     public function entry($id = 0)
@@ -57,6 +60,7 @@ class MasterBiayaController extends Controller
             'data' => $data,
             'akunBiaya' => $akunBiaya,
             'cabang' => $cabang,
+            "pageTitle"=>"SCA OPS | Master Biaya | ".($id == 0 ? 'Create' : 'Edit'),
         ]);
     }
 

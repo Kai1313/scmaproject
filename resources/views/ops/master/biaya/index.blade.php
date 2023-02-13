@@ -1,8 +1,52 @@
 @extends('layouts.main')
+@section('addedStyles')
+    <!-- DataTables -->
+    <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css') }}">
+    <!-- Treetable -->
+    <link rel="stylesheet" href="{{ asset('assets/bower_components/jquery-treetable/css/jquery.treetable.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/bower_components/jquery-treetable/css/jquery.treetable.theme.default.css') }}">
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        #table_master_akun th{
+            text-align: center !important;
+            font-size: 1.5rem !important;
+            border-color: white !important;
+            padding: 0.6rem 0.4rem;
+        }
 
-@push('styles')
-    {{-- <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css') }}"> --}}
-@endpush
+        #table_master_akun td{
+            font-size: 1.3rem !important;
+            padding: 0.5rem !important;
+        }
+
+        #table_master_akun td.btn-column{
+            text-align: center !important;
+            font-size: 12px;
+            padding: 8px;
+        }
+
+        #table_master_akun td.btn-column span{
+            padding: 2px !important;
+        }
+
+        .dropdown-menu>li>a.text-danger{
+            color: #843534 !important;
+        }
+
+        ul#horizontal-list {
+            min-width: 200px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        ul#horizontal-list li {
+            display: inline;
+        }
+
+        .mb-1 { margin-bottom:.25rem!important; }
+    </style>
+@endsection
 
 @section('header')
     <p>Daftar Master Biaya</p>
@@ -16,7 +60,7 @@
                 <br><br>
                 <select name="id_cabang" class="form-control" style="width:200px;">
                     @foreach ($cabang as $branch)
-                        <option value="{{ $branch->id_cabang }}">{{ $branch->nama_cabang }}</option>
+                        <option value="{{ $branch->id_cabang }}">{{$branch->kode_cabang}} - {{ $branch->nama_cabang }}</option>
                     @endforeach
                 </select>
             </div>
@@ -65,13 +109,24 @@
     </div>
 @endsection
 
-@push('scripts')
+@section('addedScripts')
+    <!-- DataTables -->
     <script src="{{ asset('assets/bower_components/datatables.net/js/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js') }}"></script>
+    <!-- SlimScroll -->
+    <script src="{{ asset('assets/bower_components/jquery-slimscroll/jquery.slimscroll.min.js') }}"></script>
+    <!-- FastClick -->
+    <script src="{{ asset('assets/bower_components/fastclick/lib/fastclick.js') }}"></script>
+    <!-- TreeTable -->
+    <script src="{{ asset('assets/bower_components/jquery-treetable/jquery.treetable.js') }}"></script>
+@endsection
+
+@section('externalScripts')
     <script>
         var table = $('.data-table').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route('master-biaya-page') }}?c=" + $('[name="id_cabang"]').val(),
+            ajax: "{{ route('master-biaya') }}?c=" + $('[name="id_cabang"]').val(),
             columns: [{
                 data: 'nama_biaya',
                 name: 'nama_biaya'
@@ -115,4 +170,4 @@
             table.ajax.url("?c=" + $(this).val()).load()
         })
     </script>
-@endpush
+@endsection

@@ -41,7 +41,10 @@ class MasterWrapperController extends Controller
 
         $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
 
-        return view('ops.master.wrapper.index', ['cabang' => $cabang]);
+        return view('ops.master.wrapper.index', [
+            'cabang' => $cabang,
+            "pageTitle"=>"SCA OPS | Master Wrapper | List",
+        ]);
     }
 
     public function entry($id = 0)
@@ -52,6 +55,7 @@ class MasterWrapperController extends Controller
         return view('ops.master.wrapper.form', [
             'data' => $data,
             'cabang' => $cabang,
+            "pageTitle"=>"SCA OPS | Master Wrapper | ".($id == 0 ? 'Create' : 'Edit'),
         ]);
     }
 

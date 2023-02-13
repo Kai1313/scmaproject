@@ -5,6 +5,22 @@
     <section class="sidebar">>
         <!-- Sidebar Menu -->
         <ul class="sidebar-menu" data-widget="tree">
+            <li  class="nav-item">
+                <a href="https://vps.scasda.my.id"><i class="fa fa-briefcase"></i> <span>Link Apps</span>
+                </a>
+            </li>
+            <li class="header">OPS</li>
+            <li class="treeview {{ request()->segment(1) == 'master-ops' ? 'active' : null }}">
+                <a href="#"><i class="fa fa-link"></i> <span>Master</span>
+                    <span class="pull-right-container">
+                        <i class="fa fa-angle-left pull-right"></i>
+                    </span>
+                </a>
+                <ul class="treeview-menu">
+                    <li class="{{ request()->segment(2) == 'biaya' ? 'active' : null }}"><a href="{{ route('master-biaya') }}">Master Biaya</a></li>
+                    <li class="{{ request()->segment(2) == 'wrapper' ? 'active' : null }}"><a href="{{ route('master-wrapper') }}">Master Wrapper</a></li>
+                </ul>
+            </li>
             <li class="header">ACCOUNTING</li>
             <li  class="nav-item {{ request()->segment(1) == 'dashboard' ? 'active' : null }}">
                 <a href="{{ route('dashboard') }}"><i class="fa fa-briefcase"></i> <span>Dashboard</span>
