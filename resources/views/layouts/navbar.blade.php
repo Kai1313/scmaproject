@@ -2,11 +2,11 @@
 <header class="main-header">
 
     <!-- Logo -->
-    <a href="index2.html" class="logo">
+    <a href="{{ route('dashboard', 1) }}" class="logo" style="background-color: #fff;">
         <!-- mini logo for sidebar mini 50x50 pixels -->
-        <span class="logo-mini"><b>A</b>CC</span>
+        <span class="logo-mini"><img src="{{ asset('assets/img/logo.png') }}" alt="Logo"></span>
         <!-- logo for regular state and mobile devices -->
-        <span class="logo-lg"><b>SCA</b>ACC</span>
+        <span class="logo-lg"><img src="{{ asset('assets/img/logo_full.png') }}" alt="Logo"></span>
     </a>
 
     <!-- Header Navbar -->
@@ -22,43 +22,19 @@
                 <li class="dropdown user user-menu">
                     <!-- Menu Toggle Button -->
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        <!-- The user image in the navbar-->
-                        <img src="{{ asset('assets/dist/img/user2-160x160.jpg') }}" class="user-image" alt="User Image">
+                        <i class="fa fa-user-circle"></i>
                         <!-- hidden-xs hides the username on small devices so only the image appears. -->
                         <span class="hidden-xs">{{ Session::get('user')->nama_pengguna }}</span>
                     </a>
                     <ul class="dropdown-menu">
-                        <!-- The user image in the menu -->
-                        <li class="user-header">
-                            <img src="{{ asset('assets/dist/img/user2-160x160.jpg') }}" class="img-circle" alt="User Image">
-
-                            <p>
-                                {{ Session::get('user')->nama_pengguna }}
-                                <small>Member since Nov. 2012</small>
-                            </p>
-                        </li>
-                        <!-- Menu Body -->
-                        <li class="user-body">
-                            <div class="row">
-                                <div class="col-xs-4 text-center">
-                                    <a href="#">Followers</a>
-                                </div>
-                                <div class="col-xs-4 text-center">
-                                    <a href="#">Sales</a>
-                                </div>
-                                <div class="col-xs-4 text-center">
-                                    <a href="#">Friends</a>
-                                </div>
-                            </div>
-                            <!-- /.row -->
-                        </li>
                         <!-- Menu Footer-->
                         <li class="user-footer">
-                            <div class="pull-left">
-                                <a href="#" class="btn btn-default btn-flat">Profile</a>
+                            <div class="pull-left" style="padding-top: 7px;">
+                                <i class="fa fa-user-circle"></i>
+                                <span class="">{{ Session::get('user')->nama_pengguna }}</span>
                             </div>
                             <div class="pull-right">
-                                <a href="#" class="btn btn-default btn-flat">Sign out</a>
+                                <a href="{{ route('logout') }}" class="btn btn-default btn-flat">Sign out</a>
                             </div>
                         </li>
                     </ul>

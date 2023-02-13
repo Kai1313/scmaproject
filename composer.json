@@ -14,7 +14,9 @@
         "laravel/framework": "5.8.*",
         "laravel/passport": "7.5.1",
         "laravel/tinker": "^1.0",
-        "yajra/laravel-datatables-oracle": "^9.21"
+        "maatwebsite/excel": "^3.1",
+        "realrashid/sweet-alert": "^5.1",
+        "yajra/laravel-datatables": "^1.0"
     },
     "require-dev": {
         "beyondcode/laravel-dump-server": "^1.0",
