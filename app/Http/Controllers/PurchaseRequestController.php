@@ -43,4 +43,24 @@ class PurchaseRequestController extends Controller
     {
         return $request->all();
     }
+
+    public function autoWerehouse(Request $request)
+    {
+        $search = $request->search;
+        $idCabang = $request->id_cabang;
+        $datas = DB::table('gudang')->select('id_gudang as id', 'nama_gudang as text')
+            ->where('id_cabang', $idCabang)
+            ->where('status_gudang', 1)
+            ->where('nama_gudang', 'like', '%' . $search . '%')->get();
+        return $datas;
+    }
+
+    public function autoUser(Request $request)
+    {
+        $search = $request->search;
+        $datas = DB::table('pengguna')->select('id_pengguna as id', 'nama_pengguna as text')
+            ->where('status_pengguna', 1)
+            ->where('nama_pengguna', 'like', '%' . $search . '%')->get();
+        return $datas;
+    }
 }

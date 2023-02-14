@@ -124,19 +124,41 @@
 
 @section('externalScripts')
     <script>
-        $('[name="ispph"]').change(function() {
-            if ($(this).is(':checked')) {
-                $('.show-pph').prop('disabled', false)
-            } else {
-                $('.show-pph').prop('disabled', true).val('').trigger('change')
-            }
-        })
-
         $('.select2').select2()
-        if ($('[name="ispph"]').is(':checked')) {
-            $('.show-pph').prop('disabled', false)
-        } else {
-            $('.show-pph').prop('disabled', true)
-        }
+        $('[name="id_gudang"]').select2({
+            ajax: {
+                url: "{{ route('purchase-request-auto-werehouse') }}",
+                dataType: 'json',
+                data: function(params) {
+                    let query = {
+                        search: params.term,
+                        id_cabang: $('[name="id_cabang"]').val()
+                    }
+                    return query;
+                },
+                processResults: function(data) {
+                    return {
+                        results: data
+                    };
+                }
+            }
+        });
+        $('[name="purchase_request_user_id"]').select2({
+            ajax: {
+                url: "{{ route('purchase-request-auto-user') }}",
+                dataType: 'json',
+                data: function(params) {
+                    let query = {
+                        search: params.term,
+                    }
+                    return query;
+                },
+                processResults: function(data) {
+                    return {
+                        results: data
+                    };
+                }
+            }
+        });
     </script>
 @endsection

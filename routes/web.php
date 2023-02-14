@@ -41,10 +41,12 @@ Route::prefix('master-ops/wrapper')->group(function () {
     Route::post('delete/{id}', 'MasterWrapperController@destroy')->name('master-wrapper-delete');
 });
 
-Route::prefix('/permintaan-pembelian')->group(function(){
-    Route::get('/','PurchaseRequestController@index')->name('purchase-request');
-    Route::get('entry/{id?}','PurchaseRequestController@entry')->name('purchase-request-entry');
+Route::prefix('/permintaan-pembelian')->group(function () {
+    Route::get('/', 'PurchaseRequestController@index')->name('purchase-request');
+    Route::get('entry/{id?}', 'PurchaseRequestController@entry')->name('purchase-request-entry');
     Route::post('save-entry/{id}', 'PurchaseRequestController@saveEntry')->name('purchase-request-save-entry');
+    Route::get('auto-werehouse', 'PurchaseRequestController@autoWerehouse')->name('purchase-request-auto-werehouse');
+    Route::get('auto-user', 'PurchaseRequestController@autoUser')->name('purchase-request-auto-user');
 });
 
 // Master
