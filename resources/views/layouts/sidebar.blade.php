@@ -6,7 +6,8 @@
         <!-- Sidebar Menu -->
         <ul class="sidebar-menu" data-widget="tree">
             <li  class="nav-item">
-                <a href="https://vps.scasda.my.id"><i class="fa fa-briefcase"></i> <span>Link Apps</span>
+                <a href="https://test1.scasda.my.id/development/v2/v2/#akses_menu">
+                    <i class="fa fa-briefcase"></i> <span>Akses Menu</span>
                 </a>
             </li>
             <li class="header">OPS</li>
