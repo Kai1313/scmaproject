@@ -22,6 +22,10 @@
                     <li class="{{ request()->segment(2) == 'wrapper' ? 'active' : null }}"><a href="{{ route('master-wrapper') }}">Master Wrapper</a></li>
                 </ul>
             </li>
+            <li  class="nav-item {{ request()->segment(1) == 'permintaan-pembelian' ? 'active' : null }}">
+                <a href="{{ route('purchase-request') }}"><i class="fa fa-briefcase"></i> <span>Permintaan Pembelian</span>
+                </a>
+            </li>
             <li class="header">ACCOUNTING</li>
             <li  class="nav-item {{ request()->segment(1) == 'dashboard' ? 'active' : null }}">
                 <a href="{{ route('dashboard') }}"><i class="fa fa-briefcase"></i> <span>Dashboard</span>

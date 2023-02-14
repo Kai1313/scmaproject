@@ -43,7 +43,7 @@ class MasterWrapperController extends Controller
 
         return view('ops.master.wrapper.index', [
             'cabang' => $cabang,
-            "pageTitle"=>"SCA OPS | Master Wrapper | List",
+            "pageTitle" => "SCA OPS | Master Wrapper | List",
         ]);
     }
 
@@ -55,7 +55,7 @@ class MasterWrapperController extends Controller
         return view('ops.master.wrapper.form', [
             'data' => $data,
             'cabang' => $cabang,
-            "pageTitle"=>"SCA OPS | Master Wrapper | ".($id == 0 ? 'Create' : 'Edit'),
+            "pageTitle" => "SCA OPS | Master Wrapper | " . ($id == 0 ? 'Create' : 'Edit'),
         ]);
     }
 

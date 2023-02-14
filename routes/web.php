@@ -41,6 +41,12 @@ Route::prefix('master-ops/wrapper')->group(function () {
     Route::post('delete/{id}', 'MasterWrapperController@destroy')->name('master-wrapper-delete');
 });
 
+Route::prefix('/permintaan-pembelian')->group(function(){
+    Route::get('/','PurchaseRequestController@index')->name('purchase-request');
+    Route::get('entry/{id?}','PurchaseRequestController@entry')->name('purchase-request-entry');
+    Route::post('save-entry/{id}', 'PurchaseRequestController@saveEntry')->name('purchase-request-save-entry');
+});
+
 // Master
 Route::get('/master/slip', 'MasterSlipController@index')->name('master-slip');
 Route::get('/master/slip/form/create', 'MasterSlipController@create')->name('master-slip-create');

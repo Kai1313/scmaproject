@@ -46,7 +46,7 @@ class MasterBiayaController extends Controller
 
         return view('ops.master.biaya.index', [
             'cabang' => $cabang,
-            "pageTitle"=>"SCA OPS | Master Biaya | List",
+            "pageTitle" => "SCA OPS | Master Biaya | List",
         ]);
     }
 
@@ -60,7 +60,7 @@ class MasterBiayaController extends Controller
             'data' => $data,
             'akunBiaya' => $akunBiaya,
             'cabang' => $cabang,
-            "pageTitle"=>"SCA OPS | Master Biaya | ".($id == 0 ? 'Create' : 'Edit'),
+            "pageTitle" => "SCA OPS | Master Biaya | " . ($id == 0 ? 'Create' : 'Edit'),
         ]);
     }
 
