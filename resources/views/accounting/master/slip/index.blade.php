@@ -247,7 +247,17 @@
                     },
                     orderable: false
                 }
-            ]
+            ],
+            responsive: {
+                details: {
+                    type: 'column'
+                }
+            },
+            columnDefs: [ {
+                className: 'control',
+                orderable: false,
+                targets:   0
+            } ],
         })
     }
 

@@ -56,3 +56,14 @@ Route::get('/master/coa/get_header2', 'MasterCoaController@get_header2')->name('
 Route::get('/master/coa/get_header3', 'MasterCoaController@get_header3')->name('master-coa-header3');
 Route::get('/master/coa/export/excel', 'MasterCoaController@export_excel')->name('master-coa-export-excel');
 Route::post('/master/coa/copy/data', 'MasterCoaController@copy_data')->name('master-coa-copy-data');
+
+
+// Transaction
+// Jurnal Umum
+Route::get('/transaction/general_ledger', 'GeneralLedgerController@index')->name('transaction-general-ledger');
+Route::get('/transaction/general_ledger/form/create', 'GeneralLedgerController@create')->name('transaction-general-ledger-create');
+Route::get('/transaction/general_ledger/form/edit/{id?}', 'GeneralLedgerController@edit')->name('transaction-general-ledger-edit');
+Route::get('/transaction/general_ledger/show/{id?}', 'GeneralLedgerController@show')->name('transaction-general-ledger-show');
+Route::post('/transaction/general_ledger/store', 'GeneralLedgerController@store')->name('transaction-general-ledger-store');
+Route::post('/transaction/general_ledger/update', 'GeneralLedgerController@update')->name('transaction-general-ledger-update');
+Route::get('/transaction/general_ledger/populate', 'GeneralLedgerController@populate')->name('transaction-general-ledger-populate');
