@@ -128,18 +128,26 @@
                 <div class="modal-body">
                     <label>Nama Barang</label>
                     <div class="form-group">
-                        <select name="id_barang" class="form-control select2">
+                        <select name="id_barang" class="form-control">
                             <option value=""></option>
                         </select>
                     </div>
                     <label>Satuan</label>
                     <div class="form-group">
-                        <select name="id_" id=""></select>
+                        <select name="id_satuan_barang" class="form-control">
+                            @foreach ($satuan as $sat)
+                                <option value="{{ $sat->id }}">{{ $sat->text }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <label>Jumlah</label>
+                    <div class="form-group">
+                        <input type="number" name="jumlah" class="form-control">
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                    <button type="button" class="btn btn-primary">Lanjutkan</button>
+                    <button type="button" class="btn btn-primary">Tambah</button>
                 </div>
             </div>
         </div>
@@ -206,5 +214,23 @@
         $('.add-entry').click(function() {
             $('#modalEntry').modal()
         })
+
+        $('[name="id_barang"]').select2({
+            ajax: {
+                url: "{{ route('purchase-request-auto-item') }}",
+                dataType: 'json',
+                data: function(params) {
+                    let query = {
+                        search: params.term,
+                    }
+                    return query;
+                },
+                processResults: function(data) {
+                    return {
+                        results: data
+                    };
+                }
+            }
+        });
     </script>
 @endsection

@@ -47,6 +47,7 @@ Route::prefix('/permintaan-pembelian')->group(function () {
     Route::post('save-entry/{id}', 'PurchaseRequestController@saveEntry')->name('purchase-request-save-entry');
     Route::get('auto-werehouse', 'PurchaseRequestController@autoWerehouse')->name('purchase-request-auto-werehouse');
     Route::get('auto-user', 'PurchaseRequestController@autoUser')->name('purchase-request-auto-user');
+    Route::get('auto-item', 'PurchaseRequestController@autoItem')->name('purchase-request-auto-item');
 });
 
 // Master
