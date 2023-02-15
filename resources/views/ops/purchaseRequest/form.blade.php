@@ -6,6 +6,10 @@
         label>span {
             color: red;
         }
+
+        .select2 {
+            width: 100% !important;
+        }
     </style>
 @endsection
 
@@ -82,12 +86,13 @@
                         </div>
                         <div class="row">
                             <label class="col-md-3">Catatan</label>
-                            <div class="col-md-5 form-group">
+                            <div class="col-md-9 form-group">
                                 <textarea name="catatan" class="form-control" rows="5">{{ old('catatan') }}</textarea>
                             </div>
                         </div>
                     </div>
                 </div>
+                <button class="btn btn-primary add-entry" type="button">Tambah Barang</button>
                 <div class="table-responsive">
                     <table class="table">
                         <tr>
@@ -116,6 +121,29 @@
             </div>
         </div>
     </form>
+
+    <div class="modal fade" id="modalEntry" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <label>Nama Barang</label>
+                    <div class="form-group">
+                        <select name="id_barang" class="form-control select2">
+                            <option value=""></option>
+                        </select>
+                    </div>
+                    <label>Satuan</label>
+                    <div class="form-group">
+                        <select name="id_" id=""></select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-primary">Lanjutkan</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('addedScripts')
@@ -125,6 +153,19 @@
 @section('externalScripts')
     <script>
         $('.select2').select2()
+        if ($('[name="id_cabang"]').val() == '') {
+            $('[name="id_gudang"]').prop('disabled', true)
+        }
+
+        $('[name="id_cabang"]').change(function() {
+            let self = $('[name="id_gudang"]')
+            if ($('[name="id_cabang"]').val() == '') {
+                self.val('').prop('disabled', true).trigger('change')
+            } else {
+                self.val('').prop('disabled', false).trigger('change')
+            }
+        })
+
         $('[name="id_gudang"]').select2({
             ajax: {
                 url: "{{ route('purchase-request-auto-werehouse') }}",
@@ -143,6 +184,7 @@
                 }
             }
         });
+
         $('[name="purchase_request_user_id"]').select2({
             ajax: {
                 url: "{{ route('purchase-request-auto-user') }}",
@@ -160,5 +202,9 @@
                 }
             }
         });
+
+        $('.add-entry').click(function() {
+            $('#modalEntry').modal()
+        })
     </script>
 @endsection
