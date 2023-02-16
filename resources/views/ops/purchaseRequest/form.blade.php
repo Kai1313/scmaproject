@@ -71,16 +71,16 @@
                         <div class="row">
                             <label class="col-md-3">Gudang</label>
                             <div class="col-md-5 form-group">
-                                <select name="id_gudang" class="form-control">
-                                    <option value=""></option>
+                                <select name="id_gudang" class="form-control selectAjax"
+                                    data-route="{{ route('purchase-request-auto-werehouse') }}">
                                 </select>
                             </div>
                         </div>
                         <div class="row">
                             <label class="col-md-3">Pemohon</label>
                             <div class="col-md-5 form-group">
-                                <select name="purchase_request_user_id" class="form-control">
-                                    <option value=""></option>
+                                <select name="purchase_request_user_id" class="form-control selectAjax"
+                                    data-route="{{ route('purchase-request-auto-user') }}">
                                 </select>
                             </div>
                         </div>
@@ -95,24 +95,28 @@
                 <button class="btn btn-primary add-entry" type="button">Tambah Barang</button>
                 <div class="table-responsive">
                     <table class="table">
-                        <tr>
-                            <th>Kode Barang</th>
-                            <th>Nama Barang</th>
-                            <th>Satuan</th>
-                            <th>Jumlah</th>
-                            <th>Action</th>
-                        </tr>
-                        @if ($data)
-                            @foreach ($data->details as $detail)
-                                <tr>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
-                            @endforeach
-                        @endif
+                        <thead>
+                            <tr>
+                                <th>Kode Barang</th>
+                                <th>Nama Barang</th>
+                                <th>Satuan</th>
+                                <th>Jumlah</th>
+                                <th style="width:150px;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="target-table">
+                            @if ($data)
+                                @foreach ($data->details as $detail)
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                @endforeach
+                            @endif
+                        </tbody>
                     </table>
                 </div>
                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
@@ -128,17 +132,18 @@
                 <div class="modal-body">
                     <label>Nama Barang</label>
                     <div class="form-group">
-                        <select name="id_barang" class="form-control">
-                            <option value=""></option>
+                        <select name="id_barang" class="form-control selectAjax"
+                            data-route="{{ route('purchase-request-auto-item') }}">
                         </select>
+                        <input type="hidden" name="nama_barang">
+                        <input type="hidden" name="kode_barang">
                     </div>
                     <label>Satuan</label>
                     <div class="form-group">
-                        <select name="id_satuan_barang" class="form-control">
-                            @foreach ($satuan as $sat)
-                                <option value="{{ $sat->id }}">{{ $sat->text }}</option>
-                            @endforeach
+                        <select name="id_satuan_barang" class="form-control selectAjax"
+                            data-route="{{ route('purchase-request-auto-satuan') }}">
                         </select>
+                        <input type="hidden" name="nama_satuan_barang">
                     </div>
                     <label>Jumlah</label>
                     <div class="form-group">
@@ -146,8 +151,9 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                    <button type="button" class="btn btn-primary">Tambah</button>
+                    <input type="hidden" name="index" value="0">
+                    <button type="button" class="btn btn-secondary cancel-entry">Batal</button>
+                    <button type="button" class="btn btn-primary save-entry">Tambah</button>
                 </div>
             </div>
         </div>
@@ -160,6 +166,10 @@
 
 @section('externalScripts')
     <script>
+        let details = []
+        let detailSelect = []
+        let count = details.length
+        let statusModal = 'create'
         $('.select2').select2()
         if ($('[name="id_cabang"]').val() == '') {
             $('[name="id_gudang"]').prop('disabled', true)
@@ -174,63 +184,128 @@
             }
         })
 
-        $('[name="id_gudang"]').select2({
-            ajax: {
-                url: "{{ route('purchase-request-auto-werehouse') }}",
-                dataType: 'json',
-                data: function(params) {
-                    let query = {
-                        search: params.term,
-                        id_cabang: $('[name="id_cabang"]').val()
+        $('.selectAjax').each(function(i, v) {
+            let route = $(v).data('route')
+            let name = $(v).prop('name')
+            $(v).select2({
+                ajax: {
+                    url: route,
+                    dataType: 'json',
+                    data: function(params) {
+                        if (name == 'id_gudang') {
+                            return {
+                                search: params.term,
+                                id_cabang: $('[name="id_cabang"]').val()
+                            }
+                        } else {
+                            return {
+                                search: params.term
+                            }
+                        }
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: data
+                        };
                     }
-                    return query;
-                },
-                processResults: function(data) {
-                    return {
-                        results: data
-                    };
                 }
-            }
-        });
-
-        $('[name="purchase_request_user_id"]').select2({
-            ajax: {
-                url: "{{ route('purchase-request-auto-user') }}",
-                dataType: 'json',
-                data: function(params) {
-                    let query = {
-                        search: params.term,
-                    }
-                    return query;
-                },
-                processResults: function(data) {
-                    return {
-                        results: data
-                    };
+            }).on('select2:select', function(e) {
+                let dataselect = e.params.data
+                if (name == 'id_barang') {
+                    $('#modalEntry').find('[name="nama_barang"]').val(dataselect.text)
+                    $('#modalEntry').find('[name="kode_barang"]').val(dataselect.kode_barang)
                 }
-            }
-        });
 
-        $('.add-entry').click(function() {
-            $('#modalEntry').modal()
+                if (name == 'id_satuan_barang') {
+                    $('#modalEntry').find('[name="nama_satuan_barang"]').val(dataselect.text)
+                }
+            });;
         })
 
-        $('[name="id_barang"]').select2({
-            ajax: {
-                url: "{{ route('purchase-request-auto-item') }}",
-                dataType: 'json',
-                data: function(params) {
-                    let query = {
-                        search: params.term,
-                    }
-                    return query;
-                },
-                processResults: function(data) {
-                    return {
-                        results: data
-                    };
-                }
+        $('.add-entry').click(function() {
+            $('#modalEntry').find('input,select').each(function(i, v) {
+                $(v).val('').trigger('change')
+            })
+
+            statusModal = 'create'
+            count = +1
+            console.log(count)
+            $('#modalEntry').find('[name="index"]').val(count)
+            $('#modalEntry').modal({
+                backdrop: 'static',
+                keyboard: false
+            })
+        })
+
+        $('.save-entry').click(function() {
+            let modal = $('#modalEntry')
+            modal.find('input,select').each(function(i, v) {
+                detailSelect[$(v).prop('name')] = $(v).val()
+            })
+
+            let newObj = Object.assign({}, detailSelect)
+            let html = '<tr data-index="' + newObj.index + '">' +
+                '<td>' + newObj.kode_barang + '</td>' +
+                '<td>' + newObj.nama_barang + '</td>' +
+                '<td>' + newObj.nama_satuan_barang + '</td>' +
+                '<td>' + newObj.jumlah + '</td>' +
+                '<td>' +
+                '<a href="javascript:void(0)" class="btn btn-warning edit-entry"><i class="glyphicon glyphicon-pencil"></i></a>' +
+                '<a href="javascript:void(0)" class="btn btn-danger delete-entry"><i class="glyphicon glyphicon-trash"></i></a>' +
+                '</td>' +
+                '</tr>'
+            if (statusModal == 'create') {
+                $('#target-table').append(html)
+            } else if (statusModal == 'edit') {
+                // $('#target-table').
             }
-        });
+
+
+            details.push(newObj)
+            if (statusModal == 'create') {
+                count = -1
+            }
+
+            statusModal = ''
+            detailSelect = []
+            $('#modalEntry').modal('hide')
+        })
+
+        $('.cancel-entry').click(function() {
+            $('#modalEntry').modal('hide')
+        })
+
+        $('body').on('click', '.edit-entry', function() {
+            $('#modalEntry').find('input,select').each(function(i, v) {
+                $(v).val('').trigger('change')
+            })
+
+            $('#modalEntry').modal({
+                backdrop: 'static',
+                keyboard: false
+            })
+            console.log($(this).parents('tr'))
+            let index = $(this).parents('tr').data('index')
+            statusModal = 'edit'
+            detailSelect = details[index - 1]
+            console.log(detailSelect)
+            for (select in detailSelect) {
+                if (['id_barang', 'id_satuan_barang'].includes(select)) {
+                    let nameSelect = ''
+                    if (select == 'id_barang') {
+                        nameSelect = 'nama_barang';
+                    }
+
+                    if (select == 'id_satuan_barang') {
+                        nameSelect = 'nama_satuan_barang'
+                    }
+
+                    $('[name="' + select + '"]').append('<option value="' + detailSelect[select] + '" selected>' +
+                        detailSelect[nameSelect] + '</option>')
+                }
+
+                $('[name="' + select + '"]').val(detailSelect[select]).trigger('change')
+            }
+        })
     </script>
 @endsection

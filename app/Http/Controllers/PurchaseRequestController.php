@@ -28,7 +28,6 @@ class PurchaseRequestController extends Controller
         $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
         $satuan = DB::table('satuan_barang')->select('id_satuan_barang as id', 'nama_satuan_barang as text')
             ->where('status_satuan_barang', 1)->get();
-        // return $satuan;
 
         return view('ops.purchaseRequest.form', [
             'data' => $data,
@@ -71,9 +70,18 @@ class PurchaseRequestController extends Controller
     public function autoItem(Request $request)
     {
         $serach = $request->serach;
-        $datas = DB::table('barang')->select('id_barang as id', 'nama_barang as text')
+        $datas = DB::table('barang')->select('id_barang as id', 'nama_barang as text', 'kode_barang')
             ->where('status_barang', 1)
             ->where('nama_barang', 'like', '%' . $serach . '%')->limit(10)->get();
+        return $datas;
+    }
+
+    public function autoSatuan(Request $request)
+    {
+        $serach = $request->serach;
+        $datas = DB::table('satuan_barang')->select('id_satuan_barang as id', 'nama_satuan_barang as text')
+            ->where('status_satuan_barang', 1)
+            ->where('nama_satuan_barang', 'like', '%' . $serach . '%')->get();
         return $datas;
     }
 }
