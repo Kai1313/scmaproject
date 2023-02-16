@@ -34,7 +34,7 @@
             </ul>
         </div>
     @endif
-    <form action="{{ route('purchase-request-save-entry', $data ? $data->id_biaya : 0) }}" method="post">
+    <form action="{{ route('purchase-request-save-entry', $data ? $data->purchase_request_id : 0) }}" method="post">
         <div class="panel">
             <div class="panel-body">
                 <div class="row">
@@ -53,47 +53,66 @@
                             </div>
                         </div>
                         <div class="row">
-                            <label class="col-md-3">Tanggal</label>
-                            <div class="col-md-3 form-group">
-                                <input type="date" name="purchase_request_date"
-                                    value="{{ old('purchase_request_date', date('Y-m-d')) }}" class="form-control">
+                            <label class="col-md-3">Kode Permintaan</label>
+                            <div class="col-md-9 form-group">
+                                <input type="text" name="purchase_request_code"
+                                    value="{{ old('purchase_request_code', $data ? $data->purchase_request_code : '') }}"
+                                    class="form-control" readonly placeholder="Otomatis">
                             </div>
                         </div>
                         <div class="row">
-                            <label class="col-md-3">Estimasi</label>
+                            <label class="col-md-3">Tanggal <span>*</span></label>
+                            <div class="col-md-5 form-group">
+                                <input type="date" name="purchase_request_date"
+                                    value="{{ old('purchase_request_date', $data ? $data->purchase_request_date : date('Y-m-d')) }}"
+                                    class="form-control">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label class="col-md-3">Estimasi <span>*</span></label>
                             <div class="col-md-5 form-group">
                                 <input type="date" name="purchase_request_estimation_date"
-                                    value="{{ old('purchase_request_estimation_date') }}" class=" form-control">
+                                    value="{{ old('purchase_request_estimation_date', $data ? $data->purchase_request_estimation_date : date('Y-m-d')) }}"
+                                    class=" form-control">
                             </div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="row">
-                            <label class="col-md-3">Gudang</label>
+                            <label class="col-md-3">Gudang <span>*</span></label>
                             <div class="col-md-5 form-group">
                                 <select name="id_gudang" class="form-control selectAjax"
                                     data-route="{{ route('purchase-request-auto-werehouse') }}">
+                                    @if ($data && $data->id_gudang)
+                                        <option value="{{ $data->id_gudang }}" selected>{{ $data->gudang->nama_gudang }}
+                                        </option>
+                                    @endif
                                 </select>
                             </div>
                         </div>
                         <div class="row">
-                            <label class="col-md-3">Pemohon</label>
+                            <label class="col-md-3">Pemohon <span>*</span></label>
                             <div class="col-md-5 form-group">
                                 <select name="purchase_request_user_id" class="form-control selectAjax"
                                     data-route="{{ route('purchase-request-auto-user') }}">
+                                    @if ($data && $data->purchase_request_user_id)
+                                        <option value="{{ $data->purchase_request_user_id }}">
+                                            {{ $data->pengguna->nama_pengguna }}</option>
+                                    @endif
                                 </select>
                             </div>
                         </div>
                         <div class="row">
                             <label class="col-md-3">Catatan</label>
                             <div class="col-md-9 form-group">
-                                <textarea name="catatan" class="form-control" rows="5">{{ old('catatan') }}</textarea>
+                                <textarea name="catatan" class="form-control" rows="5">{{ old('catatan', $data ? $data->catatan : '') }}</textarea>
                             </div>
                         </div>
                     </div>
                 </div>
                 <button class="btn btn-primary add-entry" type="button">Tambah Barang</button>
                 <div class="table-responsive">
+                    <input type="hidden" name="details">
                     <table class="table">
                         <thead>
                             <tr>
@@ -101,18 +120,23 @@
                                 <th>Nama Barang</th>
                                 <th>Satuan</th>
                                 <th>Jumlah</th>
+                                <th>Catatan</th>
                                 <th style="width:150px;">Action</th>
                             </tr>
                         </thead>
                         <tbody id="target-table">
                             @if ($data)
                                 @foreach ($data->details as $detail)
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
+                                    <tr data-index="{{ $detail->index }}">
+                                        <td>{{ $detail->barang->kode_barang }}</td>
+                                        <td>{{ $detail->barang->nama_barang }}</td>
+                                        <td>{{ $detail->satuan->nama_satuan_barang }}</td>
+                                        <td>{{ $detail->qty }}</td>
+                                        <td>{{ $detail->notes }}</td>
+                                        <td>
+                                            <a href="javascript:void(0)" class="btn btn-warning edit-entry">Edit</a>
+                                            <a href="javascript:void(0)" class="btn btn-danger delete-entry">Hapus</a>
+                                        </td>
                                     </tr>
                                 @endforeach
                             @endif
@@ -130,6 +154,7 @@
         <div class="modal-dialog modal-sm" role="document">
             <div class="modal-content">
                 <div class="modal-body">
+                    <input type="hidden" name="index" value="0">
                     <label>Nama Barang</label>
                     <div class="form-group">
                         <select name="id_barang" class="form-control selectAjax"
@@ -149,11 +174,14 @@
                     <div class="form-group">
                         <input type="number" name="jumlah" class="form-control">
                     </div>
+                    <label>Catatan</label>
+                    <div class="form-group">
+                        <textarea name="notes" class="form-control" rows="5"></textarea>
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <input type="hidden" name="index" value="0">
                     <button type="button" class="btn btn-secondary cancel-entry">Batal</button>
-                    <button type="button" class="btn btn-primary save-entry">Tambah</button>
+                    <button type="button" class="btn btn-primary save-entry">Simpan</button>
                 </div>
             </div>
         </div>
@@ -223,13 +251,13 @@
         })
 
         $('.add-entry').click(function() {
-            $('#modalEntry').find('input,select').each(function(i, v) {
+            detailSelect = []
+            $('#modalEntry').find('input,select,textarea').each(function(i, v) {
                 $(v).val('').trigger('change')
             })
 
             statusModal = 'create'
-            count = +1
-            console.log(count)
+            count += 1
             $('#modalEntry').find('[name="index"]').val(count)
             $('#modalEntry').modal({
                 backdrop: 'static',
@@ -239,7 +267,7 @@
 
         $('.save-entry').click(function() {
             let modal = $('#modalEntry')
-            modal.find('input,select').each(function(i, v) {
+            modal.find('input,select,textarea').each(function(i, v) {
                 detailSelect[$(v).prop('name')] = $(v).val()
             })
 
@@ -249,6 +277,7 @@
                 '<td>' + newObj.nama_barang + '</td>' +
                 '<td>' + newObj.nama_satuan_barang + '</td>' +
                 '<td>' + newObj.jumlah + '</td>' +
+                '<td>' + newObj.notes + '</td>' +
                 '<td>' +
                 '<a href="javascript:void(0)" class="btn btn-warning edit-entry"><i class="glyphicon glyphicon-pencil"></i></a>' +
                 '<a href="javascript:void(0)" class="btn btn-danger delete-entry"><i class="glyphicon glyphicon-trash"></i></a>' +
@@ -256,15 +285,13 @@
                 '</tr>'
             if (statusModal == 'create') {
                 $('#target-table').append(html)
+                details.push(newObj)
             } else if (statusModal == 'edit') {
-                // $('#target-table').
+                $('#target-table').find('[data-index="' + newObj.index + '"]').replaceWith(html)
+                details[newObj.index - 1] = newObj
             }
 
-
-            details.push(newObj)
-            if (statusModal == 'create') {
-                count = -1
-            }
+            $('[name="details"]').val(JSON.stringify(details))
 
             statusModal = ''
             detailSelect = []
@@ -273,10 +300,14 @@
 
         $('.cancel-entry').click(function() {
             $('#modalEntry').modal('hide')
+            if (statusModal == 'create') {
+                count -= 1
+            }
         })
 
         $('body').on('click', '.edit-entry', function() {
-            $('#modalEntry').find('input,select').each(function(i, v) {
+            detailSelect = []
+            $('#modalEntry').find('input,select,textarea').each(function(i, v) {
                 $(v).val('').trigger('change')
             })
 
@@ -284,28 +315,33 @@
                 backdrop: 'static',
                 keyboard: false
             })
-            console.log($(this).parents('tr'))
             let index = $(this).parents('tr').data('index')
             statusModal = 'edit'
             detailSelect = details[index - 1]
-            console.log(detailSelect)
             for (select in detailSelect) {
                 if (['id_barang', 'id_satuan_barang'].includes(select)) {
-                    let nameSelect = ''
-                    if (select == 'id_barang') {
-                        nameSelect = 'nama_barang';
-                    }
-
-                    if (select == 'id_satuan_barang') {
-                        nameSelect = 'nama_satuan_barang'
-                    }
-
+                    let nameSelect = (select == 'id_barang') ? 'nama_barang' : 'nama_satuan_barang';
                     $('[name="' + select + '"]').append('<option value="' + detailSelect[select] + '" selected>' +
                         detailSelect[nameSelect] + '</option>')
                 }
 
                 $('[name="' + select + '"]').val(detailSelect[select]).trigger('change')
             }
+        })
+
+        $('body').on('click', '.delete-entry', function() {
+            let parent = $(this).parents('tr')
+            let index = parent.data('index')
+            details.splice(index - 1, 1)
+            parent.remove()
+            count -= 1
+
+            for (let i = 0; i < details.length; i++) {
+                $('#target-table').find('[data-index="' + details[i].index + '"]').attr('data-index', i + 1)
+                details[i].index = i + 1
+            }
+
+            $('[name="details"]').val(JSON.stringify(details))
         })
     </script>
 @endsection

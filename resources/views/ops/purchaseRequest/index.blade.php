@@ -4,32 +4,33 @@
     <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css') }}">
     <!-- Treetable -->
     <link rel="stylesheet" href="{{ asset('assets/bower_components/jquery-treetable/css/jquery.treetable.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/bower_components/jquery-treetable/css/jquery.treetable.theme.default.css') }}">
+    <link rel="stylesheet"
+        href="{{ asset('assets/bower_components/jquery-treetable/css/jquery.treetable.theme.default.css') }}">
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        #table_master_akun th{
+        #table_master_akun th {
             text-align: center !important;
             font-size: 1.5rem !important;
             border-color: white !important;
             padding: 0.6rem 0.4rem;
         }
 
-        #table_master_akun td{
+        #table_master_akun td {
             font-size: 1.3rem !important;
             padding: 0.5rem !important;
         }
 
-        #table_master_akun td.btn-column{
+        #table_master_akun td.btn-column {
             text-align: center !important;
             font-size: 12px;
             padding: 8px;
         }
 
-        #table_master_akun td.btn-column span{
+        #table_master_akun td.btn-column span {
             padding: 2px !important;
         }
 
-        .dropdown-menu>li>a.text-danger{
+        .dropdown-menu>li>a.text-danger {
             color: #843534 !important;
         }
 
@@ -44,7 +45,9 @@
             display: inline;
         }
 
-        .mb-1 { margin-bottom:.25rem!important; }
+        .mb-1 {
+            margin-bottom: .25rem !important;
+        }
     </style>
 @endsection
 
@@ -60,7 +63,8 @@
                 <br><br>
                 <select name="id_cabang" class="form-control" style="width:200px;">
                     @foreach ($cabang as $branch)
-                        <option value="{{ $branch->id_cabang }}">{{$branch->kode_cabang}} - {{ $branch->nama_cabang }}</option>
+                        <option value="{{ $branch->id_cabang }}">{{ $branch->kode_cabang }} - {{ $branch->nama_cabang }}
+                        </option>
                     @endforeach
                 </select>
             </div>
@@ -123,37 +127,39 @@
     <script src="{{ asset('assets/bower_components/jquery-treetable/jquery.treetable.js') }}"></script>
 @endsection
 
-{{-- @section('externalScripts')
+@section('externalScripts')
     <script>
         var table = $('.data-table').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route('master-biaya') }}?c=" + $('[name="id_cabang"]').val(),
+            ajax: "{{ route('purchase-request') }}?c=" + $('[name="id_cabang"]').val(),
             columns: [{
-                data: 'nama_biaya',
-                name: 'nama_biaya'
+                data: 'purchase_request_code',
+                name: 'purchase_request_code'
             }, {
-                data: 'akun_biaya',
-                name: 'akun_biaya'
+                data: 'purchase_request_date',
+                name: 'purchase_request_date'
             }, {
-                data: 'isppn',
-                name: 'isppn',
-                className: 'text-center'
+                data: 'purchase_request_estimation_date',
+                name: 'purchase_request_estimation_date',
             }, {
-                data: 'ispph',
-                name: 'ispph',
-                className: 'text-center'
+                data: 'nama_gudang',
+                name: 'nama_gudang',
             }, {
-                data: 'value_pph',
-                name: 'value_pph',
-                className: 'text-right'
+                data: 'nama_pengguna',
+                name: 'nama_pengguna',
             }, {
-                data: 'akun_pph',
-                name: 'akun_pph'
+                data: 'catatan',
+                name: 'catatan'
             }, {
-                data: 'aktif',
-                name: 'aktif',
-                className: 'text-center'
+                data: 'approval_status',
+                name: 'approval_status',
+            }, {
+                data: 'approval_status',
+                name: 'approval_status',
+            }, {
+                data: 'approval_date',
+                name: 'approval_date',
             }, {
                 data: 'action',
                 name: 'action',
@@ -172,4 +178,4 @@
             table.ajax.url("?c=" + $(this).val()).load()
         })
     </script>
-@endsection --}}
+@endsection
