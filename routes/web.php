@@ -9,11 +9,8 @@
 | routes are loaded by the RouteServiceProvider within a group which
 | contains the "web" middleware group. Now create something great!
 |
-*/
+ */
 
-use App\Http\Controllers\SessionController;
-use App\Http\Controllers\MasterSlipController;
-use App\Http\Controllers\MasterCoaController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -30,6 +27,30 @@ Route::get('/get-menu/{id}', 'DashboardController@getMenu')->name('get-menu');
 //     return view('accounting.master.slip');
 // });
 
+Route::prefix('master-ops/biaya')->group(function () {
+    Route::get('/', 'MasterBiayaController@index')->name('master-biaya');
+    Route::get('entry/{id?}', 'MasterBiayaController@entry')->name('master-biaya-entry');
+    Route::post('save-entry/{id}', 'MasterBiayaController@saveEntry')->name('master-biaya-save-entry');
+    Route::post('delete/{id}', 'MasterBiayaController@destroy')->name('master-biaya-delete');
+});
+
+Route::prefix('master-ops/wrapper')->group(function () {
+    Route::get('/', 'MasterWrapperController@index')->name('master-wrapper');
+    Route::get('entry/{id?}', 'MasterWrapperController@entry')->name('master-wrapper-entry');
+    Route::post('save-entry/{id}', 'MasterWrapperController@saveEntry')->name('master-wrapper-save-entry');
+    Route::post('delete/{id}', 'MasterWrapperController@destroy')->name('master-wrapper-delete');
+});
+
+Route::prefix('/permintaan-pembelian')->group(function () {
+    Route::get('/', 'PurchaseRequestController@index')->name('purchase-request');
+    Route::get('entry/{id?}', 'PurchaseRequestController@entry')->name('purchase-request-entry');
+    Route::post('save-entry/{id}', 'PurchaseRequestController@saveEntry')->name('purchase-request-save-entry');
+    Route::post('delete/{id}', 'PurchaseRequestController@destroy')->name('purchase-request-delete');
+    Route::get('auto-werehouse', 'PurchaseRequestController@autoWerehouse')->name('purchase-request-auto-werehouse');
+    Route::get('auto-user', 'PurchaseRequestController@autoUser')->name('purchase-request-auto-user');
+    Route::get('auto-item', 'PurchaseRequestController@autoItem')->name('purchase-request-auto-item');
+    Route::get('auto-satuan', 'PurchaseRequestController@autoSatuan')->name('purchase-request-auto-satuan');
+});
 
 // Master
 Route::get('/master/slip', 'MasterSlipController@index')->name('master-slip');
