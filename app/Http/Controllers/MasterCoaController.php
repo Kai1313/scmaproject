@@ -37,7 +37,7 @@ class MasterCoaController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function populate($id_cabang){
-    //    try{
+       try{
             $coa = Akun::where('id_cabang', $id_cabang)->get();
 
             $data = $this->buildTree($coa);
@@ -47,12 +47,12 @@ class MasterCoaController extends Controller
                 "data" => $data
             ]);
 
-        // }catch (\Exception $e) {
-        //     return response()->json([
-        //         "result" => false,
-        //         "message" => "Error get data akun"
-        //     ]);
-        // }
+        }catch (\Exception $e) {
+            return response()->json([
+                "result" => false,
+                "message" => "Error get data akun"
+            ]);
+        }
     }
 
     /**
@@ -391,32 +391,14 @@ class MasterCoaController extends Controller
 
             // Get data akun from cabang source
             $data_akun = Akun::where("id_cabang", $cabang_source)->get();
-            if ($data_akun) {
-                foreach ($data_akun as $akun) {
-                    // Check if already didnt exist
-                    $check_akun = Akun::where("id_cabang", $cabang_dest)->where("kode_akun", $akun->kode_akun)->where("nama_akun", $akun->nama_akun)->first();
-                    if (!$check_akun) {
-                        $ins_akun = new Akun;
-                        $ins_akun->id_cabang = $cabang_dest;
-                        $ins_akun->kode_akun = $akun->kode_akun;
-                        $ins_akun->nama_akun = $akun->nama_akun;
-                        $ins_akun->tipe_akun = $akun->tipe_akun;
-                        $ins_akun->id_parent = $akun->id_parent;
-                        $ins_akun->isshown = $akun->isshown;
-                        $ins_akun->catatan = $akun->catatan;
-                        $ins_akun->header1 = $akun->header1;
-                        $ins_akun->header2 = $akun->header2;
-                        $ins_akun->header3 = $akun->header3;
-                        if (!$ins_akun->save()) {
-                            DB::rollback();
-                            return response()->json([
-                                "result"=>FALSE,
-                                "message"=>"Error when save copy master akun"
-                            ]);
-                        }
-                    }
-                }
+
+            if($data_akun){
+                $data_akun = $this->buildTree($data_akun);
+                $this->saveTreeCoa($data_akun, null, $cabang_dest);
+                // Log::debug('tesstt');
+                // Log::debug(json_encode($data_akun));
             }
+
             DB::commit();
             return response()->json([
                 "result"=>TRUE,
@@ -448,5 +430,39 @@ class MasterCoaController extends Controller
         }
 
         return $branch;
+    }
+
+    public function saveTreeCoa($data_akun, $parent_id = null, $cabang_dest){
+        foreach($data_akun as $akun){
+            $check_akun = Akun::where("id_cabang", $cabang_dest)
+                ->where("kode_akun", $akun->kode_akun)
+                ->where("nama_akun", $akun->nama_akun)
+                ->first();
+
+            if (!$check_akun) {
+                $ins_akun = new Akun;
+                $ins_akun->id_cabang = $cabang_dest;
+                $ins_akun->kode_akun = $akun->kode_akun;
+                $ins_akun->nama_akun = $akun->nama_akun;
+                $ins_akun->tipe_akun = $akun->tipe_akun;
+                $ins_akun->id_parent = $parent_id;
+                $ins_akun->isshown = $akun->isshown;
+                $ins_akun->catatan = $akun->catatan;
+                $ins_akun->header1 = $akun->header1;
+                $ins_akun->header2 = $akun->header2;
+                $ins_akun->header3 = $akun->header3;
+                $ins_akun->save();
+                if(isset($akun->children)){
+                    $this->saveTreeCoa($akun->children, $ins_akun->id_akun, $cabang_dest);
+                }
+                if (!$ins_akun->save()) {
+                    DB::rollback();
+                    return response()->json([
+                        "result"=>FALSE,
+                        "message"=>"Error when save copy master akun"
+                    ]);
+                }
+            }
+        }
     }
 }
