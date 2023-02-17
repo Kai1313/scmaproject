@@ -41,7 +41,7 @@ Route::prefix('master-ops/wrapper')->group(function () {
     Route::post('delete/{id}', 'MasterWrapperController@destroy')->name('master-wrapper-delete');
 });
 
-Route::prefix('/permintaan-pembelian')->group(function () {
+Route::prefix('permintaan-pembelian')->group(function () {
     Route::get('/', 'PurchaseRequestController@index')->name('purchase-request');
     Route::get('entry/{id?}', 'PurchaseRequestController@entry')->name('purchase-request-entry');
     Route::post('save-entry/{id}', 'PurchaseRequestController@saveEntry')->name('purchase-request-save-entry');
@@ -50,6 +50,16 @@ Route::prefix('/permintaan-pembelian')->group(function () {
     Route::get('auto-user', 'PurchaseRequestController@autoUser')->name('purchase-request-auto-user');
     Route::get('auto-item', 'PurchaseRequestController@autoItem')->name('purchase-request-auto-item');
     Route::get('auto-satuan', 'PurchaseRequestController@autoSatuan')->name('purchase-request-auto-satuan');
+});
+
+Route::prefix('uang-muka-pembelian')->group(function () {
+    Route::get('/', 'PurchaseDownPaymentController@index')->name('purchase-down-payment');
+    Route::get('entry/{id?}', 'PurchaseDownPaymentController@entry')->name('purchase-down-payment-entry');
+    Route::post('save-entry/{id}', 'PurchaseDownPaymentController@saveEntry')->name('purchase-down-payment-save-entry');
+    Route::post('delete/{id}', 'PurchaseDownPaymentController@destroy')->name('purchase-down-payment-delete');
+    Route::get('auto-po', 'PurchaseDownPaymentController@autoPo')->name('purchase-down-payment-auto-po');
+    Route::get('auto-currency', 'PurchaseDownPaymentController@autoCurrency')->name('purchase-down-payment-auto-currency');
+    Route::get('count-po', 'PurchaseDownPaymentController@countPo')->name('purchase-down-payment-count-po');
 });
 
 // Master

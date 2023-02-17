@@ -32,6 +32,14 @@ class PurchaseRequest extends Model
         return $this->hasMany(PurchaseRequestDetail::class, 'purchase_request_id');
     }
 
+    public function formatdetail()
+    {
+        return $this->hasMany(PurchaseRequestDetail::class, 'purchase_request_id')
+            ->select('index', 'purchase_request_detail.id_barang', 'nama_barang', 'kode_barang', 'purchase_request_detail.id_satuan_barang', 'nama_satuan_barang', 'qty', 'notes')
+            ->leftJoin('barang', 'purchase_request_detail.id_barang', '=', 'barang.id_barang')
+            ->leftJoin('satuan_barang', 'purchase_request_detail.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang');
+    }
+
     public function savedetails($details)
     {
         $detail = json_decode($details);
@@ -41,19 +49,22 @@ class PurchaseRequest extends Model
                 ->where('purchase_request_id', $this->purchase_request_id)
                 ->where('index', $data->index)->first();
             if ($check) {
-                $check->update([
-                    'index' => $data->index,
-                    'id_barang' => $data->id_barang,
-                    'id_satuan_barang' => $data->id_satuan_barang,
-                    'qty' => $data->jumlah,
-                    'notes' => $data->notes,
-                ]);
+                DB::table('purchase_request_detail')
+                    ->where('purchase_request_id', $this->purchase_request_id)
+                    ->where('index', $data->index)
+                    ->update([
+                        // 'index' => $data->index,
+                        'id_barang' => $data->id_barang,
+                        'id_satuan_barang' => $data->id_satuan_barang,
+                        'qty' => $data->qty,
+                        'notes' => $data->notes,
+                    ]);
             } else {
                 DB::table('purchase_request_detail')->insert([
                     'index' => $data->index,
                     'id_barang' => $data->id_barang,
                     'id_satuan_barang' => $data->id_satuan_barang,
-                    'qty' => $data->jumlah,
+                    'qty' => $data->qty,
                     'notes' => $data->notes,
                     'purchase_request_id' => $this->purchase_request_id,
                     'closed' => '1',

@@ -20,14 +20,16 @@ class PurchaseRequestController extends Controller
                     'purchase_request_date',
                     'purchase_request_estimation_date',
                     'nama_gudang',
-                    'nama_pengguna',
+                    'user.nama_pengguna as user',
                     'catatan',
                     'approval_status',
+                    'approval.nama_pengguna as approval_user',
                     'approval_date',
                     'dt_created as created_at'
                 )
                 ->leftJoin('gudang', 'prh.id_gudang', '=', 'gudang.id_gudang')
-                ->leftJoin('pengguna', 'prh.purchase_request_user_id', '=', 'pengguna.id_pengguna');
+                ->leftJoin('pengguna as user', 'prh.purchase_request_user_id', '=', 'user.id_pengguna')
+                ->leftJoin('pengguna as approval', 'prh.approval_user_id', '=', 'approval.id_pengguna');
 
             if (isset($request->c)) {
                 $data = $data->where('prh.id_cabang', $request->c);

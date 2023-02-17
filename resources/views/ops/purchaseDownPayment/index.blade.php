@@ -52,14 +52,14 @@
 @endsection
 
 @section('header')
-    <p>Daftar Permintaan Pembelian</p>
+    <p>Daftar Uang Muka Pembelian</p>
 @endsection
 
 @section('main-section')
     <div class="panel">
         <div class="panel-body">
             <div style="margin-bottom:10px;">
-                <a href="{{ route('purchase-request-entry') }}" class="btn btn-primary">Tambah Permintaan Pembelian</a>
+                <a href="{{ route('purchase-down-payment-entry') }}" class="btn btn-primary">Tambah Uang Muka Pembelian</a>
                 <br><br>
                 <select name="id_cabang" class="form-control" style="width:200px;">
                     @foreach ($cabang as $branch)
@@ -78,15 +78,15 @@
             <table class="table table-bordered data-table">
                 <thead>
                     <tr>
-                        <th>ID Permintaan</th>
+                        <th>ID Uang Muka Pembelian</th>
                         <th>Tanggal</th>
-                        <th>Estimasi</th>
-                        <th>Gudang</th>
-                        <th>Pemohon</th>
+                        <th>ID Permintaan Pembelian (PO)</th>
+                        <th>Supplier</th>
+                        <th>Mata Uang</th>
+                        <th>Rate</th>
+                        <th>Nominal</th>
+                        <th>Total</th>
                         <th>Catatan</th>
-                        <th>Status</th>
-                        <th>Otorisasi</th>
-                        <th>Tanggal Otorisasi</th>
                         <th width="150px">Action</th>
                     </tr>
                 </thead>
@@ -132,34 +132,34 @@
         var table = $('.data-table').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route('purchase-request') }}?c=" + $('[name="id_cabang"]').val(),
+            ajax: "{{ route('purchase-down-payment') }}?c=" + $('[name="id_cabang"]').val(),
             columns: [{
-                data: 'purchase_request_code',
-                name: 'purchase_request_code'
+                data: 'kode_uang_muka_pembelian',
+                name: 'kode_uang_muka_pembelian'
             }, {
-                data: 'purchase_request_date',
-                name: 'purchase_request_date'
+                data: 'tanggal',
+                name: 'tanggal'
             }, {
-                data: 'purchase_request_estimation_date',
-                name: 'purchase_request_estimation_date',
+                data: 'id_permintaan_pembeliaan',
+                name: 'id_permintaan_pembeliaan',
             }, {
-                data: 'nama_gudang',
-                name: 'nama_gudang',
+                data: 'id_permintaan_pembeliaan',
+                name: 'id_permintaan_pembeliaan',
             }, {
-                data: 'user',
-                name: 'user',
+                data: 'id_mata_uang',
+                name: 'id_mata_uang',
+            }, {
+                data: 'rate',
+                name: 'rate'
+            }, {
+                data: 'nominal',
+                name: 'nominal',
+            }, {
+                data: 'total',
+                name: 'total',
             }, {
                 data: 'catatan',
-                name: 'catatan'
-            }, {
-                data: 'approval_status',
-                name: 'approval_status',
-            }, {
-                data: 'approval_user',
-                name: 'approval_user',
-            }, {
-                data: 'approval_date',
-                name: 'approval_date',
+                name: 'catatan',
             }, {
                 data: 'action',
                 name: 'action',

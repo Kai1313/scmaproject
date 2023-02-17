@@ -126,16 +126,20 @@
                         </thead>
                         <tbody id="target-table">
                             @if ($data)
-                                @foreach ($data->details as $detail)
+                                @foreach ($data->formatdetail as $detail)
                                     <tr data-index="{{ $detail->index }}">
-                                        <td>{{ $detail->barang->kode_barang }}</td>
-                                        <td>{{ $detail->barang->nama_barang }}</td>
-                                        <td>{{ $detail->satuan->nama_satuan_barang }}</td>
+                                        <td>{{ $detail->kode_barang }}</td>
+                                        <td>{{ $detail->nama_barang }}</td>
+                                        <td>{{ $detail->nama_satuan_barang }}</td>
                                         <td>{{ $detail->qty }}</td>
                                         <td>{{ $detail->notes }}</td>
                                         <td>
-                                            <a href="javascript:void(0)" class="btn btn-warning edit-entry">Edit</a>
-                                            <a href="javascript:void(0)" class="btn btn-danger delete-entry">Hapus</a>
+                                            <a href="javascript:void(0)" class="btn btn-warning edit-entry btn-sm">
+                                                <i class="glyphicon glyphicon-pencil"></i>
+                                            </a>
+                                            <a href="javascript:void(0)" class="btn btn-danger delete-entry btn-sm">
+                                                <i class="glyphicon glyphicon-trash"></i>
+                                            </a>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -154,25 +158,28 @@
         <div class="modal-dialog modal-sm" role="document">
             <div class="modal-content">
                 <div class="modal-body">
+                    <div class="alert alert-danger" style="display:none;" id="alertModal">
+                        Lengkapi Data yang diperlukan
+                    </div>
                     <input type="hidden" name="index" value="0">
                     <label>Nama Barang</label>
                     <div class="form-group">
-                        <select name="id_barang" class="form-control selectAjax"
+                        <select name="id_barang" class="form-control selectAjax validate"
                             data-route="{{ route('purchase-request-auto-item') }}">
                         </select>
-                        <input type="hidden" name="nama_barang">
-                        <input type="hidden" name="kode_barang">
+                        <input type="hidden" name="nama_barang" class="validate">
+                        <input type="hidden" name="kode_barang" class="validate">
                     </div>
                     <label>Satuan</label>
                     <div class="form-group">
-                        <select name="id_satuan_barang" class="form-control selectAjax"
+                        <select name="id_satuan_barang" class="form-control selectAjax validate"
                             data-route="{{ route('purchase-request-auto-satuan') }}">
                         </select>
-                        <input type="hidden" name="nama_satuan_barang">
+                        <input type="hidden" name="nama_satuan_barang" class="validate">
                     </div>
                     <label>Jumlah</label>
                     <div class="form-group">
-                        <input type="number" name="jumlah" class="form-control">
+                        <input type="number" name="qty" class="form-control validate">
                     </div>
                     <label>Catatan</label>
                     <div class="form-group">
@@ -194,7 +201,7 @@
 
 @section('externalScripts')
     <script>
-        let details = []
+        let details = {!! $data ? $data->formatdetail : '[]' !!};
         let detailSelect = []
         let count = details.length
         let statusModal = 'create'
@@ -247,7 +254,7 @@
                 if (name == 'id_satuan_barang') {
                     $('#modalEntry').find('[name="nama_satuan_barang"]').val(dataselect.text)
                 }
-            });;
+            });
         })
 
         $('.add-entry').click(function() {
@@ -256,6 +263,7 @@
                 $(v).val('').trigger('change')
             })
 
+            $('#alertModal').hide()
             statusModal = 'create'
             count += 1
             $('#modalEntry').find('[name="index"]').val(count)
@@ -266,6 +274,14 @@
         })
 
         $('.save-entry').click(function() {
+            let valid = validatorModal()
+            if (!valid.status) {
+                $('#alertModal').show()
+                return false
+            } else {
+                $('#alertModal').hide()
+            }
+
             let modal = $('#modalEntry')
             modal.find('input,select,textarea').each(function(i, v) {
                 detailSelect[$(v).prop('name')] = $(v).val()
@@ -276,11 +292,11 @@
                 '<td>' + newObj.kode_barang + '</td>' +
                 '<td>' + newObj.nama_barang + '</td>' +
                 '<td>' + newObj.nama_satuan_barang + '</td>' +
-                '<td>' + newObj.jumlah + '</td>' +
+                '<td>' + newObj.qty + '</td>' +
                 '<td>' + newObj.notes + '</td>' +
                 '<td>' +
-                '<a href="javascript:void(0)" class="btn btn-warning edit-entry"><i class="glyphicon glyphicon-pencil"></i></a>' +
-                '<a href="javascript:void(0)" class="btn btn-danger delete-entry"><i class="glyphicon glyphicon-trash"></i></a>' +
+                '<a href="javascript:void(0)" class="btn btn-warning edit-entry btn-sm"><i class="glyphicon glyphicon-pencil"></i></a>' +
+                '<a href="javascript:void(0)" class="btn btn-danger delete-entry btn-sm"><i class="glyphicon glyphicon-trash"></i></a>' +
                 '</td>' +
                 '</tr>'
             if (statusModal == 'create') {
@@ -311,6 +327,7 @@
                 $(v).val('').trigger('change')
             })
 
+            $('#alertModal').hide()
             $('#modalEntry').modal({
                 backdrop: 'static',
                 keyboard: false
@@ -343,5 +360,19 @@
 
             $('[name="details"]').val(JSON.stringify(details))
         })
+
+        function validatorModal() {
+            let valid = true
+            $('#modalEntry').find('.validate').each(function(i, v) {
+                if ($(v).val() == '') {
+                    console.log('asd')
+                    valid = false
+                }
+            })
+
+            return {
+                'status': valid
+            }
+        }
     </script>
 @endsection
