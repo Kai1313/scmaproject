@@ -22,32 +22,32 @@
             <th style="border: #000000 solid thin; font-size: 14; text-align: center; width: 160px; font-weight: bold; background-color: #CCCCCC">Header 2</th>
             <th style="border: #000000 solid thin; font-size: 14; text-align: center; width: 160px; font-weight: bold; background-color: #CCCCCC">Header 3</th>
         </tr>
-        {{-- @foreach ($slips as $slip)
+        @foreach ($akuns as $akun)
             <tr>
-                <td style="border: #000000 solid thin; font-size: 12; text-align: center;">{{ $slip->kode_slip }}</td>
-                <td style="border: #000000 solid thin; font-size: 12; text-align: center;">{{ $slip->nama_slip }}</td>
+                <td style="border: #000000 solid thin; font-size: 12; text-align: center;">{{ $akun->kode_akun }}</td>
+                <td style="border: #000000 solid thin; font-size: 12; text-align: center;">{{ $akun->nama_akun }}</td>
                 <td style="border: #000000 solid thin; font-size: 12; text-align: center;">
                     @php
-                        switch ($slip->jenis_slip) {
+                        switch ($akun->tipe_akun) {
+                            case '0':
+                                $tipe = 'Neraca';
+                                break;
                             case '1':
-                                $jenis = 'Bank';
-                                break;
-                            case '2':
-                                $jenis = 'PG';
-                                break;
-                            case '3':
-                                $jenis = 'HG';
+                                $tipe = 'Laba Rugi';
                                 break;
                             default:
-                                $jenis = 'Kas';
+                                $tipe = 'Undefined';
                                 break;
                         }
-                        echo $jenis;
+                        echo $tipe;
                     @endphp
                 </td>
-                <td style="border: #000000 solid thin; font-size: 12; text-align: center;">{{ $slip->nama_akun }}</td>
+                <td style="border: #000000 solid thin; font-size: 12; text-align: center;">{{ $akun->parent_name }}</td>
+                <td style="border: #000000 solid thin; font-size: 12; text-align: center;">{{ $akun->header1 }}</td>
+                <td style="border: #000000 solid thin; font-size: 12; text-align: center;">{{ $akun->header2 }}</td>
+                <td style="border: #000000 solid thin; font-size: 12; text-align: center;">{{ $akun->header3 }}</td>
             </tr>
-        @endforeach --}}
+        @endforeach
     </table>
 </body>
 </html>

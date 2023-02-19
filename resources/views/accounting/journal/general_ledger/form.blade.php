@@ -36,26 +36,46 @@
                         </div>
                     </div>
                     <div class="box-body">
-                        <form id="form_slip" data-toggle="validator" enctype="multipart/form-data">
+                        <form id="form_ledger" data-toggle="validator" enctype="multipart/form-data">
                             @csrf
-                            <input type="hidden" name="id_jurnal_umum" value="{{ old('id_jurnal_umum', (isset($data_jurnal_umum)) ? $data_jurnal_umum->id_jurnal_umum : '') }}">
                             <div class="row">
-                                <div class="col-xs-6">
-                                    <div class="form-group">
-                                        <label>Nama Jurnal Umum</label>
-                                        <input type="text" class="form-control" id="nama_slip" name="nama_slip" placeholder="Masukkan nama jurnal umum" value="{{ isset($data_jurnal_umum->nama_jurnal_umum)?$data_jurnal_umum->nama_jurnal_umum:'' }}" data-validation="[NOTEMPTY]" data-validation-message="Nama Jurnal Umum tidak boleh kosong"  required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Tanggal Jurnal</label>
-                                        <input type="date" class="form-control" id="date_jurnal" name="date_jurnal" placeholder="Masukkan tanggal jurnal umum" value="{{ isset($data_jurnal_umum->date_jurnal_umum)?$data_jurnal_umum->date_jurnal_umum:'' }}" data-validation="[NOTEMPTY]" data-validation-message="Tanggal Jurnal tidak boleh kosong" required>
-                                    </div>
-                                </div>
-                                <div class="col-xs-6">
+                                <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Cabang</label>
                                         <select name="cabang_input" id="cabang_input" class="form-control select2" style="width: 100%;">
                                             @foreach ($data_cabang as $cabang)
                                                 <option value="{{ $cabang->id_cabang }}" {{ isset($data_jurnal_umum->id_cabang)?(($data_jurnal_umum->id_cabang == $cabang->id_cabang)?'selected':''):'' }}>{{ $cabang->kode_cabang.' - '.$cabang->nama_cabang }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Kode Jurnal</label>
+                                        <input type="text" class="form-control" id="kode" name="kode" placeholder="Masukkan kode jurnal umum" value="" data-validation="[NOTEMPTY]" data-validation-message="Kode Jurnal Umum tidak boleh kosong"  required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Tanggal Jurnal</label>
+                                        <input type="date" class="form-control" id="tanggal" name="tanggal" placeholder="Masukkan tanggal jurnal umum" value="" data-validation="[NOTEMPTY]" data-validation-message="Tanggal Jurnal tidak boleh kosong" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Jenis Jurnal</label>
+                                        <select name="jenis" id="jenis" class="form-control select2" data-validation="[NOTEMPTY]" data-validation-message="Jenis Jurnal tidak boleh kosong">
+                                            <option value="">Pilih Jenis Jurnal</option>
+                                            <option value="KK">Kas Keluar</option>
+                                            <option value="KM">Kas Masuk</option>
+                                            <option value="BK">Bank Keluar</option>
+                                            <option value="BM">Bank Masuk</option>
+                                            <option value="PG">Piutang Giro</option>
+                                            <option value="HG">Hutang Giro</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Slip</label>
+                                        <select name="slip" id="slip" class="form-control select2" data-validation="[NOTEMPTY]" data-validation-message="Slip tidak boleh kosong">
+                                            <option value="">Pilih Slip</option>
+                                            @foreach ($data_slip as $slip)
+                                                <option value="{{ $slip->kode_slip }}">{{ $slip->kode_slip.' - '.$slip->nama_slip }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -109,15 +129,11 @@
     <script>
         let save_route = "{{ route('transaction-general-ledger-store') }}"
         let data_route = "{{ route('transaction-general-ledger') }}"
-        let slip = JSON.parse(JSON.stringify({!! (isset($data_jurnal_umum)) ? $data_jurnal_umum : '{}' !!}))
-        if (Object.keys(slip).length > 0) {
-            save_route = "{{ route('transaction-general-ledger-update') }}";
-        }
 
-        var validateSlip = {
+        var validateLedger = {
             submit: {
                 settings: {
-                    form: '#form_slip',
+                    form: '#form_ledger',
                     inputContainer: '.form-group',
                     // errorListContainer: 'help-block',
                     errorListClass: 'form-control-error',
@@ -131,7 +147,7 @@
                 callback: {
                     onSubmit: function(node, formData) {
                         console.log('hello')
-                        save_data()
+                        // save_data()
                     }
                 }
             },
@@ -144,7 +160,7 @@
         }
 
         $(function() {
-            $.validate(validateSlip)
+            $.validate(validateLedger)
             $('.select2').select2({
                 width: '100%'
             })
@@ -162,53 +178,7 @@
                     e.stopPropagation();
                 })
             })
-
-            if(Object.keys(slip).length > 0){
-                $('#jenis_slip').val(slip.jenis_slip).trigger('change');
-            }
         })
-
-        function save_data_old() {
-            Swal.fire({
-                title: 'Do you want to save the changes?',
-                icon: 'info',
-                showDenyButton: true,
-                confirmButtonText: 'Yes',
-                denyButtonText: 'No',
-                reverseButtons: true,
-                customClass: {
-                    actions: 'my-actions',
-                    confirmButton: 'order-1',
-                    denyButton: 'order-3',
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    console.log('aaa')
-                    $.ajax({
-                        type: "POST",
-                        url: save_route,
-                        data: $('form').serialize(),
-                        success: function(data) {
-                            if (data.result) {
-                                Swal.fire('Saved!', data.message, 'success').then((result) => {
-                                    if (result.isConfirmed) {
-                                        window.location.href = data_route;
-                                    }
-                                })
-                            } else {
-                                Swal.fire("Sorry, Can't save data. ", data.message, 'error')
-                            }
-
-                        },
-                        error: function(data) {
-                            Swal.fire("Sorry, Can't save data. ", data.responseJSON.message, 'error')
-                        }
-                    });
-                } else if (result.isDenied) {
-                    Swal.fire('Changes are not saved', '', 'info')
-                }
-            })
-        }
 
         function save_data() {
             $.ajax({

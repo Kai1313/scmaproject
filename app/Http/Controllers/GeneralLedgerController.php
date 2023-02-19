@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Accounting\GeneralLedger;
-use App\Models\Master\Cabang;
 use App\Models\Master\Akun;
+use App\Models\Master\Cabang;
+use App\Models\Master\Slip;
 use Illuminate\Http\Request;
 use DB;
 
@@ -42,13 +43,15 @@ class GeneralLedgerController extends Controller
     public function create(Request $request)
     {
         $cabang = Cabang::find(1);
-        $data_akun = Akun::where("isshown", 1)->where("id_cabang", $cabang->id_cabang)->get();//DB::select('select * from master_akun');
-        $data_cabang = DB::select('select * from cabang where status_cabang = 1');
+        $data_akun = Akun::where("isshown", 1)->where("id_cabang", $cabang->id_cabang)->get();
+        $data_cabang = Cabang::where("status_cabang", 1)->get();
+        $data_slip = Slip::all();
 
         $data = [
             "pageTitle" => "SCA Accounting | Transaksi Jurnal Umum | Create",
             "data_akun" => $data_akun,
-            "data_cabang" => $data_cabang
+            "data_cabang" => $data_cabang,
+            "data_slip" => $data_slip
         ];
 
         if ($request->session()->has('token')) {
