@@ -4,7 +4,27 @@
     <!-- Select2 -->
     <link rel="stylesheet" href="{{ asset('assets/bower_components/select2/dist/css/select2.min.css') }}">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.min.css" rel="stylesheet">
+    <!-- DataTables -->
+    <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css') }}">
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <style>
+        .mt-1 { 
+            margin-top:.25rem!important; 
+        }
+        .mt-2 { 
+            margin-top:.5rem!important; 
+        }
+        .mt-4 { 
+            margin-top:1rem!important; 
+        }
+        .mb-1 { 
+            margin-bottom:.25rem!important; 
+        }
+        .mb-4 { 
+            margin-bottom:1rem!important; 
+        }
+    </style>
 @endsection
 
 @section('header')
@@ -49,12 +69,12 @@
                                         </select>
                                     </div>
                                     <div class="form-group">
-                                        <label>Kode Jurnal</label>
-                                        <input type="text" class="form-control" id="kode" name="kode" placeholder="Masukkan kode jurnal umum" value="" data-validation="[NOTEMPTY]" data-validation-message="Kode Jurnal Umum tidak boleh kosong"  required>
+                                        <label>Nomor Jurnal</label>
+                                        <input type="text" class="form-control" id="kode" name="kode" placeholder="Masukkan nomor jurnal umum" value="" data-validation="[NOTEMPTY]" data-validation-message="Nomor Jurnal Umum tidak boleh kosong">
                                     </div>
                                     <div class="form-group">
                                         <label>Tanggal Jurnal</label>
-                                        <input type="date" class="form-control" id="tanggal" name="tanggal" placeholder="Masukkan tanggal jurnal umum" value="" data-validation="[NOTEMPTY]" data-validation-message="Tanggal Jurnal tidak boleh kosong" required>
+                                        <input type="date" class="form-control" id="tanggal" name="tanggal" placeholder="Masukkan tanggal jurnal umum" value="{{ date("d/m/Y") }}" data-validation="[NOTEMPTY]" data-validation-message="Tanggal Jurnal tidak boleh kosong">
                                     </div>
                                     <div class="form-group">
                                         <label>Jenis Jurnal</label>
@@ -68,8 +88,6 @@
                                             <option value="HG">Hutang Giro</option>
                                         </select>
                                     </div>
-                                </div>
-                                <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Slip</label>
                                         <select name="slip" id="slip" class="form-control select2" data-validation="[NOTEMPTY]" data-validation-message="Slip tidak boleh kosong">
@@ -79,37 +97,122 @@
                                             @endforeach
                                         </select>
                                     </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Nomor Giro</label>
+                                        <input type="text" name="nomor_giro" id="nomor_giro" class="form-control" data-validation="[NOTEMPTY]" data-validation-message="Nomor giro tidak boleh kosong" disabled>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Tanggal Giro</label>
+                                        <input type="date" class="form-control" id="tanggal_giro" name="tanggal_giro" placeholder="Masukkan tanggal giro" value="{{ date("d/m/Y") }}" data-validation="[NOTEMPTY]" data-validation-message="Tanggal Giro tidak boleh kosong">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Tanggal JT Giro</label>
+                                        <input type="date" class="form-control" id="tanggal_jt_giro" name="tanggal_jt_giro" placeholder="Masukkan tanggal jatuh tempo giro" value="{{ date("d/m/Y") }}" data-validation="[NOTEMPTY]" data-validation-message="Tanggal JT Giro tidak boleh kosong">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Notes</label>
+                                        <textarea name="notes" class="form-control" rows="4" placeholder="Notes ..."></textarea>
+                                    </div>
+                                    <button id="hidden-btn" style="display:none;" type="submit">HIDDEN</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box box-primary">
+                    <div class="box-header">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <h3 class="box-title">Detail Jurnal</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <form action="" method="post">
+                            <div class="row">
+                                <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Akun</label>
                                         <select name="id_akun" class="form-control select2" id="id_akun"
                                         data-error="Wajib isi" data-validation="[NOTEMPTY]" data-validation-message="Akun tidak boleh kosong"  required>
                                             <option value="">Pilih Akun</option>
-                                            @foreach ($data_akun as $akun)
-                                                <option value="{{ $akun->id_akun }}"
-                                                @if(isset($data_jurnal_umum)) @if ($data_jurnal_umum->id_akun == $akun->id_akun) selected @endif @endif>{{ $akun->kode_akun.' - '.$akun->nama_akun }}
+                                            @foreach ($data_akun as $akunDt)
+                                                <option value="{{ $akunDt->id_akun }}">{{ $akunDt->kode_akun.' - '.$akunDt->nama_akun }}
                                                 </option>
                                             @endforeach
                                         </select>
                                     </div>
+                                    <div class="form-group">
+                                        <label>Notes</label>
+                                        <textarea name="notes_detail" class="form-control" rows="3" placeholder="Notes ..."></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Debet</label>
+                                        <input type="text" name="debet" id="debet" class="form-control" data-validation="[NOTEMPTY]" data-validation-message="Debet tidak boleh kosong">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Kredit</label>
+                                        <input type="text" name="kredit" id="kredit" class="form-control" data-validation="[NOTEMPTY]" data-validation-message="Kredit tidak boleh kosong">
+                                    </div>
                                 </div>
                             </div>
-                            <div class="row">
+                            <div class="row mb-1">
                                 <div class="col-xs-12">
-                                    <button type="button" id="tombol_refresh" onclick="refresh()"
-                                    class="btn btn-default pull-left sr-only"><span class="glyphicon glyphicon-repeat"
-                                        aria-hidden="true"></span> Ulangi</button>
-                                    {{-- <button type="button" id="tombol_buat" onclick="save_data()"
-                                        class="btn btn-flat btn-primary pull-right"><span class="glyphicon glyphicon-floppy-saved"
-                                            aria-hidden="true"></span> {{(isset($data_jurnal_umum)) ? ' Ubah Data' : ' Simpan Data'}}</button> --}}
-                                    <button type="submit" id="tombol_buat"
-                                        class="btn btn-flat btn-primary pull-right"><span class="glyphicon glyphicon-floppy-saved"
-                                            aria-hidden="true"></span> {{(isset($data_jurnal_umum)) ? ' Ubah Data' : ' Simpan Data'}}</button>
-                                    <button type="button" id="tombol_ubah" onclick="ubah_data()"
-                                        class="btn btn-flat btn-warning pull-right sr-only"><span class="glyphicon glyphicon-pencil"
-                                            aria-hidden="true"></span> Ubah Data</button>
+                                    <button type="submit" id="btn-submit" class="btn btn-flat btn-primary pull-right"><span class="glyphicon glyphicon-floppy-saved" aria-hidden="true"></span> Tambah Detail</button>
                                 </div>
                             </div>
                         </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box box-primary">
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <table id="table_detail" class="table table-bordered table-striped" style="width:100%">
+                                    <thead width="100%">
+                                        <tr>
+                                            <th class="text-center" width="10%">No Akun</th>
+                                            <th class="text-center" width="10%">Nama Akun</th>
+                                            <th class="text-center" width="40%">Catatan</th>
+                                            <th class="text-center" width="10%">Debet</th>
+                                            <th class="text-center" width="10%">Kredit</th>
+                                            <th class="text-center" width="20%">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                            </div>
+                            <div class="col-md-4">
+                                <label>Total Debet</label>
+                                <input type="text" name="total_debet" id="total_debet" class="form-control" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label>Total Kredit</label>
+                                <input type="text" name="total_kredit" id="total_kredit" class="form-control" readonly>
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-xs-12">
+                                <button type="submit" id="btn-save" class="btn btn-flat btn-primary pull-right mb-1"><span class="glyphicon glyphicon-floppy-saved" aria-hidden="true"></span> Simpan Data</button>
+                                <button class="btn btn-flat btn-success mr-1 mb-1 pull-right">Generate</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -123,6 +226,13 @@
     {{-- Swal alert --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.all.min.js"></script>
     <script src="{{ asset('assets/plugins/jquery-form-validation-1.5.3/dist/jquery.validation.min.js') }}"></script>
+    <!-- DataTables -->
+    <script src="{{ asset('assets/bower_components/datatables.net/js/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js') }}"></script>
+    <!-- SlimScroll -->
+    <script src="{{ asset('assets/bower_components/jquery-slimscroll/jquery.slimscroll.min.js') }}"></script>
+    <!-- FastClick -->
+    <script src="{{ asset('assets/bower_components/fastclick/lib/fastclick.js') }}"></script>
 @endsection
 
 @section('externalScripts')
@@ -164,6 +274,12 @@
             $('.select2').select2({
                 width: '100%'
             })
+
+            $("#btn-save").on("click", function() {
+                $("#hidden-btn").click()
+            })
+
+            $('#table_detail').DataTable()
 
             $(document).on('select2:open', () => {
                 document.querySelector('.select2-search__field').focus()
