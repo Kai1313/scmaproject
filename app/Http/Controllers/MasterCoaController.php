@@ -17,17 +17,22 @@ class MasterCoaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
 
         $cabang = Cabang::find(1);
         $data_cabang = Cabang::all();
         $data = [
-            "pageTitle"=>"SCA Accounting | Master CoA | List",
+            "pageTitle" => "SCA Accounting | Master CoA | List",
             "cabang_user" => $cabang,
             "data_cabang" => $data_cabang
         ];
-        return view('accounting.master.coa.index', $data);
+
+        if ($request->session()->has('token') && (in_array('291', $request->session()->get('access')) && in_array('292', $request->session()->get('access')))) {
+            return view('accounting.master.coa.index', $data);
+        } else {
+            return view('exceptions.forbidden');
+        }
     }
 
     /**
@@ -36,8 +41,9 @@ class MasterCoaController extends Controller
      * @param  int $id_cabang
      * @return \Illuminate\Http\Response
      */
-    public function populate($id_cabang){
-       try{
+    public function populate($id_cabang)
+    {
+        try {
             $coa = Akun::where('id_cabang', $id_cabang)->get();
 
             $data = $this->buildTree($coa);
@@ -46,8 +52,7 @@ class MasterCoaController extends Controller
                 "result" => true,
                 "data" => $data
             ]);
-
-        }catch (\Exception $e) {
+        } catch (\Exception $e) {
             return response()->json([
                 "result" => false,
                 "message" => "Error get data akun"
@@ -60,18 +65,23 @@ class MasterCoaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
         // Get data for select
         $data_cabang = Cabang::all();
         $data_akun = Akun::all();
         // dd($akun);
         $data = [
-            "pageTitle"=>"SCA Accounting | Master CoA | Create",
-            "data_cabang"=>$data_cabang,
-            "data_akun"=>$data_akun,
+            "pageTitle" => "SCA Accounting | Master CoA | Create",
+            "data_cabang" => $data_cabang,
+            "data_akun" => $data_akun,
         ];
-        return view('accounting.master.coa.form', $data);
+
+        if ($request->session()->has('token')) {
+            return view('accounting.master.coa.form', $data);
+        } else {
+            return view('exceptions.forbidden');
+        }
     }
 
     /**
@@ -89,9 +99,9 @@ class MasterCoaController extends Controller
             if ($check_akun) {
                 DB::rollback();
                 return response()->json([
-                    "result"=>FALSE,
-                    "akun"=>NULL,
-                    "message"=>"Akun sudah pernah dibuat, cek kembali kode akun, cabang, dan nama akun"
+                    "result" => FALSE,
+                    "akun" => NULL,
+                    "message" => "Akun sudah pernah dibuat, cek kembali kode akun, cabang, dan nama akun"
                 ]);
             }
 
@@ -113,26 +123,25 @@ class MasterCoaController extends Controller
                 DB::rollback();
                 Log::error("Error when saving data akun");
                 return response()->json([
-                    "result"=>FALSE,
-                    "akun"=>$akun,
-                    "message"=>"Error when saving data akun"
+                    "result" => FALSE,
+                    "akun" => $akun,
+                    "message" => "Error when saving data akun"
                 ]);
             }
             DB::commit();
             return response()->json([
-                "result"=>TRUE,
-                "akun"=>$akun,
-                "message"=>"Successfully saving data akun"
+                "result" => TRUE,
+                "akun" => $akun,
+                "message" => "Successfully saving data akun"
             ]);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
             Log::error("Error when store akun");
             Log::error($e);
             return response()->json([
-                "result"=>FALSE,
-                "akun"=>NULL,
-                "message"=>"Error when store akun"
+                "result" => FALSE,
+                "akun" => NULL,
+                "message" => "Error when store akun"
             ]);
         }
     }
@@ -143,7 +152,7 @@ class MasterCoaController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
         // Get data for select
         $data_cabang = Cabang::all();
@@ -159,11 +168,16 @@ class MasterCoaController extends Controller
         Log::debug(json_encode($data_akun));
 
         $data = [
-            "pageTitle"=>"SCA Accounting | Master CoA | Detail",
-            "data_cabang"=>$data_cabang,
-            "data_akun"=>$data_akun
+            "pageTitle" => "SCA Accounting | Master CoA | Detail",
+            "data_cabang" => $data_cabang,
+            "data_akun" => $data_akun
         ];
-        return view('accounting.master.coa.detail', $data);
+
+        if ($request->session()->has('token')) {
+            return view('accounting.master.coa.detail', $data);
+        } else {
+            return view('exceptions.forbidden');
+        }
     }
 
     /**
@@ -172,7 +186,7 @@ class MasterCoaController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Request $request, $id)
     {
         // Get data for select
         $data_cabang = Cabang::all();
@@ -182,12 +196,17 @@ class MasterCoaController extends Controller
         $akun = Akun::where("id_akun", $id)->first();
 
         $data = [
-            "pageTitle"=>"SCA Accounting | Master CoA | Edit",
-            "data_cabang"=>$data_cabang,
-            "data_akun"=>$data_akun,
-            "akun"=>$akun
+            "pageTitle" => "SCA Accounting | Master CoA | Edit",
+            "data_cabang" => $data_cabang,
+            "data_akun" => $data_akun,
+            "akun" => $akun
         ];
-        return view('accounting.master.coa.form', $data);
+
+        if ($request->session()->has('token')) {
+            return view('accounting.master.coa.form', $data);
+        } else {
+            return view('exceptions.forbidden');
+        }
     }
 
     /**
@@ -222,32 +241,30 @@ class MasterCoaController extends Controller
                     DB::rollback();
                     Log::error("Error when updating data akun");
                     return response()->json([
-                        "result"=>FALSE,
-                        "message"=>"Error when updating data akun"
+                        "result" => FALSE,
+                        "message" => "Error when updating data akun"
                     ]);
                 }
                 DB::commit();
                 return response()->json([
-                    "result"=>TRUE,
-                    "akun"=>$akun,
-                    "message"=>"Successfully updating data akun"
+                    "result" => TRUE,
+                    "akun" => $akun,
+                    "message" => "Successfully updating data akun"
                 ]);
-            }
-            else {
+            } else {
                 DB::rollback();
                 return response()->json([
-                    "result"=>FALSE,
-                    "message"=>"Could not find akun with id ".$id
+                    "result" => FALSE,
+                    "message" => "Could not find akun with id " . $id
                 ]);
             }
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
             Log::error("Error when update akun");
             Log::error($e);
             return response()->json([
-                "result"=>FALSE,
-                "message"=>"Error when update akun"
+                "result" => FALSE,
+                "message" => "Error when update akun"
             ]);
         }
     }
@@ -270,31 +287,29 @@ class MasterCoaController extends Controller
                     DB::rollback();
                     Log::error("Error when deleting data akun");
                     return response()->json([
-                        "result"=>FALSE,
-                        "message"=>"Error when deleting data akun"
+                        "result" => FALSE,
+                        "message" => "Error when deleting data akun"
                     ]);
                 }
                 DB::commit();
                 return response()->json([
-                    "result"=>TRUE,
-                    "message"=>"Successfully deleting data akun"
+                    "result" => TRUE,
+                    "message" => "Successfully deleting data akun"
                 ]);
-            }
-            else {
+            } else {
                 DB::rollback();
                 return response()->json([
-                    "result"=>FALSE,
-                    "message"=>"Could not find akun with id ".$id
+                    "result" => FALSE,
+                    "message" => "Could not find akun with id " . $id
                 ]);
             }
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
             Log::error("Error when delete akun");
             Log::error($e);
             return response()->json([
-                "result"=>FALSE,
-                "message"=>"Error when delete akun"
+                "result" => FALSE,
+                "message" => "Error when delete akun"
             ]);
         }
     }
@@ -304,17 +319,16 @@ class MasterCoaController extends Controller
         try {
             $data_header = Akun::distinct()->get(['header1']);
             return response()->json([
-                "result"=>TRUE,
-                "message"=>"Successfully get header1",
-                "options"=>$data_header
+                "result" => TRUE,
+                "message" => "Successfully get header1",
+                "options" => $data_header
             ]);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             Log::error("Error when get header1");
             Log::error($e);
             return response()->json([
-                "result"=>FALSE,
-                "message"=>"Error when get header1"
+                "result" => FALSE,
+                "message" => "Error when get header1"
             ]);
         }
     }
@@ -324,17 +338,16 @@ class MasterCoaController extends Controller
         try {
             $data_header = Akun::distinct()->get(['header2']);
             return response()->json([
-                "result"=>TRUE,
-                "message"=>"Successfully get header2",
-                "options"=>$data_header
+                "result" => TRUE,
+                "message" => "Successfully get header2",
+                "options" => $data_header
             ]);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             Log::error("Error when get header2");
             Log::error($e);
             return response()->json([
-                "result"=>FALSE,
-                "message"=>"Error when get header2"
+                "result" => FALSE,
+                "message" => "Error when get header2"
             ]);
         }
     }
@@ -344,17 +357,16 @@ class MasterCoaController extends Controller
         try {
             $data_header = Akun::distinct()->get(['header3']);
             return response()->json([
-                "result"=>TRUE,
-                "message"=>"Successfully get header3",
-                "options"=>$data_header
+                "result" => TRUE,
+                "message" => "Successfully get header3",
+                "options" => $data_header
             ]);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             Log::error("Error when get header3");
             Log::error($e);
             return response()->json([
-                "result"=>FALSE,
-                "message"=>"Error when get header3"
+                "result" => FALSE,
+                "message" => "Error when get header3"
             ]);
         }
     }
@@ -363,13 +375,12 @@ class MasterCoaController extends Controller
     {
         try {
             return Excel::download(new AkunsExport, 'akuns.xlsx');
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             Log::error("Error when export excel master coa");
             Log::error($e);
             return response()->json([
-                "result"=>FALSE,
-                "message"=>"Error when export excel master coa"
+                "result" => FALSE,
+                "message" => "Error when export excel master coa"
             ]);
         }
     }
@@ -384,15 +395,15 @@ class MasterCoaController extends Controller
             if ($cabang_source == $cabang_dest) {
                 DB::rollback();
                 return response()->json([
-                    "result"=>FALSE,
-                    "message"=>"Cabang asal dan cabang tujuan sama, pilih cabang tujuan yang lain"
+                    "result" => FALSE,
+                    "message" => "Cabang asal dan cabang tujuan sama, pilih cabang tujuan yang lain"
                 ]);
             }
 
             // Get data akun from cabang source
             $data_akun = Akun::where("id_cabang", $cabang_source)->get();
 
-            if($data_akun){
+            if ($data_akun) {
                 $data_akun = $this->buildTree($data_akun);
                 $this->saveTreeCoa($data_akun, null, $cabang_dest);
                 // Log::debug('tesstt');
@@ -401,22 +412,22 @@ class MasterCoaController extends Controller
 
             DB::commit();
             return response()->json([
-                "result"=>TRUE,
-                "message"=>"Successfully copying master akun"
+                "result" => TRUE,
+                "message" => "Successfully copying master akun"
             ]);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
             Log::error("Error when copy data master akun");
             Log::error($e);
             return response()->json([
-                "result"=>FALSE,
-                "message"=>"Error when copy data master akun"
+                "result" => FALSE,
+                "message" => "Error when copy data master akun"
             ]);
         }
     }
 
-    private function buildTree($elements, $parentId = 0) {
+    private function buildTree($elements, $parentId = 0)
+    {
         $branch = array();
 
         foreach ($elements as $element) {
@@ -432,8 +443,9 @@ class MasterCoaController extends Controller
         return $branch;
     }
 
-    public function saveTreeCoa($data_akun, $parent_id = null, $cabang_dest){
-        foreach($data_akun as $akun){
+    public function saveTreeCoa($data_akun, $parent_id = null, $cabang_dest)
+    {
+        foreach ($data_akun as $akun) {
             $check_akun = Akun::where("id_cabang", $cabang_dest)
                 ->where("kode_akun", $akun->kode_akun)
                 ->where("nama_akun", $akun->nama_akun)
@@ -452,14 +464,14 @@ class MasterCoaController extends Controller
                 $ins_akun->header2 = $akun->header2;
                 $ins_akun->header3 = $akun->header3;
                 $ins_akun->save();
-                if(isset($akun->children)){
+                if (isset($akun->children)) {
                     $this->saveTreeCoa($akun->children, $ins_akun->id_akun, $cabang_dest);
                 }
                 if (!$ins_akun->save()) {
                     DB::rollback();
                     return response()->json([
-                        "result"=>FALSE,
-                        "message"=>"Error when save copy master akun"
+                        "result" => FALSE,
+                        "message" => "Error when save copy master akun"
                     ]);
                 }
             }
