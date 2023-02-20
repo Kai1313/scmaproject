@@ -41,8 +41,16 @@ class PurchaseRequestController extends Controller
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
                     $btn = '<ul class="horizontal-list">';
+                    if ($row->approval_status == 0) {
+                        $btn .= '<li><a href="' . route('purchase-request-change-status', [$row->purchase_request_id, 'approval']) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-check"></i> Approval</a></li>';
+                        $btn .= '<li><a href="' . route('purchase-request-reject', [$row->purchase_request_id, 'reject']) . '" class="btn btn-default btn-xs mr-1 mb-1"><i class="fa fa-times"></i> Reject</a></li>';
+                    }
+
                     $btn .= '<li><a href="' . route('purchase-request-entry', $row->purchase_request_id) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
-                    $btn .= '<li><a href="' . route('purchase-request-delete', $row->purchase_request_id) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Hapus</a></li>';
+                    if ($row->approval_status == 0) {
+                        $btn .= '<li><a href="' . route('purchase-request-delete', $row->purchase_request_id) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Hapus</a></li>';
+                    }
+
                     $btn .= '</ul>';
                     return $btn;
                 })
@@ -105,7 +113,7 @@ class PurchaseRequestController extends Controller
         $data->fill($request->all());
         if ($id == 0) {
             $data->purchase_request_code = PurchaseRequest::createcode($request->id_cabang);
-            $data->approval_status = 1;
+            $data->approval_status = 0;
             $data->user_created = session()->get('user')['id_pengguna'];
         } else {
             $data->user_modified = session()->get('user')['id_pengguna'];
@@ -160,5 +168,25 @@ class PurchaseRequestController extends Controller
             ->where('status_satuan_barang', 1)
             ->where('nama_satuan_barang', 'like', '%' . $serach . '%')->get();
         return $datas;
+    }
+
+    public function changeStatus($id, $type = 'approval')
+    {
+        $data = PurchaseRequest::find($id);
+        if (!$data) {
+            return 'data tidak ditemukan';
+        }
+
+        if (!in_array($type, ['approval', 'reject']) || $data->approval_status != 0) {
+            return 'Perubahan ditolak';
+        }
+
+        $data->approval_status = $type == 'approval' ? '1' : '2';
+        $data->approval_user_id = session()->get('user')['id_pengguna'];
+        $data->approval_date = date('Y-m-d H:i:s');
+        $data->save();
+        return redirect()
+            ->route('purchase-request', $data->purchase_request_id)
+            ->with('success', 'Data berhasil diperbarui');
     }
 }

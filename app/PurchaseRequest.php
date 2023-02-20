@@ -44,6 +44,11 @@ class PurchaseRequest extends Model
     {
         $detail = json_decode($details);
         $ids = array_column($detail, 'index');
+
+        DB::table('purchase_request_detail')
+            ->where('purchase_request_id', $this->purchase_request_id)
+            ->whereNotIn('index', $ids)->delete();
+
         foreach ($detail as $data) {
             $check = DB::table('purchase_request_detail')
                 ->where('purchase_request_id', $this->purchase_request_id)

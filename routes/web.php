@@ -50,6 +50,7 @@ Route::prefix('permintaan-pembelian')->group(function () {
     Route::get('auto-user', 'PurchaseRequestController@autoUser')->name('purchase-request-auto-user');
     Route::get('auto-item', 'PurchaseRequestController@autoItem')->name('purchase-request-auto-item');
     Route::get('auto-satuan', 'PurchaseRequestController@autoSatuan')->name('purchase-request-auto-satuan');
+    Route::get('change-status/{id}/{type}', 'PurchaseRequestController@changeStatus')->name('purchase-request-change-status');
 });
 
 Route::prefix('uang-muka-pembelian')->group(function () {
@@ -87,7 +88,6 @@ Route::get('/master/coa/get_header2', 'MasterCoaController@get_header2')->name('
 Route::get('/master/coa/get_header3', 'MasterCoaController@get_header3')->name('master-coa-header3');
 Route::get('/master/coa/export/excel', 'MasterCoaController@export_excel')->name('master-coa-export-excel');
 Route::post('/master/coa/copy/data', 'MasterCoaController@copy_data')->name('master-coa-copy-data');
-
 
 // Transaction
 // Jurnal Umum

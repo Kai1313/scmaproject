@@ -135,7 +135,9 @@
                             </div>
                         </div>
                     </div>
-                    <button class="btn btn-primary add-entry btn-flat" type="button">Tambah Barang</button>
+                    @if (!$data || $data->approval_status == 0)
+                        <button class="btn btn-primary add-entry btn-flat" type="button">Tambah Barang</button>
+                    @endif
                     <br><br>
                     <div class="table-responsive">
                         <input type="hidden" name="details">
@@ -160,14 +162,16 @@
                                             <td class="text-right">{{ $detail->qty }}</td>
                                             <td>{{ $detail->notes }}</td>
                                             <td class="text-center">
-                                                <a href="javascript:void(0)"
-                                                    class="btn btn-warning edit-entry btn-sm btn-flat">
-                                                    <i class="glyphicon glyphicon-pencil"></i>
-                                                </a>
-                                                <a href="javascript:void(0)"
-                                                    class="btn btn-danger delete-entry btn-sm btn-flat">
-                                                    <i class="glyphicon glyphicon-trash"></i>
-                                                </a>
+                                                @if (!$data || $data->approval_status == 0)
+                                                    <a href="javascript:void(0)"
+                                                        class="btn btn-warning edit-entry btn-sm btn-flat">
+                                                        <i class="glyphicon glyphicon-pencil"></i>
+                                                    </a>
+                                                    <a href="javascript:void(0)"
+                                                        class="btn btn-danger delete-entry btn-sm btn-flat">
+                                                        <i class="glyphicon glyphicon-trash"></i>
+                                                    </a>
+                                                @endif
                                             </td>
                                         </tr>
                                     @endforeach
@@ -176,9 +180,11 @@
                         </table>
                     </div>
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                    <button class="btn btn-primary btn-flat pull-right" type="submit">
-                        <i class="glyphicon glyphicon-floppy-saved"></i> Simpan Data
-                    </button>
+                    @if (!$data || $data->approval_status == 0)
+                        <button class="btn btn-primary btn-flat pull-right" type="submit">
+                            <i class="glyphicon glyphicon-floppy-saved"></i> Simpan Data
+                        </button>
+                    @endif
                 </form>
             </div>
         </div>
@@ -216,8 +222,8 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary cancel-entry">Batal</button>
-                        <button type="button" class="btn btn-primary save-entry">Simpan</button>
+                        <button type="button" class="btn btn-secondary cancel-entry btn-flat">Batal</button>
+                        <button type="button" class="btn btn-primary save-entry btn-flat">Simpan</button>
                     </div>
                 </div>
             </div>
@@ -227,6 +233,7 @@
 
 @section('addedScripts')
     <script src="{{ asset('assets/bower_components/select2/dist/js/select2.min.js') }}"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 @endsection
 
 @section('externalScripts')
@@ -379,16 +386,34 @@
         $('body').on('click', '.delete-entry', function() {
             let parent = $(this).parents('tr')
             let index = parent.data('index')
-            details.splice(index - 1, 1)
-            parent.remove()
-            count -= 1
+            Swal.fire({
+                title: 'Anda yakin ingin menghapus data ini?',
+                icon: 'info',
+                showDenyButton: true,
+                confirmButtonText: 'Yes',
+                denyButtonText: 'No',
+                reverseButtons: true,
+                customClass: {
+                    actions: 'my-actions',
+                    confirmButton: 'order-1',
+                    denyButton: 'order-3',
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    details.splice(index - 1, 1)
+                    parent.remove()
+                    count -= 1
 
-            for (let i = 0; i < details.length; i++) {
-                $('#target-table').find('[data-index="' + details[i].index + '"]').attr('data-index', i + 1)
-                details[i].index = i + 1
-            }
+                    for (let i = 0; i < details.length; i++) {
+                        $('#target-table').find('[data-index="' + details[i].index + '"]').attr(
+                            'data-index',
+                            i + 1)
+                        details[i].index = i + 1
+                    }
 
-            $('[name="details"]').val(JSON.stringify(details))
+                    $('[name="details"]').val(JSON.stringify(details))
+                }
+            })
         })
 
         function validatorModal() {
