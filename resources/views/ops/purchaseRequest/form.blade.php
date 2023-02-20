@@ -100,6 +100,17 @@
                                         class=" form-control">
                                 </div>
                             </div>
+                            @if ($data)
+                                <div class="row">
+                                    <label class="col-md-3">Status</label>
+                                    <div class="col-md-5 form-group">
+                                        @if (isset($arrayStatus[$data->approval_status]))
+                                            <label
+                                                class="{{ $arrayStatus[$data->approval_status]['class'] }}">{{ $arrayStatus[$data->approval_status]['text'] }}</label>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endif
                         </div>
                         <div class="col-md-6">
                             <div class="row">

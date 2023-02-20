@@ -10,6 +10,12 @@ use Yajra\DataTables\DataTables;
 
 class PurchaseRequestController extends Controller
 {
+    public $arrayStatus = [
+        ['text' => 'Pending', 'class' => 'label label-default'],
+        ['text' => 'Approve', 'class' => 'label label-success'],
+        ['text' => 'Reject', 'class' => 'label label-danger'],
+    ];
+
     public function index(Request $request)
     {
         if ($request->ajax()) {
@@ -29,7 +35,8 @@ class PurchaseRequestController extends Controller
                 )
                 ->leftJoin('gudang', 'prh.id_gudang', '=', 'gudang.id_gudang')
                 ->leftJoin('pengguna as user', 'prh.purchase_request_user_id', '=', 'user.id_pengguna')
-                ->leftJoin('pengguna as approval', 'prh.approval_user_id', '=', 'approval.id_pengguna');
+                ->leftJoin('pengguna as approval', 'prh.approval_user_id', '=', 'approval.id_pengguna')
+                ->where('prh.void', '=', 0);
 
             if (isset($request->c)) {
                 $data = $data->where('prh.id_cabang', $request->c);
@@ -43,7 +50,7 @@ class PurchaseRequestController extends Controller
                     $btn = '<ul class="horizontal-list">';
                     if ($row->approval_status == 0) {
                         $btn .= '<li><a href="' . route('purchase-request-change-status', [$row->purchase_request_id, 'approval']) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-check"></i> Approval</a></li>';
-                        $btn .= '<li><a href="' . route('purchase-request-reject', [$row->purchase_request_id, 'reject']) . '" class="btn btn-default btn-xs mr-1 mb-1"><i class="fa fa-times"></i> Reject</a></li>';
+                        $btn .= '<li><a href="' . route('purchase-request-change-status', [$row->purchase_request_id, 'reject']) . '" class="btn btn-default btn-xs mr-1 mb-1"><i class="fa fa-times"></i> Reject</a></li>';
                     }
 
                     $btn .= '<li><a href="' . route('purchase-request-entry', $row->purchase_request_id) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
@@ -54,7 +61,10 @@ class PurchaseRequestController extends Controller
                     $btn .= '</ul>';
                     return $btn;
                 })
-                ->rawColumns(['action'])
+                ->editColumn('approval_status', function ($row) {
+                    return '<label class="' . $this->arrayStatus[$row->approval_status]['class'] . '">' . $this->arrayStatus[$row->approval_status]['text'] . '</label>';
+                })
+                ->rawColumns(['action', 'approval_status'])
                 ->make(true);
 
         }
@@ -71,13 +81,11 @@ class PurchaseRequestController extends Controller
     {
         $data = PurchaseRequest::find($id);
         $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
-        $satuan = DB::table('satuan_barang')->select('id_satuan_barang as id', 'nama_satuan_barang as text')
-            ->where('status_satuan_barang', 1)->get();
 
         return view('ops.purchaseRequest.form', [
             'data' => $data,
             'cabang' => $cabang,
-            'satuan' => $satuan,
+            'arrayStatus' => $this->arrayStatus,
             "pageTitle" => "SCA OPS | Permintaan Pembelian | " . ($id == 0 ? 'Create' : 'Edit'),
         ]);
     }
@@ -129,7 +137,19 @@ class PurchaseRequestController extends Controller
 
     public function destroy(Request $request, $id)
     {
-        return $request->all();
+        $data = PurchaseRequest::find($id);
+        if (!$data) {
+            return 'Data tidak ditemukan';
+        }
+
+        $data->void = 1;
+        $data->void_user_id = session()->get('user')['id_pengguna'];
+        $data->save();
+
+        return redirect()
+            ->route('purchase-reques')
+            ->with('success', 'Data berhasil dibatalkan');
+
     }
 
     public function autoWerehouse(Request $request)
@@ -184,6 +204,7 @@ class PurchaseRequestController extends Controller
         $data->approval_status = $type == 'approval' ? '1' : '2';
         $data->approval_user_id = session()->get('user')['id_pengguna'];
         $data->approval_date = date('Y-m-d H:i:s');
+
         $data->save();
         return redirect()
             ->route('purchase-request', $data->purchase_request_id)
