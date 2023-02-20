@@ -25,8 +25,10 @@ class MasterBiayaController extends Controller
             return Datatables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
-                    $btn = '<a href="' . route('master-biaya-entry', $row->id_biaya) . '" class="btn btn-warning btn-sm">Edit</a>';
-                    $btn .= '<a href="' . route('master-biaya-delete', $row->id_biaya) . '" class="btn btn-danger btn-sm btn-destroy">Delete</a>';
+                    $btn = '<ul class="horizontal-list">';
+                    $btn .= '<li><a href="' . route('master-biaya-entry', $row->id_biaya) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
+                    $btn .= '<li><a href="' . route('master-biaya-delete', $row->id_biaya) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Hapus</a></li>';
+                    $btn .= '</ul>';
                     return $btn;
                 })
                 ->editColumn('isppn', function ($row) {

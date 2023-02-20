@@ -8,107 +8,106 @@
         href="{{ asset('assets/bower_components/jquery-treetable/css/jquery.treetable.theme.default.css') }}">
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        #table_master_akun th {
-            text-align: center !important;
-            font-size: 1.5rem !important;
-            border-color: white !important;
-            padding: 0.6rem 0.4rem;
-        }
-
-        #table_master_akun td {
-            font-size: 1.3rem !important;
-            padding: 0.5rem !important;
-        }
-
-        #table_master_akun td.btn-column {
-            text-align: center !important;
-            font-size: 12px;
-            padding: 8px;
-        }
-
-        #table_master_akun td.btn-column span {
-            padding: 2px !important;
-        }
-
-        .dropdown-menu>li>a.text-danger {
-            color: #843534 !important;
-        }
-
-        ul#horizontal-list {
+        ul.horizontal-list {
             min-width: 200px;
             list-style: none;
             margin: 0;
             padding: 0;
         }
 
-        ul#horizontal-list li {
+        ul.horizontal-list li {
             display: inline;
         }
 
         .mb-1 {
             margin-bottom: .25rem !important;
         }
+
+        th {
+            text-align: center;
+        }
     </style>
 @endsection
 
 @section('header')
-    <p>Daftar Uang Muka Pembelian</p>
+    <section class="content-header">
+        <h1>
+            Uang Muka Pembelian
+            <small></small>
+        </h1>
+        <ol class="breadcrumb">
+            <li><a href="#"><i class="fa fa-dashboard"></i> Dashboard</a></li>
+            <li class="active">Uang Muka Pembelian</li>
+        </ol>
+    </section>
 @endsection
 
 @section('main-section')
-    <div class="panel">
-        <div class="panel-body">
-            <div style="margin-bottom:10px;">
-                <a href="{{ route('purchase-down-payment-entry') }}" class="btn btn-primary">Tambah Uang Muka Pembelian</a>
-                <br><br>
-                <select name="id_cabang" class="form-control" style="width:200px;">
-                    @foreach ($cabang as $branch)
-                        <option value="{{ $branch->id_cabang }}">{{ $branch->kode_cabang }} - {{ $branch->nama_cabang }}
-                        </option>
-                    @endforeach
-                </select>
+    <div class="content container-fluid">
+        <div class="box">
+            <div class="box-header">
+                <div class="row">
+                    <div class="col-md-4">
+                        <label>Cabang</label>
+                        <div class="form-group">
+                            <select name="id_cabang" class="form-control">
+                                @foreach ($cabang as $branch)
+                                    <option value="{{ $branch->id_cabang }}">{{ $branch->kode_cabang }} -
+                                        {{ $branch->nama_cabang }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <a href="{{ route('purchase-down-payment-entry') }}"
+                            class="btn btn-success pull-right btn-flat btn-sm">Tambah Uang Muka Pembelian</a>
+                    </div>
+                </div>
             </div>
-            @if (session()->has('success'))
-                <div class="alert alert-success">
-                    <ul>
-                        <li>{!! session()->get('success') !!}</li>
-                    </ul>
-                </div>
-            @endif
-            <table class="table table-bordered data-table">
-                <thead>
-                    <tr>
-                        <th>ID Uang Muka Pembelian</th>
-                        <th>Tanggal</th>
-                        <th>ID Permintaan Pembelian (PO)</th>
-                        <th>Supplier</th>
-                        <th>Mata Uang</th>
-                        <th>Rate</th>
-                        <th>Nominal</th>
-                        <th>Total</th>
-                        <th>Catatan</th>
-                        <th width="150px">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
+            <div class="box-body">
+                @if (session()->has('success'))
+                    <div class="alert alert-success">
+                        <ul>
+                            <li>{!! session()->get('success') !!}</li>
+                        </ul>
+                    </div>
+                @endif
+                <table class="table table-bordered data-table">
+                    <thead>
+                        <tr>
+                            <th>ID Uang Muka Pembelian</th>
+                            <th>Tanggal</th>
+                            <th>ID Permintaan Pembelian (PO)</th>
+                            <th>Supplier</th>
+                            <th>Mata Uang</th>
+                            <th>Rate</th>
+                            <th>Nominal</th>
+                            <th>Total</th>
+                            <th>Catatan</th>
+                            <th width="150px">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
 
-    <div class="modal fade" id="approvalDelete" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-sm" role="document">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <h4>Anda akan menghapus data ini!</h4>
-                </div>
-                <div class="modal-footer">
-                    <form action="" method="post">
-                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary">Lanjutkan</button>
-                    </form>
+        <div class="modal fade" id="approvalDelete" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-sm" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <h4>Anda akan menghapus data ini!</h4>
+                    </div>
+                    <div class="modal-footer">
+                        <form action="" method="post">
+                            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-primary">Lanjutkan</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>

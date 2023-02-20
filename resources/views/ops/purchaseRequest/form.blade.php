@@ -10,185 +10,215 @@
         .select2 {
             width: 100% !important;
         }
+
+        .table-detail th {
+            background-color: #f39c12;
+            color: white;
+            text-align: center;
+        }
     </style>
 @endsection
 
 @section('header')
-    <p>{{ $data ? 'Edit' : 'Tambah' }} Permintaan Pembelian</p>
+    <section class="content-header">
+        <h1>
+            Permintaan Pembelian
+            <small>| {{ $data ? 'Edit' : 'Tambah' }}</small>
+        </h1>
+        <ol class="breadcrumb">
+            <li><a href="#"><i class="fa fa-dashboard"></i> Dashboard</a></li>
+            <li><a href="{{ route('purchase-request') }}">Permintaan Pembelian</a></li>
+            <li class="active">Form</li>
+        </ol>
+    </section>
 @endsection
 
 @section('main-section')
-    @if (session()->has('success'))
-        <div class="alert alert-success">
-            <ul>
-                <li>{!! session()->get('success') !!}</li>
-            </ul>
-        </div>
-    @endif
-    @if (count($errors) > 0)
-        <div class="alert alert-danger">
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-    <form action="{{ route('purchase-request-save-entry', $data ? $data->purchase_request_id : 0) }}" method="post">
-        <div class="panel">
-            <div class="panel-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="row">
-                            <label class="col-md-3">Cabang <span>*</span></label>
-                            <div class="col-md-5 form-group">
-                                <select name="id_cabang" class="form-control select2">
-                                    <option value="">Pilih Cabang</option>
-                                    @foreach ($cabang as $branch)
-                                        <option value="{{ $branch->id_cabang }}"
-                                            {{ old('id_cabang', $data ? $data->id_cabang : '') == $branch->id_cabang ? 'selected' : '' }}>
-                                            {{ $branch->nama_cabang }}</option>
+    <div class="content container-fluid">
+        @if (session()->has('success'))
+            <div class="alert alert-success">
+                <ul>
+                    <li>{!! session()->get('success') !!}</li>
+                </ul>
+            </div>
+        @endif
+        @if (count($errors) > 0)
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <div class="box">
+            <div class="box-header">
+                <h3 class="box-title">{{ $data ? 'Ubah' : 'Tambah' }} Permintaan Pembelian</h3>
+                <a href="{{ route('purchase-request') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right"><span
+                        class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali</a>
+            </div>
+            <div class="box-body">
+                <form action="{{ route('purchase-request-save-entry', $data ? $data->purchase_request_id : 0) }}"
+                    method="post">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="row">
+                                <label class="col-md-3">Cabang <span>*</span></label>
+                                <div class="col-md-5 form-group">
+                                    <select name="id_cabang" class="form-control select2">
+                                        <option value="">Pilih Cabang</option>
+                                        @foreach ($cabang as $branch)
+                                            <option value="{{ $branch->id_cabang }}"
+                                                {{ old('id_cabang', $data ? $data->id_cabang : '') == $branch->id_cabang ? 'selected' : '' }}>
+                                                {{ $branch->nama_cabang }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <label class="col-md-3">Kode Permintaan</label>
+                                <div class="col-md-9 form-group">
+                                    <input type="text" name="purchase_request_code"
+                                        value="{{ old('purchase_request_code', $data ? $data->purchase_request_code : '') }}"
+                                        class="form-control" readonly placeholder="Otomatis">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <label class="col-md-3">Tanggal <span>*</span></label>
+                                <div class="col-md-5 form-group">
+                                    <input type="date" name="purchase_request_date"
+                                        value="{{ old('purchase_request_date', $data ? $data->purchase_request_date : date('Y-m-d')) }}"
+                                        class="form-control">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <label class="col-md-3">Estimasi <span>*</span></label>
+                                <div class="col-md-5 form-group">
+                                    <input type="date" name="purchase_request_estimation_date"
+                                        value="{{ old('purchase_request_estimation_date', $data ? $data->purchase_request_estimation_date : date('Y-m-d')) }}"
+                                        class=" form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="row">
+                                <label class="col-md-3">Gudang <span>*</span></label>
+                                <div class="col-md-5 form-group">
+                                    <select name="id_gudang" class="form-control selectAjax"
+                                        data-route="{{ route('purchase-request-auto-werehouse') }}">
+                                        @if ($data && $data->id_gudang)
+                                            <option value="{{ $data->id_gudang }}" selected>
+                                                {{ $data->gudang->nama_gudang }}
+                                            </option>
+                                        @endif
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <label class="col-md-3">Pemohon <span>*</span></label>
+                                <div class="col-md-5 form-group">
+                                    <select name="purchase_request_user_id" class="form-control selectAjax"
+                                        data-route="{{ route('purchase-request-auto-user') }}">
+                                        @if ($data && $data->purchase_request_user_id)
+                                            <option value="{{ $data->purchase_request_user_id }}">
+                                                {{ $data->pengguna->nama_pengguna }}</option>
+                                        @endif
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <label class="col-md-3">Catatan</label>
+                                <div class="col-md-9 form-group">
+                                    <textarea name="catatan" class="form-control" rows="5">{{ old('catatan', $data ? $data->catatan : '') }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary add-entry btn-flat" type="button">Tambah Barang</button>
+                    <br><br>
+                    <div class="table-responsive">
+                        <input type="hidden" name="details">
+                        <table class="table table-detail table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Kode Barang</th>
+                                    <th>Nama Barang</th>
+                                    <th>Satuan</th>
+                                    <th>Jumlah</th>
+                                    <th>Catatan</th>
+                                    <th style="width:150px;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="target-table">
+                                @if ($data)
+                                    @foreach ($data->formatdetail as $detail)
+                                        <tr data-index="{{ $detail->index }}">
+                                            <td>{{ $detail->kode_barang }}</td>
+                                            <td>{{ $detail->nama_barang }}</td>
+                                            <td>{{ $detail->nama_satuan_barang }}</td>
+                                            <td class="text-right">{{ $detail->qty }}</td>
+                                            <td>{{ $detail->notes }}</td>
+                                            <td class="text-center">
+                                                <a href="javascript:void(0)"
+                                                    class="btn btn-warning edit-entry btn-sm btn-flat">
+                                                    <i class="glyphicon glyphicon-pencil"></i>
+                                                </a>
+                                                <a href="javascript:void(0)"
+                                                    class="btn btn-danger delete-entry btn-sm btn-flat">
+                                                    <i class="glyphicon glyphicon-trash"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
                                     @endforeach
-                                </select>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <label class="col-md-3">Kode Permintaan</label>
-                            <div class="col-md-9 form-group">
-                                <input type="text" name="purchase_request_code"
-                                    value="{{ old('purchase_request_code', $data ? $data->purchase_request_code : '') }}"
-                                    class="form-control" readonly placeholder="Otomatis">
-                            </div>
-                        </div>
-                        <div class="row">
-                            <label class="col-md-3">Tanggal <span>*</span></label>
-                            <div class="col-md-5 form-group">
-                                <input type="date" name="purchase_request_date"
-                                    value="{{ old('purchase_request_date', $data ? $data->purchase_request_date : date('Y-m-d')) }}"
-                                    class="form-control">
-                            </div>
-                        </div>
-                        <div class="row">
-                            <label class="col-md-3">Estimasi <span>*</span></label>
-                            <div class="col-md-5 form-group">
-                                <input type="date" name="purchase_request_estimation_date"
-                                    value="{{ old('purchase_request_estimation_date', $data ? $data->purchase_request_estimation_date : date('Y-m-d')) }}"
-                                    class=" form-control">
-                            </div>
-                        </div>
+                                @endif
+                            </tbody>
+                        </table>
                     </div>
-                    <div class="col-md-6">
-                        <div class="row">
-                            <label class="col-md-3">Gudang <span>*</span></label>
-                            <div class="col-md-5 form-group">
-                                <select name="id_gudang" class="form-control selectAjax"
-                                    data-route="{{ route('purchase-request-auto-werehouse') }}">
-                                    @if ($data && $data->id_gudang)
-                                        <option value="{{ $data->id_gudang }}" selected>{{ $data->gudang->nama_gudang }}
-                                        </option>
-                                    @endif
-                                </select>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <label class="col-md-3">Pemohon <span>*</span></label>
-                            <div class="col-md-5 form-group">
-                                <select name="purchase_request_user_id" class="form-control selectAjax"
-                                    data-route="{{ route('purchase-request-auto-user') }}">
-                                    @if ($data && $data->purchase_request_user_id)
-                                        <option value="{{ $data->purchase_request_user_id }}">
-                                            {{ $data->pengguna->nama_pengguna }}</option>
-                                    @endif
-                                </select>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <label class="col-md-3">Catatan</label>
-                            <div class="col-md-9 form-group">
-                                <textarea name="catatan" class="form-control" rows="5">{{ old('catatan', $data ? $data->catatan : '') }}</textarea>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <button class="btn btn-primary add-entry" type="button">Tambah Barang</button>
-                <div class="table-responsive">
-                    <input type="hidden" name="details">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Kode Barang</th>
-                                <th>Nama Barang</th>
-                                <th>Satuan</th>
-                                <th>Jumlah</th>
-                                <th>Catatan</th>
-                                <th style="width:150px;">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="target-table">
-                            @if ($data)
-                                @foreach ($data->formatdetail as $detail)
-                                    <tr data-index="{{ $detail->index }}">
-                                        <td>{{ $detail->kode_barang }}</td>
-                                        <td>{{ $detail->nama_barang }}</td>
-                                        <td>{{ $detail->nama_satuan_barang }}</td>
-                                        <td>{{ $detail->qty }}</td>
-                                        <td>{{ $detail->notes }}</td>
-                                        <td>
-                                            <a href="javascript:void(0)" class="btn btn-warning edit-entry btn-sm">
-                                                <i class="glyphicon glyphicon-pencil"></i>
-                                            </a>
-                                            <a href="javascript:void(0)" class="btn btn-danger delete-entry btn-sm">
-                                                <i class="glyphicon glyphicon-trash"></i>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            @endif
-                        </tbody>
-                    </table>
-                </div>
-                <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                <button class="btn btn-primary" type="submit">Simpan</button>
-                <a href="{{ route('purchase-request') }}" class="btn btn-default">Kembali</a>
+                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                    <button class="btn btn-primary btn-flat pull-right" type="submit">
+                        <i class="glyphicon glyphicon-floppy-saved"></i> Simpan Data
+                    </button>
+                </form>
             </div>
         </div>
-    </form>
 
-    <div class="modal fade" id="modalEntry" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-sm" role="document">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <div class="alert alert-danger" style="display:none;" id="alertModal">
-                        Lengkapi Data yang diperlukan
+        <div class="modal fade" id="modalEntry" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-sm" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="alert alert-danger" style="display:none;" id="alertModal">
+                            Lengkapi Data yang diperlukan
+                        </div>
+                        <input type="hidden" name="index" value="0">
+                        <label>Nama Barang</label>
+                        <div class="form-group">
+                            <select name="id_barang" class="form-control selectAjax validate"
+                                data-route="{{ route('purchase-request-auto-item') }}">
+                            </select>
+                            <input type="hidden" name="nama_barang" class="validate">
+                            <input type="hidden" name="kode_barang" class="validate">
+                        </div>
+                        <label>Satuan</label>
+                        <div class="form-group">
+                            <select name="id_satuan_barang" class="form-control selectAjax validate"
+                                data-route="{{ route('purchase-request-auto-satuan') }}">
+                            </select>
+                            <input type="hidden" name="nama_satuan_barang" class="validate">
+                        </div>
+                        <label>Jumlah</label>
+                        <div class="form-group">
+                            <input type="number" name="qty" class="form-control validate">
+                        </div>
+                        <label>Catatan</label>
+                        <div class="form-group">
+                            <textarea name="notes" class="form-control" rows="5"></textarea>
+                        </div>
                     </div>
-                    <input type="hidden" name="index" value="0">
-                    <label>Nama Barang</label>
-                    <div class="form-group">
-                        <select name="id_barang" class="form-control selectAjax validate"
-                            data-route="{{ route('purchase-request-auto-item') }}">
-                        </select>
-                        <input type="hidden" name="nama_barang" class="validate">
-                        <input type="hidden" name="kode_barang" class="validate">
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary cancel-entry">Batal</button>
+                        <button type="button" class="btn btn-primary save-entry">Simpan</button>
                     </div>
-                    <label>Satuan</label>
-                    <div class="form-group">
-                        <select name="id_satuan_barang" class="form-control selectAjax validate"
-                            data-route="{{ route('purchase-request-auto-satuan') }}">
-                        </select>
-                        <input type="hidden" name="nama_satuan_barang" class="validate">
-                    </div>
-                    <label>Jumlah</label>
-                    <div class="form-group">
-                        <input type="number" name="qty" class="form-control validate">
-                    </div>
-                    <label>Catatan</label>
-                    <div class="form-group">
-                        <textarea name="notes" class="form-control" rows="5"></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary cancel-entry">Batal</button>
-                    <button type="button" class="btn btn-primary save-entry">Simpan</button>
                 </div>
             </div>
         </div>
@@ -292,11 +322,11 @@
                 '<td>' + newObj.kode_barang + '</td>' +
                 '<td>' + newObj.nama_barang + '</td>' +
                 '<td>' + newObj.nama_satuan_barang + '</td>' +
-                '<td>' + newObj.qty + '</td>' +
+                '<td class="text-right">' + newObj.qty + '</td>' +
                 '<td>' + newObj.notes + '</td>' +
-                '<td>' +
-                '<a href="javascript:void(0)" class="btn btn-warning edit-entry btn-sm"><i class="glyphicon glyphicon-pencil"></i></a>' +
-                '<a href="javascript:void(0)" class="btn btn-danger delete-entry btn-sm"><i class="glyphicon glyphicon-trash"></i></a>' +
+                '<td class="text-center">' +
+                '<a href="javascript:void(0)" class="btn btn-warning edit-entry btn-sm btn-flat"><i class="glyphicon glyphicon-pencil"></i></a>' +
+                '<a href="javascript:void(0)" class="btn btn-danger delete-entry btn-sm btn-flat"><i class="glyphicon glyphicon-trash"></i></a>' +
                 '</td>' +
                 '</tr>'
             if (statusModal == 'create') {
