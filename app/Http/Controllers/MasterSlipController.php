@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Slip;
+use App\Models\Master\Slip;
 use App\Models\Master\Cabang;
 use App\Models\Master\Akun;
 use App\Exports\SlipsExport;
@@ -33,7 +33,7 @@ class MasterSlipController extends Controller
 
         if ($request->session()->has('token')) {
             return view('accounting.master.slip.index', $data);
-        } 
+        }
         else {
             return view('exceptions.forbidden');
         }
@@ -58,7 +58,7 @@ class MasterSlipController extends Controller
 
         if ($request->session()->has('token')) {
             return view('accounting.master.slip.form', $data);
-        } 
+        }
         else {
             return view('exceptions.forbidden');
         }
@@ -138,7 +138,7 @@ class MasterSlipController extends Controller
 
         if ($request->session()->has('token')) {
             return view('accounting.master.slip.detail', $data);
-        } 
+        }
         else {
             return view('exceptions.forbidden');
         }
@@ -165,7 +165,7 @@ class MasterSlipController extends Controller
 
         if ($request->session()->has('token')) {
             return view('accounting.master.slip.form', $data);
-        } 
+        }
         else {
             return view('exceptions.forbidden');
         }
@@ -300,8 +300,6 @@ class MasterSlipController extends Controller
         $data_slip_table = DB::table(DB::raw('(' . $data_slip->toSql() . ') as master_slip'));
         $data_slip_table = $data_slip_table->where('id_cabang', $cabang);
 
-        Log::debug(json_encode($data_slip_table));
-
         if(!empty($keyword)){
             $data_slip_table->where(function ($query) use($keyword){
                 $query->orWhere('kode_slip', 'LIKE', "%$keyword%")
@@ -334,7 +332,6 @@ class MasterSlipController extends Controller
 
         // pagination
         if($current_page){
-            Log::debug('masuk sini');
             $page = $current_page;
             $limit_data = $data_slip_table->count();
 
@@ -359,7 +356,6 @@ class MasterSlipController extends Controller
         $table['recordsFiltered'] = $filtered_data->count();
         $table['data'] = $data_slip_table->get();
 
-        // Log::debug($data_slip_table->get());
         return json_encode($table);
     }
 

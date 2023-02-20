@@ -62,7 +62,7 @@
                     </span>
                 </a>
                 <ul class="treeview-menu">
-                    <li class=""><a href="#">Link in level 2</a></li>
+                    <li class="{{ request()->segment(2) == 'slip' ? 'active' : null }}"><a href="{{ route('transaction-general-ledger') }}">Jurnal Umum</a></li>
                     <li><a href="#">Link in level 2</a></li>
                 </ul>
             </li>
