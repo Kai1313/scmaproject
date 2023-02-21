@@ -36,7 +36,7 @@ class PurchaseRequestController extends Controller
                 ->leftJoin('gudang', 'prh.id_gudang', '=', 'gudang.id_gudang')
                 ->leftJoin('pengguna as user', 'prh.purchase_request_user_id', '=', 'user.id_pengguna')
                 ->leftJoin('pengguna as approval', 'prh.approval_user_id', '=', 'approval.id_pengguna')
-                ->where('prh.void', '=', 0);
+                ->where('prh.void', '=', 0)->where('void', 0);
 
             if (isset($request->c)) {
                 $data = $data->where('prh.id_cabang', $request->c);
@@ -123,6 +123,7 @@ class PurchaseRequestController extends Controller
             $data->purchase_request_code = PurchaseRequest::createcode($request->id_cabang);
             $data->approval_status = 0;
             $data->user_created = session()->get('user')['id_pengguna'];
+            $data->void = 0;
         } else {
             $data->user_modified = session()->get('user')['id_pengguna'];
         }
@@ -198,7 +199,7 @@ class PurchaseRequestController extends Controller
         }
 
         if (!in_array($type, ['approval', 'reject']) || $data->approval_status != 0) {
-            return 'Perubahan ditolak';
+            return 'Akses ditolak';
         }
 
         $data->approval_status = $type == 'approval' ? '1' : '2';

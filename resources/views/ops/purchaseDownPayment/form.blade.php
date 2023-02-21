@@ -89,13 +89,14 @@
                             </div>
                             <div class="row">
                                 <label class="col-md-3">ID Permintaan Pembelian (PO) <span>*</span></label>
-                                <div class="col-md-5 form-group">
+                                <div class="col-md-9 form-group">
                                     <select name="id_permintaan_pembelian" class="form-control selectAjax"
                                         data-route="{{ route('purchase-down-payment-auto-po') }}">
-                                        {{-- @if ($data && $data->id_permintaan_pembeliaan)
-                                        <option value="{{ $data->id_permintaan_pembeliaan }}" selected>
-                                        </option>
-                                    @endif --}}
+                                        @if ($data && $data->id_permintaan_pembelian)
+                                            <option value="{{ $data->id_permintaan_pembeliaan }}" selected>
+                                                {{ $data->purchaseOrder->nama_permintaan_pembelian }}
+                                            </option>
+                                        @endif
                                     </select>
                                 </div>
                             </div>
@@ -104,10 +105,25 @@
                                 <div class="col-md-5 form-group">
                                     <select name="id_mata_uang" class="form-control selectAjax"
                                         data-route="{{ route('purchase-down-payment-auto-currency') }}">
-                                        {{-- @if ($data && $data->id_permintaan_pembeliaan)
-                                        <option value="{{ $data->id_permintaan_pembeliaan }}" selected>
-                                        </option>
-                                    @endif --}}
+                                        @if ($data && $data->id_mata_uang)
+                                            <option value="{{ $data->id_mata_uang }}" selected>
+                                                {{ $data->mataUang->kode_mata_uang }} -
+                                                {{ $data->mataUang->nama_mata_uang }}
+                                            </option>
+                                        @endif
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <label class="col-md-3">Slip <span>*</span></label>
+                                <div class="col-md-5 form-group">
+                                    <select name="id_slip" class="form-control selectAjax"
+                                        data-route="{{ route('purchase-down-payment-auto-slip') }}">
+                                        @if ($data && $data->id_slip)
+                                            <option value="{{ $data->id_slip }}" selected>
+                                                {{ $data->slip->kode_slip }} - {{ $data->slip->nama_slip }}
+                                            </option>
+                                        @endif
                                     </select>
                                 </div>
                             </div>
@@ -116,21 +132,22 @@
                             <div class="row">
                                 <label class="col-md-3">Rate <span>*</span></label>
                                 <div class="col-md-4 form-group">
-                                    <input type="text" name="rate" class="form-control"
+                                    <input type="number" name="rate" class="form-control"
                                         value="{{ old('rate', $data ? $data->rate : '') }}">
                                 </div>
                             </div>
                             <div class="row">
                                 <label class="col-md-3">Nominal <span>*</span></label>
                                 <div class="col-md-4 form-group">
-                                    <input type="text" name="nominal" class="form-control"
-                                        value=""{{ old('nominal', $data ? $data->nominal : '') }}>
+                                    <input type="number" name="nominal" class="form-control"
+                                        value="{{ old('nominal', $data ? $data->nominal : '') }}"
+                                        max="{{ $data ? $data->nominal : 0 }}">
                                 </div>
                             </div>
                             <div class="row">
-                                <label class="col-md-3">Total</label>
+                                <label class="col-md-3">Total <span>*</span></label>
                                 <div class="col-md-4 form-group">
-                                    <input type="text" name="total" class="form-control" readonly
+                                    <input type="number" name="total" class="form-control" readonly
                                         value="{{ old('total', $data ? $data->total : '') }}">
                                 </div>
                             </div>
@@ -161,16 +178,20 @@
         $('.select2').select2()
 
         if ($('[name="id_cabang"]').val() == '') {
-            $('[name="id_permintaan_pembeliaan"]').prop('disabled', true)
+            console.log('asd')
+            $('[name="id_permintaan_pembelian"]').prop('disabled', true)
         }
 
         $('[name="id_cabang"]').change(function() {
-            let self = $('[name="id_permintaan_pembeliaan"]')
+            let self = $('[name="id_permintaan_pembelian"]')
             if ($('[name="id_cabang"]').val() == '') {
                 self.val('').prop('disabled', true).trigger('change')
             } else {
                 self.val('').prop('disabled', false).trigger('change')
             }
+
+            $('[name="nominal"]').val('').attr('max', 0)
+            $('[name="total"]').val('')
         })
 
         $('.selectAjax').each(function(i, v) {
@@ -214,7 +235,7 @@
                             id: '{{ $data ? $data->id_uang_muka_pembelian : 0 }}'
                         },
                         success: function(res) {
-                            $('[name="nominal"]').val(res.nominal)
+                            $('[name="nominal"]').val(res.nominal).attr('max', res.nominal)
                             $('[name="total"]').val(res.total)
                         },
                         error(error) {

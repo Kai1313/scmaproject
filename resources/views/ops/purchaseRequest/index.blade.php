@@ -153,6 +153,7 @@
             }, {
                 data: 'approval_status',
                 name: 'approval_status',
+                className: 'text-center'
             }, {
                 data: 'approval_user',
                 name: 'approval_user',

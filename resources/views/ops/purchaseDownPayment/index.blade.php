@@ -139,29 +139,33 @@
                 data: 'tanggal',
                 name: 'tanggal'
             }, {
-                data: 'id_permintaan_pembeliaan',
-                name: 'id_permintaan_pembeliaan',
+                data: 'nama_permintaan_pembelian',
+                name: 'nama_permintaan_pembelian',
             }, {
-                data: 'id_permintaan_pembeliaan',
-                name: 'id_permintaan_pembeliaan',
+                data: 'nama_pemasok',
+                name: 'nama_pemasok',
             }, {
-                data: 'id_mata_uang',
-                name: 'id_mata_uang',
+                data: 'nama_mata_uang',
+                name: 'nama_mata_uang',
             }, {
                 data: 'rate',
-                name: 'rate'
+                name: 'rate',
+                className: 'text-right'
             }, {
                 data: 'nominal',
                 name: 'nominal',
+                className: 'text-right'
             }, {
                 data: 'total',
                 name: 'total',
+                className: 'text-right'
             }, {
                 data: 'catatan',
                 name: 'catatan',
             }, {
                 data: 'action',
                 name: 'action',
+                className: 'text-center',
                 orderable: false,
                 searchable: false
             }, ]

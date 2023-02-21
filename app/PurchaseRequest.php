@@ -84,7 +84,7 @@ class PurchaseRequest extends Model
     {
         $branchCode = DB::table('cabang')->where('id_cabang', $id_cabang)->first();
         $string = 'PR.' . $branchCode->kode_cabang . '.' . date('ym');
-        $check = DB::table('purchase_request_header')->where('purchase_request_code', 'like', '%' . $string)->count();
+        $check = DB::table('purchase_request_header')->where('purchase_request_code', 'like', $string . '%')->count();
         $check += 1;
         $nol = '';
         for ($i = 0; $i < (4 - strlen((string) $check)); $i++) {
