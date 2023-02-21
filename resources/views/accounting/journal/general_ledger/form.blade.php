@@ -171,17 +171,17 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="box-body">
-                            {{-- <form id="detail_form" data-toggle="validator"> --}}
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Akun</label>
-                                            <select name="id_akun" class="form-control select2" id="id_akun"
-                                                data-error="Wajib isi"
-                                                data-validation-message="Akun tidak boleh kosong" required>
-                                                {{-- <option value="">Pilih Akun</option> --}}
-                                                {{-- @foreach ($data_akun as $akunDt)
+                    </div>
+                    <div class="box-body">
+                        <form id="form_detail" action="" method="post">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Akun</label>
+                                        <select name="akun_detail" class="form-control select2" id="akun_detail"
+                                        data-error="Wajib isi" data-validation="[NOTEMPTY]" data-validation-message="Akun tidak boleh kosong"  required>
+                                            <option value="">Pilih Akun</option>
+                                            {{-- @foreach ($data_akun as $akunDt)
                                                 <option value="{{ $akunDt->id_akun }}">{{ $akunDt->kode_akun.' - '.$akunDt->nama_akun }}
                                                 </option>
                                             @endforeach --}}
@@ -192,19 +192,9 @@
                                             <textarea name="notes_detail" class="form-control" rows="3" placeholder="Notes ..."></textarea>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Debet</label>
-                                            <input type="text" name="debet" id="debet" class="form-control"
-
-                                                data-validation-message="Debet tidak boleh kosong" value="0">
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Kredit</label>
-                                            <input type="text" name="kredit" id="kredit" class="form-control"
-
-                                                data-validation-message="Kredit tidak boleh kosong" value="0">
-                                        </div>
+                                    <div class="form-group">
+                                        <label>Notes</label>
+                                        <textarea name="notes_detail" id="notes_detail" class="form-control" rows="3" placeholder="Notes ..."></textarea>
                                     </div>
                                 </div>
                                 <div class="row mb-1">
@@ -265,6 +255,7 @@
                                             class="glyphicon glyphicon-floppy-saved" aria-hidden="true"></span> Simpan
                                         Data</button>
                                     <button class="btn btn-flat btn-success mr-1 mb-1 pull-right">Generate</button>
+                                    <button type="submit" id="btn-submit-detail" class="btn btn-flat btn-primary pull-right"><span class="glyphicon glyphicon-floppy-saved" aria-hidden="true"></span> Tambah Detail</button>
                                 </div>
                             </div>
                         </div>
@@ -359,9 +350,41 @@
                 },
             }
         }
+        var validateDetail = {
+            submit: {
+                settings: {
+                    form: '#form_detail',
+                    inputContainer: '.form-group',
+                    // errorListContainer: 'help-block',
+                    errorListClass: 'form-control-error',
+                    errorClass: 'has-error',
+                    allErrors: true,
+                    scrollToError: {
+                        offset: -100,
+                        duration: 500
+                    }
+                },
+                callback: {
+                    onSubmit: function(node, formData) {
+                        console.log('hello detail')
+                        submit_detail()
+                    }
+                }
+            },
+            dynamic: {
+                settings: {
+                    trigger: 'keyup',
+                    delay: 1000
+                },
+            }
+        }
+        var details = []
+        var guid = 0
 
         $(function() {
             $.validate(validateLedger)
+            $.validate(validateDetail)
+
             $('.select2').select2({
                 width: '100%'
             })
@@ -386,62 +409,30 @@
                 })
             })
 
-            getCoa($('#cabang_input').val());
-            getSlip($('#cabang_input').val());
-
-            $('#cabang_input').change(function(e) {
-                getCoa($(this).val());
-                getSlip($(this).val());
-            })
-
-            $.validate(validateDetail)
-
-            $('#btn-add-detail').click(function() {
-                let current_akun = getCurrentCoa($('#id_akun').val());
-                let row_detail_count = $('#table_detail tr').length;
-                let row_detail = `<tr data-index="${row_detail_count++}">
-                    <td>${current_akun.kode_akun}</td>
-                    <td>${current_akun.nama_akun}</td>
-                    <td>${($('#notes_detail').val()) ? $('#notes_detail').val() : '' }</td>
-                    <td>${$('#debet').val()}</td>
-                    <td>${$('#kredit').val()}</td>
-                    <td>
-                        <ul id="horizontal-list">
-                            <li><button class="btn btn-xs mr-1 mb-1 btn-warning btn-ubah"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Ubah</button></li>
-                            <li><button class="btn btn-xs mr-1 mb-1 btn-danger btn-delete"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Hapus</button></li>
-                        </ul>
-                    </td>
-                    <input type="hidden" class="id_akun_detail" name="id_akun_detail[]" value="${$('#id_akun').val()}">
-                    <input type="hidden" class="notes_detail_input" name="notes_detail_input[]" value="${($('#notes_detail').val()) ? $('#notes_detail').val() : ''}">
-                    <input type="hidden" class="debet_input" name="debet_input[]" value="${$('#debet').val()}">
-                    <input type="hidden" class="kredit_input" name="kredit_input[]" value="${$('#kredit').val()}">
-                    </tr>`;
-
-                $('#table_detail').DataTable().destroy();
-                $('#table_detail tbody').append(row_detail);
-                $('#table_detail').DataTable();
-                $('#id_akun').val('').trigger('change')
-                $('#debet').val(0).attr('disabled', false).trigger('change')
-                $('#kredit').val(0).attr('disabled', false).trigger('change')
-                $('#notes_detail').val('').trigger('change')
-            })
-
-            $('#debet').keyup(function() {
-                let value = parseFloat($(this).val());
-                if (value > 0) {
-                    $('#kredit').attr('disabled', true)
-                } else {
-                    $('#kredit').attr('disabled', false)
+            // On change jenis jurnal
+            $("#jenis").on("change", function() {
+                let jenis = $(this).val()
+                if (jenis == "PG" || jenis == "HG") {
+                    $(".comp-giro").attr("disabled", false)
+                }
+                else {
+                    $(".comp-giro").attr("disabled", true).val("")
                 }
             })
 
-            $('#kredit').keyup(function() {
-                let value = parseFloat($(this).val());
-                if (value > 0) {
-                    $('#debet').attr('disabled', true)
-                } else {
-                    $('#debet').attr('disabled', false)
-                }
+            // On change debet or kredit
+            $("#debet").on("change", function() {
+                $("#kredit").val(0)
+            })
+            $("#kredit").on("change", function() {
+                $("#debet").val(0)
+            })
+
+            // Remove detail
+            $("#table_detail").on('click', '.remove-detail', function() {
+                let guid = $(this).data('guid')
+                details = details.filter(function(item){ return item['guid'] != guid })
+                populate_detail(details)
             })
         })
 
@@ -527,6 +518,85 @@
             });
 
             return data_akun;
+        }
+
+        function submit_detail() {
+            console.log("submit detail clicked"+ guid)
+            let akun = $("#akun_detail").val()
+            let notes = $("#notes_detail").val()
+            let debet = $("#debet").val()
+            let kredit = $("#kredit").val()
+
+            details.push ({
+                guid: guid,
+                akun: akun,
+                notes: notes,
+                debet: debet,
+                kredit: kredit
+            })
+            guid++
+            detail_clear()
+            populate_detail(details)
+        }
+
+        function detail_clear() {
+            $("#akun_detail").val("").trigger("change.select2").focus()
+            $("#notes_detail").val("")
+            $("#debet").val("")
+            $("#kredit").val("")
+        }
+
+        function populate_detail(details) {
+            detail_list = $('#table_detail').DataTable({
+                data: details,
+                columns: [
+                    {
+                        data: 'akun',
+                        name: 'akun'
+                    },
+                    {
+                        data: 'akun',
+                        name: 'akun'
+                    },
+                    {
+                        data: 'notes',
+                        name: 'notes'
+                    },
+                    {
+                        data: 'debet',
+                        name: 'debet'
+                    },
+                    {
+                        data: 'kredit',
+                        name: 'kredit'
+                    },
+                    {
+                        data: 'guid',
+                        name: 'guid',
+                        orderable: false,
+                        searchable: false,
+                        render: function (data, type, row) {
+                            let btn = '<button type="button" class="btn btn-sm btn-danger remove-detail" data-guid="'+data+'"><i class="fa fa-trash"></i></button>'
+                            return btn
+                        }
+                    },
+                ],
+                paging: false,
+                bDestroy: true,
+                order: [],
+            })
+            calculate_detail(details)
+        }
+
+        function calculate_detail(details) {
+            let total_debet = parseInt(0)
+            let total_kredit = parseInt(0)
+            details.forEach(detail => {
+                total_debet = parseInt(total_debet) + parseInt(detail.debet)
+                total_kredit = parseInt(total_kredit) + parseInt(detail.kredit)
+            })
+            $("#total_debet").val(parseInt(total_debet))
+            $("#total_kredit").val(parseInt(total_kredit))
         }
     </script>
 @endsection
