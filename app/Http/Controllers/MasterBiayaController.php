@@ -6,6 +6,7 @@ use App\MasterBiaya;
 use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Log;
 use Yajra\DataTables\DataTables;
 
 class MasterBiayaController extends Controller
@@ -93,22 +94,33 @@ class MasterBiayaController extends Controller
         }
 
         $data = MasterBiaya::find($id);
-        if (!$data) {
-            $data = new MasterBiaya;
-            $data['dt_created'] = date('Y-m-d H:i:s');
-        } else {
-            $data['dt_modified'] = date('Y-m-d H:i:s');
+        try {
+            DB::beginTransaction();
+            if (!$data) {
+                $data = new MasterBiaya;
+                $data['dt_created'] = date('Y-m-d H:i:s');
+            } else {
+                $data['dt_modified'] = date('Y-m-d H:i:s');
+            }
+
+            $data->fill($request->all());
+            $data['isppn'] = isset($request->isppn) ? $request->isppn : 0;
+            $data['ispph'] = isset($request->ispph) ? $request->ispph : 0;
+            $data['aktif'] = isset($request->aktif) ? $request->aktif : 0;
+            $data->save();
+
+            DB::commit();
+            return redirect()
+                ->route('master-biaya-entry', $data->id_biaya)
+                ->with('success', 'Data berhasil tersimpan');
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error("Error when save biaya");
+            Log::error($e);
+            return redirect()
+                ->route('master-biaya-entry', $data ? $data->id_biaya : 0)
+                ->with('error', 'Data gagal tersimpan');
         }
-
-        $data->fill($request->all());
-        $data['isppn'] = isset($request->isppn) ? $request->isppn : 0;
-        $data['ispph'] = isset($request->ispph) ? $request->ispph : 0;
-        $data['aktif'] = isset($request->aktif) ? $request->aktif : 0;
-        $data->save();
-
-        return redirect()
-            ->route('master-biaya-entry', $data->id_biaya)
-            ->with('success', 'Data berhasil tersimpan');
     }
 
     public function destroy(Request $request, $id)

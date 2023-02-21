@@ -218,8 +218,7 @@
                         </div>
                         <label>Satuan</label>
                         <div class="form-group">
-                            <select name="id_satuan_barang" class="form-control selectAjax validate"
-                                data-route="{{ route('purchase-request-auto-satuan') }}">
+                            <select name="id_satuan_barang" class="form-control select2 validate" disabled>
                             </select>
                             <input type="hidden" name="nama_satuan_barang" class="validate">
                         </div>
@@ -297,13 +296,32 @@
                 if (name == 'id_barang') {
                     $('#modalEntry').find('[name="nama_barang"]').val(dataselect.text)
                     $('#modalEntry').find('[name="kode_barang"]').val(dataselect.kode_barang)
-                }
-
-                if (name == 'id_satuan_barang') {
-                    $('#modalEntry').find('[name="nama_satuan_barang"]').val(dataselect.text)
+                    $('[name="id_satuan_barang"]').html('')
+                    getSatuan(dataselect.id)
                 }
             });
         })
+
+        function getSatuan(id) {
+            $.ajax({
+                url: "{{ route('purchase-request-auto-satuan') }}?item=" + id,
+                type: 'get',
+                success: function(res) {
+                    $('[name="id_satuan_barang"]').prop('disabled', false).select2({
+                        data: [{
+                            id: '',
+                            text: 'Pilih Satuan'
+                        }, ...res]
+                    }).on('select2:select', function(e) {
+                        let dataselect = e.params.data
+                        $('#modalEntry').find('[name="nama_satuan_barang"]').val(dataselect.text)
+                    });
+                },
+                error: function(error) {
+                    console.log(error)
+                }
+            })
+        }
 
         $('.add-entry').click(function() {
             detailSelect = []

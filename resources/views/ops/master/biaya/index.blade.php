@@ -60,9 +60,9 @@
                         </div>
                     </div>
                     <div class="col-md-8">
-                        <a href="{{ route('master-biaya-entry') }}"
-                            class="btn btn-success pull-right btn-flat btn-sm">Tambah Data
-                            Biaya</a>
+                        <a href="{{ route('master-biaya-entry') }}" class="btn btn-success pull-right btn-flat btn-sm">
+                            <i class="glyphicon glyphicon-plus"></i> Tambah Data Biaya
+                        </a>
                     </div>
                 </div>
             </div>
@@ -74,22 +74,24 @@
                         </ul>
                     </div>
                 @endif
-                <table class="table table-bordered data-table">
-                    <thead>
-                        <tr>
-                            <th>Nama Biaya</th>
-                            <th>Akun Biaya</th>
-                            <th>PPn</th>
-                            <th>PPh</th>
-                            <th class="text-right">Nilai PPh</th>
-                            <th>Akun PPh</th>
-                            <th>Aktif</th>
-                            <th width="150px">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
+                <div class="table-responsive">
+                    <table class="table table-bordered data-table">
+                        <thead>
+                            <tr>
+                                <th>Nama Biaya</th>
+                                <th>Akun Biaya</th>
+                                <th>PPn</th>
+                                <th>PPh</th>
+                                <th class="text-right">Nilai PPh</th>
+                                <th>Akun PPh</th>
+                                <th>Aktif</th>
+                                <th width="150px">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 

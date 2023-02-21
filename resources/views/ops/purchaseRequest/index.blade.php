@@ -26,6 +26,14 @@
         th {
             text-align: center;
         }
+
+        .head-checkbox {
+            padding-top: 30px;
+        }
+
+        .head-checkbox label {
+            margin-right: 10px;
+        }
     </style>
 @endsection
 
@@ -59,9 +67,13 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-8">
-                        <a href="{{ route('purchase-request-entry') }}"
-                            class="btn btn-success pull-right btn-flat btn-sm">Tambah Permintaan Pembelian</a>
+                    <div class="col-md-4 head-checkbox">
+                        <label for="">Tampilkan Void</label> <input type="checkbox" name="show_void">
+                    </div>
+                    <div class="col-md-4">
+                        <a href="{{ route('purchase-request-entry') }}" class="btn btn-success pull-right btn-flat btn-sm">
+                            <i class="glyphicon glyphicon-plus"></i> Tambah Permintaan Pembelian
+                        </a>
                     </div>
                 </div>
             </div>
@@ -73,24 +85,26 @@
                         </ul>
                     </div>
                 @endif
-                <table class="table table-bordered data-table">
-                    <thead>
-                        <tr>
-                            <th>ID Permintaan</th>
-                            <th>Tanggal</th>
-                            <th>Estimasi</th>
-                            <th>Gudang</th>
-                            <th>Pemohon</th>
-                            <th>Catatan</th>
-                            <th>Status</th>
-                            <th>Otorisasi</th>
-                            <th>Tanggal Otorisasi</th>
-                            <th width="150px">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
+                <div class="table-responsive">
+                    <table class="table table-bordered data-table">
+                        <thead>
+                            <tr>
+                                <th>ID Permintaan</th>
+                                <th>Tanggal</th>
+                                <th>Estimasi</th>
+                                <th>Gudang</th>
+                                <th>Pemohon</th>
+                                <th>Catatan</th>
+                                <th>Status</th>
+                                <th>Otorisasi</th>
+                                <th>Tanggal Otorisasi</th>
+                                <th width="150px">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -131,7 +145,8 @@
         var table = $('.data-table').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route('purchase-request') }}?c=" + $('[name="id_cabang"]').val(),
+            ajax: "{{ route('purchase-request') }}?c=" + $('[name="id_cabang"]').val() + '&show_void=' + $(
+                '[name="show_void"]').is(':checked'),
             columns: [{
                 data: 'purchase_request_code',
                 name: 'purchase_request_code'
@@ -176,7 +191,13 @@
         })
 
         $('[name="id_cabang"]').change(function() {
-            table.ajax.url("?c=" + $(this).val()).load()
+            table.ajax.url("?c=" + $('[name="id_cabang"]').val() + '&show_void=' + $('[name="show_void"]').is(
+                ':checked')).load()
+        })
+
+        $('[name="show_void"]').change(function() {
+            table.ajax.url("?c=" + $('[name="id_cabang"]').val() + '&show_void=' + $('[name="show_void"]').is(
+                ':checked')).load()
         })
     </script>
 @endsection

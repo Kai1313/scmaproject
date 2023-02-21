@@ -6,6 +6,7 @@ use App\PurchaseRequest;
 use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Log;
 use Yajra\DataTables\DataTables;
 
 class PurchaseRequestController extends Controller
@@ -31,15 +32,19 @@ class PurchaseRequestController extends Controller
                     'approval_status',
                     'approval.nama_pengguna as approval_user',
                     'approval_date',
-                    'dt_created as created_at'
+                    'dt_created as created_at',
+                    'prh.void'
                 )
                 ->leftJoin('gudang', 'prh.id_gudang', '=', 'gudang.id_gudang')
                 ->leftJoin('pengguna as user', 'prh.purchase_request_user_id', '=', 'user.id_pengguna')
-                ->leftJoin('pengguna as approval', 'prh.approval_user_id', '=', 'approval.id_pengguna')
-                ->where('prh.void', '=', 0)->where('void', 0);
+                ->leftJoin('pengguna as approval', 'prh.approval_user_id', '=', 'approval.id_pengguna');
 
             if (isset($request->c)) {
                 $data = $data->where('prh.id_cabang', $request->c);
+            }
+
+            if ($request->show_void == 'false') {
+                $data = $data->where('prh.void', '0');
             }
 
             $data = $data->orderBy('prh.dt_created', 'desc');
@@ -47,18 +52,23 @@ class PurchaseRequestController extends Controller
             return Datatables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
-                    $btn = '<ul class="horizontal-list">';
-                    if ($row->approval_status == 0) {
-                        $btn .= '<li><a href="' . route('purchase-request-change-status', [$row->purchase_request_id, 'approval']) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-check"></i> Approval</a></li>';
-                        $btn .= '<li><a href="' . route('purchase-request-change-status', [$row->purchase_request_id, 'reject']) . '" class="btn btn-default btn-xs mr-1 mb-1"><i class="fa fa-times"></i> Reject</a></li>';
+                    if ($row->void == '1') {
+                        $btn = '<label class="label label-default">Batal</label>';
+                    } else {
+                        $btn = '<ul class="horizontal-list">';
+                        if ($row->approval_status == 0) {
+                            $btn .= '<li><a href="' . route('purchase-request-change-status', [$row->purchase_request_id, 'approval']) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-check"></i> Approval</a></li>';
+                            $btn .= '<li><a href="' . route('purchase-request-change-status', [$row->purchase_request_id, 'reject']) . '" class="btn btn-default btn-xs mr-1 mb-1"><i class="fa fa-times"></i> Reject</a></li>';
+                        }
+
+                        $btn .= '<li><a href="' . route('purchase-request-entry', $row->purchase_request_id) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
+                        if ($row->approval_status == 0) {
+                            $btn .= '<li><a href="' . route('purchase-request-delete', $row->purchase_request_id) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Hapus</a></li>';
+                        }
+
+                        $btn .= '</ul>';
                     }
 
-                    $btn .= '<li><a href="' . route('purchase-request-entry', $row->purchase_request_id) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
-                    if ($row->approval_status == 0) {
-                        $btn .= '<li><a href="' . route('purchase-request-delete', $row->purchase_request_id) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Hapus</a></li>';
-                    }
-
-                    $btn .= '</ul>';
                     return $btn;
                 })
                 ->editColumn('approval_status', function ($row) {
@@ -114,26 +124,37 @@ class PurchaseRequestController extends Controller
         }
 
         $data = PurchaseRequest::find($id);
-        if (!$data) {
-            $data = new PurchaseRequest;
+        try {
+            DB::beginTransaction();
+            if (!$data) {
+                $data = new PurchaseRequest;
+            }
+
+            $data->fill($request->all());
+            if ($id == 0) {
+                $data->purchase_request_code = PurchaseRequest::createcode($request->id_cabang);
+                $data->approval_status = 0;
+                $data->user_created = session()->get('user')['id_pengguna'];
+                $data->void = 0;
+            } else {
+                $data->user_modified = session()->get('user')['id_pengguna'];
+            }
+
+            $data->save();
+            $data->savedetails($request->details);
+
+            DB::commit();
+            return redirect()
+                ->route('purchase-request-entry', $data->purchase_request_id)
+                ->with('success', 'Data berhasil tersimpan');
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error("Error when save purchase request");
+            Log::error($e);
+            return redirect()
+                ->route('purchase-request-entry', $data ? $data->purchase_request_id : 0)
+                ->with('error', 'Data gagal tersimpan');
         }
-
-        $data->fill($request->all());
-        if ($id == 0) {
-            $data->purchase_request_code = PurchaseRequest::createcode($request->id_cabang);
-            $data->approval_status = 0;
-            $data->user_created = session()->get('user')['id_pengguna'];
-            $data->void = 0;
-        } else {
-            $data->user_modified = session()->get('user')['id_pengguna'];
-        }
-
-        $data->save();
-        $data->savedetails($request->details);
-
-        return redirect()
-            ->route('purchase-request-entry', $data->purchase_request_id)
-            ->with('success', 'Data berhasil tersimpan');
     }
 
     public function destroy(Request $request, $id)
@@ -143,14 +164,24 @@ class PurchaseRequestController extends Controller
             return 'Data tidak ditemukan';
         }
 
-        $data->void = 1;
-        $data->void_user_id = session()->get('user')['id_pengguna'];
-        $data->save();
+        try {
+            DB::beginTransaction();
+            $data->void = 1;
+            $data->void_user_id = session()->get('user')['id_pengguna'];
+            $data->save();
 
-        return redirect()
-            ->route('purchase-reques')
-            ->with('success', 'Data berhasil dibatalkan');
-
+            DB::commit();
+            return redirect()
+                ->route('purchase-request')
+                ->with('success', 'Data berhasil dibatalkan');
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error("Error when void purchase request");
+            Log::error($e);
+            return redirect()
+                ->route('purchase-request')
+                ->with('error', 'Data gagal tersimpan');
+        }
     }
 
     public function autoWerehouse(Request $request)
@@ -175,19 +206,20 @@ class PurchaseRequestController extends Controller
 
     public function autoItem(Request $request)
     {
-        $serach = $request->serach;
+        $search = $request->search;
         $datas = DB::table('barang')->select('id_barang as id', 'nama_barang as text', 'kode_barang')
             ->where('status_barang', 1)
-            ->where('nama_barang', 'like', '%' . $serach . '%')->limit(10)->get();
+            ->where('nama_barang', 'like', '%' . $search . '%')->limit(10)->get();
+
         return $datas;
     }
 
     public function autoSatuan(Request $request)
     {
-        $serach = $request->serach;
+        $item = $request->item;
+        $ids = DB::table('isi_satuan_barang')->where('id_barang', $item)->pluck('id_satuan_barang');
         $datas = DB::table('satuan_barang')->select('id_satuan_barang as id', 'nama_satuan_barang as text')
-            ->where('status_satuan_barang', 1)
-            ->where('nama_satuan_barang', 'like', '%' . $serach . '%')->get();
+            ->where('status_satuan_barang', 1)->whereIn('id_satuan_barang', $ids)->get();
         return $datas;
     }
 
@@ -201,14 +233,24 @@ class PurchaseRequestController extends Controller
         if (!in_array($type, ['approval', 'reject']) || $data->approval_status != 0) {
             return 'Akses ditolak';
         }
+        try {
+            DB::beginTransaction();
+            $data->approval_status = $type == 'approval' ? '1' : '2';
+            $data->approval_user_id = session()->get('user')['id_pengguna'];
+            $data->approval_date = date('Y-m-d H:i:s');
+            $data->save();
 
-        $data->approval_status = $type == 'approval' ? '1' : '2';
-        $data->approval_user_id = session()->get('user')['id_pengguna'];
-        $data->approval_date = date('Y-m-d H:i:s');
-
-        $data->save();
-        return redirect()
-            ->route('purchase-request', $data->purchase_request_id)
-            ->with('success', 'Data berhasil diperbarui');
+            DB::commit();
+            return redirect()
+                ->route('purchase-request', $data->purchase_request_id)
+                ->with('success', 'Data berhasil diperbarui');
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error("Error when change status " . $type . " purchase request");
+            Log::error($e);
+            return redirect()
+                ->route('purchase-request', $data->purchase_request_id)
+                ->with('error', 'Data gagal tersimpan');
+        }
     }
 }

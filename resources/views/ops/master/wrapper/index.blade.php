@@ -62,9 +62,9 @@
                         <span style="margin-right:10px;">Tampilkan Gambar</span> <input type="checkbox" name="show_image">
                     </div>
                     <div class="col-md-8">
-                        <a href="{{ route('master-wrapper-entry') }}"
-                            class="btn btn-success pull-right btn-flat btn-sm">Tambah Data
-                            Pembungkus</a>
+                        <a href="{{ route('master-wrapper-entry') }}" class="btn btn-success pull-right btn-flat btn-sm">
+                            <i class="glyphicon glyphicon-plus"></i> Tambah Data Pembungkus
+                        </a>
                     </div>
                 </div>
             </div>
@@ -76,19 +76,21 @@
                         </ul>
                     </div>
                 @endif
-                <table class="table table-bordered data-table">
-                    <thead>
-                        <tr>
-                            <th>Nama Pembungkus</th>
-                            <th class="text-right">Berat</th>
-                            <th>Catatan</th>
-                            <th>Gambar</th>
-                            <th width="150px">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
+                <div class="table-responsive">
+                    <table class="table table-bordered data-table">
+                        <thead>
+                            <tr>
+                                <th>Nama Pembungkus</th>
+                                <th class="text-right">Berat</th>
+                                <th>Catatan</th>
+                                <th>Gambar</th>
+                                <th width="150px">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 

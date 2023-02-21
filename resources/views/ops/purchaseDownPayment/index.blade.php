@@ -26,6 +26,14 @@
         th {
             text-align: center;
         }
+
+        .head-checkbox {
+            padding-top: 30px;
+        }
+
+        .head-checkbox label {
+            margin-right: 10px;
+        }
     </style>
 @endsection
 
@@ -59,9 +67,14 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-8">
+                    <div class="col-md-4 head-checkbox">
+                        <label for="">Tampilkan Void</label> <input type="checkbox" name="show_void">
+                    </div>
+                    <div class="col-md-4">
                         <a href="{{ route('purchase-down-payment-entry') }}"
-                            class="btn btn-success pull-right btn-flat btn-sm">Tambah Uang Muka Pembelian</a>
+                            class="btn btn-success pull-right btn-flat btn-sm">
+                            <i class="glyphicon glyphicon-plus"></i> Tambah Uang Muka Pembelian
+                        </a>
                     </div>
                 </div>
             </div>
@@ -73,24 +86,26 @@
                         </ul>
                     </div>
                 @endif
-                <table class="table table-bordered data-table">
-                    <thead>
-                        <tr>
-                            <th>ID Uang Muka Pembelian</th>
-                            <th>Tanggal</th>
-                            <th>ID Permintaan Pembelian (PO)</th>
-                            <th>Supplier</th>
-                            <th>Mata Uang</th>
-                            <th>Rate</th>
-                            <th>Nominal</th>
-                            <th>Total</th>
-                            <th>Catatan</th>
-                            <th width="150px">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
+                <div class="table-responsive">
+                    <table class="table table-bordered data-table">
+                        <thead>
+                            <tr>
+                                <th>ID Uang Muka Pembelian</th>
+                                <th>Tanggal</th>
+                                <th>ID Permintaan Pembelian (PO)</th>
+                                <th>Supplier</th>
+                                <th>Mata Uang</th>
+                                <th>Rate</th>
+                                <th>Nominal</th>
+                                <th>Total</th>
+                                <th>Catatan</th>
+                                <th width="150px">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -131,7 +146,8 @@
         var table = $('.data-table').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route('purchase-down-payment') }}?c=" + $('[name="id_cabang"]').val(),
+            ajax: "{{ route('purchase-down-payment') }}?c=" + $('[name="id_cabang"]').val() + '&show_void=' + $(
+                '[name="show_void"]').is(':checked'),
             columns: [{
                 data: 'kode_uang_muka_pembelian',
                 name: 'kode_uang_muka_pembelian'
@@ -178,7 +194,13 @@
         })
 
         $('[name="id_cabang"]').change(function() {
-            table.ajax.url("?c=" + $(this).val()).load()
+            table.ajax.url("?c=" + $('[name="id_cabang"]').val() + '&show_void=' + $('[name="show_void"]').is(
+                ':checked')).load()
+        })
+
+        $('[name="show_void"]').change(function() {
+            table.ajax.url("?c=" + $('[name="id_cabang"]').val() + '&show_void=' + $('[name="show_void"]').is(
+                ':checked')).load()
         })
     </script>
 @endsection

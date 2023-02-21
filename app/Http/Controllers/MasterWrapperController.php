@@ -6,6 +6,7 @@ use App\MasterWrapper;
 use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Log;
 use Yajra\DataTables\DataTables;
 
 class MasterWrapperController extends Controller
@@ -81,21 +82,32 @@ class MasterWrapperController extends Controller
         }
 
         $data = MasterWrapper::find($id);
-        if (!$data) {
-            $data = new MasterWrapper;
-            $data['dt_created'] = date('Y-m-d H:i:s');
-        } else {
-            $data['dt_modified'] = date('Y-m-d H:i:s');
+        try {
+            DB::beginTransaction();
+            if (!$data) {
+                $data = new MasterWrapper;
+                $data['dt_created'] = date('Y-m-d H:i:s');
+            } else {
+                $data['dt_modified'] = date('Y-m-d H:i:s');
+            }
+
+            $data->fill($request->all());
+            $data->save();
+
+            $data->uploadfile($request, $data);
+
+            DB::commit();
+            return redirect()
+                ->route('master-wrapper-entry', $data->id_wrapper)
+                ->with('success', 'Data berhasil tersimpan');
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error("Error when save wrapper");
+            Log::error($e);
+            return redirect()
+                ->route('master-wrapper-entry', $data ? $data->id_wrapper : 0)
+                ->with('error', 'Data gagal tersimpan');
         }
-
-        $data->fill($request->all());
-        $data->save();
-
-        $data->uploadfile($request, $data);
-
-        return redirect()
-            ->route('master-wrapper-entry', $data->id_wrapper)
-            ->with('success', 'Data berhasil tersimpan');
     }
 
     public function destroy(Request $request, $id)

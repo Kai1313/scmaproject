@@ -13,24 +13,31 @@ class PurchaseDownPaymentController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = DB::table('uang_muka_pembelian as ump')->select('id_uang_muka_pembelian', 'kode_uang_muka_pembelian', 'tanggal', 'pp.nama_permintaan_pembelian', DB::raw("concat(mu.kode_mata_uang,' - ',mu.nama_mata_uang) as nama_mata_uang"), 'nama_pemasok', 'rate', 'nominal', 'total', 'catatan')
+            $data = DB::table('uang_muka_pembelian as ump')->select('id_uang_muka_pembelian', 'kode_uang_muka_pembelian', 'tanggal', 'pp.nama_permintaan_pembelian', DB::raw("concat(mu.kode_mata_uang,' - ',mu.nama_mata_uang) as nama_mata_uang"), 'nama_pemasok', 'rate', 'nominal', 'total', 'catatan', 'void')
                 ->leftJoin('permintaan_pembelian as pp', 'ump.id_permintaan_pembelian', '=', 'pp.id_permintaan_pembelian')
                 ->leftJoin('pemasok as p', 'pp.id_pemasok', '=', 'p.id_pemasok')
-                ->leftJoin('mata_uang as mu', 'ump.id_mata_uang', '=', 'mu.id_mata_uang')
-                ->where('void', 0);
+                ->leftJoin('mata_uang as mu', 'ump.id_mata_uang', '=', 'mu.id_mata_uang');
 
             if (isset($request->c)) {
                 $data = $data->where('ump.id_cabang', $request->c);
+            }
+
+            if ($request->show_void == 'false') {
+                $data = $data->where('ump.void', '0');
             }
 
             $data = $data->orderBy('ump.dt_created', 'desc');
             return Datatables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
-                    $btn = '<ul class="horizontal-list">';
-                    $btn .= '<li><a href="' . route('purchase-down-payment-entry', $row->id_uang_muka_pembelian) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
-                    $btn .= '<li><a href="' . route('purchase-down-payment-delete', $row->id_uang_muka_pembelian) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Hapus</a></li>';
-                    $btn .= '</ul>';
+                    if ($row->void == '1') {
+                        $btn = '<label class="label label-default">Batal</label>';
+                    } else {
+                        $btn = '<ul class="horizontal-list">';
+                        $btn .= '<li><a href="' . route('purchase-down-payment-entry', $row->id_uang_muka_pembelian) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
+                        $btn .= '<li><a href="' . route('purchase-down-payment-delete', $row->id_uang_muka_pembelian) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Hapus</a></li>';
+                        $btn .= '</ul>';
+                    }
                     return $btn;
                 })
                 ->rawColumns(['action'])
@@ -86,24 +93,35 @@ class PurchaseDownPaymentController extends Controller
         }
 
         $data = PurchaseDownPayment::find($id);
-        if (!$data) {
-            $data = new PurchaseDownPayment;
+        try {
+            DB::beginTransaction();
+            if (!$data) {
+                $data = new PurchaseDownPayment;
+            }
+
+            $data->fill($request->all());
+            if ($id == 0) {
+                $data->kode_uang_muka_pembelian = PurchaseDownPayment::createcode($request->id_cabang);
+                $data->user_created = session()->get('user')['id_pengguna'];
+                $data->void = 0;
+            } else {
+                $data->user_modified = session()->get('user')['id_pengguna'];
+            }
+
+            $data->save();
+
+            DB::commit();
+            return redirect()
+                ->route('purchase-down-payment-entry', $data->id_uang_muka_pembelian)
+                ->with('success', 'Data berhasil tersimpan');
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error("Error when save purchase down payment");
+            Log::error($e);
+            return redirect()
+                ->route('purchase-down-payment-entry', $data ? $data->id_uang_muka_pembelian : 0)
+                ->with('error', 'Data gagal tersimpan');
         }
-
-        $data->fill($request->all());
-        if ($id == 0) {
-            $data->kode_uang_muka_pembelian = PurchaseDownPayment::createcode($request->id_cabang);
-            $data->user_created = session()->get('user')['id_pengguna'];
-            $data->void = 0;
-        } else {
-            $data->user_modified = session()->get('user')['id_pengguna'];
-        }
-
-        $data->save();
-
-        return redirect()
-            ->route('purchase-down-payment-entry', $data->id_uang_muka_pembelian)
-            ->with('success', 'Data berhasil tersimpan');
     }
 
     public function destroy(Request $request, $id)
@@ -113,13 +131,24 @@ class PurchaseDownPaymentController extends Controller
             return 'Data tidak ditemukan';
         }
 
-        $data->void = 1;
-        $data->void_user_id = session()->get('user')['id_pengguna'];
-        $data->save();
+        try {
+            DB::beginTransaction();
+            $data->void = 1;
+            $data->void_user_id = session()->get('user')['id_pengguna'];
+            $data->save();
 
-        return redirect()
-            ->route('purchase-down-payment')
-            ->with('success', 'Data berhasil dibatalkan');
+            DB::commit();
+            return redirect()
+                ->route('purchase-down-payment')
+                ->with('success', 'Data berhasil dibatalkan');
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error("Error when void purchase down payment");
+            Log::error($e);
+            return redirect()
+                ->route('purchase-down-payment')
+                ->with('error', 'Data gagal tersimpan');
+        }
     }
 
     public function autoPo(Request $request)
@@ -159,6 +188,7 @@ class PurchaseDownPaymentController extends Controller
         $countData = DB::table('uang_muka_pembelian')
             ->where('id_permintaan_pembelian', $po_id)
             ->where('id_uang_muka_pembelian', '!=', $id)
+            ->where('void', 0)
             ->sum('nominal');
         return response()->json([
             'status' => 'success',
