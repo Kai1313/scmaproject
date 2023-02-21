@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Accounting\GeneralLedger;
+use App\Models\Accounting\JurnalDetail;
+use App\Models\Accounting\JurnalHeader;
 use App\Models\Master\Akun;
 use App\Models\Master\Cabang;
 use App\Models\Master\Slip;
 use Illuminate\Http\Request;
 use DB;
+use Log;
 
 class GeneralLedgerController extends Controller
 {
@@ -42,17 +45,16 @@ class GeneralLedgerController extends Controller
      */
     public function create(Request $request)
     {
-        $cabang = Cabang::find(1);
-        $data_akun = Akun::where("isshown", 1)->where("id_cabang", $cabang->id_cabang)->get();
         $data_cabang = Cabang::where("status_cabang", 1)->get();
-        $data_slip = Slip::all();
 
         $data = [
             "pageTitle" => "SCA Accounting | Transaksi Jurnal Umum | Create",
-            "data_akun" => $data_akun,
+            // "data_akun" => $data_akun,
             "data_cabang" => $data_cabang,
-            "data_slip" => $data_slip
+            // "data_slip" => $data_slip
         ];
+
+        Log::debug(json_encode($request->session()->get('user')));
 
         if ($request->session()->has('token')) {
             return view('accounting.journal.general_ledger.form', $data);
@@ -70,7 +72,107 @@ class GeneralLedgerController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            Log::info("Store Jurnal Data");
+            // Log::debug(json_encode($request->all()));
+            // exit();
+
+            // cek detail
+            if(count($request->id_akun_detail) <= 0){
+                return response()->json([
+                    "result" => false,
+                    "message" => "Error. There is no detail"
+                ]);
+            }
+
+            // Init data
+            $journalDate = date('Y-m-d', strtotime($request->tanggal));
+            $giroDate = date('Y-m-d', strtotime($request->tanggal_giro));
+            $giroDueDate = date('Y-m-d', strtotime($request->tanggal_jt_giro));
+            $slipID = $request->slip;
+            $journalType = $request->jenis;
+            $cabangID = $request->cabang_input;
+            $noteHeader = $request->notes;
+            $userData = $request->session()->get('user');
+            $userRecord = $userData->id_pengguna;
+            $userModified = $userData->id_pengguna;
+            $dateRecord = date('Y-m-d');
+            $detailData = [];
+            for($i=0; $i < count($request->id_akun_detail); $i++){
+                array_push($detailData,[
+                    'index' => ($i+1),
+                    'id_akun' => $request->id_akun_detail[$i],
+                    'keterangan' => $request->notes_detail_input[$i],
+                    'debet' => $request->debet_input[$i],
+                    'kredit' => $request->kredit_input[$i],
+                ]);
+            }
+
+            DB::beginTransaction();
+            // Store Header
+            $reqId = rand();//$this->regenUuid();
+            $header = new JurnalHeader();
+            $header->id_cabang = $cabangID;
+            $header->kode_jurnal = $reqId;
+            $header->tanggal_jurnal = $journalDate;
+            $header->jenis_jurnal = $journalType;
+            $header->id_slip = $slipID;
+            $header->catatan = $noteHeader;
+            $header->tanggal_giro = $giroDate;
+            $header->tanggal_giro_jt = $giroDueDate;
+            $header->void = 0;
+            $header->user_created = $userRecord;
+            $header->user_modified = $userModified;
+            $header->dt_created = $dateRecord;
+            $header->dt_modified = $dateRecord;
+            $header->save();
+            if (!$header->save()) {
+                DB::rollback();
+                return response()->json([
+                    "result" => false,
+                    "message" => "Error when store Jurnal data on table header"
+                ]);
+            }
+
+            // Store Detail and Update
+            foreach ($detailData as $data) {
+                //Store Detail
+                $detail = new JurnalDetail();
+                $detail->id_jurnal = $header->id_jurnal;
+                $detail->index = $data['index'];
+                $detail->id_akun = $data['id_akun'];
+                $detail->keterangan = $data['keterangan'];
+                $detail->debet = $data['debet'];
+                $detail->credit = $data['kredit'];
+                $detail->user_created = $userRecord;
+                $detail->user_modified = $userModified;
+                $detail->dt_created = $dateRecord;
+                $detail->dt_modified = $dateRecord;
+                if (!$detail->save()) {
+                    DB::rollback();
+                    return response()->json([
+                        "result" => false,
+                        "message" => "Error when store Jurnal data on table detail"
+                    ]);
+                }
+            }
+
+            DB::commit();
+            return response()->json([
+                "result" => true,
+                "message" => "Successfully stored Jurnal data",
+            ]);
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            Log::info("Error when store Jurnal data");
+            Log::info($e);
+            return response()->json([
+                "result" => false,
+                "message" => "Error when store Jurnal data",
+                "exception" => $e
+            ]);
+        }
     }
 
     /**
@@ -104,7 +206,102 @@ class GeneralLedgerController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        try {
+            Log::info("Update Jurnal Data");
+            // exit();
+
+            // cek detail
+            if(count($request->id_akun_detail) <= 0){
+                return response()->json([
+                    "result" => false,
+                    "message" => "Error. There is no detail"
+                ]);
+            }
+
+            // Init data
+            $journalDate = date('Y-m-d', strtotime($request->tanggal));
+            $giroDate = date('Y-m-d', strtotime($request->tanggal_giro));
+            $giroDueDate = date('Y-m-d', strtotime($request->tanggal_jt_giro));
+            $slipID = $request->slip;
+            $journalType = $request->jenis;
+            $cabangID = $request->cabang_input;
+            $noteHeader = $request->notes;
+            $userData = $request->session()->get('user');
+            $userModified = $userData->id_pengguna;
+            $dateModified = date('Y-m-d');
+            $detailData = [];
+            for($i=0; $i < count($request->id_akun_detail); $i++){
+                array_push($detailData,[
+                    'index' => ($i+1),
+                    'id_akun' => $request->id_akun_detail[$i],
+                    'keterangan' => $request->notes_detail_input[$i],
+                    'debet' => $request->debet_input[$i],
+                    'kredit' => $request->kredit_input[$i],
+                ]);
+            }
+
+            DB::beginTransaction();
+
+            // Find Header data and delete detail
+            $header = JurnalHeader::where("id_jurnal", $id)->first();
+            JurnalDetail::where('id_jurnal', $id)->delete();
+
+            // Store Header
+            $header->id_cabang = $cabangID;
+            $header->tanggal_jurnal = $journalDate;
+            $header->jenis_jurnal = $journalType;
+            $header->id_slip = $slipID;
+            $header->catatan = $noteHeader;
+            $header->tanggal_giro = $giroDate;
+            $header->tanggal_giro_jt = $giroDueDate;
+            $header->user_modified = $userModified;
+            $header->dt_modified = $dateModified;
+            $header->save();
+            if (!$header->save()) {
+                DB::rollback();
+                return response()->json([
+                    "result" => false,
+                    "message" => "Error when store Jurnal data on table header"
+                ]);
+            }
+
+            // Store New Detail
+            foreach ($detailData as $data) {
+                //Store Detail
+                $detail = new JurnalDetail();
+                $detail->id_jurnal = $header->id_jurnal;
+                $detail->index = $data['index'];
+                $detail->id_akun = $data['id_akun'];
+                $detail->keterangan = $data['keterangan'];
+                $detail->debet = $data['debet'];
+                $detail->credit = $data['kredit'];
+                $detail->user_modified = $userModified;
+                $detail->dt_modified = $dateModified;
+                if (!$detail->save()) {
+                    DB::rollback();
+                    return response()->json([
+                        "result" => false,
+                        "message" => "Error when store Jurnal data on table detail"
+                    ]);
+                }
+            }
+
+            DB::commit();
+            return response()->json([
+                "result" => true,
+                "message" => "Successfully stored Jurnal data",
+            ]);
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            Log::info("Error when store Jurnal data");
+            Log::info($e);
+            return response()->json([
+                "result" => false,
+                "message" => "Error when store Jurnal data",
+                "exception" => $e
+            ]);
+        }
     }
 
     /**
@@ -143,18 +340,32 @@ class GeneralLedgerController extends Controller
         $draw = $request->draw;
         $current_page = $offset/$limit +1;
 
-        $data_general_ledger = GeneralLedger::select('*');
+        $data_general_ledger = JurnalHeader::join('master_slip', 'jurnal_header.id_slip', 'master_slip.id_slip')
+                ->select('jurnal_header.*', 'master_slip.kode_slip', DB::raw('
+                    (CASE
+                        WHEN jenis_jurnal = "KK" THEN "Kas Keluar"
+                        WHEN jenis_jurnal = "KM" THEN "Kas Masuk"
+                        WHEN jenis_jurnal = "BK" THEN "Bank Keluar"
+                        WHEN jenis_jurnal = "BM" THEN "Bank Masuk"
+                        WHEN jenis_jurnal = "PG" THEN "Piutang Dagang"
+                        WHEN jenis_jurnal = "HG" THEN "Hutang Dagang"
+                        WHEN jenis_jurnal = "ME" THEN "Memorial"
+                    END) as jenis_name
+                '));
+
+        $data_general_ledger_table = DB::table(DB::raw('(' . $data_general_ledger->toSql() . ') as jurnal_header'));
+        $data_general_ledger_table = $data_general_ledger_table->where('id_cabang', $cabang);
 
         if(!empty($keyword)){
             $data_general_ledger->where(function ($query) use($keyword){
-                $query->orWhere('id_jurnal_umum', 'LIKE', "%$keyword%")
-                    ->orWhere('nama_jurnal_umum', 'LIKE', "%$keyword%")
-                    ->orWhere('status_jurnal_umum', 'LIKE', "%$keyword%")
-                    ->orWhere('date_jurnal_umum', 'LIKE', "%$keyword%");
+                $query->orWhere('kode_jurnal', 'LIKE', "%$keyword%")
+                    ->orWhere('tanggal_jurnal', 'LIKE', "%$keyword%")
+                    ->orWhere('jenis_name', 'LIKE', "%$keyword%")
+                    ->orWhere('kode_slip', 'LIKE', "%$keyword%");
             });
         }
 
-        $filtered_data = $data_general_ledger->get();
+        $filtered_data = $data_general_ledger_table->get();
 
         if($sort){
             if(!is_array($sort)){
@@ -169,16 +380,16 @@ class GeneralLedgerController extends Controller
             foreach($sort as $key => $s){
                 $column = $s['column'];
                 $directon = $s['dir'];
-                $data_general_ledger->orderBy($column, $directon);
+                $data_general_ledger_table->orderBy($column, $directon);
             }
         }else{
-            $data_general_ledger->orderBy('id_jurnal_umum', 'ASC');
+            $data_general_ledger_table->orderBy('id_jurnal', 'ASC');
         }
 
         // pagination
         if($current_page){
             $page = $current_page;
-            $limit_data = $data_general_ledger->count();
+            $limit_data = $data_general_ledger_table->count();
 
             if($limit){
                 $limit_data = $limit;
@@ -189,15 +400,105 @@ class GeneralLedgerController extends Controller
                 $offset = 0;
             }
 
-            $data_general_ledger->skip($offset)->take($limit_data);
+            $data_general_ledger_table->skip($offset)->take($limit_data);
         }
 
 
         $table['draw'] = $draw;
-        $table['recordsTotal'] = $data_general_ledger->count();
+        $table['recordsTotal'] = $data_general_ledger_table->count();
         $table['recordsFiltered'] = $filtered_data->count();
-        $table['data'] = $data_general_ledger->get();
+        $table['data'] = $data_general_ledger_table->get();
 
         return json_encode($table);
+    }
+
+    public function void(Request $request, $id){
+        try {
+            Log::info("Void Jurnal Data");
+            // exit();
+
+            // Init data
+            $userData = $request->session()->get('user');
+            $userVoid = $userData->id_pengguna;
+            $dateVoid = date('Y-m-d');
+
+            DB::beginTransaction();
+
+            // Find Header data
+            $header = JurnalHeader::where("id_jurnal", $id)->first();
+
+            // Update Header Status
+            $header->void = 1;
+            $header->user_void = $userVoid;
+            $header->dt_void = $dateVoid;
+            if (!$header->save()) {
+                DB::rollback();
+                return response()->json([
+                    "result" => false,
+                    "message" => "Error when void Jurnal data"
+                ]);
+            }
+
+            DB::commit();
+            return response()->json([
+                "result" => true,
+                "message" => "Successfully void Jurnal data",
+            ]);
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            Log::info("Error when void Jurnal data");
+            Log::info($e);
+            return response()->json([
+                "result" => false,
+                "message" => "Error when void Jurnal data",
+                "exception" => $e
+            ]);
+        }
+    }
+
+    public function active(Request $request, $id){
+        try {
+            Log::info("Activate Jurnal Data");
+            // exit();
+
+            // Init data
+            $userData = $request->session()->get('user');
+            $userVoid = $userData->id_pengguna;
+            $dateVoid = date('Y-m-d');
+
+            DB::beginTransaction();
+
+            // Find Header data
+            $header = JurnalHeader::where("id_jurnal", $id)->first();
+
+            // Update Header Status
+            $header->void = 0;
+            $header->user_void = $userVoid;
+            $header->dt_void = $dateVoid;
+            if (!$header->save()) {
+                DB::rollback();
+                return response()->json([
+                    "result" => false,
+                    "message" => "Error when activate Jurnal data"
+                ]);
+            }
+
+            DB::commit();
+            return response()->json([
+                "result" => true,
+                "message" => "Successfully activate Jurnal data",
+            ]);
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            Log::info("Error when activate Jurnal data");
+            Log::info($e);
+            return response()->json([
+                "result" => false,
+                "message" => "Error when activate Jurnal data",
+                "exception" => $e
+            ]);
+        }
     }
 }

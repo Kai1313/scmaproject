@@ -81,10 +81,10 @@
                     <table id="table_general_ledger" class="table table-bordered table-striped" style="width:100%">
                         <thead width="100%">
                             <tr>
-                                <th class="text-center" width="15%">ID Jurnal Umum</th>
-                                <th class="text-center" width="30%">Nama Jurnal Umum</th>
-                                <th class="text-center" width="20%">Tanggal Jurnal Umum</th>
-                                <th class="text-center" width="10%">Status</th>
+                                <th class="text-center" width="25%">Kode Jurnal</th>
+                                <th class="text-center" width="20%">Tanggal Jurnal</th>
+                                <th class="text-center" width="20%">Jenis Jurnal</th>
+                                <th class="text-center" width="20%">Kode Slip</th>
                                 <th class="text-center" width="25%">Action</th>
                             </tr>
                         </thead>
@@ -133,28 +133,29 @@
                     alert('Error loading data. Exception: ' + ThrownException + '\n' + textStatus);
                 }
             },
-            columns: [{
-                    data: 'id_jurnal_umum',
-                    name: 'id_jurnal_umum',
-                    width: '15%'
+            columns: [
+                {
+                    data: 'kode_jurnal',
+                    name: 'kode_jurnal',
+                    width: '25%'
                 },
                 {
-                    data: 'nama_jurnal_umum',
-                    name: 'nama_jurnal_umum',
-                    width: '30%'
-                },
-                {
-                    data: 'date_jurnal_umum',
-                    name: 'date_jurnal_umum',
+                    data: 'tanggal_jurnal',
+                    name: 'tanggal_jurnal',
                     width: '20%'
                 },
                 {
-                    data: 'status_jurnal_umum',
-                    name: 'status_jurnal_umum',
-                    width: '10%'
+                    data: 'jenis_name',
+                    name: 'jenis_name',
+                    width: '20%'
                 },
                 {
-                    data: 'id_jurnal_umum',
+                    data: 'kode_slip',
+                    name: 'kode_slip',
+                    width: '20%'
+                },
+                {
+                    data: 'id_jurnal',
                     width: '25%',
                     'sClass': 'text-center',
                     render: function(data, row) {

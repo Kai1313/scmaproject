@@ -477,4 +477,54 @@ class MasterCoaController extends Controller
             }
         }
     }
+
+    public function getCoaByCabang($id_cabang){
+        try{
+            $data_akun = Akun::where("isshown", 1)->where("id_cabang", $id_cabang)->get();
+            if(!empty($data_akun)){
+                return response()->json([
+                    "result" => TRUE,
+                    "message" => "Sucessfully get coa data",
+                    "data" => $data_akun
+                ]);
+            }else{
+                return response()->json([
+                    "result" => FALSE,
+                    "message" => "Failed, coa data not found"
+                ]);
+            }
+        }catch(\Exception $e){
+            Log::error("Error when get data master akun");
+            Log::error($e);
+            return response()->json([
+                "result" => FALSE,
+                "message" => "Failed, error when get coa data"
+            ]);
+        }
+    }
+
+    public function getCoa($id){
+        try{
+            $data_akun = Akun::find($id);
+            if(!empty($data_akun)){
+                return response()->json([
+                    "result" => TRUE,
+                    "message" => "Sucessfully get coa data",
+                    "data" => $data_akun
+                ]);
+            }else{
+                return response()->json([
+                    "result" => FALSE,
+                    "message" => "Failed, coa data not found"
+                ]);
+            }
+        }catch(\Exception $e){
+            Log::error("Error when get data master akun");
+            Log::error($e);
+            return response()->json([
+                "result" => FALSE,
+                "message" => "Failed, error when get coa data"
+            ]);
+        }
+    }
 }

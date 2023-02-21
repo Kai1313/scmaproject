@@ -63,6 +63,7 @@ Route::get('/master/slip/destroy/{id?}', 'MasterSlipController@destroy')->name('
 Route::get('/master/slip/populate', 'MasterSlipController@populate')->name('master-slip-populate');
 Route::get('/master/slip/export/excel', 'MasterSlipController@export_excel')->name('master-slip-export-excel');
 Route::post('/master/slip/copy/data', 'MasterSlipController@copy_data')->name('master-slip-copy-data');
+Route::get('/master/slip/get_by_cabang/{id_cabang?}', 'MasterSlipController@getSlipByCabang')->name('master-slip-get-by-cabang');
 
 Route::get('/master/coa', 'MasterCoaController@index')->name('master-coa');
 Route::get('/master/coa/populate/{cabang?}', 'MasterCoaController@populate')->name('master-coa-populate');
@@ -77,6 +78,8 @@ Route::get('/master/coa/get_header2', 'MasterCoaController@get_header2')->name('
 Route::get('/master/coa/get_header3', 'MasterCoaController@get_header3')->name('master-coa-header3');
 Route::get('/master/coa/export/excel', 'MasterCoaController@export_excel')->name('master-coa-export-excel');
 Route::post('/master/coa/copy/data', 'MasterCoaController@copy_data')->name('master-coa-copy-data');
+Route::get('/master/coa/get_by_cabang/{id_cabang?}', 'MasterCoaController@getCoaByCabang')->name('master-coa-get-by-cabang');
+Route::get('/master/coa/get_data/{id?}', 'MasterCoaController@getCoa')->name('master-coa-get-data');
 
 
 // Transaction

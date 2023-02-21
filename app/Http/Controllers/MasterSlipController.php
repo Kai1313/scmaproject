@@ -422,4 +422,29 @@ class MasterSlipController extends Controller
             ]);
         }
     }
+
+    public function getSlipByCabang($id_cabang){
+        try{
+            $data_slip = Slip::where("id_cabang", $id_cabang)->get();
+            if(!empty($data_slip)){
+                return response()->json([
+                    "result" => TRUE,
+                    "message" => "Sucessfully get slip data",
+                    "data" => $data_slip
+                ]);
+            }else{
+                return response()->json([
+                    "result" => FALSE,
+                    "message" => "Failed, slip data not found"
+                ]);
+            }
+        }catch(\Exception $e){
+            Log::error("Error when copy data master akun");
+            Log::error($e);
+            return response()->json([
+                "result" => FALSE,
+                "message" => "Failed, error when get slip data"
+            ]);
+        }
+    }
 }
