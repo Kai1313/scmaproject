@@ -101,15 +101,15 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Nomor Giro</label>
-                                        <input type="text" name="nomor_giro" id="nomor_giro" class="form-control" data-validation="[NOTEMPTY]" data-validation-message="Nomor giro tidak boleh kosong" disabled>
+                                        <input type="text" name="nomor_giro" id="nomor_giro" class="form-control comp-giro" data-validation="[NOTEMPTY]" data-validation-message="Nomor giro tidak boleh kosong" disabled>
                                     </div>
                                     <div class="form-group">
                                         <label>Tanggal Giro</label>
-                                        <input type="date" class="form-control" id="tanggal_giro" name="tanggal_giro" placeholder="Masukkan tanggal giro" value="{{ date("d/m/Y") }}" data-validation="[NOTEMPTY]" data-validation-message="Tanggal Giro tidak boleh kosong">
+                                        <input type="date" class="form-control comp-giro" id="tanggal_giro" name="tanggal_giro" placeholder="Masukkan tanggal giro" value="{{ date("d/m/Y") }}" data-validation="[NOTEMPTY]" data-validation-message="Tanggal Giro tidak boleh kosong" disabled>
                                     </div>
                                     <div class="form-group">
                                         <label>Tanggal JT Giro</label>
-                                        <input type="date" class="form-control" id="tanggal_jt_giro" name="tanggal_jt_giro" placeholder="Masukkan tanggal jatuh tempo giro" value="{{ date("d/m/Y") }}" data-validation="[NOTEMPTY]" data-validation-message="Tanggal JT Giro tidak boleh kosong">
+                                        <input type="date" class="form-control comp-giro" id="tanggal_jt_giro" name="tanggal_jt_giro" placeholder="Masukkan tanggal jatuh tempo giro" value="{{ date("d/m/Y") }}" data-validation="[NOTEMPTY]" data-validation-message="Tanggal JT Giro tidak boleh kosong" disabled>
                                     </div>
                                     <div class="form-group">
                                         <label>Notes</label>
@@ -134,12 +134,12 @@
                         </div>
                     </div>
                     <div class="box-body">
-                        <form action="" method="post">
+                        <form id="form_detail" action="" method="post">
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Akun</label>
-                                        <select name="id_akun" class="form-control select2" id="id_akun"
+                                        <select name="akun_detail" class="form-control select2" id="akun_detail"
                                         data-error="Wajib isi" data-validation="[NOTEMPTY]" data-validation-message="Akun tidak boleh kosong"  required>
                                             <option value="">Pilih Akun</option>
                                             @foreach ($data_akun as $akunDt)
@@ -150,7 +150,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label>Notes</label>
-                                        <textarea name="notes_detail" class="form-control" rows="3" placeholder="Notes ..."></textarea>
+                                        <textarea name="notes_detail" id="notes_detail" class="form-control" rows="3" placeholder="Notes ..."></textarea>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -166,7 +166,7 @@
                             </div>
                             <div class="row mb-1">
                                 <div class="col-xs-12">
-                                    <button type="submit" id="btn-submit" class="btn btn-flat btn-primary pull-right"><span class="glyphicon glyphicon-floppy-saved" aria-hidden="true"></span> Tambah Detail</button>
+                                    <button type="submit" id="btn-submit-detail" class="btn btn-flat btn-primary pull-right"><span class="glyphicon glyphicon-floppy-saved" aria-hidden="true"></span> Tambah Detail</button>
                                 </div>
                             </div>
                         </form>
@@ -268,9 +268,41 @@
                 },
             }
         }
+        var validateDetail = {
+            submit: {
+                settings: {
+                    form: '#form_detail',
+                    inputContainer: '.form-group',
+                    // errorListContainer: 'help-block',
+                    errorListClass: 'form-control-error',
+                    errorClass: 'has-error',
+                    allErrors: true,
+                    scrollToError: {
+                        offset: -100,
+                        duration: 500
+                    }
+                },
+                callback: {
+                    onSubmit: function(node, formData) {
+                        console.log('hello detail')
+                        submit_detail()
+                    }
+                }
+            },
+            dynamic: {
+                settings: {
+                    trigger: 'keyup',
+                    delay: 1000
+                },
+            }
+        }
+        var details = []
+        var guid = 0
 
         $(function() {
             $.validate(validateLedger)
+            $.validate(validateDetail)
+
             $('.select2').select2({
                 width: '100%'
             })
@@ -293,6 +325,32 @@
                 $(e.target).data("select2").$selection.one('focus focusin', function (e) {
                     e.stopPropagation();
                 })
+            })
+
+            // On change jenis jurnal
+            $("#jenis").on("change", function() {
+                let jenis = $(this).val()
+                if (jenis == "PG" || jenis == "HG") {
+                    $(".comp-giro").attr("disabled", false)
+                }
+                else {
+                    $(".comp-giro").attr("disabled", true).val("")
+                }
+            })
+
+            // On change debet or kredit
+            $("#debet").on("change", function() {
+                $("#kredit").val(0)
+            })
+            $("#kredit").on("change", function() {
+                $("#debet").val(0)
+            })
+
+            // Remove detail
+            $("#table_detail").on('click', '.remove-detail', function() {
+                let guid = $(this).data('guid')
+                details = details.filter(function(item){ return item['guid'] != guid })
+                populate_detail(details)
             })
         })
 
@@ -318,6 +376,85 @@
                     Swal.fire("Sorry, Can't save data. ", data.responseJSON.message, 'error')
                 }
             })
+        }
+
+        function submit_detail() {
+            console.log("submit detail clicked"+ guid)
+            let akun = $("#akun_detail").val()
+            let notes = $("#notes_detail").val()
+            let debet = $("#debet").val()
+            let kredit = $("#kredit").val()
+
+            details.push ({
+                guid: guid,
+                akun: akun,
+                notes: notes,
+                debet: debet,
+                kredit: kredit
+            })
+            guid++
+            detail_clear()
+            populate_detail(details)
+        }
+
+        function detail_clear() {
+            $("#akun_detail").val("").trigger("change.select2").focus()
+            $("#notes_detail").val("")
+            $("#debet").val("")
+            $("#kredit").val("")
+        }
+
+        function populate_detail(details) {
+            detail_list = $('#table_detail').DataTable({
+                data: details,
+                columns: [
+                    {
+                        data: 'akun',
+                        name: 'akun'
+                    },
+                    {
+                        data: 'akun',
+                        name: 'akun'
+                    },
+                    {
+                        data: 'notes',
+                        name: 'notes'
+                    },
+                    {
+                        data: 'debet',
+                        name: 'debet'
+                    },
+                    {
+                        data: 'kredit',
+                        name: 'kredit'
+                    },
+                    {
+                        data: 'guid',
+                        name: 'guid',
+                        orderable: false,
+                        searchable: false,
+                        render: function (data, type, row) {
+                            let btn = '<button type="button" class="btn btn-sm btn-danger remove-detail" data-guid="'+data+'"><i class="fa fa-trash"></i></button>'
+                            return btn
+                        }
+                    },
+                ],
+                paging: false,
+                bDestroy: true,
+                order: [],
+            })
+            calculate_detail(details)
+        }
+
+        function calculate_detail(details) {
+            let total_debet = parseInt(0)
+            let total_kredit = parseInt(0)
+            details.forEach(detail => {
+                total_debet = parseInt(total_debet) + parseInt(detail.debet)
+                total_kredit = parseInt(total_kredit) + parseInt(detail.kredit)
+            })
+            $("#total_debet").val(parseInt(total_debet))
+            $("#total_kredit").val(parseInt(total_kredit))
         }
     </script>
 @endsection
