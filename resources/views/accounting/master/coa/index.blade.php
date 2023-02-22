@@ -1,5 +1,7 @@
 @extends('layouts.main')
 @section('addedStyles')
+    <!-- Select2 -->
+    <link rel="stylesheet" href="{{ asset('assets/bower_components/select2/dist/css/select2.min.css') }}">
     <!-- DataTables -->
     <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css') }}">
     <!-- Treetable -->
@@ -12,6 +14,7 @@
             font-size: 1.5rem !important;
             border-color: white !important;
             padding: 0.6rem 0.4rem;
+            font-weight: 600;
         }
 
         #table_master_akun td{
@@ -152,6 +155,8 @@
 @endsection
 
 @section('addedScripts')
+    <!-- Select2 -->
+    <script src="{{ asset('assets/bower_components/select2/dist/js/select2.full.min.js') }}"></script>
     <!-- DataTables -->
     <script src="{{ asset('assets/bower_components/datatables.net/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js') }}"></script>
@@ -169,6 +174,8 @@
         var base_url = "{{ url('/') }}"
         $(function () {
             // $('#example1').DataTable()
+
+            $('.select2').select2();
 
             $("#btn-copy").on("click", function() {
                 $("#modal-copy").modal("show")

@@ -91,3 +91,4 @@ Route::get('/transaction/general_ledger/show/{id?}', 'GeneralLedgerController@sh
 Route::post('/transaction/general_ledger/store', 'GeneralLedgerController@store')->name('transaction-general-ledger-store');
 Route::post('/transaction/general_ledger/update', 'GeneralLedgerController@update')->name('transaction-general-ledger-update');
 Route::get('/transaction/general_ledger/populate', 'GeneralLedgerController@populate')->name('transaction-general-ledger-populate');
+Route::get('/transaction/general_ledger/print/{id?}', 'GeneralLedgerController@printSlip')->name('transaction-general-ledger-print');

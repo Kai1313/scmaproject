@@ -11,6 +11,7 @@ use App\Models\Master\Slip;
 use Illuminate\Http\Request;
 use DB;
 use Log;
+use PDF;
 
 class GeneralLedgerController extends Controller
 {
@@ -32,8 +33,7 @@ class GeneralLedgerController extends Controller
 
         if ($request->session()->has('token')) {
             return view('accounting.journal.general_ledger.index', $data);
-        }
-        else {
+        } else {
             return view('exceptions.forbidden');
         }
     }
@@ -58,8 +58,7 @@ class GeneralLedgerController extends Controller
 
         if ($request->session()->has('token')) {
             return view('accounting.journal.general_ledger.form', $data);
-        }
-        else {
+        } else {
             return view('exceptions.forbidden');
         }
     }
@@ -78,7 +77,7 @@ class GeneralLedgerController extends Controller
             // exit();
 
             // cek detail
-            if(count($request->id_akun_detail) <= 0){
+            if (count($request->id_akun_detail) <= 0) {
                 return response()->json([
                     "result" => false,
                     "message" => "Error. There is no detail"
@@ -98,9 +97,9 @@ class GeneralLedgerController extends Controller
             $userModified = $userData->id_pengguna;
             $dateRecord = date('Y-m-d');
             $detailData = [];
-            for($i=0; $i < count($request->id_akun_detail); $i++){
-                array_push($detailData,[
-                    'index' => ($i+1),
+            for ($i = 0; $i < count($request->id_akun_detail); $i++) {
+                array_push($detailData, [
+                    'index' => ($i + 1),
                     'id_akun' => $request->id_akun_detail[$i],
                     'keterangan' => $request->notes_detail_input[$i],
                     'debet' => $request->debet_input[$i],
@@ -110,7 +109,7 @@ class GeneralLedgerController extends Controller
 
             DB::beginTransaction();
             // Store Header
-            $reqId = rand();//$this->regenUuid();
+            $reqId = rand(); //$this->regenUuid();
             $header = new JurnalHeader();
             $header->id_cabang = $cabangID;
             $header->kode_jurnal = $reqId;
@@ -162,8 +161,7 @@ class GeneralLedgerController extends Controller
                 "result" => true,
                 "message" => "Successfully stored Jurnal data",
             ]);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
             Log::info("Error when store Jurnal data");
             Log::info($e);
@@ -181,9 +179,82 @@ class GeneralLedgerController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
-        //
+        $data_jurnal_header = JurnalHeader::join('master_slip', 'master_slip.id_slip', 'jurnal_header.id_slip')
+            ->join('cabang', 'cabang.id_cabang', 'jurnal_header.id_cabang')
+            ->where('id_jurnal', $id)
+            ->select('jurnal_header.*', 'cabang.kode_cabang', 'cabang.nama_cabang', 'master_slip.kode_slip', 'master_slip.nama_slip', DB::raw(
+                '(CASE
+                    WHEN jenis_jurnal = "KK" THEN "Kas Keluar"
+                    WHEN jenis_jurnal = "KM" THEN "Kas Masuk"
+                    WHEN jenis_jurnal = "BK" THEN "Bank Keluar"
+                    WHEN jenis_jurnal = "BM" THEN "Bank Masuk"
+                    WHEN jenis_jurnal = "PG" THEN "Piutang Giro"
+                    WHEN jenis_jurnal = "HG" THEN "Hutang Giro"
+                    WHEN jenis_jurnal = "ME" THEN "Memorial"
+                END) as jenis_name'
+            ))
+            ->first();
+
+        $data_jurnal_detail = JurnalDetail::join('master_akun', 'master_akun.id_akun', 'jurnal_detail.id_akun')
+            ->where('id_jurnal', $id)
+            ->select('jurnal_detail.*', 'master_akun.kode_akun', 'master_akun.nama_akun')
+            ->get();
+
+        $data = [
+            "pageTitle" => "SCA Accounting | Transaksi Jurnal Umum | Detail",
+            "data_jurnal_header" => $data_jurnal_header,
+            "data_jurnal_detail" => $data_jurnal_detail
+        ];
+
+        if ($request->session()->has('token')) {
+            return view('accounting.journal.general_ledger.detail', $data);
+        } else {
+            return view('exceptions.forbidden');
+        }
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function printSlip(Request $request, $id)
+    {
+        $data_jurnal_header = JurnalHeader::join('master_slip', 'master_slip.id_slip', 'jurnal_header.id_slip')
+            ->join('cabang', 'cabang.id_cabang', 'jurnal_header.id_cabang')
+            ->where('id_jurnal', $id)
+            ->select('jurnal_header.*', 'cabang.kode_cabang', 'cabang.nama_cabang', 'master_slip.kode_slip', 'master_slip.nama_slip', 'master_slip.id_akun', DB::raw(
+                '(CASE
+                    WHEN jenis_jurnal = "KK" THEN "Kas Keluar"
+                    WHEN jenis_jurnal = "KM" THEN "Kas Masuk"
+                    WHEN jenis_jurnal = "BK" THEN "Bank Keluar"
+                    WHEN jenis_jurnal = "BM" THEN "Bank Masuk"
+                    WHEN jenis_jurnal = "PG" THEN "Piutang Giro"
+                    WHEN jenis_jurnal = "HG" THEN "Hutang Giro"
+                    WHEN jenis_jurnal = "ME" THEN "Memorial"
+                END) as jenis_name'
+            ))
+            ->first();
+
+        $data_jurnal_detail = JurnalDetail::join('master_akun', 'master_akun.id_akun', 'jurnal_detail.id_akun')
+            ->where('id_jurnal', $id)
+            ->where('jurnal_detail.id_akun', '<>', $data_jurnal_header->id_akun)
+            ->select('jurnal_detail.*', 'master_akun.kode_akun', 'master_akun.nama_akun')
+            ->get();
+
+        $data = [
+            "data_jurnal_header" => $data_jurnal_header,
+            "data_jurnal_detail" => $data_jurnal_detail
+        ];
+
+        // return view('accounting.journal.general_ledger.print', $data);
+
+        $pdf = PDF::loadView('accounting.journal.general_ledger.print', $data);
+        $pdf->setPaper('a4', 'potrait');
+        return $pdf->stream('printJurnal_' . $data_jurnal_header->kode_jurnal . '.pdf');
     }
 
     /**
@@ -211,7 +282,7 @@ class GeneralLedgerController extends Controller
             // exit();
 
             // cek detail
-            if(count($request->id_akun_detail) <= 0){
+            if (count($request->id_akun_detail) <= 0) {
                 return response()->json([
                     "result" => false,
                     "message" => "Error. There is no detail"
@@ -230,9 +301,9 @@ class GeneralLedgerController extends Controller
             $userModified = $userData->id_pengguna;
             $dateModified = date('Y-m-d');
             $detailData = [];
-            for($i=0; $i < count($request->id_akun_detail); $i++){
-                array_push($detailData,[
-                    'index' => ($i+1),
+            for ($i = 0; $i < count($request->id_akun_detail); $i++) {
+                array_push($detailData, [
+                    'index' => ($i + 1),
                     'id_akun' => $request->id_akun_detail[$i],
                     'keterangan' => $request->notes_detail_input[$i],
                     'debet' => $request->debet_input[$i],
@@ -291,8 +362,7 @@ class GeneralLedgerController extends Controller
                 "result" => true,
                 "message" => "Successfully stored Jurnal data",
             ]);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
             Log::info("Error when store Jurnal data");
             Log::info($e);
@@ -315,7 +385,7 @@ class GeneralLedgerController extends Controller
         //
     }
 
-      /**
+    /**
      * Remove the specified resource from storage.
      *
      * @return \Illuminate\Http\Response
@@ -328,7 +398,7 @@ class GeneralLedgerController extends Controller
         $keyword = $request->search['value'];
         $sort = [];
 
-        foreach($request->order as $key => $order){
+        foreach ($request->order as $key => $order) {
             $columnIdx = $order['column'];
             $sortDir = $order['dir'];
             $sort[] = [
@@ -338,37 +408,44 @@ class GeneralLedgerController extends Controller
         }
 
         $draw = $request->draw;
-        $current_page = $offset/$limit +1;
+        $current_page = $offset / $limit + 1;
 
         $data_general_ledger = JurnalHeader::join('master_slip', 'jurnal_header.id_slip', 'master_slip.id_slip')
-                ->select('jurnal_header.*', 'master_slip.kode_slip', DB::raw('
+            ->select('jurnal_header.*', 'master_slip.kode_slip', DB::raw('
                     (CASE
                         WHEN jenis_jurnal = "KK" THEN "Kas Keluar"
                         WHEN jenis_jurnal = "KM" THEN "Kas Masuk"
                         WHEN jenis_jurnal = "BK" THEN "Bank Keluar"
                         WHEN jenis_jurnal = "BM" THEN "Bank Masuk"
-                        WHEN jenis_jurnal = "PG" THEN "Piutang Dagang"
-                        WHEN jenis_jurnal = "HG" THEN "Hutang Dagang"
+                        WHEN jenis_jurnal = "PG" THEN "Piutang Giro"
+                        WHEN jenis_jurnal = "HG" THEN "Hutang Giro"
                         WHEN jenis_jurnal = "ME" THEN "Memorial"
                     END) as jenis_name
                 '));
 
-        $data_general_ledger_table = DB::table(DB::raw('(' . $data_general_ledger->toSql() . ') as jurnal_header'));
+        $data_general_ledger_table = DB::table(DB::raw('(' . $data_general_ledger->toSql() . ') as jurnal_header'))
+        ->join('jurnal_detail', 'jurnal_detail.id_jurnal', 'jurnal_header.id_jurnal')
+        ->groupBy('jurnal_header.id_jurnal')
+        ->select('jurnal_header.*', DB::raw('SUM(jurnal_detail.credit) as jumlah'));
         $data_general_ledger_table = $data_general_ledger_table->where('id_cabang', $cabang);
 
-        if(!empty($keyword)){
-            $data_general_ledger->where(function ($query) use($keyword){
+        Log::debug(json_encode($data_general_ledger_table->get()));
+
+        if (!empty($keyword)) {
+            $data_general_ledger->where(function ($query) use ($keyword) {
                 $query->orWhere('kode_jurnal', 'LIKE', "%$keyword%")
                     ->orWhere('tanggal_jurnal', 'LIKE', "%$keyword%")
                     ->orWhere('jenis_name', 'LIKE', "%$keyword%")
+                    ->orWhere('catatan', 'LIKE', "%$keyword%")
+                    ->orWhere('jumlah', 'LIKE', "%$keyword%")
                     ->orWhere('kode_slip', 'LIKE', "%$keyword%");
             });
         }
 
         $filtered_data = $data_general_ledger_table->get();
 
-        if($sort){
-            if(!is_array($sort)){
+        if ($sort) {
+            if (!is_array($sort)) {
                 $message = "Invalid array for parameter sort";
                 $data = [
                     'result' => false,
@@ -377,26 +454,26 @@ class GeneralLedgerController extends Controller
                 return response()->json($data);
             }
 
-            foreach($sort as $key => $s){
+            foreach ($sort as $key => $s) {
                 $column = $s['column'];
                 $directon = $s['dir'];
                 $data_general_ledger_table->orderBy($column, $directon);
             }
-        }else{
+        } else {
             $data_general_ledger_table->orderBy('id_jurnal', 'ASC');
         }
 
         // pagination
-        if($current_page){
+        if ($current_page) {
             $page = $current_page;
             $limit_data = $data_general_ledger_table->count();
 
-            if($limit){
+            if ($limit) {
                 $limit_data = $limit;
             }
 
             $offset = ($page - 1) * $limit_data;
-            if($offset < 0){
+            if ($offset < 0) {
                 $offset = 0;
             }
 
@@ -412,7 +489,8 @@ class GeneralLedgerController extends Controller
         return json_encode($table);
     }
 
-    public function void(Request $request, $id){
+    public function void(Request $request, $id)
+    {
         try {
             Log::info("Void Jurnal Data");
             // exit();
@@ -444,8 +522,7 @@ class GeneralLedgerController extends Controller
                 "result" => true,
                 "message" => "Successfully void Jurnal data",
             ]);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
             Log::info("Error when void Jurnal data");
             Log::info($e);
@@ -457,7 +534,8 @@ class GeneralLedgerController extends Controller
         }
     }
 
-    public function active(Request $request, $id){
+    public function active(Request $request, $id)
+    {
         try {
             Log::info("Activate Jurnal Data");
             // exit();
@@ -489,8 +567,7 @@ class GeneralLedgerController extends Controller
                 "result" => true,
                 "message" => "Successfully activate Jurnal data",
             ]);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
             Log::info("Error when activate Jurnal data");
             Log::info($e);
