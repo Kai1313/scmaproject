@@ -235,7 +235,7 @@ class GeneralLedgerController extends Controller
 
         $data_jurnal_detail = JurnalDetail::join('master_akun', 'master_akun.id_akun', 'jurnal_detail.id_akun')
             ->where('id_jurnal', $id)
-            ->where('jurnal_detail.id_akun', '<>', $data_jurnal_header->id_akun)
+            // ->where('jurnal_detail.id_akun', '<>', $data_jurnal_header->id_akun)
             ->select('jurnal_detail.*', 'master_akun.kode_akun', 'master_akun.nama_akun')
             ->get();
 
