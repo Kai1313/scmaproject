@@ -45,12 +45,12 @@
 @section('header')
     <section class="content-header">
         <h1>
-            Transaksi Jurnal Umum
+            Transaksi Jurnal Penyesuaian
             <small>| Tambah</small>
         </h1>
         <ol class="breadcrumb">
             <li><a href="#"><i class="fa fa-dashboard"></i> Dashboard</a></li>
-            <li><a href="{{ route('transaction-general-ledger') }}">Transaksi Jurnal Umum</a></li>
+            <li><a href="{{ route('transaction-general-ledger') }}">Transaksi Jurnal Penyesuaian</a></li>
             <li class="active">Form</li>
         </ol>
     </section>
@@ -105,17 +105,7 @@
                                         </div>
                                         <div class="form-group">
                                             <label>Jenis Jurnal</label>
-                                            <select name="jenis" id="jenis" class="form-control select2"
-                                                data-validation="[NOTEMPTY]"
-                                                data-validation-message="Jenis Jurnal tidak boleh kosong">
-                                                <option value="">Pilih Jenis Jurnal</option>
-                                                <option value="KK">Kas Keluar</option>
-                                                <option value="KM">Kas Masuk</option>
-                                                <option value="BK">Bank Keluar</option>
-                                                <option value="BM">Bank Masuk</option>
-                                                <option value="PG">Piutang Giro</option>
-                                                <option value="HG">Hutang Giro</option>
-                                            </select>
+                                            <input type="text" name="jenis" id="jenis" class="form-control" value="ME" data-validation="[NOTEMPTY]" data-validation-message="Jenis Jurnal tidak boleh kosong" readonly>
                                         </div>
                                         <div class="form-group">
                                             <label>Slip</label>
@@ -129,26 +119,6 @@
                                         </div>
                                     </div>
                                     <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Nomor Giro</label>
-                                            <input type="text" name="nomor_giro" id="nomor_giro" class="form-control comp-giro"
-                                                data-validation="[NOTEMPTY]"
-                                                data-validation-message="Nomor giro tidak boleh kosong" disabled>
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Tanggal Giro</label>
-                                            <input type="date" class="form-control comp-giro" id="tanggal_giro" name="tanggal_giro"
-                                                placeholder="Masukkan tanggal giro" value="{{ date('d/m/Y') }}"
-                                                data-validation="[NOTEMPTY]"
-                                                data-validation-message="Tanggal Giro tidak boleh kosong" disabled>
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Tanggal JT Giro</label>
-                                            <input type="date" class="form-control comp-giro" id="tanggal_jt_giro"
-                                                name="tanggal_jt_giro" placeholder="Masukkan tanggal jatuh tempo giro"
-                                                value="{{ date('d/m/Y') }}" data-validation="[NOTEMPTY]"
-                                                data-validation-message="Tanggal JT Giro tidak boleh kosong" disabled>
-                                        </div>
                                         <div class="form-group">
                                             <label>Notes</label>
                                             <textarea name="notes" id="notes" class="form-control" rows="4" placeholder="Notes ..."></textarea>
@@ -256,7 +226,6 @@
                                         class="btn btn-flat btn-primary pull-right mb-1"><span
                                             class="glyphicon glyphicon-floppy-saved" aria-hidden="true"></span> Simpan
                                         Data</button>
-                                    <button id="btn-generate" type="button" class="btn btn-flat btn-success mr-1 mb-1 pull-right">Generate</button>
                                 </div>
                             </div>
                         </div>

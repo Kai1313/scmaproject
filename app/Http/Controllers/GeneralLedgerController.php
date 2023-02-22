@@ -74,11 +74,11 @@ class GeneralLedgerController extends Controller
     {
         try {
             Log::info("Store Jurnal Data");
-            // Log::debug(json_encode($request->all()));
+            // dd($request->header[0]["tanggal"]);
             // exit();
 
             // cek detail
-            if(count($request->id_akun_detail) <= 0){
+            if(count($request->detail) <= 0){
                 return response()->json([
                     "result" => false,
                     "message" => "Error. There is no detail"
@@ -86,27 +86,19 @@ class GeneralLedgerController extends Controller
             }
 
             // Init data
-            $journalDate = date('Y-m-d', strtotime($request->tanggal));
-            $giroDate = date('Y-m-d', strtotime($request->tanggal_giro));
-            $giroDueDate = date('Y-m-d', strtotime($request->tanggal_jt_giro));
-            $slipID = $request->slip;
-            $journalType = $request->jenis;
-            $cabangID = $request->cabang_input;
-            $noteHeader = $request->notes;
+            $journalDate = date('Y-m-d', strtotime($request->header[0]["tanggal"]));
+            $giroDate = date('Y-m-d', strtotime($request->header[0]["tanggal_giro"]));
+            $giroDueDate = date('Y-m-d', strtotime($request->header[0]["tanggal_jt_giro"]));
+            $slipID = $request->header[0]["slip"];
+            $journalType = $request->header[0]["jenis"];
+            $cabangID = $request->header[0]["cabang"];
+            $noteHeader = $request->header[0]["notes"];
             $userData = $request->session()->get('user');
             $userRecord = $userData->id_pengguna;
             $userModified = $userData->id_pengguna;
             $dateRecord = date('Y-m-d');
-            $detailData = [];
-            for($i=0; $i < count($request->id_akun_detail); $i++){
-                array_push($detailData,[
-                    'index' => ($i+1),
-                    'id_akun' => $request->id_akun_detail[$i],
-                    'keterangan' => $request->notes_detail_input[$i],
-                    'debet' => $request->debet_input[$i],
-                    'kredit' => $request->kredit_input[$i],
-                ]);
-            }
+            $detailData = $request->detail;
+            // dd($detailData);
 
             DB::beginTransaction();
             // Store Header
@@ -125,6 +117,7 @@ class GeneralLedgerController extends Controller
             $header->user_modified = $userModified;
             $header->dt_created = $dateRecord;
             $header->dt_modified = $dateRecord;
+            // dd($header);
             $header->save();
             if (!$header->save()) {
                 DB::rollback();
@@ -139,15 +132,16 @@ class GeneralLedgerController extends Controller
                 //Store Detail
                 $detail = new JurnalDetail();
                 $detail->id_jurnal = $header->id_jurnal;
-                $detail->index = $data['index'];
-                $detail->id_akun = $data['id_akun'];
-                $detail->keterangan = $data['keterangan'];
+                $detail->index = ($data['guid'] == 'gen')?count($detailData)+1:$data['guid'];
+                $detail->id_akun = $data['akun'];
+                $detail->keterangan = $data['notes'];
                 $detail->debet = $data['debet'];
                 $detail->credit = $data['kredit'];
                 $detail->user_created = $userRecord;
                 $detail->user_modified = $userModified;
                 $detail->dt_created = $dateRecord;
                 $detail->dt_modified = $dateRecord;
+                // dd(json_encode($detail));
                 if (!$detail->save()) {
                     DB::rollback();
                     return response()->json([
