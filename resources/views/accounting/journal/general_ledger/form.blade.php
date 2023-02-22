@@ -74,89 +74,89 @@
                             </div>
                         </div>
                         <div class="box-body">
-                            {{-- <form id="form_ledger" data-toggle="validator" enctype="multipart/form-data"> --}}
-                            @csrf
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Cabang</label>
-                                        <select name="cabang_input" id="cabang_input" class="form-control select2"
-                                            style="width: 100%;">
-                                            @foreach ($data_cabang as $cabang)
-                                                <option value="{{ $cabang->id_cabang }}"
-                                                    {{ isset($data_jurnal_umum->id_cabang) ? ($data_jurnal_umum->id_cabang == $cabang->id_cabang ? 'selected' : '') : '' }}>
-                                                    {{ $cabang->kode_cabang . ' - ' . $cabang->nama_cabang }}</option>
-                                            @endforeach
-                                        </select>
+                            <form id="form_ledger" data-toggle="validator" enctype="multipart/form-data">
+                                @csrf
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Cabang</label>
+                                            <select name="cabang_input" id="cabang_input" class="form-control select2"
+                                                style="width: 100%;">
+                                                @foreach ($data_cabang as $cabang)
+                                                    <option value="{{ $cabang->id_cabang }}"
+                                                        {{ isset($data_jurnal_umum->id_cabang) ? ($data_jurnal_umum->id_cabang == $cabang->id_cabang ? 'selected' : '') : '' }}>
+                                                        {{ $cabang->kode_cabang . ' - ' . $cabang->nama_cabang }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Nomor Jurnal</label>
+                                            <input type="text" class="form-control" id="kode" name="kode"
+                                                placeholder="Masukkan nomor jurnal umum" value=""
+                                                data-validation="[NOTEMPTY]"
+                                                data-validation-message="Nomor Jurnal Umum tidak boleh kosong">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Tanggal Jurnal</label>
+                                            <input type="date" class="form-control" id="tanggal" name="tanggal"
+                                                placeholder="Masukkan tanggal jurnal umum" value="{{ date('d/m/Y') }}"
+                                                data-validation="[NOTEMPTY]"
+                                                data-validation-message="Tanggal Jurnal tidak boleh kosong">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Jenis Jurnal</label>
+                                            <select name="jenis" id="jenis" class="form-control select2"
+                                                data-validation="[NOTEMPTY]"
+                                                data-validation-message="Jenis Jurnal tidak boleh kosong">
+                                                <option value="">Pilih Jenis Jurnal</option>
+                                                <option value="KK">Kas Keluar</option>
+                                                <option value="KM">Kas Masuk</option>
+                                                <option value="BK">Bank Keluar</option>
+                                                <option value="BM">Bank Masuk</option>
+                                                <option value="PG">Piutang Giro</option>
+                                                <option value="HG">Hutang Giro</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Slip</label>
+                                            <select name="slip" id="slip" class="form-control select2"
+                                                data-validation="[NOTEMPTY]" data-validation-message="Slip tidak boleh kosong">
+                                                {{-- <option value="">Pilih Slip</option> --}}
+                                                {{-- @foreach ($data_slip as $slip)
+                                                    <option value="{{ $slip->kode_slip }}">{{ $slip->kode_slip.' - '.$slip->nama_slip }}</option>
+                                                @endforeach --}}
+                                            </select>
+                                        </div>
                                     </div>
-                                    <div class="form-group">
-                                        <label>Nomor Jurnal</label>
-                                        <input type="text" class="form-control" id="kode" name="kode"
-                                            placeholder="Masukkan nomor jurnal umum" value=""
-                                            data-validation="[NOTEMPTY]"
-                                            data-validation-message="Nomor Jurnal Umum tidak boleh kosong">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Tanggal Jurnal</label>
-                                        <input type="date" class="form-control" id="tanggal" name="tanggal"
-                                            placeholder="Masukkan tanggal jurnal umum" value="{{ date('d/m/Y') }}"
-                                            data-validation="[NOTEMPTY]"
-                                            data-validation-message="Tanggal Jurnal tidak boleh kosong">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Jenis Jurnal</label>
-                                        <select name="jenis" id="jenis" class="form-control select2"
-                                            data-validation="[NOTEMPTY]"
-                                            data-validation-message="Jenis Jurnal tidak boleh kosong">
-                                            <option value="">Pilih Jenis Jurnal</option>
-                                            <option value="KK">Kas Keluar</option>
-                                            <option value="KM">Kas Masuk</option>
-                                            <option value="BK">Bank Keluar</option>
-                                            <option value="BM">Bank Masuk</option>
-                                            <option value="PG">Piutang Giro</option>
-                                            <option value="HG">Hutang Giro</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Slip</label>
-                                        <select name="slip" id="slip" class="form-control select2"
-                                            data-validation="[NOTEMPTY]" data-validation-message="Slip tidak boleh kosong">
-                                            {{-- <option value="">Pilih Slip</option> --}}
-                                            {{-- @foreach ($data_slip as $slip)
-                                                <option value="{{ $slip->kode_slip }}">{{ $slip->kode_slip.' - '.$slip->nama_slip }}</option>
-                                            @endforeach --}}
-                                        </select>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Nomor Giro</label>
+                                            <input type="text" name="nomor_giro" id="nomor_giro" class="form-control"
+                                                data-validation="[NOTEMPTY]"
+                                                data-validation-message="Nomor giro tidak boleh kosong" disabled>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Tanggal Giro</label>
+                                            <input type="date" class="form-control" id="tanggal_giro" name="tanggal_giro"
+                                                placeholder="Masukkan tanggal giro" value="{{ date('d/m/Y') }}"
+                                                data-validation="[NOTEMPTY]"
+                                                data-validation-message="Tanggal Giro tidak boleh kosong">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Tanggal JT Giro</label>
+                                            <input type="date" class="form-control" id="tanggal_jt_giro"
+                                                name="tanggal_jt_giro" placeholder="Masukkan tanggal jatuh tempo giro"
+                                                value="{{ date('d/m/Y') }}" data-validation="[NOTEMPTY]"
+                                                data-validation-message="Tanggal JT Giro tidak boleh kosong">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Notes</label>
+                                            <textarea name="notes" class="form-control" rows="4" placeholder="Notes ..."></textarea>
+                                        </div>
+                                        <button id="hidden-btn" style="display:none;" type="submit">HIDDEN</button>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Nomor Giro</label>
-                                        <input type="text" name="nomor_giro" id="nomor_giro" class="form-control"
-                                            data-validation="[NOTEMPTY]"
-                                            data-validation-message="Nomor giro tidak boleh kosong" disabled>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Tanggal Giro</label>
-                                        <input type="date" class="form-control" id="tanggal_giro" name="tanggal_giro"
-                                            placeholder="Masukkan tanggal giro" value="{{ date('d/m/Y') }}"
-                                            data-validation="[NOTEMPTY]"
-                                            data-validation-message="Tanggal Giro tidak boleh kosong">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Tanggal JT Giro</label>
-                                        <input type="date" class="form-control" id="tanggal_jt_giro"
-                                            name="tanggal_jt_giro" placeholder="Masukkan tanggal jatuh tempo giro"
-                                            value="{{ date('d/m/Y') }}" data-validation="[NOTEMPTY]"
-                                            data-validation-message="Tanggal JT Giro tidak boleh kosong">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Notes</label>
-                                        <textarea name="notes" class="form-control" rows="4" placeholder="Notes ..."></textarea>
-                                    </div>
-                                    <button id="hidden-btn" style="display:none;" type="submit">HIDDEN</button>
-                                </div>
-                            </div>
-                            {{-- </form> --}}
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -171,41 +171,37 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="box-body">
-                        <form id="form_detail" action="" method="post">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Akun</label>
-                                        <select name="akun_detail" class="form-control select2" id="akun_detail"
-                                        data-error="Wajib isi" data-validation="[NOTEMPTY]" data-validation-message="Akun tidak boleh kosong"  required>
-                                            <option value="">Pilih Akun</option>
-                                            {{-- @foreach ($data_akun as $akunDt)
-                                                <option value="{{ $akunDt->id_akun }}">{{ $akunDt->kode_akun.' - '.$akunDt->nama_akun }}
-                                                </option>
-                                            @endforeach --}}
-                                            </select>
-                                        </div>
+                        <div class="box-body">
+                            <form id="form_detail" action="" method="post">
+                                <div class="row">
+                                    <div class="col-md-6">
                                         <div class="form-group">
-                                            <label>Notes</label>
-                                            <textarea name="notes_detail" class="form-control" rows="3" placeholder="Notes ..."></textarea>
+                                            <label>Akun</label>
+                                            <select name="akun_detail" class="form-control select2" id="akun_detail"
+                                            data-error="Wajib isi" data-validation="[NOTEMPTY]" data-validation-message="Akun tidak boleh kosong"  required>
+                                                <option value="">Pilih Akun</option>
+                                                {{-- @foreach ($data_akun as $akunDt)
+                                                    <option value="{{ $akunDt->id_akun }}">{{ $akunDt->kode_akun.' - '.$akunDt->nama_akun }}
+                                                    </option>
+                                                @endforeach --}}
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Notes</label>
+                                                <textarea name="notes_detail" id="notes_detail" class="form-control" rows="3" placeholder="Notes ..."></textarea>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="form-group">
-                                        <label>Notes</label>
-                                        <textarea name="notes_detail" id="notes_detail" class="form-control" rows="3" placeholder="Notes ..."></textarea>
+                                    <div class="row mb-1">
+                                        <div class="col-xs-12">
+                                            <button type="button" id="btn-add-detail"
+                                                class="btn btn-flat btn-primary pull-right"><span
+                                                    class="glyphicon glyphicon-floppy-saved" aria-hidden="true"></span> Tambah
+                                                Detail</button>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="row mb-1">
-                                    <div class="col-xs-12">
-                                        <button type="button" id="btn-add-detail"
-                                            class="btn btn-flat btn-primary pull-right"><span
-                                                class="glyphicon glyphicon-floppy-saved" aria-hidden="true"></span> Tambah
-                                            Detail</button>
-                                    </div>
-                                </div>
-                            {{-- </form> --}}
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -235,8 +231,6 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-4">
-                                </div>
                                 <div class="col-md-4">
                                     <label>Total Debet</label>
                                     <input type="text" name="total_debet" id="total_debet" class="form-control"
@@ -308,37 +302,6 @@
                         console.log(formData)
                         console.log('hello')
                         // $('#form_ledger').submit();
-                        save_data()
-                    }
-                }
-            },
-            dynamic: {
-                settings: {
-                    trigger: 'keyup',
-                    delay: 1000
-                },
-            }
-        }
-
-
-        var validateDetail = {
-            submit: {
-                settings: {
-                    form: '#detail_form',
-                    inputContainer: '.form-group',
-                    // errorListContainer: 'help-block',
-                    errorListClass: 'form-control-error',
-                    errorClass: 'has-error',
-                    allErrors: true,
-                    scrollToError: {
-                        offset: -100,
-                        duration: 500
-                    }
-                },
-                callback: {
-                    onSubmit: function(node, formData) {
-                        console.log(formData)
-                        console.log(getCurrentCoa($('#id_akun').val()))
                         // save_data()
                     }
                 }
@@ -350,6 +313,37 @@
                 },
             }
         }
+
+
+        // var validateDetail = {
+        //     submit: {
+        //         settings: {
+        //             form: '#form_detail',
+        //             inputContainer: '.form-group',
+        //             // errorListContainer: 'help-block',
+        //             errorListClass: 'form-control-error',
+        //             errorClass: 'has-error',
+        //             allErrors: true,
+        //             scrollToError: {
+        //                 offset: -100,
+        //                 duration: 500
+        //             }
+        //         },
+        //         callback: {
+        //             onSubmit: function(node, formData) {
+        //                 console.log(formData)
+        //                 console.log(getCurrentCoa($('#id_akun').val()))
+        //                 // save_data()
+        //             }
+        //         }
+        //     },
+        //     dynamic: {
+        //         settings: {
+        //             trigger: 'keyup',
+        //             delay: 1000
+        //         },
+        //     }
+        // }
         var validateDetail = {
             submit: {
                 settings: {
@@ -389,9 +383,9 @@
                 width: '100%'
             })
 
-            // $("#btn-save").on("click", function() {
-            //     $("#hidden-btn").click()
-            // })
+            $("#btn-save").on("click", function() {
+                $("#hidden-btn").click()
+            })
 
             $('#table_detail').DataTable()
 
