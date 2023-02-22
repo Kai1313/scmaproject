@@ -121,7 +121,7 @@
                                             <label>Slip</label>
                                             <select name="slip" id="slip" class="form-control select2"
                                                 data-validation="[NOTEMPTY]" data-validation-message="Slip tidak boleh kosong">
-                                                {{-- <option value="">Pilih Slip</option> --}}
+                                                <option value="">Pilih Slip</option>
                                                 {{-- @foreach ($data_slip as $slip)
                                                     <option value="{{ $slip->kode_slip }}">{{ $slip->kode_slip.' - '.$slip->nama_slip }}</option>
                                                 @endforeach --}}
@@ -131,23 +131,23 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label>Nomor Giro</label>
-                                            <input type="text" name="nomor_giro" id="nomor_giro" class="form-control"
+                                            <input type="text" name="nomor_giro" id="nomor_giro" class="form-control comp-giro"
                                                 data-validation="[NOTEMPTY]"
                                                 data-validation-message="Nomor giro tidak boleh kosong" disabled>
                                         </div>
                                         <div class="form-group">
                                             <label>Tanggal Giro</label>
-                                            <input type="date" class="form-control" id="tanggal_giro" name="tanggal_giro"
+                                            <input type="date" class="form-control comp-giro" id="tanggal_giro" name="tanggal_giro"
                                                 placeholder="Masukkan tanggal giro" value="{{ date('d/m/Y') }}"
                                                 data-validation="[NOTEMPTY]"
-                                                data-validation-message="Tanggal Giro tidak boleh kosong">
+                                                data-validation-message="Tanggal Giro tidak boleh kosong" disabled>
                                         </div>
                                         <div class="form-group">
                                             <label>Tanggal JT Giro</label>
-                                            <input type="date" class="form-control" id="tanggal_jt_giro"
+                                            <input type="date" class="form-control comp-giro" id="tanggal_jt_giro"
                                                 name="tanggal_jt_giro" placeholder="Masukkan tanggal jatuh tempo giro"
                                                 value="{{ date('d/m/Y') }}" data-validation="[NOTEMPTY]"
-                                                data-validation-message="Tanggal JT Giro tidak boleh kosong">
+                                                data-validation-message="Tanggal JT Giro tidak boleh kosong" disabled>
                                         </div>
                                         <div class="form-group">
                                             <label>Notes</label>
@@ -184,24 +184,32 @@
                                                     <option value="{{ $akunDt->id_akun }}">{{ $akunDt->kode_akun.' - '.$akunDt->nama_akun }}
                                                     </option>
                                                 @endforeach --}}
-                                                </select>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Notes</label>
-                                                <textarea name="notes_detail" id="notes_detail" class="form-control" rows="3" placeholder="Notes ..."></textarea>
-                                            </div>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Notes</label>
+                                            <textarea name="notes_detail" id="notes_detail" class="form-control" rows="3" placeholder="Notes ..."></textarea>
                                         </div>
                                     </div>
-                                    <div class="row mb-1">
-                                        <div class="col-xs-12">
-                                            <button type="button" id="btn-add-detail"
-                                                class="btn btn-flat btn-primary pull-right"><span
-                                                    class="glyphicon glyphicon-floppy-saved" aria-hidden="true"></span> Tambah
-                                                Detail</button>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Debet</label>
+                                            <input type="text" name="debet" id="debet" class="form-control"
+                                                data-validation="[NOTEMPTY]" data-validation-message="Debet tidak boleh kosong" value="">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Kredit</label>
+                                            <input type="text" name="kredit" id="kredit" class="form-control"
+                                                data-validation="[NOTEMPTY]" data-validation-message="Kredit tidak boleh kosong" value="">
                                         </div>
                                     </div>
-                                </form>
-                            </div>
+                                </div>
+                                <div class="row mb-1">
+                                    <div class="col-xs-12">
+                                        <button type="submit" id="btn-submit-detail" class="btn btn-flat btn-primary pull-right"><span class="glyphicon glyphicon-floppy-saved" aria-hidden="true"></span> Tambah Detail</button>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -249,7 +257,6 @@
                                             class="glyphicon glyphicon-floppy-saved" aria-hidden="true"></span> Simpan
                                         Data</button>
                                     <button class="btn btn-flat btn-success mr-1 mb-1 pull-right">Generate</button>
-                                    <button type="submit" id="btn-submit-detail" class="btn btn-flat btn-primary pull-right"><span class="glyphicon glyphicon-floppy-saved" aria-hidden="true"></span> Tambah Detail</button>
                                 </div>
                             </div>
                         </div>
@@ -314,36 +321,6 @@
             }
         }
 
-
-        // var validateDetail = {
-        //     submit: {
-        //         settings: {
-        //             form: '#form_detail',
-        //             inputContainer: '.form-group',
-        //             // errorListContainer: 'help-block',
-        //             errorListClass: 'form-control-error',
-        //             errorClass: 'has-error',
-        //             allErrors: true,
-        //             scrollToError: {
-        //                 offset: -100,
-        //                 duration: 500
-        //             }
-        //         },
-        //         callback: {
-        //             onSubmit: function(node, formData) {
-        //                 console.log(formData)
-        //                 console.log(getCurrentCoa($('#id_akun').val()))
-        //                 // save_data()
-        //             }
-        //         }
-        //     },
-        //     dynamic: {
-        //         settings: {
-        //             trigger: 'keyup',
-        //             delay: 1000
-        //         },
-        //     }
-        // }
         var validateDetail = {
             submit: {
                 settings: {
@@ -378,6 +355,9 @@
         $(function() {
             $.validate(validateLedger)
             $.validate(validateDetail)
+
+            getCoa()
+            getSlip()
 
             $('.select2').select2({
                 width: '100%'
@@ -431,28 +411,28 @@
         })
 
         function save_data() {
-        // $('#form_ledger').submit(function(e){
-            $.ajax({
-                type: "POST",
-                url: save_route,
-                data: $('form').serialize(),
-                success: function(data) {
-                    if (data.result) {
-                        Swal.fire('Saved!', data.message, 'success').then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.href = data_route;
-                            }
-                        })
-                    } else {
-                        Swal.fire("Sorry, Can't save data. ", data.message, 'error')
-                    }
+            // $('#form_ledger').submit(function(e){
+                $.ajax({
+                    type: "POST",
+                    url: save_route,
+                    data: $('form').serialize(),
+                    success: function(data) {
+                        if (data.result) {
+                            Swal.fire('Saved!', data.message, 'success').then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.href = data_route;
+                                }
+                            })
+                        } else {
+                            Swal.fire("Sorry, Can't save data. ", data.message, 'error')
+                        }
 
-                },
-                error: function(data) {
-                    Swal.fire("Sorry, Can't save data. ", data.responseJSON.message, 'error')
-                }
-            })
-        // });
+                    },
+                    error: function(data) {
+                        Swal.fire("Sorry, Can't save data. ", data.responseJSON.message, 'error')
+                    }
+                })
+            // });
         }
 
         function getCoa(id_cabang) {
