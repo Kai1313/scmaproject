@@ -234,8 +234,15 @@ class GeneralLedgerController extends Controller
             ->first();
 
         $data_jurnal_detail = JurnalDetail::join('master_akun', 'master_akun.id_akun', 'jurnal_detail.id_akun')
-            ->where('id_jurnal', $id)
-            // ->where('jurnal_detail.id_akun', '<>', $data_jurnal_header->id_akun)
+            ->join('jurnal_header', 'jurnal_header.id_jurnal', 'jurnal_detail.id_jurnal')
+            ->where('jurnal_header.id_jurnal', $id)
+            ->whereRaw('
+                CASE
+                    WHEN jenis_jurnal IN ("KK", "BK", "PG") THEN jurnal_detail.credit = 0
+                    WHEN jenis_jurnal IN ("KM", "BM", "HG") THEN jurnal_detail.debet = 0
+                    ELSE jurnal_detail.credit >= 0
+                END
+            ')
             ->select('jurnal_detail.*', 'master_akun.kode_akun', 'master_akun.nama_akun')
             ->get();
 
@@ -243,6 +250,8 @@ class GeneralLedgerController extends Controller
             "data_jurnal_header" => $data_jurnal_header,
             "data_jurnal_detail" => $data_jurnal_detail
         ];
+
+        // dd($data);
 
         // return view('accounting.journal.general_ledger.print', $data);
 

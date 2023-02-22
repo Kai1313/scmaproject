@@ -7,11 +7,11 @@
             font-family: sans-serif;
         }
 
-        .table-header td{
+        .table-header td {
             vertical-align: top;
         }
 
-        .table-bordered{
+        .table-bordered {
             border-collapse: collapse;
         }
 
@@ -29,7 +29,8 @@
     <table width="100%" class="table-header">
         <thead>
             <tr>
-                <th colspan="2" style="text-align: center; padding-bottom: 20px;"><b>Bukti {{ ucwords($data_jurnal_header->jenis_name) }}</b></th>
+                <th colspan="2" style="text-align: center; padding-bottom: 20px;"><b>Bukti
+                        {{ ucwords($data_jurnal_header->jenis_name) }}</b></th>
             </tr>
         </thead>
         <tbody>
@@ -44,7 +45,8 @@
                         <tr>
                             <td width="35%">Tanggal</td>
                             <td width="2%">:</td>
-                            <td width="63%"><b>{{ date('d-m-Y', strtotime($data_jurnal_header->tanggal_jurnal)) }}</b>
+                            <td width="63%">
+                                <b>{{ date('d-m-Y', strtotime($data_jurnal_header->tanggal_jurnal)) }}</b>
                             </td>
                         </tr>
                         <tr>
@@ -76,8 +78,9 @@
             <tr>
                 <th width="30%">Akun</th>
                 <th width="40%">Keterangan</th>
-                <th width="30%">Debet</th>
-                <th width="30%">Kredit</th>
+                {{-- <th width="30%">Debet</th> --}}
+                {{-- <th width="30%">Kredit</th> --}}
+                <th width="30%">Jumlah</th>
             </tr>
         </thead>
         <tbody>
@@ -97,18 +100,24 @@
                     <td>
                         {{ $detail->keterangan }}
                     </td>
-                    <td style="text-align: right">
-                       {{ number_format($detail->debet,2) }}
-                    </td>
-                    <td style="text-align: right">
-                       {{ number_format($detail->credit,2) }}
-                    </td>
+                    @if (in_array($data_jurnal_header->jenis_jurnal, ['KK', 'BK', 'PG']))
+                        <td style="text-align: right">
+                            {{ number_format($detail->debet, 2) }}
+                        </td>
+                    @elseif(in_array($data_jurnal_header->jenis_jurnal, ['KM', 'BM', 'HG']))
+                        <td style="text-align: right">
+                            {{ number_format($detail->credit, 2) }}
+                        </td>
+                    @endif
                 </tr>
             @endforeach
             <tr>
                 <td colspan="2" style="text-align: center;">Total</td>
-                <td style="text-align: right">{{ number_format($totalDebet,2) }}</td>
-                <td style="text-align: right">{{ number_format($totalCredit,2) }}</td>
+                @if (in_array($data_jurnal_header->jenis_jurnal, ['KK', 'BK', 'PG']))
+                    <td style="text-align: right">{{ number_format($totalDebet, 2) }}</td>
+                @elseif(in_array($data_jurnal_header->jenis_jurnal, ['KM', 'BM', 'HG']))
+                    <td style="text-align: right">{{ number_format($totalCredit, 2) }}</td>
+                @endif
             </tr>
         </tbody>
     </table>
