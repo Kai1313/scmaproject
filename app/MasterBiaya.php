@@ -10,6 +10,9 @@ class MasterBiaya extends Model
     protected $primaryKey = 'id_biaya';
     public $timestamps = false;
 
+    const CREATED_AT = 'dt_created';
+    const UPDATED_AT = 'dt_modified';
+
     protected $fillable = [
         'id_cabang', 'nama_biaya', 'id_akun_biaya', 'isppn', 'ispph', 'id_akun_pph', 'value_pph', 'aktif', 'user_created', 'dt_created', 'user_modified', 'dt_modified',
     ];

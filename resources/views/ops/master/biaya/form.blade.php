@@ -133,6 +133,7 @@
 
 @section('externalScripts')
     <script>
+        // $('.handle-number-2').trigger('input')
         $('[name="ispph"]').change(function() {
             if ($(this).is(':checked')) {
                 $('.show-pph').prop('disabled', false)
@@ -162,6 +163,13 @@
                     e.stopPropagation();
                 })
             })
+        })
+
+        $(document).on('input', '.handle-number-2', function() {
+            let str = $(this).val()
+            str = str.replace(/^\,/, '')
+            str = str.match(/(^[0-9]*(\,?)+([0-9]{1,4})?)/)
+            $(this).val(str[0])
         })
     </script>
 @endsection

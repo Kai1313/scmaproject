@@ -166,14 +166,17 @@
             }, {
                 data: 'rate',
                 name: 'rate',
+                render: $.fn.dataTable.render.number('.', ',', 2),
                 className: 'text-right'
             }, {
                 data: 'nominal',
                 name: 'nominal',
+                render: $.fn.dataTable.render.number('.', ',', 2),
                 className: 'text-right'
             }, {
                 data: 'total',
                 name: 'total',
+                render: $.fn.dataTable.render.number('.', ',', 2),
                 className: 'text-right'
             }, {
                 data: 'catatan',

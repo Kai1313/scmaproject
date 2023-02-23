@@ -98,14 +98,19 @@ class MasterBiayaController extends Controller
             DB::beginTransaction();
             if (!$data) {
                 $data = new MasterBiaya;
-                $data['dt_created'] = date('Y-m-d H:i:s');
+                $data->user_created = session()->get('user')['id_pengguna'];
             } else {
-                $data['dt_modified'] = date('Y-m-d H:i:s');
+                $data->user_modified = session()->get('user')['id_pengguna'];
             }
 
             $data->fill($request->all());
             $data['isppn'] = isset($request->isppn) ? $request->isppn : 0;
             $data['ispph'] = isset($request->ispph) ? $request->ispph : 0;
+            if ($data['ispph'] == 0) {
+                $data['value_pph'] = null;
+                $data['id_akun_pph'] = null;
+            }
+
             $data['aktif'] = isset($request->aktif) ? $request->aktif : 0;
             $data->save();
 

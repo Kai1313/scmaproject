@@ -170,5 +170,12 @@
                 })
             })
         })
+
+        $(document).on('input', '.handle-number-4', function() {
+            let str = $(this).val()
+            str = str.replace(/^\,/, '')
+            str = str.match(/(^[0-9]*(\,?)+([0-9]{1,4})?)/)
+            $(this).val(str[0])
+        })
     </script>
 @endsection

@@ -138,7 +138,7 @@
                 name: 'nama_biaya'
             }, {
                 data: 'akun_biaya',
-                name: 'akun_biaya'
+                name: 'ma.nama_akun'
             }, {
                 data: 'isppn',
                 name: 'isppn',
@@ -150,10 +150,11 @@
             }, {
                 data: 'value_pph',
                 name: 'value_pph',
+                render: $.fn.dataTable.render.number('.', ',', 2),
                 className: 'text-right'
             }, {
                 data: 'akun_pph',
-                name: 'akun_pph'
+                name: 'man.nama_akun'
             }, {
                 data: 'aktif',
                 name: 'aktif',

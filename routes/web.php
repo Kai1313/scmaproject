@@ -41,11 +41,6 @@ Route::prefix('master-ops/wrapper')->group(function () {
     Route::post('delete/{id}', 'MasterWrapperController@destroy')->name('master-wrapper-delete');
 });
 
-Route::get('tes', function () {
-    $data = App\Barang::find(10);
-    return $data->satuans;
-});
-
 Route::prefix('permintaan-pembelian')->group(function () {
     Route::get('/', 'PurchaseRequestController@index')->name('purchase-request');
     Route::get('entry/{id?}', 'PurchaseRequestController@entry')->name('purchase-request-entry');
