@@ -74,7 +74,7 @@ class GeneralLedgerController extends Controller
     {
         try {
             Log::info("Store Jurnal Data");
-            // dd($request->all());
+            // Log::debug($request->all());
             // exit();
 
             // cek detail
@@ -135,8 +135,8 @@ class GeneralLedgerController extends Controller
                 $detail->index = ($data['guid'] == 'gen')?count($detailData)+1:$data['guid'];
                 $detail->id_akun = $data['akun'];
                 $detail->keterangan = $data['notes'];
-                $detail->debet = $data['debet'];
-                $detail->credit = $data['kredit'];
+                $detail->debet = str_replace(',', '', $data['debet']);
+                $detail->credit = str_replace(',', '', $data['kredit']);
                 $detail->user_created = $userRecord;
                 $detail->user_modified = $userModified;
                 $detail->dt_created = $dateRecord;
@@ -374,8 +374,8 @@ class GeneralLedgerController extends Controller
                 $detail->index = ($data['guid'] == 'gen')?count($detailData)+1:$data['guid'];
                 $detail->id_akun = $data['akun'];
                 $detail->keterangan = $data['notes'];
-                $detail->debet = $data['debet'];
-                $detail->credit = $data['kredit'];
+                $detail->debet = str_replace(',', '', $data['debet']);
+                $detail->credit = str_replace(',', '', $data['kredit']);
                 $detail->user_modified = $userModified;
                 $detail->dt_modified = $dateModified;
                 if (!$detail->save()) {
