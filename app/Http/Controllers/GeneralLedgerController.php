@@ -463,7 +463,10 @@ class GeneralLedgerController extends Controller
             foreach ($sort as $key => $s) {
                 $column = $s['column'];
                 $directon = $s['dir'];
-                $data_general_ledger_table->orderBy($column, $directon);
+
+                if($column != ''){
+                    $data_general_ledger_table->orderBy($column, $directon);
+                }
             }
         } else {
             $data_general_ledger_table->orderBy('id_jurnal', 'ASC');

@@ -4,12 +4,9 @@
     <link rel="stylesheet" href="{{ asset('assets/bower_components/select2/dist/css/select2.min.css') }}">
     <!-- DataTables -->
     <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables-responsive/css/responsive.dataTables.css') }}">
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        table {
-            width: 100% !important;
-        }
-
         .dataTables_scrollHeadInner {
             width: 100% !important;
         }
@@ -29,11 +26,11 @@
             margin-bottom: .25rem !important;
         }
 
-        .mr-1{
+        .mr-1 {
             margin-right: 1rem !important;
         }
 
-        .rounded-0{
+        .rounded-0 {
             border-radius: 0;
         }
     </style>
@@ -101,17 +98,19 @@
                         </div>
                     @endif
                     <div class="box-body">
-                        <table id="table_general_ledger" class="table table-bordered table-striped" style="width:100%">
+                        <table id="table_general_ledger"
+                            class="table table-bordered table-striped display responsive nowrap" width="100%">
                             <thead width="100%">
                                 <tr>
-                                    <th class="text-center" width="10%">Kode Jurnal</th>
-                                    <th class="text-center" width="15%">Tanggal Jurnal</th>
+                                    <th class="text-center" width="2%"></th>
+                                    <th class="text-center" width="10%" data-priority="1">Kode Jurnal</th>
+                                    <th class="text-center" width="13%" data-priority="2">Tanggal Jurnal</th>
                                     <th class="text-center" width="10%">Jenis Jurnal</th>
                                     <th class="text-center" width="10%">Kode Slip</th>
                                     <th class="text-center" width="10%">ID Transaksi</th>
                                     <th class="text-center" width="20%">Catatan</th>
-                                    <th class="text-center" width="20%">Total</th>
-                                    <th class="text-center" width="15%">Action</th>
+                                    <th class="text-center" width="10%">Total</th>
+                                    <th class="text-center" width="10%">Action</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -129,6 +128,7 @@
     <!-- DataTables -->
     <script src="{{ asset('assets/bower_components/datatables.net/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js') }}"></script>
+    <script src="{{ asset('assets/bower_components/datatables-responsive/js/dataTables.responsive.js') }}"></script>
     <!-- SlimScroll -->
     <script src="{{ asset('assets/bower_components/jquery-slimscroll/jquery.slimscroll.min.js') }}"></script>
     <!-- FastClick -->
@@ -145,10 +145,10 @@
                 populate_table(0)
             })
 
-            $('#void').change(function(){
-                if($(this).is(':checked')){
+            $('#void').change(function() {
+                if ($(this).is(':checked')) {
                     populate_table(1)
-                }else{
+                } else {
                     populate_table(0)
                 }
             })
@@ -163,6 +163,11 @@
                 serverSide: true,
                 "scrollX": true,
                 "bDestroy": true,
+                responsive: true,
+                "columnDefs": [{
+                    className: 'dtr-control',
+                    targets: 0
+                }],
                 ajax: {
                     'url': get_data_url,
                     'type': 'GET',
@@ -172,14 +177,29 @@
                     }
                 },
                 columns: [{
+                        orderable: false,
+                        searchable: false,
+                        data: null,
+                        name: null,
+                        targets: 0,
+                        render: function(data, type) {
+                            if (!data.LatestStatusRecord) {
+                                return '';
+                            }
+                            return data.LatestStatusRecord.Status;
+                        }
+                    },
+                    {
                         data: 'kode_jurnal',
                         name: 'kode_jurnal',
-                        width: '10%'
+                        width: '10%',
+                        responsivePriority: 1
                     },
                     {
                         data: 'tanggal_jurnal',
                         name: 'tanggal_jurnal',
-                        width: '15%'
+                        width: '15%',
+                        responsivePriority: 2
                     },
                     {
                         data: 'jenis_name',
@@ -204,13 +224,11 @@
                     {
                         data: 'jumlah',
                         name: 'jumlah',
-                        className: 'text-right',
-                        width: '20%'
+                        width: '10%'
                     },
                     {
                         data: 'id_jurnal',
-                        width: '15%',
-                        'sClass': 'text-center',
+                        width: '10%',
                         render: function(data, type, row) {
                             return getActions(data, row);
                         },
@@ -233,15 +251,22 @@
         window.getActions = function(data, row) {
             let base_url = "{{ url('') }}"
             var action_btn = '<ul id="horizontal-list">';
-                action_btn += '<li><a href="' + base_url + '/transaction/general_ledger/show/' + data + '" class="btn btn-xs mr-1 mb-1 btn-default"><span class="glyphicon glyphicon-search" aria-hidden="true"></span> Detail</a></li>';
-                action_btn += '<li><a href="' + base_url + '/transaction/general_ledger/form/edit/' + data + '" class="btn btn-xs mr-1 mb-1 btn-warning"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Ubah</a></li>';
-                if(row['void'] == 0)
-                    action_btn += '<li><button type="button" id="void-btn" data-ids="' +  data + '" onclick="void_jurnal(' + data + ')" class="btn btn-xs mr-1 mb-1 btn-danger delete-btn"><span class="glyphicon glyphicon-remove-sign" aria-hidden="true"></span> Void</button></li>';
-                else{
-                    action_btn += '<li><button type="button" id="void-btn" data-ids="' +  data + '" onclick="active_jurnal(' + data + ')" class="btn btn-xs mr-1 mb-1 btn-success delete-btn"><span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span> Active</button></li>';
-                }
-                action_btn += '<li><a href="' + base_url + '/transaction/general_ledger/print/' + data + '" class="btn btn-xs mr-1 mb-1 btn-default"><span class="glyphicon glyphicon-print" aria-hidden="true"></span> Print</a></li>';
-                action_btn += '</ul>'
+            action_btn += '<li><a href="' + base_url + '/transaction/general_ledger/show/' + data +
+                '" class="btn btn-xs mr-1 mb-1 btn-default"><span class="glyphicon glyphicon-search" aria-hidden="true"></span> Detail</a></li>';
+            action_btn += '<li><a href="' + base_url + '/transaction/general_ledger/form/edit/' + data +
+                '" class="btn btn-xs mr-1 mb-1 btn-warning"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Ubah</a></li>';
+            if (row['void'] == 0)
+                action_btn += '<li><button type="button" id="void-btn" data-ids="' + data + '" onclick="void_jurnal(' +
+                data +
+                ')" class="btn btn-xs mr-1 mb-1 btn-danger delete-btn"><span class="glyphicon glyphicon-remove-sign" aria-hidden="true"></span> Void</button></li>';
+            else {
+                action_btn += '<li><button type="button" id="void-btn" data-ids="' + data +
+                    '" onclick="active_jurnal(' + data +
+                    ')" class="btn btn-xs mr-1 mb-1 btn-success delete-btn"><span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span> Active</button></li>';
+            }
+            action_btn += '<li><a href="' + base_url + '/transaction/general_ledger/print/' + data +
+                '" class="btn btn-xs mr-1 mb-1 btn-default"><span class="glyphicon glyphicon-print" aria-hidden="true"></span> Print</a></li>';
+            action_btn += '</ul>'
             return action_btn;
         }
 
@@ -267,7 +292,8 @@
                         url: url,
                         success: function(data) {
                             if (data.result) {
-                                Swal.fire('Data Jurnal void!', data.message, 'success').then((result) => {
+                                Swal.fire('Data Jurnal void!', data.message, 'success').then((
+                                    result) => {
                                     if (result.isConfirmed) {
                                         populate_table(0)
                                     }
@@ -309,7 +335,8 @@
                         url: url,
                         success: function(data) {
                             if (data.result) {
-                                Swal.fire('Data Jurnal active!', data.message, 'success').then((result) => {
+                                Swal.fire('Data Jurnal active!', data.message, 'success').then((
+                                    result) => {
                                     if (result.isConfirmed) {
                                         populate_table(1)
                                     }
