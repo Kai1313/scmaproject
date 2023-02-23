@@ -11,6 +11,10 @@
             width: 100% !important;
         }
 
+        .table{
+            width: 100% !important;
+        }
+
         ul#horizontal-list {
             min-width: 200px;
             list-style: none;
