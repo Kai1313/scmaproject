@@ -423,6 +423,7 @@ class GeneralLedgerController extends Controller
     public function populate(Request $request)
     {
         $cabang = $request->cabang;
+        $void = $request->void;
         $offset = $request->start;
         $limit = $request->length;
         $keyword = $request->search['value'];
@@ -455,6 +456,7 @@ class GeneralLedgerController extends Controller
 
         $data_general_ledger_table = DB::table(DB::raw('(' . $data_general_ledger->toSql() . ') as jurnal_header'))
         ->join('jurnal_detail', 'jurnal_detail.id_jurnal', 'jurnal_header.id_jurnal')
+        ->where('jurnal_header.void', $void)
         ->groupBy('jurnal_header.id_jurnal')
         ->select('jurnal_header.*', DB::raw('SUM(jurnal_detail.credit) as jumlah'));
         $data_general_ledger_table = $data_general_ledger_table->where('id_cabang', $cabang);
@@ -466,6 +468,7 @@ class GeneralLedgerController extends Controller
                 $query->orWhere('kode_jurnal', 'LIKE', "%$keyword%")
                     ->orWhere('tanggal_jurnal', 'LIKE', "%$keyword%")
                     ->orWhere('jenis_name', 'LIKE', "%$keyword%")
+                    ->orWhere('id_transaksi', 'LIKE', "%$keyword%")
                     ->orWhere('catatan', 'LIKE', "%$keyword%")
                     ->orWhere('jumlah', 'LIKE', "%$keyword%")
                     ->orWhere('kode_slip', 'LIKE', "%$keyword%");
