@@ -75,7 +75,7 @@
                         </div>
                         <div class="box-body">
                             <form id="form_ledger" data-toggle="validator" enctype="multipart/form-data">
-                                @csrf
+                                <input type="hidden" name="id_jurnal" id="id_jurnal" value="{{ $jurnal_header->id_jurnal }}">
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
@@ -84,7 +84,7 @@
                                                 style="width: 100%;">
                                                 @foreach ($data_cabang as $cabang)
                                                     <option value="{{ $cabang->id_cabang }}"
-                                                        {{ isset($data_jurnal_umum->id_cabang) ? ($data_jurnal_umum->id_cabang == $cabang->id_cabang ? 'selected' : '') : '' }}>
+                                                        {{ isset($jurnal_header->id_cabang) ? ($jurnal_header->id_cabang == $cabang->id_cabang ? 'selected' : '') : '' }}>
                                                         {{ $cabang->kode_cabang . ' - ' . $cabang->nama_cabang }}</option>
                                                 @endforeach
                                             </select>
@@ -92,9 +92,9 @@
                                         <div class="form-group">
                                             <label>Nomor Jurnal</label>
                                             <input type="text" class="form-control" id="kode" name="kode"
-                                                placeholder="Masukkan nomor jurnal umum" value=""
+                                                placeholder="Masukkan nomor jurnal umum" value="{{ isset($jurnal_header->kode_jurnal)?$jurnal_header->kode_jurnal:'' }}"
                                                 data-validation="[NOTEMPTY]"
-                                                data-validation-message="Nomor Jurnal Umum tidak boleh kosong">
+                                                data-validation-message="Nomor Jurnal Umum tidak boleh kosong" readonly>
                                         </div>
                                         <div class="form-group">
                                             <label>Tanggal Jurnal</label>
@@ -105,17 +105,7 @@
                                         </div>
                                         <div class="form-group">
                                             <label>Jenis Jurnal</label>
-                                            <select name="jenis" id="jenis" class="form-control select2"
-                                                data-validation="[NOTEMPTY]"
-                                                data-validation-message="Jenis Jurnal tidak boleh kosong">
-                                                <option value="">Pilih Jenis Jurnal</option>
-                                                <option value="KK">Kas Keluar</option>
-                                                <option value="KM">Kas Masuk</option>
-                                                <option value="BK">Bank Keluar</option>
-                                                <option value="BM">Bank Masuk</option>
-                                                <option value="PG">Piutang Giro</option>
-                                                <option value="HG">Hutang Giro</option>
-                                            </select>
+                                            <input type="text" name="jenis" id="jenis" value="{{ isset($jurnal_header->jenis_jurnal)?$jurnal_header->jenis_jurnal:'' }}" class="form-control" readonly>
                                         </div>
                                         <div class="form-group">
                                             <label>Slip</label>
@@ -151,7 +141,7 @@
                                         </div>
                                         <div class="form-group">
                                             <label>Notes</label>
-                                            <textarea name="notes" id="notes" class="form-control" rows="4" placeholder="Notes ..."></textarea>
+                                            <textarea name="notes" id="notes" class="form-control" rows="4" placeholder="Notes ...">{{ isset($jurnal_header->catatan)?$jurnal_header->catatan:'' }}</textarea>
                                         </div>
                                         <button id="hidden-btn" style="display:none;" type="submit">HIDDEN</button>
                                     </div>
@@ -284,7 +274,7 @@
 
 @section('externalScripts')
     <script>
-        let save_route = "{{ route('transaction-general-ledger-store') }}"
+        let save_route = "{{ route('transaction-general-ledger-update') }}"
         let data_route = "{{ route('transaction-general-ledger') }}"
         let coa_by_cabang_route = "{{ route('master-coa-get-by-cabang', ':id') }}"
         let slip_by_cabang_route = "{{ route('master-slip-get-by-cabang', ':id') }}"
@@ -349,15 +339,19 @@
                 },
             }
         }
-        var details = []
-        var guid = 1
+        var details = JSON.parse('<?php echo $jurnal_detail ?>')
+        var guid = '<?php echo $jurnal_detail_count ?>'
+        var current_slip = '<?php echo $jurnal_header->id_slip?>'
 
         $(function() {
             $.validate(validateLedger)
             $.validate(validateDetail)
 
+            console.log(details)
+            populate_detail(details)
+
             getCoa()
-            getSlip()
+            getSlip(current_slip)
 
             $('.select2').select2({
                 width: '100%'
@@ -467,6 +461,7 @@
         function save_data() {
             let header = []
             header.push({
+                id_jurnal: $("#id_jurnal").val(),
                 cabang: $("#cabang_input").val(),
                 tanggal: $("#tanggal").val(),
                 jenis: $("#jenis").val(),
@@ -525,7 +520,7 @@
             })
         }
 
-        function getSlip() {
+        function getSlip(current = null) {
             let id_cabang = $("#cabang_input").val()
             let current_slip_route = slip_by_cabang_route.replace(':id', id_cabang);
 
@@ -538,8 +533,9 @@
 
                     option_slip += `<option value="">Pilih Slip</option>`;
                     data_slip.forEach(slip => {
+                        let selected =  (current == slip.id_slip) ? 'selected' : ''
                         option_slip +=
-                            `<option value="${slip.id_slip}" data-nama="${slip.nama_slip}" data-akun="${slip.id_akun}" data-namaakun="${slip.nama_akun}" data-kode="${slip.kode_akun}">${slip.kode_slip} - ${slip.nama_slip}</option>`;
+                            `<option value="${slip.id_slip}" data-nama="${slip.nama_slip}" data-akun="${slip.id_akun}" data-namaakun="${slip.nama_akun}" data-kode="${slip.kode_akun}" ${selected}>${slip.kode_slip} - ${slip.nama_slip}</option>`;
                     });
 
                     $('#slip').append(option_slip);
