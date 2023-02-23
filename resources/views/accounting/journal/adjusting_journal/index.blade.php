@@ -57,7 +57,7 @@
                             </div>
                         </div>
                         <div class="col-md-8">
-                            <a href="{{ route('transaction-general-ledger-create') }}" class="btn btn-sm btn-success btn-flat pull-right"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Tambah Jurnal Umum</a>
+                            <a href="{{ route('transaction-adjustment-ledger-create') }}" class="btn btn-sm btn-success btn-flat pull-right"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Tambah Jurnal Penyesuaian</a>
                         </div>
                     </div>
                 </div>

@@ -94,3 +94,7 @@ Route::get('/transaction/general_ledger/populate', 'GeneralLedgerController@popu
 Route::get('/transaction/general_ledger/print/{id?}', 'GeneralLedgerController@printSlip')->name('transaction-general-ledger-print');
 Route::get('/transaction/general_ledger/void/{id?}', 'GeneralLedgerController@void')->name('transaction-general-ledger-void');
 Route::get('/transaction/general_ledger/active/{id?}', 'GeneralLedgerController@active')->name('transaction-general-ledger-active');
+
+// Jurnal Penyesuaian
+Route::get('/transaction/adjustment_ledger', 'AdjustmentLedgerController@index')->name('transaction-adjustment-ledger');
+Route::get('/transaction/adjustment_ledger/form/create', 'AdjustmentLedgerController@create')->name('transaction-adjustment-ledger-create');

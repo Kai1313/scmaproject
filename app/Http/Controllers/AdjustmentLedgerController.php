@@ -2,7 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Accounting\GeneralLedger;
+use App\Models\Accounting\JurnalDetail;
+use App\Models\Accounting\JurnalHeader;
+use App\Models\Master\Akun;
+use App\Models\Master\Cabang;
+use App\Models\Master\Slip;
 use Illuminate\Http\Request;
+use DB;
+use Log;
+use PDF;
 
 class AdjustmentLedgerController extends Controller
 {
@@ -11,9 +20,23 @@ class AdjustmentLedgerController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $cabang = Cabang::find(1);
+        $data_cabang = Cabang::all();
+
+        $data = [
+            "pageTitle" => "SCA Accounting | Transaksi Jurnal Penyesuaian | List",
+            "cabang" => $cabang,
+            "data_cabang" => $data_cabang
+        ];
+
+        if ($request->session()->has('token')) {
+            return view('accounting.journal.adjusting_journal.index', $data);
+        } 
+        else {
+            return view('exceptions.forbidden');
+        }
     }
 
     /**
@@ -21,9 +44,23 @@ class AdjustmentLedgerController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+        $data_cabang = Cabang::where("status_cabang", 1)->get();
+
+        $data = [
+            "pageTitle" => "SCA Accounting | Transaksi Jurnal Penyesuaian | Create",
+            "data_cabang" => $data_cabang,
+        ];
+
+        Log::debug(json_encode($request->session()->get('user')));
+
+        if ($request->session()->has('token')) {
+            return view('accounting.journal.adjusting_journal.form', $data);
+        } 
+        else {
+            return view('exceptions.forbidden');
+        }
     }
 
     /**

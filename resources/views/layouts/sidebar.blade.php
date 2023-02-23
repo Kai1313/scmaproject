@@ -49,15 +49,15 @@
                 </ul>
             </li>
             @endif
-            <li class="treeview ">
+            <li class="treeview {{ request()->segment(1) == 'transaction' ? 'active' : null }}">
                 <a href="#"><i class="fa fa-link"></i> <span>Transaction</span>
                     <span class="pull-right-container">
                         <i class="fa fa-angle-left pull-right"></i>
                     </span>
                 </a>
                 <ul class="treeview-menu">
-                    <li class="{{ request()->segment(2) == 'slip' ? 'active' : null }}"><a href="{{ route('transaction-general-ledger') }}">Jurnal Umum</a></li>
-                    <li><a href="#">Link in level 2</a></li>
+                    <li class="{{ request()->segment(2) == 'general_ledger' ? 'active' : null }}"><a href="{{ route('transaction-general-ledger') }}">Jurnal Umum</a></li>
+                    <li class="{{ request()->segment(2) == 'adjustment_ledger' ? 'active' : null }}"><a href="{{ route('transaction-adjustment-ledger') }}">Jurnal Penyesuaian</a></li>
                 </ul>
             </li>
             <li class="treeview ">
