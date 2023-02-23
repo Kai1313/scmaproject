@@ -28,6 +28,14 @@
         .mb-1 {
             margin-bottom: .25rem !important;
         }
+
+        .mr-1{
+            margin-right: 1rem !important;
+        }
+
+        .rounded-0{
+            border-radius: 0;
+        }
     </style>
 @endsection
 @section('header')
@@ -64,8 +72,14 @@
                                 </div>
                             </div>
                             <div class="col-md-8">
+                                <span class="badge badge-default rounded-0 pull-right">
+                                    <input class="form-check-input" type="checkbox" id="void">
+                                    <label class="form-check-label" for="void">
+                                        Void
+                                    </label>
+                                </span>
                                 <a href="{{ route('transaction-general-ledger-create') }}"
-                                    class="btn btn-sm btn-success btn-flat pull-right"><span
+                                    class="btn btn-sm btn-success btn-flat pull-right mr-1"><span
                                         class="glyphicon glyphicon-plus" aria-hidden="true"></span> Tambah Jurnal Umum</a>
                             </div>
                         </div>
@@ -94,6 +108,7 @@
                                     <th class="text-center" width="15%">Tanggal Jurnal</th>
                                     <th class="text-center" width="10%">Jenis Jurnal</th>
                                     <th class="text-center" width="10%">Kode Slip</th>
+                                    <th class="text-center" width="10%">ID Transaksi</th>
                                     <th class="text-center" width="20%">Catatan</th>
                                     <th class="text-center" width="20%">Total</th>
                                     <th class="text-center" width="15%">Action</th>
@@ -129,11 +144,20 @@
             $("#cabang_table").on("change", function() {
                 populate_table(0)
             })
+
+            $('#void').change(function(){
+                if($(this).is(':checked')){
+                    populate_table(1)
+                }else{
+                    populate_table(0)
+                }
+            })
         })
 
         function populate_table(status) {
+            $('#table_general_ledger').DataTable().destroy();
             let get_data_url = "{{ route('transaction-general-ledger-populate') }}"
-            get_data_url += '?cabang=' + $("#cabang_table").val() + '?void=' + status
+            get_data_url += '?cabang=' + $("#cabang_table").val() + '&void=' + status
             $('#table_general_ledger').DataTable({
                 processing: true,
                 serverSide: true,
@@ -168,6 +192,11 @@
                         width: '10%'
                     },
                     {
+                        data: 'id_transaksi',
+                        name: 'id_transaksi',
+                        width: '10%'
+                    },
+                    {
                         data: 'catatan',
                         name: 'catatan',
                         width: '20%'
@@ -182,7 +211,7 @@
                         data: 'id_jurnal',
                         width: '15%',
                         'sClass': 'text-center',
-                        render: function(data, row) {
+                        render: function(data, type, row) {
                             return getActions(data, row);
                         },
                         orderable: false
@@ -203,16 +232,101 @@
 
         window.getActions = function(data, row) {
             let base_url = "{{ url('') }}"
-            var action_btn = '<ul id="horizontal-list"><li><a href="' + base_url + '/transaction/general_ledger/show/' +
-                data +
-                '" class="btn btn-xs mr-1 mb-1 btn-default"><span class="glyphicon glyphicon-search" aria-hidden="true"></span> Detail</a></li><li><a href="' +
-                base_url + '/transaction/general_ledger/form/edit/' + data +
-                '" class="btn btn-xs mr-1 mb-1 btn-warning"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Ubah</a></li><li><button type="button" id="void-btn" data-ids="' +
-                data + '" onclick="void_jurnal(' + data +
-                ')" class="btn btn-xs mr-1 mb-1 btn-danger delete-btn"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Void</button</li></ul><a href="' +
-                base_url + '/transaction/general_ledger/print/' + data +
-                '" class="btn btn-xs mr-1 mb-1 btn-default"><span class="glyphicon glyphicon-print" aria-hidden="true"></span> Print</a>';
+            var action_btn = '<ul id="horizontal-list">';
+                action_btn += '<li><a href="' + base_url + '/transaction/general_ledger/show/' + data + '" class="btn btn-xs mr-1 mb-1 btn-default"><span class="glyphicon glyphicon-search" aria-hidden="true"></span> Detail</a></li>';
+                action_btn += '<li><a href="' + base_url + '/transaction/general_ledger/form/edit/' + data + '" class="btn btn-xs mr-1 mb-1 btn-warning"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Ubah</a></li>';
+                if(row['void'] == 0)
+                    action_btn += '<li><button type="button" id="void-btn" data-ids="' +  data + '" onclick="void_jurnal(' + data + ')" class="btn btn-xs mr-1 mb-1 btn-danger delete-btn"><span class="glyphicon glyphicon-remove-sign" aria-hidden="true"></span> Void</button></li>';
+                else{
+                    action_btn += '<li><button type="button" id="void-btn" data-ids="' +  data + '" onclick="active_jurnal(' + data + ')" class="btn btn-xs mr-1 mb-1 btn-success delete-btn"><span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span> Active</button></li>';
+                }
+                action_btn += '<li><a href="' + base_url + '/transaction/general_ledger/print/' + data + '" class="btn btn-xs mr-1 mb-1 btn-default"><span class="glyphicon glyphicon-print" aria-hidden="true"></span> Print</a></li>';
+                action_btn += '</ul>'
             return action_btn;
+        }
+
+        function void_jurnal(id) {
+            let url = "{{ route('transaction-general-ledger-void', ':id') }}"
+            url = url.replace(':id', id)
+            Swal.fire({
+                title: 'Anda yakin ingin void data ini?',
+                icon: 'info',
+                showDenyButton: true,
+                confirmButtonText: 'Yes',
+                denyButtonText: 'No',
+                reverseButtons: true,
+                customClass: {
+                    actions: 'my-actions',
+                    confirmButton: 'order-1',
+                    denyButton: 'order-3',
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: "GET",
+                        url: url,
+                        success: function(data) {
+                            if (data.result) {
+                                Swal.fire('Data Jurnal void!', data.message, 'success').then((result) => {
+                                    if (result.isConfirmed) {
+                                        populate_table(0)
+                                    }
+                                })
+                            } else {
+                                Swal.fire("Gagal void data. ", data.message, 'error')
+                            }
+
+                        },
+                        error: function(data) {
+                            Swal.fire("Gagal void data. ", data.message, 'error')
+                        }
+                    });
+                } else if (result.isDenied) {
+                    Swal.fire('Batal void data', '', 'info')
+                }
+            })
+        }
+
+        function active_jurnal(id) {
+            let url = "{{ route('transaction-general-ledger-active', ':id') }}"
+            url = url.replace(':id', id)
+            Swal.fire({
+                title: 'Anda yakin ingin mengaktifkan data ini?',
+                icon: 'info',
+                showDenyButton: true,
+                confirmButtonText: 'Yes',
+                denyButtonText: 'No',
+                reverseButtons: true,
+                customClass: {
+                    actions: 'my-actions',
+                    confirmButton: 'order-1',
+                    denyButton: 'order-3',
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: "GET",
+                        url: url,
+                        success: function(data) {
+                            if (data.result) {
+                                Swal.fire('Data Jurnal active!', data.message, 'success').then((result) => {
+                                    if (result.isConfirmed) {
+                                        populate_table(1)
+                                    }
+                                })
+                            } else {
+                                Swal.fire("Gagal mengaktifkan data. ", data.message, 'error')
+                            }
+
+                        },
+                        error: function(data) {
+                            Swal.fire("Gagal mengaktifkan data. ", data.message, 'error')
+                        }
+                    });
+                } else if (result.isDenied) {
+                    Swal.fire('Batal mengaktifkan data', '', 'info')
+                }
+            })
         }
     </script>
 @endsection
