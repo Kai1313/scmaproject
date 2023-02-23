@@ -89,13 +89,13 @@
                                                 @endforeach
                                             </select>
                                         </div>
-                                        <div class="form-group">
+                                        {{-- <div class="form-group">
                                             <label>Nomor Jurnal</label>
                                             <input type="text" class="form-control" id="kode" name="kode"
                                                 placeholder="Masukkan nomor jurnal umum" value=""
                                                 data-validation="[NOTEMPTY]"
                                                 data-validation-message="Nomor Jurnal Umum tidak boleh kosong">
-                                        </div>
+                                        </div> --}}
                                         <div class="form-group">
                                             <label>Tanggal Jurnal</label>
                                             <input type="date" class="form-control" id="tanggal" name="tanggal"
