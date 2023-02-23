@@ -81,4 +81,36 @@ class AdjustmentLedgerController extends Controller
     {
         //
     }
+
+    public function generateJournalCode($cabang)
+    {
+        try {
+            $ex = 0;
+            do {
+                // Init data
+                $kodeCabang = Cabang::find($cabang);
+                $prefix = $kodeCabang->kode_cabang.".".date("ym");
+
+                // Check exist
+                $check = JurnalHeader::where("kode_jurnal", "LIKE", "$prefix%")->orderBy("kode_jurnal", "DESC")->get();
+                if (count($check) > 0) {
+                    $max = count($check);
+                    $max += 1;
+                    $code = $prefix.".".sprintf("%04s", $max);
+                }
+                else {
+                    $code = $prefix.".0001";
+                }
+                $ex++;
+                if ($ex >= 5) {
+                    $code = "error";
+                    break;
+                }
+            } while (JurnalHeader::where("kode_jurnal", $code)->first());
+            return $code;
+        } 
+        catch (\Exception $e) {
+            Log::error("Error when generate journal code");
+        }
+    }
 }
