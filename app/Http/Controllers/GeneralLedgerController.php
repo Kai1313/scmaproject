@@ -455,6 +455,7 @@ class GeneralLedgerController extends Controller
         $data_general_ledger_table = DB::table(DB::raw('(' . $data_general_ledger->toSql() . ') as jurnal_header'))
             ->join('jurnal_detail', 'jurnal_detail.id_jurnal', 'jurnal_header.id_jurnal')
             ->where('jurnal_header.void', $void)
+            ->where('jurnal_header.jenis_jurnal', '<>', 'ME')
             ->groupBy('jurnal_header.id_jurnal')
             ->select('jurnal_header.*', DB::raw('SUM(jurnal_detail.credit) as jumlah'));
         $data_general_ledger_table = $data_general_ledger_table->where('id_cabang', $cabang);
