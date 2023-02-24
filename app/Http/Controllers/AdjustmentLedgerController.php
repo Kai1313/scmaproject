@@ -312,7 +312,7 @@ class AdjustmentLedgerController extends Controller
             // Init data
             $journalDate = date('Y-m-d', strtotime($request->header[0]["tanggal"]));
             $journalID = $request->header[0]["id_jurnal"];
-            $journalType = $request->header[0]["jenis"];
+            $journalType = "ME";
             $cabangID = $request->header[0]["cabang"];
             $noteHeader = $request->header[0]["notes"];
             $userData = $request->session()->get('user');

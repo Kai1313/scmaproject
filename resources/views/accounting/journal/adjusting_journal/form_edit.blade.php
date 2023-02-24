@@ -95,10 +95,10 @@
                                         <label>Tanggal Jurnal</label>
                                         <input type="date" class="form-control" id="tanggal" name="tanggal" placeholder="Masukkan tanggal jurnal umum" value="{{ isset($jurnal_header->tanggal_jurnal)?$jurnal_header->tanggal_jurnal:'' }}" data-validation="[NOTEMPTY]" data-validation-message="Tanggal Jurnal tidak boleh kosong">
                                     </div>
-                                    <div class="form-group">
+                                    {{-- <div class="form-group">
                                         <label>Jenis Jurnal</label>
                                         <input type="text" name="jenis" id="jenis" value="{{ isset($jurnal_header->jenis_jurnal)?$jurnal_header->jenis_jurnal:'' }}" class="form-control" readonly>
-                                    </div>
+                                    </div> --}}
                                     {{-- <div class="form-group">
                                         <label>Slip</label>
                                         <select name="slip" id="slip" class="form-control select2" data-validation="[NOTEMPTY]" data-validation-message="Slip tidak boleh kosong">
@@ -522,12 +522,20 @@
                     name: 'notes'
                 },
                 {
+                    className: 'text-right',
                     data: 'debet',
-                    name: 'debet'
+                    name: 'debet',
+                    render: function(data, type, row) {
+                        return formatCurr(data)
+                    }
                 },
                 {
+                    className: 'text-right',
                     data: 'kredit',
-                    name: 'kredit'
+                    name: 'kredit',
+                    render: function(data, type, row) {
+                        return formatCurr(data)
+                    }
                 },
                 {
                     data: 'guid',

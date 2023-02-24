@@ -252,7 +252,7 @@
     let save_route = "{{ route('transaction-general-ledger-update') }}"
     let data_route = "{{ route('transaction-general-ledger') }}"
     let coa_by_cabang_route = "{{ route('master-coa-get-by-cabang', ':id') }}"
-    let slip_by_cabang_route = "{{ route('master-slip-get-by-cabang', ':id') }}"
+    let slip_by_cabang_route = "{{ route('master-slip-get-by-cabang', [':id', ':slip']) }}"
     let coa_data_route = "{{ route('master-coa-get-data', ':id') }}"
 
     var validateLedger = {
@@ -515,7 +515,19 @@
 
     function getSlip(current = null) {
         let id_cabang = $("#cabang_input").val()
+        let jenis_jurnal = $("#jenis").val()
+        let slip = '';
+        if(jenis_jurnal == 'KK' || jenis_jurnal == 'KM'){
+            slip = 0;
+        }else if(jenis_jurnal == 'BK' || jenis_jurnal == 'BM'){
+            slip = 1;
+        }else if(jenis_jurnal == 'PG'){
+            slip = 2;
+        }else if(jenis_jurnal == 'HG'){
+            slip = 3;
+        }
         let current_slip_route = slip_by_cabang_route.replace(':id', id_cabang);
+        current_slip_route = current_slip_route.replace(':slip', slip);
 
         $.getJSON(current_slip_route, function(data) {
             if (data.result) {
@@ -599,12 +611,20 @@
                     name: 'notes'
                 },
                 {
+                    className: 'text-right',
                     data: 'debet',
-                    name: 'debet'
+                    name: 'debet',
+                    render: function(data, type, row) {
+                        return formatCurr(data)
+                    }
                 },
                 {
+                    className: 'text-right',
                     data: 'kredit',
-                    name: 'kredit'
+                    name: 'kredit',
+                    render: function(data, type, row) {
+                        return formatCurr(data)
+                    }
                 },
                 {
                     data: 'guid',
