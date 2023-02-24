@@ -72,10 +72,10 @@
                                                     Bank
                                                     @break
                                                 @case(2)
-                                                    Piutang Dagang
+                                                    Piutang Giro
                                                     @break
                                                 @case(3)
-                                                    Hutang Dagang
+                                                    Hutang Giro
                                                     @break
                                                 @default
                                             @endswitch

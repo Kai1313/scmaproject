@@ -288,8 +288,8 @@ class MasterSlipController extends Controller
                     (CASE
                         WHEN jenis_slip = 0 THEN "Kas"
                         WHEN jenis_slip = 1 THEN "Bank"
-                        WHEN jenis_slip = 2 THEN "Piutang Dagang"
-                        WHEN jenis_slip = 3 THEN "Hutang Dagang"
+                        WHEN jenis_slip = 2 THEN "Piutang Giro"
+                        WHEN jenis_slip = 3 THEN "Hutang Giro"
                     END) as jenis_name
                 '));
 
