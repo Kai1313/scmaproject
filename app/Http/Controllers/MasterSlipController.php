@@ -31,7 +31,7 @@ class MasterSlipController extends Controller
             "data_slip" => $data_slip
         ];
 
-        if ($request->session()->has('token') && (in_array('291', $request->session()->get('access')) && in_array('293', $request->session()->get('access')))) {
+        if ($request->session()->has('token') && (in_array('304', $request->session()->get('access')) && in_array('306', $request->session()->get('access')))) {
             return view('accounting.master.slip.index', $data);
         } else {
             return view('exceptions.forbidden');
