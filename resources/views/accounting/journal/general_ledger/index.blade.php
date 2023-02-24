@@ -273,7 +273,7 @@
                     '" onclick="active_jurnal(' + data +
                     ')" class="btn btn-xs mr-1 mb-1 btn-success delete-btn"><span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span> Active</button></li>';
             }
-            action_btn += '<li><a href="' + base_url + '/transaction/general_ledger/print/' + data +
+            action_btn += '<li><a target="_blank" href="' + base_url + '/transaction/general_ledger/print/' + data +
                 '" class="btn btn-xs mr-1 mb-1 btn-default"><span class="glyphicon glyphicon-print" aria-hidden="true"></span> Print</a></li>';
             action_btn += '</ul>'
             return action_btn;
