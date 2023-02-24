@@ -86,6 +86,7 @@ class GeneralLedgerController extends Controller
 
             // Init data
             $journalDate = date('Y-m-d', strtotime($request->header[0]["tanggal"]));
+            $giroNo = ($request->header[0]["nomor_giro"])?$request->header[0]["nomor_giro"]:NULL;
             $giroDate = ($request->header[0]["tanggal_giro"])?date('Y-m-d', strtotime($request->header[0]["tanggal_giro"])):NULL;
             $giroDueDate = ($request->header[0]["tanggal_jt_giro"])?date('Y-m-d', strtotime($request->header[0]["tanggal_jt_giro"])):NULL;
             $slipID = $request->header[0]["slip"];
@@ -106,6 +107,7 @@ class GeneralLedgerController extends Controller
             $header->jenis_jurnal = $journalType;
             $header->id_slip = $slipID;
             $header->catatan = $noteHeader;
+            $header->no_giro = $giroNo;
             $header->tanggal_giro = $giroDate;
             $header->tanggal_giro_jt = $giroDueDate;
             $header->void = 0;
@@ -325,6 +327,7 @@ class GeneralLedgerController extends Controller
 
             // Init data
             $journalDate = date('Y-m-d', strtotime($request->header[0]["tanggal"]));
+            $giroNo = ($request->header[0]["nomor_giro"])?$request->header[0]["nomor_giro"]:NULL;
             $giroDate = ($request->header[0]["tanggal_giro"])?date('Y-m-d', strtotime($request->header[0]["tanggal_giro"])):NULL;
             $giroDueDate = ($request->header[0]["tanggal_jt_giro"])?date('Y-m-d', strtotime($request->header[0]["tanggal_jt_giro"])):NULL;
             $journalID = $request->header[0]["id_jurnal"];
@@ -349,6 +352,7 @@ class GeneralLedgerController extends Controller
             $header->jenis_jurnal = $journalType;
             $header->id_slip = $slipID;
             $header->catatan = $noteHeader;
+            $header->no_giro = $giroNo;
             $header->tanggal_giro = $giroDate;
             $header->tanggal_giro_jt = $giroDueDate;
             $header->user_modified = $userModified;
