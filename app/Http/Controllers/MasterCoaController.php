@@ -28,7 +28,7 @@ class MasterCoaController extends Controller
             "data_cabang" => $data_cabang
         ];
 
-        if ($request->session()->has('token') && (in_array('291', $request->session()->get('access')) && in_array('292', $request->session()->get('access')))) {
+        if ($request->session()->has('token') && (in_array('304', $request->session()->get('access')) && in_array('305', $request->session()->get('access')))) {
             return view('accounting.master.coa.index', $data);
         } else {
             return view('exceptions.forbidden');

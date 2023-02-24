@@ -32,7 +32,7 @@
                 </a>
             </li>
             <!-- Optionally, you can add icons to the links -->
-            @if(in_array('291', Session::get('access')))
+            @if(in_array('304', Session::get('access')))
             <li class="treeview {{ request()->segment(1) == 'master' ? 'active' : null }}">
                 <a href="#"><i class="fa fa-link"></i> <span>Master</span>
                     <span class="pull-right-container">
@@ -40,10 +40,10 @@
                     </span>
                 </a>
                 <ul class="treeview-menu">
-                    @if(in_array('292', Session::get('access')))
+                    @if(in_array('305', Session::get('access')))
                     <li class="{{ request()->segment(2) == 'coa' ? 'active' : null }}"><a href="{{ route('master-coa') }}">Master CoA</a></li>
                     @endif
-                    @if(in_array('293', Session::get('access')))
+                    @if(in_array('306', Session::get('access')))
                     <li class="{{ request()->segment(2) == 'slip' ? 'active' : null }}"><a href="{{ route('master-slip') }}">Master Slip</a></li>
                     @endif
                 </ul>
