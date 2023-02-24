@@ -430,18 +430,14 @@ class AdjustmentLedgerController extends Controller
             ->select('jurnal_header.*', DB::raw('SUM(jurnal_detail.credit) as jumlah'));
         $data_general_ledger_table = $data_general_ledger_table->where('id_cabang', $cabang)->where('jenis_jurnal', 'ME');
 
-        Log::debug(json_encode($data_general_ledger_table));
-        Log::debug(json_encode($data_general_ledger_table->get()));
-
         if (!empty($keyword)) {
-            $data_general_ledger->where(function ($query) use ($keyword) {
+            $data_general_ledger_table->where(function ($query) use ($keyword) {
                 $query->orWhere('kode_jurnal', 'LIKE', "%$keyword%")
                     ->orWhere('tanggal_jurnal', 'LIKE', "%$keyword%")
                     ->orWhere('jenis_name', 'LIKE', "%$keyword%")
-                    ->orWhere('id_transaksi', 'LIKE', "%$keyword%")
-                    ->orWhere('catatan', 'LIKE', "%$keyword%")
-                    ->orWhere('jumlah', 'LIKE', "%$keyword%")
-                    ->orWhere('kode_slip', 'LIKE', "%$keyword%");
+                    ->orWhere('jurnal_header.id_transaksi', 'LIKE', "%$keyword%")
+                    ->orWhere('catatan', 'LIKE', "%$keyword%");
+                    // ->orWhere('jumlah', 'LIKE', "%$keyword%")
             });
         }
 
