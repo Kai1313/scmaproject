@@ -216,9 +216,10 @@ class GeneralLedgerController extends Controller
     public function printSlip(Request $request, $id)
     {
         $data_jurnal_header = JurnalHeader::join('master_slip', 'master_slip.id_slip', 'jurnal_header.id_slip')
+            ->join('master_akun', 'master_akun.id_akun', 'master_slip.id_akun')
             ->join('cabang', 'cabang.id_cabang', 'jurnal_header.id_cabang')
             ->where('id_jurnal', $id)
-            ->select('jurnal_header.*', 'cabang.kode_cabang', 'cabang.nama_cabang', 'master_slip.kode_slip', 'master_slip.nama_slip', 'master_slip.id_akun', DB::raw(
+            ->select('jurnal_header.*', 'cabang.kode_cabang', 'cabang.nama_cabang', 'master_slip.kode_slip', 'master_slip.nama_slip', 'master_slip.id_akun', 'master_akun.kode_akun', 'master_akun.nama_akun', DB::raw(
                 '(CASE
                     WHEN jenis_jurnal = "KK" THEN "Kas Keluar"
                     WHEN jenis_jurnal = "KM" THEN "Kas Masuk"

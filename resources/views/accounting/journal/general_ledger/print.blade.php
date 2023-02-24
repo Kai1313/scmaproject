@@ -43,7 +43,7 @@
                             <td width="63%">{{ $data_jurnal_header->kode_jurnal }}</td>
                         </tr>
                         <tr>
-                            <td width="35%">Tanggal</td>
+                            <td width="35%">Tanggal Jurnal</td>
                             <td width="2%">:</td>
                             <td width="63%">
                                 <b>{{ date('d-m-Y', strtotime($data_jurnal_header->tanggal_jurnal)) }}</b>
@@ -54,15 +54,43 @@
                             <td width="2%">:</td>
                             <td width="63%">{{ $data_jurnal_header->nama_cabang }}</td>
                         </tr>
+                        @if ($data_jurnal_header->jenis_jurnal != 'ME')
+                                <tr>
+                                    <td width="35%">Slip</td>
+                                    <td width="2%">:</td>
+                                    <td width="63%">{{ $data_jurnal_header->kode_slip }}</td>
+                                </tr>
+                                <tr>
+                                    <td width="35%">Akun Slip</td>
+                                    <td width="2%">:</td>
+                                    <td width="63%">{{ $data_jurnal_header->kode_akun }} - {{ $data_jurnal_header->nama_akun }}</td>
+                                </tr>
+                        @endif
                     </table>
                 </td>
                 <td width="50%">
                     <table>
-                        @if ($data_jurnal_header->jenis_jurnal != 'ME')
+                        @if($data_jurnal_header->jenis_jurnal == 'PG' || $data_jurnal_header->jenis_jurnal == 'HG')
                             <tr>
-                                <td width="35%">Slip</td>
+                                <td width="35%">Nomor Giro</td>
                                 <td width="2%">:</td>
-                                <td width="63%">{{ $data_jurnal_header->kode_slip }}</td>
+                                <td width="63%">
+                                    {{ $data_jurnal_header->no_giro }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td width="35%">Tanggal Giro</td>
+                                <td width="2%">:</td>
+                                <td width="63%">
+                                    {{ date('d-m-Y', strtotime($data_jurnal_header->tanggal_giro)) }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td width="35%">Tanggal Jatuh Tempo</td>
+                                <td width="2%">:</td>
+                                <td width="63%">
+                                    {{ date('d-m-Y', strtotime($data_jurnal_header->tanggal_giro_jt)) }}
+                                </td>
                             </tr>
                         @endif
                         <tr>
