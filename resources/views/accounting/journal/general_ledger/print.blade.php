@@ -58,11 +58,13 @@
                 </td>
                 <td width="50%">
                     <table>
-                        <tr>
-                            <td width="35%">Slip</td>
-                            <td width="2%">:</td>
-                            <td width="63%">{{ $data_jurnal_header->kode_slip }}</td>
-                        </tr>
+                        @if ($data_jurnal_header->jenis_jurnal != 'ME')
+                            <tr>
+                                <td width="35%">Slip</td>
+                                <td width="2%">:</td>
+                                <td width="63%">{{ $data_jurnal_header->kode_slip }}</td>
+                            </tr>
+                        @endif
                         <tr>
                             <td width="35%">Catatan</td>
                             <td width="2%">:</td>

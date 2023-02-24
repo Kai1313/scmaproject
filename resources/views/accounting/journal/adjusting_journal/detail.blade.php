@@ -67,7 +67,7 @@
                             </div>
                             @if (($data_jurnal_header->no_giro != null && $data_jurnal_header->jenis_jurnal == 'PG') ||
                             ($data_jurnal_header->no_giro != null && $data_jurnal_header->jenis_jurnal == 'HG'))
-                            <div class="row">
+                            {{-- <div class="row">
                                 <div class="col-md-4">
                                     <label>Slip</label>
                                 </div>
@@ -76,7 +76,7 @@
                                         {{ $data_jurnal_header->nama_slip }}
                                     </p>
                                 </div>
-                            </div>
+                            </div> --}}
                             <div class="row">
                                 <div class="col-md-4">
                                     <label>Notes</label>
@@ -90,7 +90,7 @@
                         <div class="col-md-6">
                             @if (($data_jurnal_header->no_giro == null && $data_jurnal_header->jenis_jurnal != 'PG') ||
                             ($data_jurnal_header->no_giro == null && $data_jurnal_header->jenis_jurnal != 'HG'))
-                            <div class="row">
+                            {{-- <div class="row">
                                 <div class="col-md-4">
                                     <label>Slip</label>
                                 </div>
@@ -99,7 +99,7 @@
                                         {{ $data_jurnal_header->nama_slip }}
                                     </p>
                                 </div>
-                            </div>
+                            </div> --}}
                             <div class="row">
                                 <div class="col-md-4">
                                     <label>Notes</label>
