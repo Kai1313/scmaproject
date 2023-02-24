@@ -91,10 +91,10 @@
                                         <label>Tanggal Jurnal</label>
                                         <input type="date" class="form-control" id="tanggal" name="tanggal" placeholder="Masukkan tanggal jurnal umum" value="{{ date('Y-m-d') }}" data-validation="[NOTEMPTY]" data-validation-message="Tanggal Jurnal tidak boleh kosong">
                                     </div>
-                                    <div class="form-group">
+                                    {{-- <div class="form-group">
                                         <label>Jenis Jurnal</label>
                                         <input type="text" name="jenis" id="jenis" class="form-control" value="ME" data-validation="[NOTEMPTY]" data-validation-message="Jenis Jurnal tidak boleh kosong" readonly>
-                                    </div>
+                                    </div> --}}
                                     {{-- <div class="form-group">
                                         <label>Slip</label>
                                         <select name="slip" id="slip" class="form-control select2" data-validation="[NOTEMPTY]" data-validation-message="Slip tidak boleh kosong">
@@ -339,16 +339,6 @@
             })
         })
 
-        // On change jenis jurnal
-        $("#jenis").on("change", function() {
-            let jenis = $(this).val()
-            if (jenis == "PG" || jenis == "HG") {
-                $(".comp-giro").attr("disabled", false)
-            } else {
-                $(".comp-giro").attr("disabled", true).val("")
-            }
-        })
-
         // On change debet or kredit
         $("#debet").on("change", function() {
             $("#kredit").val(0)
@@ -510,14 +500,23 @@
                     name: 'notes'
                 },
                 {
+                    className: 'text-right',
                     data: 'debet',
-                    name: 'debet'
+                    name: 'debet',
+                    render: function(data, type, row) {
+                        return formatCurr(data)
+                    }
                 },
                 {
+                    className: 'text-right',
                     data: 'kredit',
-                    name: 'kredit'
+                    name: 'kredit',
+                    render: function(data, type, row) {
+                        return formatCurr(data)
+                    }
                 },
                 {
+                    className: 'text-center',
                     data: 'guid',
                     name: 'guid',
                     orderable: false,

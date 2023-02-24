@@ -84,10 +84,7 @@ class AdjustmentLedgerController extends Controller
 
             // Init data
             $journalDate = date('Y-m-d', strtotime($request->header[0]["tanggal"]));
-            // $giroDate = date('Y-m-d', strtotime($request->header[0]["tanggal_giro"]));
-            // $giroDueDate = date('Y-m-d', strtotime($request->header[0]["tanggal_jt_giro"]));
-            // $slipID = $request->header[0]["slip"];
-            $journalType = $request->header[0]["jenis"];
+            $journalType = "ME";
             $cabangID = $request->header[0]["cabang"];
             $noteHeader = $request->header[0]["notes"];
             $userData = $request->session()->get('user');
@@ -102,10 +99,7 @@ class AdjustmentLedgerController extends Controller
             $header = new JurnalHeader();
             $header->id_cabang = $cabangID;
             $header->jenis_jurnal = $journalType;
-            // $header->id_slip = $slipID;
             $header->catatan = $noteHeader;
-            // $header->tanggal_giro = $giroDate;
-            // $header->tanggal_giro_jt = $giroDueDate;
             $header->void = 0;
             $header->tanggal_jurnal = $journalDate;
             $header->user_created = $userRecord;
@@ -317,10 +311,7 @@ class AdjustmentLedgerController extends Controller
 
             // Init data
             $journalDate = date('Y-m-d', strtotime($request->header[0]["tanggal"]));
-            // $giroDate = date('Y-m-d', strtotime($request->header[0]["tanggal_giro"]));
-            // $giroDueDate = date('Y-m-d', strtotime($request->header[0]["tanggal_jt_giro"]));
             $journalID = $request->header[0]["id_jurnal"];
-            // $slipID = $request->header[0]["slip"];
             $journalType = $request->header[0]["jenis"];
             $cabangID = $request->header[0]["cabang"];
             $noteHeader = $request->header[0]["notes"];
@@ -339,10 +330,7 @@ class AdjustmentLedgerController extends Controller
             $header->id_cabang = $cabangID;
             $header->tanggal_jurnal = $journalDate;
             $header->jenis_jurnal = $journalType;
-            // $header->id_slip = $slipID;
             $header->catatan = $noteHeader;
-            // $header->tanggal_giro = $giroDate;
-            // $header->tanggal_giro_jt = $giroDueDate;
             $header->user_modified = $userModified;
             $header->dt_modified = $dateModified;
             if (!$header->save()) {
@@ -597,14 +585,14 @@ class AdjustmentLedgerController extends Controller
         }
     }
 
-    public function generateJournalCode($cabang)
+    public function generateJournalCode($cabang, $jenis)
     {
         try {
             $ex = 0;
             do {
                 // Init data
                 $kodeCabang = Cabang::find($cabang);
-                $prefix = $kodeCabang->kode_cabang . "." . date("ym");
+                $prefix = $kodeCabang->kode_cabang . "." . $jenis . "." . date("ym");
 
                 // Check exist
                 $check = JurnalHeader::where("kode_jurnal", "LIKE", "$prefix%")->orderBy("kode_jurnal", "DESC")->get();
