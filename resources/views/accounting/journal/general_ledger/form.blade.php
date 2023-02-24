@@ -430,6 +430,7 @@
                         guid: "gen",
                         akun: akun_slip,
                         nama_akun: nama_akun_slip,
+                        kode_akun: kode_akun_slip,
                         notes: jenis + " [" + notes + "]",
                         debet: debet,
                         kredit: kredit
