@@ -403,50 +403,56 @@
             let kode_akun_slip = $("#slip").find(":selected").data("kode")
             let nama_akun_slip = $("#slip").find(":selected").data("namaakun")
             let nama_slip = $("#slip").find(":selected").data("nama")
-            let jenis = $("#jenis").val()
-            let notes = $("#notes").val()
-            let debet = 0
-            let kredit = 0
-            let total_debet = parseFloat(0)
-            let total_kredit = parseFloat(0)
-            details = details.filter(function(item) {
-                return item['guid'] != "gen"
-            })
-            details.forEach(detail => {
-                total_debet = parseFloat(total_debet) + parseFloat(detail.debet)
-                total_kredit = parseFloat(total_kredit) + parseFloat(detail.kredit)
-            })
-            if (jenis == "BM" || jenis == "KM" || jenis == "PG") {
-                if (total_kredit > total_debet) {
-                    debet = parseFloat(total_kredit) - parseFloat(total_debet)
-                    details.push({
-                        guid: "gen",
-                        akun: akun_slip,
-                        nama_akun: nama_akun_slip,
-                        kode_akun: kode_akun_slip,
-                        notes: jenis + " [" + notes + "]",
-                        debet: debet,
-                        kredit: kredit
-                    })
-                    populate_detail(details)
+            let slip = $("#slip").val()
+            if (slip === "") {
+                Swal.fire("Sorry, Can't save data. ", "Slip tidak boleh kosong", 'error')
+            }
+            else {
+                let jenis = $("#jenis").val()
+                let notes = $("#notes").val()
+                let debet = 0
+                let kredit = 0
+                let total_debet = parseFloat(0)
+                let total_kredit = parseFloat(0)
+                details = details.filter(function(item) {
+                    return item['guid'] != "gen"
+                })
+                details.forEach(detail => {
+                    total_debet = parseFloat(total_debet) + parseFloat(detail.debet)
+                    total_kredit = parseFloat(total_kredit) + parseFloat(detail.kredit)
+                })
+                if (jenis == "BM" || jenis == "KM" || jenis == "PG") {
+                    if (total_kredit > total_debet) {
+                        debet = parseFloat(total_kredit) - parseFloat(total_debet)
+                        details.push({
+                            guid: "gen",
+                            akun: akun_slip,
+                            nama_akun: nama_akun_slip,
+                            kode_akun: kode_akun_slip,
+                            notes: jenis + " [" + notes + "]",
+                            debet: debet,
+                            kredit: kredit
+                        })
+                        populate_detail(details)
+                    } else {
+                        Swal.fire("Sorry, Can't save data. ", "Jumlah total kredit harus lebih besar dari total debet", 'error')
+                    }
                 } else {
-                    Swal.fire("Sorry, Can't save data. ", "Jumlah total kredit harus lebih besar dari total debet", 'error')
-                }
-            } else {
-                if (total_debet > total_kredit) {
-                    kredit = parseFloat(total_debet) - parseFloat(total_kredit);
-                    details.push({
-                        guid: "gen",
-                        akun: akun_slip,
-                        nama_akun: nama_akun_slip,
-                        kode_akun: kode_akun_slip,
-                        notes: jenis + " [" + notes + "]",
-                        debet: debet,
-                        kredit: kredit
-                    })
-                    populate_detail(details)
-                } else {
-                    Swal.fire("Sorry, Can't save data. ", "Jumlah total debet harus lebih besar dari total kredit", 'error')
+                    if (total_debet > total_kredit) {
+                        kredit = parseFloat(total_debet) - parseFloat(total_kredit);
+                        details.push({
+                            guid: "gen",
+                            akun: akun_slip,
+                            nama_akun: nama_akun_slip,
+                            kode_akun: kode_akun_slip,
+                            notes: jenis + " [" + notes + "]",
+                            debet: debet,
+                            kredit: kredit
+                        })
+                        populate_detail(details)
+                    } else {
+                        Swal.fire("Sorry, Can't save data. ", "Jumlah total debet harus lebih besar dari total kredit", 'error')
+                    }
                 }
             }
         })
