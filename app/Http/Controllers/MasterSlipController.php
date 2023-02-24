@@ -423,9 +423,14 @@ class MasterSlipController extends Controller
         }
     }
 
-    public function getSlipByCabang($id_cabang){
+    public function getSlipByCabang($id_cabang, $id_slip){
         try{
-            $data_slip = Slip::where("master_slip.id_cabang", $id_cabang)->join("master_akun", "master_akun.id_akun", "master_slip.id_akun")->get();
+            $data_slip = Slip::where("master_slip.id_cabang", $id_cabang)
+            ->where("master_slip.jenis_slip", $id_slip)
+            ->join("master_akun", "master_akun.id_akun", "master_slip.id_akun")
+            ->get();
+
+
             if(!empty($data_slip)){
                 return response()->json([
                     "result" => TRUE,

@@ -194,8 +194,8 @@
                                         <td>{{ $detail->kode_akun }}</td>
                                         <td>{{ $detail->nama_akun }}</td>
                                         <td>{{ $detail->keterangan }}</td>
-                                        <td>{{ $detail->debet }}</td>
-                                        <td>{{ $detail->credit }}</td>
+                                        <td style="text-align: right">{{ number_format($detail->debet, 2) }}</td>
+                                        <td style="text-align: right">{{ number_format($detail->credit, 2) }}</td>
                                     </tr>
                                     @endforeach
                                 </tbody>

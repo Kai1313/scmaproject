@@ -263,7 +263,7 @@
     let save_route = "{{ route('transaction-general-ledger-store') }}"
     let data_route = "{{ route('transaction-general-ledger') }}"
     let coa_by_cabang_route = "{{ route('master-coa-get-by-cabang', ':id') }}"
-    let slip_by_cabang_route = "{{ route('master-slip-get-by-cabang', ':id') }}"
+    let slip_by_cabang_route = "{{ route('master-slip-get-by-cabang', [':id', ':slip']) }}"
     let coa_data_route = "{{ route('master-coa-get-data', ':id') }}"
 
     var validateLedger = {
@@ -291,15 +291,15 @@
                     if (jenis == "BM" || jenis == "KM" || jenis == "PG") {
                         if (total_kredit == total_debet) {
                             save_data()
-                        } 
+                        }
                         else {
                             Swal.fire("Sorry, Can't save data. ", "Jumlah total kredit harus sama dengan dari total debet", 'error')
                         }
-                    } 
+                    }
                     else {
                         if (total_debet == total_kredit) {
                             save_data()
-                        } 
+                        }
                         else {
                             Swal.fire("Sorry, Can't save data. ", "Jumlah total debet harus sama dengan dari total kredit", 'error')
                         }
@@ -385,6 +385,7 @@
             } else {
                 $(".comp-giro").attr("disabled", true).val("")
             }
+            getSlip()
         })
 
         // On change debet or kredit
@@ -436,11 +437,11 @@
                         kredit: kredit
                     })
                     populate_detail(details)
-                } 
+                }
                 else {
                     Swal.fire("Sorry, Can't save data. ", "Jumlah total kredit harus lebih besar dari total debet", 'error')
                 }
-            } 
+            }
             else {
                 if (total_debet > total_kredit) {
                     kredit = parseFloat(total_debet) - parseFloat(total_kredit);
@@ -454,7 +455,7 @@
                         kredit: kredit
                     })
                     populate_detail(details)
-                } 
+                }
                 else {
                     Swal.fire("Sorry, Can't save data. ", "Jumlah total debet harus lebih besar dari total kredit", 'error')
                 }
@@ -524,7 +525,20 @@
 
     function getSlip() {
         let id_cabang = $("#cabang_input").val()
+        let jenis_jurnal = $("#jenis").val()
+        let slip = '';
+        if(jenis_jurnal == 'KK' || jenis_jurnal == 'KM'){
+            slip = 0;
+        }else if(jenis_jurnal == 'BK' || jenis_jurnal == 'BM'){
+            slip = 1;
+        }else if(jenis_jurnal == 'PG'){
+            slip = 2;
+        }else if(jenis_jurnal == 'HG'){
+            slip = 3;
+        }
+
         let current_slip_route = slip_by_cabang_route.replace(':id', id_cabang);
+        current_slip_route = current_slip_route.replace(':slip', slip);
 
         $.getJSON(current_slip_route, function(data) {
             if (data.result) {

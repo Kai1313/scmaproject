@@ -458,16 +458,13 @@ class GeneralLedgerController extends Controller
             ->select('jurnal_header.*', DB::raw('SUM(jurnal_detail.credit) as jumlah'));
         $data_general_ledger_table = $data_general_ledger_table->where('id_cabang', $cabang);
 
-        Log::debug(json_encode($data_general_ledger_table->get()));
-
-        if (!empty($keyword)) {
-            $data_general_ledger->where(function ($query) use ($keyword) {
+        if (isset($keyword)) {
+            $data_general_ledger_table->where(function ($query) use ($keyword) {
                 $query->orWhere('kode_jurnal', 'LIKE', "%$keyword%")
                     ->orWhere('tanggal_jurnal', 'LIKE', "%$keyword%")
                     ->orWhere('jenis_name', 'LIKE', "%$keyword%")
-                    ->orWhere('id_transaksi', 'LIKE', "%$keyword%")
+                    ->orWhere('jurnal_header.id_transaksi', 'LIKE', "%$keyword%")
                     ->orWhere('catatan', 'LIKE', "%$keyword%")
-                    ->orWhere('jumlah', 'LIKE', "%$keyword%")
                     ->orWhere('kode_slip', 'LIKE', "%$keyword%");
             });
         }
@@ -628,7 +625,7 @@ class GeneralLedgerController extends Controller
                     $max = (int)substr($check[0]->kode_jurnal, -4);
                     $max += 1;
                     $code = $prefix . "." . sprintf("%04s", $max);
-                } 
+                }
                 else {
                     $code = $prefix . ".0001";
                 }
@@ -639,7 +636,7 @@ class GeneralLedgerController extends Controller
                 }
             } while (JurnalHeader::where("kode_jurnal", $code)->first());
             return $code;
-        } 
+        }
         catch (\Exception $e) {
             Log::error("Error when generate journal code");
         }
