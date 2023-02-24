@@ -58,8 +58,7 @@ class GeneralLedgerController extends Controller
 
         if ($request->session()->has('token')) {
             return view('accounting.journal.general_ledger.form', $data);
-        } 
-        else {
+        } else {
             return view('exceptions.forbidden');
         }
     }
@@ -78,7 +77,7 @@ class GeneralLedgerController extends Controller
             // exit();
 
             // cek detail
-            if(count($request->detail) <= 0){
+            if (count($request->detail) <= 0) {
                 return response()->json([
                     "result" => false,
                     "message" => "Error. There is no detail"
@@ -132,7 +131,7 @@ class GeneralLedgerController extends Controller
                 //Store Detail
                 $detail = new JurnalDetail();
                 $detail->id_jurnal = $header->id_jurnal;
-                $detail->index = ($data['guid'] == 'gen')?count($detailData)+1:$data['guid'];
+                $detail->index = ($data['guid'] == 'gen') ? count($detailData) + 1 : $data['guid'];
                 $detail->id_akun = $data['akun'];
                 $detail->keterangan = $data['notes'];
                 $detail->debet = str_replace(',', '', $data['debet']);
@@ -277,18 +276,18 @@ class GeneralLedgerController extends Controller
         foreach ($jurnal_detail as $key => $jurnal) {
             $akun = Akun::find($jurnal->id_akun);
             $details[] = [
-                "guid"=>(++$i == count($jurnal_detail))?"gen":$jurnal->index,
-                "akun"=>$akun->id_akun,
-                "nama_akun"=>$akun->nama_akun,
-                "kode_akun"=>$akun->kode_akun,
-                "notes"=>$jurnal->keterangan,
-                "debet"=>$jurnal->debet,
-                "kredit"=>$jurnal->credit
+                "guid" => (++$i == count($jurnal_detail)) ? "gen" : $jurnal->index,
+                "akun" => $akun->id_akun,
+                "nama_akun" => $akun->nama_akun,
+                "kode_akun" => $akun->kode_akun,
+                "notes" => $jurnal->keterangan,
+                "debet" => $jurnal->debet,
+                "kredit" => $jurnal->credit
             ];
         }
 
         $data = [
-            "pageTitle" => "SCA Accounting | Transaksi Jurnal Umum | Create",
+            "pageTitle" => "SCA Accounting | Transaksi Jurnal Umum | Edit",
             "data_cabang" => $data_cabang,
             "jurnal_header" => $jurnal_header,
             "jurnal_detail" => json_encode($details),
@@ -300,8 +299,7 @@ class GeneralLedgerController extends Controller
 
         if ($request->session()->has('token')) {
             return view('accounting.journal.general_ledger.form_edit', $data);
-        } 
-        else {
+        } else {
             return view('exceptions.forbidden');
         }
     }
@@ -371,7 +369,7 @@ class GeneralLedgerController extends Controller
                 //Store Detail
                 $detail = new JurnalDetail();
                 $detail->id_jurnal = $header->id_jurnal;
-                $detail->index = ($data['guid'] == 'gen')?count($detailData)+1:$data['guid'];
+                $detail->index = ($data['guid'] == 'gen') ? count($detailData) + 1 : $data['guid'];
                 $detail->id_akun = $data['akun'];
                 $detail->keterangan = $data['notes'];
                 $detail->debet = str_replace(',', '', $data['debet']);
@@ -455,10 +453,10 @@ class GeneralLedgerController extends Controller
                 '));
 
         $data_general_ledger_table = DB::table(DB::raw('(' . $data_general_ledger->toSql() . ') as jurnal_header'))
-        ->join('jurnal_detail', 'jurnal_detail.id_jurnal', 'jurnal_header.id_jurnal')
-        ->where('jurnal_header.void', $void)
-        ->groupBy('jurnal_header.id_jurnal')
-        ->select('jurnal_header.*', DB::raw('SUM(jurnal_detail.credit) as jumlah'));
+            ->join('jurnal_detail', 'jurnal_detail.id_jurnal', 'jurnal_header.id_jurnal')
+            ->where('jurnal_header.void', $void)
+            ->groupBy('jurnal_header.id_jurnal')
+            ->select('jurnal_header.*', DB::raw('SUM(jurnal_detail.credit) as jumlah'));
         $data_general_ledger_table = $data_general_ledger_table->where('id_cabang', $cabang);
 
         Log::debug(json_encode($data_general_ledger_table->get()));
@@ -491,7 +489,7 @@ class GeneralLedgerController extends Controller
                 $column = $s['column'];
                 $directon = $s['dir'];
 
-                if($column != ''){
+                if ($column != '') {
                     $data_general_ledger_table->orderBy($column, $directon);
                 }
             }
@@ -622,17 +620,16 @@ class GeneralLedgerController extends Controller
             do {
                 // Init data
                 $kodeCabang = Cabang::find($cabang);
-                $prefix = $kodeCabang->kode_cabang.".".$jenis.".".date("ym");
+                $prefix = $kodeCabang->kode_cabang . "." . $jenis . "." . date("ym");
 
                 // Check exist
                 $check = JurnalHeader::where("kode_jurnal", "LIKE", "$prefix%")->orderBy("kode_jurnal", "DESC")->get();
                 if (count($check) > 0) {
                     $max = count($check);
                     $max += 1;
-                    $code = $prefix.".".sprintf("%04s", $max);
-                }
-                else {
-                    $code = $prefix.".0001";
+                    $code = $prefix . "." . sprintf("%04s", $max);
+                } else {
+                    $code = $prefix . ".0001";
                 }
                 $ex++;
                 if ($ex >= 5) {
@@ -641,8 +638,7 @@ class GeneralLedgerController extends Controller
                 }
             } while (JurnalHeader::where("kode_jurnal", $code)->first());
             return $code;
-        } 
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             Log::error("Error when generate journal code");
         }
     }

@@ -47,7 +47,7 @@
 <section class="content-header">
     <h1>
         Transaksi Jurnal Umum
-        <small>| Tambah</small>
+        <small>| Ubah</small>
     </h1>
     <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> Dashboard</a></li>
@@ -66,7 +66,7 @@
                     <div class="box-header">
                         <div class="row">
                             <div class="col-xs-12">
-                                <h3 class="box-title">{{ isset($data_jurnal_umum) ? 'Ubah' : 'Tambah' }} Jurnal Umum</h3>
+                                <h3 class="box-title">Ubah Jurnal Umum</h3>
                                 <a href="{{ route('transaction-general-ledger') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right"><span class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span>
                                     Kembali</a>
                             </div>

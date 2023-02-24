@@ -6,12 +6,12 @@
 @section('header')
 <section class="content-header">
     <h1>
-        Transaksi Jurnal Umum
+        Transaksi Jurnal Penyesuaian
         <small>| Detail</small>
     </h1>
     <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> Dashboard</a></li>
-        <li><a href="{{ route('transaction-general-ledger') }}">Transaksi Jurnal Umum</a></li>
+        <li><a href="{{ route('transaction-adjustment-ledger') }}">Transaksi Jurnal Penyesuaian</a></li>
         <li class="active">Detail</li>
     </ol>
 </section>
@@ -23,8 +23,8 @@
         <div class="col-xs-12">
             <div class="box box-primary">
                 <div class="box-header">
-                    <h3 class="box-title">Jurnal Umum <span class="text-muted"></span></h3>
-                    <a href="{{ route('transaction-general-ledger') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right"><span class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali</a>
+                    <h3 class="box-title">Jurnal Penyesuaian <span class="text-muted"></span></h3>
+                    <a href="{{ route('transaction-adjustment-ledger') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right"><span class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali</a>
                 </div>
                 <div class="box-body">
                     <div class="row">
