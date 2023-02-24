@@ -114,7 +114,7 @@ class GeneralLedgerController extends Controller
             $header->user_modified = $userModified;
             $header->dt_created = $dateRecord;
             $header->dt_modified = $dateRecord;
-            $header->kode_jurnal = $this->generateJournalCode($cabangID, $journalType);
+            $header->kode_jurnal = $this->generateJournalCode($cabangID, $journalType, $slipID);
             // dd($header);
             if (!$header->save()) {
                 DB::rollback();
@@ -612,14 +612,15 @@ class GeneralLedgerController extends Controller
         }
     }
 
-    public function generateJournalCode($cabang, $jenis)
+    public function generateJournalCode($cabang, $jenis, $slip)
     {
         try {
             $ex = 0;
             do {
                 // Init data
                 $kodeCabang = Cabang::find($cabang);
-                $prefix = $kodeCabang->kode_cabang . "." . $jenis . "." . date("ym");
+                $kodeSlip = Slip::find($slip);
+                $prefix = $kodeCabang->kode_cabang . "." . $jenis . "." . $kodeSlip->kode_slip . "." . date("ym");
 
                 // Check exist
                 $check = JurnalHeader::where("kode_jurnal", "LIKE", "$prefix%")->orderBy("kode_jurnal", "DESC")->get();
