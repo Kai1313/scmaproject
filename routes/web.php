@@ -98,3 +98,11 @@ Route::get('/transaction/general_ledger/active/{id?}', 'GeneralLedgerController@
 // Jurnal Penyesuaian
 Route::get('/transaction/adjustment_ledger', 'AdjustmentLedgerController@index')->name('transaction-adjustment-ledger');
 Route::get('/transaction/adjustment_ledger/form/create', 'AdjustmentLedgerController@create')->name('transaction-adjustment-ledger-create');
+Route::get('/transaction/adjustment_ledger/form/edit/{id?}', 'AdjustmentLedgerController@edit')->name('transaction-adjustment-ledger-edit');
+Route::get('/transaction/adjustment_ledger/show/{id?}', 'AdjustmentLedgerController@show')->name('transaction-adjustment-ledger-show');
+Route::post('/transaction/adjustment_ledger/store', 'AdjustmentLedgerController@store')->name('transaction-adjustment-ledger-store');
+Route::post('/transaction/adjustment_ledger/update', 'AdjustmentLedgerController@update')->name('transaction-adjustment-ledger-update');
+Route::get('/transaction/adjustment_ledger/populate', 'AdjustmentLedgerController@populate')->name('transaction-adjustment-ledger-populate');
+Route::get('/transaction/adjustment_ledger/print/{id?}', 'AdjustmentLedgerController@printSlip')->name('transaction-adjustment-ledger-print');
+Route::get('/transaction/adjustment_ledger/void/{id?}', 'AdjustmentLedgerController@void')->name('transaction-adjustment-ledger-void');
+Route::get('/transaction/adjustment_ledger/active/{id?}', 'AdjustmentLedgerController@active')->name('transaction-adjustment-ledger-active');
