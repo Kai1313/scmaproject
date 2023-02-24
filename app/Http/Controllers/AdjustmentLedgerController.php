@@ -86,7 +86,7 @@ class AdjustmentLedgerController extends Controller
             $journalDate = date('Y-m-d', strtotime($request->header[0]["tanggal"]));
             // $giroDate = date('Y-m-d', strtotime($request->header[0]["tanggal_giro"]));
             // $giroDueDate = date('Y-m-d', strtotime($request->header[0]["tanggal_jt_giro"]));
-            $slipID = $request->header[0]["slip"];
+            // $slipID = $request->header[0]["slip"];
             $journalType = $request->header[0]["jenis"];
             $cabangID = $request->header[0]["cabang"];
             $noteHeader = $request->header[0]["notes"];
@@ -102,7 +102,7 @@ class AdjustmentLedgerController extends Controller
             $header = new JurnalHeader();
             $header->id_cabang = $cabangID;
             $header->jenis_jurnal = $journalType;
-            $header->id_slip = $slipID;
+            // $header->id_slip = $slipID;
             $header->catatan = $noteHeader;
             // $header->tanggal_giro = $giroDate;
             // $header->tanggal_giro_jt = $giroDueDate;
@@ -321,7 +321,7 @@ class AdjustmentLedgerController extends Controller
             // $giroDate = date('Y-m-d', strtotime($request->header[0]["tanggal_giro"]));
             // $giroDueDate = date('Y-m-d', strtotime($request->header[0]["tanggal_jt_giro"]));
             $journalID = $request->header[0]["id_jurnal"];
-            $slipID = $request->header[0]["slip"];
+            // $slipID = $request->header[0]["slip"];
             $journalType = $request->header[0]["jenis"];
             $cabangID = $request->header[0]["cabang"];
             $noteHeader = $request->header[0]["notes"];
@@ -340,7 +340,7 @@ class AdjustmentLedgerController extends Controller
             $header->id_cabang = $cabangID;
             $header->tanggal_jurnal = $journalDate;
             $header->jenis_jurnal = $journalType;
-            $header->id_slip = $slipID;
+            // $header->id_slip = $slipID;
             $header->catatan = $noteHeader;
             // $header->tanggal_giro = $giroDate;
             // $header->tanggal_giro_jt = $giroDueDate;
@@ -424,8 +424,7 @@ class AdjustmentLedgerController extends Controller
         $draw = $request->draw;
         $current_page = $offset / $limit + 1;
 
-        $data_general_ledger = JurnalHeader::join('master_slip', 'jurnal_header.id_slip', 'master_slip.id_slip')
-            ->select('jurnal_header.*', 'master_slip.kode_slip', DB::raw('
+        $data_general_ledger = JurnalHeader::select('jurnal_header.*', DB::raw('
                     (CASE
                         WHEN jenis_jurnal = "KK" THEN "Kas Keluar"
                         WHEN jenis_jurnal = "KM" THEN "Kas Masuk"

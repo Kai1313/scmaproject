@@ -106,7 +106,6 @@
                                 <th class="text-center" width="10%" data-priority="1">Kode Jurnal</th>
                                 <th class="text-center" width="13%" data-priority="2">Tanggal Jurnal</th>
                                 <th class="text-center" width="10%">Jenis Jurnal</th>
-                                <th class="text-center" width="10%">Kode Slip</th>
                                 <th class="text-center" width="10%">ID Transaksi</th>
                                 <th class="text-center" width="20%">Catatan</th>
                                 <th class="text-center" width="10%">Total</th>
@@ -204,11 +203,6 @@
                 {
                     data: 'jenis_name',
                     name: 'jenis_name',
-                    width: '10%'
-                },
-                {
-                    data: 'kode_slip',
-                    name: 'kode_slip',
                     width: '10%'
                 },
                 {

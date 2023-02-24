@@ -88,6 +88,10 @@
                                         </select>
                                     </div>
                                     <div class="form-group">
+                                        <label>Nomor Jurnal</label>
+                                        <input type="text" class="form-control" id="kode" name="kode" placeholder="Masukkan nomor jurnal umum" value="{{ isset($jurnal_header->kode_jurnal)?$jurnal_header->kode_jurnal:'' }}" data-validation="[NOTEMPTY]" data-validation-message="Nomor Jurnal Umum tidak boleh kosong" readonly>
+                                    </div>
+                                    <div class="form-group">
                                         <label>Tanggal Jurnal</label>
                                         <input type="date" class="form-control" id="tanggal" name="tanggal" placeholder="Masukkan tanggal jurnal umum" value="{{ isset($jurnal_header->tanggal_jurnal)?$jurnal_header->tanggal_jurnal:'' }}" data-validation="[NOTEMPTY]" data-validation-message="Tanggal Jurnal tidak boleh kosong">
                                     </div>
@@ -95,15 +99,15 @@
                                         <label>Jenis Jurnal</label>
                                         <input type="text" name="jenis" id="jenis" value="{{ isset($jurnal_header->jenis_jurnal)?$jurnal_header->jenis_jurnal:'' }}" class="form-control" readonly>
                                     </div>
-                                    <div class="form-group">
+                                    {{-- <div class="form-group">
                                         <label>Slip</label>
                                         <select name="slip" id="slip" class="form-control select2" data-validation="[NOTEMPTY]" data-validation-message="Slip tidak boleh kosong">
                                             <option value="">Pilih Slip</option>
-                                            {{-- @foreach ($data_slip as $slip)
+                                            @foreach ($data_slip as $slip)
                                                     <option value="{{ $slip->kode_slip }}">{{ $slip->kode_slip.' - '.$slip->nama_slip }}</option>
-                                            @endforeach --}}
+                                            @endforeach
                                         </select>
-                                    </div>
+                                    </div> --}}
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
@@ -205,7 +209,6 @@
                             <div class="col-xs-12">
                                 <button type="submit" id="btn-save" class="btn btn-flat btn-primary pull-right mb-1"><span class="glyphicon glyphicon-floppy-saved" aria-hidden="true"></span> Simpan
                                     Data</button>
-                                <button id="btn-generate" type="button" class="btn btn-flat btn-success mr-1 mb-1 pull-right">Generate</button>
                             </div>
                         </div>
                     </div>
@@ -255,6 +258,12 @@
             },
             callback: {
                 onSubmit: function(node, formData) {
+                    let total_debet = parseFloat(0)
+                    let total_kredit = parseFloat(0)
+                    details.forEach(detail => {
+                        total_debet = parseFloat(total_debet) + parseFloat(detail.debet)
+                        total_kredit = parseFloat(total_kredit) + parseFloat(detail.kredit)
+                    })
                     if (total_debet == total_kredit) {
                         save_data()
                     } 
