@@ -254,10 +254,18 @@
             },
             callback: {
                 onSubmit: function(node, formData) {
-                    console.log(formData)
-                    console.log('hello')
-                    // $('#form_ledger').submit();
-                    save_data()
+                    let total_debet = parseFloat(0)
+                    let total_kredit = parseFloat(0)
+                    details.forEach(detail => {
+                        total_debet = parseFloat(total_debet) + parseFloat(detail.debet)
+                        total_kredit = parseFloat(total_kredit) + parseFloat(detail.kredit)
+                    })
+                    if (total_debet == total_kredit) {
+                        save_data()
+                    } 
+                    else {
+                        Swal.fire("Sorry, Can't save data. ", "Jumlah total debet harus sama dengan dari total kredit", 'error')
+                    }
                 }
             }
         },
@@ -356,57 +364,6 @@
                 return item['guid'] != guid
             })
             populate_detail(details)
-        })
-
-        // Generate button
-        $("#btn-generate").on("click", function() {
-            let akun_slip = $("#slip").find(":selected").data("akun")
-            let nama_akun_slip = $("#slip").find(":selected").data("namaakun")
-            let nama_slip = $("#slip").find(":selected").data("nama")
-            let jenis = $("#jenis").val()
-            let notes = $("#notes").val()
-            let debet = 0
-            let kredit = 0
-            let total_debet = parseFloat(0)
-            let total_kredit = parseFloat(0)
-            details = details.filter(function(item) {
-                return item['guid'] != "gen"
-            })
-            details.forEach(detail => {
-                total_debet = parseFloat(total_debet) + parseFloat(detail.debet.replace(/,/g, ''))
-                total_kredit = parseFloat(total_kredit) + parseFloat(detail.kredit.replace(/,/g, ''))
-            })
-            if (jenis == "BM" || jenis == "KM" || jenis == "PG") {
-                if (total_kredit > total_debet) {
-                    debet = parseFloat(total_kredit) - parseFloat(total_debet)
-                    details.push({
-                        guid: "gen",
-                        akun: akun_slip,
-                        nama_akun: nama_akun_slip,
-                        notes: jenis + " [" + notes + "]",
-                        debet: debet,
-                        kredit: kredit
-                    })
-                    populate_detail(details)
-                } else {
-                    Swal.fire("Sorry, Can't save data. ", "Jumlah total kredit harus lebih besar dari total debet", 'error')
-                }
-            } else {
-                if (total_debet > total_kredit) {
-                    kredit = parseFloat(total_debet) - parseFloat(total_kredit);
-                    details.push({
-                        guid: "gen",
-                        akun: akun_slip,
-                        nama_akun: nama_akun_slip,
-                        notes: jenis + " [" + notes + "]",
-                        debet: debet,
-                        kredit: kredit
-                    })
-                    populate_detail(details)
-                } else {
-                    Swal.fire("Sorry, Can't save data. ", "Jumlah total debet harus lebih besar dari total kredit", 'error')
-                }
-            }
         })
     })
 
@@ -522,8 +479,8 @@
             akun: akun,
             nama_akun: nama_akun,
             notes: notes,
-            debet: debet,
-            kredit: kredit
+            debet: debet.replace(/,/g, ''),
+            kredit: kredit.replace(/,/g, '')
         })
         guid++
         detail_clear()
@@ -582,8 +539,8 @@
         let total_debet = parseFloat(0)
         let total_kredit = parseFloat(0)
         details.forEach(detail => {
-            total_debet = parseFloat(total_debet) + parseFloat(detail.debet.replace(/,/g, ''))
-            total_kredit = parseFloat(total_kredit) + parseFloat(detail.kredit.replace(/,/g, ''))
+            total_debet = parseFloat(total_debet) + parseFloat(detail.debet)
+            total_kredit = parseFloat(total_kredit) + parseFloat(detail.kredit)
         })
         $("#total_debet").val(formatCurr(total_debet))
         $("#total_kredit").val(formatCurr(total_kredit))

@@ -73,7 +73,7 @@ class GeneralLedgerController extends Controller
     {
         try {
             Log::info("Store Jurnal Data");
-            // Log::debug($request->all());
+            // dd($request->all());
             // exit();
 
             // cek detail
@@ -86,8 +86,8 @@ class GeneralLedgerController extends Controller
 
             // Init data
             $journalDate = date('Y-m-d', strtotime($request->header[0]["tanggal"]));
-            $giroDate = date('Y-m-d', strtotime($request->header[0]["tanggal_giro"]));
-            $giroDueDate = date('Y-m-d', strtotime($request->header[0]["tanggal_jt_giro"]));
+            $giroDate = ($request->header[0]["tanggal_giro"])?date('Y-m-d', strtotime($request->header[0]["tanggal_giro"])):NULL;
+            $giroDueDate = ($request->header[0]["tanggal_jt_giro"])?date('Y-m-d', strtotime($request->header[0]["tanggal_jt_giro"])):NULL;
             $slipID = $request->header[0]["slip"];
             $journalType = $request->header[0]["jenis"];
             $cabangID = $request->header[0]["cabang"];
@@ -101,7 +101,6 @@ class GeneralLedgerController extends Controller
 
             DB::beginTransaction();
             // Store Header
-            $reqId = rand(); //$this->regenUuid();
             $header = new JurnalHeader();
             $header->id_cabang = $cabangID;
             $header->jenis_jurnal = $journalType;
@@ -117,7 +116,6 @@ class GeneralLedgerController extends Controller
             $header->dt_modified = $dateRecord;
             $header->kode_jurnal = $this->generateJournalCode($cabangID, $journalType);
             // dd($header);
-            $header->save();
             if (!$header->save()) {
                 DB::rollback();
                 return response()->json([
@@ -327,8 +325,8 @@ class GeneralLedgerController extends Controller
 
             // Init data
             $journalDate = date('Y-m-d', strtotime($request->header[0]["tanggal"]));
-            $giroDate = date('Y-m-d', strtotime($request->header[0]["tanggal_giro"]));
-            $giroDueDate = date('Y-m-d', strtotime($request->header[0]["tanggal_jt_giro"]));
+            $giroDate = ($request->header[0]["tanggal_giro"])?date('Y-m-d', strtotime($request->header[0]["tanggal_giro"])):NULL;
+            $giroDueDate = ($request->header[0]["tanggal_jt_giro"])?date('Y-m-d', strtotime($request->header[0]["tanggal_jt_giro"])):NULL;
             $journalID = $request->header[0]["id_jurnal"];
             $slipID = $request->header[0]["slip"];
             $journalType = $request->header[0]["jenis"];
@@ -625,10 +623,11 @@ class GeneralLedgerController extends Controller
                 // Check exist
                 $check = JurnalHeader::where("kode_jurnal", "LIKE", "$prefix%")->orderBy("kode_jurnal", "DESC")->get();
                 if (count($check) > 0) {
-                    $max = count($check);
+                    $max = (int)substr($check[0]->kode_jurnal, -4);
                     $max += 1;
                     $code = $prefix . "." . sprintf("%04s", $max);
-                } else {
+                } 
+                else {
                     $code = $prefix . ".0001";
                 }
                 $ex++;
@@ -638,7 +637,8 @@ class GeneralLedgerController extends Controller
                 }
             } while (JurnalHeader::where("kode_jurnal", $code)->first());
             return $code;
-        } catch (\Exception $e) {
+        } 
+        catch (\Exception $e) {
             Log::error("Error when generate journal code");
         }
     }

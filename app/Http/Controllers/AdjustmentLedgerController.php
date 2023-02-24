@@ -99,7 +99,6 @@ class AdjustmentLedgerController extends Controller
 
             DB::beginTransaction();
             // Store Header
-            $reqId = rand(); //$this->regenUuid();
             $header = new JurnalHeader();
             $header->id_cabang = $cabangID;
             $header->jenis_jurnal = $journalType;
@@ -115,7 +114,6 @@ class AdjustmentLedgerController extends Controller
             $header->dt_modified = $dateRecord;
             $header->kode_jurnal = $this->generateJournalCode($cabangID, $journalType);
             // dd($header);
-            $header->save();
             if (!$header->save()) {
                 DB::rollback();
                 return response()->json([
@@ -348,7 +346,6 @@ class AdjustmentLedgerController extends Controller
             // $header->tanggal_giro_jt = $giroDueDate;
             $header->user_modified = $userModified;
             $header->dt_modified = $dateModified;
-            $header->save();
             if (!$header->save()) {
                 DB::rollback();
                 return response()->json([
@@ -614,7 +611,7 @@ class AdjustmentLedgerController extends Controller
                 // Check exist
                 $check = JurnalHeader::where("kode_jurnal", "LIKE", "$prefix%")->orderBy("kode_jurnal", "DESC")->get();
                 if (count($check) > 0) {
-                    $max = count($check);
+                    $max = (int)substr($check[0]->kode_jurnal, -4);
                     $max += 1;
                     $code = $prefix . "." . sprintf("%04s", $max);
                 } else {
