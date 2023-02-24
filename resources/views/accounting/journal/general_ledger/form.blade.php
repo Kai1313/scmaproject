@@ -622,12 +622,20 @@
                     name: 'notes'
                 },
                 {
+                    className: 'text-right',
                     data: 'debet',
-                    name: 'debet'
+                    name: 'debet',
+                    render: function(data, type, row) {
+                        return formatCurr(data)
+                    }
                 },
                 {
+                    className: 'text-right',
                     data: 'kredit',
-                    name: 'kredit'
+                    name: 'kredit',
+                    render: function(data, type, row) {
+                        return formatCurr(data)
+                    }
                 },
                 {
                     data: 'guid',
