@@ -76,11 +76,14 @@
     <table width="100%" class="table-bordered" style="margin-top: 20px">
         <thead>
             <tr>
-                <th width="30%">Akun</th>
-                <th width="40%">Keterangan</th>
-                {{-- <th width="30%">Debet</th> --}}
-                {{-- <th width="30%">Kredit</th> --}}
-                <th width="30%">Jumlah</th>
+                <th width="25%">Akun</th>
+                <th width="35%">Keterangan</th>
+                @if ($data_jurnal_header->jenis_jurnal == 'ME')
+                    <th width="20%">Debet</th>
+                    <th width="20%">Kredit</th>
+                @else
+                    <th width="40%">Jumlah</th>
+                @endif
             </tr>
         </thead>
         <tbody>
@@ -108,6 +111,13 @@
                         <td style="text-align: right">
                             {{ number_format($detail->credit, 2) }}
                         </td>
+                    @else
+                        <td style="text-align: right">
+                            {{ number_format($detail->debet, 2) }}
+                        </td>
+                        <td style="text-align: right">
+                            {{ number_format($detail->credit, 2) }}
+                        </td>
                     @endif
                 </tr>
             @endforeach
@@ -116,6 +126,9 @@
                 @if (in_array($data_jurnal_header->jenis_jurnal, ['KK', 'BK', 'PG']))
                     <td style="text-align: right">{{ number_format($totalDebet, 2) }}</td>
                 @elseif(in_array($data_jurnal_header->jenis_jurnal, ['KM', 'BM', 'HG']))
+                    <td style="text-align: right">{{ number_format($totalCredit, 2) }}</td>
+                @else
+                    <td style="text-align: right">{{ number_format($totalDebet, 2) }}</td>
                     <td style="text-align: right">{{ number_format($totalCredit, 2) }}</td>
                 @endif
             </tr>
