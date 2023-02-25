@@ -10,6 +10,10 @@
         .select2 {
             width: 100% !important;
         }
+
+        .handle-number-4 {
+            text-align: right;
+        }
     </style>
 @endsection
 
@@ -100,20 +104,13 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="row">
+                            {{-- <div class="row">
                                 <label class="col-md-3">Mata Uang <span>*</span></label>
-                                <div class="col-md-5 form-group">
-                                    <select name="id_mata_uang" class="form-control selectAjax"
-                                        data-route="{{ route('purchase-down-payment-auto-currency') }}">
-                                        @if ($data && $data->id_mata_uang)
-                                            <option value="{{ $data->id_mata_uang }}" selected>
-                                                {{ $data->mataUang->kode_mata_uang }} -
-                                                {{ $data->mataUang->nama_mata_uang }}
-                                            </option>
-                                        @endif
-                                    </select>
-                                </div>
-                            </div>
+                                <div class="col-md-5 form-group"> --}}
+                            <input type="hidden" name="id_mata_uang"
+                                value="{{ old('id_mata_uang', $data ? $data->id_mata_uang : '') }}">
+                            {{-- </div>
+                            </div> --}}
                             <div class="row">
                                 <label class="col-md-3">Slip <span>*</span></label>
                                 <div class="col-md-5 form-group">
@@ -132,22 +129,25 @@
                             <div class="row">
                                 <label class="col-md-3">Rate <span>*</span></label>
                                 <div class="col-md-4 form-group">
-                                    <input type="number" name="rate" class="form-control"
+                                    <input type="text" name="rate" class="form-control handle-number-4"
                                         value="{{ old('rate', $data ? $data->rate : '') }}">
                                 </div>
                             </div>
                             <div class="row">
                                 <label class="col-md-3">Nominal <span>*</span></label>
                                 <div class="col-md-4 form-group">
-                                    <input type="number" name="nominal" class="form-control"
+                                    <input type="text" name="nominal" class="form-control handle-number-4"
                                         value="{{ old('nominal', $data ? $data->nominal : '') }}"
-                                        max="{{ $data ? $data->nominal : 0 }}">
+                                        data-max="{{ $data ? $data->nominal : 0 }}">
+                                    {{-- <input type="text" name="nominal" class="form-control handle-number-4"
+                                        value="{{ old('nominal', $data ? $data->nominal : '') }}"
+                                        max="{{ $data ? $data->nominal : 0 }}"> --}}
                                 </div>
                             </div>
                             <div class="row">
                                 <label class="col-md-3">Total <span>*</span></label>
                                 <div class="col-md-4 form-group">
-                                    <input type="number" name="total" class="form-control" readonly
+                                    <input type="text" name="total" class="form-control handle-number-4" readonly
                                         value="{{ old('total', $data ? $data->total : '') }}">
                                 </div>
                             </div>
@@ -171,6 +171,7 @@
 
 @section('addedScripts')
     <script src="{{ asset('assets/bower_components/select2/dist/js/select2.min.js') }}"></script>
+    <script src="{{ asset('js/custom.js') }}"></script>
 @endsection
 
 @section('externalScripts')
@@ -178,7 +179,6 @@
         $('.select2').select2()
 
         if ($('[name="id_cabang"]').val() == '') {
-            console.log('asd')
             $('[name="id_permintaan_pembelian"]').prop('disabled', true)
         }
 
@@ -221,7 +221,6 @@
                 }
             }).on('select2:select', function(e) {
                 let dataselect = e.params.data
-                console.log(dataselect)
                 if (name == 'id_mata_uang') {
                     $('[name="rate"]').val(dataselect.nilai_mata_uang)
                 }
@@ -235,8 +234,12 @@
                             id: '{{ $data ? $data->id_uang_muka_pembelian : 0 }}'
                         },
                         success: function(res) {
-                            $('[name="nominal"]').val(res.nominal).attr('max', res.nominal)
-                            $('[name="total"]').val(res.total)
+                            $('[name="nominal"]').val(formatNumber(res.nominal)).attr(
+                                'data-max', res
+                                .nominal)
+                            $('[name="total"]').val(formatNumber(res.total))
+                            $('[name="id_mata_uang"]').val(res.id_mata_uang)
+                            $('[name="rate"]').val(formatNumber(res.nilai_mata_uang))
                         },
                         error(error) {
                             console.log(error)
@@ -260,6 +263,12 @@
                     e.stopPropagation();
                 })
             })
+        })
+
+        $('body').on('input', '[name="nominal"]', function() {
+            let val = normalizeNumber($(this).val())
+
+            console.log($(this).val())
         })
     </script>
 @endsection

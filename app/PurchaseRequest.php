@@ -58,10 +58,9 @@ class PurchaseRequest extends Model
                     ->where('purchase_request_id', $this->purchase_request_id)
                     ->where('index', $data->index)
                     ->update([
-                        // 'index' => $data->index,
                         'id_barang' => $data->id_barang,
                         'id_satuan_barang' => $data->id_satuan_barang,
-                        'qty' => $data->qty,
+                        'qty' => normalizeNumber($data->qty),
                         'notes' => $data->notes,
                     ]);
             } else {
@@ -69,7 +68,7 @@ class PurchaseRequest extends Model
                     'index' => $data->index,
                     'id_barang' => $data->id_barang,
                     'id_satuan_barang' => $data->id_satuan_barang,
-                    'qty' => $data->qty,
+                    'qty' => normalizeNumber($data->qty),
                     'notes' => $data->notes,
                     'purchase_request_id' => $this->purchase_request_id,
                     'closed' => '1',

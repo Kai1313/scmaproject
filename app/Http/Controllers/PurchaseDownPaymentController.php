@@ -162,14 +162,14 @@ class PurchaseDownPaymentController extends Controller
         return $datas;
     }
 
-    public function autoCurrency(Request $request)
-    {
-        $search = $request->search;
-        $datas = DB::table('mata_uang')->select('id_mata_uang as id', DB::raw("CONCAT(kode_mata_uang,' - ',nama_mata_uang) as text"), 'nilai_mata_uang')
-            ->where(DB::raw("CONCAT(kode_mata_uang, ' - ', nama_mata_uang)"), 'like', '%' . $search . '%')
-            ->get();
-        return $datas;
-    }
+    // public function autoCurrency(Request $request)
+    // {
+    //     $search = $request->search;
+    //     $datas = DB::table('mata_uang')->select('id_mata_uang as id', DB::raw("CONCAT(kode_mata_uang,' - ',nama_mata_uang) as text"), 'nilai_mata_uang')
+    //         ->where(DB::raw("CONCAT(kode_mata_uang, ' - ', nama_mata_uang)"), 'like', '%' . $search . '%')
+    //         ->get();
+    //     return $datas;
+    // }
 
     public function autoSlip(Request $request)
     {
@@ -184,7 +184,10 @@ class PurchaseDownPaymentController extends Controller
     {
         $po_id = $request->po_id;
         $id = $request->id;
-        $countDataPo = DB::table('permintaan_pembelian')->where('id_permintaan_pembelian', $po_id)->value('mtotal_permintaan_pembelian');
+        $countDataPo = DB::table('permintaan_pembelian as pp')
+            ->select('pp.mtotal_permintaan_pembelian', 'nilai_mata_uang', 'pp.id_mata_uang')
+            ->leftJoin('mata_uang as mu', 'pp.id_mata_uang', '=', 'mu.id_mata_uang')
+            ->where('pp.id_permintaan_pembelian', $po_id)->first();
         $countData = DB::table('uang_muka_pembelian')
             ->where('id_permintaan_pembelian', $po_id)
             ->where('id_uang_muka_pembelian', '!=', $id)
@@ -192,8 +195,10 @@ class PurchaseDownPaymentController extends Controller
             ->sum('nominal');
         return response()->json([
             'status' => 'success',
-            'nominal' => $countDataPo - $countData,
-            'total' => $countDataPo,
+            'nominal' => $countDataPo->mtotal_permintaan_pembelian - $countData,
+            'total' => $countDataPo->mtotal_permintaan_pembelian,
+            'nilai_mata_uang' => $countDataPo->nilai_mata_uang,
+            'id_mata_uang' => $countDataPo->id_mata_uang,
         ]);
     }
 }

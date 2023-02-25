@@ -16,6 +16,10 @@
             color: white;
             text-align: center;
         }
+
+        .handle-number-4 {
+            text-align: right;
+        }
     </style>
 @endsection
 
@@ -141,13 +145,14 @@
                             <div class="row">
                                 <label class="col-md-3">Catatan</label>
                                 <div class="col-md-9 form-group">
-                                    <textarea name="catatan" class="form-control" rows="5">{{ old('catatan', $data ? $data->catatan : '') }}</textarea>
+                                    <textarea name="catatan" class="form-control" rows="3">{{ old('catatan', $data ? $data->catatan : '') }}</textarea>
                                 </div>
                             </div>
                         </div>
                     </div>
                     @if (!$data || $data->approval_status == 0)
-                        <button class="btn btn-primary add-entry btn-flat" type="button">Tambah Barang</button>
+                        <button class="btn btn-primary add-entry btn-flat" type="button"><i
+                                class="glyphicon glyphicon-plus"></i> Tambah Barang</button>
                     @endif
                     <br><br>
                     <div class="table-responsive">
@@ -170,7 +175,7 @@
                                             <td>{{ $detail->kode_barang }}</td>
                                             <td>{{ $detail->nama_barang }}</td>
                                             <td>{{ $detail->nama_satuan_barang }}</td>
-                                            <td class="text-right">{{ $detail->qty }}</td>
+                                            <td class="text-right tag-qty">{{ $detail->qty }}</td>
                                             <td>{{ $detail->notes }}</td>
                                             <td class="text-center">
                                                 @if (!$data || $data->approval_status == 0)
@@ -224,7 +229,7 @@
                         </div>
                         <label>Jumlah</label>
                         <div class="form-group">
-                            <input type="number" name="qty" class="form-control validate">
+                            <input type="text" name="qty" class="form-control validate handle-number-4">
                         </div>
                         <label>Catatan</label>
                         <div class="form-group">
@@ -244,6 +249,7 @@
 @section('addedScripts')
     <script src="{{ asset('assets/bower_components/select2/dist/js/select2.min.js') }}"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ asset('js/custom.js') }}"></script>
 @endsection
 
 @section('externalScripts')
@@ -256,6 +262,11 @@
         if ($('[name="id_cabang"]').val() == '') {
             $('[name="id_gudang"]').prop('disabled', true)
         }
+
+        $('.tag-qty').each(function(i, v) {
+            let num = $(v).text()
+            $(this).text(formatNumber(num))
+        })
 
         $('[name="id_cabang"]').change(function() {
             let self = $('[name="id_gudang"]')
@@ -337,6 +348,13 @@
                 backdrop: 'static',
                 keyboard: false
             })
+
+            $('[name="id_barang"]').select2('open')
+
+            $('.handle-number-4').each(function(i, v) {
+                let val = $(v).val().replace('.', ',')
+                $(v).val(formatRupiah(val, 4))
+            })
         })
 
         $('.save-entry').click(function() {
@@ -350,7 +368,11 @@
 
             let modal = $('#modalEntry')
             modal.find('input,select,textarea').each(function(i, v) {
-                detailSelect[$(v).prop('name')] = $(v).val()
+                if ($(v).hasClass('handle-number-4')) {
+                    detailSelect[$(v).prop('name')] = normalizeNumber($(v).val())
+                } else {
+                    detailSelect[$(v).prop('name')] = $(v).val()
+                }
             })
 
             let newObj = Object.assign({}, detailSelect)
@@ -358,7 +380,7 @@
                 '<td>' + newObj.kode_barang + '</td>' +
                 '<td>' + newObj.nama_barang + '</td>' +
                 '<td>' + newObj.nama_satuan_barang + '</td>' +
-                '<td class="text-right">' + newObj.qty + '</td>' +
+                '<td class="text-right tag-qty">' + formatNumber(newObj.qty) + '</td>' +
                 '<td>' + newObj.notes + '</td>' +
                 '<td class="text-center">' +
                 '<a href="javascript:void(0)" class="btn btn-warning edit-entry btn-sm btn-flat"><i class="glyphicon glyphicon-pencil"></i></a>' +
@@ -410,6 +432,11 @@
 
                 $('[name="' + select + '"]').val(detailSelect[select]).trigger('change')
             }
+
+            $('.handle-number-4').each(function(i, v) {
+                let val = $(v).val().replace('.', ',')
+                $(v).val(formatRupiah(val, 4))
+            })
         })
 
         $('body').on('click', '.delete-entry', function() {
@@ -465,7 +492,6 @@
             let valid = true
             $('#modalEntry').find('.validate').each(function(i, v) {
                 if ($(v).val() == '') {
-                    console.log('asd')
                     valid = false
                 }
             })

@@ -10,6 +10,10 @@
         .label-checkbox {
             margin-right: 10px;
         }
+
+        .handle-number-4 {
+            text-align: right;
+        }
     </style>
 @endsection
 
@@ -96,8 +100,8 @@
                             </div>
                             <div class="form-group">
                                 <label>Nilai PPh</label>
-                                <input type="number" name="value_pph" class="form-control show-pph"
-                                    value="{{ old('value_pph', $data ? $data->value_pph : '') }}" step=".01">
+                                <input type="text" name="value_pph" class="form-control show-pph handle-number-4"
+                                    value="{{ old('value_pph', $data ? $data->value_pph : '') }}">
                             </div>
                             <div class="form-group">
                                 <label>Akun PPh</label>
@@ -129,11 +133,11 @@
 
 @section('addedScripts')
     <script src="{{ asset('assets/bower_components/select2/dist/js/select2.min.js') }}"></script>
+    <script src="{{ asset('js/custom.js') }}"></script>
 @endsection
 
 @section('externalScripts')
     <script>
-        // $('.handle-number-2').trigger('input')
         $('[name="ispph"]').change(function() {
             if ($(this).is(':checked')) {
                 $('.show-pph').prop('disabled', false)
@@ -163,13 +167,6 @@
                     e.stopPropagation();
                 })
             })
-        })
-
-        $(document).on('input', '.handle-number-2', function() {
-            let str = $(this).val()
-            str = str.replace(/^\,/, '')
-            str = str.match(/(^[0-9]*(\,?)+([0-9]{1,4})?)/)
-            $(this).val(str[0])
         })
     </script>
 @endsection

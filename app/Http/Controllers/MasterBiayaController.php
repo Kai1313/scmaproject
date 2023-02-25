@@ -106,6 +106,7 @@ class MasterBiayaController extends Controller
             $data->fill($request->all());
             $data['isppn'] = isset($request->isppn) ? $request->isppn : 0;
             $data['ispph'] = isset($request->ispph) ? $request->ispph : 0;
+            $data['value_pph'] = normalizeNumber($request->value_pph);
             if ($data['ispph'] == 0) {
                 $data['value_pph'] = null;
                 $data['id_akun_pph'] = null;

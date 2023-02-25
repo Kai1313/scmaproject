@@ -6,6 +6,10 @@
         label>span {
             color: red;
         }
+
+        .handle-number-4 {
+            text-align: right;
+        }
     </style>
 @endsection
 
@@ -71,8 +75,10 @@
                             <div class="form-group">
                                 <label>Berat <span>*</span></label>
                                 <div class="input-group">
-                                    <input type="number" name="weight" class="form-control show-pph"
-                                        value="{{ old('weight', $data ? $data->weight : '') }}" step=".0001">
+                                    {{-- <input type="number" name="weight" class="form-control show-pph"
+                                        value="{{ old('weight', $data ? $data->weight : '') }}" step=".0001"> --}}
+                                    <input type="text" name="weight" class="form-control handle-number-4"
+                                        value="{{ old('weight', $data ? $data->weight : '') }}">
                                     <span class="input-group-addon">KG</span>
                                 </div>
                             </div>
@@ -112,6 +118,7 @@
 
 @section('addedScripts')
     <script src="{{ asset('assets/bower_components/select2/dist/js/select2.min.js') }}"></script>
+    <script src="{{ asset('js/custom.js') }}"></script>
 @endsection
 
 @section('externalScripts')
@@ -169,13 +176,6 @@
                     e.stopPropagation();
                 })
             })
-        })
-
-        $(document).on('input', '.handle-number-4', function() {
-            let str = $(this).val()
-            str = str.replace(/^\,/, '')
-            str = str.match(/(^[0-9]*(\,?)+([0-9]{1,4})?)/)
-            $(this).val(str[0])
         })
     </script>
 @endsection

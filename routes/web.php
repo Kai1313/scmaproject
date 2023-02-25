@@ -59,7 +59,7 @@ Route::prefix('uang-muka-pembelian')->group(function () {
     Route::post('save-entry/{id}', 'PurchaseDownPaymentController@saveEntry')->name('purchase-down-payment-save-entry');
     Route::post('delete/{id}', 'PurchaseDownPaymentController@destroy')->name('purchase-down-payment-delete');
     Route::get('auto-po', 'PurchaseDownPaymentController@autoPo')->name('purchase-down-payment-auto-po');
-    Route::get('auto-currency', 'PurchaseDownPaymentController@autoCurrency')->name('purchase-down-payment-auto-currency');
+    // Route::get('auto-currency', 'PurchaseDownPaymentController@autoCurrency')->name('purchase-down-payment-auto-currency');
     Route::get('count-po', 'PurchaseDownPaymentController@countPo')->name('purchase-down-payment-count-po');
     Route::get('auto-slip', 'PurchaseDownPaymentController@autoSlip')->name('purchase-down-payment-auto-slip');
 });

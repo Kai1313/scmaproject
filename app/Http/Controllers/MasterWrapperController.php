@@ -92,6 +92,7 @@ class MasterWrapperController extends Controller
             }
 
             $data->fill($request->all());
+            $data['weight'] = normalizeNumber($request->weight);
             $data->save();
 
             $data->uploadfile($request, $data);
