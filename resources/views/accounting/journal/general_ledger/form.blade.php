@@ -187,7 +187,7 @@
                             </div>
                             <div class="row mb-1">
                                 <div class="col-xs-12">
-                                    <button type="submit" id="btn-submit-detail" class="btn btn-flat btn-primary pull-right"><span class="glyphicon glyphicon-floppy-saved" aria-hidden="true"></span> Tambah Detail</button>
+                                    <button type="submit" id="btn-submit-detail" class="btn btn-flat btn-primary pull-right" data-detailguid=""><span class="glyphicon glyphicon-floppy-saved" aria-hidden="true"></span> Tambah Detail</button>
                                 </div>
                             </div>
                         </form>
@@ -405,6 +405,21 @@
             populate_detail(details)
         })
 
+        // Edit detail
+        $("#table_detail").on("click", ".edit-detail", function() {
+            let guid = $(this).data('guid')
+            detail = details.filter(function(item) {
+                return item['guid'] == guid
+            })
+            console.log(detail)
+            // Set data on form
+            $("#akun_detail").val(detail[0]["akun"]).trigger("change.select2")
+            $("#notes_detail").val(detail[0]["notes"])
+            $("#debet").val(detail[0]["debet"])
+            $("#kredit").val(detail[0]["kredit"])
+            $("#btn-submit-detail").data("detailguid", detail[0]["guid"])
+        })
+
         // Generate button
         $("#btn-generate").on("click", function() {
             let akun_slip = $("#slip").find(":selected").data("akun")
@@ -583,6 +598,8 @@
 
     function submit_detail() {
         console.log("submit detail clicked" + guid)
+        let detailguid = $("#btn-submit.detail").data("detailguid")
+        console.log(detailguid)
         let akun = $("#akun_detail").val()
         let nama_akun = $("#akun_detail").find(":selected").data("nama")
         let kode_akun = $("#akun_detail").find(":selected").data("kode")
@@ -590,6 +607,12 @@
         let debet = $("#debet").val()
         let kredit = $("#kredit").val()
 
+        if (detailguid != "undefined") {
+            console.log("masuk sini")
+            details = details.filter(function(item) {
+                return item['guid'] != detailguid
+            })
+        }
         details.push({
             guid: guid,
             akun: akun,
@@ -649,7 +672,7 @@
                     orderable: false,
                     searchable: false,
                     render: function(data, type, row) {
-                        let btn = '<button type="button" class="btn btn-sm btn-danger remove-detail" data-guid="' + data + '"><i class="fa fa-trash"></i></button>'
+                        let btn = '<button type="button" class="btn btn-sm btn-danger remove-detail mr-1" data-guid="' + data + '"><i class="fa fa-trash"></i></button><button type="button" class="btn btn-sm btn-warning edit-detail" data-guid="' + data + '"><i class="fa fa-edit"></i></button>'
                         return btn
                     }
                 },
