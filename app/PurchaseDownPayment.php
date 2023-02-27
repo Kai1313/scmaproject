@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Models\Master\Cabang;
 use App\Models\Master\MataUang;
 use App\Models\Master\Slip;
 use DB;
@@ -18,6 +19,11 @@ class PurchaseDownPayment extends Model
     protected $fillable = [
         'id_cabang', 'kode_uang_muka_pembelian', 'tanggal', 'id_permintaan_pembelian', 'id_mata_uang', 'rate', 'nominal', 'total', 'catatan', 'id_slip', 'void', 'void_user_id', 'user_created', 'dt_created', 'user_modified', 'dt_modified',
     ];
+
+    public function cabang()
+    {
+        return $this->belongsTo(Cabang::class, 'id_cabang');
+    }
 
     public static function createcode($id_cabang)
     {

@@ -26,6 +26,7 @@ class MasterWrapperController extends Controller
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
                     $btn = '<ul class="horizontal-list">';
+                    $btn .= '<li><a href="' . route('master-wrapper-view', $row->id_wrapper) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
                     $btn .= '<li><a href="' . route('master-wrapper-entry', $row->id_wrapper) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
                     $btn .= '<li><a href="' . route('master-wrapper-delete', $row->id_wrapper) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Hapus</a></li>';
                     $btn .= '</ul>';
@@ -109,6 +110,16 @@ class MasterWrapperController extends Controller
                 ->route('master-wrapper-entry', $data ? $data->id_wrapper : 0)
                 ->with('error', 'Data gagal tersimpan');
         }
+    }
+
+    public function viewData($id)
+    {
+        $data = MasterWrapper::find($id);
+
+        return view('ops.master.wrapper.detail', [
+            'data' => $data,
+            "pageTitle" => "SCA OPS | Master Wrapper | Detail",
+        ]);
     }
 
     public function destroy(Request $request, $id)

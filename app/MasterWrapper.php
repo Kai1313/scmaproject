@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Models\Master\Cabang;
 use Illuminate\Database\Eloquent\Model;
 
 class MasterWrapper extends Model
@@ -13,6 +14,11 @@ class MasterWrapper extends Model
     protected $fillable = [
         'id_cabang', 'nama_wrapper', 'weight', 'path', 'path2', 'catatan', 'user_created', 'dt_created', 'user_modified', 'dt_modified',
     ];
+
+    public function cabang()
+    {
+        return $this->belongsTo(Cabang::class, 'id_cabang');
+    }
 
     public function uploadfile($req, $data)
     {

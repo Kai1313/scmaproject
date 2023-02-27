@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Models\Master\Cabang;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 
@@ -16,6 +17,11 @@ class PurchaseRequest extends Model
 
     const CREATED_AT = 'dt_created';
     const UPDATED_AT = 'dt_modified';
+
+    public function cabang()
+    {
+        return $this->belongsTo(Cabang::class, 'id_cabang');
+    }
 
     public function gudang()
     {

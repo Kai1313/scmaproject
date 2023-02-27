@@ -30,6 +30,7 @@ Route::get('/get-menu/{id}', 'DashboardController@getMenu')->name('get-menu');
 Route::prefix('master-ops/biaya')->group(function () {
     Route::get('/', 'MasterBiayaController@index')->name('master-biaya');
     Route::get('entry/{id?}', 'MasterBiayaController@entry')->name('master-biaya-entry');
+    Route::get('view/{id}', 'MasterBiayaController@viewData')->name('master-biaya-view');
     Route::post('save-entry/{id}', 'MasterBiayaController@saveEntry')->name('master-biaya-save-entry');
     Route::post('delete/{id}', 'MasterBiayaController@destroy')->name('master-biaya-delete');
 });
@@ -37,6 +38,7 @@ Route::prefix('master-ops/biaya')->group(function () {
 Route::prefix('master-ops/wrapper')->group(function () {
     Route::get('/', 'MasterWrapperController@index')->name('master-wrapper');
     Route::get('entry/{id?}', 'MasterWrapperController@entry')->name('master-wrapper-entry');
+    Route::get('view/{id}', 'MasterWrapperController@viewData')->name('master-wrapper-view');
     Route::post('save-entry/{id}', 'MasterWrapperController@saveEntry')->name('master-wrapper-save-entry');
     Route::post('delete/{id}', 'MasterWrapperController@destroy')->name('master-wrapper-delete');
 });
@@ -44,6 +46,7 @@ Route::prefix('master-ops/wrapper')->group(function () {
 Route::prefix('permintaan-pembelian')->group(function () {
     Route::get('/', 'PurchaseRequestController@index')->name('purchase-request');
     Route::get('entry/{id?}', 'PurchaseRequestController@entry')->name('purchase-request-entry');
+    Route::get('view/{id}', 'PurchaseRequestController@viewData')->name('purchase-request-view');
     Route::post('save-entry/{id}', 'PurchaseRequestController@saveEntry')->name('purchase-request-save-entry');
     Route::post('delete/{id}', 'PurchaseRequestController@destroy')->name('purchase-request-delete');
     Route::get('auto-werehouse', 'PurchaseRequestController@autoWerehouse')->name('purchase-request-auto-werehouse');
@@ -56,6 +59,7 @@ Route::prefix('permintaan-pembelian')->group(function () {
 Route::prefix('uang-muka-pembelian')->group(function () {
     Route::get('/', 'PurchaseDownPaymentController@index')->name('purchase-down-payment');
     Route::get('entry/{id?}', 'PurchaseDownPaymentController@entry')->name('purchase-down-payment-entry');
+    Route::get('view/{id}', 'PurchaseDownPaymentController@viewData')->name('purchase-down-payment-view');
     Route::post('save-entry/{id}', 'PurchaseDownPaymentController@saveEntry')->name('purchase-down-payment-save-entry');
     Route::post('delete/{id}', 'PurchaseDownPaymentController@destroy')->name('purchase-down-payment-delete');
     Route::get('auto-po', 'PurchaseDownPaymentController@autoPo')->name('purchase-down-payment-auto-po');

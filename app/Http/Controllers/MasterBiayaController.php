@@ -27,6 +27,7 @@ class MasterBiayaController extends Controller
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
                     $btn = '<ul class="horizontal-list">';
+                    $btn .= '<li><a href="' . route('master-biaya-view', $row->id_biaya) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
                     $btn .= '<li><a href="' . route('master-biaya-entry', $row->id_biaya) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
                     $btn .= '<li><a href="' . route('master-biaya-delete', $row->id_biaya) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Hapus</a></li>';
                     $btn .= '</ul>';
@@ -127,6 +128,16 @@ class MasterBiayaController extends Controller
                 ->route('master-biaya-entry', $data ? $data->id_biaya : 0)
                 ->with('error', 'Data gagal tersimpan');
         }
+    }
+
+    public function viewData($id)
+    {
+        $data = MasterBiaya::find($id);
+
+        return view('ops.master.biaya.detail', [
+            'data' => $data,
+            "pageTitle" => "SCA OPS | Master Biaya | Detail",
+        ]);
     }
 
     public function destroy(Request $request, $id)

@@ -2,6 +2,8 @@
 
 namespace App;
 
+use App\Models\Master\Akun;
+use App\Models\Master\Cabang;
 use Illuminate\Database\Eloquent\Model;
 
 class MasterBiaya extends Model
@@ -16,4 +18,20 @@ class MasterBiaya extends Model
     protected $fillable = [
         'id_cabang', 'nama_biaya', 'id_akun_biaya', 'isppn', 'ispph', 'id_akun_pph', 'value_pph', 'aktif', 'user_created', 'dt_created', 'user_modified', 'dt_modified',
     ];
+
+    public function cabang()
+    {
+        return $this->belongsTo(Cabang::class, 'id_cabang');
+    }
+
+    public function akunBiaya()
+    {
+        return $this->belongsTo(Akun::class, 'id_akun_biaya');
+    }
+
+    public function akunPph()
+    {
+        return $this->belongsTo(Akun::class, 'id_akun_pph');
+    }
+
 }

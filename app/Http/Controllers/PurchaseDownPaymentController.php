@@ -34,6 +34,7 @@ class PurchaseDownPaymentController extends Controller
                         $btn = '<label class="label label-default">Batal</label>';
                     } else {
                         $btn = '<ul class="horizontal-list">';
+                        $btn .= '<li><a href="' . route('purchase-down-payment-view', $row->id_uang_muka_pembelian) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
                         $btn .= '<li><a href="' . route('purchase-down-payment-entry', $row->id_uang_muka_pembelian) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
                         $btn .= '<li><a href="' . route('purchase-down-payment-delete', $row->id_uang_muka_pembelian) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Hapus</a></li>';
                         $btn .= '</ul>';
@@ -124,6 +125,16 @@ class PurchaseDownPaymentController extends Controller
         }
     }
 
+    public function viewData($id)
+    {
+        $data = PurchaseDownPayment::find($id);
+
+        return view('ops.purchaseDownPayment.detail', [
+            'data' => $data,
+            "pageTitle" => "SCA OPS | Uang Muka Pembelian | Detail",
+        ]);
+    }
+
     public function destroy(Request $request, $id)
     {
         $data = PurchaseDownPayment::find($id);
@@ -161,15 +172,6 @@ class PurchaseDownPaymentController extends Controller
             ->orderBy('date_permintaan_pembelian', 'desc')->limit(10)->get();
         return $datas;
     }
-
-    // public function autoCurrency(Request $request)
-    // {
-    //     $search = $request->search;
-    //     $datas = DB::table('mata_uang')->select('id_mata_uang as id', DB::raw("CONCAT(kode_mata_uang,' - ',nama_mata_uang) as text"), 'nilai_mata_uang')
-    //         ->where(DB::raw("CONCAT(kode_mata_uang, ' - ', nama_mata_uang)"), 'like', '%' . $search . '%')
-    //         ->get();
-    //     return $datas;
-    // }
 
     public function autoSlip(Request $request)
     {
