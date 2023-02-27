@@ -31,10 +31,9 @@ class MasterSlipController extends Controller
             "data_slip" => $data_slip
         ];
 
-        if ($request->session()->has('token')) {
+        if ($request->session()->has('token') && (in_array('304', $request->session()->get('access')) && in_array('306', $request->session()->get('access')))) {
             return view('accounting.master.slip.index', $data);
-        }
-        else {
+        } else {
             return view('exceptions.forbidden');
         }
     }
@@ -47,7 +46,7 @@ class MasterSlipController extends Controller
     public function create(Request $request)
     {
         $cabang = Cabang::find(1);
-        $data_akun = Akun::where("isshown", 1)->where("id_cabang", $cabang->id_cabang)->get();//DB::select('select * from master_akun');
+        $data_akun = Akun::where("isshown", 1)->where("id_cabang", $cabang->id_cabang)->get(); //DB::select('select * from master_akun');
         $data_cabang = DB::select('select * from cabang where status_cabang = 1');
 
         $data = [
@@ -58,8 +57,7 @@ class MasterSlipController extends Controller
 
         if ($request->session()->has('token')) {
             return view('accounting.master.slip.form', $data);
-        }
-        else {
+        } else {
             return view('exceptions.forbidden');
         }
     }
@@ -138,8 +136,7 @@ class MasterSlipController extends Controller
 
         if ($request->session()->has('token')) {
             return view('accounting.master.slip.detail', $data);
-        }
-        else {
+        } else {
             return view('exceptions.forbidden');
         }
     }
@@ -165,8 +162,7 @@ class MasterSlipController extends Controller
 
         if ($request->session()->has('token')) {
             return view('accounting.master.slip.form', $data);
-        }
-        else {
+        } else {
             return view('exceptions.forbidden');
         }
     }
@@ -248,16 +244,16 @@ class MasterSlipController extends Controller
         if (!empty($data_journal_header)) {
             // return back()->with("failed", "Maaf, tidak bisa menghapus slip" . $data_slip->kode_slip . "karena sudah digunakan pada jurnal");
             return response()->json([
-                "result"=>FALSE,
-                "message"=>"Maaf, tidak bisa menghapus slip dengan kode slip ".$kode_slip.", karena sudah digunakan pada jurnal"
+                "result" => FALSE,
+                "message" => "Maaf, tidak bisa menghapus slip dengan kode slip " . $kode_slip . ", karena sudah digunakan pada jurnal"
             ]);
         }
 
         Slip::find($id)->delete();
         // return back()->with("success", "Berhasil menghapus slip " .  $data_slip->kode_slip);
         return response()->json([
-            "result"=>TRUE,
-            "message"=>"Berhasil menghapus slip dengan kode slip ".$kode_slip
+            "result" => TRUE,
+            "message" => "Berhasil menghapus slip dengan kode slip " . $kode_slip
         ]);
     }
 
@@ -275,7 +271,7 @@ class MasterSlipController extends Controller
         $keyword = $request->search['value'];
         $sort = [];
 
-        foreach($request->order as $key => $order){
+        foreach ($request->order as $key => $order) {
             $columnIdx = $order['column'];
             $sortDir = $order['dir'];
             $sort[] = [
@@ -285,23 +281,23 @@ class MasterSlipController extends Controller
         }
 
         $draw = $request->draw;
-        $current_page = $offset/$limit +1;
+        $current_page = $offset / $limit + 1;
 
         $data_slip = Slip::join('master_akun', 'master_akun.id_akun', 'master_slip.id_akun')
-                ->select('master_slip.*', 'master_akun.nama_akun', DB::raw('
+            ->select('master_slip.*', 'master_akun.nama_akun', DB::raw('
                     (CASE
                         WHEN jenis_slip = 0 THEN "Kas"
                         WHEN jenis_slip = 1 THEN "Bank"
-                        WHEN jenis_slip = 2 THEN "Piutang Dagang"
-                        WHEN jenis_slip = 3 THEN "Hutang Dagang"
+                        WHEN jenis_slip = 2 THEN "Piutang Giro"
+                        WHEN jenis_slip = 3 THEN "Hutang Giro"
                     END) as jenis_name
                 '));
 
         $data_slip_table = DB::table(DB::raw('(' . $data_slip->toSql() . ') as master_slip'));
         $data_slip_table = $data_slip_table->where('id_cabang', $cabang);
 
-        if(!empty($keyword)){
-            $data_slip_table->where(function ($query) use($keyword){
+        if (!empty($keyword)) {
+            $data_slip_table->where(function ($query) use ($keyword) {
                 $query->orWhere('kode_slip', 'LIKE', "%$keyword%")
                     ->orWhere('nama_slip', 'LIKE', "%$keyword%")
                     ->orWhere('jenis_name', 'LIKE', "%$keyword%")
@@ -311,8 +307,8 @@ class MasterSlipController extends Controller
 
         $filtered_data = $data_slip_table->get();
 
-        if($sort){
-            if(!is_array($sort)){
+        if ($sort) {
+            if (!is_array($sort)) {
                 $message = "Invalid array for parameter sort";
                 $data = [
                     'result' => false,
@@ -321,26 +317,26 @@ class MasterSlipController extends Controller
                 return response()->json($data);
             }
 
-            foreach($sort as $key => $s){
+            foreach ($sort as $key => $s) {
                 $column = $s['column'];
                 $directon = $s['dir'];
                 $data_slip_table->orderBy($column, $directon);
             }
-        }else{
+        } else {
             $data_slip_table->orderBy('kode_slip', 'ASC');
         }
 
         // pagination
-        if($current_page){
+        if ($current_page) {
             $page = $current_page;
             $limit_data = $data_slip_table->count();
 
-            if($limit){
+            if ($limit) {
                 $limit_data = $limit;
             }
 
             $offset = ($page - 1) * $limit_data;
-            if($offset < 0){
+            if ($offset < 0) {
                 $offset = 0;
             }
 
@@ -363,13 +359,12 @@ class MasterSlipController extends Controller
     {
         try {
             return Excel::download(new SlipsExport, 'slips.xlsx');
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             Log::error("Error when export excel master slip");
             Log::error($e);
             return response()->json([
-                "result"=>FALSE,
-                "message"=>"Error when export excel master slip"
+                "result" => FALSE,
+                "message" => "Error when export excel master slip"
             ]);
         }
     }
@@ -384,8 +379,8 @@ class MasterSlipController extends Controller
             if ($cabang_source == $cabang_dest) {
                 DB::rollback();
                 return response()->json([
-                    "result"=>FALSE,
-                    "message"=>"Cabang asal dan cabang tujuan sama, pilih cabang tujuan yang lain"
+                    "result" => FALSE,
+                    "message" => "Cabang asal dan cabang tujuan sama, pilih cabang tujuan yang lain"
                 ]);
             }
 
@@ -405,8 +400,8 @@ class MasterSlipController extends Controller
                         if (!$ins_slip->save()) {
                             DB::rollback();
                             return response()->json([
-                                "result"=>FALSE,
-                                "message"=>"Error when save copy master slip"
+                                "result" => FALSE,
+                                "message" => "Error when save copy master slip"
                             ]);
                         }
                     }
@@ -414,17 +409,48 @@ class MasterSlipController extends Controller
             }
             DB::commit();
             return response()->json([
-                "result"=>TRUE,
-                "message"=>"Successfully copying master slip"
+                "result" => TRUE,
+                "message" => "Successfully copying master slip"
             ]);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
             Log::error("Error when copy data master slip");
             Log::error($e);
             return response()->json([
-                "result"=>FALSE,
-                "message"=>"Error when copy data master slip"
+                "result" => FALSE,
+                "message" => "Error when copy data master slip"
+            ]);
+        }
+    }
+
+    public function getSlipByCabang($id_cabang, $id_slip){
+        try{
+            $data_slip = Slip::where("master_slip.id_cabang", $id_cabang)
+            ->where("master_slip.jenis_slip", $id_slip)
+            ->join("master_akun", "master_akun.id_akun", "master_slip.id_akun")
+            ->get();
+
+
+            if(!empty($data_slip)){
+                return response()->json([
+                    "result" => TRUE,
+                    "message" => "Sucessfully get slip data",
+                    "data" => $data_slip
+                ]);
+            }
+            else{
+                return response()->json([
+                    "result" => FALSE,
+                    "message" => "Failed, slip data not found"
+                ]);
+            }
+        }
+        catch(\Exception $e){
+            Log::error("Error when get slip data by cabang");
+            Log::error($e);
+            return response()->json([
+                "result" => FALSE,
+                "message" => "Failed, error when get slip data"
             ]);
         }
     }

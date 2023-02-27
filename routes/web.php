@@ -75,6 +75,7 @@ Route::get('/master/slip/destroy/{id?}', 'MasterSlipController@destroy')->name('
 Route::get('/master/slip/populate', 'MasterSlipController@populate')->name('master-slip-populate');
 Route::get('/master/slip/export/excel', 'MasterSlipController@export_excel')->name('master-slip-export-excel');
 Route::post('/master/slip/copy/data', 'MasterSlipController@copy_data')->name('master-slip-copy-data');
+Route::get('/master/slip/get_by_cabang/{id_cabang?}/{id_slip?}', 'MasterSlipController@getSlipByCabang')->name('master-slip-get-by-cabang');
 
 Route::get('/master/coa', 'MasterCoaController@index')->name('master-coa');
 Route::get('/master/coa/populate/{cabang?}', 'MasterCoaController@populate')->name('master-coa-populate');
@@ -89,6 +90,8 @@ Route::get('/master/coa/get_header2', 'MasterCoaController@get_header2')->name('
 Route::get('/master/coa/get_header3', 'MasterCoaController@get_header3')->name('master-coa-header3');
 Route::get('/master/coa/export/excel', 'MasterCoaController@export_excel')->name('master-coa-export-excel');
 Route::post('/master/coa/copy/data', 'MasterCoaController@copy_data')->name('master-coa-copy-data');
+Route::get('/master/coa/get_by_cabang/{id_cabang?}', 'MasterCoaController@getCoaByCabang')->name('master-coa-get-by-cabang');
+Route::get('/master/coa/get_data/{id?}', 'MasterCoaController@getCoa')->name('master-coa-get-data');
 
 // Transaction
 // Jurnal Umum
@@ -99,3 +102,18 @@ Route::get('/transaction/general_ledger/show/{id?}', 'GeneralLedgerController@sh
 Route::post('/transaction/general_ledger/store', 'GeneralLedgerController@store')->name('transaction-general-ledger-store');
 Route::post('/transaction/general_ledger/update', 'GeneralLedgerController@update')->name('transaction-general-ledger-update');
 Route::get('/transaction/general_ledger/populate', 'GeneralLedgerController@populate')->name('transaction-general-ledger-populate');
+Route::get('/transaction/general_ledger/print/{id?}', 'GeneralLedgerController@printSlip')->name('transaction-general-ledger-print');
+Route::get('/transaction/general_ledger/void/{id?}', 'GeneralLedgerController@void')->name('transaction-general-ledger-void');
+Route::get('/transaction/general_ledger/active/{id?}', 'GeneralLedgerController@active')->name('transaction-general-ledger-active');
+
+// Jurnal Penyesuaian
+Route::get('/transaction/adjustment_ledger', 'AdjustmentLedgerController@index')->name('transaction-adjustment-ledger');
+Route::get('/transaction/adjustment_ledger/form/create', 'AdjustmentLedgerController@create')->name('transaction-adjustment-ledger-create');
+Route::get('/transaction/adjustment_ledger/form/edit/{id?}', 'AdjustmentLedgerController@edit')->name('transaction-adjustment-ledger-edit');
+Route::get('/transaction/adjustment_ledger/show/{id?}', 'AdjustmentLedgerController@show')->name('transaction-adjustment-ledger-show');
+Route::post('/transaction/adjustment_ledger/store', 'AdjustmentLedgerController@store')->name('transaction-adjustment-ledger-store');
+Route::post('/transaction/adjustment_ledger/update', 'AdjustmentLedgerController@update')->name('transaction-adjustment-ledger-update');
+Route::get('/transaction/adjustment_ledger/populate', 'AdjustmentLedgerController@populate')->name('transaction-adjustment-ledger-populate');
+Route::get('/transaction/adjustment_ledger/print/{id?}', 'AdjustmentLedgerController@printSlip')->name('transaction-adjustment-ledger-print');
+Route::get('/transaction/adjustment_ledger/void/{id?}', 'AdjustmentLedgerController@void')->name('transaction-adjustment-ledger-void');
+Route::get('/transaction/adjustment_ledger/active/{id?}', 'AdjustmentLedgerController@active')->name('transaction-adjustment-ledger-active');

@@ -38,32 +38,40 @@
             </li>
             <li class="header">ACCOUNTING</li>
             <li class="nav-item {{ request()->segment(1) == 'dashboard' ? 'active' : null }}">
-                <a href="{{ route('dashboard') }}">
+                <a href="{{ route('dashboard') }}"><i class="fa fa-briefcase"></i> <span>Dashboard</span>
                 </a>
             </li>
             <!-- Optionally, you can add icons to the links -->
-            <li class="treeview {{ request()->segment(1) == 'master' ? 'active' : null }}">
-                <a href="#"><i class="fa fa-link"></i> <span>Master</span>
-                    <span class="pull-right-container">
-                        <i class="fa fa-angle-left pull-right"></i>
-                    </span>
-                </a>
-                <ul class="treeview-menu">
-                    <li class="{{ request()->segment(2) == 'coa' ? 'active' : null }}"><a
-                            href="{{ route('master-coa') }}">Master CoA</a></li>
-                    <li class="{{ request()->segment(2) == 'slip' ? 'active' : null }}"><a
-                            href="{{ route('master-slip') }}">Master Slip</a></li>
-                </ul>
-            </li>
-            <li class="treeview ">
+            @if (in_array('304', Session::get('access')))
+                <li class="treeview {{ request()->segment(1) == 'master' ? 'active' : null }}">
+                    <a href="#"><i class="fa fa-link"></i> <span>Master</span>
+                        <span class="pull-right-container">
+                            <i class="fa fa-angle-left pull-right"></i>
+                        </span>
+                    </a>
+                    <ul class="treeview-menu">
+                        @if (in_array('305', Session::get('access')))
+                            <li class="{{ request()->segment(2) == 'coa' ? 'active' : null }}"><a
+                                    href="{{ route('master-coa') }}">Master CoA</a></li>
+                        @endif
+                        @if (in_array('306', Session::get('access')))
+                            <li class="{{ request()->segment(2) == 'slip' ? 'active' : null }}"><a
+                                    href="{{ route('master-slip') }}">Master Slip</a></li>
+                        @endif
+                    </ul>
+                </li>
+            @endif
+            <li class="treeview {{ request()->segment(1) == 'transaction' ? 'active' : null }}">
                 <a href="#"><i class="fa fa-link"></i> <span>Transaction</span>
                     <span class="pull-right-container">
                         <i class="fa fa-angle-left pull-right"></i>
                     </span>
                 </a>
                 <ul class="treeview-menu">
-                    <li class="{{ request()->segment(2) == 'slip' ? 'active' : null }}"><a href="{{ route('transaction-general-ledger') }}">Jurnal Umum</a></li>
-                    <li><a href="#">Link in level 2</a></li>
+                    <li class="{{ request()->segment(2) == 'general_ledger' ? 'active' : null }}"><a
+                            href="{{ route('transaction-general-ledger') }}">Jurnal Umum</a></li>
+                    <li class="{{ request()->segment(2) == 'adjustment_ledger' ? 'active' : null }}"><a
+                            href="{{ route('transaction-adjustment-ledger') }}">Jurnal Penyesuaian</a></li>
                 </ul>
             </li>
             <li class="treeview ">

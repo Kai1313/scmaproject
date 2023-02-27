@@ -104,7 +104,7 @@
                                 <div class="form-group">
                                     <label>Notes</label>
                                     <textarea name="notes" class="form-control" rows="3" placeholder="Notes ...">{{ (isset($akun->catatan)?$akun->catatan:'') }}</textarea>
-                                  </div>
+                                </div>
                             </div>
                         </div>
                         <div class="row">
