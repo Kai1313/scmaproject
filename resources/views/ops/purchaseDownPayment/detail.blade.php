@@ -58,7 +58,6 @@
                                 : {{ $data->purchaseOrder->nama_permintaan_pembelian }}
                             </div>
                         </div>
-
                     </div>
                     <div class="col-md-6">
                         <div class="row">
