@@ -77,7 +77,7 @@ class PurchaseRequest extends Model
                     'qty' => normalizeNumber($data->qty),
                     'notes' => $data->notes,
                     'purchase_request_id' => $this->purchase_request_id,
-                    'closed' => '1',
+                    'closed' => '0',
                 ]);
             }
         }
