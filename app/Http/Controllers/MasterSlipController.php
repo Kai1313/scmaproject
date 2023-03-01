@@ -6,6 +6,7 @@ use App\Models\Master\Slip;
 use App\Models\Master\Cabang;
 use App\Models\Master\Akun;
 use App\Exports\SlipsExport;
+use App\Models\Accounting\JurnalHeader;
 use Illuminate\Http\Request;
 use DB;
 use Log;
@@ -107,10 +108,10 @@ class MasterSlipController extends Controller
             return response()->json($data);
         } catch (\Exception $e) {
             DB::rollback();
-            Log::debug(json_encode($request->all()));
+            Log::error("Failed when saving data slip " . $e);
             $data = [
                 'result' => false,
-                'message' => 'Failed when saving data slip ' . $e
+                'message' => 'Failed when saving data slip, contact developer'
             ];
 
             return response()->json($data);
@@ -175,7 +176,7 @@ class MasterSlipController extends Controller
      */
     public function update(Request $request)
     {
-        // try {
+        try {
         //code...
         DB::beginTransaction();
         $request->validate([
@@ -218,16 +219,16 @@ class MasterSlipController extends Controller
         }
 
         return response()->json($data);
-        // } catch (\Exception $e) {
-        //     DB::rollback();
-        //     Log::debug(json_encode($request->all()));
-        //     $data = [
-        //         'result' => false,
-        //         'message' => 'Failed when saving data slip ' . $e
-        //     ];
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error("Failed when saving data slip " . $e);
+            $data = [
+                'result' => false,
+                'message' => 'Failed when saving data slip, contact developer'
+            ];
 
-        //     return response()->json($data);
-        // }
+            return response()->json($data);
+        }
     }
 
     /**
@@ -238,10 +239,10 @@ class MasterSlipController extends Controller
      */
     public function destroy($id)
     {
-        $data_journal_header = DB::select('select * from jurnal_header where id_slip = ' . $id);
+        $data_journal_header = JurnalHeader::where('id_slip', $id)->get();
         $data_slip = Slip::find($id);
         $kode_slip = $data_slip->kode_slip;
-        if (!empty($data_journal_header)) {
+        if ($data_journal_header->isNotEmpty()) {
             // return back()->with("failed", "Maaf, tidak bisa menghapus slip" . $data_slip->kode_slip . "karena sudah digunakan pada jurnal");
             return response()->json([
                 "result" => FALSE,

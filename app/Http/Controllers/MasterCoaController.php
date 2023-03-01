@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Master\Akun;
 use App\Models\Master\Cabang;
 use App\Exports\AkunsExport;
+use App\Models\Accounting\JurnalDetail;
+use App\Models\Master\Slip;
 use Log;
 use DB;
 use Excel;
@@ -281,7 +283,33 @@ class MasterCoaController extends Controller
             DB::beginTransaction();
             // Get akun data
             $akun = Akun::where("id_akun", $id)->first();
+            $kode_akun = $akun->kode_akun;
             if ($akun) {
+
+                // Init check
+                $children = Akun::where('id_parent', $id)->get();
+                $akun_slip = Slip::where('id_akun', $id)->get();
+                $jurnal_detail = JurnalDetail::where('id_akun', $id)->get();
+
+                // checking
+                if($children->isNotEmpty()){
+                    return response()->json([
+                        "result" => FALSE,
+                        "message" => "Maaf, tidak bisa menghapus akun dengan kode akun  " . $kode_akun .". Karena mempunyai sub akun"
+                    ]);
+                }
+                else if($akun_slip->isNotEmpty()){
+                    return response()->json([
+                        "result" => FALSE,
+                        "message" => "Maaf, tidak bisa menghapus akun dengan kode akun  " . $kode_akun .". Karena telah digunakan pada Master Slip"
+                    ]);
+                }else if($jurnal_detail->isNotEmpty()){
+                    return response()->json([
+                        "result" => FALSE,
+                        "message" => "Maaf, tidak bisa menghapus akun dengan kode akun  " . $kode_akun .". Karena telah digunakan pada Jurnal"
+                    ]);
+                }
+
                 // Delete data
                 if (!$akun->delete()) {
                     DB::rollback();
