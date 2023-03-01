@@ -95,19 +95,6 @@
                                         <label>Tanggal Jurnal</label>
                                         <input type="date" class="form-control" id="tanggal" name="tanggal" placeholder="Masukkan tanggal jurnal umum" value="{{ isset($jurnal_header->tanggal_jurnal)?$jurnal_header->tanggal_jurnal:'' }}" data-validation="[NOTEMPTY]" data-validation-message="Tanggal Jurnal tidak boleh kosong">
                                     </div>
-                                    {{-- <div class="form-group">
-                                        <label>Jenis Jurnal</label>
-                                        <input type="text" name="jenis" id="jenis" value="{{ isset($jurnal_header->jenis_jurnal)?$jurnal_header->jenis_jurnal:'' }}" class="form-control" readonly>
-                                    </div> --}}
-                                    {{-- <div class="form-group">
-                                        <label>Slip</label>
-                                        <select name="slip" id="slip" class="form-control select2" data-validation="[NOTEMPTY]" data-validation-message="Slip tidak boleh kosong">
-                                            <option value="">Pilih Slip</option>
-                                            @foreach ($data_slip as $slip)
-                                                    <option value="{{ $slip->kode_slip }}">{{ $slip->kode_slip.' - '.$slip->nama_slip }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div> --}}
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
@@ -140,10 +127,6 @@
                                         <label>Akun</label>
                                         <select name="akun_detail" class="form-control select2" id="akun_detail" data-error="Wajib isi" data-validation="[NOTEMPTY]" data-validation-message="Akun tidak boleh kosong" required>
                                             <option value="">Pilih Akun</option>
-                                            {{-- @foreach ($data_akun as $akunDt)
-                                                    <option value="{{ $akunDt->id_akun }}">{{ $akunDt->kode_akun.' - '.$akunDt->nama_akun }}
-                                            </option>
-                                            @endforeach --}}
                                         </select>
                                     </div>
                                     <div class="form-group">
@@ -164,6 +147,7 @@
                             </div>
                             <div class="row mb-1">
                                 <div class="col-xs-12">
+                                    <input type="hidden" id="edit_id" name="edit_id">
                                     <button type="submit" id="btn-submit-detail" class="btn btn-flat btn-primary pull-right"><span class="glyphicon glyphicon-floppy-saved" aria-hidden="true"></span> Tambah Detail</button>
                                 </div>
                             </div>
@@ -373,6 +357,20 @@
             })
             populate_detail(details)
         })
+
+        // Edit detail
+        $("#table_detail").on("click", ".edit-detail", function() {
+            let guid = $(this).data('guid')
+            detail = details.filter(function(item) {
+                return item['guid'] == guid
+            })
+            // Set data on form
+            $("#akun_detail").val(detail[0]["akun"]).trigger("change.select2")
+            $("#notes_detail").val(detail[0]["notes"])
+            $("#debet").val(detail[0]["debet"])
+            $("#kredit").val(detail[0]["kredit"])
+            $("#edit_id").val(detail[0]["guid"])
+        })
     })
 
     function save_data() {
@@ -478,6 +476,7 @@
 
     function submit_detail() {
         console.log("submit detail clicked" + guid)
+        let detailguid = $("#edit_id").val()
         let akun = $("#akun_detail").val()
         let nama_akun = $("#akun_detail").find(":selected").data("nama")
         let kode_akun = $("#akun_detail").find(":selected").data("kode")
@@ -485,8 +484,13 @@
         let debet = $("#debet").val()
         let kredit = $("#kredit").val()
 
+        if (detailguid != "") {
+            details = details.filter(function(item) {
+                return item['guid'] != detailguid
+            })
+        }
         details.push({
-            guid: guid,
+            guid: (detailguid != "")?detailguid:guid,
             akun: akun,
             nama_akun: nama_akun,
             kode_akun: kode_akun,
@@ -504,6 +508,7 @@
         $("#notes_detail").val("")
         $("#debet").val("")
         $("#kredit").val("")
+        $("#edit_id").val("")
     }
 
     function populate_detail(details) {
@@ -543,7 +548,7 @@
                     orderable: false,
                     searchable: false,
                     render: function(data, type, row) {
-                        let btn = '<button type="button" class="btn btn-sm btn-danger remove-detail" data-guid="' + data + '"><i class="fa fa-trash"></i></button>'
+                        let btn = '<button type="button" class="btn btn-sm btn-danger remove-detail mr-1" data-guid="' + data + '"><i class="fa fa-trash"></i></button><button type="button" class="btn btn-sm btn-warning edit-detail" data-guid="' + data + '"><i class="fa fa-edit"></i></button>'
                         return btn
                     }
                 },
