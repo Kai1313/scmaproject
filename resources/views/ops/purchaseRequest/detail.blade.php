@@ -1,6 +1,8 @@
 @extends('layouts.main')
 
 @section('addedStyles')
+    <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/bower_components/jquery-treetable/css/jquery.treetable.css') }}">
     <style>
         th {
             text-align: center;
@@ -88,31 +90,65 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+        <div class="box box-primary">
+            <div class="box-body">
+                <h4>Detil Permintaan Barang</h4>
                 <div class="table-responsive">
-                    <table class="table">
+                    <table id="table-detail" class="table table-bordered data-table">
                         <thead>
                             <tr>
-                                <th width="200">Kode Barang</th>
-                                <th width="200">Nama Barang</th>
-                                <th width="100">Satuan</th>
-                                <th width="150">Jumlah</th>
+                                <th>Kode Barang</th>
+                                <th>Nama Barang</th>
+                                <th>Satuan</th>
+                                <th>Jumlah</th>
                                 <th>Catatan</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            @foreach ($data->formatdetail as $detail)
-                                <tr>
-                                    <td>{{ $detail->kode_barang }}</td>
-                                    <td>{{ $detail->nama_barang }}</td>
-                                    <td class="text-center">{{ $detail->nama_satuan_barang }}</td>
-                                    <td class="text-right">{{ $detail->qty }}</td>
-                                    <td>{{ $detail->notes }}</td>
-                                </tr>
-                            @endforeach
-                        </tbody>
                     </table>
                 </div>
             </div>
         </div>
     </div>
+@endsection
+
+@section('addedScripts')
+    <script src="{{ asset('assets/bower_components/datatables.net/js/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js') }}"></script>
+    <script src="{{ asset('js/custom.js') }}"></script>
+@endsection
+
+@section('externalScripts')
+    <script>
+        let details = {!! $data ? $data->formatdetail : '[]' !!};
+        var resDataTable = $('#table-detail').DataTable({
+            data: details,
+            ordering: false,
+            columns: [{
+                    data: 'kode_barang',
+                    name: 'kode_barang'
+                },
+                {
+                    data: 'nama_barang',
+                    name: 'nama_barang'
+                },
+                {
+                    data: 'nama_satuan_barang',
+                    name: 'nama_satuan_barang'
+                },
+                {
+                    data: 'qty',
+                    name: 'qty',
+                    render: $.fn.dataTable.render.number('.', ',', 2),
+                    className: 'text-right'
+                },
+                {
+                    data: 'notes',
+                    name: 'notes'
+                },
+
+            ]
+        });
+    </script>
 @endsection

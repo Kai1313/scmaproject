@@ -2,7 +2,6 @@
 
 @section('addedStyles')
     <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css') }}">
-    <!-- Treetable -->
     <link rel="stylesheet" href="{{ asset('assets/bower_components/jquery-treetable/css/jquery.treetable.css') }}">
     <link rel="stylesheet"
         href="{{ asset('assets/bower_components/jquery-treetable/css/jquery.treetable.theme.default.css') }}">
@@ -93,12 +92,11 @@
             <div class="box">
                 <div class="box-header">
                     <h3 class="box-title">{{ $data ? 'Ubah' : 'Tambah' }} Permintaan Pembelian</h3>
-                    <a href="{{ route('purchase-request') }}"
-                        class="btn bg-navy btn-sm btn-default btn-flat pull-right"><span
-                            class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali</a>
+                    <a href="{{ route('purchase-request') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right">
+                        <span class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali
+                    </a>
                 </div>
                 <div class="box-body">
-
                     <div class="row">
                         <div class="col-md-6">
                             <div class="row">
@@ -143,8 +141,9 @@
                                     <label class="col-md-3">Status</label>
                                     <div class="col-md-5 form-group">
                                         @if (isset($arrayStatus[$data->approval_status]))
-                                            <label
-                                                class="{{ $arrayStatus[$data->approval_status]['class'] }}">{{ $arrayStatus[$data->approval_status]['text'] }}</label>
+                                            <label class="{{ $arrayStatus[$data->approval_status]['class'] }}">
+                                                {{ $arrayStatus[$data->approval_status]['text'] }}
+                                            </label>
                                         @endif
                                     </div>
                                 </div>
@@ -190,7 +189,7 @@
                 <div class="box-body">
                     <div class="row">
                         <div class="col-md-6">
-                            <h4>Detil Permintaan Pembelian</h4>
+                            <h4>Detil Permintaan Barang</h4>
                         </div>
                         <div class="col-md-6">
                             @if (!$data || $data->approval_status == 0)

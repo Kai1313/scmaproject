@@ -50,6 +50,8 @@ function formatRupiah(angka, prefix) {
 function normalizeNumber(number) {
     if (number.indexOf(',')) {
         number = number.replace('.', '').replace(',', '.')
+    } else {
+        number = number.replace('.', '')
     }
 
     return parseFloat(number)

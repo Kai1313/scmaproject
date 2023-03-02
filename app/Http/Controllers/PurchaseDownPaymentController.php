@@ -36,7 +36,7 @@ class PurchaseDownPaymentController extends Controller
                         $btn = '<ul class="horizontal-list">';
                         $btn .= '<li><a href="' . route('purchase-down-payment-view', $row->id_uang_muka_pembelian) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
                         $btn .= '<li><a href="' . route('purchase-down-payment-entry', $row->id_uang_muka_pembelian) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
-                        $btn .= '<li><a href="' . route('purchase-down-payment-delete', $row->id_uang_muka_pembelian) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Hapus</a></li>';
+                        $btn .= '<li><a href="' . route('purchase-down-payment-delete', $row->id_uang_muka_pembelian) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Void</a></li>';
                         $btn .= '</ul>';
                     }
                     return $btn;
@@ -109,6 +109,9 @@ class PurchaseDownPaymentController extends Controller
                 $data->user_modified = session()->get('user')['id_pengguna'];
             }
 
+            $data->rate = normalizeNumber($request->rate);
+            $data->nominal = normalizeNumber($request->nominal);
+            $data->total = normalizeNumber($request->total);
             $data->save();
 
             DB::commit();
