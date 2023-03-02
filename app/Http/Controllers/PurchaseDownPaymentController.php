@@ -135,7 +135,7 @@ class PurchaseDownPaymentController extends Controller
         ]);
     }
 
-    public function destroy(Request $request, $id)
+    public function destroy($id)
     {
         $data = PurchaseDownPayment::find($id);
         if (!$data) {

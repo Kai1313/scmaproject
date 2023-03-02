@@ -1,8 +1,41 @@
 @extends('layouts.main')
 
 @section('addedStyles')
+    <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css') }}">
+    <!-- Treetable -->
+    <link rel="stylesheet" href="{{ asset('assets/bower_components/jquery-treetable/css/jquery.treetable.css') }}">
+    <link rel="stylesheet"
+        href="{{ asset('assets/bower_components/jquery-treetable/css/jquery.treetable.theme.default.css') }}">
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="{{ asset('assets/bower_components/select2/dist/css/select2.min.css') }}">
     <style>
+        ul.horizontal-list {
+            min-width: 200px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        ul.horizontal-list li {
+            display: inline;
+        }
+
+        .mb-1 {
+            margin-bottom: .25rem !important;
+        }
+
+        th {
+            text-align: center;
+        }
+
+        .head-checkbox {
+            padding-top: 30px;
+        }
+
+        .head-checkbox label {
+            margin-right: 10px;
+        }
+
         label>span {
             color: red;
         }
@@ -56,15 +89,16 @@
             </div>
         @endif
 
-        <div class="box">
-            <div class="box-header">
-                <h3 class="box-title">{{ $data ? 'Ubah' : 'Tambah' }} Permintaan Pembelian</h3>
-                <a href="{{ route('purchase-request') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right"><span
-                        class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali</a>
-            </div>
-            <div class="box-body">
-                <form action="{{ route('purchase-request-save-entry', $data ? $data->purchase_request_id : 0) }}"
-                    method="post">
+        <form action="{{ route('purchase-request-save-entry', $data ? $data->purchase_request_id : 0) }}" method="post">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">{{ $data ? 'Ubah' : 'Tambah' }} Permintaan Pembelian</h3>
+                    <a href="{{ route('purchase-request') }}"
+                        class="btn bg-navy btn-sm btn-default btn-flat pull-right"><span
+                            class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali</a>
+                </div>
+                <div class="box-body">
+
                     <div class="row">
                         <div class="col-md-6">
                             <div class="row">
@@ -150,14 +184,25 @@
                             </div>
                         </div>
                     </div>
-                    @if (!$data || $data->approval_status == 0)
-                        <button class="btn btn-primary add-entry btn-flat" type="button"><i
-                                class="glyphicon glyphicon-plus"></i> Tambah Barang</button>
-                    @endif
-                    <br><br>
+                </div>
+            </div>
+            <div class="box">
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4>Detil Permintaan Pembelian</h4>
+                        </div>
+                        <div class="col-md-6">
+                            @if (!$data || $data->approval_status == 0)
+                                <button class="btn btn-info add-entry btn-flat pull-right" type="button">
+                                    <i class="glyphicon glyphicon-plus"></i> Tambah Barang
+                                </button>
+                            @endif
+                        </div>
+                    </div>
                     <div class="table-responsive">
                         <input type="hidden" name="details">
-                        <table class="table table-detail table-bordered">
+                        <table id="table-detail" class="table table-bordered data-table">
                             <thead>
                                 <tr>
                                     <th>Kode Barang</th>
@@ -168,31 +213,6 @@
                                     <th style="width:150px;">Action</th>
                                 </tr>
                             </thead>
-                            <tbody id="target-table">
-                                @if ($data)
-                                    @foreach ($data->formatdetail as $detail)
-                                        <tr data-index="{{ $detail->index }}">
-                                            <td>{{ $detail->kode_barang }}</td>
-                                            <td>{{ $detail->nama_barang }}</td>
-                                            <td>{{ $detail->nama_satuan_barang }}</td>
-                                            <td class="text-right tag-qty">{{ $detail->qty }}</td>
-                                            <td>{{ $detail->notes }}</td>
-                                            <td class="text-center">
-                                                @if (!$data || $data->approval_status == 0)
-                                                    <a href="javascript:void(0)"
-                                                        class="btn btn-warning edit-entry btn-sm btn-flat">
-                                                        <i class="glyphicon glyphicon-pencil"></i>
-                                                    </a>
-                                                    <a href="javascript:void(0)"
-                                                        class="btn btn-danger delete-entry btn-sm btn-flat">
-                                                        <i class="glyphicon glyphicon-trash"></i>
-                                                    </a>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                @endif
-                            </tbody>
                         </table>
                     </div>
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
@@ -201,9 +221,9 @@
                             <i class="glyphicon glyphicon-floppy-saved"></i> Simpan Data
                         </button>
                     @endif
-                </form>
+                </div>
             </div>
-        </div>
+        </form>
 
         <div class="modal fade" id="modalEntry" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-sm" role="document">
@@ -247,6 +267,8 @@
 @endsection
 
 @section('addedScripts')
+    <script src="{{ asset('assets/bower_components/datatables.net/js/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js') }}"></script>
     <script src="{{ asset('assets/bower_components/select2/dist/js/select2.min.js') }}"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/custom.js') }}"></script>
@@ -259,6 +281,52 @@
         let count = details.length
         let statusModal = 'create'
         $('.select2').select2()
+
+        var resDataTable = $('#table-detail').DataTable({
+            data: details,
+            ordering: false,
+            columns: [{
+                    data: 'kode_barang',
+                    name: 'kode_barang'
+                },
+                {
+                    data: 'nama_barang',
+                    name: 'nama_barang'
+                },
+                {
+                    data: 'nama_satuan_barang',
+                    name: 'nama_satuan_barang'
+                },
+                {
+                    data: 'qty',
+                    name: 'qty',
+                    render: $.fn.dataTable.render.number('.', ',', 2),
+                    className: 'text-right'
+                },
+                {
+                    data: 'notes',
+                    name: 'notes'
+                },
+                {
+                    data: 'index',
+                    className: 'text-center',
+                    name: 'index',
+                    searchable: false,
+                    render: function(data, type, row, meta) {
+                        let btn = '<ul class="horizontal-list">';
+                        btn +=
+                            '<li><a href="javascript:void(0)" data-index="' + data +
+                            '" class="btn btn-warning btn-xs mr-1 mb-1 edit-entry"><i class="glyphicon glyphicon-pencil"></i></a></li>';
+                        btn +=
+                            '<li><a href="javascript:void(0)" data-index="' + data +
+                            '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1 delete-entry"><i class="glyphicon glyphicon-trash"></i></a></li>';
+                        btn += '</ul>';
+                        return btn;
+                    }
+                },
+            ]
+        });
+
         if ($('[name="id_cabang"]').val() == '') {
             $('[name="id_gudang"]').prop('disabled', true)
         }
@@ -376,22 +444,9 @@
             })
 
             let newObj = Object.assign({}, detailSelect)
-            let html = '<tr data-index="' + newObj.index + '">' +
-                '<td>' + newObj.kode_barang + '</td>' +
-                '<td>' + newObj.nama_barang + '</td>' +
-                '<td>' + newObj.nama_satuan_barang + '</td>' +
-                '<td class="text-right tag-qty">' + formatNumber(newObj.qty) + '</td>' +
-                '<td>' + newObj.notes + '</td>' +
-                '<td class="text-center">' +
-                '<a href="javascript:void(0)" class="btn btn-warning edit-entry btn-sm btn-flat"><i class="glyphicon glyphicon-pencil"></i></a>' +
-                '<a href="javascript:void(0)" class="btn btn-danger delete-entry btn-sm btn-flat"><i class="glyphicon glyphicon-trash"></i></a>' +
-                '</td>' +
-                '</tr>'
             if (statusModal == 'create') {
-                $('#target-table').append(html)
                 details.push(newObj)
             } else if (statusModal == 'edit') {
-                $('#target-table').find('[data-index="' + newObj.index + '"]').replaceWith(html)
                 details[newObj.index - 1] = newObj
             }
 
@@ -399,6 +454,8 @@
 
             statusModal = ''
             detailSelect = []
+
+            resDataTable.clear().rows.add(details).draw()
             $('#modalEntry').modal('hide')
         })
 
@@ -420,7 +477,7 @@
                 backdrop: 'static',
                 keyboard: false
             })
-            let index = $(this).parents('tr').data('index')
+            let index = $(this).data('index')
             statusModal = 'edit'
             detailSelect = details[index - 1]
             for (select in detailSelect) {
@@ -440,8 +497,7 @@
         })
 
         $('body').on('click', '.delete-entry', function() {
-            let parent = $(this).parents('tr')
-            let index = parent.data('index')
+            let index = $(this).parents('tr').index()
             Swal.fire({
                 title: 'Anda yakin ingin menghapus data ini?',
                 icon: 'info',
@@ -456,35 +512,16 @@
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    details.splice(index - 1, 1)
-                    parent.remove()
+                    details.splice(index, 1)
                     count -= 1
 
                     for (let i = 0; i < details.length; i++) {
-                        $('#target-table').find('[data-index="' + details[i].index + '"]').attr(
-                            'data-index',
-                            i + 1)
                         details[i].index = i + 1
                     }
 
+                    resDataTable.clear().rows.add(details).draw()
                     $('[name="details"]').val(JSON.stringify(details))
                 }
-            })
-        })
-
-        $(function() {
-            $(document).on('select2:open', () => {
-                document.querySelector('.select2-search__field').focus()
-            })
-
-            $(document).on('focus', '.select2-selection.select2-selection--single', function(e) {
-                $(this).closest(".select2-container").siblings('select:enabled').select2('open')
-            })
-
-            $('select.select2').on('select2:closing', function(e) {
-                $(e.target).data("select2").$selection.one('focus focusin', function(e) {
-                    e.stopPropagation();
-                })
             })
         })
 

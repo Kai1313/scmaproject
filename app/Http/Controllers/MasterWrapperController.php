@@ -122,7 +122,7 @@ class MasterWrapperController extends Controller
         ]);
     }
 
-    public function destroy(Request $request, $id)
+    public function destroy($id)
     {
         $data = MasterWrapper::find($id);
         if (!$data) {

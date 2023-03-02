@@ -124,6 +124,7 @@
     <script src="{{ asset('assets/bower_components/fastclick/lib/fastclick.js') }}"></script>
     <!-- TreeTable -->
     <script src="{{ asset('assets/bower_components/jquery-treetable/jquery.treetable.js') }}"></script>
+    <script src="{{ asset('js/custom.js') }}"></script>
 @endsection
 
 @section('externalScripts')
@@ -156,12 +157,6 @@
                 searchable: false
             }]
         });
-
-        $(document).on('click', '.btn-destroy', function(e) {
-            e.preventDefault()
-            let route = $(this).prop('href')
-            $('#approvalDelete').modal('show').find('form').attr('action', route)
-        })
 
         $('[name="id_cabang"]').change(function() {
             table.ajax.url("?c=" + $('[name="id_cabang"]').val() + '&show_img=' + $('[name="show_image"]').is(

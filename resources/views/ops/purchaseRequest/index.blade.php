@@ -199,5 +199,27 @@
             table.ajax.url("?c=" + $('[name="id_cabang"]').val() + '&show_void=' + $('[name="show_void"]').is(
                 ':checked')).load()
         })
+
+        $('body').on('click', '.btn-change-status', function(e) {
+            let self = $(this)
+            e.preventDefault();
+            Swal.fire({
+                title: 'Anda yakin ingin ' + self.data('param') + ' data ini?',
+                icon: 'info',
+                showDenyButton: true,
+                confirmButtonText: 'Yes',
+                denyButtonText: 'No',
+                reverseButtons: true,
+                customClass: {
+                    actions: 'my-actions',
+                    confirmButton: 'order-1',
+                    denyButton: 'order-3',
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = self.prop('href')
+                }
+            })
+        })
     </script>
 @endsection

@@ -140,7 +140,7 @@ class MasterBiayaController extends Controller
         ]);
     }
 
-    public function destroy(Request $request, $id)
+    public function destroy($id)
     {
         $data = MasterBiaya::find($id);
         if (!$data) {
