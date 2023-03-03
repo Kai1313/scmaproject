@@ -299,7 +299,7 @@
                 {
                     data: 'qty',
                     name: 'qty',
-                    render: $.fn.dataTable.render.number('.', ',', 2),
+                    render: $.fn.dataTable.render.number('.', ',', 4),
                     className: 'text-right'
                 },
                 {

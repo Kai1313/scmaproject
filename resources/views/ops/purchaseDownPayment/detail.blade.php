@@ -69,19 +69,19 @@
                         <div class="row">
                             <label class="col-md-4">Rate</label>
                             <div class="col-md-8">
-                                : {{ $data->rate }}
+                                : {{ number_format($data->rate, 2, ',', '.') }}
                             </div>
                         </div>
                         <div class="row">
                             <label class="col-md-4">Nominal</label>
                             <div class="col-md-8">
-                                : {{ $data->nominal }}
+                                : {{ number_format($data->nominal, 2, ',', '.') }}
                             </div>
                         </div>
                         <div class="row">
                             <label class="col-md-4">Total</label>
                             <div class="col-md-8">
-                                : {{ $data->total }}
+                                : {{ number_format($data->total, 2, ',', '.') }}
                             </div>
                         </div>
                         <div class="row">

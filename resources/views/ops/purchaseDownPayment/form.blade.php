@@ -104,13 +104,8 @@
                                     </select>
                                 </div>
                             </div>
-                            {{-- <div class="row">
-                                <label class="col-md-3">Mata Uang <span>*</span></label>
-                                <div class="col-md-5 form-group"> --}}
                             <input type="hidden" name="id_mata_uang"
                                 value="{{ old('id_mata_uang', $data ? $data->id_mata_uang : '') }}">
-                            {{-- </div>
-                            </div> --}}
                             <div class="row">
                                 <label class="col-md-3">Slip <span>*</span></label>
                                 <div class="col-md-5 form-group">
@@ -139,9 +134,6 @@
                                     <input type="text" name="nominal" class="form-control handle-number-4"
                                         value="{{ old('nominal', $data ? $data->nominal : '') }}"
                                         data-max="{{ $data ? $data->nominal : 0 }}">
-                                    {{-- <input type="text" name="nominal" class="form-control handle-number-4"
-                                        value="{{ old('nominal', $data ? $data->nominal : '') }}"
-                                        max="{{ $data ? $data->nominal : 0 }}"> --}}
                                 </div>
                             </div>
                             <div class="row">

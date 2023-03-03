@@ -61,7 +61,8 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Cabang <span>*</span></label>
-                                <select name="id_cabang" class="form-control select2">
+                                <select name="id_cabang" class="form-control select2" data-validation="[NOTEMPTY]"
+                                    data-validation-message="Cabang tidak boleh kosong">
                                     <option value="">Pilih Cabang</option>
                                     @foreach ($cabang as $branch)
                                         <option value="{{ $branch->id_cabang }}"
@@ -73,11 +74,13 @@
                             <div class="form-group">
                                 <label>Nama Biaya <span>*</span></label>
                                 <input type="text" class="form-control" name="nama_biaya"
-                                    value="{{ old('nama_biaya', $data ? $data->nama_biaya : '') }}">
+                                    value="{{ old('nama_biaya', $data ? $data->nama_biaya : '') }}"
+                                    data-validation="[NOTEMPTY]" data-validation-message="Nama Biaya tidak boleh kosong">
                             </div>
                             <div class="form-group">
                                 <label>Akun Biaya <span>*</span></label>
-                                <select name="id_akun_biaya" class="form-control select2">
+                                <select name="id_akun_biaya" class="form-control select2" data-validation="[NOTEMPTY]"
+                                    data-validation-message="Akun Biaya tidak boleh kosong">
                                     <option value="">Pilih Akun Biaya</option>
                                     @foreach ($akunBiaya as $biaya)
                                         <option value="{{ $biaya->id_akun }}"
@@ -86,17 +89,23 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="form-group">
-                                <label class="label-checkbox">PPn</label>
-                                <input type="checkbox" name="isppn" value="1"
-                                    {{ old('isppn', $data ? $data->isppn : '') ? 'checked' : '' }}>
-                            </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="label-checkbox">PPh</label>
-                                <input type="checkbox" name="ispph" value="1"
-                                    {{ old('ispph', $data ? $data->ispph : '') ? 'checked' : '' }}>
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label class="label-checkbox">PPn</label>
+                                        <input type="checkbox" name="isppn" value="1"
+                                            {{ old('isppn', $data ? $data->isppn : '') ? 'checked' : '' }}>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label class="label-checkbox">PPh</label>
+                                        <input type="checkbox" name="ispph" value="1"
+                                            {{ old('ispph', $data ? $data->ispph : '') ? 'checked' : '' }}>
+                                    </div>
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label>Nilai PPh</label>
@@ -132,17 +141,54 @@
 @endsection
 
 @section('addedScripts')
+    <script src="{{ asset('assets/plugins/jquery-form-validation-1.5.3/dist/jquery.validation.min.js') }}"></script>
     <script src="{{ asset('assets/bower_components/select2/dist/js/select2.min.js') }}"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/custom.js') }}"></script>
 @endsection
 
 @section('externalScripts')
     <script>
+        var validation = {
+            submit: {
+                settings: {
+                    form: 'form',
+                    inputContainer: '.form-group',
+                    errorListClass: 'form-control-error',
+                    errorClass: 'has-error',
+                    allErrors: true,
+                    scrollToError: {
+                        offset: -100,
+                        duration: 500
+                    }
+                },
+                callback: {
+                    onSubmit: function(node, formData) {
+                        saveData()
+                    }
+                }
+            },
+            dynamic: {
+                settings: {
+                    trigger: 'keyup',
+                    delay: 1000
+                },
+            }
+        }
+
+        $.validate(validation)
+
         $('[name="ispph"]').change(function() {
             if ($(this).is(':checked')) {
                 $('.show-pph').prop('disabled', false)
+                $('[name="value_pph"]').attr('data-validation', '[NOTEMPTY]').attr('data-validation-message',
+                    'Nilai pph tidak boleh kosong')
+                $('[name="id_akun_pph"]').attr('data-validation', '[NOTEMPTY]').attr('data-validation-message',
+                    'Akun pph tidak boleh kosong')
             } else {
                 $('.show-pph').prop('disabled', true).val('').trigger('change')
+                $('[name="value_pph"]').removeAttr('data-validation').removeAttr('data-validation-message')
+                $('[name="id_akun_pph"]').removeAttr('data-validation').removeAttr('data-validation-message')
             }
         })
 
@@ -151,6 +197,30 @@
             $('.show-pph').prop('disabled', false)
         } else {
             $('.show-pph').prop('disabled', true)
+        }
+
+        function saveData() {
+            let url = $('form').prop('action')
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: $("form").serialize(),
+                dataType: "JSON",
+                success: function(data) {
+                    if (data.result) {
+                        Swal.fire('Tersimpan!', data.message, 'success').then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = data.redirect;
+                            }
+                        })
+                    } else {
+                        Swal.fire("Gagal Menyimpan Data. ", data.message, 'error')
+                    }
+                },
+                error: function(data) {
+                    Swal.fire("Gagal Menyimpan Data. ", data.responseJSON.message, 'error')
+                }
+            })
         }
     </script>
 @endsection

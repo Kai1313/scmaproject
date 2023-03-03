@@ -169,9 +169,15 @@ class PurchaseDownPaymentController extends Controller
     {
         $search = $request->search;
         $idCabang = $request->id_cabang;
-        $datas = DB::table('permintaan_pembelian')->select('id_permintaan_pembelian as id', 'nama_permintaan_pembelian as text')
-            ->where('id_cabang', $idCabang)
+        $datas = DB::table('permintaan_pembelian as pp')->select('pp.id_permintaan_pembelian as id', 'nama_permintaan_pembelian as text', 'mtotal_permintaan_pembelian')
+            ->leftJoin('uang_muka_pembelian as ump', function ($join) {
+                $join->on('pp.id_permintaan_pembelian', '=', 'ump.id_permintaan_pembelian')
+                    ->where('ump.void', 0);
+            })
+            ->where('pp.id_cabang', $idCabang)
             ->where('nama_permintaan_pembelian', 'like', '%' . $search . '%')
+            ->groupBy('pp.id_permintaan_pembelian')
+            ->having(DB::raw('mtotal_permintaan_pembelian - COALESCE(sum(nominal),0)'), '<>', '0')
             ->orderBy('date_permintaan_pembelian', 'desc')->limit(10)->get();
         return $datas;
     }

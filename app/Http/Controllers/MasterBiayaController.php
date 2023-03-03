@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\MasterBiaya;
 use DB;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Log;
 use Yajra\DataTables\DataTables;
 
@@ -70,29 +69,29 @@ class MasterBiayaController extends Controller
 
     public function saveEntry(Request $request, $id)
     {
-        $paramValidate = [
-            'id_cabang' => 'required',
-            'nama_biaya' => 'required',
-            'id_akun_biaya' => 'required',
-        ];
+        // $paramValidate = [
+        //     'id_cabang' => 'required',
+        //     'nama_biaya' => 'required',
+        //     'id_akun_biaya' => 'required',
+        // ];
 
-        $messages = [
-            'id_cabang.required' => 'Cabang harus diisi',
-            'nama_biaya.required' => 'Nama biaya harus diisi',
-            'id_akun_biaya.required' => 'Akun biaya harus diisi',
-        ];
+        // $messages = [
+        //     'id_cabang.required' => 'Cabang harus diisi',
+        //     'nama_biaya.required' => 'Nama biaya harus diisi',
+        //     'id_akun_biaya.required' => 'Akun biaya harus diisi',
+        // ];
 
-        if (isset($request->ispph)) {
-            $paramValidate['value_pph'] = 'required';
-            $paramValidate['id_akun_pph'] = 'required';
-            $messages['value_pph.required'] = 'Nilai PPh harus diisi';
-            $messages['id_akun_pph.required'] = 'Akun PPh harus diisi';
-        }
+        // if (isset($request->ispph)) {
+        //     $paramValidate['value_pph'] = 'required';
+        //     $paramValidate['id_akun_pph'] = 'required';
+        //     $messages['value_pph.required'] = 'Nilai PPh harus diisi';
+        //     $messages['id_akun_pph.required'] = 'Akun PPh harus diisi';
+        // }
 
-        $valid = Validator::make($request->all(), $paramValidate, $messages);
-        if ($valid->fails()) {
-            return redirect()->back()->withErrors($valid)->withInput($request->all());
-        }
+        // $valid = Validator::make($request->all(), $paramValidate, $messages);
+        // if ($valid->fails()) {
+        //     return redirect()->back()->withErrors($valid)->withInput($request->all());
+        // }
 
         $data = MasterBiaya::find($id);
         try {
@@ -115,18 +114,20 @@ class MasterBiayaController extends Controller
 
             $data['aktif'] = isset($request->aktif) ? $request->aktif : 0;
             $data->save();
-
             DB::commit();
-            return redirect()
-                ->route('master-biaya-entry', $data->id_biaya)
-                ->with('success', 'Data berhasil tersimpan');
+            return response()->json([
+                "result" => true,
+                "message" => "Data berhasil tersimpan",
+                "redirect" => route('master-biaya'),
+            ]);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error("Error when save biaya");
             Log::error($e);
-            return redirect()
-                ->route('master-biaya-entry', $data ? $data->id_biaya : 0)
-                ->with('error', 'Data gagal tersimpan');
+            return response()->json([
+                "result" => false,
+                "message" => "Data gagal tersimpan",
+            ]);
         }
     }
 
@@ -150,7 +151,7 @@ class MasterBiayaController extends Controller
         $data->delete();
 
         return redirect()
-            ->route('master-biaya-page')
+            ->route('master-biaya')
             ->with('success', 'Data berhasil terhapus');
     }
 }

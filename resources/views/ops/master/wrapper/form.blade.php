@@ -117,7 +117,9 @@
 @endsection
 
 @section('addedScripts')
+    <script src="{{ asset('assets/plugins/jquery-form-validation-1.5.3/dist/jquery.validation.min.js') }}"></script>
     <script src="{{ asset('assets/bower_components/select2/dist/js/select2.min.js') }}"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/custom.js') }}"></script>
 @endsection
 
