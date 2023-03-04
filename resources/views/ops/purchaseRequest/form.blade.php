@@ -208,7 +208,8 @@
                         </div>
                     </div>
                     <div class="table-responsive">
-                        <input type="hidden" name="details">
+                        <input type="hidden" name="details"
+                            value="{{ $data ? json_encode($data->formatdetail) : '[]' }}">
                         <table id="table-detail" class="table table-bordered data-table">
                             <thead>
                                 <tr>
