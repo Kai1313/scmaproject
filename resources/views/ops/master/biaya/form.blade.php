@@ -33,28 +33,14 @@
 
 @section('main-section')
     <div class="content container-fluid">
-        @if (session()->has('success'))
-            <div class="alert alert-success">
-                <ul>
-                    <li>{!! session()->get('success') !!}</li>
-                </ul>
-            </div>
-        @endif
-        @if (count($errors) > 0)
-            <div class="alert alert-danger">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-        <form action="{{ route('master-biaya-save-entry', $data ? $data->id_biaya : 0) }}" method="post">
+        <form action="{{ route('master-biaya-save-entry', $data ? $data->id_biaya : 0) }}" method="post"
+            class="post-action">
             <div class="box">
                 <div class="box-header">
                     <h3 class="box-title">{{ $data ? 'Ubah' : 'Tambah' }} Biaya</h3>
-                    <a href="{{ route('master-biaya') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right"><span
-                            class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali</a>
+                    <a href="{{ route('master-biaya') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right">
+                        <span class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali
+                    </a>
                 </div>
                 <div class="box-body">
                     <div class="row">
@@ -149,35 +135,6 @@
 
 @section('externalScripts')
     <script>
-        var validation = {
-            submit: {
-                settings: {
-                    form: 'form',
-                    inputContainer: '.form-group',
-                    errorListClass: 'form-control-error',
-                    errorClass: 'has-error',
-                    allErrors: true,
-                    scrollToError: {
-                        offset: -100,
-                        duration: 500
-                    }
-                },
-                callback: {
-                    onSubmit: function(node, formData) {
-                        saveData()
-                    }
-                }
-            },
-            dynamic: {
-                settings: {
-                    trigger: 'keyup',
-                    delay: 1000
-                },
-            }
-        }
-
-        $.validate(validation)
-
         $('[name="ispph"]').change(function() {
             if ($(this).is(':checked')) {
                 $('.show-pph').prop('disabled', false)
@@ -197,30 +154,6 @@
             $('.show-pph').prop('disabled', false)
         } else {
             $('.show-pph').prop('disabled', true)
-        }
-
-        function saveData() {
-            let url = $('form').prop('action')
-            $.ajax({
-                url: url,
-                type: "POST",
-                data: $("form").serialize(),
-                dataType: "JSON",
-                success: function(data) {
-                    if (data.result) {
-                        Swal.fire('Tersimpan!', data.message, 'success').then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.href = data.redirect;
-                            }
-                        })
-                    } else {
-                        Swal.fire("Gagal Menyimpan Data. ", data.message, 'error')
-                    }
-                },
-                error: function(data) {
-                    Swal.fire("Gagal Menyimpan Data. ", data.responseJSON.message, 'error')
-                }
-            })
         }
     </script>
 @endsection

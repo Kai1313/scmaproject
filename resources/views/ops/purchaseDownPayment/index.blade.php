@@ -79,13 +79,6 @@
                 </div>
             </div>
             <div class="box-body">
-                @if (session()->has('success'))
-                    <div class="alert alert-success">
-                        <ul>
-                            <li>{!! session()->get('success') !!}</li>
-                        </ul>
-                    </div>
-                @endif
                 <div class="table-responsive">
                     <table class="table table-bordered data-table">
                         <thead>
@@ -105,24 +98,6 @@
                         <tbody>
                         </tbody>
                     </table>
-                </div>
-            </div>
-        </div>
-
-        <div class="modal fade" id="approvalDelete" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog modal-sm" role="document">
-                <div class="modal-content">
-                    <div class="modal-body">
-                        <h4>Anda akan menghapus data ini!</h4>
-                    </div>
-                    <div class="modal-footer">
-                        <form action="" method="post">
-                            <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                            <button type="submit" class="btn btn-primary">Lanjutkan</button>
-                        </form>
-                    </div>
                 </div>
             </div>
         </div>

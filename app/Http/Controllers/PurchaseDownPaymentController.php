@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\PurchaseDownPayment;
 use DB;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\DataTables;
 
 class PurchaseDownPaymentController extends Controller
@@ -66,32 +65,32 @@ class PurchaseDownPaymentController extends Controller
 
     public function saveEntry(Request $request, $id = 0)
     {
-        $paramValidate = [
-            'id_cabang' => 'required',
-            'tanggal' => 'required',
-            'id_permintaan_pembelian' => 'required',
-            'id_mata_uang' => 'required',
-            'id_slip' => 'required',
-            'rate' => 'required',
-            'nominal' => 'required',
-            'total' => 'required',
-        ];
+        // $paramValidate = [
+        //     'id_cabang' => 'required',
+        //     'tanggal' => 'required',
+        //     'id_permintaan_pembelian' => 'required',
+        //     'id_mata_uang' => 'required',
+        //     'id_slip' => 'required',
+        //     'rate' => 'required',
+        //     'nominal' => 'required',
+        //     'total' => 'required',
+        // ];
 
-        $messages = [
-            'id_cabang.required' => 'Cabang harus diisi',
-            'tanggal.required' => 'Tanggal harus diisi',
-            'id_permintaan_pembelian.required' => 'PO harus diisi',
-            'id_mata_uang.required' => 'Mata uang harus diisi',
-            'id_slip.required' => 'Slip harus diisi',
-            'rate.required' => 'Rate harus diisi',
-            'nominal.required' => 'Nomial harus diisi',
-            'total.required' => 'Total harus diisi',
-        ];
+        // $messages = [
+        //     'id_cabang.required' => 'Cabang harus diisi',
+        //     'tanggal.required' => 'Tanggal harus diisi',
+        //     'id_permintaan_pembelian.required' => 'PO harus diisi',
+        //     'id_mata_uang.required' => 'Mata uang harus diisi',
+        //     'id_slip.required' => 'Slip harus diisi',
+        //     'rate.required' => 'Rate harus diisi',
+        //     'nominal.required' => 'Nomial harus diisi',
+        //     'total.required' => 'Total harus diisi',
+        // ];
 
-        $valid = Validator::make($request->all(), $paramValidate, $messages);
-        if ($valid->fails()) {
-            return redirect()->back()->withErrors($valid)->withInput($request->all());
-        }
+        // $valid = Validator::make($request->all(), $paramValidate, $messages);
+        // if ($valid->fails()) {
+        //     return redirect()->back()->withErrors($valid)->withInput($request->all());
+        // }
 
         $data = PurchaseDownPayment::find($id);
         try {
@@ -115,16 +114,19 @@ class PurchaseDownPaymentController extends Controller
             $data->save();
 
             DB::commit();
-            return redirect()
-                ->route('purchase-down-payment-entry', $data->id_uang_muka_pembelian)
-                ->with('success', 'Data berhasil tersimpan');
+            return response()->json([
+                "result" => true,
+                "message" => "Data berhasil disimpan",
+                "redirect" => route('purchase-down-payment'),
+            ]);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error("Error when save purchase down payment");
             Log::error($e);
-            return redirect()
-                ->route('purchase-down-payment-entry', $data ? $data->id_uang_muka_pembelian : 0)
-                ->with('error', 'Data gagal tersimpan');
+            return response()->json([
+                "result" => false,
+                "message" => "Data gagal tersimpan",
+            ]);
         }
     }
 
@@ -142,7 +144,10 @@ class PurchaseDownPaymentController extends Controller
     {
         $data = PurchaseDownPayment::find($id);
         if (!$data) {
-            return 'Data tidak ditemukan';
+            return response()->json([
+                "result" => false,
+                "message" => "Data tidak ditemukan",
+            ]);
         }
 
         try {
@@ -152,16 +157,19 @@ class PurchaseDownPaymentController extends Controller
             $data->save();
 
             DB::commit();
-            return redirect()
-                ->route('purchase-down-payment')
-                ->with('success', 'Data berhasil dibatalkan');
+            return response()->json([
+                "result" => true,
+                "message" => "Data berhasil dibatalkan",
+                "redirect" => route('purchase-down-payment'),
+            ]);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error("Error when void purchase down payment");
             Log::error($e);
-            return redirect()
-                ->route('purchase-down-payment')
-                ->with('error', 'Data gagal tersimpan');
+            return response()->json([
+                "result" => false,
+                "message" => "Data gagal tersimpan",
+            ]);
         }
     }
 

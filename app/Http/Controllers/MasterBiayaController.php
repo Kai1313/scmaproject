@@ -145,13 +145,29 @@ class MasterBiayaController extends Controller
     {
         $data = MasterBiaya::find($id);
         if (!$data) {
-            return response()->json(['message' => 'data tidak ditemukan'], 500);
+            return response()->json([
+                "result" => false,
+                "message" => "Data tidak ditemukan",
+            ]);
         }
 
-        $data->delete();
-
-        return redirect()
-            ->route('master-biaya')
-            ->with('success', 'Data berhasil terhapus');
+        try {
+            DB::beginTransaction();
+            $data->delete();
+            DB::commit();
+            return response()->json([
+                "result" => true,
+                "message" => "Data berhasil dihapus",
+                "redirect" => route('master-biaya'),
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error("Error when delete biaya");
+            Log::error($e);
+            return response()->json([
+                "result" => false,
+                "message" => "Data gagal dihapus",
+            ]);
+        }
     }
 }

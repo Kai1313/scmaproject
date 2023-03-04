@@ -9,7 +9,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>{{ $pageTitle }}</title>
-    <link rel="icon" href="{{asset('assets/img/logo.png')}}">
+    <link rel="icon" href="{{ asset('assets/img/logo.png') }}">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     @include('includes.styles')
     @yield('addedStyles')
@@ -19,6 +19,25 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <style>
         .wrapper-cabang {
             margin-top: 1rem;
+        }
+
+        #cover-spin {
+            position: fixed;
+            width: 100%;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.7);
+            z-index: 9999;
+            display: none;
+        }
+
+        #cover-spin>img {
+            display: block;
+            position: absolute;
+            left: 48%;
+            top: 40%;
         }
     </style>
     <!-- AdminLTE Skins. We have chosen the skin-blue for this starter
@@ -35,7 +54,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <![endif]-->
 
     <!-- Google Font -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
 </head>
 
 <body class="hold-transition skin-yellow sidebar-mini">
@@ -53,6 +73,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         @yield('modal-section')
         <div class="control-sidebar-bg"></div>
     </div>
+    <div id="cover-spin" style="display: none;"><img src="{{ asset('images/833.gif') }}" alt=""></div>
     @include('includes.scripts')
     @yield('addedScripts')
     <!-- AdminLTE App -->

@@ -42,7 +42,7 @@
                 <div class="row">
                     <label class="col-md-3">Berat</label>
                     <div class="col-md-9">
-                        : {{ $data->weight }}
+                        : {{ number_format($data->weight, 4, ',', '.') }}
                     </div>
                 </div>
                 <div class="row">

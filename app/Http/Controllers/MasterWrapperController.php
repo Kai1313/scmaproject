@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\MasterWrapper;
 use DB;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Log;
 use Yajra\DataTables\DataTables;
 
@@ -65,22 +64,22 @@ class MasterWrapperController extends Controller
 
     public function saveEntry(Request $request, $id)
     {
-        $paramValidate = [
-            'id_cabang' => 'required',
-            'nama_wrapper' => 'required',
-            'weight' => 'required',
-        ];
+        // $paramValidate = [
+        //     'id_cabang' => 'required',
+        //     'nama_wrapper' => 'required',
+        //     'weight' => 'required',
+        // ];
 
-        $messages = [
-            'id_cabang.required' => 'Cabang harus diisi',
-            'nama_wrapper.required' => 'Nama Pembungkus harus diisi',
-            'weight.required' => 'Berat harus diisi',
-        ];
+        // $messages = [
+        //     'id_cabang.required' => 'Cabang harus diisi',
+        //     'nama_wrapper.required' => 'Nama Pembungkus harus diisi',
+        //     'weight.required' => 'Berat harus diisi',
+        // ];
 
-        $valid = Validator::make($request->all(), $paramValidate, $messages);
-        if ($valid->fails()) {
-            return redirect()->back()->withErrors($valid)->withInput($request->all());
-        }
+        // $valid = Validator::make($request->all(), $paramValidate, $messages);
+        // if ($valid->fails()) {
+        //     return redirect()->back()->withErrors($valid)->withInput($request->all());
+        // }
 
         $data = MasterWrapper::find($id);
         try {
@@ -99,16 +98,19 @@ class MasterWrapperController extends Controller
             $data->uploadfile($request, $data);
 
             DB::commit();
-            return redirect()
-                ->route('master-wrapper-entry', $data->id_wrapper)
-                ->with('success', 'Data berhasil tersimpan');
+            return response()->json([
+                "result" => true,
+                "message" => "Data berhasil disimpan",
+                "redirect" => route('master-wrapper'),
+            ]);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error("Error when save wrapper");
             Log::error($e);
-            return redirect()
-                ->route('master-wrapper-entry', $data ? $data->id_wrapper : 0)
-                ->with('error', 'Data gagal tersimpan');
+            return response()->json([
+                "result" => false,
+                "message" => "Data gagal tersimpan",
+            ]);
         }
     }
 
@@ -133,9 +135,23 @@ class MasterWrapperController extends Controller
             \Storage::delete([$data->path, $data->path2]);
         }
 
-        $data->delete();
-        return redirect()
-            ->route('master-wrapper-page')
-            ->with('success', 'Data berhasil terhapus');
+        try {
+            DB::beginTransaction();
+            $data->delete();
+            DB::commit();
+            return response()->json([
+                "result" => true,
+                "message" => "Data berhasil dihapus",
+                "redirect" => route('master-wrapper'),
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error("Error when delete biaya");
+            Log::error($e);
+            return response()->json([
+                "result" => false,
+                "message" => "Data gagal dihapus",
+            ]);
+        }
     }
 }

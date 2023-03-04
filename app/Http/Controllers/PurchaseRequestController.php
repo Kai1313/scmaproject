@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\PurchaseRequest;
 use DB;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Log;
 use Yajra\DataTables\DataTables;
 
@@ -100,26 +99,26 @@ class PurchaseRequestController extends Controller
 
     public function saveEntry(Request $request, $id = 0)
     {
-        $paramValidate = [
-            'id_cabang' => 'required',
-            'purchase_request_date' => 'required',
-            'purchase_request_estimation_date' => 'required',
-            'purchase_request_user_id' => 'required',
-            'id_gudang' => 'required',
-        ];
+        // $paramValidate = [
+        //     'id_cabang' => 'required',
+        //     'purchase_request_date' => 'required',
+        //     'purchase_request_estimation_date' => 'required',
+        //     'purchase_request_user_id' => 'required',
+        //     'id_gudang' => 'required',
+        // ];
 
-        $messages = [
-            'id_cabang.required' => 'Cabang harus diisi',
-            'purchase_request_date.required' => 'Tanggal harus diisi',
-            'purchase_request_estimation_date.required' => 'Tanggal estimasi harus diisi',
-            'id_gudang.required' => 'Gudang harus diisi',
-            'purchase_request_user_id' => 'Pemohon harus diisi',
-        ];
+        // $messages = [
+        //     'id_cabang.required' => 'Cabang harus diisi',
+        //     'purchase_request_date.required' => 'Tanggal harus diisi',
+        //     'purchase_request_estimation_date.required' => 'Tanggal estimasi harus diisi',
+        //     'id_gudang.required' => 'Gudang harus diisi',
+        //     'purchase_request_user_id' => 'Pemohon harus diisi',
+        // ];
 
-        $valid = Validator::make($request->all(), $paramValidate, $messages);
-        if ($valid->fails()) {
-            return redirect()->back()->withErrors($valid)->withInput($request->all());
-        }
+        // $valid = Validator::make($request->all(), $paramValidate, $messages);
+        // if ($valid->fails()) {
+        //     return redirect()->back()->withErrors($valid)->withInput($request->all());
+        // }
 
         $data = PurchaseRequest::find($id);
         try {
@@ -142,16 +141,19 @@ class PurchaseRequestController extends Controller
             $data->savedetails($request->details);
 
             DB::commit();
-            return redirect()
-                ->route('purchase-request-entry', $data->purchase_request_id)
-                ->with('success', 'Data berhasil tersimpan');
+            return response()->json([
+                "result" => true,
+                "message" => "Data berhasil disimpan",
+                "redirect" => route('purchase-request'),
+            ]);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error("Error when save purchase request");
             Log::error($e);
-            return redirect()
-                ->route('purchase-request-entry', $data ? $data->purchase_request_id : 0)
-                ->with('error', 'Data gagal tersimpan');
+            return response()->json([
+                "result" => false,
+                "message" => "Data gagal tersimpan",
+            ]);
         }
     }
 
@@ -170,7 +172,10 @@ class PurchaseRequestController extends Controller
     {
         $data = PurchaseRequest::find($id);
         if (!$data) {
-            return 'Data tidak ditemukan';
+            return response()->json([
+                "result" => false,
+                "message" => "Data tidak ditemukan",
+            ]);
         }
 
         try {
@@ -180,16 +185,19 @@ class PurchaseRequestController extends Controller
             $data->save();
 
             DB::commit();
-            return redirect()
-                ->route('purchase-request')
-                ->with('success', 'Data berhasil dibatalkan');
+            return response()->json([
+                "result" => true,
+                "message" => "Data berhasil dibatalkan",
+                "redirect" => route('purchase-request'),
+            ]);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error("Error when void purchase request");
             Log::error($e);
-            return redirect()
-                ->route('purchase-request')
-                ->with('error', 'Data gagal tersimpan');
+            return response()->json([
+                "result" => false,
+                "message" => "Data gagal dibatalkan",
+            ]);
         }
     }
 
@@ -236,11 +244,17 @@ class PurchaseRequestController extends Controller
     {
         $data = PurchaseRequest::find($id);
         if (!$data) {
-            return 'data tidak ditemukan';
+            return response()->json([
+                "result" => false,
+                "message" => "Data tidak ditemukan",
+            ]);
         }
 
         if (!in_array($type, ['approval', 'reject']) || $data->approval_status != 0) {
-            return 'Akses ditolak';
+            return response()->json([
+                "result" => false,
+                "message" => "Data gagal diperbarui",
+            ]);
         }
         try {
             DB::beginTransaction();
@@ -250,16 +264,19 @@ class PurchaseRequestController extends Controller
             $data->save();
 
             DB::commit();
-            return redirect()
-                ->route('purchase-request', $data->purchase_request_id)
-                ->with('success', 'Data berhasil diperbarui');
+            return response()->json([
+                "result" => true,
+                "message" => "Data berhasil diperbarui",
+                "redirect" => route('purchase-request'),
+            ]);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error("Error when change status " . $type . " purchase request");
             Log::error($e);
-            return redirect()
-                ->route('purchase-request', $data->purchase_request_id)
-                ->with('error', 'Data gagal tersimpan');
+            return response()->json([
+                "result" => false,
+                "message" => "Data gagal diperbarui",
+            ]);
         }
     }
 }

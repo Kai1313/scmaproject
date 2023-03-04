@@ -78,13 +78,6 @@
                 </div>
             </div>
             <div class="box-body">
-                @if (session()->has('success'))
-                    <div class="alert alert-success">
-                        <ul>
-                            <li>{!! session()->get('success') !!}</li>
-                        </ul>
-                    </div>
-                @endif
                 <div class="table-responsive">
                     <table class="table table-bordered data-table">
                         <thead>
@@ -186,10 +179,36 @@
                     denyButton: 'order-3',
                 }
             }).then((result) => {
+                $('#cover-spin').hide()
                 if (result.isConfirmed) {
-                    window.location.href = self.prop('href')
+                    changeData(self.prop('href'))
                 }
             })
         })
+
+        function changeData(url) {
+            $('#cover-spin').show()
+            $.ajax({
+                url: url,
+                type: "get",
+                dataType: "JSON",
+                success: function(data) {
+                    $('#cover-spin').hide()
+                    if (data.result) {
+                        Swal.fire('Berhasil', data.message, 'success').then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = data.redirect;
+                            }
+                        })
+                    } else {
+                        Swal.fire("Gagal", data.message, 'error')
+                    }
+                },
+                error: function(data) {
+                    $('#cover-spin').hide()
+                    Swal.fire("Gagal", data.responseJSON.message, 'error')
+                }
+            })
+        }
     </script>
 @endsection

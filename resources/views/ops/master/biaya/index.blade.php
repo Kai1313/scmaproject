@@ -67,13 +67,6 @@
                 </div>
             </div>
             <div class="box-body">
-                @if (session()->has('success'))
-                    <div class="alert alert-success">
-                        <ul>
-                            <li>{!! session()->get('success') !!}</li>
-                        </ul>
-                    </div>
-                @endif
                 <div class="table-responsive">
                     <table class="table table-bordered data-table">
                         <thead>

@@ -33,23 +33,6 @@
 
 @section('main-section')
     <div class="content container-fluid">
-        @if (session()->has('success'))
-            <div class="alert alert-success">
-                <ul>
-                    <li>{!! session()->get('success') !!}</li>
-                </ul>
-            </div>
-        @endif
-        @if (count($errors) > 0)
-            <div class="alert alert-danger">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
         <div class="box">
             <div class="box-header">
                 <h3 class="box-title">{{ $data ? 'Ubah' : 'Tambah' }} Uang Muka Pembelian</h3>
@@ -59,13 +42,14 @@
             </div>
             <div class="box-body">
                 <form action="{{ route('purchase-down-payment-save-entry', $data ? $data->id_uang_muka_pembelian : 0) }}"
-                    method="post">
+                    method="post" class="post-action">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="row">
                                 <label class="col-md-3">Cabang <span>*</span></label>
                                 <div class="col-md-5 form-group">
-                                    <select name="id_cabang" class="form-control select2">
+                                    <select name="id_cabang" class="form-control select2" data-validation="[NOTEMPTY]"
+                                        data-validation-message="Cabang tidak boleh kosong">
                                         <option value="">Pilih Cabang</option>
                                         @foreach ($cabang as $branch)
                                             <option value="{{ $branch->id_cabang }}"
@@ -88,14 +72,18 @@
                                 <div class="col-md-5 form-group">
                                     <input type="date" name="tanggal"
                                         value="{{ old('tanggal', $data ? $data->tanggal : date('Y-m-d')) }}"
-                                        class="form-control">
+                                        class="form-control" data-validation="[NOTEMPTY]"
+                                        data-validation-message="Tanggal tidak boleh kosong">
                                 </div>
                             </div>
                             <div class="row">
                                 <label class="col-md-3">ID Permintaan Pembelian (PO) <span>*</span></label>
                                 <div class="col-md-9 form-group">
                                     <select name="id_permintaan_pembelian" class="form-control selectAjax"
-                                        data-route="{{ route('purchase-down-payment-auto-po') }}">
+                                        data-route="{{ route('purchase-down-payment-auto-po') }}"
+                                        data-validation="[NOTEMPTY]"
+                                        data-validation-message="ID permintaan pembelian tidak boleh kosong">
+                                        <option value="">Pilih Permintaan Pembelian (PO)</option>
                                         @if ($data && $data->id_permintaan_pembelian)
                                             <option value="{{ $data->id_permintaan_pembeliaan }}" selected>
                                                 {{ $data->purchaseOrder->nama_permintaan_pembelian }}
@@ -110,7 +98,9 @@
                                 <label class="col-md-3">Slip <span>*</span></label>
                                 <div class="col-md-5 form-group">
                                     <select name="id_slip" class="form-control selectAjax"
-                                        data-route="{{ route('purchase-down-payment-auto-slip') }}">
+                                        data-route="{{ route('purchase-down-payment-auto-slip') }}"
+                                        data-validation="[NOTEMPTY]" data-validation-message="Slip tidak boleh kosong">
+                                        <option value="">Pilih Slip</option>
                                         @if ($data && $data->id_slip)
                                             <option value="{{ $data->id_slip }}" selected>
                                                 {{ $data->slip->kode_slip }} - {{ $data->slip->nama_slip }}
@@ -125,7 +115,8 @@
                                 <label class="col-md-3">Rate <span>*</span></label>
                                 <div class="col-md-4 form-group">
                                     <input type="text" name="rate" class="form-control handle-number-4"
-                                        value="{{ old('rate', $data ? $data->rate : '') }}">
+                                        value="{{ old('rate', $data ? $data->rate : '') }}" data-validation="[NOTEMPTY]"
+                                        data-validation-message="Rate tidak boleh kosong">
                                 </div>
                             </div>
                             <div class="row">
@@ -133,14 +124,16 @@
                                 <div class="col-md-4 form-group">
                                     <input type="text" name="nominal" class="form-control handle-number-4"
                                         value="{{ old('nominal', $data ? $data->nominal : '') }}"
-                                        data-max="{{ $data ? $data->nominal : 0 }}">
+                                        data-max="{{ $data ? $data->nominal : 0 }}" data-validation="[NOTEMPTY]"
+                                        data-validation-message="Nominal tidak boleh kosong">
                                 </div>
                             </div>
                             <div class="row">
                                 <label class="col-md-3">Total <span>*</span></label>
                                 <div class="col-md-4 form-group">
                                     <input type="text" name="total" class="form-control handle-number-4" readonly
-                                        value="{{ old('total', $data ? $data->total : '') }}">
+                                        value="{{ old('total', $data ? $data->total : '') }}" data-validation="[NOTEMPTY]"
+                                        data-validation-message="Total tidak boleh kosong">
                                 </div>
                             </div>
                             <div class="row">
@@ -162,7 +155,9 @@
 @endsection
 
 @section('addedScripts')
+    <script src="{{ asset('assets/plugins/jquery-form-validation-1.5.3/dist/jquery.validation.min.js') }}"></script>
     <script src="{{ asset('assets/bower_components/select2/dist/js/select2.min.js') }}"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/custom.js') }}"></script>
 @endsection
 
@@ -182,7 +177,7 @@
                 self.val('').prop('disabled', false).trigger('change')
             }
 
-            $('[name="nominal"]').val('').attr('max', 0)
+            $('[name="nominal"]').val('').attr('data-max', 0)
             $('[name="total"]').val('')
         })
 
@@ -239,12 +234,6 @@
                     })
                 }
             });
-        })
-
-        $('body').on('input', '[name="nominal"]', function() {
-            let val = normalizeNumber($(this).val())
-
-            console.log($(this).val())
         })
     </script>
 @endsection

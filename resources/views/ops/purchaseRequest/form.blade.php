@@ -88,7 +88,8 @@
             </div>
         @endif
 
-        <form action="{{ route('purchase-request-save-entry', $data ? $data->purchase_request_id : 0) }}" method="post">
+        <form action="{{ route('purchase-request-save-entry', $data ? $data->purchase_request_id : 0) }}" method="post"
+            class="post-action">
             <div class="box">
                 <div class="box-header">
                     <h3 class="box-title">{{ $data ? 'Ubah' : 'Tambah' }} Permintaan Pembelian</h3>
@@ -102,7 +103,8 @@
                             <div class="row">
                                 <label class="col-md-3">Cabang <span>*</span></label>
                                 <div class="col-md-5 form-group">
-                                    <select name="id_cabang" class="form-control select2">
+                                    <select name="id_cabang" class="form-control select2" data-validation="[NOTEMPTY]"
+                                        data-validation-message="Cabang tidak boleh kosong">
                                         <option value="">Pilih Cabang</option>
                                         @foreach ($cabang as $branch)
                                             <option value="{{ $branch->id_cabang }}"
@@ -125,7 +127,8 @@
                                 <div class="col-md-5 form-group">
                                     <input type="date" name="purchase_request_date"
                                         value="{{ old('purchase_request_date', $data ? $data->purchase_request_date : date('Y-m-d')) }}"
-                                        class="form-control">
+                                        class="form-control" data-validation="[NOTEMPTY]"
+                                        data-validation-message="Tanggal tidak boleh kosong">
                                 </div>
                             </div>
                             <div class="row">
@@ -133,7 +136,8 @@
                                 <div class="col-md-5 form-group">
                                     <input type="date" name="purchase_request_estimation_date"
                                         value="{{ old('purchase_request_estimation_date', $data ? $data->purchase_request_estimation_date : date('Y-m-d')) }}"
-                                        class=" form-control">
+                                        class=" form-control" data-validation="[NOTEMPTY]"
+                                        data-validation-message="Tanggal estimasi tidak boleh kosong">
                                 </div>
                             </div>
                             @if ($data)
@@ -154,7 +158,9 @@
                                 <label class="col-md-3">Gudang <span>*</span></label>
                                 <div class="col-md-5 form-group">
                                     <select name="id_gudang" class="form-control selectAjax"
-                                        data-route="{{ route('purchase-request-auto-werehouse') }}">
+                                        data-route="{{ route('purchase-request-auto-werehouse') }}"
+                                        data-validation="[NOTEMPTY]" data-validation-message="Gudang tidak boleh kosong">
+                                        <option value="">Pilih Gudang</option>
                                         @if ($data && $data->id_gudang)
                                             <option value="{{ $data->id_gudang }}" selected>
                                                 {{ $data->gudang->nama_gudang }}
@@ -167,9 +173,11 @@
                                 <label class="col-md-3">Pemohon <span>*</span></label>
                                 <div class="col-md-5 form-group">
                                     <select name="purchase_request_user_id" class="form-control selectAjax"
-                                        data-route="{{ route('purchase-request-auto-user') }}">
+                                        data-route="{{ route('purchase-request-auto-user') }}" data-validation="[NOTEMPTY]"
+                                        data-validation-message="Pemohon tidak boleh kosong">
+                                        <option value="">Pilih Pemohon</option>
                                         @if ($data && $data->purchase_request_user_id)
-                                            <option value="{{ $data->purchase_request_user_id }}">
+                                            <option value="{{ $data->purchase_request_user_id }}" selected>
                                                 {{ $data->pengguna->nama_pengguna }}</option>
                                         @endif
                                     </select>
@@ -232,7 +240,7 @@
                             Lengkapi Data yang diperlukan
                         </div>
                         <input type="hidden" name="index" value="0">
-                        <label>Nama Barang</label>
+                        <label>Nama Barang <span>*</span></label>
                         <div class="form-group">
                             <select name="id_barang" class="form-control selectAjax validate"
                                 data-route="{{ route('purchase-request-auto-item') }}">
@@ -240,13 +248,13 @@
                             <input type="hidden" name="nama_barang" class="validate">
                             <input type="hidden" name="kode_barang" class="validate">
                         </div>
-                        <label>Satuan</label>
+                        <label>Satuan <span>*</span></label>
                         <div class="form-group">
                             <select name="id_satuan_barang" class="form-control select2 validate" disabled>
                             </select>
                             <input type="hidden" name="nama_satuan_barang" class="validate">
                         </div>
-                        <label>Jumlah</label>
+                        <label>Jumlah <span>*</span></label>
                         <div class="form-group">
                             <input type="text" name="qty" class="form-control validate handle-number-4">
                         </div>
@@ -266,6 +274,7 @@
 @endsection
 
 @section('addedScripts')
+    <script src="{{ asset('assets/plugins/jquery-form-validation-1.5.3/dist/jquery.validation.min.js') }}"></script>
     <script src="{{ asset('assets/bower_components/datatables.net/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js') }}"></script>
     <script src="{{ asset('assets/bower_components/select2/dist/js/select2.min.js') }}"></script>

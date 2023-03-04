@@ -29,22 +29,6 @@
 
 @section('main-section')
     <div class="content container-fluid">
-        @if (session()->has('success'))
-            <div class="alert alert-success">
-                <ul>
-                    <li>{!! session()->get('success') !!}</li>
-                </ul>
-            </div>
-        @endif
-        @if (count($errors) > 0)
-            <div class="alert alert-danger">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
         <div class="box">
             <div class="box-header">
                 <h3 class="box-title">{{ $data ? 'Ubah' : 'Tambah' }} Pembungkus</h3>
@@ -53,12 +37,13 @@
             </div>
             <div class="box-body">
                 <form action="{{ route('master-wrapper-save-entry', $data ? $data->id_wrapper : 0) }}" method="post"
-                    enctype="multipart/form-data">
+                    enctype="multipart/form-data" class="post-action">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Cabang <span>*</span></label>
-                                <select name="id_cabang" class="form-control select2">
+                                <select name="id_cabang" class="form-control select2" data-validation="[NOTEMPTY]"
+                                    data-validation-message="Cabang tidak boleh kosong">
                                     <option value="">Pilih Cabang</option>
                                     @foreach ($cabang as $branch)
                                         <option value="{{ $branch->id_cabang }}"
@@ -70,15 +55,16 @@
                             <div class="form-group">
                                 <label>Nama Pembungkus <span>*</span></label>
                                 <input type="text" class="form-control" name="nama_wrapper"
-                                    value="{{ old('nama_wrapper', $data ? $data->nama_wrapper : '') }}">
+                                    value="{{ old('nama_wrapper', $data ? $data->nama_wrapper : '') }}"
+                                    data-validation="[NOTEMPTY]"
+                                    data-validation-message="nama pembungkus tidak boleh kosong">
                             </div>
                             <div class="form-group">
                                 <label>Berat <span>*</span></label>
                                 <div class="input-group">
-                                    {{-- <input type="number" name="weight" class="form-control show-pph"
-                                        value="{{ old('weight', $data ? $data->weight : '') }}" step=".0001"> --}}
                                     <input type="text" name="weight" class="form-control handle-number-4"
-                                        value="{{ old('weight', $data ? $data->weight : '') }}">
+                                        value="{{ old('weight', $data ? $data->weight : '') }}"
+                                        data-validation="[NOTEMPTY]" data-validation-message="Berat tidak boleh kosong">
                                     <span class="input-group-addon">KG</span>
                                 </div>
                             </div>
