@@ -253,22 +253,12 @@
                 <div class="modal-body">
                     <form id="form-copy" action="" method="post">
                         <div class="row">
-                            <div class="col-xs-12">
+                            <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Dari Cabang</label>
-                                    {{ csrf_field() }}
-                                    <input type="hidden" id="id_cabang" name="id_cabang" value="{{ $cabang->id_cabang }}">
-                                    <input type="text" class="form-control" id="nama_cabang"
-                                        value="{{ $cabang->kode_cabang . ' - ' . $cabang->nama_cabang }}" readonly>
-                                </div>
-                                <div class="form-group">
-                                    <label>Ke Cabang</label>
-                                    <select name="cabang" class="form-control select2" style="width: 100%;">
-                                        @foreach ($data_cabang as $cabang)
-                                            <option value="{{ $cabang->id_cabang }}"
-                                                {{ isset($akun->id_cabang) ? ($akun->id_cabang == $cabang->id_cabang ? 'selected' : '') : '' }}>
-                                                {{ $cabang->kode_cabang . ' - ' . $cabang->nama_cabang }}</option>
-                                        @endforeach
+                                    <select name="transaction_type" id="transaction_type" class="form-control select2">
+                                        <option value="">Pilih Jenis Transaksi</option>
+                                        <option value=""></option>
                                     </select>
                                 </div>
                             </div>
@@ -277,7 +267,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
-                    <button type="button" id="btn-copy-data" class="btn btn-primary">Copy Data Slip</button>
+                    <button type="button" id="btn-add-transaction" class="btn btn-primary">Tambah Transaksi</button>
                 </div>
             </div>
         </div>
