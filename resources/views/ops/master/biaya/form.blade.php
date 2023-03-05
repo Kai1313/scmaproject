@@ -11,7 +11,8 @@
             margin-right: 10px;
         }
 
-        .handle-number-4 {
+        .handle-number-4,
+        .handle-number-2 {
             text-align: right;
         }
     </style>
@@ -95,7 +96,7 @@
                             </div>
                             <div class="form-group">
                                 <label>Nilai PPh</label>
-                                <input type="text" name="value_pph" class="form-control show-pph handle-number-4"
+                                <input type="text" name="value_pph" class="form-control show-pph handle-number-2"
                                     value="{{ old('value_pph', $data ? $data->value_pph : '') }}">
                             </div>
                             <div class="form-group">

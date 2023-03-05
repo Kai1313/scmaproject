@@ -64,23 +64,6 @@ class MasterWrapperController extends Controller
 
     public function saveEntry(Request $request, $id)
     {
-        // $paramValidate = [
-        //     'id_cabang' => 'required',
-        //     'nama_wrapper' => 'required',
-        //     'weight' => 'required',
-        // ];
-
-        // $messages = [
-        //     'id_cabang.required' => 'Cabang harus diisi',
-        //     'nama_wrapper.required' => 'Nama Pembungkus harus diisi',
-        //     'weight.required' => 'Berat harus diisi',
-        // ];
-
-        // $valid = Validator::make($request->all(), $paramValidate, $messages);
-        // if ($valid->fails()) {
-        //     return redirect()->back()->withErrors($valid)->withInput($request->all());
-        // }
-
         $data = MasterWrapper::find($id);
         try {
             DB::beginTransaction();

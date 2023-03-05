@@ -1,12 +1,6 @@
 @extends('layouts.main')
 @section('addedStyles')
-    <!-- DataTables -->
     <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css') }}">
-    <!-- Treetable -->
-    <link rel="stylesheet" href="{{ asset('assets/bower_components/jquery-treetable/css/jquery.treetable.css') }}">
-    <link rel="stylesheet"
-        href="{{ asset('assets/bower_components/jquery-treetable/css/jquery.treetable.theme.default.css') }}">
-    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         ul.horizontal-list {
             min-width: 200px;
@@ -107,6 +101,7 @@
 @section('addedScripts')
     <script src="{{ asset('assets/bower_components/datatables.net/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js') }}"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/custom.js') }}"></script>
 @endsection
 

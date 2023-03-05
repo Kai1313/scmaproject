@@ -2,10 +2,8 @@
 
 @section('addedStyles')
     <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/bower_components/jquery-treetable/css/jquery.treetable.css') }}">
     <link rel="stylesheet"
-        href="{{ asset('assets/bower_components/jquery-treetable/css/jquery.treetable.theme.default.css') }}">
-    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        href="{{ asset('assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/bower_components/select2/dist/css/select2.min.css') }}">
     <style>
         ul.horizontal-list {
@@ -125,18 +123,18 @@
                             <div class="row">
                                 <label class="col-md-3">Tanggal <span>*</span></label>
                                 <div class="col-md-5 form-group">
-                                    <input type="date" name="purchase_request_date"
+                                    <input type="text" name="purchase_request_date"
                                         value="{{ old('purchase_request_date', $data ? $data->purchase_request_date : date('Y-m-d')) }}"
-                                        class="form-control" data-validation="[NOTEMPTY]"
+                                        class="form-control datepicker" data-validation="[NOTEMPTY]"
                                         data-validation-message="Tanggal tidak boleh kosong">
                                 </div>
                             </div>
                             <div class="row">
                                 <label class="col-md-3">Estimasi <span>*</span></label>
                                 <div class="col-md-5 form-group">
-                                    <input type="date" name="purchase_request_estimation_date"
+                                    <input type="text" name="purchase_request_estimation_date"
                                         value="{{ old('purchase_request_estimation_date', $data ? $data->purchase_request_estimation_date : date('Y-m-d')) }}"
-                                        class=" form-control" data-validation="[NOTEMPTY]"
+                                        class=" form-control datepicker" data-validation="[NOTEMPTY]"
                                         data-validation-message="Tanggal estimasi tidak boleh kosong">
                                 </div>
                             </div>
@@ -279,6 +277,7 @@
     <script src="{{ asset('assets/bower_components/datatables.net/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js') }}"></script>
     <script src="{{ asset('assets/bower_components/select2/dist/js/select2.min.js') }}"></script>
+    <script src="{{ asset('assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js') }}"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/custom.js') }}"></script>
 @endsection
@@ -290,6 +289,10 @@
         let count = details.length
         let statusModal = 'create'
         $('.select2').select2()
+
+        $('.datepicker').datepicker({
+            format: 'yyyy-mm-dd',
+        });
 
         var resDataTable = $('#table-detail').DataTable({
             data: details,

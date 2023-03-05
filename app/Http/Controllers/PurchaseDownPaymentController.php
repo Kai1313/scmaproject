@@ -55,43 +55,29 @@ class PurchaseDownPaymentController extends Controller
     public function entry($id = 0)
     {
         $data = PurchaseDownPayment::find($id);
+        $remainingPayment = 0;
+        if ($data) {
+            $totalPO = DB::table('permintaan_pembelian')
+                ->where('id_permintaan_pembelian', $data->id_permintaan_pembelian)
+                ->value('mtotal_permintaan_pembelian');
+            $totalPayment = DB::table('uang_muka_pembelian')
+                ->where('id_permintaan_pembelian', $data->id_permintaan_pembelian)
+                ->where('id_uang_muka_pembelian', '!=', $data->id_uang_muka_pembelian)
+                ->where('void', 0)->sum('nominal');
+            $remainingPayment = $totalPO - $totalPayment;
+        }
+
         $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
         return view('ops.purchaseDownPayment.form', [
             'data' => $data,
             'cabang' => $cabang,
+            'maxPayment' => $remainingPayment,
             "pageTitle" => "SCA OPS | Uang Muka Pembelian | " . ($id == 0 ? 'Create' : 'Edit'),
         ]);
     }
 
     public function saveEntry(Request $request, $id = 0)
     {
-        // $paramValidate = [
-        //     'id_cabang' => 'required',
-        //     'tanggal' => 'required',
-        //     'id_permintaan_pembelian' => 'required',
-        //     'id_mata_uang' => 'required',
-        //     'id_slip' => 'required',
-        //     'rate' => 'required',
-        //     'nominal' => 'required',
-        //     'total' => 'required',
-        // ];
-
-        // $messages = [
-        //     'id_cabang.required' => 'Cabang harus diisi',
-        //     'tanggal.required' => 'Tanggal harus diisi',
-        //     'id_permintaan_pembelian.required' => 'PO harus diisi',
-        //     'id_mata_uang.required' => 'Mata uang harus diisi',
-        //     'id_slip.required' => 'Slip harus diisi',
-        //     'rate.required' => 'Rate harus diisi',
-        //     'nominal.required' => 'Nomial harus diisi',
-        //     'total.required' => 'Total harus diisi',
-        // ];
-
-        // $valid = Validator::make($request->all(), $paramValidate, $messages);
-        // if ($valid->fails()) {
-        //     return redirect()->back()->withErrors($valid)->withInput($request->all());
-        // }
-
         $data = PurchaseDownPayment::find($id);
         try {
             DB::beginTransaction();

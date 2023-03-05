@@ -2,6 +2,8 @@
 
 @section('addedStyles')
     <link rel="stylesheet" href="{{ asset('assets/bower_components/select2/dist/css/select2.min.css') }}">
+    <link rel="stylesheet"
+        href="{{ asset('assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css') }}">
     <style>
         label>span {
             color: red;
@@ -11,7 +13,8 @@
             width: 100% !important;
         }
 
-        .handle-number-4 {
+        .handle-number-4,
+        .handle-number-2 {
             text-align: right;
         }
     </style>
@@ -70,9 +73,9 @@
                             <div class="row">
                                 <label class="col-md-3">Tanggal <span>*</span></label>
                                 <div class="col-md-5 form-group">
-                                    <input type="date" name="tanggal"
+                                    <input type="text" name="tanggal"
                                         value="{{ old('tanggal', $data ? $data->tanggal : date('Y-m-d')) }}"
-                                        class="form-control" data-validation="[NOTEMPTY]"
+                                        class="form-control datepicker" data-validation="[NOTEMPTY]"
                                         data-validation-message="Tanggal tidak boleh kosong">
                                 </div>
                             </div>
@@ -85,7 +88,7 @@
                                         data-validation-message="ID permintaan pembelian tidak boleh kosong">
                                         <option value="">Pilih Permintaan Pembelian (PO)</option>
                                         @if ($data && $data->id_permintaan_pembelian)
-                                            <option value="{{ $data->id_permintaan_pembeliaan }}" selected>
+                                            <option value="{{ $data->id_permintaan_pembelian }}" selected>
                                                 {{ $data->purchaseOrder->nama_permintaan_pembelian }}
                                             </option>
                                         @endif
@@ -114,7 +117,7 @@
                             <div class="row">
                                 <label class="col-md-3">Rate <span>*</span></label>
                                 <div class="col-md-4 form-group">
-                                    <input type="text" name="rate" class="form-control handle-number-4"
+                                    <input type="text" name="rate" class="form-control handle-number-2"
                                         value="{{ old('rate', $data ? $data->rate : '') }}" data-validation="[NOTEMPTY]"
                                         data-validation-message="Rate tidak boleh kosong">
                                 </div>
@@ -122,16 +125,16 @@
                             <div class="row">
                                 <label class="col-md-3">Nominal <span>*</span></label>
                                 <div class="col-md-4 form-group">
-                                    <input type="text" name="nominal" class="form-control handle-number-4"
+                                    <input type="text" name="nominal" class="form-control handle-number-2"
                                         value="{{ old('nominal', $data ? $data->nominal : '') }}"
-                                        data-max="{{ $data ? $data->nominal : 0 }}" data-validation="[NOTEMPTY]"
+                                        data-max="{{ $maxPayment }}" data-validation="[NOTEMPTY]"
                                         data-validation-message="Nominal tidak boleh kosong">
                                 </div>
                             </div>
                             <div class="row">
                                 <label class="col-md-3">Total <span>*</span></label>
                                 <div class="col-md-4 form-group">
-                                    <input type="text" name="total" class="form-control handle-number-4" readonly
+                                    <input type="text" name="total" class="form-control handle-number-2" readonly
                                         value="{{ old('total', $data ? $data->total : '') }}" data-validation="[NOTEMPTY]"
                                         data-validation-message="Total tidak boleh kosong">
                                 </div>
@@ -157,6 +160,7 @@
 @section('addedScripts')
     <script src="{{ asset('assets/plugins/jquery-form-validation-1.5.3/dist/jquery.validation.min.js') }}"></script>
     <script src="{{ asset('assets/bower_components/select2/dist/js/select2.min.js') }}"></script>
+    <script src="{{ asset('assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js') }}"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/custom.js') }}"></script>
 @endsection
@@ -164,6 +168,9 @@
 @section('externalScripts')
     <script>
         $('.select2').select2()
+        $('.datepicker').datepicker({
+            format: 'yyyy-mm-dd',
+        });
 
         if ($('[name="id_cabang"]').val() == '') {
             $('[name="id_permintaan_pembelian"]').prop('disabled', true)

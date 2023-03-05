@@ -7,9 +7,23 @@ $(document).on('input', '.handle-number-4', function () {
     }
 })
 
+$(document).on('input', '.handle-number-2', function () {
+    let str = $(this).val()
+    if ((this).hasAttribute('data-max')) {
+        $(this).val(formatRupiah(str, 2, $(this)))
+    } else {
+        $(this).val(formatRupiah(str, 2))
+    }
+})
+
 $('.handle-number-4').each(function (i, v) {
     let val = $(v).val().replace('.', ',')
     $(v).val(formatRupiah(val, 4))
+})
+
+$('.handle-number-2').each(function (i, v) {
+    let val = $(v).val().replace('.', ',')
+    $(v).val(formatRupiah(val, 2))
 })
 
 $(document).on('select2:open', () => {

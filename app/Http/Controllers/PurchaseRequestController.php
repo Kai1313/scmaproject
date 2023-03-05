@@ -99,27 +99,6 @@ class PurchaseRequestController extends Controller
 
     public function saveEntry(Request $request, $id = 0)
     {
-        // $paramValidate = [
-        //     'id_cabang' => 'required',
-        //     'purchase_request_date' => 'required',
-        //     'purchase_request_estimation_date' => 'required',
-        //     'purchase_request_user_id' => 'required',
-        //     'id_gudang' => 'required',
-        // ];
-
-        // $messages = [
-        //     'id_cabang.required' => 'Cabang harus diisi',
-        //     'purchase_request_date.required' => 'Tanggal harus diisi',
-        //     'purchase_request_estimation_date.required' => 'Tanggal estimasi harus diisi',
-        //     'id_gudang.required' => 'Gudang harus diisi',
-        //     'purchase_request_user_id' => 'Pemohon harus diisi',
-        // ];
-
-        // $valid = Validator::make($request->all(), $paramValidate, $messages);
-        // if ($valid->fails()) {
-        //     return redirect()->back()->withErrors($valid)->withInput($request->all());
-        // }
-
         $data = PurchaseRequest::find($id);
         try {
             DB::beginTransaction();
