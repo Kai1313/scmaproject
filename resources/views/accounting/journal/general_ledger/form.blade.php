@@ -63,20 +63,22 @@
         <div class="row">
             <div class="col-xs-12">
                 <div class="box box-primary">
-                    <div class="box-header">
-                        <div class="row">
+                    <div class="box-header with-border">
+                        {{-- <div class="row">
                             <div class="col-xs-12">
-                                <h3 class="box-title">{{ isset($data_jurnal_umum) ? 'Ubah' : 'Tambah' }} Jurnal Umum</h3>
-                                <a href="{{ route('transaction-general-ledger') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right"><span class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span>
-                                    Kembali</a>
                             </div>
+                        </div> --}}
+                        <h3 class="box-title">{{ isset($data_jurnal_umum) ? 'Ubah' : 'Tambah' }} Jurnal Umum</h3>
+                        <div class="box-tools pull-right">
+                            <a href="{{ route('transaction-general-ledger') }}" class="btn bg-navy btn-sm btn-default btn-flat"><span class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali</a>
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
                         </div>
                     </div>
                     <div class="box-body">
                         <form id="form_ledger" data-toggle="validator" enctype="multipart/form-data">
                             @csrf
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <div class="form-group">
                                         <label>Cabang</label>
                                         <select name="cabang_input" id="cabang_input" class="form-control select2" style="width: 100%;">
@@ -87,13 +89,6 @@
                                             @endforeach
                                         </select>
                                     </div>
-                                    {{-- <div class="form-group">
-                                            <label>Nomor Jurnal</label>
-                                            <input type="text" class="form-control" id="kode" name="kode"
-                                                placeholder="Masukkan nomor jurnal umum" value=""
-                                                data-validation="[NOTEMPTY]"
-                                                data-validation-message="Nomor Jurnal Umum tidak boleh kosong">
-                                        </div> --}}
                                     <div class="form-group">
                                         <label>Tanggal Jurnal</label>
                                         <input type="date" class="form-control" id="tanggal" name="tanggal" placeholder="Masukkan tanggal jurnal umum" value="{{ date('Y-m-d') }}" data-validation="[NOTEMPTY]" data-validation-message="Tanggal Jurnal tidak boleh kosong">
@@ -110,17 +105,20 @@
                                             <option value="HG">Hutang Giro</option>
                                         </select>
                                     </div>
+                                </div>
+                                <div class="col-md-4">
                                     <div class="form-group">
                                         <label>Slip</label>
                                         <select name="slip" id="slip" class="form-control select2" data-validation="[NOTEMPTY]" data-validation-message="Slip tidak boleh kosong">
                                             <option value="">Pilih Slip</option>
-                                            {{-- @foreach ($data_slip as $slip)
-                                                    <option value="{{ $slip->kode_slip }}">{{ $slip->kode_slip.' - '.$slip->nama_slip }}</option>
-                                            @endforeach --}}
                                         </select>
                                     </div>
+                                    <div class="form-group">
+                                        <label>Notes</label>
+                                        <textarea name="notes" id="notes" class="form-control" rows="4" placeholder="Notes ..."></textarea>
+                                    </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <div class="form-group">
                                         <label>Nomor Giro</label>
                                         <input type="text" name="nomor_giro" id="nomor_giro" class="form-control comp-giro" data-validation="[NOTEMPTY]" data-validation-message="Nomor giro tidak boleh kosong" disabled>
@@ -133,10 +131,6 @@
                                         <label>Tanggal JT Giro</label>
                                         <input type="date" class="form-control comp-giro" id="tanggal_jt_giro" name="tanggal_jt_giro" placeholder="Masukkan tanggal jatuh tempo giro" value="{{ date('Y-m-d') }}" data-validation="[NOTEMPTY]" data-validation-message="Tanggal JT Giro tidak boleh kosong" disabled>
                                     </div>
-                                    <div class="form-group">
-                                        <label>Notes</label>
-                                        <textarea name="notes" id="notes" class="form-control" rows="4" placeholder="Notes ..."></textarea>
-                                    </div>
                                     <button id="hidden-btn" style="display:none;" type="submit">HIDDEN</button>
                                 </div>
                             </div>
@@ -148,33 +142,40 @@
         <div class="row">
             <div class="col-xs-12">
                 <div class="box box-primary">
-                    <div class="box-header">
-                        <div class="row">
+                    <div class="box-header with-border">
+                        {{-- <div class="row">
                             <div class="col-xs-12">
-                                <h3 class="box-title">Detail Jurnal</h3>
                             </div>
+                        </div> --}}
+                        <h3 class="box-title">Detail Jurnal</h3>
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
                         </div>
                     </div>
                     <div class="box-body">
                         <form id="form_detail" action="" method="post">
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-3">
                                     <div class="form-group">
                                         <label>Akun</label>
                                         <select name="akun_detail" class="form-control select2" id="akun_detail" data-error="Wajib isi" data-validation="[NOTEMPTY]" data-validation-message="Akun tidak boleh kosong" required>
                                             <option value="">Pilih Akun</option>
                                         </select>
                                     </div>
+                                </div>
+                                <div class="col-md-3">
                                     <div class="form-group">
                                         <label>Notes</label>
-                                        <textarea name="notes_detail" id="notes_detail" class="form-control" rows="3" placeholder="Notes ..."></textarea>
+                                        <textarea name="notes_detail" id="notes_detail" class="form-control" rows="2" placeholder="Notes ..."></textarea>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-3">
                                     <div class="form-group">
                                         <label>Debet</label>
                                         <input type="text" name="debet" id="debet" class="form-control" data-validation="[NOTEMPTY]" data-validation-message="Debet tidak boleh kosong" value="0" onblur="this.value=formatCurr(this.value)">
                                     </div>
+                                </div>
+                                <div class="col-md-3">
                                     <div class="form-group">
                                         <label>Kredit</label>
                                         <input type="text" name="kredit" id="kredit" class="form-control" data-validation="[NOTEMPTY]" data-validation-message="Debet tidak boleh kosong" value="0" onblur="this.value=formatCurr(this.value)">
@@ -227,9 +228,9 @@
                         </div>
                         <div class="row mt-4">
                             <div class="col-xs-12">
-                                <button type="submit" id="btn-save" class="btn btn-flat btn-primary pull-right mb-1"><span class="glyphicon glyphicon-floppy-saved" aria-hidden="true"></span> Simpan
-                                    Data</button>
+                                <button type="submit" id="btn-save" class="btn btn-flat btn-primary pull-right mb-1"><span class="glyphicon glyphicon-floppy-saved" aria-hidden="true"></span> Simpan Data</button>
                                 <button id="btn-generate" type="button" class="btn btn-flat btn-success mr-1 mb-1 pull-right">Generate</button>
+                                <button id="btn-transaction" type="button" class="btn btn-flat btn-success mr-1 mb-1 pull-right">Transaksi</button>
                             </div>
                         </div>
                     </div>
@@ -238,6 +239,49 @@
         </div>
     </form>
 </div>
+@endsection
+
+@section('modal-section')
+    <div class="modal fade" id="modal-transaction">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">List Transaksi</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="form-copy" action="" method="post">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="form-group">
+                                    <label>Dari Cabang</label>
+                                    {{ csrf_field() }}
+                                    <input type="hidden" id="id_cabang" name="id_cabang" value="{{ $cabang->id_cabang }}">
+                                    <input type="text" class="form-control" id="nama_cabang"
+                                        value="{{ $cabang->kode_cabang . ' - ' . $cabang->nama_cabang }}" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>Ke Cabang</label>
+                                    <select name="cabang" class="form-control select2" style="width: 100%;">
+                                        @foreach ($data_cabang as $cabang)
+                                            <option value="{{ $cabang->id_cabang }}"
+                                                {{ isset($akun->id_cabang) ? ($akun->id_cabang == $cabang->id_cabang ? 'selected' : '') : '' }}>
+                                                {{ $cabang->kode_cabang . ' - ' . $cabang->nama_cabang }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+                    <button type="button" id="btn-copy-data" class="btn btn-primary">Copy Data Slip</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('addedScripts')
@@ -477,6 +521,11 @@
                     }
                 }
             }
+        })
+
+        // Open Transaction Modal
+        $("#btn-transaction").on("click", function() {
+            $("#modal-transaction").modal("show")
         })
     })
 
