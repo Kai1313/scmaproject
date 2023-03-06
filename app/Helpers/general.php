@@ -10,3 +10,8 @@ function normalizeNumber($number = 0)
 
     return $number;
 }
+
+function handleNull($number)
+{
+    return $number ? $number : 0;
+}
