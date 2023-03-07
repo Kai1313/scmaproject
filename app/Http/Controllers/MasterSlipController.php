@@ -425,7 +425,7 @@ class MasterSlipController extends Controller
     {
         try {
             $session = $request->session()->get('access');
-            if ($request->session()->has('token') && $session['Master Slip']['edit'] == 1) {
+            if ($request->session()->has('token') && $session['Master Slip']['print'] == 1) {
                 return Excel::download(new SlipsExport, 'slips.xlsx');
             } else {
                 return response()->json([

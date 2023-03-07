@@ -464,7 +464,7 @@ class MasterCoaController extends Controller
     {
         try {
             $session = $request->session()->get('access');
-            if ($request->session()->has('token') && $session['Master CoA']['edit'] == 1) {
+            if ($request->session()->has('token') && $session['Master CoA']['print'] == 1) {
                 return Excel::download(new AkunsExport, 'akuns.xlsx');
             } else {
                 return response()->json([
