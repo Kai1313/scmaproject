@@ -27,12 +27,10 @@
                 </a>
             </li>
             <li class="header">ACCOUNTING</li>
-            <li class="nav-item {{ request()->segment(1) == 'dashboard' ? 'active' : null }}">
-                <a href="{{ route('dashboard') }}"><i class="fa fa-briefcase"></i> <span>Dashboard</span>
+            <li class="nav-item {{ request()->segment(1) == '' ? 'active' : null }}">
+                <a href="{{ route('welcome') }}"><i class="fa fa-briefcase"></i> <span>Dashboard</span>
                 </a>
             </li>
-            <!-- Optionally, you can add icons to the links -->
-            @if(in_array('304', Session::get('access')))
             <li class="treeview {{ request()->segment(1) == 'master' ? 'active' : null }}">
                 <a href="#"><i class="fa fa-link"></i> <span>Master</span>
                     <span class="pull-right-container">
@@ -40,15 +38,10 @@
                     </span>
                 </a>
                 <ul class="treeview-menu">
-                    @if(in_array('305', Session::get('access')))
-                    <li class="{{ request()->segment(2) == 'coa' ? 'active' : null }}"><a href="{{ route('master-coa') }}">Master CoA</a></li>
-                    @endif
-                    @if(in_array('306', Session::get('access')))
-                    <li class="{{ request()->segment(2) == 'slip' ? 'active' : null }}"><a href="{{ route('master-slip') }}">Master Slip</a></li>
-                    @endif
+                    <li class="{{ request()->segment(2) == 'coa' ? 'active' : null }}"><a href="{{ route('master-coa', 1) }}">Master CoA</a></li>
+                    <li class="{{ request()->segment(2) == 'slip' ? 'active' : null }}"><a href="{{ route('master-slip', 1) }}">Master Slip</a></li>
                 </ul>
             </li>
-            @endif
             <li class="treeview {{ request()->segment(1) == 'transaction' ? 'active' : null }}">
                 <a href="#"><i class="fa fa-link"></i> <span>Transaction</span>
                     <span class="pull-right-container">

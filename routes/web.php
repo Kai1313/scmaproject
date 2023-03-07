@@ -13,10 +13,7 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('welcome');
-Route::get('/dashboard/{user_id?}', 'SessionController@index')->name('dashboard');
+Route::get('/', 'SessionController@index')->name('welcome');
 Route::get('/logout', 'SessionController@logout')->name('logout');
 
 Route::get('/get-menu/{id}', 'DashboardController@getMenu')->name('get-menu');
@@ -53,7 +50,7 @@ Route::prefix('/permintaan-pembelian')->group(function () {
 });
 
 // Master
-Route::get('/master/slip', 'MasterSlipController@index')->name('master-slip');
+Route::get('/master/slip/index/{user_id?}', 'MasterSlipController@index')->name('master-slip');
 Route::get('/master/slip/form/create', 'MasterSlipController@create')->name('master-slip-create');
 Route::get('/master/slip/form/edit/{id?}', 'MasterSlipController@edit')->name('master-slip-edit');
 Route::get('/master/slip/show/{id?}', 'MasterSlipController@show')->name('master-slip-show');
@@ -65,7 +62,7 @@ Route::get('/master/slip/export/excel', 'MasterSlipController@export_excel')->na
 Route::post('/master/slip/copy/data', 'MasterSlipController@copy_data')->name('master-slip-copy-data');
 Route::get('/master/slip/get_by_cabang/{id_cabang?}/{id_slip?}', 'MasterSlipController@getSlipByCabang')->name('master-slip-get-by-cabang');
 
-Route::get('/master/coa', 'MasterCoaController@index')->name('master-coa');
+Route::get('/master/coa/index/{user_id?}', 'MasterCoaController@index')->name('master-coa');
 Route::get('/master/coa/populate/{cabang?}', 'MasterCoaController@populate')->name('master-coa-populate');
 Route::get('/master/coa/form/create', 'MasterCoaController@create')->name('master-coa-create');
 Route::get('/master/coa/form/edit/{id}', 'MasterCoaController@edit')->name('master-coa-edit');
