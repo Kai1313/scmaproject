@@ -68,7 +68,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         <header class="main-header">
 
             <!-- Logo -->
-            <a href="{{ route('dashboard', 1) }}" class="logo" style="background-color: #fff;">
+            <a href="{{ route('welcome') }}" class="logo" style="background-color: #fff;">
                 <!-- mini logo for sidebar mini 50x50 pixels -->
                 <span class="logo-mini"><img src="{{ asset('assets/img/logo.png') }}" alt="Logo"></span>
                 <!-- logo for regular state and mobile devices -->
@@ -94,7 +94,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 <ul class="sidebar-menu" data-widget="tree">
                     <li class="header">ACCOUNTING</li>
                     <li class="nav-item">
-                        <a href="{{ route('dashboard', 1) }}" class="{{ request()->segment(1) == '' ? 'active' : null }}"><i class="fa fa-briefcase"></i> <span>Accounting</span>
+                        <a href="{{ route('welcome') }}" class="{{ request()->segment(1) == '' ? 'active' : null }}"><i class="fa fa-briefcase"></i> <span>Accounting</span>
                         </a>
                     </li>
                 </ul>
