@@ -27,7 +27,7 @@ class MasterCoaController extends Controller
         $cabang = Cabang::find(1);
         $data_cabang = Cabang::all();
         $user_id    = $request->user_id;
-        if ($user_id != '') {
+        if (($user_id != '' && $request->session()->has('token') == false) || $request->session()->has('token') == true) {
             $user       = User::where('id_pengguna', $user_id)->first();
             $token      = UserToken::where('id_pengguna', $user_id)->where('status_token_pengguna', 1)->whereRaw("waktu_habis_token_pengguna > STR_TO_DATE(?, '%Y-%m-%d %H:%i:%s')", Carbon::now()->format('Y-m-d H:i:s'))->first();
 
