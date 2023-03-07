@@ -136,30 +136,32 @@ class ApiController extends Controller
             if (!empty($jurnal_detail)) {
                 $index = 1;
                 foreach ($jurnal_detail as $jd) {
-                    $detail = new JurnalDetail();
-                    $detail->id_jurnal = $header->id_jurnal;
-                    $detail->index = $index;
-                    $detail->id_akun = $jd['akun'];
-                    $detail->debet = $jd['debet'];
-                    $detail->credit = $jd['credit'];
-                    $detail->keterangan = $jd['keterangan'];
-                    $detail->user_created = $user_created;
-                    $detail->dt_created = date('Y-m-d h:i:s');
-                    $detail->user_modified = $user_created;
-                    $detail->dt_modified = date('Y-m-d h:i:s');
+                    if(($jd['debet'] > 0 && $jd['credit'] == 0) || ($jd['debet'] == 0 && $jd['credit'] > 0)){
+                        $detail = new JurnalDetail();
+                        $detail->id_jurnal = $header->id_jurnal;
+                        $detail->index = $index;
+                        $detail->id_akun = $jd['akun'];
+                        $detail->debet = $jd['debet'];
+                        $detail->credit = $jd['credit'];
+                        $detail->keterangan = $jd['keterangan'];
+                        $detail->user_created = $user_created;
+                        $detail->dt_created = date('Y-m-d h:i:s');
+                        $detail->user_modified = $user_created;
+                        $detail->dt_modified = date('Y-m-d h:i:s');
 
-                    Log::debug(json_encode($detail));
+                        Log::debug(json_encode($detail));
 
-                    if (!$detail->save()) {
-                        DB::rollback();
-                        return response()->json([
-                            "result" => false,
-                            "code" => 400,
-                            "message" => "Error when store Jurnal data on table detail"
-                        ]);
+                        if (!$detail->save()) {
+                            DB::rollback();
+                            return response()->json([
+                                "result" => false,
+                                "code" => 400,
+                                "message" => "Error when store Jurnal data on table detail"
+                            ]);
+                        }
+
+                        $index++;
                     }
-
-                    $index++;
                 }
             }
 
@@ -306,30 +308,32 @@ class ApiController extends Controller
             if (!empty($jurnal_detail)) {
                 $index = 1;
                 foreach ($jurnal_detail as $jd) {
-                    $detail = new JurnalDetail();
-                    $detail->id_jurnal = $header->id_jurnal;
-                    $detail->index = $index;
-                    $detail->id_akun = $jd['akun'];
-                    $detail->debet = $jd['debet'];
-                    $detail->credit = $jd['credit'];
-                    $detail->keterangan = $jd['keterangan'];
-                    $detail->user_created = $user_created;
-                    $detail->dt_created = date('Y-m-d h:i:s');
-                    $detail->user_modified = $user_created;
-                    $detail->dt_modified = date('Y-m-d h:i:s');
+                   if(($jd['debet'] > 0 && $jd['credit'] == 0) || ($jd['debet'] == 0 && $jd['credit'] > 0)){
+                        $detail = new JurnalDetail();
+                        $detail->id_jurnal = $header->id_jurnal;
+                        $detail->index = $index;
+                        $detail->id_akun = $jd['akun'];
+                        $detail->debet = $jd['debet'];
+                        $detail->credit = $jd['credit'];
+                        $detail->keterangan = $jd['keterangan'];
+                        $detail->user_created = $user_created;
+                        $detail->dt_created = date('Y-m-d h:i:s');
+                        $detail->user_modified = $user_created;
+                        $detail->dt_modified = date('Y-m-d h:i:s');
 
-                    Log::debug(json_encode($detail));
+                        Log::debug(json_encode($detail));
 
-                    if (!$detail->save()) {
-                        DB::rollback();
-                        return response()->json([
-                            "result" => false,
-                            "code" => 400,
-                            "message" => "Error when store Jurnal data on table detail"
-                        ]);
-                    }
+                        if (!$detail->save()) {
+                            DB::rollback();
+                            return response()->json([
+                                "result" => false,
+                                "code" => 400,
+                                "message" => "Error when store Jurnal data on table detail"
+                            ]);
+                        }
 
-                    $index++;
+                        $index++;
+                   }
                 }
             }
 
