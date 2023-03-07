@@ -96,7 +96,7 @@ class GeneralLedgerController extends Controller
             $userData = $request->session()->get('user');
             $userRecord = $userData->id_pengguna;
             $userModified = $userData->id_pengguna;
-            $dateRecord = date('Y-m-d');
+            $dateRecord = date('Y-m-d h:i:s');
             $detailData = $request->detail;
             // dd($detailData);
 
@@ -338,7 +338,7 @@ class GeneralLedgerController extends Controller
             $noteHeader = $request->header[0]["notes"];
             $userData = $request->session()->get('user');
             $userModified = $userData->id_pengguna;
-            $dateModified = date('Y-m-d');
+            $dateModified = date('Y-m-d h:i:s');
             $detailData = $request->detail;
 
             DB::beginTransaction();
