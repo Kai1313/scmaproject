@@ -30,6 +30,9 @@ class MasterSlipController extends Controller
         $user_id = $request->user_id;
 
         if (($user_id != '' && $request->session()->has('token') == false) || $request->session()->has('token') == true) {
+            if ($request->session()->has('token') == true) {
+                $user_id = $request->session()->get('user')->id_pengguna;
+            }
             $user       = User::where('id_pengguna', $user_id)->first();
             $token      = UserToken::where('id_pengguna', $user_id)->where('status_token_pengguna', 1)->whereRaw("waktu_habis_token_pengguna > STR_TO_DATE(?, '%Y-%m-%d %H:%i:%s')", Carbon::now()->format('Y-m-d H:i:s'))->first();
 
@@ -52,7 +55,7 @@ class MasterSlipController extends Controller
                 a.id_grup_pengguna = b.id_grup_pengguna 
                 AND b.id_grup_pengguna = c.id_grup_pengguna 
                 AND c.id_menu = d.id_menu 
-                AND a.id_pengguna = 1
+                AND a.id_pengguna = $user_id
                 AND d.keterangan_menu = 'Accounting' 
                 AND d.status_menu = 1";
             $access = DB::connection('mysql')->select($sql);
@@ -81,7 +84,7 @@ class MasterSlipController extends Controller
                 "data_slip" => $data_slip
             ];
 
-            if ($request->session()->has('token') && $session['Master Slip']['show'] == 1) {
+            if (($request->session()->has('token') && array_key_exists('Master Slip', $session)) && $session['Master Slip']['show'] == 1) {
                 return view('accounting.master.slip.index', $data);
             } else {
                 return view('exceptions.forbidden');
@@ -111,7 +114,7 @@ class MasterSlipController extends Controller
 
         $session = $request->session()->get('access');
 
-        if ($request->session()->has('token') && $session['Master Slip']['create'] == 1) {
+        if (($request->session()->has('token') && array_key_exists('Master Slip', $session)) && $session['Master Slip']['create'] == 1) {
             return view('accounting.master.slip.form', $data);
         } else {
             return view('exceptions.forbidden');
@@ -191,7 +194,7 @@ class MasterSlipController extends Controller
         ];
         $session = $request->session()->get('access');
 
-        if ($request->session()->has('token') && $session['Master Slip']['show'] == 1) {
+        if (($request->session()->has('token') && array_key_exists('Master Slip', $session)) && $session['Master Slip']['show'] == 1) {
             return view('accounting.master.slip.detail', $data);
         } else {
             return view('exceptions.forbidden');
@@ -218,7 +221,7 @@ class MasterSlipController extends Controller
             "data_cabang" => $data_cabang
         ];
 
-        if ($request->session()->has('token') && $session['Master Slip']['edit'] == 1) {
+        if (($request->session()->has('token') && array_key_exists('Master Slip', $session)) && $session['Master Slip']['edit'] == 1) {
             return view('accounting.master.slip.form', $data);
         } else {
             return view('exceptions.forbidden');
@@ -300,7 +303,7 @@ class MasterSlipController extends Controller
         $data_slip = Slip::find($id);
         $kode_slip = $data_slip->kode_slip;
         $session = $request->session()->get('access');
-        if ($request->session()->has('token') && $session['Master Slip']['edit'] == 1) {
+        if (($request->session()->has('token') && array_key_exists('Master Slip', $session)) && $session['Master Slip']['edit'] == 1) {
             if ($data_journal_header->isNotEmpty()) {
                 // return back()->with("failed", "Maaf, tidak bisa menghapus slip" . $data_slip->kode_slip . "karena sudah digunakan pada jurnal");
                 return response()->json([
@@ -425,7 +428,7 @@ class MasterSlipController extends Controller
     {
         try {
             $session = $request->session()->get('access');
-            if ($request->session()->has('token') && $session['Master Slip']['print'] == 1) {
+            if (($request->session()->has('token') && array_key_exists('Master Slip', $session)) && $session['Master Slip']['print'] == 1) {
                 return Excel::download(new SlipsExport, 'slips.xlsx');
             } else {
                 return response()->json([
