@@ -251,16 +251,86 @@
                     <h4 class="modal-title">List Transaksi</h4>
                 </div>
                 <div class="modal-body">
-                    <form id="form-copy" action="" method="post">
+                    <form id="form-transaction" action="" method="post">
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label>Dari Cabang</label>
+                                    <label>Jenis Transaksi</label>
                                     <select name="transaction_type" id="transaction_type" class="form-control select2">
                                         <option value="">Pilih Jenis Transaksi</option>
-                                        <option value=""></option>
+                                        <option value="jual">Jual</option>
+                                        <option value="retur_jual">Retur Jual</option>
+                                        <option value="beli">Beli</option>
+                                        <option value="retur_beli">Retur Beli</option>
+                                        <option value="piutang_giro">Piutang Giro</option>
+                                        <option value="hutang_giro">Hutang Giro</option>
+                                        <option value="piutang_giro_tolak">Piutang Giro Tolak</option>
+                                        <option value="hutang_giro_tolak">Hutang Giro Tolak</option>
                                     </select>
                                 </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row box-transaction" id="box-jual">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Customer</label>
+                                    <select name="customer_jual" id="customer_jual" class="form-control select2">
+                                        <option value="">Pilih Customer</option>
+                                        <option value="a">Customer A</option>
+                                        <option value="b">Customer B</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <table id="table_jual" class="table table-bordered table-striped" style="width:100%">
+                                    <thead width="100%">
+                                        <tr>
+                                            <th class="text-center">Tanggal</th>
+                                            <th class="text-center">Nomor Jual</th>
+                                            <th class="text-center">Sales Order</th>
+                                            <th class="text-center">Customer</th>
+                                            <th class="text-center">Note</th>
+                                            <th class="text-center">DPP</th>
+                                            <th class="text-center">PPn</th>
+                                            <th class="text-center">Total</th>
+                                            <th class="text-center">Terbayar</th>
+                                            <th class="text-center">Sisa</th>
+                                            <th class="text-center">Bayar</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="row box-transaction" id="box-beli">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Supplier</label>
+                                    <select name="supplier_beli" id="supplier_beli" class="form-control select2">
+                                        <option value="">Pilih Supplier</option>
+                                        <option value="a">Customer A</option>
+                                        <option value="b">Customer B</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <table id="table_jual" class="table table-bordered table-striped" style="width:100%">
+                                    <thead width="100%">
+                                        <tr>
+                                            <th class="text-center">Tanggal</th>
+                                            <th class="text-center">Nomor Beli</th>
+                                            <th class="text-center">Nomor PO</th>
+                                            <th class="text-center">Supplier</th>
+                                            <th class="text-center">Note</th>
+                                            <th class="text-center">DPP</th>
+                                            <th class="text-center">PPn</th>
+                                            <th class="text-center">Total</th>
+                                            <th class="text-center">Terbayar</th>
+                                            <th class="text-center">Sisa</th>
+                                            <th class="text-center">Bayar</th>
+                                        </tr>
+                                    </thead>
+                                </table>
                             </div>
                         </div>
                     </form>
@@ -393,6 +463,8 @@
         })
 
         $('#table_detail').DataTable()
+        $('#table_jual').DataTable()
+        $('#table_beli').DataTable()
 
         $(document).on('select2:open', () => {
             document.querySelector('.select2-search__field').focus()
@@ -516,6 +588,26 @@
         // Open Transaction Modal
         $("#btn-transaction").on("click", function() {
             $("#modal-transaction").modal("show")
+            $(".box-transaction").hide()
+        })
+
+        // Open Transaction Box from selected transaction type
+        $("#transaction_type").on("change", function() {
+            let type = $(this).val()
+            switch (type) {
+                case "jual":
+                    $(".box-transaction").hide()
+                    $("#box-jual").show()
+                    break;
+                case "beli":
+                    $(".box-transaction").hide()
+                    $("#box-beli").show()
+                    break;
+            
+                default:
+                    $(".box-transaction").hide()
+                    break;
+            }
         })
     })
 
