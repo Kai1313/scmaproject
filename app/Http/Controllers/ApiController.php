@@ -86,16 +86,16 @@ class ApiController extends Controller
             }
 
             // detail
-            $data_akun_uang_muka_penjualan = DB::table('setting')->where('id', 'UM Penjualan')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
+            $data_akun_uang_muka_penjualan = DB::table('setting')->where('code', 'Uang Muka Penjualan')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
             if (empty($data_akun_uang_muka_penjualan)) {
                 return response()->json([
                     "result" => false,
                     "code" => 404,
-                    "message" => "Error, Setting UM Penjualan not found"
+                    "message" => "Error, Setting Uang Muka Penjualan not found"
                 ]);
             }
 
-            $data_akun_ppn_keluaran = DB::table('setting')->where('id', 'PPN Keluaran')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
+            $data_akun_ppn_keluaran = DB::table('setting')->where('code', 'PPN Keluaran')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
             if (empty($data_akun_ppn_keluaran)) {
                 return response()->json([
                     "result" => false,
@@ -116,7 +116,7 @@ class ApiController extends Controller
                     'akun'          => $akun_slip,
                     'debet'         => $total,
                     'credit'        => 0,
-                    'keterangan'    => 'Jurnal Otomatis ' . $jurnal_type_detail . ' UM Penjualan - ' . $id_transaksi . ' - ' . $nama_pelanggan,
+                    'keterangan'    => 'Jurnal Otomatis ' . $jurnal_type_detail . ' Uang Muka Penjualan - ' . $id_transaksi . ' - ' . $nama_pelanggan,
                 ],
                 [
                     'akun'          => $akun_uang_muka_penjualan,
@@ -190,8 +190,6 @@ class ApiController extends Controller
                         $detail->user_modified = $user_created;
                         $detail->dt_modified = date('Y-m-d h:i:s');
 
-                        Log::debug(json_encode($detail));
-
                         if (!$detail->save()) {
                             DB::rollback();
                             return response()->json([
@@ -259,16 +257,16 @@ class ApiController extends Controller
             }
 
             // detail
-            $data_akun_uang_muka_pembelian = DB::table('setting')->where('id', 'UM Pembelian')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
+            $data_akun_uang_muka_pembelian = DB::table('setting')->where('code', 'Uang Muka Pembelian')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
             if (empty($data_akun_uang_muka_pembelian)) {
                 return response()->json([
                     "result" => false,
                     "code" => 404,
-                    "message" => "Error, Setting UM Pembelian not found"
+                    "message" => "Error, Setting Uang Muka Pembelian not found"
                 ]);
             }
 
-            $data_akun_ppn_masukan = DB::table('setting')->where('id', 'PPN Masukkan')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
+            $data_akun_ppn_masukan = DB::table('setting')->where('code', 'PPN Masukkan')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
             if(empty($data_akun_ppn_masukan)){
                 return response()->json([
                     "result" => false,
@@ -289,7 +287,7 @@ class ApiController extends Controller
                     'akun'          => $akun_slip,
                     'debet'         => $total,
                     'credit'        => 0,
-                    'keterangan'    => 'Jurnal Otomatis ' . $jurnal_type_detail . ' UM Pembelian - ' . $id_transaksi . ' - ' . $nama_pelanggan,
+                    'keterangan'    => 'Jurnal Otomatis ' . $jurnal_type_detail . ' Uang Muka Pembelian - ' . $id_transaksi . ' - ' . $nama_pelanggan,
                 ],
                 [
                     'akun'          => $akun_uang_muka_pembelian,
@@ -363,8 +361,6 @@ class ApiController extends Controller
                         $detail->user_modified = $user_created;
                         $detail->dt_modified = date('Y-m-d h:i:s');
 
-                        Log::debug(json_encode($detail));
-
                         if (!$detail->save()) {
                             DB::rollback();
                             return response()->json([
@@ -400,8 +396,7 @@ class ApiController extends Controller
 
     public function journalPenjualan(Request $request)
     {
-        // try {
-            Log::debug(json_encode($request->all()));
+        try {
             // init data
             // header
             $id_transaksi = $request->no_transaksi;
@@ -411,16 +406,14 @@ class ApiController extends Controller
             $id_pelanggan = $request->pelanggan;
             $id_cabang = $request->cabang;
             $id_slip = $request->slip;
-            $detail_inventory = $request->detail;
+            $detail_inventory = array_values($request->detail);
 
             $data_pelanggan = DB::table("pelanggan")->where('id_pelanggan', $id_pelanggan)->first();
-            Log::debug($id_pelanggan);
-            Log::debug(json_encode($data_pelanggan));
             $nama_pelanggan = $data_pelanggan->nama_pelanggan;
             $catatan_me = 'Journal Otomatis Penjualan - ' . $id_transaksi . ' - ' . $nama_pelanggan;
 
             // init setting
-            $data_akun_piutang_dagang = DB::table('setting')->where('id', 'Piutang Dagang')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
+            $data_akun_piutang_dagang = DB::table('setting')->where('code', 'Piutang Dagang')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
             if(empty($data_akun_piutang_dagang)){
                 return response()->json([
                     "result" => false,
@@ -429,16 +422,16 @@ class ApiController extends Controller
                 ]);
             }
 
-            $data_akun_uang_muka_penjualan = DB::table('setting')->where('id', 'UM Penjualan')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
+            $data_akun_uang_muka_penjualan = DB::table('setting')->where('code', 'Uang Muka Penjualan')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
             if(empty($data_akun_uang_muka_penjualan)){
                 return response()->json([
                     "result" => false,
                     "code" => 404,
-                    "message" => "Error, Setting UM Penjualan not found"
+                    "message" => "Error, Setting Uang Muka Penjualan not found"
                 ]);
             }
 
-            $data_akun_ppn_keluaran = DB::table('setting')->where('id', 'PPN Keluaran')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
+            $data_akun_ppn_keluaran = DB::table('setting')->where('code', 'PPN Keluaran')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
             if(empty($data_akun_ppn_keluaran)){
                 return response()->json([
                     "result" => false,
@@ -447,7 +440,7 @@ class ApiController extends Controller
                 ]);
             }
 
-            $data_akun_penjualan = DB::table('setting')->where('id', 'Penjualan')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
+            $data_akun_penjualan = DB::table('setting')->where('code', 'Penjualan')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
             if(empty($data_akun_penjualan)){
                 return response()->json([
                     "result" => false,
@@ -502,41 +495,41 @@ class ApiController extends Controller
                 array_push($jurnal_detail_me, [
                     'akun'          => $akun_penjualan,
                     'debet'         => 0,
-                    'credit'        => $d_inv->total,
-                    'keterangan'    => 'Jurnal Otomatis Pelunasan - ' . $id_transaksi . ' - ' . $nama_pelanggan . ' - ' . $d_inv->nama_barang,
+                    'credit'        => $d_inv['total'],
+                    'keterangan'    => 'Jurnal Otomatis Pelunasan - ' . $id_transaksi . ' - ' . $nama_pelanggan . ' - ' . $d_inv['nama_barang'],
                     'id_transaksi'  => null
                 ]);
             }
 
             // Find Header data and delete detail
-            $header = JurnalHeader::where("id_transaksi", $id_transaksi)->where('void', 0)->first();
+            $header_me = JurnalHeader::where("id_transaksi", $id_transaksi)->where('void', 0)->first();
 
             // Begin save
             DB::beginTransaction();
-            if (!empty($header)) {
-                JurnalDetail::where('id_jurnal', $header->id_jurnal)->delete();
-                $header->id_cabang = $id_cabang;
-                $header->tanggal_jurnal = $tanggal_jurnal;
-                $header->void = $void;
-                $header->catatan = $catatan_me;
-                $header->user_modified = $user_created;
-                $header->dt_modified = date('Y-m-d h:i:s');
+            if (!empty($header_me)) {
+                JurnalDetail::where('id_jurnal', $header_me->id_jurnal)->delete();
+                $header_me->id_cabang = $id_cabang;
+                $header_me->tanggal_jurnal = $tanggal_jurnal;
+                $header_me->void = $void;
+                $header_me->catatan = $catatan_me;
+                $header_me->user_modified = $user_created;
+                $header_me->dt_modified = date('Y-m-d h:i:s');
             } else {
-                $header = new JurnalHeader();
-                $header->id_cabang = $id_cabang;
-                $header->kode_jurnal = $this->generateJournalCode($id_cabang, 'ME');
-                $header->id_transaksi = $id_transaksi;
-                $header->jenis_jurnal = 'ME';
-                $header->tanggal_jurnal = $tanggal_jurnal;
-                $header->void = $void;
-                $header->catatan = $catatan_me;
-                $header->user_created = $user_created;
-                $header->dt_created = date('Y-m-d h:i:s');
-                $header->user_modified = $user_created;
-                $header->dt_created = date('Y-m-d h:i:s');
+                $header_me = new JurnalHeader();
+                $header_me->id_cabang = $id_cabang;
+                $header_me->kode_jurnal = $this->generateJournalCode($id_cabang, 'ME');
+                $header_me->id_transaksi = $id_transaksi;
+                $header_me->jenis_jurnal = 'ME';
+                $header_me->tanggal_jurnal = $tanggal_jurnal;
+                $header_me->void = $void;
+                $header_me->catatan = $catatan_me;
+                $header_me->user_created = $user_created;
+                $header_me->dt_created = date('Y-m-d h:i:s');
+                $header_me->user_modified = $user_created;
+                $header_me->dt_created = date('Y-m-d h:i:s');
             }
 
-            if (!$header->save()) {
+            if (!$header_me->save()) {
                 DB::rollback();
                 return response()->json([
                     "result" => false,
@@ -549,22 +542,20 @@ class ApiController extends Controller
                 $index = 1;
                 foreach ($jurnal_detail_me as $jd) {
                     if(($jd['debet'] > 0 && $jd['credit'] == 0) || ($jd['debet'] == 0 && $jd['credit'] > 0)){
-                        $detail = new JurnalDetail();
-                        $detail->id_jurnal = $header->id_jurnal;
-                        $detail->index = $index;
-                        $detail->id_akun = $jd['akun'];
-                        $detail->debet = $jd['debet'];
-                        $detail->credit = $jd['credit'];
-                        $detail->keterangan = $jd['keterangan'];
-                        $detail->id_transaksi = $jd['id_transaksi'];
-                        $detail->user_created = $user_created;
-                        $detail->dt_created = date('Y-m-d h:i:s');
-                        $detail->user_modified = $user_created;
-                        $detail->dt_modified = date('Y-m-d h:i:s');
+                        $detail_me = new JurnalDetail();
+                        $detail_me->id_jurnal = $header_me->id_jurnal;
+                        $detail_me->index = $index;
+                        $detail_me->id_akun = $jd['akun'];
+                        $detail_me->debet = $jd['debet'];
+                        $detail_me->credit = $jd['credit'];
+                        $detail_me->keterangan = $jd['keterangan'];
+                        $detail_me->id_transaksi = $jd['id_transaksi'];
+                        $detail_me->user_created = $user_created;
+                        $detail_me->dt_created = date('Y-m-d h:i:s');
+                        $detail_me->user_modified = $user_created;
+                        $detail_me->dt_modified = date('Y-m-d h:i:s');
 
-                        Log::debug(json_encode($detail));
-
-                        if (!$detail->save()) {
+                        if (!$detail_me->save()) {
                             DB::rollback();
                             return response()->json([
                                 "result" => false,
@@ -596,6 +587,8 @@ class ApiController extends Controller
                     ]);
                 }
 
+                $catatan_pelunasan = 'Journal Otomatis Pelunasan - ' . $id_transaksi . ' - ' . $nama_pelanggan;
+
                 $akun_slip = $data_slip->id_akun;
 
                 $jurnal_detail_pelunasan = [
@@ -616,21 +609,22 @@ class ApiController extends Controller
                 ];
 
                 // Find Header data and delete detail
-                $header = JurnalHeader::where("id_transaksi", $id_transaksi)->where('void', 0)->first();
+                $header = JurnalHeader::where("id_transaksi", $id_transaksi)->where('jenis_jurnal', '<>', 'ME')->where('void', 0)->first();
 
-                // Begin save
-                DB::beginTransaction();
-                if (!empty($header) && $header->id_slip != $id_slip) {
+                if (!empty($header) && $header->id_slip == $id_slip) {
                     JurnalDetail::where('id_jurnal', $header->id_jurnal)->delete();
                     $header->id_cabang = $id_cabang;
                     $header->tanggal_jurnal = $tanggal_jurnal;
+                    $header->id_slip = $id_slip;
                     $header->void = $void;
-                    $header->catatan = $catatan_me;
+                    $header->catatan = $catatan_pelunasan;
                     $header->user_modified = $user_created;
                     $header->dt_modified = date('Y-m-d h:i:s');
                 } else {
-                    if(!empty($header) && $header->id_slip == $id_slip){
+                    if(!empty($header) && $header->id_slip != $id_slip){
                         $header->void = 1;
+                        $header->user_void = $user_created;
+                        $header->dt_void = date('Y-m-d h:i:s');
                         $header->save();
                     }
                     $header = new JurnalHeader();
@@ -638,9 +632,10 @@ class ApiController extends Controller
                     $header->kode_jurnal = $this->generateJournalCode($id_cabang, $jurnal_type, $id_slip);
                     $header->id_transaksi = $id_transaksi;
                     $header->jenis_jurnal = $jurnal_type;
+                    $header->id_slip = $id_slip;
                     $header->tanggal_jurnal = $tanggal_jurnal;
                     $header->void = $void;
-                    $header->catatan = $catatan_me;
+                    $header->catatan = $catatan_pelunasan;
                     $header->user_created = $user_created;
                     $header->dt_created = date('Y-m-d h:i:s');
                     $header->user_modified = $user_created;
@@ -658,7 +653,7 @@ class ApiController extends Controller
 
                 if (!empty($jurnal_detail_pelunasan)) {
                     $index = 1;
-                    foreach ($jurnal_detail_me as $jd) {
+                    foreach ($jurnal_detail_pelunasan as $jd) {
                         if(($jd['debet'] > 0 && $jd['credit'] == 0) || ($jd['debet'] == 0 && $jd['credit'] > 0)){
                             $detail = new JurnalDetail();
                             $detail->id_jurnal = $header->id_jurnal;
@@ -672,8 +667,6 @@ class ApiController extends Controller
                             $detail->dt_created = date('Y-m-d h:i:s');
                             $detail->user_modified = $user_created;
                             $detail->dt_modified = date('Y-m-d h:i:s');
-
-                            Log::debug(json_encode($detail));
 
                             if (!$detail->save()) {
                                 DB::rollback();
@@ -696,17 +689,17 @@ class ApiController extends Controller
                 "code" => 200,
                 "message" => "Successfully stored Jurnal data",
             ]);
-        // } catch (\Exception $e) {
-        //     DB::rollback();
-        //     Log::info("Error when store Jurnal data");
-        //     Log::info($e);
-        //     return response()->json([
-        //         "result" => false,
-        //         "code" => 400,
-        //         "message" => "Error when store Jurnal data",
-        //         "exception" => $e
-        //     ]);
-        // }
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::info("Error when store Jurnal data");
+            Log::info($e);
+            return response()->json([
+                "result" => false,
+                "code" => 400,
+                "message" => "Error when store Jurnal data",
+                "exception" => $e
+            ]);
+        }
     }
 
     public function generateJournalCode($cabang, $jenis, $slip = null)
