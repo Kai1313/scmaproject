@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Accounting\GeneralLedger;
 use App\Models\Accounting\JurnalDetail;
 use App\Models\Accounting\JurnalHeader;
+use App\Models\Accounting\TrxSaldo;
 use App\Models\Master\Akun;
 use App\Models\Master\Cabang;
 use App\Models\Master\Slip;
@@ -644,6 +645,115 @@ class GeneralLedgerController extends Controller
         }
         catch (\Exception $e) {
             Log::error("Error when generate journal code");
+        }
+    }
+
+    public function populateTrxSaldo(Request $request)
+    {
+        // dd($request->all());
+        try {
+            // Init
+            $type = $request->transaction_type;
+            $customer = $request->customer;
+            $offset = $request->start;
+            $limit = $request->length;
+            $keyword = $request->search['value'];
+            $sort = [];
+            foreach ($request->order as $key => $order) {
+                $columnIdx = $order['column'];
+                $sortDir = $order['dir'];
+                $sort[] = [
+                    'column' => $request->columns[$columnIdx]['name'],
+                    'dir' => $sortDir
+                ];
+            }
+            $draw = $request->draw;
+            $current_page = $offset / $limit + 1;
+            $data_saldo = TrxSaldo::where("tipe_transaksi", $type);
+            if ($customer != "") {
+                $data_saldo = $data_saldo->where("id_pelanggan", $customer);
+            }
+            if (isset($keyword)) {
+                $data_saldo->where(function ($query) use ($keyword) {
+                    $query->orWhere('tanggal', 'LIKE', "%$keyword%")
+                        ->orWhere('id_transaksi', 'LIKE', "%$keyword%")
+                        ->orWhere('ref_id', 'LIKE', "%$keyword%")
+                        ->orWhere('catatan', 'LIKE', "%$keyword%")
+                        ->orWhere('id_pelanggan', 'LIKE', "%$keyword%")
+                        ->orWhere('id_pemasok', 'LIKE', "%$keyword%")
+                        ->orWhere('dpp', 'LIKE', "%$keyword%")
+                        ->orWhere('ppn', 'LIKE', "%$keyword%")
+                        ->orWhere('total', 'LIKE', "%$keyword%")
+                        ->orWhere('bayar', 'LIKE', "%$keyword%")
+                        ->orWhere('sisa', 'LIKE', "%$keyword%");
+                });
+            }
+            $filtered_data = $data_saldo->get();
+
+            if ($sort) {
+                if (!is_array($sort)) {
+                    $message = "Invalid array for parameter sort";
+                    $data = [
+                        'result' => false,
+                        'message' => $message
+                    ];
+                    return response()->json($data);
+                }
+
+                foreach ($sort as $key => $s) {
+                    $column = $s['column'];
+                    $directon = $s['dir'];
+
+                    if ($column != '') {
+                        $data_saldo->orderBy($column, $directon);
+                    }
+                }
+            } 
+            else {
+                $data_saldo->orderBy('tanggal', 'ASC');
+            }
+
+            // Pagination
+            if ($current_page) {
+                $page = $current_page;
+                $limit_data = $data_saldo->count();
+
+                if ($limit) {
+                    $limit_data = $limit;
+                }
+
+                $offset = ($page - 1) * $limit_data;
+                if ($offset < 0) {
+                    $offset = 0;
+                }
+
+                $data_saldo->skip($offset)->take($limit_data);
+            }
+
+            $table['draw'] = $draw;
+            $table['recordsTotal'] = $data_saldo->count();
+            $table['recordsFiltered'] = $filtered_data->count();
+            $table['data'] = $data_saldo->get();
+            return json_encode($table);
+            
+            // Get transaction saldo
+            // switch ($type) {
+            //     case 'penjualan':
+            //         break;
+                
+            //     default:
+            //         $result = NULL;
+            //         break;
+            // }
+        }
+        catch (\Exception $e) {
+            Log::info("Error when get trx saldo data");
+            Log::info($e);
+            return response()->json([
+                "result" => false,
+                "message" => "Error when get trx saldo data",
+                "exception" => $e
+            ]);
         }
     }
 }

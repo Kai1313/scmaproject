@@ -258,10 +258,10 @@
                                     <label>Jenis Transaksi</label>
                                     <select name="transaction_type" id="transaction_type" class="form-control select2">
                                         <option value="">Pilih Jenis Transaksi</option>
-                                        <option value="jual">Jual</option>
-                                        <option value="retur_jual">Retur Jual</option>
-                                        <option value="beli">Beli</option>
-                                        <option value="retur_beli">Retur Beli</option>
+                                        <option value="penjualan">Penjualan</option>
+                                        <option value="retur_penjualan">Retur Penjualan</option>
+                                        <option value="pembelian">Pembelian</option>
+                                        <option value="retur_pembelian">Retur Pembelian</option>
                                         <option value="piutang_giro">Piutang Giro</option>
                                         <option value="hutang_giro">Hutang Giro</option>
                                         <option value="piutang_giro_tolak">Piutang Giro Tolak</option>
@@ -269,19 +269,27 @@
                                     </select>
                                 </div>
                             </div>
-                        </div>
-                        <hr>
-                        <div class="row box-transaction" id="box-jual">
                             <div class="col-md-6">
-                                <div class="form-group">
+                                <div class="form-group transaction-filter" id="customer_transaction_select">
                                     <label>Customer</label>
-                                    <select name="customer_jual" id="customer_jual" class="form-control select2">
+                                    <select name="customer_transaction" id="customer_transaction" class="form-control select2">
                                         <option value="">Pilih Customer</option>
-                                        <option value="a">Customer A</option>
-                                        <option value="b">Customer B</option>
+                                        <option value="1">Customer A</option>
+                                        <option value="2">Customer B</option>
+                                    </select>
+                                </div>
+                                <div class="form-group transaction-filter" id="supplier_transaction_select">
+                                    <label>Supplier</label>
+                                    <select name="supplier_transaction" id="supplier_transaction" class="form-control select2">
+                                        <option value="">Pilih Supplier</option>
+                                        <option value="1">Customer A</option>
+                                        <option value="4">Customer B</option>
                                     </select>
                                 </div>
                             </div>
+                        </div>
+                        <hr>
+                        <div class="row box-transaction" id="box-jual">
                             <div class="col-md-12">
                                 <table id="table_jual" class="table table-bordered table-striped" style="width:100%">
                                     <thead width="100%">
@@ -303,16 +311,6 @@
                             </div>
                         </div>
                         <div class="row box-transaction" id="box-beli">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Supplier</label>
-                                    <select name="supplier_beli" id="supplier_beli" class="form-control select2">
-                                        <option value="">Pilih Supplier</option>
-                                        <option value="a">Customer A</option>
-                                        <option value="b">Customer B</option>
-                                    </select>
-                                </div>
-                            </div>
                             <div class="col-md-12">
                                 <table id="table_jual" class="table table-bordered table-striped" style="width:100%">
                                     <thead width="100%">
@@ -589,25 +587,37 @@
         $("#btn-transaction").on("click", function() {
             $("#modal-transaction").modal("show")
             $(".box-transaction").hide()
+            $(".transaction-filter").hide()
         })
 
         // Open Transaction Box from selected transaction type
         $("#transaction_type").on("change", function() {
             let type = $(this).val()
             switch (type) {
-                case "jual":
+                case "penjualan":
                     $(".box-transaction").hide()
+                    $(".transaction-filter").hide()
+                    populate_transaction()
                     $("#box-jual").show()
+                    $("#customer_transaction_select").show()
                     break;
-                case "beli":
+                case "pembelian":
                     $(".box-transaction").hide()
+                    $(".transaction-filter").hide()
                     $("#box-beli").show()
+                    $("#supplier_transaction_select").show()
                     break;
             
                 default:
                     $(".box-transaction").hide()
+                    $(".transaction-filter").hide()
                     break;
             }
+        })
+
+        // On change customer transaction
+        $("#customer_transaction").on("change", function() {
+            populate_transaction()
         })
     })
 
@@ -831,6 +841,124 @@
         num = String(num);
         num = num.replace(/[^0-9.]/g, '');
         return numeral(num).format('0,0.00');
+    }
+
+    function populate_transaction() {
+        $("#table_jual").DataTable().destroy();
+        let get_data_url = "{{ route('transaction-general-ledger-populate-transaction') }}"
+        get_data_url += '?transaction_type=' + $("#transaction_type").val() + '&customer=' + $("#customer_transaction").val()
+        $('#table_jual').DataTable({
+            processing: true,
+            serverSide: true,
+            "scrollX": true,
+            "bDestroy": true,
+            responsive: true,
+            // "columnDefs": [{
+            //     className: 'dtr-control',
+            //     targets: 0
+            // }],
+            ajax: {
+                'url': get_data_url,
+                'type': 'GET',
+                'dataType': 'JSON',
+                'error': function(xhr, textStatus, ThrownException) {
+                    alert('Error loading data. Exception: ' + ThrownException + '\n' + textStatus);
+                }
+            },
+            columns: [
+                {
+                    data: 'tanggal',
+                    name: 'tanggal',
+                    width: '10%'
+                },
+                {
+                    data: 'id_transaksi',
+                    name: 'id_transaksi',
+                    width: '15%'
+                },
+                {
+                    data: 'ref_id',
+                    name: 'ref_id',
+                    width: '10%'
+                },
+                {
+                    data: 'id_pelanggan',
+                    name: 'id_pelanggan',
+                    width: '10%'
+                },
+                {
+                    data: 'catatan',
+                    name: 'catatan',
+                    width: '10%'
+                },
+                {
+                    data: 'dpp',
+                    name: 'dpp',
+                    width: '10%',
+                    className: 'text-right',
+                    render: function(data, type, row) {
+                        return numberWithCommas(data);
+                    },
+                },
+                {
+                    data: 'ppn',
+                    name: 'ppn',
+                    width: '10%',
+                    className: 'text-right',
+                    render: function(data, type, row) {
+                        return numberWithCommas(data);
+                    },
+                },
+                {
+                    data: 'total',
+                    name: 'total',
+                    width: '10%',
+                    className: 'text-right',
+                    render: function(data, type, row) {
+                        return numberWithCommas(data);
+                    },
+                },
+                {
+                    data: 'bayar',
+                    name: 'bayar',
+                    width: '10%',
+                    className: 'text-right',
+                    render: function(data, type, row) {
+                        return numberWithCommas(data);
+                    },
+                },
+                {
+                    data: 'sisa',
+                    name: 'sisa',
+                    width: '10%',
+                    className: 'text-right',
+                    render: function(data, type, row) {
+                        return numberWithCommas(data);
+                    },
+                },
+                {
+                    data: 'sisa',
+                    width: '10%',
+                    render: function(data, type, row) {
+                        return '<input type="text" class="form-control" value="'+data+'">';
+                    },
+                    orderable: false
+                }
+            ],
+            // responsive: {
+            //     details: {
+            //         type: 'column'
+            //     }
+            // },
+            // columnDefs: [{
+            //     className: 'control',
+            //     orderable: false,
+            //     targets: 0
+            // }],
+        })
+    }
+    function numberWithCommas(x) {
+        return x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
     }
 </script>
 @endsection
