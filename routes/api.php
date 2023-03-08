@@ -14,11 +14,14 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+Route::post('login', 'ApiController@login');
 
-Route::prefix('/jurnal_otomatis')->group(function () {
-    Route::post('/uangmuka_penjualan', 'ApiController@journalUangMukaPenjualan')->name('jurnal-otomatis-uangmuka-penjualan');
-    Route::post('/uangmuka_pembelian', 'ApiController@journalUangMukaPembelian')->name('jurnal-otomatis-uangmuka-pembelian');
+Route::group(['middleware' => ['auth:api']], function () {
+    Route::get('profile', 'ApiController@profile');
+    Route::post('logout', 'ApiController@logout');
+
+    Route::prefix('/jurnal_otomatis')->group(function () {
+        Route::post('/uangmuka_penjualan', 'ApiController@journalUangMukaPenjualan')->name('jurnal-otomatis-uangmuka-penjualan');
+        Route::post('/uangmuka_pembelian', 'ApiController@journalUangMukaPembelian')->name('jurnal-otomatis-uangmuka-pembelian');
+    });
 });

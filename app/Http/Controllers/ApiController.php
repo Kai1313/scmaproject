@@ -6,12 +6,52 @@ use App\Models\Accounting\JurnalDetail;
 use App\Models\Accounting\JurnalHeader;
 use App\Models\Master\Cabang;
 use App\Models\Master\Slip;
+use App\Models\User;
+use App\Models\UserToken;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
-use DB;
-use Log;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ApiController extends Controller
 {
+    public function login(Request $request)
+    {
+        $user_id = $request->id_pengguna;
+
+        $user       = User::where('id_pengguna', $user_id)->first();
+        $token      = UserToken::where('id_pengguna', $user_id)->where('status_token_pengguna', 1)->whereRaw("waktu_habis_token_pengguna > STR_TO_DATE(?, '%Y-%m-%d %H:%i:%s')", Carbon::now()->format('Y-m-d H:i:s'))->first();
+
+        if ($token) {
+            $token = $user->createToken('Token Passport User [' . $user->id_pengguna . '] ' .$user->nama_pengguna)->accessToken;
+            $response = [
+                'token' => $token
+            ];
+            return response($response, 200);
+        } else {
+            $response = ["message" => 'User does not exist'];
+            return response($response, 500);
+        }
+    }
+
+    public function profile(Request $request)
+    {
+        return response()->json([
+            'user' => Auth::guard('api')->user()
+        ]);
+    }
+
+    public function logout(Request $request)
+    {
+        if (Auth::guard('api')->user()) {
+            Auth::guard('api')->user()->tokens()->delete();
+            return 'You are logged out';
+        } else {
+            return 'Logged out failed';
+        }
+    }
+
     public function journalUangMukaPenjualan(Request $request)
     {
         try {
@@ -47,7 +87,7 @@ class ApiController extends Controller
 
             // detail
             $data_akun_uang_muka_penjualan = DB::table('setting')->where('id', 'UM Penjualan')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
-            if(empty($data_akun_uang_muka_penjualan)){
+            if (empty($data_akun_uang_muka_penjualan)) {
                 return response()->json([
                     "result" => false,
                     "code" => 404,
@@ -56,7 +96,7 @@ class ApiController extends Controller
             }
 
             $data_akun_ppn_keluaran = DB::table('setting')->where('id', 'PPN Keluaran')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
-            if(empty($data_akun_ppn_keluaran)){
+            if (empty($data_akun_ppn_keluaran)) {
                 return response()->json([
                     "result" => false,
                     "code" => 404,
@@ -106,7 +146,7 @@ class ApiController extends Controller
                 $header->user_modified = $user_created;
                 $header->dt_modified = date('Y-m-d h:i:s');
             } else {
-                if(!empty($header) && $header->id_slip != $id_slip){
+                if (!empty($header) && $header->id_slip != $id_slip) {
                     $header->void = 1;
                 }
                 $header = new JurnalHeader();
@@ -136,7 +176,7 @@ class ApiController extends Controller
             if (!empty($jurnal_detail)) {
                 $index = 1;
                 foreach ($jurnal_detail as $jd) {
-                    if(($jd['debet'] > 0 && $jd['credit'] == 0) || ($jd['debet'] == 0 && $jd['credit'] > 0)){
+                    if (($jd['debet'] > 0 && $jd['credit'] == 0) || ($jd['debet'] == 0 && $jd['credit'] > 0)) {
                         $detail = new JurnalDetail();
                         $detail->id_jurnal = $header->id_jurnal;
                         $detail->index = $index;
@@ -219,7 +259,7 @@ class ApiController extends Controller
 
             // detail
             $data_akun_uang_muka_pembelian = DB::table('setting')->where('id', 'UM Pembelian')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
-            if(empty($data_akun_uang_muka_pembelian)){
+            if (empty($data_akun_uang_muka_pembelian)) {
                 return response()->json([
                     "result" => false,
                     "code" => 404,
@@ -228,7 +268,7 @@ class ApiController extends Controller
             }
 
             $data_akun_ppn_masukan = DB::table('setting')->where('id', 'PPN Masukan')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
-            if(empty($data_akun_ppn_masukan)){
+            if (empty($data_akun_ppn_masukan)) {
                 return response()->json([
                     "result" => false,
                     "code" => 404,
@@ -278,7 +318,7 @@ class ApiController extends Controller
                 $header->user_modified = $user_created;
                 $header->dt_modified = date('Y-m-d h:i:s');
             } else {
-                if(!empty($header) && $header->id_slip != $id_slip){
+                if (!empty($header) && $header->id_slip != $id_slip) {
                     $header->void = 1;
                 }
                 $header = new JurnalHeader();
@@ -308,7 +348,7 @@ class ApiController extends Controller
             if (!empty($jurnal_detail)) {
                 $index = 1;
                 foreach ($jurnal_detail as $jd) {
-                   if(($jd['debet'] > 0 && $jd['credit'] == 0) || ($jd['debet'] == 0 && $jd['credit'] > 0)){
+                    if (($jd['debet'] > 0 && $jd['credit'] == 0) || ($jd['debet'] == 0 && $jd['credit'] > 0)) {
                         $detail = new JurnalDetail();
                         $detail->id_jurnal = $header->id_jurnal;
                         $detail->index = $index;
@@ -333,7 +373,7 @@ class ApiController extends Controller
                         }
 
                         $index++;
-                   }
+                    }
                 }
             }
 
