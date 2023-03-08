@@ -10,6 +10,6 @@ class TransactionBalance extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'id', 'tipe_transaksi', 'id_transaksi', 'tanggal', 'ref_id', 'catatan', 'id_pelanggan', 'id_pemasok', 'dpp', 'ppn', 'uang_muka', 'biaya', 'sisa', 'id_jurnal', 'no_giro', 'tanggal_giro', 'tanggal_giro_jt', 'status_giro', 'tipe_pembayaran',
+        'id', 'tipe_transaksi', 'id_transaksi', 'tanggal', 'ref_id', 'catatan', 'id_pelanggan', 'id_pemasok', 'dpp', 'ppn', 'uang_muka', 'biaya', 'sisa', 'id_jurnal', 'no_giro', 'tanggal_giro', 'tanggal_giro_jt', 'status_giro', 'tipe_pembayaran', 'total', 'bayar',
     ];
 }
