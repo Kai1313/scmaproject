@@ -21,4 +21,5 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::prefix('/jurnal_otomatis')->group(function () {
     Route::post('/uangmuka_penjualan', 'ApiController@journalUangMukaPenjualan')->name('jurnal-otomatis-uangmuka-penjualan');
     Route::post('/uangmuka_pembelian', 'ApiController@journalUangMukaPembelian')->name('jurnal-otomatis-uangmuka-pembelian');
+    Route::post('/penjualan', 'ApiController@journalPenjualan')->name('jurnal-otomatis-penjualan');
 });
