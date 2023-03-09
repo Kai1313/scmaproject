@@ -24,14 +24,19 @@ class ApiController extends Controller
         $token      = UserToken::where('id_pengguna', $user_id)->where('status_token_pengguna', 1)->whereRaw("waktu_habis_token_pengguna > STR_TO_DATE(?, '%Y-%m-%d %H:%i:%s')", Carbon::now()->format('Y-m-d H:i:s'))->first();
 
         if ($token) {
-            $token = $user->createToken('Token Passport User [' . $user->id_pengguna . '] ' .$user->nama_pengguna)->accessToken;
-            $response = [
-                'token' => $token
-            ];
-            return response($response, 200);
+            $token = $user->createToken('Token Passport User '. Carbon::now()->format('Y-m-d H:i:s') . '[' . $user->id_pengguna . '] ' .$user->nama_pengguna)->accessToken;
+            return response()->json([
+                "result" => true,
+                "code" => 200,
+                "message" => "Login Success",
+                "token" => $token
+            ]);
         } else {
-            $response = ["message" => 'User does not exist'];
-            return response($response, 500);
+            return response()->json([
+                "result" => false,
+                "code" => 400,
+                "message" => "Error, User has no Authorization"
+            ]);
         }
     }
 
@@ -46,9 +51,17 @@ class ApiController extends Controller
     {
         if (Auth::guard('api')->user()) {
             Auth::guard('api')->user()->tokens()->delete();
-            return 'You are logged out';
+            return response()->json([
+                "result" => true,
+                "code" => 200,
+                "message" => "Log Out Success"
+            ]);
         } else {
-            return 'Logged out failed';
+            return response()->json([
+                "result" => false,
+                "code" => 400,
+                "message" => "Error, Log Out Failed"
+            ]);
         }
     }
 
