@@ -8,6 +8,8 @@ use App\Models\Accounting\JurnalHeader;
 use App\Models\Accounting\TrxSaldo;
 use App\Models\Master\Akun;
 use App\Models\Master\Cabang;
+use App\Models\Master\Pelanggan;
+use App\Models\Master\Pemasok;
 use App\Models\Master\Slip;
 use Illuminate\Http\Request;
 use DB;
@@ -47,12 +49,14 @@ class GeneralLedgerController extends Controller
     public function create(Request $request)
     {
         $data_cabang = Cabang::where("status_cabang", 1)->get();
+        $data_pelanggan = Pelanggan::all();
+        $data_pemasok = Pemasok::all();
 
         $data = [
             "pageTitle" => "SCA Accounting | Transaksi Jurnal Umum | Create",
-            // "data_akun" => $data_akun,
             "data_cabang" => $data_cabang,
-            // "data_slip" => $data_slip
+            "data_pelanggan" => $data_pelanggan,
+            "data_pemasok" => $data_pemasok,
         ];
 
         Log::debug(json_encode($request->session()->get('user')));
@@ -127,14 +131,15 @@ class GeneralLedgerController extends Controller
                 ]);
             }
 
-            // Store Detail and Update
-            foreach ($detailData as $data) {
-                //Store Detail
+            // Store Detail and Update Saldo Transaksi
+            foreach ($detailData as $key => $data) {
+                // Store Detail
                 $detail = new JurnalDetail();
                 $detail->id_jurnal = $header->id_jurnal;
-                $detail->index = ($data['guid'] == 'gen') ? count($detailData) + 1 : $data['guid'];
+                $detail->index = ($data['guid'] == 'gen') ? count($detailData) + 1 : $key+1;
                 $detail->id_akun = $data['akun'];
                 $detail->keterangan = $data['notes'];
+                $detail->id_transaksi = $data['trx'];
                 $detail->debet = str_replace(',', '', $data['debet']);
                 $detail->credit = str_replace(',', '', $data['kredit']);
                 $detail->user_created = $userRecord;
@@ -148,6 +153,19 @@ class GeneralLedgerController extends Controller
                         "result" => false,
                         "message" => "Error when store Jurnal data on table detail"
                     ]);
+                }
+
+                // Update Saldo Transaksi
+                $trx_saldo = TrxSaldo::where("id_transaksi", $data["trx"])->first();
+                if ($trx_saldo) {
+                    $update_trx_saldo = $this->updateTrxSaldo($trx_saldo, str_replace(',', '', $data['debet']), str_replace(',', '', $data['kredit']));
+                    if (!$update_trx_saldo) {
+                        DB::rollback();
+                        return response()->json([
+                            "result" => false,
+                            "message" => "Error when store Jurnal data on update saldo transaksi"
+                        ]);
+                    }
                 }
             }
 
@@ -271,18 +289,22 @@ class GeneralLedgerController extends Controller
     public function edit(Request $request, $id)
     {
         $data_cabang = Cabang::where("status_cabang", 1)->get();
+        $data_pelanggan = Pelanggan::all();
+        $data_pemasok = Pemasok::all();
         $jurnal_header = JurnalHeader::find($id);
         $jurnal_detail = JurnalDetail::where("id_jurnal", $id)->get();
         $details = [];
         $i = 0;
         foreach ($jurnal_detail as $key => $jurnal) {
             $akun = Akun::find($jurnal->id_akun);
+            $trx_id = TrxSaldo::where("id_transaksi", $jurnal->id_transaksi)->first();
             $details[] = [
-                "guid" => (++$i == count($jurnal_detail)) ? "gen" : $jurnal->index,
+                "guid" => (++$i == count($jurnal_detail)) ? "gen" : (($trx_id)?"trx-".$trx_id->id:$jurnal->index),
                 "akun" => $akun->id_akun,
                 "nama_akun" => $akun->nama_akun,
                 "kode_akun" => $akun->kode_akun,
                 "notes" => $jurnal->keterangan,
+                "trx" => $jurnal->id_transaksi,
                 "debet" => $jurnal->debet,
                 "kredit" => $jurnal->credit
             ];
@@ -291,6 +313,8 @@ class GeneralLedgerController extends Controller
         $data = [
             "pageTitle" => "SCA Accounting | Transaksi Jurnal Umum | Edit",
             "data_cabang" => $data_cabang,
+            "data_pelanggan" => $data_pelanggan,
+            "data_pemasok" => $data_pemasok,
             "jurnal_header" => $jurnal_header,
             "jurnal_detail" => json_encode($details),
             "jurnal_detail_count" => count($details),
@@ -346,6 +370,24 @@ class GeneralLedgerController extends Controller
 
             // Find Header data and delete detail
             $header = JurnalHeader::where("id_jurnal", $journalID)->first();
+            // Update saldo transaksi before delete
+            $old_details = JurnalDetail::where("id_jurnal", $journalID)->get();
+            foreach ($old_details as $key => $detail) {
+                Log::info($detail->credit);
+                $debet = $detail->debet;
+                $kredit = $detail->credit;
+                $trx_saldo = TrxSaldo::where("id_transaksi", $detail->id_transaksi)->first();
+                if ($trx_saldo) {
+                    $update_trx_saldo = $this->revertTrxSaldo($trx_saldo, $debet, $kredit);
+                    if (!$update_trx_saldo) {
+                        DB::rollback();
+                        return response()->json([
+                            "result" => false,
+                            "message" => "Error when store Jurnal data on revert saldo transaksi"
+                        ]);
+                    }
+                }
+            }
             JurnalDetail::where('id_jurnal', $journalID)->delete();
 
             // Store Header
@@ -368,14 +410,15 @@ class GeneralLedgerController extends Controller
                 ]);
             }
 
-            // Store New Detail
-            foreach ($detailData as $data) {
-                //Store Detail
+            // Store Detail
+            foreach ($detailData as $key => $data) {
+                // Store Detail
                 $detail = new JurnalDetail();
                 $detail->id_jurnal = $header->id_jurnal;
-                $detail->index = ($data['guid'] == 'gen') ? count($detailData) + 1 : $data['guid'];
+                $detail->index = ($data['guid'] == 'gen') ? count($detailData) + 1 : $key+1;
                 $detail->id_akun = $data['akun'];
                 $detail->keterangan = $data['notes'];
+                $detail->id_transaksi = $data['trx'];
                 $detail->debet = str_replace(',', '', $data['debet']);
                 $detail->credit = str_replace(',', '', $data['kredit']);
                 $detail->user_modified = $userModified;
@@ -386,6 +429,19 @@ class GeneralLedgerController extends Controller
                         "result" => false,
                         "message" => "Error when store Jurnal data on table detail"
                     ]);
+                }
+
+                //  Update Saldo Transaksi
+                $trx_saldo = TrxSaldo::where("id_transaksi", $data["trx"])->first();
+                if ($trx_saldo) {
+                    $update_trx_saldo = $this->updateTrxSaldo($trx_saldo, str_replace(',', '', $data['debet']), str_replace(',', '', $data['kredit']));
+                    if (!$update_trx_saldo) {
+                        DB::rollback();
+                        return response()->json([
+                            "result" => false,
+                            "message" => "Error when store Jurnal data on update saldo transaksi"
+                        ]);
+                    }
                 }
             }
 
@@ -655,6 +711,7 @@ class GeneralLedgerController extends Controller
             // Init
             $type = $request->transaction_type;
             $customer = $request->customer;
+            $supplier = $request->supplier;
             $offset = $request->start;
             $limit = $request->length;
             $keyword = $request->search['value'];
@@ -669,9 +726,15 @@ class GeneralLedgerController extends Controller
             }
             $draw = $request->draw;
             $current_page = $offset / $limit + 1;
-            $data_saldo = TrxSaldo::where("tipe_transaksi", $type);
+            $data_saldo = TrxSaldo::select("saldo_transaksi.*", "pelanggan.nama_pelanggan as nama_pelanggan", "pemasok.nama_pemasok as nama_pemasok")
+                ->leftJoin("pelanggan", "pelanggan.id_pelanggan", "saldo_transaksi.id_pelanggan")
+                ->leftJoin("pemasok", "pemasok.id_pemasok", "saldo_transaksi.id_pemasok")
+                ->where("tipe_transaksi", $type)->where("sisa", "<>", 0);
             if ($customer != "") {
-                $data_saldo = $data_saldo->where("id_pelanggan", $customer);
+                $data_saldo = $data_saldo->where("saldo_transaksi.id_pelanggan", $customer);
+            }
+            if ($supplier != "") {
+                $data_saldo = $data_saldo->where("saldo_transaksi.id_pemasok", $supplier);
             }
             if (isset($keyword)) {
                 $data_saldo->where(function ($query) use ($keyword) {
@@ -679,7 +742,8 @@ class GeneralLedgerController extends Controller
                         ->orWhere('id_transaksi', 'LIKE', "%$keyword%")
                         ->orWhere('ref_id', 'LIKE', "%$keyword%")
                         ->orWhere('catatan', 'LIKE', "%$keyword%")
-                        ->orWhere('id_pelanggan', 'LIKE', "%$keyword%")
+                        ->orWhere('saldo_transaksi.id_pelanggan', 'LIKE', "%$keyword%")
+                        ->orWhere('pelanggan.nama_pelanggan', 'LIKE', "%$keyword%")
                         ->orWhere('id_pemasok', 'LIKE', "%$keyword%")
                         ->orWhere('dpp', 'LIKE', "%$keyword%")
                         ->orWhere('ppn', 'LIKE', "%$keyword%")
@@ -754,6 +818,82 @@ class GeneralLedgerController extends Controller
                 "message" => "Error when get trx saldo data",
                 "exception" => $e
             ]);
+        }
+    }
+
+    public function updateTrxSaldo($trx, $debet, $kredit)
+    {
+        try {
+            // DB::beginTransaction();
+            $trx_saldo = TrxSaldo::find($trx->id);
+            $type = $trx->tipe_transaksi;
+            $current_total = $trx->total;
+            $current_bayar = $trx->bayar;
+            $current_sisa = $trx->sisa;
+            switch ($type) {
+                case 'Penjualan':
+                    $trx_saldo->bayar = $current_bayar + $kredit;
+                    $trx_saldo->sisa = $current_sisa - $kredit;
+                    break;
+                case 'Pembelian':
+                    $trx_saldo->bayar = $current_bayar + $debet;
+                    $trx_saldo->sisa = $current_sisa - $debet;
+                    break;
+                
+                default:
+                    // DB::rollback();
+                    return false;
+                    break;
+            }
+            if (!$trx_saldo->save()) {
+                // DB::rollback();
+                return false;
+            }
+            return true;
+            // DB::commit();
+        }
+        catch (\Exception $e) {
+            // DB::rollback();
+            Log::error($e);
+            return false;
+        }
+    }
+
+    public function revertTrxSaldo($trx, $debet, $kredit)
+    {
+        try {
+            // DB::beginTransaction();
+            $trx_saldo = TrxSaldo::find($trx->id);
+            $type = $trx->tipe_transaksi;
+            $current_total = $trx->total;
+            $current_bayar = $trx->bayar;
+            $current_sisa = $trx->sisa;
+            switch ($type) {
+                case 'Penjualan':
+                    $trx_saldo->bayar = $current_bayar - $kredit;
+                    $trx_saldo->sisa = $current_sisa + $kredit;
+                    break;
+                case 'Pembelian':
+                    $trx_saldo->bayar = $current_bayar - $debet;
+                    $trx_saldo->sisa = $current_sisa + $debet;
+                    break;
+                
+                default:
+                    // DB::rollback();
+                    return false;
+                    break;
+            }
+            if (!$trx_saldo->save()) {
+                // DB::rollback();
+                return false;
+            }
+            return true;
+            // DB::commit();
+        }
+        catch (\Exception $e) {
+            // DB::rollback();
+            Log::error($e);
+            return false;
         }
     }
 }
