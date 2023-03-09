@@ -245,13 +245,13 @@ class ApiController extends Controller
             $tanggal_jurnal = date('Y-m-d', strtotime($request->tanggal));
             $void = $request->void;
             $user_created = $request->user;
-            $id_pelanggan = $request->pelanggan;
+            $id_pemasok = $request->pemasok;
             $id_cabang = $request->cabang;
             $id_slip = $request->slip;
 
-            $data_pelanggan = DB::table("pelanggan")->where('id_pelanggan', $id_pelanggan)->first();
-            $nama_pelanggan = $data_pelanggan->nama_pelanggan;
-            $catatan = 'Journal Otomatis Uang Muka Pembelian - ' . $id_transaksi . ' - ' . $nama_pelanggan;
+            $data_pemasok = DB::table("pemasok")->where('id_pemasok', $id_pemasok)->first();
+            $nama_pemasok = $data_pemasok->nama_pemasok;
+            $catatan = 'Journal Otomatis Uang Muka Pembelian - ' . $id_transaksi . ' - ' . $nama_pemasok;
 
             $data_slip = Slip::find($id_slip);
 
@@ -300,19 +300,19 @@ class ApiController extends Controller
                     'akun'          => $akun_slip,
                     'debet'         => 0,
                     'credit'        => $total,
-                    'keterangan'    => 'Jurnal Otomatis ' . $jurnal_type_detail . ' Uang Muka Pembelian - ' . $id_transaksi . ' - ' . $nama_pelanggan,
+                    'keterangan'    => 'Jurnal Otomatis ' . $jurnal_type_detail . ' Uang Muka Pembelian - ' . $id_transaksi . ' - ' . $nama_pemasok,
                 ],
                 [
                     'akun'          => $akun_uang_muka_pembelian,
                     'debet'         => $uang_muka,
                     'credit'        => 0,
-                    'keterangan'    => 'Jurnal Otomatis Uang Muka Pembelian - ' . $id_transaksi . ' - ' . $nama_pelanggan,
+                    'keterangan'    => 'Jurnal Otomatis Uang Muka Pembelian - ' . $id_transaksi . ' - ' . $nama_pemasok,
                 ],
                 [
                     'akun'          => $akun_ppn_masukan,
                     'debet'         => $nominal_ppn,
                     'credit'        => 0,
-                    'keterangan'    => 'Jurnal Otomatis PPN Masukkan - ' . $id_transaksi . ' - ' . $nama_pelanggan,
+                    'keterangan'    => 'Jurnal Otomatis PPN Masukkan - ' . $id_transaksi . ' - ' . $nama_pemasok,
                 ],
             ];
 
