@@ -6,8 +6,8 @@
 <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.min.css" rel="stylesheet">
 <!-- DataTables -->
 <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/plugins/jquery-datatables-checkboxes-1.2.12/css/dataTables.checkboxes.css') }}">
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/numeral.js/2.0.6/numeral.min.js"></script>
 
 <style>
     .mt-1 {
@@ -64,10 +64,6 @@
             <div class="col-xs-12">
                 <div class="box box-primary">
                     <div class="box-header with-border">
-                        {{-- <div class="row">
-                            <div class="col-xs-12">
-                            </div>
-                        </div> --}}
                         <h3 class="box-title">{{ isset($data_jurnal_umum) ? 'Ubah' : 'Tambah' }} Jurnal Umum</h3>
                         <div class="box-tools pull-right">
                             <a href="{{ route('transaction-general-ledger') }}" class="btn bg-navy btn-sm btn-default btn-flat"><span class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali</a>
@@ -143,10 +139,6 @@
             <div class="col-xs-12">
                 <div class="box box-primary">
                     <div class="box-header with-border">
-                        {{-- <div class="row">
-                            <div class="col-xs-12">
-                            </div>
-                        </div> --}}
                         <h3 class="box-title">Detail Jurnal</h3>
                         <div class="box-tools pull-right">
                             <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
@@ -259,13 +251,13 @@
                                     <select name="transaction_type" id="transaction_type" class="form-control select2">
                                         <option value="">Pilih Jenis Transaksi</option>
                                         <option value="penjualan">Penjualan</option>
-                                        <option value="retur_penjualan">Retur Penjualan</option>
+                                        {{-- <option value="retur_penjualan">Retur Penjualan</option> --}}
                                         <option value="pembelian">Pembelian</option>
-                                        <option value="retur_pembelian">Retur Pembelian</option>
+                                        {{-- <option value="retur_pembelian">Retur Pembelian</option>
                                         <option value="piutang_giro">Piutang Giro</option>
                                         <option value="hutang_giro">Hutang Giro</option>
                                         <option value="piutang_giro_tolak">Piutang Giro Tolak</option>
-                                        <option value="hutang_giro_tolak">Hutang Giro Tolak</option>
+                                        <option value="hutang_giro_tolak">Hutang Giro Tolak</option> --}}
                                     </select>
                                 </div>
                             </div>
@@ -274,16 +266,18 @@
                                     <label>Customer</label>
                                     <select name="customer_transaction" id="customer_transaction" class="form-control select2">
                                         <option value="">Pilih Customer</option>
-                                        <option value="1">Customer A</option>
-                                        <option value="2">Customer B</option>
+                                        @foreach ($data_pelanggan as $pelanggan)
+                                            <option value="{{ $pelanggan->id_pelanggan }}">{{ $pelanggan->nama_pelanggan }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
                                 <div class="form-group transaction-filter" id="supplier_transaction_select">
                                     <label>Supplier</label>
                                     <select name="supplier_transaction" id="supplier_transaction" class="form-control select2">
                                         <option value="">Pilih Supplier</option>
-                                        <option value="1">Customer A</option>
-                                        <option value="4">Customer B</option>
+                                        @foreach ($data_pemasok as $pemasok)
+                                            <option value="{{ $pemasok->id_pemasok }}">{{ $pemasok->nama_pemasok }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
                             </div>
@@ -291,9 +285,10 @@
                         <hr>
                         <div class="row box-transaction" id="box-jual">
                             <div class="col-md-12">
-                                <table id="table_jual" class="table table-bordered table-striped" style="width:100%">
+                                <table id="table_jual" class="table table-bordered table-striped table-transaction" style="width:100%">
                                     <thead width="100%">
                                         <tr>
+                                            <th class="text-center"></th>
                                             <th class="text-center">Tanggal</th>
                                             <th class="text-center">Nomor Jual</th>
                                             <th class="text-center">Sales Order</th>
@@ -312,9 +307,10 @@
                         </div>
                         <div class="row box-transaction" id="box-beli">
                             <div class="col-md-12">
-                                <table id="table_jual" class="table table-bordered table-striped" style="width:100%">
+                                <table id="table_beli" class="table table-bordered table-striped table-transaction" style="width:100%">
                                     <thead width="100%">
                                         <tr>
+                                            <th class="text-center"></th>
                                             <th class="text-center">Tanggal</th>
                                             <th class="text-center">Nomor Beli</th>
                                             <th class="text-center">Nomor PO</th>
@@ -351,10 +347,14 @@
 <!-- DataTables -->
 <script src="{{ asset('assets/bower_components/datatables.net/js/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js') }}"></script>
+<script src="{{ asset('assets/plugins/jquery-datatables-checkboxes-1.2.12/js/dataTables.checkboxes.min.js') }}"></script>
 <!-- SlimScroll -->
 <script src="{{ asset('assets/bower_components/jquery-slimscroll/jquery.slimscroll.min.js') }}"></script>
 <!-- FastClick -->
 <script src="{{ asset('assets/bower_components/fastclick/lib/fastclick.js') }}"></script>
+<!-- Numeral -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/numeral.js/2.0.6/numeral.min.js"></script>
+
 @endsection
 
 @section('externalScripts')
@@ -553,6 +553,7 @@
                             nama_akun: nama_akun_slip,
                             kode_akun: kode_akun_slip,
                             notes: jenis + " [" + notes + "]",
+                            trx: null,
                             debet: debet,
                             kredit: kredit
                         })
@@ -571,6 +572,7 @@
                             nama_akun: nama_akun_slip,
                             kode_akun: kode_akun_slip,
                             notes: jenis + " [" + notes + "]",
+                            trx: null,
                             debet: debet,
                             kredit: kredit
                         })
@@ -588,6 +590,9 @@
             $("#modal-transaction").modal("show")
             $(".box-transaction").hide()
             $(".transaction-filter").hide()
+            $("#transaction_type").val("").trigger("change.select2")
+            $("#customer_transaction").val("").trigger("change.select2")
+            $("#supplier_transaction").val("").trigger("change.select2")
         })
 
         // Open Transaction Box from selected transaction type
@@ -597,13 +602,14 @@
                 case "penjualan":
                     $(".box-transaction").hide()
                     $(".transaction-filter").hide()
-                    populate_transaction()
+                    populate_transaction(type)
                     $("#box-jual").show()
                     $("#customer_transaction_select").show()
                     break;
                 case "pembelian":
                     $(".box-transaction").hide()
                     $(".transaction-filter").hide()
+                    populate_transaction(type)
                     $("#box-beli").show()
                     $("#supplier_transaction_select").show()
                     break;
@@ -617,7 +623,103 @@
 
         // On change customer transaction
         $("#customer_transaction").on("change", function() {
-            populate_transaction()
+            let trx_type = $("#transaction_type").val()
+            switch (trx_type) {
+                case "penjualan":
+                    populate_transaction(trx_type)
+                    break;
+                case "pembelian":
+                    populate_transaction(trx_type)
+                    break;
+            
+                default:
+                    $(".box-transaction").hide()
+                    $(".transaction-filter").hide()
+                    break;
+            }
+        })
+
+        // On change supplier transaction
+        $("#supplier_transaction").on("change", function() {
+            let trx_type = $("#transaction_type").val()
+            switch (trx_type) {
+                case "penjualan":
+                    populate_transaction(trx_type)
+                    break;
+                case "pembelian":
+                    populate_transaction(trx_type)
+                    break;
+            
+                default:
+                    $(".box-transaction").hide()
+                    $(".transaction-filter").hide()
+                    break;
+            }
+        })
+
+        // Transaction table add transaction
+        $("#btn-add-transaction").on("click", function() {
+            let trx_type = $("#transaction_type").val()
+            let transactions = []
+            switch (trx_type) {
+                case "penjualan":
+                    let table_jual = $('#table_jual')
+                    $('.dt-checkboxes:checked', table_jual).each(function() {
+                        // Init data from row
+                        let trx_id = $(this).closest('tr').find('.transaction-id').val()
+                        let no_jual = $(this).closest('tr').find('td:eq(2)').text()
+                        let pelanggan = $(this).closest('tr').find('td:eq(4)').text()
+                        let kredit = $(this).closest('tr').find('.transaction-bayar').val()
+
+                        // Remove data from details
+                        details = details.filter(function(item) {
+                            return item['guid'] != "trx-" + trx_id
+                        })
+                        details.push({
+                            guid: "trx-" + trx_id,
+                            akun: '34',
+                            nama_akun: 'Piutang Dagang',
+                            kode_akun: '110302',
+                            notes: 'Jurnal Otomatis Pelunasan - ' + no_jual + ' - ' + pelanggan,
+                            trx: no_jual,
+                            debet: 0,
+                            kredit: kredit.replace(/,/g, '')
+                        })
+                    }).get()
+                    populate_detail(details)
+                    break;
+                case "pembelian":
+                    let table_beli = $('#table_beli')
+                    $('.dt-checkboxes:checked', table_beli).each(function() {
+                        // Init data from row
+                        let trx_id = $(this).closest('tr').find('.transaction-id').val()
+                        let no_beli = $(this).closest('tr').find('td:eq(2)').text()
+                        let pemasok = $(this).closest('tr').find('td:eq(4)').text()
+                        let debet = $(this).closest('tr').find('.transaction-bayar').val()
+
+                        // Remove data from details
+                        details = details.filter(function(item) {
+                            return item['guid'] != "trx-" + trx_id
+                        })
+                        details.push({
+                            guid: "trx-" + trx_id,
+                            akun: '35',
+                            nama_akun: 'Hutang Dagang',
+                            kode_akun: '999999',
+                            notes: 'Jurnal Otomatis Pelunasan - ' + no_beli + ' - ' + pemasok,
+                            trx: no_beli,
+                            debet: debet.replace(/,/g, ''),
+                            kredit: 0
+                        })
+                    }).get()
+                    populate_detail(details)
+                    break;
+            
+                default:
+                    alert("Nothing to add")
+                    break;
+            }
+            $("#modal-transaction").modal("hide")
         })
     })
 
@@ -754,6 +856,7 @@
             nama_akun: nama_akun,
             kode_akun: kode_akun,
             notes: notes,
+            trx: null,
             debet: debet.replace(/,/g, ''),
             kredit: kredit.replace(/,/g, '')
         })
@@ -776,20 +879,24 @@
             data: details,
             columns: [{
                     data: 'kode_akun',
-                    name: 'kode_akun'
+                    name: 'kode_akun',
+                    width: '10%'
                 },
                 {
                     data: 'nama_akun',
-                    name: 'nama_akun'
+                    name: 'nama_akun',
+                    width: '20%'
                 },
                 {
                     data: 'notes',
-                    name: 'notes'
+                    name: 'notes',
+                    width: '40%'
                 },
                 {
                     className: 'text-right',
                     data: 'debet',
                     name: 'debet',
+                    width: '10%',
                     render: function(data, type, row) {
                         return formatCurr(data)
                     }
@@ -798,6 +905,7 @@
                     className: 'text-right',
                     data: 'kredit',
                     name: 'kredit',
+                    width: '10%',
                     render: function(data, type, row) {
                         return formatCurr(data)
                     }
@@ -805,11 +913,12 @@
                 {
                     data: 'guid',
                     name: 'guid',
+                    width: '10%',
                     orderable: false,
                     searchable: false,
                     render: function(data, type, row) {
                         let btn
-                        if (data != "gen") {
+                        if (data != "gen" && row["trx"] == null) {
                             btn = '<button type="button" class="btn btn-sm btn-danger remove-detail mr-1" data-guid="' + data + '"><i class="fa fa-trash"></i></button><button type="button" class="btn btn-sm btn-warning edit-detail" data-guid="' + data + '"><i class="fa fa-edit"></i></button>'
                         }
                         else {
@@ -843,120 +952,247 @@
         return numeral(num).format('0,0.00');
     }
 
-    function populate_transaction() {
-        $("#table_jual").DataTable().destroy();
-        let get_data_url = "{{ route('transaction-general-ledger-populate-transaction') }}"
-        get_data_url += '?transaction_type=' + $("#transaction_type").val() + '&customer=' + $("#customer_transaction").val()
-        $('#table_jual').DataTable({
-            processing: true,
-            serverSide: true,
-            "scrollX": true,
-            "bDestroy": true,
-            responsive: true,
-            // "columnDefs": [{
-            //     className: 'dtr-control',
-            //     targets: 0
-            // }],
-            ajax: {
-                'url': get_data_url,
-                'type': 'GET',
-                'dataType': 'JSON',
-                'error': function(xhr, textStatus, ThrownException) {
-                    alert('Error loading data. Exception: ' + ThrownException + '\n' + textStatus);
-                }
-            },
-            columns: [
-                {
-                    data: 'tanggal',
-                    name: 'tanggal',
-                    width: '10%'
-                },
-                {
-                    data: 'id_transaksi',
-                    name: 'id_transaksi',
-                    width: '15%'
-                },
-                {
-                    data: 'ref_id',
-                    name: 'ref_id',
-                    width: '10%'
-                },
-                {
-                    data: 'id_pelanggan',
-                    name: 'id_pelanggan',
-                    width: '10%'
-                },
-                {
-                    data: 'catatan',
-                    name: 'catatan',
-                    width: '10%'
-                },
-                {
-                    data: 'dpp',
-                    name: 'dpp',
-                    width: '10%',
-                    className: 'text-right',
-                    render: function(data, type, row) {
-                        return numberWithCommas(data);
+    function populate_transaction(type) {
+        switch (type) {
+            case "penjualan":
+                $("#table_jual").DataTable().destroy()
+                let get_penjualan_url = "{{ route('transaction-general-ledger-populate-transaction') }}"
+                get_penjualan_url += '?transaction_type=' + $("#transaction_type").val() + '&customer=' + $("#customer_transaction").val()
+                $('#table_jual').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    "scrollX": true,
+                    "bDestroy": true,
+                    responsive: true,
+                    ajax: {
+                        'url': get_penjualan_url,
+                        'type': 'GET',
+                        'dataType': 'JSON',
+                        'error': function(xhr, textStatus, ThrownException) {
+                            alert('Error loading data. Exception: ' + ThrownException + '\n' + textStatus);
+                        }
                     },
-                },
-                {
-                    data: 'ppn',
-                    name: 'ppn',
-                    width: '10%',
-                    className: 'text-right',
-                    render: function(data, type, row) {
-                        return numberWithCommas(data);
+                    columns: [
+                        {
+                            data: 'id',
+                            name: 'id',
+                        },
+                        {
+                            data: 'tanggal',
+                            name: 'tanggal',
+                            width: '10%'
+                        },
+                        {
+                            data: 'id_transaksi',
+                            name: 'id_transaksi',
+                            width: '15%'
+                        },
+                        {
+                            data: 'ref_id',
+                            name: 'ref_id',
+                            width: '10%'
+                        },
+                        {
+                            data: 'nama_pelanggan',
+                            name: 'pelanggan.nama_pelanggan',
+                            width: '10%'
+                        },
+                        {
+                            data: 'catatan',
+                            name: 'catatan',
+                            width: '10%'
+                        },
+                        {
+                            data: 'dpp',
+                            name: 'dpp',
+                            width: '10%',
+                            className: 'text-right',
+                            render: function(data, type, row) {
+                                return numberWithCommas(data);
+                            },
+                        },
+                        {
+                            data: 'ppn',
+                            name: 'ppn',
+                            width: '10%',
+                            className: 'text-right',
+                            render: function(data, type, row) {
+                                return numberWithCommas(data);
+                            },
+                        },
+                        {
+                            data: 'total',
+                            name: 'total',
+                            width: '10%',
+                            className: 'text-right',
+                            render: function(data, type, row) {
+                                return numberWithCommas(data);
+                            },
+                        },
+                        {
+                            data: 'bayar',
+                            name: 'bayar',
+                            width: '10%',
+                            className: 'text-right',
+                            render: function(data, type, row) {
+                                return numberWithCommas(data);
+                            },
+                        },
+                        {
+                            data: 'sisa',
+                            name: 'sisa',
+                            width: '10%',
+                            className: 'text-right',
+                            render: function(data, type, row) {
+                                return numberWithCommas(data);
+                            },
+                        },
+                        {
+                            data: 'sisa',
+                            width: '10%',
+                            render: function(data, type, row) {
+                                return '<input type="text" class="form-control transaction-bayar" value="'+formatCurr(data)+'" onblur="this.value=formatCurr(this.value)"><input type="hidden" class="form-control transaction-id" value="'+row["id"]+'">';
+                            },
+                            orderable: false
+                        }
+                    ],
+                    'columnDefs': [
+                        {
+                           'targets': 0,
+                           'checkboxes': {
+                              'selectRow': true
+                           }
+                        }
+                     ],
+                     'select': {
+                        'style': 'multi'
+                     },
+                     'order': [[1, 'asc']]
+                })
+                break;
+            case "pembelian":
+                $("#table_beli").DataTable().destroy()
+                let get_pembelian_url = "{{ route('transaction-general-ledger-populate-transaction') }}"
+                get_pembelian_url += '?transaction_type=' + $("#transaction_type").val() + '&supplier=' + $("#supplier_transaction").val()
+                $('#table_beli').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    "scrollX": true,
+                    "bDestroy": true,
+                    responsive: true,
+                    ajax: {
+                        'url': get_pembelian_url,
+                        'type': 'GET',
+                        'dataType': 'JSON',
+                        'error': function(xhr, textStatus, ThrownException) {
+                            alert('Error loading data. Exception: ' + ThrownException + '\n' + textStatus);
+                        }
                     },
-                },
-                {
-                    data: 'total',
-                    name: 'total',
-                    width: '10%',
-                    className: 'text-right',
-                    render: function(data, type, row) {
-                        return numberWithCommas(data);
-                    },
-                },
-                {
-                    data: 'bayar',
-                    name: 'bayar',
-                    width: '10%',
-                    className: 'text-right',
-                    render: function(data, type, row) {
-                        return numberWithCommas(data);
-                    },
-                },
-                {
-                    data: 'sisa',
-                    name: 'sisa',
-                    width: '10%',
-                    className: 'text-right',
-                    render: function(data, type, row) {
-                        return numberWithCommas(data);
-                    },
-                },
-                {
-                    data: 'sisa',
-                    width: '10%',
-                    render: function(data, type, row) {
-                        return '<input type="text" class="form-control" value="'+data+'">';
-                    },
-                    orderable: false
-                }
-            ],
-            // responsive: {
-            //     details: {
-            //         type: 'column'
-            //     }
-            // },
-            // columnDefs: [{
-            //     className: 'control',
-            //     orderable: false,
-            //     targets: 0
-            // }],
-        })
+                    columns: [
+                        {
+                            data: 'id',
+                            name: 'id',
+                        },
+                        {
+                            data: 'tanggal',
+                            name: 'tanggal',
+                            width: '10%'
+                        },
+                        {
+                            data: 'id_transaksi',
+                            name: 'id_transaksi',
+                            width: '15%'
+                        },
+                        {
+                            data: 'ref_id',
+                            name: 'ref_id',
+                            width: '10%'
+                        },
+                        {
+                            data: 'nama_pemasok',
+                            name: 'pemasok.nama_pemasok',
+                            width: '10%'
+                        },
+                        {
+                            data: 'catatan',
+                            name: 'catatan',
+                            width: '10%'
+                        },
+                        {
+                            data: 'dpp',
+                            name: 'dpp',
+                            width: '10%',
+                            className: 'text-right',
+                            render: function(data, type, row) {
+                                return numberWithCommas(data);
+                            },
+                        },
+                        {
+                            data: 'ppn',
+                            name: 'ppn',
+                            width: '10%',
+                            className: 'text-right',
+                            render: function(data, type, row) {
+                                return numberWithCommas(data);
+                            },
+                        },
+                        {
+                            data: 'total',
+                            name: 'total',
+                            width: '10%',
+                            className: 'text-right',
+                            render: function(data, type, row) {
+                                return numberWithCommas(data);
+                            },
+                        },
+                        {
+                            data: 'bayar',
+                            name: 'bayar',
+                            width: '10%',
+                            className: 'text-right',
+                            render: function(data, type, row) {
+                                return numberWithCommas(data);
+                            },
+                        },
+                        {
+                            data: 'sisa',
+                            name: 'sisa',
+                            width: '10%',
+                            className: 'text-right',
+                            render: function(data, type, row) {
+                                return numberWithCommas(data);
+                            },
+                        },
+                        {
+                            data: 'sisa',
+                            width: '10%',
+                            render: function(data, type, row) {
+                                return '<input type="text" class="form-control transaction-bayar" value="'+formatCurr(data)+'" onblur="this.value=formatCurr(this.value)"><input type="hidden" class="form-control transaction-id" value="'+row["id"]+'">';
+                            },
+                            orderable: false
+                        }
+                    ],
+                    'columnDefs': [
+                        {
+                           'targets': 0,
+                           'checkboxes': {
+                              'selectRow': true
+                           }
+                        }
+                     ],
+                     'select': {
+                        'style': 'multi'
+                     },
+                     'order': [[1, 'asc']]
+                })
+                break;
+        
+            default:
+                $(".table-transaction").DataTable().destroy()
+                break;
+        }
     }
+
     function numberWithCommas(x) {
         return x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
     }
