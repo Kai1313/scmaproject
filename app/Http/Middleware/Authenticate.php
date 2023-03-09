@@ -21,8 +21,11 @@ class Authenticate extends Middleware
         if (Auth::guard('api')->check() && Auth::guard('api')) {
             return $next($request);
         } else {
-            $message = ["message" => "Permission Denied"];
-            return response($message, 401);
+            return response()->json([
+                "result" => false,
+                "code" => 401,
+                "message" => "Error, User has no Authorization"
+            ]);
         }
     }
 
