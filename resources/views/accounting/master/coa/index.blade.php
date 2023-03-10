@@ -93,15 +93,15 @@
                     <div class="table-responsive">
                         <table id="table_master_akun" class="table table-bordered table-striped">
                             <thead>
-                                <tr>
-                                    <th style="background-color: #f39c12;" width="18%">Kode Akun</th>
-                                    <th style="background-color: #f39c12;" width="19%">Nama Akun</th>
-                                    <th style="background-color: #f39c12;" width="5%">Level</th>
-                                    <th style="background-color: #f39c12;" width="10%">Tipe</th>
-                                    <th style="background-color: #f39c12;" width="10%">Header1</th>
-                                    <th style="background-color: #f39c12;" width="10%">Header2</th>
-                                    <th style="background-color: #f39c12;" width="10%">Header3</th>
-                                    <th style="background-color: #f39c12;" width="18%">Actions</th>
+                                <tr style="border: 1px solid #f4f4f4;">
+                                    <th style="background-color: #ffffff;" width="18%">Kode Akun</th>
+                                    <th style="background-color: #ffffff;" width="19%">Nama Akun</th>
+                                    <th style="background-color: #ffffff;" width="5%">Level</th>
+                                    <th style="background-color: #ffffff;" width="10%">Tipe</th>
+                                    <th style="background-color: #ffffff;" width="10%">Header1</th>
+                                    <th style="background-color: #ffffff;" width="10%">Header2</th>
+                                    <th style="background-color: #ffffff;" width="10%">Header3</th>
+                                    <th style="background-color: #ffffff;" width="18%">Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="coa_table">

@@ -13,10 +13,7 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('welcome');
-Route::get('/dashboard/{user_id?}', 'SessionController@index')->name('dashboard');
+Route::get('/', 'SessionController@index')->name('welcome');
 Route::get('/logout', 'SessionController@logout')->name('logout');
 
 Route::get('/get-menu/{id}', 'DashboardController@getMenu')->name('get-menu');
@@ -67,12 +64,8 @@ Route::prefix('uang-muka-pembelian')->group(function () {
     Route::get('auto-slip', 'PurchaseDownPaymentController@autoSlip')->name('purchase-down-payment-auto-slip');
 });
 
-Route::prefix('api')->group(function () {
-    Route::post('transaction-balance', 'ApiController@transactionBalance')->name('transaction-balance');
-});
-
 // Master
-Route::get('/master/slip', 'MasterSlipController@index')->name('master-slip');
+Route::get('/master/slip/index/{user_id?}', 'MasterSlipController@index')->name('master-slip');
 Route::get('/master/slip/form/create', 'MasterSlipController@create')->name('master-slip-create');
 Route::get('/master/slip/form/edit/{id?}', 'MasterSlipController@edit')->name('master-slip-edit');
 Route::get('/master/slip/show/{id?}', 'MasterSlipController@show')->name('master-slip-show');
@@ -84,7 +77,7 @@ Route::get('/master/slip/export/excel', 'MasterSlipController@export_excel')->na
 Route::post('/master/slip/copy/data', 'MasterSlipController@copy_data')->name('master-slip-copy-data');
 Route::get('/master/slip/get_by_cabang/{id_cabang?}/{id_slip?}', 'MasterSlipController@getSlipByCabang')->name('master-slip-get-by-cabang');
 
-Route::get('/master/coa', 'MasterCoaController@index')->name('master-coa');
+Route::get('/master/coa/index/{user_id?}', 'MasterCoaController@index')->name('master-coa');
 Route::get('/master/coa/populate/{cabang?}', 'MasterCoaController@populate')->name('master-coa-populate');
 Route::get('/master/coa/form/create', 'MasterCoaController@create')->name('master-coa-create');
 Route::get('/master/coa/form/edit/{id}', 'MasterCoaController@edit')->name('master-coa-edit');
@@ -109,6 +102,7 @@ Route::get('/transaction/general_ledger/show/{id?}', 'GeneralLedgerController@sh
 Route::post('/transaction/general_ledger/store', 'GeneralLedgerController@store')->name('transaction-general-ledger-store');
 Route::post('/transaction/general_ledger/update', 'GeneralLedgerController@update')->name('transaction-general-ledger-update');
 Route::get('/transaction/general_ledger/populate', 'GeneralLedgerController@populate')->name('transaction-general-ledger-populate');
+Route::get('/transaction/general_ledger/populate-transaction', 'GeneralLedgerController@populateTrxSaldo')->name('transaction-general-ledger-populate-transaction');
 Route::get('/transaction/general_ledger/print/{id?}', 'GeneralLedgerController@printSlip')->name('transaction-general-ledger-print');
 Route::get('/transaction/general_ledger/void/{id?}', 'GeneralLedgerController@void')->name('transaction-general-ledger-void');
 Route::get('/transaction/general_ledger/active/{id?}', 'GeneralLedgerController@active')->name('transaction-general-ledger-active');
