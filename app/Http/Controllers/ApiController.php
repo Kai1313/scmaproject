@@ -30,13 +30,13 @@ class ApiController extends Controller
                 "code" => 200,
                 "message" => "Login Success",
                 "token" => $token
-            ]);
+            ], 200);
         } else {
             return response()->json([
                 "result" => false,
-                "code" => 400,
+                "code" => 401,
                 "message" => "Error, User has no Authorization"
-            ]);
+            ], 401);
         }
     }
 
@@ -44,7 +44,7 @@ class ApiController extends Controller
     {
         return response()->json([
             'user' => Auth::guard('api')->user()
-        ]);
+        ], 200);
     }
 
     public function logout(Request $request)
@@ -55,13 +55,13 @@ class ApiController extends Controller
                 "result" => true,
                 "code" => 200,
                 "message" => "Log Out Success"
-            ]);
+            ], 200);
         } else {
             return response()->json([
                 "result" => false,
                 "code" => 400,
                 "message" => "Error, Log Out Failed"
-            ]);
+            ], 401);
         }
     }
 
