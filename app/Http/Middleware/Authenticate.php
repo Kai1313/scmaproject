@@ -25,7 +25,7 @@ class Authenticate extends Middleware
                 "result" => false,
                 "code" => 401,
                 "message" => "Error, User has no Authorization"
-            ]);
+            ], 401);
         }
     }
 
