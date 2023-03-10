@@ -21,6 +21,10 @@
         th {
             text-align: center;
         }
+
+        .rounded-0 {
+            border-radius: 0;
+        }
     </style>
 @endsection
 
@@ -53,10 +57,16 @@
                                 @endforeach
                             </select>
                         </div>
-                        <span style="margin-right:10px;">Tampilkan Gambar</span> <input type="checkbox" name="show_image">
                     </div>
                     <div class="col-md-8">
-                        <a href="{{ route('master-wrapper-entry') }}" class="btn btn-success pull-right btn-flat btn-sm">
+                        <span class="badge badge-default rounded-0 pull-right">
+                            <input class="form-check-input" type="checkbox" id="show_image" name="show_image">
+                            <label class="form-check-label" for="show_image">
+                                Gambar
+                            </label>
+                        </span>
+                        <a href="{{ route('master-wrapper-entry') }}"
+                            class="btn btn-success pull-right btn-flat btn-sm mr-1">
                             <i class="glyphicon glyphicon-plus"></i> Tambah Data Pembungkus
                         </a>
                     </div>

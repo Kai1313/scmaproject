@@ -28,6 +28,10 @@
         .head-checkbox label {
             margin-right: 10px;
         }
+
+        .rounded-0 {
+            border-radius: 0;
+        }
     </style>
 @endsection
 
@@ -61,11 +65,15 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-4 head-checkbox">
-                        <label for="">Tampilkan Void</label> <input type="checkbox" name="show_void">
-                    </div>
-                    <div class="col-md-4">
-                        <a href="{{ route('purchase-request-entry') }}" class="btn btn-success pull-right btn-flat btn-sm">
+                    <div class="col-md-8">
+                        <span class="badge badge-default rounded-0 pull-right">
+                            <input class="form-check-input" type="checkbox" id="void" name="show_void">
+                            <label class="form-check-label" for="void">
+                                Void
+                            </label>
+                        </span>
+                        <a href="{{ route('purchase-request-entry') }}"
+                            class="btn btn-success pull-right btn-flat btn-sm mr-1">
                             <i class="glyphicon glyphicon-plus"></i> Tambah Permintaan Pembelian
                         </a>
                     </div>

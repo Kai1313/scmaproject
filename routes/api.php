@@ -18,6 +18,7 @@ Route::post('login', 'ApiController@login');
 Route::group(['middleware' => ['auth:api']], function () {
     Route::get('profile', 'ApiController@profile');
     Route::post('logout', 'ApiController@logout');
+    Route::post('transaction-balance', 'ApiController@transactionBalance')->name('transaction-balance');
 });
 
 Route::prefix('/jurnal_otomatis')->group(function () {
@@ -28,5 +29,3 @@ Route::prefix('/jurnal_otomatis')->group(function () {
     Route::post('/retur_penjualan', 'ApiController@journalReturPenjualan')->name('jurnal-otomatis-retur-penjualan');
     Route::post('/retur_pembelian', 'ApiController@journalReturPembelian')->name('jurnal-otomatis-retur-pembelian');
 });
-
-Route::post('transaction-balance', 'ApiController@transactionBalance')->name('transaction-balance');
