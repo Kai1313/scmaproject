@@ -709,7 +709,7 @@ class GeneralLedgerController extends Controller
         // dd($request->all());
         try {
             // Init
-            $type = $request->transaction_type;
+            $type = str_replace("_", " ", $request->transaction_type);
             $customer = $request->customer;
             $supplier = $request->supplier;
             $offset = $request->start;
@@ -729,7 +729,7 @@ class GeneralLedgerController extends Controller
             $data_saldo = TrxSaldo::select("saldo_transaksi.*", "pelanggan.nama_pelanggan as nama_pelanggan", "pemasok.nama_pemasok as nama_pemasok")
                 ->leftJoin("pelanggan", "pelanggan.id_pelanggan", "saldo_transaksi.id_pelanggan")
                 ->leftJoin("pemasok", "pemasok.id_pemasok", "saldo_transaksi.id_pemasok")
-                ->where("tipe_transaksi", $type)->where("sisa", "<>", 0);
+                ->where("tipe_transaksi", ucwords($type))->where("sisa", "<>", 0);
             if ($customer != "") {
                 $data_saldo = $data_saldo->where("saldo_transaksi.id_pelanggan", $customer);
             }
@@ -835,9 +835,17 @@ class GeneralLedgerController extends Controller
                     $trx_saldo->bayar = $current_bayar + $kredit;
                     $trx_saldo->sisa = $current_sisa - $kredit;
                     break;
+                case 'Retur Penjualan':
+                    $trx_saldo->bayar = $current_bayar + $debet;
+                    $trx_saldo->sisa = $current_sisa - $debet;
+                    break;
                 case 'Pembelian':
                     $trx_saldo->bayar = $current_bayar + $debet;
                     $trx_saldo->sisa = $current_sisa - $debet;
+                    break;
+                case 'Retur Pembelian':
+                    $trx_saldo->bayar = $current_bayar + $kredit;
+                    $trx_saldo->sisa = $current_sisa - $kredit;
                     break;
                 
                 default:
@@ -873,9 +881,17 @@ class GeneralLedgerController extends Controller
                     $trx_saldo->bayar = $current_bayar - $kredit;
                     $trx_saldo->sisa = $current_sisa + $kredit;
                     break;
+                case 'Retur Penjualan':
+                    $trx_saldo->bayar = $current_bayar - $debet;
+                    $trx_saldo->sisa = $current_sisa + $debet;
+                    break;
                 case 'Pembelian':
                     $trx_saldo->bayar = $current_bayar - $debet;
                     $trx_saldo->sisa = $current_sisa + $debet;
+                    break;
+                case 'Retur Pembelian':
+                    $trx_saldo->bayar = $current_bayar - $kredit;
+                    $trx_saldo->sisa = $current_sisa + $kredit;
                     break;
                 
                 default:
