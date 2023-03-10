@@ -705,7 +705,14 @@ class ApiController extends Controller
                             //  Update Saldo Transaksi
                             $trx_saldo = TrxSaldo::where("id_transaksi", $jd["id_transaksi"])->first();
                             if ($trx_saldo) {
-                                $update_trx_saldo = $this->updateTrxSaldo($trx_saldo, str_replace(',', '', $jd['debet']), str_replace(',', '', $jd['credit']));
+                                // cek untuk revert
+                                if($trx_saldo->bayar > 0){
+                                    $update_trx_saldo = $this->revertTrxSaldo($trx_saldo, $jd['debet'], $jd['credit']);
+                                }
+
+                                // update
+                                $trx_saldo = TrxSaldo::where("id_transaksi", $jd["id_transaksi"])->first();
+                                $update_trx_saldo = $this->updateTrxSaldo($trx_saldo, $jd['debet'], $jd['credit']);
                                 if (!$update_trx_saldo) {
                                     DB::rollback();
                                     return response()->json([
@@ -1027,7 +1034,14 @@ class ApiController extends Controller
                             //  Update Saldo Transaksi
                             $trx_saldo = TrxSaldo::where("id_transaksi", $jd["id_transaksi"])->first();
                             if ($trx_saldo) {
-                                $update_trx_saldo = $this->updateTrxSaldo($trx_saldo, str_replace(',', '', $jd['debet']), str_replace(',', '', $jd['credit']));
+                                // cek untuk revert
+                                if($trx_saldo->bayar > 0){
+                                    $update_trx_saldo = $this->revertTrxSaldo($trx_saldo, $jd['debet'], $jd['credit']);
+                                }
+
+                                // update
+                                $trx_saldo = TrxSaldo::where("id_transaksi", $jd["id_transaksi"])->first();
+                                $update_trx_saldo = $this->updateTrxSaldo($trx_saldo, $jd['debet'], $jd['credit']);
                                 if (!$update_trx_saldo) {
                                     DB::rollback();
                                     return response()->json([
@@ -1333,7 +1347,14 @@ class ApiController extends Controller
                             //  Update Saldo Transaksi
                             $trx_saldo = TrxSaldo::where("id_transaksi", $jd["id_transaksi"])->first();
                             if ($trx_saldo) {
-                                $update_trx_saldo = $this->updateTrxSaldo($trx_saldo, str_replace(',', '', $jd['debet']), str_replace(',', '', $jd['credit']));
+                                // cek untuk revert
+                                if($trx_saldo->bayar > 0){
+                                    $update_trx_saldo = $this->revertTrxSaldo($trx_saldo, $jd['debet'], $jd['credit']);
+                                }
+
+                                // update
+                                $trx_saldo = TrxSaldo::where("id_transaksi", $jd["id_transaksi"])->first();
+                                $update_trx_saldo = $this->updateTrxSaldo($trx_saldo, $jd['debet'], $jd['credit']);
                                 if (!$update_trx_saldo) {
                                     DB::rollback();
                                     return response()->json([
@@ -1630,7 +1651,14 @@ class ApiController extends Controller
                             //  Update Saldo Transaksi
                             $trx_saldo = TrxSaldo::where("id_transaksi", $jd["id_transaksi"])->first();
                             if ($trx_saldo) {
-                                $update_trx_saldo = $this->updateTrxSaldo($trx_saldo, str_replace(',', '', $jd['debet']), str_replace(',', '', $jd['credit']));
+                                // cek untuk revert
+                                if($trx_saldo->bayar > 0){
+                                    $update_trx_saldo = $this->revertTrxSaldo($trx_saldo, $jd['debet'], $jd['credit']);
+                                }
+
+                                // update
+                                $trx_saldo = TrxSaldo::where("id_transaksi", $jd["id_transaksi"])->first();
+                                $update_trx_saldo = $this->updateTrxSaldo($trx_saldo, $jd['debet'], $jd['credit']);
                                 if (!$update_trx_saldo) {
                                     DB::rollback();
                                     return response()->json([
@@ -1698,6 +1726,60 @@ class ApiController extends Controller
                 case 'Hutang Giro':
                     $trx_saldo->bayar = $current_bayar + $debet;
                     $trx_saldo->sisa = $current_sisa - $debet;
+                    break;
+
+                default:
+                    // DB::rollback();
+                    return false;
+                    break;
+            }
+            if (!$trx_saldo->save()) {
+                // DB::rollback();
+                return false;
+            }
+            return true;
+            // DB::commit();
+        }
+        catch (\Exception $e) {
+            // DB::rollback();
+            Log::error($e);
+            return false;
+        }
+    }
+
+    public function revertTrxSaldo($trx, $debet, $credit)
+    {
+        try {
+            // DB::beginTransaction();
+            $trx_saldo = TrxSaldo::find($trx->id);
+            $type = $trx->tipe_transaksi;
+            $current_total = $trx->total;
+            $current_bayar = $trx->bayar;
+            $current_sisa = $trx->sisa;
+            switch ($type) {
+                case 'Penjualan':
+                    $trx_saldo->bayar = $current_bayar - $credit;
+                    $trx_saldo->sisa = $current_sisa + $credit;
+                    break;
+                case 'Retur Penjualan':
+                    $trx_saldo->bayar = $current_bayar - $debet;
+                    $trx_saldo->sisa = $current_sisa + $debet;
+                    break;
+                case 'Pembelian':
+                    $trx_saldo->bayar = $current_bayar - $debet;
+                    $trx_saldo->sisa = $current_sisa + $debet;
+                    break;
+                case 'Retur Pembelian':
+                    $trx_saldo->bayar = $current_bayar - $credit;
+                    $trx_saldo->sisa = $current_sisa + $credit;
+                    break;
+                case 'Piutang Giro':
+                    $trx_saldo->bayar = $current_bayar - $credit;
+                    $trx_saldo->sisa = $current_sisa + $credit;
+                    break;
+                case 'Hutang Giro':
+                    $trx_saldo->bayar = $current_bayar - $debet;
+                    $trx_saldo->sisa = $current_sisa + $debet;
                     break;
 
                 default:
