@@ -726,8 +726,7 @@ class GeneralLedgerController extends Controller
             }
             $draw = $request->draw;
             $current_page = $offset / $limit + 1;
-            $data_saldo = TrxSaldo::select("saldo_transaksi.*", "pelanggan.nama_pelanggan as nama_pelanggan", "pemasok.nama_pemasok as nama_pemasok")
-                ->leftJoin("pelanggan", "pelanggan.id_pelanggan", "saldo_transaksi.id_pelanggan")
+            $data_saldo = TrxSaldo::leftJoin("pelanggan", "pelanggan.id_pelanggan", "saldo_transaksi.id_pelanggan")
                 ->leftJoin("pemasok", "pemasok.id_pemasok", "saldo_transaksi.id_pemasok")
                 ->where("tipe_transaksi", ucwords($type))->where("sisa", "<>", 0);
             if ($customer != "") {
@@ -736,20 +735,30 @@ class GeneralLedgerController extends Controller
             if ($supplier != "") {
                 $data_saldo = $data_saldo->where("saldo_transaksi.id_pemasok", $supplier);
             }
+            if ($type == "piutang giro" || $type == "hutang giro") {
+                $data_saldo = $data_saldo->join("jurnal_header", "jurnal_header.id_jurnal", "saldo_transaksi.id_jurnal")->join("master_slip", "master_slip.id_slip", "jurnal_header.id_slip")->join("master_akun", "master_akun.id_akun", "master_slip.id_akun")->select("saldo_transaksi.*", "pelanggan.nama_pelanggan as nama_pelanggan", "pemasok.nama_pemasok as nama_pemasok", "master_akun.nama_akun as nama_akun", "master_akun.kode_akun as kode_akun", "master_akun.id_akun as id_akun");
+            }
+            else {
+                $data_saldo = $data_saldo->select("saldo_transaksi.*", "pelanggan.nama_pelanggan as nama_pelanggan", "pemasok.nama_pemasok as nama_pemasok");
+            }
             if (isset($keyword)) {
-                $data_saldo->where(function ($query) use ($keyword) {
+                $data_saldo->where(function ($query) use ($keyword, $type) {
                     $query->orWhere('tanggal', 'LIKE', "%$keyword%")
-                        ->orWhere('id_transaksi', 'LIKE', "%$keyword%")
+                        ->orWhere('saldo_transaksi.id_transaksi', 'LIKE', "%$keyword%")
                         ->orWhere('ref_id', 'LIKE', "%$keyword%")
-                        ->orWhere('catatan', 'LIKE', "%$keyword%")
+                        ->orWhere('saldo_transaksi.catatan', 'LIKE', "%$keyword%")
                         ->orWhere('saldo_transaksi.id_pelanggan', 'LIKE', "%$keyword%")
                         ->orWhere('pelanggan.nama_pelanggan', 'LIKE', "%$keyword%")
-                        ->orWhere('id_pemasok', 'LIKE', "%$keyword%")
+                        ->orWhere('saldo_transaksi.id_pemasok', 'LIKE', "%$keyword%")
                         ->orWhere('dpp', 'LIKE', "%$keyword%")
                         ->orWhere('ppn', 'LIKE', "%$keyword%")
                         ->orWhere('total', 'LIKE', "%$keyword%")
                         ->orWhere('bayar', 'LIKE', "%$keyword%")
                         ->orWhere('sisa', 'LIKE', "%$keyword%");
+                        if ($type == "piutang giro" || $type == "hutang giro") {
+                            $query->orWhere('tanggal', 'LIKE', "%$keyword%")
+                                ->orWhere('saldo_transaksi.no_giro', 'LIKE', "%$keyword%");
+                        }
                 });
             }
             $filtered_data = $data_saldo->get();
@@ -847,6 +856,14 @@ class GeneralLedgerController extends Controller
                     $trx_saldo->bayar = $current_bayar + $kredit;
                     $trx_saldo->sisa = $current_sisa - $kredit;
                     break;
+                case 'Piutang Giro':
+                    $trx_saldo->bayar = $current_bayar + $kredit;
+                    $trx_saldo->sisa = $current_sisa - $kredit;
+                    break;
+                case 'Hutang Giro':
+                    $trx_saldo->bayar = $current_bayar + $debet;
+                    $trx_saldo->sisa = $current_sisa - $debet;
+                    break;
                 
                 default:
                     // DB::rollback();
@@ -892,6 +909,14 @@ class GeneralLedgerController extends Controller
                 case 'Retur Pembelian':
                     $trx_saldo->bayar = $current_bayar - $kredit;
                     $trx_saldo->sisa = $current_sisa + $kredit;
+                    break;
+                case 'Piutang Giro':
+                    $trx_saldo->bayar = $current_bayar - $kredit;
+                    $trx_saldo->sisa = $current_sisa + $kredit;
+                    break;
+                case 'Hutang Giro':
+                    $trx_saldo->bayar = $current_bayar - $debet;
+                    $trx_saldo->sisa = $current_sisa + $debet;
                     break;
                 
                 default:
