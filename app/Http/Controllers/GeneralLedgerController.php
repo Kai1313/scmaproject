@@ -131,6 +131,33 @@ class GeneralLedgerController extends Controller
                 ]);
             }
 
+            // Insert trx saldo if jenis_jurnal PG|HG
+            if ($journalType == "PG" || $journalType == "HG") {
+                $sum = 0;
+                foreach ($detailData as $key => $item) {
+                    $sum += ($journalType == "PG")?$item["debet"]:$item["kredit"];
+                }
+                $trx_saldo = new TrxSaldo;
+                $trx_saldo->tipe_transaksi = ($journalType == "PG")?"Piutang Giro":"Hutang Giro";
+                $trx_saldo->id_transaksi = $header->kode_jurnal;
+                $trx_saldo->tanggal = $journalDate;
+                $trx_saldo->total = $sum;
+                $trx_saldo->bayar = 0;
+                $trx_saldo->sisa = $sum;
+                $trx_saldo->id_jurnal = $header->id_jurnal;
+                $trx_saldo->no_giro = $header->no_giro;
+                $trx_saldo->tanggal_giro = $header->tanggal_giro;
+                $trx_saldo->tanggal_giro_jt = $header->tanggal_giro_jt;
+                $trx_saldo->status_giro = 0;
+                if (!$trx_saldo->save()) {
+                    DB::rollback();
+                    return response()->json([
+                        "result" => false,
+                        "message" => "Error when store trx saldo after table header"
+                    ]);
+                }
+            }
+
             // Store Detail and Update Saldo Transaksi
             foreach ($detailData as $key => $data) {
                 // Store Detail
@@ -373,7 +400,6 @@ class GeneralLedgerController extends Controller
             // Update saldo transaksi before delete
             $old_details = JurnalDetail::where("id_jurnal", $journalID)->get();
             foreach ($old_details as $key => $detail) {
-                Log::info($detail->credit);
                 $debet = $detail->debet;
                 $kredit = $detail->credit;
                 $trx_saldo = TrxSaldo::where("id_transaksi", $detail->id_transaksi)->first();
@@ -408,6 +434,36 @@ class GeneralLedgerController extends Controller
                     "result" => false,
                     "message" => "Error when store Jurnal data on table header"
                 ]);
+            }
+
+            // Insert trx saldo if jenis_jurnal PG|HG
+            if ($journalType == "PG" || $journalType == "HG") {
+                $check = TrxSaldo::where("id_jurnal", $journalID)->first();
+                Log::info($check);
+                $sum = 0;
+                foreach ($detailData as $key => $item) {
+                    $sum += ($journalType == "PG")?$item["debet"]:$item["kredit"];
+                }
+                Log::info($sum);
+                $trx_saldo = ($check)?TrxSaldo::where("id_jurnal", $journalID)->first():new TrxSaldo;
+                $trx_saldo->tipe_transaksi = ($journalType == "PG")?"Piutang Giro":"Hutang Giro";
+                $trx_saldo->id_transaksi = $header->kode_jurnal;
+                $trx_saldo->tanggal = $journalDate;
+                $trx_saldo->total = $sum;
+                $trx_saldo->bayar = 0;
+                $trx_saldo->sisa = $sum;
+                $trx_saldo->id_jurnal = $header->id_jurnal;
+                $trx_saldo->no_giro = $header->no_giro;
+                $trx_saldo->tanggal_giro = $header->tanggal_giro;
+                $trx_saldo->tanggal_giro_jt = $header->tanggal_giro_jt;
+                $trx_saldo->status_giro = 0;
+                if (!$trx_saldo->save()) {
+                    DB::rollback();
+                    return response()->json([
+                        "result" => false,
+                        "message" => "Error when store trx saldo after table header"
+                    ]);
+                }
             }
 
             // Store Detail
