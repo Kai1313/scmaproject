@@ -125,6 +125,10 @@ class ApiController extends Controller
             $uang_muka = $request->uang_muka;
             $nominal_ppn = $request->ppn;
 
+            // Check balance
+            $check_balance_debit = 0;
+            $check_balance_credit = 0;
+
             $jurnal_detail = [
                 [
                     'akun'          => $akun_slip,
@@ -204,6 +208,10 @@ class ApiController extends Controller
                         $detail->user_modified = $user_created;
                         $detail->dt_modified = date('Y-m-d h:i:s');
 
+                        // variable check
+                        $check_balance_debit += $jd['debet'];
+                        $check_balance_credit += $jd['credit'];
+
                         if (!$detail->save()) {
                             DB::rollback();
                             return response()->json([
@@ -216,6 +224,16 @@ class ApiController extends Controller
                         $index++;
                     }
                 }
+            }
+
+            // check balance
+            if($check_balance_debit != $check_balance_credit){
+                DB::rollback();
+                return response()->json([
+                    "result" => false,
+                    "code" => 400,
+                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance"
+                ], 400);
             }
 
             DB::commit();
@@ -296,6 +314,10 @@ class ApiController extends Controller
             $uang_muka = $request->uang_muka;
             $nominal_ppn = $request->ppn;
 
+            // Check balance
+            $check_balance_debit = 0;
+            $check_balance_credit = 0;
+
             $jurnal_detail = [
                 [
                     'akun'          => $akun_slip,
@@ -375,6 +397,10 @@ class ApiController extends Controller
                         $detail->user_modified = $user_created;
                         $detail->dt_modified = date('Y-m-d h:i:s');
 
+                        // variable check
+                        $check_balance_debit += $jd['debet'];
+                        $check_balance_credit += $jd['credit'];
+
                         if (!$detail->save()) {
                             DB::rollback();
                             return response()->json([
@@ -387,6 +413,16 @@ class ApiController extends Controller
                         $index++;
                     }
                 }
+            }
+
+            // check balance
+            if($check_balance_debit != $check_balance_credit){
+                DB::rollback();
+                return response()->json([
+                    "result" => false,
+                    "code" => 400,
+                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance"
+                ], 400);
             }
 
             DB::commit();
@@ -485,6 +521,10 @@ class ApiController extends Controller
             $uang_muka = $request->uang_muka;
             $nominal_ppn = $request->ppn;
 
+            // Check balance
+            $check_balance_debit = 0;
+            $check_balance_credit = 0;
+
             $jurnal_detail_me = [
                 [
                     'akun'          => $akun_uang_muka_penjualan,
@@ -580,6 +620,10 @@ class ApiController extends Controller
                         $detail_me->user_modified = $user_created;
                         $detail_me->dt_modified = date('Y-m-d h:i:s');
 
+                        // variable check
+                        $check_balance_debit += $jd['debet'];
+                        $check_balance_credit += $jd['credit'];
+
                         if (!$detail_me->save()) {
                             DB::rollback();
                             return response()->json([
@@ -592,6 +636,16 @@ class ApiController extends Controller
                         $index++;
                     }
                 }
+            }
+
+            // check balance
+            if($check_balance_debit != $check_balance_credit){
+                DB::rollback();
+                return response()->json([
+                    "result" => false,
+                    "code" => 400,
+                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance"
+                ], 400);
             }
 
             if($id_slip != null){
@@ -814,6 +868,10 @@ class ApiController extends Controller
             $uang_muka = $request->uang_muka;
             $nominal_ppn = $request->ppn;
 
+            // Check balance
+            $check_balance_debit = 0;
+            $check_balance_credit = 0;
+
             $jurnal_detail_me = [
                 [
                     'akun'          => $akun_uang_muka_pembelian,
@@ -909,6 +967,10 @@ class ApiController extends Controller
                         $detail_me->user_modified = $user_created;
                         $detail_me->dt_modified = date('Y-m-d h:i:s');
 
+                        // variable check
+                        $check_balance_debit += $jd['debet'];
+                        $check_balance_credit += $jd['credit'];
+
                         if (!$detail_me->save()) {
                             DB::rollback();
                             return response()->json([
@@ -921,6 +983,16 @@ class ApiController extends Controller
                         $index++;
                     }
                 }
+            }
+
+            // check balance
+            if($check_balance_debit != $check_balance_credit){
+                DB::rollback();
+                return response()->json([
+                    "result" => false,
+                    "code" => 400,
+                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance"
+                ], 400);
             }
 
             if($id_slip != null){
@@ -1141,6 +1213,10 @@ class ApiController extends Controller
             $total = $request->total;
             $nominal_ppn = $request->ppn;
 
+            // Check balance
+            $check_balance_debit = 0;
+            $check_balance_credit = 0;
+
             $jurnal_detail_me = [
                 [
                     'akun'          => $akun_piutang_dagang,
@@ -1222,6 +1298,10 @@ class ApiController extends Controller
                         $detail_me->user_modified = $user_created;
                         $detail_me->dt_modified = date('Y-m-d h:i:s');
 
+                        // variable check
+                        $check_balance_debit += $jd['debet'];
+                        $check_balance_credit += $jd['credit'];
+
                         if (!$detail_me->save()) {
                             DB::rollback();
                             return response()->json([
@@ -1234,6 +1314,16 @@ class ApiController extends Controller
                         $index++;
                     }
                 }
+            }
+
+            // check balance
+            if($check_balance_debit != $check_balance_credit){
+                DB::rollback();
+                return response()->json([
+                    "result" => false,
+                    "code" => 400,
+                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance"
+                ], 400);
             }
 
             if($id_slip != null){
@@ -1445,6 +1535,10 @@ class ApiController extends Controller
             $uang_muka = $request->uang_muka;
             $nominal_ppn = $request->ppn;
 
+            // Check balance
+            $check_balance_debit = 0;
+            $check_balance_credit = 0;
+
             $jurnal_detail_me = [
                 [
                     'akun'          => $akun_hutang_dagang,
@@ -1526,6 +1620,10 @@ class ApiController extends Controller
                         $detail_me->user_modified = $user_created;
                         $detail_me->dt_modified = date('Y-m-d h:i:s');
 
+                        // variable check
+                        $check_balance_debit += $jd['debet'];
+                        $check_balance_credit += $jd['credit'];
+
                         if (!$detail_me->save()) {
                             DB::rollback();
                             return response()->json([
@@ -1538,6 +1636,16 @@ class ApiController extends Controller
                         $index++;
                     }
                 }
+            }
+
+            // check balance
+            if($check_balance_debit != $check_balance_credit){
+                DB::rollback();
+                return response()->json([
+                    "result" => false,
+                    "code" => 400,
+                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance"
+                ], 400);
             }
 
             if($id_slip != null){
