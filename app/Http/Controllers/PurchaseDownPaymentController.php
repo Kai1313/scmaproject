@@ -313,7 +313,7 @@ class PurchaseDownPaymentController extends Controller
                         "void" => $data->void,
                         "user" => session()->get('user')['id_pengguna'],
                         "total" => $data->nominal,
-                        "uang_muka" => 0,
+                        "uang_muka" => $data->nominal,
                         "ppn" => 0,
                     )
                 )
