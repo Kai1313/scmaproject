@@ -439,12 +439,10 @@ class GeneralLedgerController extends Controller
             // Insert trx saldo if jenis_jurnal PG|HG
             if ($journalType == "PG" || $journalType == "HG") {
                 $check = TrxSaldo::where("id_jurnal", $journalID)->first();
-                Log::info($check);
                 $sum = 0;
                 foreach ($detailData as $key => $item) {
                     $sum += ($journalType == "PG")?$item["debet"]:$item["kredit"];
                 }
-                Log::info($sum);
                 $trx_saldo = ($check)?TrxSaldo::where("id_jurnal", $journalID)->first():new TrxSaldo;
                 $trx_saldo->tipe_transaksi = ($journalType == "PG")?"Piutang Giro":"Hutang Giro";
                 $trx_saldo->id_transaksi = $header->kode_jurnal;

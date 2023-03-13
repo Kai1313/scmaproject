@@ -202,9 +202,6 @@
                                             <th class="text-center" width="20%">Action</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-
-                                    </tbody>
                                 </table>
                             </div>
                         </div>
