@@ -1,0 +1,1238 @@
+[33mcommit c8b698a04d939945cba8af8d2b058d03ec17e2ce[m[33m ([m[1;36mHEAD -> [m[1;32mfitur_ops[m[33m)[m
+Merge: af6aad2 ae29a2b
+Author: it scma <itdiv@sinarcemaramasabadi.co.id>
+Date:   Mon Mar 13 13:26:40 2023 +0700
+
+    Merge branch 'fitur_ops' of https://github.com/Kai1313/scmaproject into fitur_ops
+
+[33mcommit af6aad27a6c3c23eac7bf6d9bad98e1b16fce751[m
+Author: it scma <itdiv@sinarcemaramasabadi.co.id>
+Date:   Mon Mar 13 13:26:23 2023 +0700
+
+    commit server
+
+[33mcommit ae29a2bf45d7be60c248bfb205eb3d038b0b8182[m
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Mon Mar 13 13:22:16 2023 +0700
+
+    tes api
+
+[33mcommit 59dea10eda9023179f29b135d0b14cb9f4ffc78a[m
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Mon Mar 13 11:06:30 2023 +0700
+
+    tambah index di url
+
+[33mcommit 2fc48bf12a19e75ef47736c0b09f1d74888de085[m
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Mon Mar 13 10:54:54 2023 +0700
+
+    check auth di index
+
+[33mcommit 4687989cc09eb79311723c1760876942dec12841[m
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Mon Mar 13 10:20:03 2023 +0700
+
+    fix apicontroller
+
+[33mcommit 3ce8a3e2899d499b64a4ba2282de42a0edb8a12a[m
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Mon Mar 13 10:14:09 2023 +0700
+
+    posisi menu
+
+[33mcommit 061ac6b0b0f2a1cf96d0cfd3067bebf017369ae2[m
+Merge: a202fb1 e9766b6
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Mon Mar 13 09:17:18 2023 +0700
+
+    menu
+
+[33mcommit e9766b639364d1fe7147e5e05dac45f44ef6e7c4[m
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Sun Mar 12 18:35:04 2023 +0700
+
+    update check balance jurnal otomatis
+
+[33mcommit 07590d9190023a7bc5f0e4e9e0c79f1672bd6a3e[m[33m ([m[1;31morigin/development[m[33m, [m[1;32mdevelopment[m[33m)[m
+Merge: 873799c d884fc2
+Author: Kaisha Satrio <kaisha.genesys@gmail.com>
+Date:   Sat Mar 11 08:31:41 2023 +0700
+
+    Merge branch 'development' of https://github.com/Kai1313/scmaproject into development
+
+[33mcommit 873799cab5b2943d86ae703084246e26594bbf5e[m
+Author: Kaisha Satrio <kaisha.genesys@gmail.com>
+Date:   Sat Mar 11 08:28:33 2023 +0700
+
+    update insert saldo transaksi PGP HG
+
+[33mcommit d884fc27a0240c312289fbadc8bd872d7c9152e9[m
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Sat Mar 11 02:35:33 2023 +0700
+
+    fix saat edit
+
+[33mcommit 33a6a76db270598f3cb5a4289c10a70f62835c40[m
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Sat Mar 11 02:19:44 2023 +0700
+
+    update saldo pada pelunasan otomatis
+
+[33mcommit 877afd19d9c8c5dbdc11938d33f59beb90eb2f4a[m
+Author: Kaisha Satrio <kaisha.genesys@gmail.com>
+Date:   Fri Mar 10 23:44:45 2023 +0700
+
+    update tgl giro <= today
+
+[33mcommit 2b2b0fbfde3de019b6e24ecfa403393fee2cce29[m
+Author: Kaisha Satrio <kaisha.genesys@gmail.com>
+Date:   Fri Mar 10 23:20:48 2023 +0700
+
+    Update piutang giro dan hutang giro saat add jurnal umum
+
+[33mcommit a202fb14d57df20870289efb01df003e70629978[m
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Fri Mar 10 17:34:01 2023 +0700
+
+    api middleware
+
+[33mcommit 73f85e0ba9b4f1837a977d82e6e0bf8e4db6a69a[m
+Merge: 1e39568 ae5e3c9
+Author: Kaisha Satrio <kaisha.genesys@gmail.com>
+Date:   Fri Mar 10 11:24:03 2023 +0700
+
+    Merge branch 'development' of https://github.com/Kai1313/scmaproject into development
+
+[33mcommit 1e39568c799a6ee77f7be64c4d268024431b9316[m
+Author: Kaisha Satrio <kaisha.genesys@gmail.com>
+Date:   Fri Mar 10 11:23:41 2023 +0700
+
+    update retur beli retur jual
+
+[33mcommit a9a15e5396956c67679265b7c0177de7f2ed5a14[m
+Merge: e7a264c 10eb96d
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Fri Mar 10 08:42:24 2023 +0700
+
+    merge
+
+[33mcommit ae5e3c9bcaa5d2edcde513d0235647aa65bb18b0[m
+Author: Samuel Chrisdian <samuel_chrisdian_27rpl@student.smktelkom-mlg.sch.id>
+Date:   Fri Mar 10 08:18:49 2023 +0700
+
+    Fixing error code, use middleware for API
+
+[33mcommit 10eb96dc3f29bc26edea31e1bcee4801407ae49e[m
+Merge: e82d12e a18c718
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Fri Mar 10 06:12:34 2023 +0700
+
+    Merge branch 'development' of https://github.com/Kai1313/scmaproject into development
+
+[33mcommit e82d12e40dbeccb1d4d75a5dfe7c856b76a0cac6[m
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Fri Mar 10 06:12:27 2023 +0700
+
+    fix uang muka pembelian
+
+[33mcommit a18c718fdd6bee93226367dccac4f93ae59e771d[m
+Merge: 1d3d2ec e004141
+Author: Kaisha Satrio <kaisha.genesys@gmail.com>
+Date:   Fri Mar 10 00:31:09 2023 +0700
+
+    Merge branch 'development' of https://github.com/Kai1313/scmaproject into development
+
+[33mcommit 1d3d2ec79cbde1cf601c7daeef997626d4e3dfa4[m
+Author: Kaisha Satrio <kaisha.genesys@gmail.com>
+Date:   Fri Mar 10 00:30:50 2023 +0700
+
+    update transaksi
+
+[33mcommit e004141ce99879d4496ec73bdd023ffb82c86344[m
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Thu Mar 9 23:44:54 2023 +0700
+
+    fix jurnal otomatis pembelian dan tambah jurnal retur
+
+[33mcommit e057b0486c299328f223c23d326b8ab6716ccd2e[m
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Thu Mar 9 22:21:28 2023 +0700
+
+    jurnal pembelian
+
+[33mcommit e7a264cbee552782cc66ee17331487199b8dc6b1[m
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Thu Mar 9 18:32:39 2023 +0700
+
+    menu
+
+[33mcommit 33eba02a80a023010815bedd5b7d8cbdec0c0cbb[m
+Author: Samuel Chrisdian <samuel_chrisdian_27rpl@student.smktelkom-mlg.sch.id>
+Date:   Thu Mar 9 10:05:38 2023 +0700
+
+    Fixing standard return response
+
+[33mcommit 9c6b667417c90c87b36dd9630fe67cadfa166f6a[m
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Thu Mar 9 01:26:15 2023 +0700
+
+    fix penjualan
+
+[33mcommit e8926256d2e6e4b5b228299852df0750b02f758e[m
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Wed Mar 8 23:56:13 2023 +0700
+
+    fix
+
+[33mcommit c290e945a1a735b79d5b50a32bb0d6e5ce65070b[m
+Merge: d07ef8c 830d2c9
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Wed Mar 8 23:55:47 2023 +0700
+
+    Merge branch 'development' of https://github.com/Kai1313/scmaproject into development
+
+[33mcommit d07ef8c553ddac70df82a85911908450ab156ff5[m
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Wed Mar 8 23:53:33 2023 +0700
+
+    jurnal otomatis penjualan
+
+[33mcommit 8c5f5319ebcef4d2fbbefea19ad341ec75a71436[m
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Wed Mar 8 23:53:10 2023 +0700
+
+    jurnal otomatis penjualan
+
+[33mcommit 830d2c95de1153027c8972875f9b91c673617b24[m
+Author: Kaisha Satrio <kaisha.genesys@gmail.com>
+Date:   Wed Mar 8 23:46:04 2023 +0700
+
+    update select transaksi saldo
+
+[33mcommit 984ec8a4c288a1e2c2a1a2cf9e5708c4987eb46b[m
+Author: Samuel Chrisdian <samuel_chrisdian_27rpl@student.smktelkom-mlg.sch.id>
+Date:   Wed Mar 8 21:53:21 2023 +0700
+
+    Update authentication API
+
+[33mcommit 444b3f4306362ca1668bc673335e03f56672368c[m
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Wed Mar 8 17:24:41 2023 +0700
+
+    perbaikan
+
+[33mcommit d6db7d3a1a553c84b2959769adbfc6289caa406c[m
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Tue Mar 7 23:36:18 2023 +0700
+
+    tambah pengecekan
+
+[33mcommit 9cbdd6c65f1e76bdcaac0e798dd7d3d2189bc9d6[m
+Merge: fedbdfb 6697ff0
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Tue Mar 7 23:25:12 2023 +0700
+
+    Merge branch 'development' of https://github.com/Kai1313/scmaproject into development
+
+[33mcommit fedbdfb9bb77a0d19f7c706ebf087810a7fd45d3[m
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Tue Mar 7 23:24:38 2023 +0700
+
+    api uang muka penjualan dan uang muka pembelian
+
+[33mcommit 6697ff0250027f92d172c54f65912726ac08ba26[m
+Author: Kaisha Satrio <kaisha.genesys@gmail.com>
+Date:   Tue Mar 7 22:19:53 2023 +0700
+
+    update form
+
+[33mcommit 6a139efe91aba9550b3884569f97e032b77f53ba[m
+Author: Samuel Chrisdian <samuel_chrisdian_27rpl@student.smktelkom-mlg.sch.id>
+Date:   Tue Mar 7 21:02:17 2023 +0700
+
+    Fixing handler when no menu found
+
+[33mcommit 720fd92676f3d171dd7cb5135f1ef5c8c3608721[m
+Author: Samuel Chrisdian <samuel_chrisdian_27rpl@student.smktelkom-mlg.sch.id>
+Date:   Tue Mar 7 18:13:29 2023 +0700
+
+    Fixing wrong access index
+
+[33mcommit ddb0bc21a5d4e777a57cd66e33b6a7a4c95e1354[m
+Author: Samuel Chrisdian <samuel_chrisdian_27rpl@student.smktelkom-mlg.sch.id>
+Date:   Tue Mar 7 18:09:49 2023 +0700
+
+    Update fixing logic create session
+
+[33mcommit bfacdd57e786af6ae95a92c7ebca8989c16773d6[m
+Author: Samuel Chrisdian <samuel_chrisdian_27rpl@student.smktelkom-mlg.sch.id>
+Date:   Tue Mar 7 17:56:26 2023 +0700
+
+    Update session managing
+
+[33mcommit 861d5b323ae744d196d41f39464d694be50d7c4f[m
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Tue Mar 7 17:49:07 2023 +0700
+
+    coba api
+
+[33mcommit d480baac84bc3bbea40f0e4842a593a6add4102d[m
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Mon Mar 6 17:12:18 2023 +0700
+
+    api
+
+[33mcommit 0a340c0d343a6ac8a2c46bb6eb9f62d9055f2bd9[m
+Author: Kaisha Satrio <kaishasatrio@gmail.com>
+Date:   Mon Mar 6 00:09:05 2023 +0700
+
+    update
+
+[33mcommit 021aebaef8f00b9b922fc103883b04d8e73095b4[m
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Sun Mar 5 20:01:58 2023 +0700
+
+    pergantian tanggal
+
+[33mcommit c93aa46a5f21cebcd585f9167e670e970c07ca8e[m
+Author: Kaisha Satrio <kaishasatrio@gmail.com>
+Date:   Sun Mar 5 19:44:21 2023 +0700
+
+    update API
+
+[33mcommit 9994dbd9f92b8e07e6f78d4b24f27b19952bd25e[m
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Sat Mar 4 13:42:12 2023 +0700
+
+    error detail
+
+[33mcommit bb044c64328ca037cf4fe620adeee906719b5609[m
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Sat Mar 4 11:51:22 2023 +0700
+
+    redirect with json
+
+[33mcommit 8bed83009a42534e374acd34f6104a4f380c691e[m
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Fri Mar 3 17:42:10 2023 +0700
+
+    ajax data
+
+[33mcommit c4bad9c2491de2966b3c52cc6895ac28c216f47d[m
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Thu Mar 2 23:06:03 2023 +0700
+
+    alert void
+
+[33mcommit 8eeaa5d63677e975b53fd8a3f3c2c5c25843feac[m
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Thu Mar 2 19:51:18 2023 +0700
+
+    datatable in detail
+
+[33mcommit 8f68ad8fbc9182e12c1318769d197e59a3d9313b[m[33m ([m[1;31morigin/staging_010323[m[33m)[m
+Author: Kaisha Satrio <kaishasatrio@gmail.com>
+Date:   Wed Mar 1 23:21:13 2023 +0700
+
+    update edit detail
+
+[33mcommit a3c460027f2fc79e72f37b61c55456c6246301f3[m
+Merge: 4d4eae7 3dc66d8
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Wed Mar 1 09:25:04 2023 +0700
+
+    Merge branch 'development' of https://github.com/Kai1313/scmaproject into fitur_ops
+
+[33mcommit 4d4eae7b14f8033e5d8a736fa0b5f273f4fc6bca[m
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Wed Mar 1 09:24:48 2023 +0700
+
+    closed 0 in purchase request detail
+
+[33mcommit 3dc66d82f9bdb593c279af3a249b891fa6bb04cc[m
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Tue Feb 28 03:39:46 2023 +0700
+
+    tambah pengecekan saat delete
+    
+    Pengecekan saat delete coa :
+    - check apakah coa mempunyai sub coa
+    - check apakah coa sudah digunakan pada slip
+    - check apakah coas sudha digunakan pada jurnal detail
+    
+    Pengecekan saat delete slip :
+    - check apakah slip sudah digunakan pada jurnal header
+
+[33mcommit 99924c966e00293770a110fcab53c2cfba210155[m
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Mon Feb 27 18:19:09 2023 +0700
+
+    detail
+
+[33mcommit 5c7fb90669f07363786152e7783e85468cd42e12[m
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Mon Feb 27 18:18:35 2023 +0700
+
+    view page
+
+[33mcommit c1566c4419b3fede6e0457b48ba8a11506fc06d8[m
+Merge: b1144f4 ee0dcba
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Mon Feb 27 15:17:10 2023 +0700
+
+    fix conflict sidebar
+
+[33mcommit ee0dcba9dda5730fc359ca99c10f9931010f0c84[m
+Author: Kaisha Satrio <kaishasatrio@gmail.com>
+Date:   Mon Feb 27 00:16:02 2023 +0700
+
+    update form
+
+[33mcommit b1144f4a54dd83be525ccbff4f9be2b476641c70[m
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Sat Feb 25 14:02:25 2023 +0700
+
+    perbaikan format angka
+
+[33mcommit 850b6f8f40051ee08fd1b0e21e86a5de827923a6[m
+Merge: 8d32bfd 7e52489
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Sat Feb 25 00:21:23 2023 +0700
+
+    Merge branch 'development' of https://github.com/Kai1313/scmaproject into development
+
+[33mcommit 8d32bfd59338c00cabd2b2ce9bd1ef2d9421a86b[m
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Sat Feb 25 00:21:19 2023 +0700
+
+    print jurnal umum tambah informasi giro dan akun slip
+
+[33mcommit 7e52489fa7b87fcb2417a1da64536a31f30dbb89[m
+Merge: b8f9749 0155d5c
+Author: Kaisha Satrio <kaishasatrio@gmail.com>
+Date:   Sat Feb 25 00:09:04 2023 +0700
+
+    Merge branch 'development' of https://github.com/Kai1313/scmaproject into development
+
+[33mcommit b8f9749cdd36c75e6ae2dcbd486dc1a43215e7af[m
+Author: Kaisha Satrio <kaishasatrio@gmail.com>
+Date:   Sat Feb 25 00:08:52 2023 +0700
+
+    update giro
+
+[33mcommit 0155d5ceabd7ae07edde14ce4203447b67e6c98e[m
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Sat Feb 25 00:03:46 2023 +0700
+
+    fix print new tab
+
+[33mcommit f14736b9d0bdd0c706702a617d39f81650179876[m
+Merge: beb9b83 f2a38c6
+Author: Kaisha Satrio <kaishasatrio@gmail.com>
+Date:   Fri Feb 24 23:48:12 2023 +0700
+
+    Merge branch 'development' of https://github.com/Kai1313/scmaproject into development
+
+[33mcommit beb9b83d6dc1ea712ef1befc0ef610bca0de5ee6[m
+Author: Kaisha Satrio <kaishasatrio@gmail.com>
+Date:   Fri Feb 24 23:47:34 2023 +0700
+
+    update generate with slip
+
+[33mcommit f2a38c662a802f07f8299a44233832b6f17319b0[m
+Merge: 8f9e16c 78f6765
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Fri Feb 24 23:35:23 2023 +0700
+
+    Merge branch 'development' of https://github.com/Kai1313/scmaproject into development
+
+[33mcommit 8f9e16ca8622482868e9eb91933432034547d04b[m
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Fri Feb 24 23:35:12 2023 +0700
+
+    fix jenis slip
+
+[33mcommit 78f67651250b9e1fb3e7804778079a1455673dcf[m
+Author: Kaisha Satrio <kaishasatrio@gmail.com>
+Date:   Fri Feb 24 23:34:11 2023 +0700
+
+    update detail
+
+[33mcommit 69d403726a6afd705657aee029dfe009aa19431a[m
+Merge: acc9ece ff07a1f
+Author: Kaisha Satrio <kaishasatrio@gmail.com>
+Date:   Fri Feb 24 23:26:44 2023 +0700
+
+    Merge branch 'development' of https://github.com/Kai1313/scmaproject into development
+
+[33mcommit acc9eceb86ff4a302923b4056fb5791c1b29e4f8[m
+Author: Kaisha Satrio <kaishasatrio@gmail.com>
+Date:   Fri Feb 24 23:26:29 2023 +0700
+
+    update for me
+
+[33mcommit ff07a1f6d0da8d103bcf2c101b7b1e8526cb560b[m
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Fri Feb 24 23:24:56 2023 +0700
+
+    fix index jurnal
+
+[33mcommit 9648558fdacafd9a95edd869af70d99261bc56a3[m
+Merge: da0caf1 a912a7f
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Fri Feb 24 22:57:08 2023 +0700
+
+    Merge branch 'development' of https://github.com/Kai1313/scmaproject into development
+
+[33mcommit da0caf142a06a47a3fb325f877f9a91569fad333[m
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Fri Feb 24 22:57:00 2023 +0700
+
+    penyesuaian slip by jenis jurnal
+
+[33mcommit a912a7fa79131573928e96c5e55ca15f709bfcf3[m
+Merge: f8d021d b935cf1
+Author: Kaisha Satrio <kaishasatrio@gmail.com>
+Date:   Fri Feb 24 22:55:46 2023 +0700
+
+    Merge branch 'development' of https://github.com/Kai1313/scmaproject into development
+
+[33mcommit f8d021d9ea8ee4c7d02fec5a05f569d7af81a13b[m
+Author: Kaisha Satrio <kaishasatrio@gmail.com>
+Date:   Fri Feb 24 22:55:37 2023 +0700
+
+    update
+
+[33mcommit b935cf1e6c1812b4c401905f25058c205ae9d65c[m
+Author: Samuel Chrisdian <samuel_chrisdian_27rpl@student.smktelkom-mlg.sch.id>
+Date:   Fri Feb 24 22:50:58 2023 +0700
+
+    Update hardcode user akses
+
+[33mcommit 77325ed8b6f284becdec23a9cb9aaf63f05db516[m
+Merge: 87daf41 b1c07c1
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Fri Feb 24 22:29:50 2023 +0700
+
+    Merge branch 'development' of https://github.com/Kai1313/scmaproject into development
+
+[33mcommit 87daf41ebccc3bc3e3f48b5b5c3b57da4171057b[m
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Fri Feb 24 22:26:18 2023 +0700
+
+    update slip dan detail adjusment
+
+[33mcommit b1c07c16169e099a8095de053d913fb2943adf00[m
+Author: Kaisha Satrio <kaishasatrio@gmail.com>
+Date:   Fri Feb 24 22:22:05 2023 +0700
+
+    update
+
+[33mcommit d29b688faf9780540ac082515b922ae4c0359134[m
+Author: Kaisha Satrio <kaishasatrio@gmail.com>
+Date:   Fri Feb 24 22:12:50 2023 +0700
+
+    update
+
+[33mcommit 07e0398025358a06f8a7a722ee2976ebfaec7bce[m
+Merge: 909c567 46496de
+Author: Kaisha Satrio <kaishasatrio@gmail.com>
+Date:   Fri Feb 24 21:48:02 2023 +0700
+
+    Merge branch 'development' of https://github.com/Kai1313/scmaproject into development
+
+[33mcommit 909c567281c391c59f0ea5b001c843872d3febfc[m
+Author: Kaisha Satrio <kaishasatrio@gmail.com>
+Date:   Fri Feb 24 21:45:06 2023 +0700
+
+    update
+
+[33mcommit 46496de21904397a808c9a118ea0007fc664a9ff[m
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Fri Feb 24 20:50:58 2023 +0700
+
+    print memorial
+
+[33mcommit 96f8bde87ef48a31946648ed2700e008d5dd2dec[m
+Merge: bf252eb 4990d5f
+Author: Kaisha Satrio <kaisha.genesys@gmail.com>
+Date:   Fri Feb 24 17:03:07 2023 +0700
+
+    Merge branch 'development' of https://github.com/Kai1313/scmaproject into development
+
+[33mcommit bf252eb8ed7a9070820474ef91eaab87360e8433[m
+Author: Kaisha Satrio <kaisha.genesys@gmail.com>
+Date:   Fri Feb 24 17:03:01 2023 +0700
+
+    update strict database
+
+[33mcommit 4990d5f750ef3c0dcd1f5e63fc1dddcf746e366a[m
+Author: Samuel Chrisdian <samuel_chrisdian_27rpl@student.smktelkom-mlg.sch.id>
+Date:   Fri Feb 24 17:02:58 2023 +0700
+
+    Update datepicker
+
+[33mcommit 9efddce8678b0499eaa27ab85f34e613af8c7b84[m
+Author: Samuel Chrisdian <samuel_chrisdian_27rpl@student.smktelkom-mlg.sch.id>
+Date:   Fri Feb 24 16:35:26 2023 +0700
+
+    Update adjustment ledger
+
+[33mcommit 60a1900e2872f8784eb0fb431d60cbffa0d98ea5[m
+Author: Samuel Chrisdian <samuel_chrisdian_27rpl@student.smktelkom-mlg.sch.id>
+Date:   Fri Feb 24 06:59:56 2023 +0700
+
+    Update format number
+
+[33mcommit 0d599fb1d961bcfbf0d89659a5a024a53816c775[m
+Author: Kaisha Satrio <kaishasatrio@gmail.com>
+Date:   Fri Feb 24 00:21:37 2023 +0700
+
+    update
+
+[33mcommit d3f3a5587dc1f14a66fd104ca5cac6923d3bef53[m
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Thu Feb 23 23:42:41 2023 +0700
+
+    composer pdf
+
+[33mcommit dea129e531d593650bde78c17829cfd549f31c37[m
+Merge: 9d6ed31 0025e20
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Thu Feb 23 23:36:30 2023 +0700
+
+    Merge branch 'development' of https://github.com/Kai1313/scmaproject into development
+
+[33mcommit 9d6ed319ed53e016e351f28d18daa3eaeab225f6[m
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Thu Feb 23 23:36:19 2023 +0700
+
+    fix css table
+
+[33mcommit c727317220954f166fdbbe6149b0c531ed02c4ec[m
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Thu Feb 23 23:33:11 2023 +0700
+
+    fix index
+
+[33mcommit 0025e206a2c476cc9d00a0ae8616d78aa0cbc6b8[m
+Author: Kaisha Satrio <kaishasatrio@gmail.com>
+Date:   Thu Feb 23 23:08:50 2023 +0700
+
+    update jurnal
+
+[33mcommit 93ecdfd4aee0dfe392fa9cb28edb2bd19d26205e[m
+Merge: 4660a44 46035da
+Author: Kaisha Satrio <kaishasatrio@gmail.com>
+Date:   Thu Feb 23 23:07:33 2023 +0700
+
+    Merge branch 'development' of https://github.com/Kai1313/scmaproject into development
+
+[33mcommit 4660a4458368a627d17539d7401d0f83365dc01a[m
+Author: Kaisha Satrio <kaishasatrio@gmail.com>
+Date:   Thu Feb 23 23:07:03 2023 +0700
+
+    update jurnal transaksi
+
+[33mcommit 46035da95d26886c6cb57d8e73385a9fc2ad8de6[m
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Thu Feb 23 22:19:20 2023 +0700
+
+    void dan active jurnal
+
+[33mcommit 034571c299faee5221faf43b244aec6a81964d1b[m
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Thu Feb 23 19:23:12 2023 +0700
+
+    open select2
+
+[33mcommit 1d637eb9b7d566476321d9eb3c2df98ff630b2ca[m
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Thu Feb 23 00:43:01 2023 +0700
+
+    fix jurnal print slip
+
+[33mcommit afc2222c618afb115cd6e8208ec839e6f84867c0[m
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Thu Feb 23 00:23:38 2023 +0700
+
+    Fix slip
+
+[33mcommit e092887091ff3e28cd78d9bf2ac834666d626066[m
+Merge: 92581eb 675efe6
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Thu Feb 23 00:16:17 2023 +0700
+
+    Merge branch 'development' of https://github.com/Kai1313/scmaproject into development
+
+[33mcommit 92581ebd2c741d99523be4734b11dcdf4e7a60ba[m
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Thu Feb 23 00:14:37 2023 +0700
+
+    tambah detail dan print slip, penyesuaian list jurnal umum
+
+[33mcommit 675efe6715182d2ec8de638d0a86ebcc8ba3be35[m
+Author: Kaisha Satrio <kaishasatrio@gmail.com>
+Date:   Wed Feb 22 23:49:00 2023 +0700
+
+    update jurnal save
+
+[33mcommit 54ef45832f344aaeeca3a4a2e819525a9e7657a6[m
+Author: Kaisha Satrio <kaisha.genesys@gmail.com>
+Date:   Wed Feb 22 17:22:54 2023 +0700
+
+    update tampilan
+
+[33mcommit 84a08cc8bf4cf270a87e12d158265f47ffbe9b46[m
+Author: Kaisha Satrio <kaisha.genesys@gmail.com>
+Date:   Wed Feb 22 17:00:42 2023 +0700
+
+    update tampilan
+
+[33mcommit c1e6d060abac73eff1ac7091126c3a5b82359855[m
+Merge: e9d775f c059602
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Wed Feb 22 00:56:22 2023 +0700
+
+    Merge branch 'development' of https://github.com/Kai1313/scmaproject into development
+
+[33mcommit e9d775f30c4864c7f21327d9bdc21e9c6533f32f[m
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Wed Feb 22 00:52:19 2023 +0700
+
+    update general ledger
+    
+    penyesuai form jurnal umum
+    fix populate jurnal umum
+    buat save, update, void backend
+
+[33mcommit c0596028694d7ba0df5589cd600f6f924483dad7[m
+Author: Kaisha Satrio <kaishasatrio@gmail.com>
+Date:   Wed Feb 22 00:06:47 2023 +0700
+
+    update form jurnal
+
+[33mcommit 157e64abca87c878df1cc766276a6bcaf1504d09[m
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Tue Feb 21 17:09:54 2023 +0700
+
+    select2
+
+[33mcommit 9b6c7a1893533a70df4c6f61554f91055759a18e[m
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Tue Feb 21 15:22:30 2023 +0700
+
+    filter satuan barang berdasarkan barang
+
+[33mcommit 59544644872865c80fc882eca213d73caabcf97c[m
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Tue Feb 21 11:35:50 2023 +0700
+
+    uang muka pembelian
+
+[33mcommit 7cafce239a4a7941db4dfcad5b8cdeeac356b1af[m
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Tue Feb 21 06:45:46 2023 +0700
+
+    status permintaan pembelian
+
+[33mcommit e02f40582a11aaefa4a900a1d6631d3f21f9a50c[m
+Merge: 75490a8 a2334ff
+Author: Kaisha Satrio <kaishasatrio@gmail.com>
+Date:   Tue Feb 21 00:33:17 2023 +0700
+
+    Merge branch 'development' of https://github.com/Kai1313/scmaproject into development
+
+[33mcommit 75490a8fecbc7c06b1bcd69ae646ff7a3f6c58fa[m
+Author: Kaisha Satrio <kaishasatrio@gmail.com>
+Date:   Tue Feb 21 00:25:21 2023 +0700
+
+    update
+
+[33mcommit a2334ff70a32d0ce48483ac8e9369b2d762349e1[m
+Author: Samuel Chrisdian <samuel_chrisdian_27rpl@student.smktelkom-mlg.sch.id>
+Date:   Mon Feb 20 20:18:50 2023 +0700
+
+    Update user access
+
+[33mcommit 13cff727a7e12981f518812d502c4cd4f25c2350[m
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Mon Feb 20 15:09:10 2023 +0700
+
+    fitur approval dan reject permintaan pembelian
+
+[33mcommit 03fbbd82b7a204e47c16e466cba284b10a391905[m
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Mon Feb 20 11:52:51 2023 +0700
+
+    perbaikan tampilan
+
+[33mcommit f16584db14013cb1bd743501a132519b114d4c13[m
+Merge: dc2a265 0383fb0
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Mon Feb 20 08:04:15 2023 +0700
+
+    Merge branch 'development' of https://github.com/Kai1313/scmaproject into fitur_ops
+
+[33mcommit 0383fb05bc2dd8a56fb9994554ad8c57e2997500[m
+Author: Kaisha Satrio <kaishasatrio@gmail.com>
+Date:   Sun Feb 19 23:47:58 2023 +0700
+
+    update
+
+[33mcommit 896fd5dc76717bf15dca7b7c83d30b7bb0c87cae[m
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Fri Feb 17 21:33:24 2023 +0700
+
+    fix save copy master akun
+
+[33mcommit dc2a2659a705c4272afcdf88a395805c58cce582[m
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Fri Feb 17 18:14:59 2023 +0700
+
+    modul uang muka pembelian
+
+[33mcommit 36b490687237ead4fc3ac20c7963185c81d73834[m
+Merge: a58fa81 1be5cc6
+Author: Kaisha Satrio Noor Hutomo <bdamnboyz.09@gmail.com>
+Date:   Fri Feb 17 09:23:49 2023 +0700
+
+    Merge pull request #1 from Kai1313/fitur_ops
+    
+    Fitur ops
+
+[33mcommit 1be5cc6d32fe09c08c7941a7ba856979e1585e85[m
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Fri Feb 17 06:52:48 2023 +0700
+
+    simpan purchase request
+
+[33mcommit f257a3743f0a38c557649e5972ba5f3eec9ef1f7[m
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Thu Feb 16 17:48:59 2023 +0700
+
+    form edit
+
+[33mcommit a58fa81b0fa0051e3dab0dd9335e09230084a578[m
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Wed Feb 15 23:19:20 2023 +0700
+
+    index dan form awal jurnal umum
+
+[33mcommit 0a94e2fdd8baaa59a0b400f0542d8f4a7cd082f2[m
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Wed Feb 15 07:28:32 2023 +0700
+
+    modal barang
+
+[33mcommit 5b299fa5e4a6927a983bc882dd23dec5a96e9c09[m
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Wed Feb 15 17:21:35 2023 +0700
+
+    form
+
+[33mcommit eb910fea510d76da5ddb12730eb07c9ad6b22f4e[m
+Author: Kaisha Satrio <kaishasatrio@gmail.com>
+Date:   Tue Feb 14 22:53:00 2023 +0700
+
+    update
+
+[33mcommit 37181a5d71569dad0d361c202da653722001d937[m
+Author: mis <itsinarcemaramasabadi@gmail.com>
+Date:   Tue Feb 14 17:08:06 2023 +0700
+
+    autocomplete gudang dan user
+
+[33mcommit eb47a2ae41b96dd62903101dc33fc423fcc3c9b1[m
+Author: mis <itsinarcemaramasabadi@gmail.com>
+Date:   Tue Feb 14 13:26:55 2023 +0700
+
+    controller purchase request
+
+[33mcommit 6c86b5af5f3a80716c1bb7ee13b7716bcc157ae2[m
+Author: mis <itsinarcemaramasabadi@gmail.com>
+Date:   Tue Feb 14 10:04:04 2023 +0700
+
+    pasang menu eksternal
+
+[33mcommit 28792bb1fbcbb6e1f6432a68de92f7b678e15832[m
+Author: mis <itsinarcemaramasabadi@gmail.com>
+Date:   Mon Feb 13 16:39:21 2023 +0700
+
+    penyesuaian halaman
+
+[33mcommit ee24dbb62f5c95d6e45ee725b2badb39ad5a9336[m
+Merge: e79a1b2 68105af
+Author: mis <itsinarcemaramasabadi@gmail.com>
+Date:   Mon Feb 13 15:29:09 2023 +0700
+
+    merge development
+
+[33mcommit e79a1b2a1e53c4f23e4e583cd5561f99a28dab5e[m
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Sat Feb 11 09:45:43 2023 +0700
+
+    tambah bintang di master wrapper
+
+[33mcommit 9880fe05595b25aa9db8cb78ae9e5d957db6b66d[m
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Sat Feb 11 06:09:18 2023 +0700
+
+    pesan validasi bhs indonesia
+
+[33mcommit 68105af46dfebaa1af6ca39f27e66c883ee0e974[m
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Fri Feb 10 21:18:14 2023 +0700
+
+    fix table slip
+
+[33mcommit 4258aa38b55d091251cae743f33a5a3c16ac9494[m
+Author: Kaisha Satrio <kaisha.genesys@gmail.com>
+Date:   Fri Feb 10 10:02:31 2023 +0700
+
+    update width action slip
+
+[33mcommit 609371c3430b535b64a672288a2db88ade0d0b05[m
+Author: Kaisha Satrio <kaisha.genesys@gmail.com>
+Date:   Thu Feb 9 23:45:44 2023 +0700
+
+    update margin bottom
+
+[33mcommit f0f5dc62149ecc2bf26c7955fec2d75b0f9b3905[m
+Merge: a90c822 0dea102
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Thu Feb 9 23:11:07 2023 +0700
+
+    Merge branch 'development' of https://github.com/Kai1313/scmaproject into development
+
+[33mcommit a90c8229189ca7059e1c09b5c05302018f4205e2[m
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Thu Feb 9 23:10:57 2023 +0700
+
+    fix treetable
+
+[33mcommit 0dea102b2e60c2d16f95864fac1453143262bc77[m
+Author: Samuel Chrisdian <samuel_chrisdian_27rpl@student.smktelkom-mlg.sch.id>
+Date:   Thu Feb 9 22:16:39 2023 +0700
+
+    Update minor
+    Profile on navbar
+
+[33mcommit f790bb7706546cf2604e6a1380c02795fa124ada[m
+Merge: 0ea55da 666077b
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Thu Feb 9 22:05:26 2023 +0700
+
+    Merge branch 'development' of https://github.com/Kai1313/scmaproject into development
+
+[33mcommit 0ea55daef7db16233f5cb6499f562765d7fe418a[m
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Thu Feb 9 22:05:15 2023 +0700
+
+    fix button index
+
+[33mcommit 666077bf16129a44645a7ecc02c7b1955271ae10[m
+Author: Kaisha Satrio <kaisha.genesys@gmail.com>
+Date:   Thu Feb 9 22:04:58 2023 +0700
+
+    button
+
+[33mcommit acef84765ac128b1b651c08daf0597f54f17b789[m
+Merge: 7ff20f8 dcf4ae0
+Author: Samuel Chrisdian <samuel_chrisdian_27rpl@student.smktelkom-mlg.sch.id>
+Date:   Thu Feb 9 21:58:53 2023 +0700
+
+    Merge branch 'development' of https://github.com/Kai1313/scmaproject into development
+
+[33mcommit 7ff20f81604dc7026c448e051161cea30151a0d6[m
+Author: Samuel Chrisdian <samuel_chrisdian_27rpl@student.smktelkom-mlg.sch.id>
+Date:   Thu Feb 9 21:58:42 2023 +0700
+
+    Update minor, fixing action list in master slip
+
+[33mcommit dcf4ae03e76d88fd7ee8ff4c15f7d18947a10c15[m
+Merge: 72dfafb 612c181
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Thu Feb 9 21:51:58 2023 +0700
+
+    Merge branch 'development' of https://github.com/Kai1313/scmaproject into development
+    
+    # Conflicts:
+    #       resources/views/accounting/master/coa/index.blade.php
+
+[33mcommit 72dfafb3779e4bd75c4a18a6adcd3d70e0e1a1cc[m
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Thu Feb 9 21:50:19 2023 +0700
+
+    penyesuaian treetable coa
+
+[33mcommit 612c18115305304101ed458b8b3507000d77c7d2[m
+Merge: 3bc5404 35e5f07
+Author: Samuel Chrisdian <samuel_chrisdian_27rpl@student.smktelkom-mlg.sch.id>
+Date:   Thu Feb 9 20:57:00 2023 +0700
+
+    Merge branch 'development' of https://github.com/Kai1313/scmaproject into development
+
+[33mcommit 3bc5404f1752d144492e7e62aa26f8d868857e8b[m
+Author: Samuel Chrisdian <samuel_chrisdian_27rpl@student.smktelkom-mlg.sch.id>
+Date:   Thu Feb 9 20:56:43 2023 +0700
+
+    Update minor :
+    - logo
+    - color
+    - minor active sidebar
+    - add href to welcome page on exception page
+
+[33mcommit 35e5f0728f76d78e522511f2efb5d63efe817915[m
+Author: Kaisha Satrio <kaisha.genesys@gmail.com>
+Date:   Thu Feb 9 20:49:32 2023 +0700
+
+    update validation master coa
+
+[33mcommit 07cbc6b4226ced7dcfe22671b131f4d59421d7d5[m
+Author: Kaisha Satrio <kaisha.genesys@gmail.com>
+Date:   Thu Feb 9 17:11:36 2023 +0700
+
+    update slip
+
+[33mcommit 03ac954ab080f498f6871d78a885c269b0c34ce1[m
+Author: Kaisha Satrio <kaisha.genesys@gmail.com>
+Date:   Thu Feb 9 16:39:20 2023 +0700
+
+    update validation
+
+[33mcommit 5d697ac7cea77268c186b71ceaa0aca3615d0677[m
+Author: Kaisha Satrio <kaishasatrio@gmail.com>
+Date:   Thu Feb 9 00:08:25 2023 +0700
+
+    update rabu malam kamis pagi
+
+[33mcommit ea4b97fce992f1e31ab873d75a240197a9193a60[m
+Author: Samuel Chrisdian <samuel_chrisdian_27rpl@student.smktelkom-mlg.sch.id>
+Date:   Wed Feb 8 19:13:58 2023 +0700
+
+    Update add new welcome page to go to dashboard
+
+[33mcommit 167cec7caee10b1f139a10cc3c6353f8f611e6c7[m
+Author: Kaisha Satrio <kaishasatrio@gmail.com>
+Date:   Tue Feb 7 23:20:26 2023 +0700
+
+    update tampilan
+
+[33mcommit c3b15bf974bd1624692f75153281256c07cf2f3c[m
+Author: Kaisha Satrio <kaishasatrio@gmail.com>
+Date:   Tue Feb 7 21:56:51 2023 +0700
+
+    update  master slip copy
+
+[33mcommit 521d4c81e533c0f80ae35f3838a99fa8475b2a30[m
+Author: Kaisha Satrio <kaisha.genesys@gmail.com>
+Date:   Tue Feb 7 09:37:02 2023 +0700
+
+    update web
+
+[33mcommit 8bf9bb113080153e0e791f3ba802528ac1a37e9b[m
+Merge: a0cf97b ce74b62
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Tue Feb 7 00:13:40 2023 +0700
+
+    Merge branch 'development' of https://github.com/Kai1313/scmaproject into development
+
+[33mcommit a0cf97b695ac4d8600eebbfe60d22145e8cc3362[m
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Tue Feb 7 00:13:34 2023 +0700
+
+    treetable master akun
+
+[33mcommit ce74b629fbd83f5fa56481b24548834deee889fb[m
+Author: Kaisha Satrio <kaishasatrio@gmail.com>
+Date:   Mon Feb 6 22:51:14 2023 +0700
+
+    update export starter
+
+[33mcommit 9da03b76d1e4aa3c3767a5844d95dbc1865a6c18[m
+Author: Kaisha Satrio <kaishasatrio@gmail.com>
+Date:   Sun Feb 5 23:36:07 2023 +0700
+
+    update form
+
+[33mcommit 57502b412aa788ecb694c77e064351854dca1ff0[m
+Merge: 61c836e 8a38357
+Author: Kaisha Satrio <kaishasatrio@gmail.com>
+Date:   Sun Feb 5 16:26:00 2023 +0700
+
+    Merge branch 'development' of https://github.com/Kai1313/scmaproject into development
+
+[33mcommit 61c836ecd11a1d71339cb214d3191bdb9b050dcb[m
+Author: Kaisha Satrio <kaishasatrio@gmail.com>
+Date:   Sun Feb 5 16:25:37 2023 +0700
+
+    update 050223
+
+[33mcommit 1caec217bfe9417e4dc094203197a27c04fd3ccf[m
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Sun Feb 5 00:48:18 2023 +0700
+
+    resize ukuran upload foto, notifikasi success update data
+
+[33mcommit b359b3cc35c41dab93006623783a21d8142c58c6[m
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Sat Feb 4 13:59:43 2023 +0700
+
+    setting permission upload file
+
+[33mcommit 8a38357097133ffbd889091427176df8e8fcde0a[m
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Sat Feb 4 13:19:04 2023 +0700
+
+    fix filtered
+
+[33mcommit aeb93e5e5f3592db89bc344e4d0a53c7bb56138f[m
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Sat Feb 4 13:14:31 2023 +0700
+
+    crud master slip
+
+[33mcommit 8875c44818626fbc3ec5b8f8cb38917c4e408927[m
+Author: Kaisha Satrio <kaishasatrio@gmail.com>
+Date:   Thu Feb 2 23:56:27 2023 +0700
+
+    update akun
+
+[33mcommit 86b897909043c9a6d332987357e11c3d9a2e099c[m
+Author: Kaisha Satrio <kaishasatrio@gmail.com>
+Date:   Thu Feb 2 23:54:41 2023 +0700
+
+    update akun
+
+[33mcommit 8cb8cbc87e2543fc61cbb437b5165d325b80e777[m
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Thu Feb 2 16:52:53 2023 +0700
+
+    tambah filter cabang dilist master
+
+[33mcommit d8511e8ab2ae5c27e2a34e55dfe3ae2713765927[m
+Merge: dd76d32 efafd02
+Author: Kaisha Satrio <kaishasatrio@gmail.com>
+Date:   Wed Feb 1 23:27:53 2023 +0700
+
+    Merge branch 'development' of https://github.com/Kai1313/scmaproject into development
+
+[33mcommit dd76d32959a5401eafe6f730a52b65bb144fa9bf[m
+Author: Kaisha Satrio <kaishasatrio@gmail.com>
+Date:   Wed Feb 1 23:27:01 2023 +0700
+
+    update
+
+[33mcommit c900df46ce4a65f0ee487877075b3f485c439e0f[m
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Wed Feb 1 11:52:58 2023 +0700
+
+    trial upload file
+
+[33mcommit efafd022a78f06e8ab68aab61fcb48b6c0ef19c4[m
+Author: Samuel Chrisdian <samuel_chrisdian_27rpl@student.smktelkom-mlg.sch.id>
+Date:   Wed Feb 1 10:31:28 2023 +0700
+
+    Update Sidebar, dashboard ui; update session for MasterSlipController; fixing get token logic
+
+[33mcommit 412e6271a18ed491a3afed89f981668e471ee76a[m
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Wed Feb 1 01:25:18 2023 +0700
+
+    update tampilan master slip
+    
+    - tambah tampilan index untuk table data
+    - tambah tampilan form untuk add & edit
+    - tambah tampilan detail
+
+[33mcommit 1f1eb9ee76cd5c4b5fa56758f974e77ab46ab68c[m
+Author: Kaisha Satrio <kaishasatrio@gmail.com>
+Date:   Tue Jan 31 23:54:01 2023 +0700
+
+    update
+
+[33mcommit c47dc54bb4e5cbb20c5eec30d9eb630ebf92f295[m
+Author: Kaisha Satrio <kaishasatrio@gmail.com>
+Date:   Tue Jan 31 22:02:55 2023 +0700
+
+    update yield
+
+[33mcommit 5132bdf405724ac5569ae05972cfdf7fa832fdc5[m
+Author: ashabfirdaus <firdaus.ashab@gmail.com>
+Date:   Tue Jan 31 17:32:23 2023 +0700
+
+    insert modul wrapper
+
+[33mcommit 34fe870f7f5b80d130c21ab576ccea9c319f0498[m
+Author: Kaisha Satrio <kaishasatrio@gmail.com>
+Date:   Mon Jan 30 22:37:35 2023 +0700
+
+    update for menu and form schema
+
+[33mcommit fc30bde8caa3b6c5b641b4ef475860eb51399010[m
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Sun Jan 29 08:57:54 2023 +0700
+
+    tambah route akun dan slip
+
+[33mcommit d26c92ae72d513fbedf7e6eb5d4909b03633b56f[m
+Author: Aris Saputra <arissaputra362@gmail.com>
+Date:   Sun Jan 29 08:53:30 2023 +0700
+
+    penyesuaian template
+
+[33mcommit e4d3cf2985de99850d41879fb1c1ec3cac365894[m
+Author: Samuel Chrisdian <samuel_chrisdian_27rpl@student.smktelkom-mlg.sch.id>
+Date:   Sat Jan 28 15:15:23 2023 +0700
+
+    Update timezone; Fixing logic get token
+
+[33mcommit 403e19bcd944a4f24557d3b90d9d2d73cfabc24f[m
+Author: Samuel Chrisdian <samuel_chrisdian_27rpl@student.smktelkom-mlg.sch.id>
+Date:   Sat Jan 28 14:49:03 2023 +0700
+
+    Update Session controller; Fix naming for models; Add Exception view
+
+[33mcommit e3abf42670f3b1e7451e4526f5dcdb4bfc3b8995[m
+Author: Samuel Chrisdian <samuel_chrisdian_27rpl@student.smktelkom-mlg.sch.id>
+Date:   Sat Jan 28 13:58:53 2023 +0700
+
+    Update layout for templating; Add Models; Add Session Controller
+
+[33mcommit 2f7fe40a1592f2b44ca938e2cca9814c4a097dc7[m
+Author: Samuel Chrisdian <samuel_chrisdian_27rpl@student.smktelkom-mlg.sch.id>
+Date:   Sat Jan 28 11:45:05 2023 +0700
+
+    Test Commit
+
+[33mcommit 6db3058f4f8fa9508f8e79357bc0878d3c620a56[m
+Author: samuelchrisdian <samuel_chrisdian_27rpl@student.smktelkom-mlg.sch.id>
+Date:   Sat Jan 28 11:41:23 2023 +0700
+
+    Test Commit
+
+[33mcommit 6a9913073f33659e332d09a6370c46db3eebae93[m
+Author: Samuel Chrisdian <samuel_chrisdian_27rpl@student.smktelkom-mlg.sch.id>
+Date:   Sat Jan 28 10:25:46 2023 +0700
+
+    Add schema provider
+
+[33mcommit 2ec2bb40b70064da99f72f333ebacbd424f5f87b[m
+Author: Kaisha Satrio <kaishasatrio@gmail.com>
+Date:   Sat Jan 28 08:44:25 2023 +0700
+
+    master template
+
+[33mcommit 668433b1a5ee270e28be1aa0bcae42a0c4b14238[m[33m ([m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmaster[m[33m, [m[1;32m0r[m[33m)[m
+Author: Kaisha Satrio <kaishasatrio@gmail.com>
+Date:   Fri Jan 27 23:34:22 2023 +0700
+
+    adminlte assets
+
+[33mcommit e3fa6f7e601c9d42421c2f92db9434c3a3ca88cf[m
+Author: Kai1313 <bdamnboyz.09@gmail.com>
+Date:   Tue Jan 24 21:08:35 2023 +0700
+
+    first commit
