@@ -1,9 +1,9 @@
 <aside class="main-sidebar">
-    <section class="sidebar">>
+    <section class="sidebar">
         <ul class="sidebar-menu" data-widget="tree">
             <li class="nav-item">
                 <a href="{{ env('OLD_URL_ROOT') }}">
-                    <i class="fa fa-briefcase"></i> <span>Beranda</span>
+                    <i class="glyphicon glyphicon-home"></i> <span>Beranda</span>
                 </a>
             </li>
             <li class="treeview">
