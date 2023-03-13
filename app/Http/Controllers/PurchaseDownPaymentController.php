@@ -287,7 +287,13 @@ class PurchaseDownPaymentController extends Controller
     public function callApiJournal($data)
     {
         try {
-            $token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjZhMjcyY2VkNmFjNDc1NzA0ZTNhNzY0NGE3YmYyNmMwOTVlYTA5OWJlMjA0NWIzMjVkZTNhZDk3NmQ4YTJiNmRiMTliMTNmN2I0YWY3N2MxIn0.eyJhdWQiOiIzIiwianRpIjoiNmEyNzJjZWQ2YWM0NzU3MDRlM2E3NjQ0YTdiZjI2YzA5NWVhMDk5YmUyMDQ1YjMyNWRlM2FkOTc2ZDhhMmI2ZGIxOWIxM2Y3YjRhZjc3YzEiLCJpYXQiOjE2Nzg3MDA1MjAsIm5iZiI6MTY3ODcwMDUyMCwiZXhwIjoxNjc4Nzg2OTIwLCJzdWIiOiIxIiwic2NvcGVzIjpbXX0.vdiYTLp5Ff3FL1Q857BCqeZQSjaZI6RbHw9gGZJatOjNoyKOWWgCaSixslsfFPoJcthRcR4elnhBUZvHKTEQ7T08lq-NwjFM-mgz4IekEDMXrmYsAI2hLL2VyIquhoJQDHVtcOb2Zy8TLjEpKKqjIitFVz_oHz5K2kDFDgFZvLAT1u3YubMDhAEcF7kp99ZPYR56PMvlWZU3MJxU8q2lPb4gQPtJSEmGMjjAdD_LtQ6Qx5iuniREq6z1EXhNyc2MFQb-PcaiAVmBSj-xrq0xuV7hPYqJmGjK2TjRMRAYQXUAi1w4E2nWYXmi8pVr1tdRKU-Wyy91jne-wkdmgiIqsMhK8xAWXez9mfvJ9RvhNLW4UvHJ4sRx762VlzcRGf6VYG-jK0z0Sv_Dj9bV_XkBHdujAqPpqlhq9qxhnuwEdlRTVpzQOHosEY9ARQFv7XQRJ-evP-yk1KaKHM244xtjvWe9cMsfAgYmA8Gp8XMAS7CzK841y0MfpyFaPIjGVpHbMynime4Kfbj-t09c2xvZp-PR11gUlnwin_rIDQx8diyYKK67IjssouxNXKpKB1sLZIlwHwBwubZwuxhA7USrnH_7q6-SBcd7A42nIE--3Va0WGinls3LtNjWOO9KXyyrHFl-atYMBrp9JwSvA7fbl28P-zcKtgpGasTP0zDlwiE";
+            $date = date('Y-m-d H:i:s');
+            $findToken = DB::table('token_pengguna')->where('id_pengguna', session()->get('user')['id_pengguna'])
+                ->where('status_token_pengguna', '1')
+                ->where('waktu_habis_token_pengguna', '>=', $date)
+                ->where('nama2_token_pengguna', '!=', null)
+                ->orderBy('id_token_pengguna', 'desc')->first();
+            $token = $findToken->nama2_token_pengguna;
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, route('jurnal-otomatis-uangmuka-pembelian'));
             curl_setopt($ch, CURLOPT_POST, 1);
@@ -306,9 +312,9 @@ class PurchaseDownPaymentController extends Controller
                         "pemasok" => $data->purchaseOrder->id_pemasok,
                         "void" => $data->void,
                         "user" => session()->get('user')['id_pengguna'],
-                        "total" => $data->total,
-                        "uang_muka" => $data->nominal,
-                        "ppn" => $data->purchaseOrder->mppn_permintaan_pembelian,
+                        "total" => $data->nominal,
+                        "uang_muka" => 0,
+                        "ppn" => 0,
                     )
                 )
             );
