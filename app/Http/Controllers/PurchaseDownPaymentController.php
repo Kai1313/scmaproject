@@ -162,6 +162,17 @@ class PurchaseDownPaymentController extends Controller
             $data->void_user_id = session()->get('user')['id_pengguna'];
             $data->save();
 
+            $resApi = $this->callApiJournal($data);
+            if (!$resApi->result) {
+                DB::rollback();
+                Log::error("Error when void purchase down payment");
+                Log::error($resApi);
+                return response()->json([
+                    "result" => false,
+                    "message" => "Data gagal tersimpan",
+                ]);
+            }
+
             DB::commit();
             return response()->json([
                 "result" => true,
