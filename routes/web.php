@@ -25,43 +25,43 @@ Route::get('/get-menu/{id}', 'DashboardController@getMenu')->name('get-menu');
 // });
 
 Route::prefix('master_biaya')->group(function () {
-    Route::get('/', 'MasterBiayaController@index')->name('master-biaya');
-    Route::get('entry/{id?}', 'MasterBiayaController@entry')->name('master-biaya-entry');
-    Route::get('view/{id}', 'MasterBiayaController@viewData')->name('master-biaya-view');
-    Route::post('save_entry/{id}', 'MasterBiayaController@saveEntry')->name('master-biaya-save-entry');
-    Route::get('delete/{id}', 'MasterBiayaController@destroy')->name('master-biaya-delete');
+    Route::get('/{user_id?}', 'MasterBiayaController@index')->name('master-biaya');
+    Route::get('/entry/{id?}', 'MasterBiayaController@entry')->name('master-biaya-entry');
+    Route::get('/view/{id}', 'MasterBiayaController@viewData')->name('master-biaya-view');
+    Route::post('/save_entry/{id}', 'MasterBiayaController@saveEntry')->name('master-biaya-save-entry');
+    Route::get('/delete/{id}', 'MasterBiayaController@destroy')->name('master-biaya-delete');
 });
 
 Route::prefix('master_wrapper')->group(function () {
-    Route::get('/', 'MasterWrapperController@index')->name('master-wrapper');
-    Route::get('entry/{id?}', 'MasterWrapperController@entry')->name('master-wrapper-entry');
-    Route::get('view/{id}', 'MasterWrapperController@viewData')->name('master-wrapper-view');
-    Route::post('save_entry/{id}', 'MasterWrapperController@saveEntry')->name('master-wrapper-save-entry');
-    Route::get('delete/{id}', 'MasterWrapperController@destroy')->name('master-wrapper-delete');
+    Route::get('/{user_id?}', 'MasterWrapperController@index')->name('master-wrapper');
+    Route::get('/entry/{id?}', 'MasterWrapperController@entry')->name('master-wrapper-entry');
+    Route::get('/view/{id}', 'MasterWrapperController@viewData')->name('master-wrapper-view');
+    Route::post('/save_entry/{id}', 'MasterWrapperController@saveEntry')->name('master-wrapper-save-entry');
+    Route::get('/delete/{id}', 'MasterWrapperController@destroy')->name('master-wrapper-delete');
 });
 
 Route::prefix('purchase_requisitions')->group(function () {
-    Route::get('/', 'PurchaseRequestController@index')->name('purchase-request');
-    Route::get('entry/{id?}', 'PurchaseRequestController@entry')->name('purchase-request-entry');
-    Route::get('view/{id}', 'PurchaseRequestController@viewData')->name('purchase-request-view');
-    Route::post('save_entry/{id}', 'PurchaseRequestController@saveEntry')->name('purchase-request-save-entry');
-    Route::get('delete/{id}', 'PurchaseRequestController@destroy')->name('purchase-request-delete');
-    Route::get('auto_werehouse', 'PurchaseRequestController@autoWerehouse')->name('purchase-request-auto-werehouse');
-    Route::get('auto_user', 'PurchaseRequestController@autoUser')->name('purchase-request-auto-user');
-    Route::get('auto_item', 'PurchaseRequestController@autoItem')->name('purchase-request-auto-item');
-    Route::get('auto_satuan', 'PurchaseRequestController@autoSatuan')->name('purchase-request-auto-satuan');
-    Route::get('change_status/{id}/{type}', 'PurchaseRequestController@changeStatus')->name('purchase-request-change-status');
+    Route::get('/{user_id?}', 'PurchaseRequestController@index')->name('purchase-request');
+    Route::get('/entry/{id?}', 'PurchaseRequestController@entry')->name('purchase-request-entry');
+    Route::get('/view/{id}', 'PurchaseRequestController@viewData')->name('purchase-request-view');
+    Route::post('/save_entry/{id}', 'PurchaseRequestController@saveEntry')->name('purchase-request-save-entry');
+    Route::get('/delete/{id}', 'PurchaseRequestController@destroy')->name('purchase-request-delete');
+    Route::get('/auto_werehouse', 'PurchaseRequestController@autoWerehouse')->name('purchase-request-auto-werehouse');
+    Route::get('/auto_user', 'PurchaseRequestController@autoUser')->name('purchase-request-auto-user');
+    Route::get('/auto_item', 'PurchaseRequestController@autoItem')->name('purchase-request-auto-item');
+    Route::get('/auto_satuan', 'PurchaseRequestController@autoSatuan')->name('purchase-request-auto-satuan');
+    Route::get('/change_status/{id}/{type}', 'PurchaseRequestController@changeStatus')->name('purchase-request-change-status');
 });
 
 Route::prefix('uang_muka_pembelian')->group(function () {
-    Route::get('/', 'PurchaseDownPaymentController@index')->name('purchase-down-payment');
-    Route::get('entry/{id?}', 'PurchaseDownPaymentController@entry')->name('purchase-down-payment-entry');
-    Route::get('view/{id}', 'PurchaseDownPaymentController@viewData')->name('purchase-down-payment-view');
-    Route::post('save_entry/{id}', 'PurchaseDownPaymentController@saveEntry')->name('purchase-down-payment-save-entry');
-    Route::get('delete/{id}', 'PurchaseDownPaymentController@destroy')->name('purchase-down-payment-delete');
-    Route::get('auto_po', 'PurchaseDownPaymentController@autoPo')->name('purchase-down-payment-auto-po');
-    Route::get('count_po', 'PurchaseDownPaymentController@countPo')->name('purchase-down-payment-count-po');
-    Route::get('auto_slip', 'PurchaseDownPaymentController@autoSlip')->name('purchase-down-payment-auto-slip');
+    Route::get('/{user_id?}', 'PurchaseDownPaymentController@index')->name('purchase-down-payment');
+    Route::get('/entry/{id?}', 'PurchaseDownPaymentController@entry')->name('purchase-down-payment-entry');
+    Route::get('/view/{id}', 'PurchaseDownPaymentController@viewData')->name('purchase-down-payment-view');
+    Route::post('/save_entry/{id}', 'PurchaseDownPaymentController@saveEntry')->name('purchase-down-payment-save-entry');
+    Route::get('/delete/{id}', 'PurchaseDownPaymentController@destroy')->name('purchase-down-payment-delete');
+    Route::get('/auto_po', 'PurchaseDownPaymentController@autoPo')->name('purchase-down-payment-auto-po');
+    Route::get('/count_po', 'PurchaseDownPaymentController@countPo')->name('purchase-down-payment-count-po');
+    Route::get('/auto_slip', 'PurchaseDownPaymentController@autoSlip')->name('purchase-down-payment-auto-slip');
 });
 
 // Master
