@@ -25,7 +25,7 @@ Route::get('/get-menu/{id}', 'DashboardController@getMenu')->name('get-menu');
 // });
 
 Route::prefix('master_biaya')->group(function () {
-    Route::get('/{user_id?}', 'MasterBiayaController@index')->name('master-biaya');
+    Route::get('/index/{user_id?}', 'MasterBiayaController@index')->name('master-biaya');
     Route::get('/entry/{id?}', 'MasterBiayaController@entry')->name('master-biaya-entry');
     Route::get('/view/{id}', 'MasterBiayaController@viewData')->name('master-biaya-view');
     Route::post('/save_entry/{id}', 'MasterBiayaController@saveEntry')->name('master-biaya-save-entry');
@@ -33,7 +33,7 @@ Route::prefix('master_biaya')->group(function () {
 });
 
 Route::prefix('master_wrapper')->group(function () {
-    Route::get('/{user_id?}', 'MasterWrapperController@index')->name('master-wrapper');
+    Route::get('/index/{user_id?}', 'MasterWrapperController@index')->name('master-wrapper');
     Route::get('/entry/{id?}', 'MasterWrapperController@entry')->name('master-wrapper-entry');
     Route::get('/view/{id}', 'MasterWrapperController@viewData')->name('master-wrapper-view');
     Route::post('/save_entry/{id}', 'MasterWrapperController@saveEntry')->name('master-wrapper-save-entry');
@@ -41,7 +41,7 @@ Route::prefix('master_wrapper')->group(function () {
 });
 
 Route::prefix('purchase_requisitions')->group(function () {
-    Route::get('/{user_id?}', 'PurchaseRequestController@index')->name('purchase-request');
+    Route::get('/index/{user_id?}', 'PurchaseRequestController@index')->name('purchase-request');
     Route::get('/entry/{id?}', 'PurchaseRequestController@entry')->name('purchase-request-entry');
     Route::get('/view/{id}', 'PurchaseRequestController@viewData')->name('purchase-request-view');
     Route::post('/save_entry/{id}', 'PurchaseRequestController@saveEntry')->name('purchase-request-save-entry');
@@ -54,7 +54,7 @@ Route::prefix('purchase_requisitions')->group(function () {
 });
 
 Route::prefix('uang_muka_pembelian')->group(function () {
-    Route::get('/{user_id?}', 'PurchaseDownPaymentController@index')->name('purchase-down-payment');
+    Route::get('/index/{user_id?}', 'PurchaseDownPaymentController@index')->name('purchase-down-payment');
     Route::get('/entry/{id?}', 'PurchaseDownPaymentController@entry')->name('purchase-down-payment-entry');
     Route::get('/view/{id}', 'PurchaseDownPaymentController@viewData')->name('purchase-down-payment-view');
     Route::post('/save_entry/{id}', 'PurchaseDownPaymentController@saveEntry')->name('purchase-down-payment-save-entry');
