@@ -2,84 +2,6 @@
     <section class="sidebar">>
         <ul class="sidebar-menu" data-widget="tree">
             <li class="nav-item">
-                <a href="https://test1.scasda.my.id/development/v2/v2/#akses_menu">
-                    <i class="fa fa-briefcase"></i> <span>Akses Menu</span>
-                </a>
-            </li>
-            <li class="header">OPS</li>
-            <li class="treeview {{ request()->segment(1) == 'master-ops' ? 'active' : null }}">
-                <a href="#"><i class="fa fa-link"></i> <span>Master</span>
-                    <span class="pull-right-container">
-                        <i class="fa fa-angle-left pull-right"></i>
-                    </span>
-                </a>
-                <ul class="treeview-menu">
-                    <li class="{{ request()->segment(2) == 'biaya' ? 'active' : null }}">
-                        <a href="{{ route('master-biaya') }}">Master Biaya</a>
-                    </li>
-                    <li class="{{ request()->segment(2) == 'wrapper' ? 'active' : null }}">
-                        <a href="{{ route('master-wrapper') }}">Master Wrapper</a>
-                    </li>
-                </ul>
-            </li>
-            <li class="nav-item {{ request()->segment(1) == 'permintaan-pembelian' ? 'active' : null }}">
-                <a href="{{ route('purchase-request') }}">
-                    <i class="fa fa-briefcase"></i> <span>Permintaan Pembelian</span>
-                </a>
-            </li>
-            <li class="nav-item {{ request()->segment(1) == 'uang-muka-pembelian' ? 'active' : null }}">
-                <a href="{{ route('purchase-down-payment') }}">
-                    <i class="fa fa-briefcase"></i> <span>Uang Muka Pembelian</span>
-                </a>
-            </li>
-            <li class="header">ACCOUNTING</li>
-            <li class="nav-item {{ request()->segment(1) == '' ? 'active' : null }}">
-                <a href="{{ route('welcome') }}"><i class="fa fa-briefcase"></i> <span>Dashboard</span>
-                </a>
-            </li>
-            <li class="treeview {{ request()->segment(1) == 'master' ? 'active' : null }}">
-                <a href="#"><i class="fa fa-link"></i> <span>Master</span>
-                    <span class="pull-right-container">
-                        <i class="fa fa-angle-left pull-right"></i>
-                    </span>
-                </a>
-                <ul class="treeview-menu">
-                    <li class="{{ request()->segment(2) == 'coa' ? 'active' : null }}">
-                        <a href="{{ route('master-coa', 1) }}">Master CoA</a>
-                    </li>
-                    <li class="{{ request()->segment(2) == 'slip' ? 'active' : null }}">
-                        <a href="{{ route('master-slip', 1) }}">Master Slip</a>
-                    </li>
-                </ul>
-            </li>
-            <li class="treeview {{ request()->segment(1) == 'transaction' ? 'active' : null }}">
-                <a href="#"><i class="fa fa-link"></i> <span>Transaction</span>
-                    <span class="pull-right-container">
-                        <i class="fa fa-angle-left pull-right"></i>
-                    </span>
-                </a>
-                <ul class="treeview-menu">
-                    <li class="{{ request()->segment(2) == 'general_ledger' ? 'active' : null }}">
-                        <a href="{{ route('transaction-general-ledger') }}">Jurnal Umum</a>
-                    </li>
-                    <li class="{{ request()->segment(2) == 'adjustment_ledger' ? 'active' : null }}">
-                        <a href="{{ route('transaction-adjustment-ledger') }}">Jurnal Penyesuaian</a>
-                    </li>
-                </ul>
-            </li>
-            <li class="treeview ">
-                <a href="#"><i class="fa fa-link"></i> <span>Report</span>
-                    <span class="pull-right-container">
-                        <i class="fa fa-angle-left pull-right"></i>
-                    </span>
-                </a>
-                <ul class="treeview-menu">
-                    <li class=""><a href="#">Link in level 2</a></li>
-                    <li><a href="#">Link in level 2</a></li>
-                </ul>
-            </li>
-            <li class="header">Merge Menu</li>
-            <li class="nav-item">
                 <a href="{{ env('OLD_URL_ROOT') }}">
                     <i class="fa fa-briefcase"></i> <span>Beranda</span>
                 </a>
@@ -148,7 +70,7 @@
                     </li>
                 </ul>
             </li>
-            <li class="treeview">
+            <li class="treeview {{ request()->segment(1) == 'master-ops' ? 'active' : null }}">
                 <a href="#"><i class="fa fa-link"></i> <span>Master Data</span>
                     <span class="pull-right-container">
                         <i class="fa fa-angle-left pull-right"></i>
@@ -193,11 +115,6 @@
                     <li>
                         <a href="{{ env('OLD_URL_ROOT') }}#cabang">
                             <i class="glyphicon glyphicon-option-vertical"></i> Cabang
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ env('OLD_URL_ROOT') }}#">
-                            <i class="glyphicon glyphicon-option-vertical"></i> Master Wrapper
                         </a>
                     </li>
                     <li>
@@ -282,6 +199,16 @@
                             <i class="glyphicon glyphicon-option-vertical"></i> Rak
                         </a>
                     </li>
+                    <li class="{{ request()->segment(2) == 'biaya' ? 'active' : null }}">
+                        <a href="{{ route('master-biaya') }}">
+                            <i class="glyphicon glyphicon-option-vertical"></i> Master Biaya
+                        </a>
+                    </li>
+                    <li class="{{ request()->segment(2) == 'wrapper' ? 'active' : null }}">
+                        <a href="{{ route('master-wrapper') }}">
+                            <i class="glyphicon glyphicon-option-vertical"></i> Master Wrapper
+                        </a>
+                    </li>
                 </ul>
             </li>
             <li class="treeview">
@@ -353,14 +280,15 @@
                     </li>
                 </ul>
             </li>
-            <li class="treeview">
+            <li class="treeview {{ request()->segment(1) == 'trans' ? 'active' : null }}">
                 <a href="#"><i class="fa fa-link"></i> <span>Transaksi</span>
                     <span class="pull-right-container">
                         <i class="fa fa-angle-left pull-right"></i>
                     </span>
                 </a>
                 <ul class="treeview-menu">
-                    <li class="treeview">
+                    <li
+                        class="treeview {{ in_array(request()->segment(2), ['permintaan-pembelian', 'uang-muka-pembelian']) ? 'active' : null }}">
                         <a href="#"><i class="fa fa-link"></i> <span>Pembelian</span>
                             <span class="pull-right-container">
                                 <i class="fa fa-angle-left pull-right"></i>
@@ -368,9 +296,18 @@
                         </a>
                         <ul class="treeview-menu">
                             {{-- bermasalah --}}
-                            <li>
-                                <a href="{{ env('OLD_URL_ROOT') }}#">
-                                    <i class="glyphicon glyphicon-option-vertical"></i>Purchase Requisitions (PR)
+                            <li
+                                class="nav-item {{ request()->segment(2) == 'permintaan-pembelian' ? 'active' : null }}">
+                                <a href="{{ route('purchase-request') }}">
+                                    <i class="glyphicon glyphicon-option-vertical"></i> <span>Permintaan
+                                        Pembelian</span>
+                                </a>
+                            </li>
+                            <li
+                                class="nav-item {{ request()->segment(2) == 'uang-muka-pembelian' ? 'active' : null }}">
+                                <a href="{{ route('purchase-down-payment') }}">
+                                    <i class="glyphicon glyphicon-option-vertical"></i> <span>Uang Muka
+                                        Pembelian</span>
                                 </a>
                             </li>
                             <li>
@@ -794,6 +731,52 @@
                             <i class="glyphicon glyphicon-option-vertical"></i>Kartu Stok
                         </a>
                     </li>
+                </ul>
+            </li>
+            <li class="header">ACCOUNTING</li>
+            <li class="nav-item {{ request()->segment(1) == '' ? 'active' : null }}">
+                <a href="{{ route('welcome') }}"><i class="fa fa-briefcase"></i> <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="treeview {{ request()->segment(1) == 'master' ? 'active' : null }}">
+                <a href="#"><i class="fa fa-link"></i> <span>Master</span>
+                    <span class="pull-right-container">
+                        <i class="fa fa-angle-left pull-right"></i>
+                    </span>
+                </a>
+                <ul class="treeview-menu">
+                    <li class="{{ request()->segment(2) == 'coa' ? 'active' : null }}">
+                        <a href="{{ route('master-coa', 1) }}">Master CoA</a>
+                    </li>
+                    <li class="{{ request()->segment(2) == 'slip' ? 'active' : null }}">
+                        <a href="{{ route('master-slip', 1) }}">Master Slip</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="treeview {{ request()->segment(1) == 'transaction' ? 'active' : null }}">
+                <a href="#"><i class="fa fa-link"></i> <span>Transaction</span>
+                    <span class="pull-right-container">
+                        <i class="fa fa-angle-left pull-right"></i>
+                    </span>
+                </a>
+                <ul class="treeview-menu">
+                    <li class="{{ request()->segment(2) == 'general_ledger' ? 'active' : null }}">
+                        <a href="{{ route('transaction-general-ledger') }}">Jurnal Umum</a>
+                    </li>
+                    <li class="{{ request()->segment(2) == 'adjustment_ledger' ? 'active' : null }}">
+                        <a href="{{ route('transaction-adjustment-ledger') }}">Jurnal Penyesuaian</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="treeview ">
+                <a href="#"><i class="fa fa-link"></i> <span>Report</span>
+                    <span class="pull-right-container">
+                        <i class="fa fa-angle-left pull-right"></i>
+                    </span>
+                </a>
+                <ul class="treeview-menu">
+                    <li class=""><a href="#">Link in level 2</a></li>
+                    <li><a href="#">Link in level 2</a></li>
                 </ul>
             </li>
         </ul>

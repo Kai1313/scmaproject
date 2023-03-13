@@ -131,6 +131,33 @@ class GeneralLedgerController extends Controller
                 ]);
             }
 
+            // Insert trx saldo if jenis_jurnal PG|HG
+            if ($journalType == "PG" || $journalType == "HG") {
+                $sum = 0;
+                foreach ($detailData as $key => $item) {
+                    $sum += ($journalType == "PG")?$item["debet"]:$item["kredit"];
+                }
+                $trx_saldo = new TrxSaldo;
+                $trx_saldo->tipe_transaksi = ($journalType == "PG")?"Piutang Giro":"Hutang Giro";
+                $trx_saldo->id_transaksi = $header->kode_jurnal;
+                $trx_saldo->tanggal = $journalDate;
+                $trx_saldo->total = $sum;
+                $trx_saldo->bayar = 0;
+                $trx_saldo->sisa = $sum;
+                $trx_saldo->id_jurnal = $header->id_jurnal;
+                $trx_saldo->no_giro = $header->no_giro;
+                $trx_saldo->tanggal_giro = $header->tanggal_giro;
+                $trx_saldo->tanggal_giro_jt = $header->tanggal_giro_jt;
+                $trx_saldo->status_giro = 0;
+                if (!$trx_saldo->save()) {
+                    DB::rollback();
+                    return response()->json([
+                        "result" => false,
+                        "message" => "Error when store trx saldo after table header"
+                    ]);
+                }
+            }
+
             // Store Detail and Update Saldo Transaksi
             foreach ($detailData as $key => $data) {
                 // Store Detail
@@ -373,7 +400,6 @@ class GeneralLedgerController extends Controller
             // Update saldo transaksi before delete
             $old_details = JurnalDetail::where("id_jurnal", $journalID)->get();
             foreach ($old_details as $key => $detail) {
-                Log::info($detail->credit);
                 $debet = $detail->debet;
                 $kredit = $detail->credit;
                 $trx_saldo = TrxSaldo::where("id_transaksi", $detail->id_transaksi)->first();
@@ -408,6 +434,36 @@ class GeneralLedgerController extends Controller
                     "result" => false,
                     "message" => "Error when store Jurnal data on table header"
                 ]);
+            }
+
+            // Insert trx saldo if jenis_jurnal PG|HG
+            if ($journalType == "PG" || $journalType == "HG") {
+                $check = TrxSaldo::where("id_jurnal", $journalID)->first();
+                Log::info($check);
+                $sum = 0;
+                foreach ($detailData as $key => $item) {
+                    $sum += ($journalType == "PG")?$item["debet"]:$item["kredit"];
+                }
+                Log::info($sum);
+                $trx_saldo = ($check)?TrxSaldo::where("id_jurnal", $journalID)->first():new TrxSaldo;
+                $trx_saldo->tipe_transaksi = ($journalType == "PG")?"Piutang Giro":"Hutang Giro";
+                $trx_saldo->id_transaksi = $header->kode_jurnal;
+                $trx_saldo->tanggal = $journalDate;
+                $trx_saldo->total = $sum;
+                $trx_saldo->bayar = 0;
+                $trx_saldo->sisa = $sum;
+                $trx_saldo->id_jurnal = $header->id_jurnal;
+                $trx_saldo->no_giro = $header->no_giro;
+                $trx_saldo->tanggal_giro = $header->tanggal_giro;
+                $trx_saldo->tanggal_giro_jt = $header->tanggal_giro_jt;
+                $trx_saldo->status_giro = 0;
+                if (!$trx_saldo->save()) {
+                    DB::rollback();
+                    return response()->json([
+                        "result" => false,
+                        "message" => "Error when store trx saldo after table header"
+                    ]);
+                }
             }
 
             // Store Detail
@@ -709,7 +765,7 @@ class GeneralLedgerController extends Controller
         // dd($request->all());
         try {
             // Init
-            $type = $request->transaction_type;
+            $type = str_replace("_", " ", $request->transaction_type);
             $customer = $request->customer;
             $supplier = $request->supplier;
             $offset = $request->start;
@@ -726,30 +782,39 @@ class GeneralLedgerController extends Controller
             }
             $draw = $request->draw;
             $current_page = $offset / $limit + 1;
-            $data_saldo = TrxSaldo::select("saldo_transaksi.*", "pelanggan.nama_pelanggan as nama_pelanggan", "pemasok.nama_pemasok as nama_pemasok")
-                ->leftJoin("pelanggan", "pelanggan.id_pelanggan", "saldo_transaksi.id_pelanggan")
+            $data_saldo = TrxSaldo::leftJoin("pelanggan", "pelanggan.id_pelanggan", "saldo_transaksi.id_pelanggan")
                 ->leftJoin("pemasok", "pemasok.id_pemasok", "saldo_transaksi.id_pemasok")
-                ->where("tipe_transaksi", $type)->where("sisa", "<>", 0);
+                ->where("tipe_transaksi", ucwords($type))->where("sisa", "<>", 0);
             if ($customer != "") {
                 $data_saldo = $data_saldo->where("saldo_transaksi.id_pelanggan", $customer);
             }
             if ($supplier != "") {
                 $data_saldo = $data_saldo->where("saldo_transaksi.id_pemasok", $supplier);
             }
+            if ($type == "piutang giro" || $type == "hutang giro") {
+                $data_saldo = $data_saldo->where("saldo_transaksi.tanggal_giro_jt", "<=", date("Y-m-d"))->join("jurnal_header", "jurnal_header.id_jurnal", "saldo_transaksi.id_jurnal")->join("master_slip", "master_slip.id_slip", "jurnal_header.id_slip")->join("master_akun", "master_akun.id_akun", "master_slip.id_akun")->select("saldo_transaksi.*", "pelanggan.nama_pelanggan as nama_pelanggan", "pemasok.nama_pemasok as nama_pemasok", "master_akun.nama_akun as nama_akun", "master_akun.kode_akun as kode_akun", "master_akun.id_akun as id_akun");
+            }
+            else {
+                $data_saldo = $data_saldo->select("saldo_transaksi.*", "pelanggan.nama_pelanggan as nama_pelanggan", "pemasok.nama_pemasok as nama_pemasok");
+            }
             if (isset($keyword)) {
-                $data_saldo->where(function ($query) use ($keyword) {
+                $data_saldo->where(function ($query) use ($keyword, $type) {
                     $query->orWhere('tanggal', 'LIKE', "%$keyword%")
-                        ->orWhere('id_transaksi', 'LIKE', "%$keyword%")
+                        ->orWhere('saldo_transaksi.id_transaksi', 'LIKE', "%$keyword%")
                         ->orWhere('ref_id', 'LIKE', "%$keyword%")
-                        ->orWhere('catatan', 'LIKE', "%$keyword%")
+                        ->orWhere('saldo_transaksi.catatan', 'LIKE', "%$keyword%")
                         ->orWhere('saldo_transaksi.id_pelanggan', 'LIKE', "%$keyword%")
                         ->orWhere('pelanggan.nama_pelanggan', 'LIKE', "%$keyword%")
-                        ->orWhere('id_pemasok', 'LIKE', "%$keyword%")
+                        ->orWhere('saldo_transaksi.id_pemasok', 'LIKE', "%$keyword%")
                         ->orWhere('dpp', 'LIKE', "%$keyword%")
                         ->orWhere('ppn', 'LIKE', "%$keyword%")
                         ->orWhere('total', 'LIKE', "%$keyword%")
                         ->orWhere('bayar', 'LIKE', "%$keyword%")
                         ->orWhere('sisa', 'LIKE', "%$keyword%");
+                        if ($type == "piutang giro" || $type == "hutang giro") {
+                            $query->orWhere('tanggal', 'LIKE', "%$keyword%")
+                                ->orWhere('saldo_transaksi.no_giro', 'LIKE', "%$keyword%");
+                        }
                 });
             }
             $filtered_data = $data_saldo->get();
@@ -835,7 +900,23 @@ class GeneralLedgerController extends Controller
                     $trx_saldo->bayar = $current_bayar + $kredit;
                     $trx_saldo->sisa = $current_sisa - $kredit;
                     break;
+                case 'Retur Penjualan':
+                    $trx_saldo->bayar = $current_bayar + $debet;
+                    $trx_saldo->sisa = $current_sisa - $debet;
+                    break;
                 case 'Pembelian':
+                    $trx_saldo->bayar = $current_bayar + $debet;
+                    $trx_saldo->sisa = $current_sisa - $debet;
+                    break;
+                case 'Retur Pembelian':
+                    $trx_saldo->bayar = $current_bayar + $kredit;
+                    $trx_saldo->sisa = $current_sisa - $kredit;
+                    break;
+                case 'Piutang Giro':
+                    $trx_saldo->bayar = $current_bayar + $kredit;
+                    $trx_saldo->sisa = $current_sisa - $kredit;
+                    break;
+                case 'Hutang Giro':
                     $trx_saldo->bayar = $current_bayar + $debet;
                     $trx_saldo->sisa = $current_sisa - $debet;
                     break;
@@ -873,7 +954,23 @@ class GeneralLedgerController extends Controller
                     $trx_saldo->bayar = $current_bayar - $kredit;
                     $trx_saldo->sisa = $current_sisa + $kredit;
                     break;
+                case 'Retur Penjualan':
+                    $trx_saldo->bayar = $current_bayar - $debet;
+                    $trx_saldo->sisa = $current_sisa + $debet;
+                    break;
                 case 'Pembelian':
+                    $trx_saldo->bayar = $current_bayar - $debet;
+                    $trx_saldo->sisa = $current_sisa + $debet;
+                    break;
+                case 'Retur Pembelian':
+                    $trx_saldo->bayar = $current_bayar - $kredit;
+                    $trx_saldo->sisa = $current_sisa + $kredit;
+                    break;
+                case 'Piutang Giro':
+                    $trx_saldo->bayar = $current_bayar - $kredit;
+                    $trx_saldo->sisa = $current_sisa + $kredit;
+                    break;
+                case 'Hutang Giro':
                     $trx_saldo->bayar = $current_bayar - $debet;
                     $trx_saldo->sisa = $current_sisa + $debet;
                     break;
