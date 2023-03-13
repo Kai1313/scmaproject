@@ -70,7 +70,8 @@
                     </li>
                 </ul>
             </li>
-            <li class="treeview {{ request()->segment(1) == 'master-ops' ? 'active' : null }}">
+            <li
+                class="treeview {{ in_array(request()->segment(1), ['master_biaya', 'master_wrapper']) ? 'active' : null }}">
                 <a href="#"><i class="fa fa-link"></i> <span>Master Data</span>
                     <span class="pull-right-container">
                         <i class="fa fa-angle-left pull-right"></i>
@@ -199,12 +200,12 @@
                             <i class="glyphicon glyphicon-option-vertical"></i> Rak
                         </a>
                     </li>
-                    <li class="{{ request()->segment(2) == 'biaya' ? 'active' : null }}">
+                    <li class="{{ request()->segment(1) == 'master_biaya' ? 'active' : null }}">
                         <a href="{{ route('master-biaya') }}">
                             <i class="glyphicon glyphicon-option-vertical"></i> Master Biaya
                         </a>
                     </li>
-                    <li class="{{ request()->segment(2) == 'wrapper' ? 'active' : null }}">
+                    <li class="{{ request()->segment(1) == 'master_wrapper' ? 'active' : null }}">
                         <a href="{{ route('master-wrapper') }}">
                             <i class="glyphicon glyphicon-option-vertical"></i> Master Wrapper
                         </a>
@@ -280,7 +281,8 @@
                     </li>
                 </ul>
             </li>
-            <li class="treeview {{ request()->segment(1) == 'trans' ? 'active' : null }}">
+            <li
+                class="treeview {{ in_array(request()->segment(1), ['purchase_requisitions', 'uang_muka_pembelian']) ? 'active' : null }}">
                 <a href="#"><i class="fa fa-link"></i> <span>Transaksi</span>
                     <span class="pull-right-container">
                         <i class="fa fa-angle-left pull-right"></i>
@@ -288,25 +290,17 @@
                 </a>
                 <ul class="treeview-menu">
                     <li
-                        class="treeview {{ in_array(request()->segment(2), ['permintaan-pembelian', 'uang-muka-pembelian']) ? 'active' : null }}">
+                        class="treeview {{ in_array(request()->segment(1), ['purchase_requisitions', 'uang_muka_pembelian']) ? 'active' : null }}">
                         <a href="#"><i class="fa fa-link"></i> <span>Pembelian</span>
                             <span class="pull-right-container">
                                 <i class="fa fa-angle-left pull-right"></i>
                             </span>
                         </a>
                         <ul class="treeview-menu">
-                            {{-- bermasalah --}}
                             <li
-                                class="nav-item {{ request()->segment(2) == 'permintaan-pembelian' ? 'active' : null }}">
+                                class="nav-item {{ request()->segment(1) == 'purchase_requisitions' ? 'active' : null }}">
                                 <a href="{{ route('purchase-request') }}">
                                     <i class="glyphicon glyphicon-option-vertical"></i> <span>Permintaan
-                                        Pembelian</span>
-                                </a>
-                            </li>
-                            <li
-                                class="nav-item {{ request()->segment(2) == 'uang-muka-pembelian' ? 'active' : null }}">
-                                <a href="{{ route('purchase-down-payment') }}">
-                                    <i class="glyphicon glyphicon-option-vertical"></i> <span>Uang Muka
                                         Pembelian</span>
                                 </a>
                             </li>
@@ -333,6 +327,13 @@
                             <li>
                                 <a href="{{ env('OLD_URL_ROOT') }}#retur_pembelian">
                                     <i class="glyphicon glyphicon-option-vertical"></i>Retur Pembelian
+                                </a>
+                            </li>
+                            <li
+                                class="nav-item {{ request()->segment(1) == 'uang_muka_pembelian' ? 'active' : null }}">
+                                <a href="{{ route('purchase-down-payment') }}">
+                                    <i class="glyphicon glyphicon-option-vertical"></i> <span>Uang Muka
+                                        Pembelian</span>
                                 </a>
                             </li>
                             <li>
