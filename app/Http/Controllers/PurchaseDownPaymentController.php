@@ -7,7 +7,9 @@ use App\Models\UserToken;
 use App\PurchaseDownPayment;
 use Carbon\Carbon;
 use DB;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
+use Log;
 use Yajra\DataTables\DataTables;
 
 class PurchaseDownPaymentController extends Controller
@@ -106,6 +108,8 @@ class PurchaseDownPaymentController extends Controller
             $data->nominal = normalizeNumber($request->nominal);
             $data->total = normalizeNumber($request->total);
             $data->save();
+
+            return $this->callApiJournal($data);
 
             DB::commit();
             return response()->json([
@@ -271,4 +275,34 @@ class PurchaseDownPaymentController extends Controller
             return ['status' => false];
         }
     }
+
+    public function callApiJournal($data)
+    {
+        $apiJurnal = new Client();
+        try {
+            $token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImQ3ODBkYzhkY2VkN2MzOGQwNzMwZDQ3OWIzMTFjNjE4Nzk1MzM2MWY2NGM4Yzg3NDQ0OWU5OWRiMmNmZTE2NDJlNWI0OWYyY2M3YTQ5YzVhIn0.eyJhdWQiOiIzIiwianRpIjoiZDc4MGRjOGRjZWQ3YzM4ZDA3MzBkNDc5YjMxMWM2MTg3OTUzMzYxZjY0YzhjODc0NDQ5ZTk5ZGIyY2ZlMTY0MmU1YjQ5ZjJjYzdhNDljNWEiLCJpYXQiOjE2Nzg2ODAzNzMsIm5iZiI6MTY3ODY4MDM3MywiZXhwIjoxNjc4NzY2NzczLCJzdWIiOiIxIiwic2NvcGVzIjpbXX0.S3vYXPNxExUcgNvQx1yTSUmguKtxJipFc6u9_LnagMHU9fvIP7Ge38mar-0Zq_F6HNHKcQNZpfFom0rJ24lUgzfIUyVx2dTLuX8IyyaiSkKK5_OUv27jkjkxmu7i5HqOgtY6k1MkFbdzxWjGP1ei17yuxxN2Nzn2Vo-gL-glmx_izWwwZnMmqkCf4MZFawVLWYQTDEgNAWCQD1dwgCiUR9XjUhKvUZO0Bh6kF3mhabPhh3P6tL08a0v5YOXa3ZItydNFov61qHuRGK4NvQ4lNGElttj6b98S2mup5xD4ni6JLLu8odfCe__Cm0-wKIr7AgwGCzNzvteIPW5fU1GJnG_Dm9-JULOTv0Cg6_cezbYQwF117BkWTwQIPYarVn8KSTMdQM7olnRdr9x6nhUyiqDDcfWRCRM4ChkZS4gI83mSUo1pq_996MFL0P2BOoNrSpXI2GtvXNwQJUcbx4lpHETF4u3XXA_0LkYwgwOYzlqVH9wK1hqSkXJM86Tz0NOJjsZTloUtEodJl4fhNvsSFAmgx1DJTtWK3P22wwTnNf-yzlq3NukhJUBhxwLBrn7NTlwA0SHiKIwCGh2z19vqaAdgs9M7zETvY8VScaPX0nfQDea2qy9RGesASQDbbQtb2veSk9i2nbK7gqgMOFLPAD_Cg05woNqWN0MjQYIPMYk';
+            $req = $apiJurnal->request('POST', route('jurnal-otomatis-uangmuka-pembelian'), [
+                'headers' => [
+                    'Accept' => 'application/json',
+                    'Authorization' => 'Bearer ' . $token,
+                ],
+                'body' => json_encode([
+                    "no_transaksi" => $data->kode_uang_muka_pembelian,
+                    "tanggal" => $data->tanggal,
+                    "slip" => $data->id_slip,
+                    "cabang" => $data->id_cabang,
+                    "pemasok" => $data->purchaseOrder->id_pemasok,
+                    "void" => $data->void,
+                    "user" => session()->get('user')['id_pengguna'],
+                    "total" => $data->total,
+                    "uang_muka" => $data->nominal,
+                    "ppn" => $data->purchaseOrder->mppn_permintaan_pembelian,
+                ]),
+            ]);
+            return response()->json($req->getBody()->getContents());
+        } catch (\Throwable $th) {
+            return response()->json($th);
+        }
+    }
+
 }
