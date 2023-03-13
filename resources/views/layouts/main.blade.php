@@ -39,6 +39,113 @@ scratch. This page gets rid of all links and provides the needed markup only.
             left: 48%;
             top: 40%;
         }
+
+        .skin-yellow .main-header .navbar {
+            background-color: #EBA925;
+        }
+
+        .skin-yellow .main-header .logo {
+            background-color: white;
+        }
+
+        .skin-yellow .main-header .logo:hover {
+            background-color: white;
+        }
+
+        .skin-yellow .sidebar-menu>li>.treeview-menu {
+            background-color: #1e282c;
+        }
+
+        .skin-yellow .sidebar-menu>li>.treeview-menu>li:hover {
+            background-color: #7d6129;
+        }
+
+        .skin-yellow .sidebar-menu>li>.treeview-menu>li>a {
+            padding: 10px 5px 10px 15px;
+        }
+
+        .skin-yellow .sidebar-menu>li>.treeview-menu>.menu-open {
+            background-color: #161f22;
+        }
+
+        .skin-yellow .sidebar-menu>li>.treeview-menu>.treeview>.treeview-menu {
+            background-color: #161f22;
+        }
+
+        .skin-yellow .sidebar-menu>li>.treeview-menu>.treeview>.treeview-menu>li:hover {
+            background-color: #7d6129;
+        }
+
+        .skin-yellow .sidebar-menu>li>.treeview-menu>.treeview>.treeview-menu>li>a {
+            padding: 10px 5px 10px 15px;
+        }
+
+        .container-custom {
+            background-color: white;
+            margin: 15px 15px 0px 15px;
+            padding: 15px;
+        }
+
+        .skin-yellow .main-header .navbar .sidebar-toggle:hover {
+            background-color: #f0b94a;
+        }
+
+        .search-header {
+            max-width: 400px;
+            min-width: 200px;
+            margin-right: 10px;
+        }
+
+        .treeview-menu {
+            transition: none;
+        }
+
+        .sidebar-menu,
+        .main-sidebar .user-panel,
+        .sidebar-menu>li.header {
+            white-space: normal !important;
+        }
+
+        .treeview-menu li a {
+            display: flex;
+        }
+
+        th {
+            background-color: #fce7bc;
+        }
+
+        @media only screen and (max-width: 767px) {
+            .skin-yellow .main-header .navbar .dropdown-menu li a {
+                color: black;
+            }
+
+            .skin-yellow .main-header .navbar .dropdown-menu li a:hover {
+                background-color: #e2e3e8;
+            }
+
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            color: black;
+        }
+
+        li .active {
+            background-color: #7d6129;
+        }
+
+        .treeview-menu .treeview-menu {
+            padding-left: 5px;
+        }
+
+        .position-left {
+            margin-right: 5px;
+            font-size: 20px;
+        }
+
+        .btn-index {
+            display: inline-block;
+            margin: 5px;
+        }
     </style>
     <!-- AdminLTE Skins. We have chosen the skin-blue for this starter
             page. However, you can choose any other skin. Make sure you

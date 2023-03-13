@@ -7,7 +7,7 @@
                 </a>
             </li>
             <li class="treeview">
-                <a href="#"><i class="fa fa-link"></i> <span>Administrasi</span>
+                <a href="#"><i class="glyphicon glyphicon-lock"></i> <span>Administrasi</span>
                     <span class="pull-right-container">
                         <i class="fa fa-angle-left pull-right"></i>
                     </span>
@@ -72,7 +72,7 @@
             </li>
             <li
                 class="treeview {{ in_array(request()->segment(1), ['master_biaya', 'master_wrapper']) ? 'active' : null }}">
-                <a href="#"><i class="fa fa-link"></i> <span>Master Data</span>
+                <a href="#"><i class="glyphicon glyphicon-folder-close"></i> <span>Master Data</span>
                     <span class="pull-right-container">
                         <i class="fa fa-angle-left pull-right"></i>
                     </span>
@@ -213,7 +213,7 @@
                 </ul>
             </li>
             <li class="treeview">
-                <a href="#"><i class="fa fa-link"></i> <span>Master Barang</span>
+                <a href="#"><i class="glyphicon glyphicon-glass"></i> <span>Master Barang</span>
                     <span class="pull-right-container">
                         <i class="fa fa-angle-left pull-right"></i>
                     </span>
@@ -283,7 +283,7 @@
             </li>
             <li
                 class="treeview {{ in_array(request()->segment(1), ['purchase_requisitions', 'uang_muka_pembelian']) ? 'active' : null }}">
-                <a href="#"><i class="fa fa-link"></i> <span>Transaksi</span>
+                <a href="#"><i class="glyphicon glyphicon-list-alt"></i> <span>Transaksi</span>
                     <span class="pull-right-container">
                         <i class="fa fa-angle-left pull-right"></i>
                     </span>
@@ -291,7 +291,7 @@
                 <ul class="treeview-menu">
                     <li
                         class="treeview {{ in_array(request()->segment(1), ['purchase_requisitions', 'uang_muka_pembelian']) ? 'active' : null }}">
-                        <a href="#"><i class="fa fa-link"></i> <span>Pembelian</span>
+                        <a href="#"><i class="glyphicon glyphicon-arrow-right"></i> <span>Pembelian</span>
                             <span class="pull-right-container">
                                 <i class="fa fa-angle-left pull-right"></i>
                             </span>
@@ -300,8 +300,7 @@
                             <li
                                 class="nav-item {{ request()->segment(1) == 'purchase_requisitions' ? 'active' : null }}">
                                 <a href="{{ route('purchase-request') }}">
-                                    <i class="glyphicon glyphicon-option-vertical"></i> <span>Permintaan
-                                        Pembelian</span>
+                                    <i class="glyphicon glyphicon-option-vertical"></i> Purchase Requesition (PR)
                                 </a>
                             </li>
                             <li>
@@ -332,8 +331,8 @@
                             <li
                                 class="nav-item {{ request()->segment(1) == 'uang_muka_pembelian' ? 'active' : null }}">
                                 <a href="{{ route('purchase-down-payment') }}">
-                                    <i class="glyphicon glyphicon-option-vertical"></i> <span>Uang Muka
-                                        Pembelian</span>
+                                    <i class="glyphicon glyphicon-option-vertical"></i> Uang Muka
+                                    Beli (UMB)
                                 </a>
                             </li>
                             <li>
@@ -344,7 +343,7 @@
                         </ul>
                     </li>
                     <li class="treeview">
-                        <a href="#"><i class="fa fa-link"></i> <span>Persediaan</span>
+                        <a href="#"><i class="glyphicon glyphicon-arrow-right"></i> <span>Persediaan</span>
                             <span class="pull-right-container">
                                 <i class="fa fa-angle-left pull-right"></i>
                             </span>
@@ -398,7 +397,7 @@
                         </ul>
                     </li>
                     <li class="treeview">
-                        <a href="#"><i class="fa fa-link"></i> <span>Produksi</span>
+                        <a href="#"><i class="glyphicon glyphicon-arrow-right"></i> <span>Produksi</span>
                             <span class="pull-right-container">
                                 <i class="fa fa-angle-left pull-right"></i>
                             </span>
@@ -417,7 +416,7 @@
                         </ul>
                     </li>
                     <li class="treeview">
-                        <a href="#"><i class="fa fa-link"></i> <span>Penjualan</span>
+                        <a href="#"><i class="glyphicon glyphicon-arrow-right"></i> <span>Penjualan</span>
                             <span class="pull-right-container">
                                 <i class="fa fa-angle-left pull-right"></i>
                             </span>
@@ -451,7 +450,7 @@
                         </ul>
                     </li>
                     <li class="treeview">
-                        <a href="#"><i class="fa fa-link"></i> <span>Kas & Bank</span>
+                        <a href="#"><i class="glyphicon glyphicon-arrow-right"></i> <span>Kas & Bank</span>
                             <span class="pull-right-container">
                                 <i class="fa fa-angle-left pull-right"></i>
                             </span>
@@ -472,14 +471,14 @@
                 </ul>
             </li>
             <li class="treeview">
-                <a href="#"><i class="fa fa-link"></i> <span>Laporan</span>
+                <a href="#"><i class="glyphicon glyphicon-stats"></i> <span>Laporan</span>
                     <span class="pull-right-container">
                         <i class="fa fa-angle-left pull-right"></i>
                     </span>
                 </a>
                 <ul class="treeview-menu">
                     <li class="treeview">
-                        <a href="#"><i class="fa fa-link"></i> <span>Pembelian</span>
+                        <a href="#"><i class="glyphicon glyphicon-arrow-right"></i> <span>Pembelian</span>
                             <span class="pull-right-container">
                                 <i class="fa fa-angle-left pull-right"></i>
                             </span>
@@ -508,7 +507,7 @@
                         </ul>
                     </li>
                     <li class="treeview">
-                        <a href="#"><i class="fa fa-link"></i> <span>Persediaan</span>
+                        <a href="#"><i class="glyphicon glyphicon-arrow-right"></i> <span>Persediaan</span>
                             <span class="pull-right-container">
                                 <i class="fa fa-angle-left pull-right"></i>
                             </span>
@@ -582,7 +581,7 @@
                         </ul>
                     </li>
                     <li class="treeview">
-                        <a href="#"><i class="fa fa-link"></i> <span>Produksi</span>
+                        <a href="#"><i class="glyphicon glyphicon-arrow-right"></i>> <span>Produksi</span>
                             <span class="pull-right-container">
                                 <i class="fa fa-angle-left pull-right"></i>
                             </span>
@@ -611,7 +610,7 @@
                         </ul>
                     </li>
                     <li class="treeview">
-                        <a href="#"><i class="fa fa-link"></i> <span>Penjualan</span>
+                        <a href="#"><i class="glyphicon glyphicon-arrow-right"></i> <span>Penjualan</span>
                             <span class="pull-right-container">
                                 <i class="fa fa-angle-left pull-right"></i>
                             </span>
@@ -655,7 +654,7 @@
                         </ul>
                     </li>
                     <li class="treeview">
-                        <a href="#"><i class="fa fa-link"></i> <span>Kas & Bank</span>
+                        <a href="#"><i class="glyphicon glyphicon-arrow-right"></i> <span>Kas & Bank</span>
                             <span class="pull-right-container">
                                 <i class="fa fa-angle-left pull-right"></i>
                             </span>
@@ -716,7 +715,7 @@
                 </ul>
             </li>
             <li class="treeview">
-                <a href="#"><i class="fa fa-link"></i> <span>Audit</span>
+                <a href="#"><i class="glyphicon glyphicon-book"></i> <span>Audit</span>
                     <span class="pull-right-container">
                         <i class="fa fa-angle-left pull-right"></i>
                     </span>
@@ -735,10 +734,6 @@
                 </ul>
             </li>
             <li class="header">ACCOUNTING</li>
-            <li class="nav-item {{ request()->segment(1) == '' ? 'active' : null }}">
-                <a href="{{ route('welcome') }}"><i class="fa fa-briefcase"></i> <span>Dashboard</span>
-                </a>
-            </li>
             <li class="treeview {{ request()->segment(1) == 'master' ? 'active' : null }}">
                 <a href="#"><i class="fa fa-link"></i> <span>Master</span>
                     <span class="pull-right-container">
