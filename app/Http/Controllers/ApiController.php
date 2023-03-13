@@ -31,38 +31,22 @@ class ApiController extends Controller
                 "result" => true,
                 "code" => 200,
                 "message" => "Login Success",
-<<<<<<< HEAD
                 "token" => $token,
-            ]);
-        } else {
-            return response()->json([
-                "result" => false,
-                "code" => 400,
-                "message" => "Error, User has no Authorization",
-            ]);
-=======
-                "token" => $token
             ], 200);
         } else {
             return response()->json([
                 "result" => false,
                 "code" => 401,
-                "message" => "Error, User has no Authorization"
+                "message" => "Error, User has no Authorization",
             ], 401);
->>>>>>> e9766b639364d1fe7147e5e05dac45f44ef6e7c4
         }
     }
 
     public function profile(Request $request)
     {
         return response()->json([
-<<<<<<< HEAD
             'user' => Auth::guard('api')->user(),
-        ]);
-=======
-            'user' => Auth::guard('api')->user()
         ], 200);
->>>>>>> e9766b639364d1fe7147e5e05dac45f44ef6e7c4
     }
 
     public function logout(Request $request)
@@ -72,24 +56,14 @@ class ApiController extends Controller
             return response()->json([
                 "result" => true,
                 "code" => 200,
-<<<<<<< HEAD
                 "message" => "Log Out Success",
-            ]);
-=======
-                "message" => "Log Out Success"
             ], 200);
->>>>>>> e9766b639364d1fe7147e5e05dac45f44ef6e7c4
         } else {
             return response()->json([
                 "result" => false,
                 "code" => 400,
-<<<<<<< HEAD
                 "message" => "Error, Log Out Failed",
-            ]);
-=======
-                "message" => "Error, Log Out Failed"
             ], 401);
->>>>>>> e9766b639364d1fe7147e5e05dac45f44ef6e7c4
         }
     }
 
@@ -254,12 +228,12 @@ class ApiController extends Controller
             }
 
             // check balance
-            if($check_balance_debit != $check_balance_credit){
+            if ($check_balance_debit != $check_balance_credit) {
                 DB::rollback();
                 return response()->json([
                     "result" => false,
                     "code" => 400,
-                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance"
+                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance",
                 ], 400);
             }
 
@@ -443,12 +417,12 @@ class ApiController extends Controller
             }
 
             // check balance
-            if($check_balance_debit != $check_balance_credit){
+            if ($check_balance_debit != $check_balance_credit) {
                 DB::rollback();
                 return response()->json([
                     "result" => false,
                     "code" => 400,
-                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance"
+                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance",
                 ], 400);
             }
 
@@ -526,21 +500,17 @@ class ApiController extends Controller
                 ], 404);
             }
 
-<<<<<<< HEAD
-=======
             // cek apakah ada saldo_transaksi
             $check_trx_saldo = TrxSaldo::where("id_transaksi", $id_transaksi)->first();
-            if(empty($check_trx_saldo)){
+            if (empty($check_trx_saldo)) {
                 DB::rollback();
                 return response()->json([
                     "result" => false,
                     "code" => 404,
-                    "message" => "Error saldo transaksi belum ada"
+                    "message" => "Error saldo transaksi belum ada",
                 ], 404);
             }
 
-
->>>>>>> e9766b639364d1fe7147e5e05dac45f44ef6e7c4
             // detail
             // Memorial
             $akun_piutang_dagang = $data_akun_piutang_dagang->value2;
@@ -668,21 +638,17 @@ class ApiController extends Controller
                 }
             }
 
-<<<<<<< HEAD
-            if ($id_slip != null) {
-=======
             // check balance
-            if($check_balance_debit != $check_balance_credit){
+            if ($check_balance_debit != $check_balance_credit) {
                 DB::rollback();
                 return response()->json([
                     "result" => false,
                     "code" => 400,
-                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance"
+                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance",
                 ], 400);
             }
 
-            if($id_slip != null){
->>>>>>> e9766b639364d1fe7147e5e05dac45f44ef6e7c4
+            if ($id_slip != null) {
                 // init slip
                 $data_slip = Slip::find($id_slip);
 
@@ -794,7 +760,7 @@ class ApiController extends Controller
                             $trx_saldo = TrxSaldo::where("id_transaksi", $jd["id_transaksi"])->first();
                             if ($trx_saldo) {
                                 // cek untuk revert
-                                if($trx_saldo->bayar > 0){
+                                if ($trx_saldo->bayar > 0) {
                                     $update_trx_saldo = $this->revertTrxSaldo($trx_saldo, $jd['debet'], $jd['credit']);
                                 }
 
@@ -805,7 +771,7 @@ class ApiController extends Controller
                                     DB::rollback();
                                     return response()->json([
                                         "result" => false,
-                                        "message" => "Error when store Jurnal data on update saldo transaksi"
+                                        "message" => "Error when store Jurnal data on update saldo transaksi",
                                     ]);
                                 }
                             }
@@ -881,21 +847,17 @@ class ApiController extends Controller
                 ], 404);
             }
 
-<<<<<<< HEAD
-=======
             // cek apakah ada saldo_transaksi
             $check_trx_saldo = TrxSaldo::where("id_transaksi", $id_transaksi)->first();
-            if(empty($check_trx_saldo)){
+            if (empty($check_trx_saldo)) {
                 DB::rollback();
                 return response()->json([
                     "result" => false,
                     "code" => 404,
-                    "message" => "Error saldo transaksi belum ada"
+                    "message" => "Error saldo transaksi belum ada",
                 ], 404);
             }
 
-
->>>>>>> e9766b639364d1fe7147e5e05dac45f44ef6e7c4
             // detail
             // Memorial
             $akun_hutang_dagang = $data_akun_hutang_dagang->value2;
@@ -1022,21 +984,17 @@ class ApiController extends Controller
                 }
             }
 
-<<<<<<< HEAD
-            if ($id_slip != null) {
-=======
             // check balance
-            if($check_balance_debit != $check_balance_credit){
+            if ($check_balance_debit != $check_balance_credit) {
                 DB::rollback();
                 return response()->json([
                     "result" => false,
                     "code" => 400,
-                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance"
+                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance",
                 ], 400);
             }
 
-            if($id_slip != null){
->>>>>>> e9766b639364d1fe7147e5e05dac45f44ef6e7c4
+            if ($id_slip != null) {
                 // init slip
                 $data_slip = Slip::find($id_slip);
 
@@ -1148,7 +1106,7 @@ class ApiController extends Controller
                             $trx_saldo = TrxSaldo::where("id_transaksi", $jd["id_transaksi"])->first();
                             if ($trx_saldo) {
                                 // cek untuk revert
-                                if($trx_saldo->bayar > 0){
+                                if ($trx_saldo->bayar > 0) {
                                     $update_trx_saldo = $this->revertTrxSaldo($trx_saldo, $jd['debet'], $jd['credit']);
                                 }
 
@@ -1159,7 +1117,7 @@ class ApiController extends Controller
                                     DB::rollback();
                                     return response()->json([
                                         "result" => false,
-                                        "message" => "Error when store Jurnal data on update saldo transaksi"
+                                        "message" => "Error when store Jurnal data on update saldo transaksi",
                                     ]);
                                 }
                             }
@@ -1235,20 +1193,17 @@ class ApiController extends Controller
                 ], 404);
             }
 
-<<<<<<< HEAD
-=======
             // cek apakah ada saldo_transaksi
             $check_trx_saldo = TrxSaldo::where("id_transaksi", $id_transaksi)->first();
-            if(empty($check_trx_saldo)){
+            if (empty($check_trx_saldo)) {
                 DB::rollback();
                 return response()->json([
                     "result" => false,
                     "code" => 404,
-                    "message" => "Error saldo transaksi belum ada"
+                    "message" => "Error saldo transaksi belum ada",
                 ], 404);
             }
 
->>>>>>> e9766b639364d1fe7147e5e05dac45f44ef6e7c4
             // detail
             // Memorial
             $akun_piutang_dagang = $data_akun_piutang_dagang->value2;
@@ -1360,21 +1315,17 @@ class ApiController extends Controller
                 }
             }
 
-<<<<<<< HEAD
-            if ($id_slip != null) {
-=======
             // check balance
-            if($check_balance_debit != $check_balance_credit){
+            if ($check_balance_debit != $check_balance_credit) {
                 DB::rollback();
                 return response()->json([
                     "result" => false,
                     "code" => 400,
-                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance"
+                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance",
                 ], 400);
             }
 
-            if($id_slip != null){
->>>>>>> e9766b639364d1fe7147e5e05dac45f44ef6e7c4
+            if ($id_slip != null) {
                 // init slip
                 $data_slip = Slip::find($id_slip);
 
@@ -1486,7 +1437,7 @@ class ApiController extends Controller
                             $trx_saldo = TrxSaldo::where("id_transaksi", $jd["id_transaksi"])->first();
                             if ($trx_saldo) {
                                 // cek untuk revert
-                                if($trx_saldo->bayar > 0){
+                                if ($trx_saldo->bayar > 0) {
                                     $update_trx_saldo = $this->revertTrxSaldo($trx_saldo, $jd['debet'], $jd['credit']);
                                 }
 
@@ -1497,7 +1448,7 @@ class ApiController extends Controller
                                     DB::rollback();
                                     return response()->json([
                                         "result" => false,
-                                        "message" => "Error when store Jurnal data on update saldo transaksi"
+                                        "message" => "Error when store Jurnal data on update saldo transaksi",
                                     ]);
                                 }
                             }
@@ -1564,20 +1515,17 @@ class ApiController extends Controller
                 ], 404);
             }
 
-<<<<<<< HEAD
-=======
             // cek apakah ada saldo_transaksi
             $check_trx_saldo = TrxSaldo::where("id_transaksi", $id_transaksi)->first();
-            if(empty($check_trx_saldo)){
+            if (empty($check_trx_saldo)) {
                 DB::rollback();
                 return response()->json([
                     "result" => false,
                     "code" => 404,
-                    "message" => "Error saldo transaksi belum ada"
+                    "message" => "Error saldo transaksi belum ada",
                 ], 404);
             }
 
->>>>>>> e9766b639364d1fe7147e5e05dac45f44ef6e7c4
             // detail
             // Memorial
             $akun_hutang_dagang = $data_akun_hutang_dagang->value2;
@@ -1689,21 +1637,17 @@ class ApiController extends Controller
                 }
             }
 
-<<<<<<< HEAD
-            if ($id_slip != null) {
-=======
             // check balance
-            if($check_balance_debit != $check_balance_credit){
+            if ($check_balance_debit != $check_balance_credit) {
                 DB::rollback();
                 return response()->json([
                     "result" => false,
                     "code" => 400,
-                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance"
+                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance",
                 ], 400);
             }
 
-            if($id_slip != null){
->>>>>>> e9766b639364d1fe7147e5e05dac45f44ef6e7c4
+            if ($id_slip != null) {
                 // init slip
                 $data_slip = Slip::find($id_slip);
 
@@ -1815,7 +1759,7 @@ class ApiController extends Controller
                             $trx_saldo = TrxSaldo::where("id_transaksi", $jd["id_transaksi"])->first();
                             if ($trx_saldo) {
                                 // cek untuk revert
-                                if($trx_saldo->bayar > 0){
+                                if ($trx_saldo->bayar > 0) {
                                     $update_trx_saldo = $this->revertTrxSaldo($trx_saldo, $jd['debet'], $jd['credit']);
                                 }
 
@@ -1826,7 +1770,7 @@ class ApiController extends Controller
                                     DB::rollback();
                                     return response()->json([
                                         "result" => false,
-                                        "message" => "Error when store Jurnal data on update saldo transaksi"
+                                        "message" => "Error when store Jurnal data on update saldo transaksi",
                                     ]);
                                 }
                             }
@@ -1902,8 +1846,7 @@ class ApiController extends Controller
             }
             return true;
             // DB::commit();
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             // DB::rollback();
             Log::error($e);
             return false;
@@ -1956,8 +1899,7 @@ class ApiController extends Controller
             }
             return true;
             // DB::commit();
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             // DB::rollback();
             Log::error($e);
             return false;
