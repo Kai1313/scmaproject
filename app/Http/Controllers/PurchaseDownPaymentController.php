@@ -109,13 +109,15 @@ class PurchaseDownPaymentController extends Controller
             $data->save();
 
             $resApi = $this->callApiJournal($data);
-            if (!$resApi->result) {
+            $convertResApi = json_decode(json_encode($resApi), true);
+
+            if ($convertResApi['original']['result'] == false) {
                 DB::rollback();
-                Log::error("Error when save purchase down payment");
-                Log::error($resApi);
+                Log::error($convertResApi['original']['message']);
+                Log::error($convertResApi['original']);
                 return response()->json([
                     "result" => false,
-                    "message" => "Data gagal tersimpan",
+                    "message" => $convertResApi['original']['message'],
                 ]);
             }
 
@@ -156,38 +158,41 @@ class PurchaseDownPaymentController extends Controller
             ]);
         }
 
-        try {
-            DB::beginTransaction();
-            $data->void = 1;
-            $data->void_user_id = session()->get('user')['id_pengguna'];
-            $data->save();
+        // try {
+        //     DB::beginTransaction();
+        //     $data->void = 1;
+        //     $data->void_user_id = session()->get('user')['id_pengguna'];
+        //     $data->save();
 
-            $resApi = $this->callApiJournal($data);
-            if (!$resApi->result) {
-                DB::rollback();
-                Log::error("Error when void purchase down payment");
-                Log::error($resApi);
-                return response()->json([
-                    "result" => false,
-                    "message" => "Data gagal tersimpan",
-                ]);
-            }
+        $resApi = $this->callApiJournal($data);
+        $convertResApi = json_decode(json_encode($resApi), true);
+        dd($convertResApi);
 
-            DB::commit();
-            return response()->json([
-                "result" => true,
-                "message" => "Data berhasil dibatalkan",
-                "redirect" => route('purchase-down-payment'),
-            ]);
-        } catch (\Exception $e) {
-            DB::rollback();
-            Log::error("Error when void purchase down payment");
-            Log::error($e);
-            return response()->json([
-                "result" => false,
-                "message" => "Data gagal tersimpan",
-            ]);
-        }
+        // if ($convertResApi['original']['result'] == false) {
+        //     DB::rollback();
+        //     Log::error($convertResApi['original']['message']);
+        //     Log::error($convertResApi['original']);
+        //     return response()->json([
+        //         "result" => false,
+        //         "message" => $convertResApi['original']['message'],
+        //     ]);
+        // }
+
+        // DB::commit();
+        //     return response()->json([
+        //         "result" => true,
+        //         "message" => "Data berhasil dibatalkan",
+        //         "redirect" => route('purchase-down-payment'),
+        //     ]);
+        // } catch (\Exception $e) {
+        //     DB::rollback();
+        //     Log::error("Error when void purchase down payment");
+        //     Log::error($e);
+        //     return response()->json([
+        //         "result" => false,
+        //         "message" => "Data gagal tersimpana",
+        //     ]);
+        // }
     }
 
     public function autoPo(Request $request)
@@ -299,41 +304,58 @@ class PurchaseDownPaymentController extends Controller
     {
         try {
             $date = date('Y-m-d H:i:s');
-            $findToken = DB::table('token_pengguna')->where('id_pengguna', session()->get('user')['id_pengguna'])
+            $findToken = DB::table('token_pengguna')->where('id_pengguna', 72)
                 ->where('status_token_pengguna', '1')
                 ->where('waktu_habis_token_pengguna', '>=', $date)
                 ->where('nama2_token_pengguna', '!=', null)
                 ->orderBy('id_token_pengguna', 'desc')->first();
+            return $findToken;
             $token = $findToken->nama2_token_pengguna;
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, route('jurnal-otomatis-uangmuka-pembelian'));
-            curl_setopt($ch, CURLOPT_POST, 1);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-                'Accept: application/json',
-                'Authorization: Bearer ' . $token,
-            ));
-            curl_setopt($ch, CURLOPT_POSTFIELDS,
-                http_build_query(
-                    array(
-                        "no_transaksi" => $data->kode_uang_muka_pembelian,
-                        "tanggal" => $data->tanggal,
-                        "slip" => $data->id_slip,
-                        "cabang" => $data->id_cabang,
-                        "pemasok" => $data->purchaseOrder->id_pemasok,
-                        "void" => $data->void,
-                        "user" => session()->get('user')['id_pengguna'],
-                        "total" => $data->nominal,
-                        "uang_muka" => $data->nominal,
-                        "ppn" => 0,
+            if ($token) {
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, route('jurnal-otomatis-uangmuka-pembelian'));
+                curl_setopt($ch, CURLOPT_POST, 1);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                    'Accept: application/json',
+                    'Authorization: Bearer ' . $token,
+                ));
+                curl_setopt($ch, CURLOPT_POSTFIELDS,
+                    http_build_query(
+                        array(
+                            "no_transaksi" => $data->kode_uang_muka_pembelian,
+                            "tanggal" => $data->tanggal,
+                            "slip" => $data->id_slip,
+                            "cabang" => $data->id_cabang,
+                            "pemasok" => $data->purchaseOrder->id_pemasok,
+                            "void" => $data->void,
+                            "user" => session()->get('user')['id_pengguna'],
+                            "total" => $data->nominal,
+                            "uang_muka" => $data->nominal,
+                            "ppn" => 0,
+                        )
                     )
-                )
-            );
-            $data = curl_exec($ch);
-            curl_close($ch);
-            return json_decode($data);
+                );
+
+                $newData = curl_exec($ch);
+
+                curl_close($ch);
+                return $newData;
+            } else {
+                Log::error("Error when token tidak ditemukan");
+                return response()->json([
+                    "result" => false,
+                    "message" => "Token tidak ditemukan",
+                ]);
+            }
+
         } catch (\Throwable $th) {
-            return response()->json($th);
+            Log::error("Error when gagal purchase down payment");
+            Log::error($th);
+            return response()->json([
+                "result" => false,
+                "message" => "Data gagal tersimpan",
+            ]);
         }
     }
 }
