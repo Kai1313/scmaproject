@@ -300,7 +300,7 @@
                             <li
                                 class="nav-item {{ request()->segment(1) == 'purchase_requisitions' ? 'active' : null }}">
                                 <a href="{{ route('purchase-request') }}">
-                                    <i class="glyphicon glyphicon-option-vertical"></i> Purchase Requesition (PR)
+                                    <i class="glyphicon glyphicon-option-vertical"></i> Purchase Requisitions (PR)
                                 </a>
                             </li>
                             <li>
@@ -318,11 +318,11 @@
                                     <i class="glyphicon glyphicon-option-vertical"></i>Invoice Pembelian (Rp)
                                 </a>
                             </li>
-                            <li>
+                            {{-- <li>
                                 <a href="{{ env('OLD_URL_ROOT') }}#cc_pembelian">
                                     <i class="glyphicon glyphicon-option-vertical"></i>CC Invoice Pembelian (Rp)
                                 </a>
-                            </li>
+                            </li> --}}
                             <li>
                                 <a href="{{ env('OLD_URL_ROOT') }}#retur_pembelian">
                                     <i class="glyphicon glyphicon-option-vertical"></i>Retur Pembelian
