@@ -109,15 +109,14 @@ class PurchaseDownPaymentController extends Controller
             $data->save();
 
             $resApi = $this->callApiJournal($data);
-            $convertResApi = json_decode(json_encode($resApi), true);
-
-            if ($convertResApi['original']['result'] == false) {
+            $convertResApi = (array) json_decode($resApi);
+            if ($convertResApi['result'] == false) {
                 DB::rollback();
-                Log::error($convertResApi['original']['message']);
-                Log::error($convertResApi['original']);
+                Log::error($convertResApi['message']);
+                Log::error($convertResApi);
                 return response()->json([
                     "result" => false,
-                    "message" => $convertResApi['original']['message'],
+                    "message" => $convertResApi['message'],
                 ]);
             }
 
@@ -158,41 +157,39 @@ class PurchaseDownPaymentController extends Controller
             ]);
         }
 
-        // try {
-        //     DB::beginTransaction();
-        //     $data->void = 1;
-        //     $data->void_user_id = session()->get('user')['id_pengguna'];
-        //     $data->save();
+        try {
+            DB::beginTransaction();
+            $data->void = 1;
+            $data->void_user_id = session()->get('user')['id_pengguna'];
+            $data->save();
 
-        $resApi = $this->callApiJournal($data);
-        $convertResApi = json_decode(json_encode($resApi), true);
-        dd($convertResApi);
+            $resApi = $this->callApiJournal($data);
+            $convertResApi = (array) json_decode($resApi);
+            if ($convertResApi['result'] == false) {
+                DB::rollback();
+                Log::error($convertResApi['message']);
+                Log::error($convertResApi);
+                return response()->json([
+                    "result" => false,
+                    "message" => $convertResApi['message'],
+                ]);
+            }
 
-        // if ($convertResApi['original']['result'] == false) {
-        //     DB::rollback();
-        //     Log::error($convertResApi['original']['message']);
-        //     Log::error($convertResApi['original']);
-        //     return response()->json([
-        //         "result" => false,
-        //         "message" => $convertResApi['original']['message'],
-        //     ]);
-        // }
-
-        // DB::commit();
-        //     return response()->json([
-        //         "result" => true,
-        //         "message" => "Data berhasil dibatalkan",
-        //         "redirect" => route('purchase-down-payment'),
-        //     ]);
-        // } catch (\Exception $e) {
-        //     DB::rollback();
-        //     Log::error("Error when void purchase down payment");
-        //     Log::error($e);
-        //     return response()->json([
-        //         "result" => false,
-        //         "message" => "Data gagal tersimpana",
-        //     ]);
-        // }
+            DB::commit();
+            return response()->json([
+                "result" => true,
+                "message" => "Data berhasil dibatalkan",
+                "redirect" => route('purchase-down-payment'),
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error("Error when void purchase down payment");
+            Log::error($e);
+            return response()->json([
+                "result" => false,
+                "message" => "Data gagal tersimpana",
+            ]);
+        }
     }
 
     public function autoPo(Request $request)
@@ -304,12 +301,11 @@ class PurchaseDownPaymentController extends Controller
     {
         try {
             $date = date('Y-m-d H:i:s');
-            $findToken = DB::table('token_pengguna')->where('id_pengguna', 72)
+            $findToken = DB::table('token_pengguna')->where('id_pengguna', session()->get('user')['id_pengguna'])
                 ->where('status_token_pengguna', '1')
                 ->where('waktu_habis_token_pengguna', '>=', $date)
                 ->where('nama2_token_pengguna', '!=', null)
-                ->orderBy('id_token_pengguna', 'desc')->first();
-            return $findToken;
+                ->orderBy('date_token_pengguna', 'desc')->first();
             $token = $findToken->nama2_token_pengguna;
             if ($token) {
                 $ch = curl_init();
@@ -336,9 +332,7 @@ class PurchaseDownPaymentController extends Controller
                         )
                     )
                 );
-
                 $newData = curl_exec($ch);
-
                 curl_close($ch);
                 return $newData;
             } else {
@@ -348,7 +342,6 @@ class PurchaseDownPaymentController extends Controller
                     "message" => "Token tidak ditemukan",
                 ]);
             }
-
         } catch (\Throwable $th) {
             Log::error("Error when gagal purchase down payment");
             Log::error($th);
