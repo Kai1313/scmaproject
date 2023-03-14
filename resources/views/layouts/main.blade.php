@@ -166,7 +166,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
 </head>
 
-<body class="hold-transition skin-yellow sidebar-mini">
+<body class="hold-transition skin-yellow fixed sidebar-mini">
     <div class="wrapper">
         @include('layouts.navbar')
         @include('layouts.sidebar')
@@ -185,7 +185,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
     @include('includes.scripts')
     @yield('addedScripts')
     <!-- AdminLTE App -->
-    <script src="{{ asset('assets/dist/js/adminlte.min.js') }}"></script>
+    <script src="{{ asset('assets/dist/js/adminlte.js') }}"></script>
+    <script src="{{ asset('assets/bower_components/jquery-slimscroll/jquery.slimscroll.min.js') }}"></script>
     @yield('externalScripts')
 </body>
 
