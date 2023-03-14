@@ -53,7 +53,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         }
 
         .skin-yellow .sidebar-menu>li>.treeview-menu {
-            background-color: #1e282c;
+            background-color: #161f22 !important;
         }
 
         .skin-yellow .sidebar-menu>li>.treeview-menu>li:hover {
@@ -61,6 +61,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         }
 
         .skin-yellow .sidebar-menu>li>.treeview-menu>li>a {
+            background-color: #161f22;
             padding: 10px 5px 10px 15px;
         }
 
@@ -72,7 +73,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             background-color: #161f22;
         }
 
-        .skin-yellow .sidebar-menu>li>.treeview-menu>.treeview>.treeview-menu>li:hover {
+        .skin-yellow .sidebar-menu>li>.treeview-menu .skin-yellow .sidebar-menu>li>.treeview-menu>.treeview>.treeview-menu>li:hover {
             background-color: #7d6129;
         }
 
