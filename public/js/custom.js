@@ -46,15 +46,16 @@ function formatNumber(angka) {
 }
 
 function formatRupiah(angka, prefix, self = '') {
-    angka = angka.toString().replace(/^\,/, '').replace(/[^,\d]/g, '')
+    angka = angka.toString().replace(/^\,|^0/, '0').replace(/[^,\d]/g, '')
     let number_string = angka.toString()
 
     if (self && normalizeNumber(number_string) > self.data('max')) {
         number_string = self.data('max').toString()
     }
 
-    let split = number_string.split(','),
-        sisa = split[0].length % 3,
+    let split = number_string.split(',');
+    split[0] = '' + parseInt(split[0])
+    let sisa = split[0].length % 3,
         rupiah = split[0].substr(0, sisa),
         ribuan = split[0].substr(sisa).match(/\d{3}/gi);
 
