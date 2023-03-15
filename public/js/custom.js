@@ -70,9 +70,9 @@ function formatRupiah(angka, prefix, self = '') {
 
 function normalizeNumber(number) {
     if (number.indexOf(',')) {
-        number = number.replace('.', '').replace(',', '.')
+        number = number.replaceAll('.', '').replaceAll(',', '.')
     } else {
-        number = number.replace('.', '')
+        number = number.replaceAll('.', '')
     }
 
     return parseFloat(number)

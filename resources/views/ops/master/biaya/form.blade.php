@@ -153,6 +153,10 @@
         $('.select2').select2()
         if ($('[name="ispph"]').is(':checked')) {
             $('.show-pph').prop('disabled', false)
+            $('[name="value_pph"]').attr('data-validation', '[NOTEMPTY]').attr('data-validation-message',
+                'Nilai pph tidak boleh kosong')
+            $('[name="id_akun_pph"]').attr('data-validation', '[NOTEMPTY]').attr('data-validation-message',
+                'Akun pph tidak boleh kosong')
         } else {
             $('.show-pph').prop('disabled', true)
         }

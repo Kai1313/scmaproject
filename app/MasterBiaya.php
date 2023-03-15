@@ -10,7 +10,6 @@ class MasterBiaya extends Model
 {
     protected $table = 'master_biaya';
     protected $primaryKey = 'id_biaya';
-    public $timestamps = false;
 
     const CREATED_AT = 'dt_created';
     const UPDATED_AT = 'dt_modified';

@@ -29,7 +29,7 @@ class MasterBiayaController extends Controller
                 $data = $data->where('mb.id_cabang', $request->c);
             }
 
-            $data = $data->orderBy('created_at', 'asc');
+            $data = $data->orderBy('mb.dt_created', 'desc');
             return Datatables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
@@ -82,9 +82,9 @@ class MasterBiayaController extends Controller
             DB::beginTransaction();
             if (!$data) {
                 $data = new MasterBiaya;
-                $data->user_created = session()->get('user')['id_pengguna'];
+                $dat['user_created'] = session()->get('user')['id_pengguna'];
             } else {
-                $data->user_modified = session()->get('user')['id_pengguna'];
+                $data['user_modified'] = session()->get('user')['id_pengguna'];
             }
 
             $data->fill($request->all());
