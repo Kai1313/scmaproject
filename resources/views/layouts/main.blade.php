@@ -73,6 +73,11 @@ scratch. This page gets rid of all links and provides the needed markup only.
             background-color: #161f22;
         }
 
+        .skin-yellow .sidebar-menu .treeview-menu>li.active>a,
+        .skin-yellow .sidebar-menu .treeview-menu>li>a:hover {
+            background-color: #7d6129;
+        }
+
         .skin-yellow .sidebar-menu>li>.treeview-menu .skin-yellow .sidebar-menu>li>.treeview-menu>.treeview>.treeview-menu>li:hover {
             background-color: #7d6129;
         }
