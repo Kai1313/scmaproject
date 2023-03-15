@@ -82,6 +82,18 @@ class MasterWrapperController extends Controller
                 $data['dt_modified'] = date('Y-m-d H:i:s');
             }
 
+            $checkData = DB::table('master_wrapper')
+                ->where('id_cabang', $request->id_cabang)
+                ->where('nama_wrapper', $request->nama_wrapper)
+                ->where('id_wrapper', '!=', $id)->first();
+            if ($checkData) {
+                DB::rollback();
+                return response()->json([
+                    "result" => false,
+                    "message" => "Nama " . $request->nama_wrapper . " sudah ada",
+                ]);
+            }
+
             $data->fill($request->all());
             $data['weight'] = normalizeNumber($request->weight);
             $data->save();

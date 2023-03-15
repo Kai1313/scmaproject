@@ -87,6 +87,18 @@ class MasterBiayaController extends Controller
                 $data['user_modified'] = session()->get('user')['id_pengguna'];
             }
 
+            $checkData = DB::table('master_biaya')
+                ->where('id_cabang', $request->id_cabang)
+                ->where('nama_biaya', $request->nama_biaya)
+                ->where('id_biaya', '!=', $id)->first();
+            if ($checkData) {
+                DB::rollback();
+                return response()->json([
+                    "result" => false,
+                    "message" => "Nama " . $request->nama_biaya . " sudah ada",
+                ]);
+            }
+
             $data->fill($request->all());
             $data['isppn'] = isset($request->isppn) ? $request->isppn : 0;
             $data['ispph'] = isset($request->ispph) ? $request->ispph : 0;
