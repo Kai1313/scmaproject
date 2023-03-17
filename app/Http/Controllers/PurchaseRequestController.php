@@ -147,6 +147,14 @@ class PurchaseRequestController extends Controller
     public function viewData($id)
     {
         $data = PurchaseRequest::find($id);
+        // $array = [
+        //     '1' => [1, 3],
+        //     '2' => [8],
+        // ];
+
+        // $stock = DB::table('kartu_stok')->select(DB::raw('sum(kartu_stok.debit_kartu_stok) - sum(kredit_kartu_stok) as saldo'), 'id_barang')->whereIn('id_gudang', $array[$data->id_cabang])
+        //     ->groupBy('id_barang')->get();
+        // return $stock;
 
         return view('ops.purchaseRequest.detail', [
             'data' => $data,

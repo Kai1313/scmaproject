@@ -40,10 +40,18 @@ class PurchaseRequest extends Model
 
     public function formatdetail()
     {
+        $arrayCabang = [
+            '1' => [1, 3],
+            '2' => [8],
+        ];
         return $this->hasMany(PurchaseRequestDetail::class, 'purchase_request_id')
-            ->select('index', 'purchase_request_detail.id_barang', 'nama_barang', 'kode_barang', 'purchase_request_detail.id_satuan_barang', 'nama_satuan_barang', 'qty', 'notes')
+            ->select('index', 'purchase_request_detail.id_barang', 'nama_barang', 'kode_barang', 'purchase_request_detail.id_satuan_barang', 'nama_satuan_barang', 'qty', 'notes',
+                DB::raw('sum(debit_kartu_stok) - sum(kredit_kartu_stok) as stok'))
             ->leftJoin('barang', 'purchase_request_detail.id_barang', '=', 'barang.id_barang')
-            ->leftJoin('satuan_barang', 'purchase_request_detail.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang');
+            ->leftJoin('satuan_barang', 'purchase_request_detail.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
+            ->leftJoin('kartu_stok', 'purchase_request_detail.id_barang', '=', 'kartu_stok.id_barang')
+            ->whereIn('kartu_stok.id_gudang', $arrayCabang[$this->id_cabang])
+            ->groupBy('id_barang');
     }
 
     public function savedetails($details)
