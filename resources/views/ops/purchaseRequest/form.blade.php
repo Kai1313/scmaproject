@@ -237,7 +237,6 @@
                 <div class="modal-content">
                     <div class="modal-body">
                         <div class="alert alert-danger" style="display:none;" id="alertModal">
-                            Lengkapi Data yang diperlukan
                         </div>
                         <input type="hidden" name="index" value="0">
                         <label>Nama Barang <span>*</span></label>
@@ -427,7 +426,7 @@
                 $(v).val('').trigger('change')
             })
 
-            $('#alertModal').hide()
+            $('#alertModal').text('').hide()
             statusModal = 'create'
             count += 1
             $('#modalEntry').find('[name="index"]').val(count)
@@ -447,10 +446,10 @@
         $('.save-entry').click(function() {
             let valid = validatorModal()
             if (!valid.status) {
-                $('#alertModal').show()
+                $('#alertModal').text(valid.message).show()
                 return false
             } else {
-                $('#alertModal').hide()
+                $('#alertModal').text('').hide()
             }
 
             let modal = $('#modalEntry')
@@ -493,7 +492,7 @@
                 $(v).val('').trigger('change')
             })
 
-            $('#alertModal').hide()
+            $('#alertModal').text('').hide()
             $('#modalEntry').modal({
                 backdrop: 'static',
                 keyboard: false
@@ -547,15 +546,26 @@
         })
 
         function validatorModal() {
+            let message = 'Lengkapi inputan yang diperlukan'
             let valid = true
             $('#modalEntry').find('.validate').each(function(i, v) {
                 if ($(v).val() == '') {
                     valid = false
                 }
+
+                if ($(v).prop('name') == 'id_barang') {
+                    let findItem = details.filter(p => p.id_barang == $(v).val())
+                    if (findItem.length > 0) {
+                        console.log(findItem)
+                        message = "Barang sudah ada"
+                        valid = false
+                    }
+                }
             })
 
             return {
-                'status': valid
+                'status': valid,
+                'message': message
             }
         }
     </script>
