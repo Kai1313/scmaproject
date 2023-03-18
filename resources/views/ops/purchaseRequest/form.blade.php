@@ -216,6 +216,7 @@
                                     <th>Satuan</th>
                                     <th>Jumlah</th>
                                     <th>Catatan</th>
+                                    <th>Stok</th>
                                     <th style="width:150px;">Action</th>
                                 </tr>
                             </thead>
@@ -318,6 +319,12 @@
                 {
                     data: 'notes',
                     name: 'notes'
+                },
+                {
+                    data: 'stok',
+                    name: 'stok',
+                    render: $.fn.dataTable.render.number('.', ',', 4),
+                    className: 'text-right'
                 },
                 {
                     data: 'index',
@@ -454,6 +461,8 @@
                     detailSelect[$(v).prop('name')] = $(v).val()
                 }
             })
+
+            detailSelect['stok'] = null
 
             let newObj = Object.assign({}, detailSelect)
             if (statusModal == 'create') {
