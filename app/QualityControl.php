@@ -2,6 +2,7 @@
 
 namespace App;
 
+use DB;
 use Illuminate\Database\Eloquent\Model;
 
 class QualityControl extends Model
@@ -19,13 +20,33 @@ class QualityControl extends Model
         return $this->belongsTo(Cabang::class, 'id_cabang');
     }
 
-    public function gudang()
+    public function purchase()
     {
-        return $this->belongsTo(Gudang::class, 'id_gudang');
+        return $this->belongsTo(Purchase::class, 'id_pembelian');
     }
 
-    public function purchasing()
+    public function barang()
     {
-        return Purchasing::find($this->id_pembelian);
+        return $this->belongsTo(Barang::class, 'id_barang');
+    }
+
+    public function satuan()
+    {
+        return $this->belongsTo(Satuan::class, 'id_satuan_barang');
+    }
+
+    public function updatePembelianDetail()
+    {
+        $array = [
+            'sg_pembelian_detail' => $this->sg_pembelian_detail,
+            'be_pembelian_detail' => $this->be_pembelian_detail,
+            'ph_pembelian_detail' => $this->ph_pembelian_detail,
+            'warna_pembelian_detail' => $this->warna_pembelian_detail,
+            'keterangan_pembelian_detail' => $this->keterangan_pembelian_detail,
+        ];
+
+        DB::table('pembelian_detail')->where('id_pembelian', $this->id_pembelian)
+            ->where('id_barang', $this->id_barang)->update($array);
+
     }
 }

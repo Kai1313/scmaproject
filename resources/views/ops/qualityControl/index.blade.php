@@ -65,13 +65,20 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-8">
-                        {{-- <span class="badge badge-default rounded-0 pull-right">
-                            <input class="form-check-input" type="checkbox" id="void" name="show_void">
-                            <label class="form-check-label" for="void">
-                                Void
-                            </label>
-                        </span> --}}
+                    <div class="col-md-2">
+                        <label>Tanggal Awal</label>
+                        <div class="form-group">
+                            <input type="date" name="start_date" class="form-control"
+                                value="{{ date('Y-m-d', strtotime('-1 month')) }}">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <label>Tanggal Akhir</label>
+                        <div class="form-group">
+                            <input type="date" name="end_date" class="form-control" value="{{ date('Y-m-d') }}">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
                         <a href="{{ route('qc_receipt-entry') }}" class="btn btn-success pull-right btn-flat btn-sm mr-1">
                             <i class="glyphicon glyphicon-plus"></i> Tambah QC Penerimaan Pembelian
                         </a>
@@ -89,11 +96,12 @@
                                 <th>Total Qty</th>
                                 <th>Satuan</th>
                                 <th>Status</th>
-                                <th>Keterangan</th>
+                                <th>Alasan</th>
                                 <th>SG</th>
                                 <th>BE</th>
                                 <th>PH</th>
                                 <th>Warna</th>
+                                <th>Keterangan</th>
                                 <th width="150px">Action</th>
                             </tr>
                         </thead>
@@ -109,49 +117,67 @@
 @section('addedScripts')
     <script src="{{ asset('assets/bower_components/datatables.net/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js') }}"></script>
+    {{-- <script src="{{ asset('assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js') }}"></script> --}}
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/custom.js') }}"></script>
 @endsection
 
 @section('externalScripts')
     <script>
+        // $('.datepicker').datepicker({
+        //     format: 'yyyy-mm-dd',
+        // });
+
         var table = $('.data-table').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route('qc_receipt') }}?c=" + $('[name="id_cabang"]').val(),
+            ajax: "{{ route('qc_receipt') }}?c=" + $('[name="id_cabang"]').val() + '&start_date=' + $(
+                '[name="start_date"]').val() + '&end_date=' + $('[name="end_date"]').val(),
             columns: [{
                 data: 'tanggal_qc',
                 name: 'tanggal_qc'
             }, {
-                data: 'id_pembelian',
-                name: 'id_pembelian'
+                data: 'nama_pembelian',
+                name: 'nama_pembelian'
             }, {
-                data: 'id_barang',
-                name: 'id_barang',
+                data: 'nama_barang',
+                name: 'nama_barang',
             }, {
                 data: 'jumlah_pembelian_detail',
                 name: 'jumlah_pembelian_detail',
+                render: $.fn.dataTable.render.number('.', ',', 4),
+                className: 'text-right'
             }, {
-                data: 'id_satuan_barang',
-                name: 'id_satuan_barang',
+                data: 'nama_satuan_barang',
+                name: 'nama_satuan_barang',
             }, {
                 data: 'status_qc',
-                name: 'status_qc'
+                name: 'status_qc',
+                className: 'text-center'
             }, {
                 data: 'reason',
                 name: 'reason',
             }, {
-                data: '	sg_pembelian_detail',
-                name: '	sg_pembelian_detail',
+                data: 'sg_pembelian_detail',
+                name: 'sg_pembelian_detail',
+                render: $.fn.dataTable.render.number('.', ',', 4),
+                className: 'text-right'
             }, {
                 data: 'be_pembelian_detail',
                 name: 'be_pembelian_detail',
+                render: $.fn.dataTable.render.number('.', ',', 4),
+                className: 'text-right'
             }, {
                 data: 'ph_pembelian_detail',
                 name: 'ph_pembelian_detail',
+                render: $.fn.dataTable.render.number('.', ',', 4),
+                className: 'text-right'
             }, {
                 data: 'warna_pembelian_detail',
                 name: 'warna_pembelian_detail',
+            }, {
+                data: 'keterangan_pembelian_detail',
+                name: 'keterangan_pembelian_detail',
             }, {
                 data: 'action',
                 name: 'action',
@@ -161,62 +187,9 @@
             }, ]
         });
 
-        $('[name="id_cabang"]').change(function() {
-            table.ajax.url("?c=" + $('[name="id_cabang"]').val() + '&show_void=' + $('[name="show_void"]').is(
-                ':checked')).load()
+        $('[name="id_cabang"],[name="start_date"],[name="end_date"]').change(function() {
+            table.ajax.url("?c=" + $('[name="id_cabang"]').val() + '&start_date=' + $('[name="start_date"]').val() +
+                '&end_date=' + $('[name="end_date"]').val()).load()
         })
-
-        $('[name="show_void"]').change(function() {
-            table.ajax.url("?c=" + $('[name="id_cabang"]').val() + '&show_void=' + $('[name="show_void"]').is(
-                ':checked')).load()
-        })
-
-        $('body').on('click', '.btn-change-status', function(e) {
-            let self = $(this)
-            e.preventDefault();
-            Swal.fire({
-                title: 'Anda yakin ingin ' + self.data('param') + ' data ini?',
-                icon: 'info',
-                showDenyButton: true,
-                confirmButtonText: 'Yes',
-                denyButtonText: 'No',
-                reverseButtons: true,
-                customClass: {
-                    actions: 'my-actions',
-                    confirmButton: 'order-1',
-                    denyButton: 'order-3',
-                }
-            }).then((result) => {
-                $('#cover-spin').hide()
-                if (result.isConfirmed) {
-                    changeData(self.prop('href'))
-                }
-            })
-        })
-
-        function changeData(url) {
-            $('#cover-spin').show()
-            $.ajax({
-                url: url,
-                type: "get",
-                dataType: "JSON",
-                success: function(data) {
-                    $('#cover-spin').hide()
-                    if (data.result) {
-                        Swal.fire('Berhasil', data.message, 'success').then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.href = data.redirect;
-                            }
-                        })
-                    } else {
-                        Swal.fire("Gagal", data.message, 'error')
-                    }
-                },
-                error: function(data) {
-                    $('#cover-spin').hide()
-                    Swal.fire("Gagal", data.responseJSON.message, 'error')
-                }
-            })
-        }
     </script>
 @endsection

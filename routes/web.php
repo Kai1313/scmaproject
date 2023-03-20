@@ -67,9 +67,9 @@ Route::prefix('uang_muka_pembelian')->group(function () {
 Route::prefix('qc_penerimaan_barang')->group(function () {
     Route::get('/index/{user_id?}', 'QcReceiptController@index')->name('qc_receipt');
     Route::get('/entry/{id?}', 'QcReceiptController@entry')->name('qc_receipt-entry');
-    Route::get('/view/{id}', 'QcReceiptController@viewData')->name('qc_receipt-view');
+    // Route::get('/view/{id}', 'QcReceiptController@viewData')->name('qc_receipt-view');
     Route::post('/save_entry/{id}', 'QcReceiptController@saveEntry')->name('qc_receipt-save-entry');
-    Route::get('/delete/{id}', 'QcReceiptController@destroy')->name('qc_receipt-delete');
+    // Route::get('/delete/{id}', 'QcReceiptController@destroy')->name('qc_receipt-delete');
     Route::get('/auto_purchasing', 'QcReceiptController@autoPurchasing')->name('qc_receipt-auto-purchasing');
     Route::get('/auto-item', 'QcReceiptController@autoItem')->name('qc_receipt-auto-item');
     // Route::get('/auto_po', 'QcReceiptController@autoPo')->name('purchase-down-payment-auto-po');

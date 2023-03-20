@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\UserToken;
+use App\Purchase;
 use App\QualityControl;
 use Carbon\Carbon;
 use DB;
@@ -13,6 +14,13 @@ use Yajra\DataTables\DataTables;
 
 class QcReceiptController extends Controller
 {
+    public $arrayStatus = [
+        ['text' => '', 'class' => 'label label-default'],
+        ['text' => 'Passed', 'class' => 'label label-success'],
+        ['text' => 'Reject', 'class' => 'label label-danger'],
+        ['text' => 'Hols', 'class' => 'label label-default'],
+    ];
+
     public function index(Request $request)
     {
         $checkAuth = $this->checkUser($request);
@@ -21,34 +29,35 @@ class QcReceiptController extends Controller
         }
 
         if ($request->ajax()) {
-            $data = DB::table('qc');
+            $data = DB::table('qc')->select('id', 'tanggal_qc', 'nama_pembelian', 'nama_barang', 'jumlah_pembelian_detail', 'status_qc', 'nama_satuan_barang', 'reason', 'sg_pembelian_detail', 'be_pembelian_detail', 'ph_pembelian_detail', 'warna_pembelian_detail', 'keterangan_pembelian_detail')
+                ->leftJoin('pembelian', 'qc.id_pembelian', '=', 'pembelian.id_pembelian')
+                ->leftJoin('barang', 'qc.id_barang', '=', 'barang.id_barang')
+                ->leftJoin('satuan_barang', 'qc.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
+                ->whereBetween('tanggal_qc', [$request->start_date, $request->end_date]);
             if (isset($request->c)) {
                 $data = $data->where('qc.id_cabang', $request->c);
             }
 
             $data = $data->orderBy('qc.tanggal_qc', 'desc');
-
             return Datatables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
-
                     $btn = '<ul class="horizontal-list">';
-                    $btn .= '<li><a href="' . route('purchase-request-view', $row->purchase_request_id) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
-                    $btn .= '<li><a href="' . route('purchase-request-entry', $row->purchase_request_id) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
-                    $btn .= '<li><a href="' . route('purchase-request-delete', $row->purchase_request_id) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Void</a></li>';
-
+                    $btn .= '<li><a href="' . route('purchase-request-view', $row->id) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
+                    $btn .= '<li><a href="' . route('purchase-request-entry', $row->id) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
+                    $btn .= '<li><a href="' . route('purchase-request-delete', $row->id) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Void</a></li>';
                     $btn .= '</ul>';
 
                     return $btn;
                 })
-
-                ->rawColumns(['action'])
+                ->editColumn('status_qc', function ($row) {
+                    return '<label class="' . $this->arrayStatus[$row->status_qc]['class'] . '">' . $this->arrayStatus[$row->status_qc]['text'] . '</label>';
+                })
+                ->rawColumns(['action', 'status_qc'])
                 ->make(true);
-
         }
 
         $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
-
         return view('ops.qualityControl.index', [
             'cabang' => $cabang,
             "pageTitle" => "SCA OPS | QC Permintaan Pembelian | List",
@@ -64,31 +73,38 @@ class QcReceiptController extends Controller
             'data' => $data,
             'cabang' => $cabang,
             "pageTitle" => "SCA OPS | QC Penerimaan Pembelian | " . ($id == 0 ? 'Create' : 'Edit'),
+            'arrayStatus' => $this->arrayStatus,
         ]);
     }
 
     public function saveEntry(Request $request, $id = 0)
     {
-        $data = QualityControl::find($id);
         try {
             DB::beginTransaction();
-            if (!$data) {
-                $data = new QualityControl;
+            $datas = json_decode($request->details);
+            foreach ($datas as $value) {
+                $data = QualityControl::find($value->id);
+                if (!$data) {
+                    $data = new QualityControl;
+                    $data->tanggal_qc = date('Y-m-d');
+                    $data->id_cabang = $request->id_cabang;
+                    $data->id_pembelian = $request->id_pembelian;
+                    $data->id_barang = $value->id_barang;
+                    $data->id_satuan_barang = $value->id_satuan_barang;
+                    $data->jumlah_pembelian_detail = $value->jumlah_pembelian_detail;
+                }
+
+                $data->status_qc = $value->status_qc;
+                $data->reason = $value->reason;
+                $data->sg_pembelian_detail = $value->sg_pembelian_detail;
+                $data->be_pembelian_detail = $value->be_pembelian_detail;
+                $data->ph_pembelian_detail = $value->ph_pembelian_detail;
+                $data->warna_pembelian_detail = $value->warna_pembelian_detail;
+                $data->keterangan_pembelian_detail = $value->keterangan_pembelian_detail;
+                $data->save();
+
+                $data->updatePembelianDetail();
             }
-
-            $data->fill($request->all());
-            // if ($id == 0) {
-            //     $data->purchase_request_code = PurchaseRequest::createcode($request->id_cabang);
-            //     $data->approval_status = 0;
-            //     $data->user_created = session()->get('user')['id_pengguna'];
-            //     $data->void = 0;
-            //     $data->purchase_request_user_id = session()->get('user')['id_pengguna'];
-            // } else {
-            //     $data->user_modified = session()->get('user')['id_pengguna'];
-            // }
-
-            $data->save();
-            // $data->savedetails($request->details);
 
             DB::commit();
             return response()->json([
@@ -107,48 +123,48 @@ class QcReceiptController extends Controller
         }
     }
 
-    public function viewData($id)
-    {
-        $data = QualityControl::find($id);
+    // public function viewData($id)
+    // {
+    //     $data = QualityControl::find($id);
 
-        return view('ops.qualityControl.detail', [
-            'data' => $data,
-            "pageTitle" => "SCA OPS | QC Penerimaan Pembelian | Detail",
-        ]);
-    }
+    //     return view('ops.qualityControl.detail', [
+    //         'data' => $data,
+    //         "pageTitle" => "SCA OPS | QC Penerimaan Pembelian | Detail",
+    //     ]);
+    // }
 
-    public function destroy($id)
-    {
-        $data = QualityControl::find($id);
-        if (!$data) {
-            return response()->json([
-                "result" => false,
-                "message" => "Data tidak ditemukan",
-            ]);
-        }
+    // public function destroy($id)
+    // {
+    //     $data = QualityControl::find($id);
+    //     if (!$data) {
+    //         return response()->json([
+    //             "result" => false,
+    //             "message" => "Data tidak ditemukan",
+    //         ]);
+    //     }
 
-        try {
-            DB::beginTransaction();
-            $data->void = 1;
-            $data->void_user_id = session()->get('user')['id_pengguna'];
-            $data->save();
+    //     try {
+    //         DB::beginTransaction();
+    //         $data->void = 1;
+    //         $data->void_user_id = session()->get('user')['id_pengguna'];
+    //         $data->save();
 
-            DB::commit();
-            return response()->json([
-                "result" => true,
-                "message" => "Data berhasil dibatalkan",
-                "redirect" => route('qc_receipt'),
-            ]);
-        } catch (\Exception $e) {
-            DB::rollback();
-            Log::error("Error when void qc receipt");
-            Log::error($e);
-            return response()->json([
-                "result" => false,
-                "message" => "Data gagal dibatalkan",
-            ]);
-        }
-    }
+    //         DB::commit();
+    //         return response()->json([
+    //             "result" => true,
+    //             "message" => "Data berhasil dibatalkan",
+    //             "redirect" => route('qc_receipt'),
+    //         ]);
+    //     } catch (\Exception $e) {
+    //         DB::rollback();
+    //         Log::error("Error when void qc receipt");
+    //         Log::error($e);
+    //         return response()->json([
+    //             "result" => false,
+    //             "message" => "Data gagal dibatalkan",
+    //         ]);
+    //     }
+    // }
 
     public function autoPurchasing(Request $request)
     {
@@ -166,21 +182,11 @@ class QcReceiptController extends Controller
     public function autoItem(Request $request)
     {
         $idPembelian = $request->number;
-        $datas = DB::table('pembelian_detail')
-            ->select(DB::raw('sum(pembelian_detail.jumlah_pembelian_detail) as jumlah_pembelian_detail'), 'pembelian_detail.id_barang as id', 'barang.nama_barang as text', 'pembelian_detail.id_satuan_barang', 'nama_satuan_barang')
-            ->leftJoin('barang', 'pembelian_detail.id_barang', '=', 'barang.id_barang')
-            ->leftJoin('satuan_barang', 'pembelian_detail.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
-            ->leftJoin('qc', function ($qc) {
-                $qc->on('pembelian_detail.id_pembelian', '=', 'qc.id_pembelian')
-                    ->on('pembelian_detail.id_barang', '=', 'qc.id_barang')
-                    ->where('status_qc', 3);
-            })
-            ->where('pembelian_detail.id_pembelian', $idPembelian)
-            ->groupBy('pembelian_detail.id_barang')->get();
-
+        $parent = Purchase::find($idPembelian);
         return response()->json([
             'result' => true,
-            'data' => $datas,
+            'list_item' => $parent->detailgroup,
+            'qc' => $parent->qc,
         ]);
     }
 
