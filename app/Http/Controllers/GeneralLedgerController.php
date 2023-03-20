@@ -913,10 +913,22 @@ class GeneralLedgerController extends Controller
                 case 'Piutang Giro':
                     $trx_saldo->bayar = $current_bayar + $kredit;
                     $trx_saldo->sisa = $current_sisa - $kredit;
+                    $trx_saldo->status_giro = ($kredit > $debet)?1:2;
                     break;
                 case 'Hutang Giro':
                     $trx_saldo->bayar = $current_bayar + $debet;
                     $trx_saldo->sisa = $current_sisa - $debet;
+                    $trx_saldo->status_giro = ($debet > $kredit)?1:2;
+                    break;
+                case 'Piutang Giro Tolak':
+                    $trx_saldo->bayar = $current_bayar + $kredit;
+                    $trx_saldo->sisa = $current_sisa - $kredit;
+                    $trx_saldo->status_giro = ($debet > $debet)?1:2;
+                    break;
+                case 'Hutang Giro Tolak':
+                    $trx_saldo->bayar = $current_bayar + $debet;
+                    $trx_saldo->sisa = $current_sisa - $debet;
+                    $trx_saldo->status_giro = ($debet > $kredit)?1:2;
                     break;
                 
                 default:
@@ -967,10 +979,22 @@ class GeneralLedgerController extends Controller
                 case 'Piutang Giro':
                     $trx_saldo->bayar = $current_bayar - $kredit;
                     $trx_saldo->sisa = $current_sisa + $kredit;
+                    $trx_saldo->status_giro = 0;
                     break;
                 case 'Hutang Giro':
                     $trx_saldo->bayar = $current_bayar - $debet;
                     $trx_saldo->sisa = $current_sisa + $debet;
+                    $trx_saldo->status_giro = 0;
+                    break;
+                case 'Piutang Giro Tolak':
+                    $trx_saldo->bayar = $current_bayar - $kredit;
+                    $trx_saldo->sisa = $current_sisa + $kredit;
+                    $trx_saldo->status_giro = 0;
+                    break;
+                case 'Hutang Giro Tolak':
+                    $trx_saldo->bayar = $current_bayar - $debet;
+                    $trx_saldo->sisa = $current_sisa + $debet;
+                    $trx_saldo->status_giro = 0;
                     break;
                 
                 default:
