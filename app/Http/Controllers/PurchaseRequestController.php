@@ -120,6 +120,7 @@ class PurchaseRequestController extends Controller
                 $data->approval_status = 0;
                 $data->user_created = session()->get('user')['id_pengguna'];
                 $data->void = 0;
+                $data->purchase_request_user_id = session()->get('user')['id_pengguna'];
             } else {
                 $data->user_modified = session()->get('user')['id_pengguna'];
             }
@@ -147,14 +148,6 @@ class PurchaseRequestController extends Controller
     public function viewData($id)
     {
         $data = PurchaseRequest::find($id);
-        // $array = [
-        //     '1' => [1, 3],
-        //     '2' => [8],
-        // ];
-
-        // $stock = DB::table('kartu_stok')->select(DB::raw('sum(kartu_stok.debit_kartu_stok) - sum(kredit_kartu_stok) as saldo'), 'id_barang')->whereIn('id_gudang', $array[$data->id_cabang])
-        //     ->groupBy('id_barang')->get();
-        // return $stock;
 
         return view('ops.purchaseRequest.detail', [
             'data' => $data,
@@ -198,23 +191,25 @@ class PurchaseRequestController extends Controller
 
     public function autoWerehouse(Request $request)
     {
-        $search = $request->search;
-        $idCabang = $request->id_cabang;
+        $idCabang = $request->cabang;
         $datas = DB::table('gudang')->select('id_gudang as id', 'nama_gudang as text')
             ->where('id_cabang', $idCabang)
             ->where('status_gudang', 1)
-            ->where('nama_gudang', 'like', '%' . $search . '%')->get();
-        return $datas;
+            ->get();
+        return response()->json([
+            'result' => true,
+            'data' => $datas,
+        ], 200);
     }
 
-    public function autoUser(Request $request)
-    {
-        $search = $request->search;
-        $datas = DB::table('pengguna')->select('id_pengguna as id', 'nama_pengguna as text')
-            ->where('status_pengguna', 1)
-            ->where('nama_pengguna', 'like', '%' . $search . '%')->get();
-        return $datas;
-    }
+    // public function autoUser(Request $request)
+    // {
+    //     $search = $request->search;
+    //     $datas = DB::table('pengguna')->select('id_pengguna as id', 'nama_pengguna as text')
+    //         ->where('status_pengguna', 1)
+    //         ->where('nama_pengguna', 'like', '%' . $search . '%')->get();
+    //     return $datas;
+    // }
 
     public function autoItem(Request $request)
     {
@@ -223,16 +218,50 @@ class PurchaseRequestController extends Controller
             ->where('status_barang', 1)
             ->where('nama_barang', 'like', '%' . $search . '%')->limit(10)->get();
 
-        return $datas;
+        return response()->json([
+            'result' => true,
+            'data' => $datas,
+        ], 200);
     }
 
     public function autoSatuan(Request $request)
     {
         $item = $request->item;
-        $ids = DB::table('isi_satuan_barang')->where('id_barang', $item)->pluck('id_satuan_barang');
-        $datas = DB::table('satuan_barang')->select('id_satuan_barang as id', 'nama_satuan_barang as text')
-            ->where('status_satuan_barang', 1)->whereIn('id_satuan_barang', $ids)->get();
-        return $datas;
+        $cabang = $request->cabang;
+        $gudang = $request->gudang;
+        $satuan = DB::table('isi_satuan_barang')->select('satuan_barang.id_satuan_barang as id', 'nama_satuan_barang as text')
+            ->leftJoin('satuan_barang', 'isi_satuan_barang.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
+            ->where('id_barang', $item)
+            ->where('status_satuan_barang', 1)->get();
+
+        $messageStock = '0';
+        $messageSatuanStok = '';
+        if ($cabang) {
+            $arrayCabang = [
+                '1' => [1, 3],
+                '2' => [8],
+            ];
+
+            $gudang = $arrayCabang[$cabang];
+            $stok = DB::table('kartu_stok')->select(DB::raw('sum(debit_kartu_stok) - sum(kredit_kartu_stok) as stok'), 'satuan_barang.nama_satuan_barang')
+                ->leftJoin('barang', 'kartu_stok.id_barang', '=', 'barang.id_barang')
+                ->leftJoin('isi_satuan_barang', 'kartu_stok.id_barang', '=', 'isi_satuan_barang.id_barang')
+                ->leftJoin('satuan_barang', 'isi_satuan_barang.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
+                ->where('satuan_jual_isi_satuan_barang', 1)
+                ->where('kartu_stok.id_barang', $item)
+                ->whereIn('id_gudang', $arrayCabang[$cabang])->groupBy('kartu_stok.id_barang')->first();
+            if ($stok) {
+                $messageStock = $stok->stok;
+                $messageSatuanStok = $stok->nama_satuan_barang;
+            }
+        }
+
+        return response()->json([
+            'result' => true,
+            'satuan' => $satuan,
+            'stok' => $messageStock,
+            'satuan_stok' => $messageSatuanStok,
+        ], 200);
     }
 
     public function changeStatus($id, $type = 'approval')

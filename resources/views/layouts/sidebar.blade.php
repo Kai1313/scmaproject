@@ -314,8 +314,13 @@
                                 </a>
                             </li>
                             <li>
+                                <a href="{{ route('qc_receipt') }}">
+                                    <i class="glyphicon glyphicon-option-vertical"></i>QC Penerimaan Barang (QC)
+                                </a>
+                            </li>
+                            <li>
                                 <a href="{{ env('OLD_URL_ROOT') }}#pembelian_invoice">
-                                    <i class="glyphicon glyphicon-option-vertical"></i>Invoice Pembelian (Rp)
+                                    <i class="glyphicon glyphicon-option-vertical"></i>Invoice Pembelian (INV)
                                 </a>
                             </li>
                             {{-- <li>
