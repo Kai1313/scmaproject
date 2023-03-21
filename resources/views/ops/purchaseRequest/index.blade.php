@@ -1,6 +1,7 @@
 @extends('layouts.main')
 @section('addedStyles')
     <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables-responsive/css/responsive.dataTables.css') }}">
     <style>
         ul.horizontal-list {
             min-width: 200px;
@@ -81,7 +82,7 @@
             </div>
             <div class="box-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered data-table">
+                    <table class="table table-bordered data-table display responsive nowrap">
                         <thead>
                             <tr>
                                 <th>ID Permintaan</th>
@@ -108,6 +109,7 @@
 @section('addedScripts')
     <script src="{{ asset('assets/bower_components/datatables.net/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js') }}"></script>
+    <script src="{{ asset('assets/bower_components/datatables-responsive/js/dataTables.responsive.js') }}"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/custom.js') }}"></script>
 @endsection

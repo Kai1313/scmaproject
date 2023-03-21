@@ -15,10 +15,10 @@ use Yajra\DataTables\DataTables;
 class QcReceiptController extends Controller
 {
     public $arrayStatus = [
-        ['text' => '', 'class' => 'label label-default'],
-        ['text' => 'Passed', 'class' => 'label label-success'],
-        ['text' => 'Reject', 'class' => 'label label-danger'],
-        ['text' => 'Hols', 'class' => 'label label-default'],
+        ['text' => '', 'class' => 'label label-default', 'id' => ''],
+        ['text' => 'Passed', 'class' => 'label label-success', 'id' => '1'],
+        ['text' => 'Reject', 'class' => 'label label-danger', 'id' => '2'],
+        ['text' => 'Hold', 'class' => 'label label-default', 'id' => '3'],
     ];
 
     public function index(Request $request)
@@ -42,13 +42,13 @@ class QcReceiptController extends Controller
             return Datatables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
-                    $btn = '<ul class="horizontal-list">';
-                    $btn .= '<li><a href="' . route('purchase-request-view', $row->id) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
-                    $btn .= '<li><a href="' . route('purchase-request-entry', $row->id) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
-                    $btn .= '<li><a href="' . route('purchase-request-delete', $row->id) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Void</a></li>';
-                    $btn .= '</ul>';
+                    // $btn = '<ul class="horizontal-list">';
+                    // $btn .= '<li><a href="' . route('purchase-request-view', $row->id) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
+                    // $btn .= '<li><a href="' . route('purchase-request-entry', $row->id) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
+                    // $btn .= '<li><a href="' . route('purchase-request-delete', $row->id) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Void</a></li>';
+                    // $btn .= '</ul>';
 
-                    return $btn;
+                    return '';
                 })
                 ->editColumn('status_qc', function ($row) {
                     return '<label class="' . $this->arrayStatus[$row->status_qc]['class'] . '">' . $this->arrayStatus[$row->status_qc]['text'] . '</label>';
@@ -123,53 +123,14 @@ class QcReceiptController extends Controller
         }
     }
 
-    // public function viewData($id)
-    // {
-    //     $data = QualityControl::find($id);
-
-    //     return view('ops.qualityControl.detail', [
-    //         'data' => $data,
-    //         "pageTitle" => "SCA OPS | QC Penerimaan Pembelian | Detail",
-    //     ]);
-    // }
-
-    // public function destroy($id)
-    // {
-    //     $data = QualityControl::find($id);
-    //     if (!$data) {
-    //         return response()->json([
-    //             "result" => false,
-    //             "message" => "Data tidak ditemukan",
-    //         ]);
-    //     }
-
-    //     try {
-    //         DB::beginTransaction();
-    //         $data->void = 1;
-    //         $data->void_user_id = session()->get('user')['id_pengguna'];
-    //         $data->save();
-
-    //         DB::commit();
-    //         return response()->json([
-    //             "result" => true,
-    //             "message" => "Data berhasil dibatalkan",
-    //             "redirect" => route('qc_receipt'),
-    //         ]);
-    //     } catch (\Exception $e) {
-    //         DB::rollback();
-    //         Log::error("Error when void qc receipt");
-    //         Log::error($e);
-    //         return response()->json([
-    //             "result" => false,
-    //             "message" => "Data gagal dibatalkan",
-    //         ]);
-    //     }
-    // }
-
     public function autoPurchasing(Request $request)
     {
         $cabang = $request->cabang;
+        $duration = DB::table('setting')->where('code', 'QC Duration')->first();
+        $startDate = date('Y-m-d', strtotime('-' . intval($duration->value2) . ' months'));
+        $endDate = date('Y-m-d');
         $datas = DB::table('pembelian')->select('nama_pembelian as text', 'id_pembelian as id')
+            ->whereBetween('tanggal_pembelian', [$startDate, $endDate])
             ->where('id_cabang', $cabang)
             ->get();
 

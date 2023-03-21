@@ -49,7 +49,7 @@ class PurchaseRequest extends Model
 
         return $this->hasMany(PurchaseRequestDetail::class, 'purchase_request_id')
             ->select('index', 'purchase_request_detail.id_barang', 'nama_barang', 'kode_barang', 'purchase_request_detail.id_satuan_barang', 'nama_satuan_barang', 'qty', 'notes',
-                DB::raw('sum(debit_kartu_stok) - sum(kredit_kartu_stok) as stok'))
+                DB::raw('(case when sum(debit_kartu_stok) - sum(kredit_kartu_stok) > 0 then sum(debit_kartu_stok) - sum(kredit_kartu_stok) else 0 end) as stok'))
             ->leftJoin('barang', 'purchase_request_detail.id_barang', '=', 'barang.id_barang')
             ->leftJoin('satuan_barang', 'purchase_request_detail.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
             ->leftJoin('kartu_stok', function ($kartuStok) use ($gudang) {

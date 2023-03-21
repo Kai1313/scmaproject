@@ -97,53 +97,31 @@
                 </div>
                 <div class="box-body">
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="row">
-                                <label class="col-md-3">Cabang <span>*</span></label>
-                                <div class="col-md-5 form-group">
-                                    <select name="id_cabang" class="form-control select2" data-validation="[NOTEMPTY]"
-                                        data-validation-message="Cabang tidak boleh kosong">
-                                        <option value="">Pilih Cabang</option>
-                                        @foreach ($cabang as $branch)
-                                            <option value="{{ $branch->id_cabang }}"
-                                                {{ old('id_cabang', $data ? $data->id_cabang : '') == $branch->id_cabang ? 'selected' : '' }}>
-                                                {{ $branch->nama_cabang }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <label class="col-md-3">Gudang <span>*</span></label>
-                                <div class="col-md-5 form-group">
-                                    <select name="id_gudang" class="form-control" data-validation="[NOTEMPTY]"
-                                        data-validation-message="Gudang tidak boleh kosong">
-                                        <option value="">Pilih Gudang</option>
-                                        @if ($data && $data->id_gudang)
-                                            <option value="{{ $data->id_gudang }}" selected>
-                                                {{ $data->gudang->nama_gudang }}
-                                            </option>
-                                        @endif
-                                    </select>
-                                </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Cabang <span>*</span></label>
+                                <select name="id_cabang" class="form-control select2" data-validation="[NOTEMPTY]"
+                                    data-validation-message="Cabang tidak boleh kosong">
+                                    <option value="">Pilih Cabang</option>
+                                    @foreach ($cabang as $branch)
+                                        <option value="{{ $branch->id_cabang }}"
+                                            {{ old('id_cabang', $data ? $data->id_cabang : '') == $branch->id_cabang ? 'selected' : '' }}>
+                                            {{ $branch->nama_cabang }}</option>
+                                    @endforeach
+                                </select>
                             </div>
 
-                            <div class="row">
-                                <label class="col-md-3">Tanggal <span>*</span></label>
-                                <div class="col-md-5 form-group">
-                                    <input type="text" name="purchase_request_date"
-                                        value="{{ old('purchase_request_date', $data ? $data->purchase_request_date : date('Y-m-d')) }}"
-                                        class="form-control datepicker" data-validation="[NOTEMPTY]"
-                                        data-validation-message="Tanggal tidak boleh kosong">
-                                </div>
-                            </div>
-                            <div class="row">
-                                <label class="col-md-3">Estimasi <span>*</span></label>
-                                <div class="col-md-5 form-group">
-                                    <input type="text" name="purchase_request_estimation_date"
-                                        value="{{ old('purchase_request_estimation_date', $data ? $data->purchase_request_estimation_date : date('Y-m-d')) }}"
-                                        class=" form-control datepicker" data-validation="[NOTEMPTY]"
-                                        data-validation-message="Tanggal estimasi tidak boleh kosong">
-                                </div>
+                            <label>Gudang <span>*</span></label>
+                            <div class="form-group">
+                                <select name="id_gudang" class="form-control" data-validation="[NOTEMPTY]"
+                                    data-validation-message="Gudang tidak boleh kosong">
+                                    <option value="">Pilih Gudang</option>
+                                    @if ($data && $data->id_gudang)
+                                        <option value="{{ $data->id_gudang }}" selected>
+                                            {{ $data->gudang->nama_gudang }}
+                                        </option>
+                                    @endif
+                                </select>
                             </div>
                             @if ($data)
                                 <div class="row">
@@ -158,20 +136,32 @@
                                 </div>
                             @endif
                         </div>
-                        <div class="col-md-6">
-                            <div class="row">
-                                <label class="col-md-3">Kode Permintaan</label>
-                                <div class="col-md-9 form-group">
-                                    <input type="text" name="purchase_request_code"
-                                        value="{{ old('purchase_request_code', $data ? $data->purchase_request_code : '') }}"
-                                        class="form-control" readonly placeholder="Otomatis">
-                                </div>
+                        <div class="col-md-4">
+                            <label>Tanggal <span>*</span></label>
+                            <div class="form-group">
+                                <input type="text" name="purchase_request_date"
+                                    value="{{ old('purchase_request_date', $data ? $data->purchase_request_date : date('Y-m-d')) }}"
+                                    class="form-control datepicker" data-validation="[NOTEMPTY]"
+                                    data-validation-message="Tanggal tidak boleh kosong">
                             </div>
-                            <div class="row">
-                                <label class="col-md-3">Catatan</label>
-                                <div class="col-md-9 form-group">
-                                    <textarea name="catatan" class="form-control" rows="3">{{ old('catatan', $data ? $data->catatan : '') }}</textarea>
-                                </div>
+                            <label>Estimasi <span>*</span></label>
+                            <div class="form-group">
+                                <input type="text" name="purchase_request_estimation_date"
+                                    value="{{ old('purchase_request_estimation_date', $data ? $data->purchase_request_estimation_date : date('Y-m-d')) }}"
+                                    class=" form-control datepicker" data-validation="[NOTEMPTY]"
+                                    data-validation-message="Tanggal estimasi tidak boleh kosong">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label>Kode Permintaan</label>
+                            <div class="form-group">
+                                <input type="text" name="purchase_request_code"
+                                    value="{{ old('purchase_request_code', $data ? $data->purchase_request_code : '') }}"
+                                    class="form-control" readonly placeholder="Otomatis">
+                            </div>
+                            <label>Catatan</label>
+                            <div class="form-group">
+                                <textarea name="catatan" class="form-control" rows="3">{{ old('catatan', $data ? $data->catatan : '') }}</textarea>
                             </div>
                         </div>
                     </div>
@@ -472,8 +462,6 @@
                 }
             })
 
-            // detailSelect['stok'] = null
-
             let newObj = Object.assign({}, detailSelect)
             if (statusModal == 'create') {
                 details.push(newObj)
@@ -520,6 +508,10 @@
                 }
 
                 $('[name="' + select + '"]').val(detailSelect[select]).trigger('change')
+                if (select == 'stok') {
+                    $('#message-stok').text(formatRupiah(detailSelect[select], 4) + ' ' + detailSelect
+                        .nama_satuan_barang)
+                }
             }
 
             $('.handle-number-4').each(function(i, v) {
@@ -567,7 +559,7 @@
 
                 if ($(v).prop('name') == 'id_barang') {
                     let findItem = details.filter(p => p.id_barang == $(v).val())
-                    if (findItem.length > 0 && findItem.id_barang != id) {
+                    if (findItem.length > 0 && findItem[0].id_barang == id) {
                         message = "Barang sudah ada"
                         valid = false
                     }

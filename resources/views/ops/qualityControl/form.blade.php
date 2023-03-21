@@ -57,7 +57,7 @@
     <section class="content-header">
         <h1>
             QC Penerimaan Pembelian
-            <small>| {{ $data ? 'Edit' : 'Tambah' }}</small>
+            {{-- <small>| {{ $data ? 'Edit' : 'Tambah' }}</small> --}}
         </h1>
         <ol class="breadcrumb">
             <li><a href="#"><i class="fa fa-dashboard"></i> Dashboard</a></li>
@@ -72,7 +72,7 @@
         <form action="{{ route('qc_receipt-save-entry', $data ? $data->id : 0) }}" method="post" class="post-action">
             <div class="box">
                 <div class="box-header">
-                    <h3 class="box-title">{{ $data ? 'Ubah' : 'Tambah' }} QC Penerimaan Pembelian</h3>
+                    <h3 class="box-title">Cari Penerimaan Pembelian</h3>
                     <a href="{{ route('qc_receipt') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right">
                         <span class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali
                     </a>
@@ -135,7 +135,7 @@
                                     <th>PH</th>
                                     <th>Warna</th>
                                     <th>Keterangan</th>
-                                    {{-- <th>Action</th> --}}
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                         </table>
@@ -166,23 +166,24 @@
                                 </select>
                                 <input type="hidden" name="nama_barang" class="validate">
                             </div>
-                            <label>Total</label>
+                            <label>Total <span>*</span></label>
                             <div class="form-group">
                                 <div class="input-group" id="qty">
                                     <input type="text" name="jumlah_pembelian_detail"
                                         class="form-control handle-number-4" readonly>
                                     <span class="input-group-addon">KG</span>
                                 </div>
-                                <input type="hidden" name="nama_satuan_barang">
-                                <input type="hidden" name="id_satuan_barang">
+                                <input type="hidden" name="nama_satuan_barang" class="validate">
+                                <input type="hidden" name="id_satuan_barang" class="validate">
                                 <input type="hidden" name="tanggal_qc" value="{{ date('Y-m-d') }}">
                             </div>
-                            <label>Status</label>
+                            <label>Status <span>*</span></label>
                             <div class="form-group">
-                                <select name="status_qc" class="form-control select2">
-                                    <option value="">Pilih Status</option>
-                                    <option value="1">Passed</option>
-                                    <option value="2">Reject</option>
+                                <select name="status_qc" class="form-control select2 validate">
+                                    @foreach ($arrayStatus as $status)
+                                        <option value="{{ $status['id'] }}">
+                                            {{ $status['text'] == '' ? 'Pilih Status' : $status['text'] }}</option>
+                                    @endforeach
                                 </select>
                             </div>
                             <label>Alasan</label>
@@ -191,15 +192,15 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <label>SG</label>
+                            <label>SG </label>
                             <div class="form-group">
                                 <input type="text" name="sg_pembelian_detail" class="form-control handle-number-4">
                             </div>
-                            <label>BE</label>
+                            <label>BE </label>
                             <div class="form-group">
                                 <input type="text" name="be_pembelian_detail" class="form-control handle-number-4">
                             </div>
-                            <label>PH</label>
+                            <label>PH </label>
                             <div class="form-group">
                                 <input type="text" name="ph_pembelian_detail" class="form-control handle-number-4">
                             </div>
@@ -301,23 +302,27 @@
                     data: 'keterangan_pembelian_detail',
                     name: 'keterangan_pembelian_detail',
                 },
-                // {
-                //     data: 'id',
-                //     className: 'text-center',
-                //     name: 'id',
-                //     searchable: false,
-                //     render: function(data, type, row, meta) {
-                //         let btn = '<ul class="horizontal-list">';
-                //         btn +=
-                //             '<li><a href="javascript:void(0)" data-index="' + data +
-                //             '" class="btn btn-warning btn-xs mr-1 mb-1 edit-entry"><i class="glyphicon glyphicon-pencil"></i></a></li>';
-                //         btn +=
-                //             '<li><a href="javascript:void(0)" data-index="' + data +
-                //             '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1 delete-entry"><i class="glyphicon glyphicon-trash"></i></a></li>';
-                //         btn += '</ul>';
-                //         return btn;
-                //     }
-                // },
+                {
+                    data: 'id_barang',
+                    className: 'text-center',
+                    name: 'id_barang',
+                    searchable: false,
+                    render: function(data, type, row, meta) {
+                        let btn = '';
+                        if (row.status_qc == 3) {
+                            btn = '<ul class="horizontal-list">';
+                            btn +=
+                                '<li><a href="javascript:void(0)" data-id="' + data +
+                                '" class="btn btn-warning btn-xs mr-1 mb-1 edit-entry"><i class="glyphicon glyphicon-pencil"></i></a></li>';
+                            // btn +=
+                            //     '<li><a href="javascript:void(0)" data-index="' + data +
+                            //     '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1 delete-entry"><i class="glyphicon glyphicon-trash"></i></a></li>';
+                            btn += '</ul>';
+                        }
+
+                        return btn;
+                    }
+                },
             ]
         });
 
@@ -352,6 +357,7 @@
         }
 
         function getItem(param) {
+            console.log('tes')
             $('#cover-spin').show()
             $.ajax({
                 url: '{{ route('qc_receipt-auto-item') }}',
@@ -390,9 +396,14 @@
             statusModal = 'create'
             detailSelect = []
             $('#modalEntry').find('input,select,textarea').each(function(i, v) {
-                $(v).val('').trigger('change')
+                if ($(v).hasClass('handle-number-4')) {
+                    $(v).val(0).trigger('change')
+                } else {
+                    $(v).val('').trigger('change')
+                }
             })
 
+            $('#alertModal').text('').hide()
             $('#modalEntry').modal('show')
             setTimeout(() => {
                 $('[name="id_barang"]').select2('open')
@@ -406,13 +417,13 @@
 
         $('.save-entry').click(function() {
             let modal = $('#modalEntry')
-            // let valid = validatorModal(modal.find('[name="id_barang"]').val())
-            // if (!valid.status) {
-            //     $('#alertModal').text(valid.message).show()
-            //     return false
-            // } else {
-            //     $('#alertModal').text('').hide()
-            // }
+            let valid = validatorModal(modal.find('[name="id_barang"]').val())
+            if (!valid.status) {
+                $('#alertModal').text(valid.message).show()
+                return false
+            } else {
+                $('#alertModal').text('').hide()
+            }
 
 
             modal.find('input,select,textarea').each(function(i, v) {
@@ -422,6 +433,7 @@
                     detailSelect[$(v).prop('name')] = $(v).val()
                 }
             })
+            console.log(detailSelect)
 
             let newObj = Object.assign({}, detailSelect)
             if (statusModal == 'create') {
@@ -442,12 +454,70 @@
         $('[name="status_qc"]').change(function() {
             $('[name="reason"]').attr('readonly', true)
             if ($(this).val() == 2) {
-                $('[name="reason"]').attr('readonly', false)
+                $('[name="reason"]').attr('readonly', false).addClass('validate')
+            } else {
+                $('[name="reason"]').attr('readonly', true).removeClass('validate')
             }
         })
 
         $('.cancel-entry').click(function() {
             $('#modalEntry').modal('hide')
         })
+
+        $('body').on('click', '.edit-entry', function() {
+            detailSelect = []
+            $('#modalEntry').find('input,select,textarea').each(function(i, v) {
+                if ($(v).hasClass('handle-number-4')) {
+                    $(v).val(0).trigger('change')
+                } else {
+                    $(v).val('').trigger('change')
+                }
+            })
+
+            $('#alertModal').text('').hide()
+            $('#modalEntry').modal({
+                backdrop: 'static',
+                keyboard: false
+            })
+            let id = $(this).data('id')
+            statusModal = 'edit'
+            let findItem = details.filter(p => p.id_barang == id)
+            detailSelect = findItem.length > 0 ? findItem[0] : []
+            for (select in detailSelect) {
+                if (['jumlah_pembelian_detail'].includes(select)) {
+                    $('#qty').find('span').text(detailSelect['nama_satuan_barang'])
+                }
+
+                $('[name="' + select + '"]').val(detailSelect[select]).trigger('change')
+            }
+
+            $('.handle-number-4').each(function(i, v) {
+                let val = $(v).val().replace('.', ',')
+                $(v).val(formatRupiah(val, 4))
+            })
+        })
+
+        function validatorModal(id = 0) {
+            let message = 'Lengkapi inputan yang diperlukan'
+            let valid = true
+            $('#modalEntry').find('.validate').each(function(i, v) {
+                if ($(v).val() == '') {
+                    valid = false
+                }
+
+                if ($(v).prop('name') == 'id_barang') {
+                    let findItem = details.filter(p => p.id_barang == $(v).val())
+                    if (findItem.length > 0 && findItem[0].id_barang == id) {
+                        message = "Barang sudah ada dalam daftar"
+                        valid = false
+                    }
+                }
+            })
+
+            return {
+                'status': valid,
+                'message': message
+            }
+        }
     </script>
 @endsection

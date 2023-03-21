@@ -61,7 +61,7 @@ Route::prefix('uang_muka_pembelian')->group(function () {
     Route::get('/delete/{id}', 'PurchaseDownPaymentController@destroy')->name('purchase-down-payment-delete');
     Route::get('/auto_po', 'PurchaseDownPaymentController@autoPo')->name('purchase-down-payment-auto-po');
     Route::get('/count_po', 'PurchaseDownPaymentController@countPo')->name('purchase-down-payment-count-po');
-    Route::get('/auto_slip', 'PurchaseDownPaymentController@autoSlip')->name('purchase-down-payment-auto-slip');
+    // Route::get('/auto_slip', 'PurchaseDownPaymentController@autoSlip')->name('purchase-down-payment-auto-slip');
 });
 
 Route::prefix('qc_penerimaan_barang')->group(function () {

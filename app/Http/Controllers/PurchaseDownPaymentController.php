@@ -77,11 +77,14 @@ class PurchaseDownPaymentController extends Controller
         }
 
         $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
+        $slip = DB::table('master_slip')->select('id_slip as id', DB::raw("CONCAT(kode_slip,' - ',nama_slip) as text"))
+            ->get();
         return view('ops.purchaseDownPayment.form', [
             'data' => $data,
             'cabang' => $cabang,
             'maxPayment' => $remainingPayment,
             "pageTitle" => "SCA OPS | Uang Muka Pembelian | " . ($id == 0 ? 'Create' : 'Edit'),
+            "slip" => $slip,
         ]);
     }
 
@@ -106,6 +109,7 @@ class PurchaseDownPaymentController extends Controller
             $data->rate = normalizeNumber($request->rate);
             $data->nominal = normalizeNumber($request->nominal);
             $data->total = normalizeNumber($request->total);
+            $data->konversi_nominal = normalizeNumber($request->konversi_nominal);
             $data->save();
 
             $resApi = $this->callApiJournal($data);
@@ -194,28 +198,24 @@ class PurchaseDownPaymentController extends Controller
 
     public function autoPo(Request $request)
     {
-        $search = $request->search;
         $idCabang = $request->id_cabang;
+        $duration = DB::table('setting')->where('code', 'Uang Muka Pembelian')->first();
+        $startDate = date('Y-m-d', strtotime('-' . intval($duration->value2) . ' months'));
+        $endDate = date('Y-m-d');
         $datas = DB::table('permintaan_pembelian as pp')->select('pp.id_permintaan_pembelian as id', 'nama_permintaan_pembelian as text', 'mtotal_permintaan_pembelian')
             ->leftJoin('uang_muka_pembelian as ump', function ($join) {
                 $join->on('pp.id_permintaan_pembelian', '=', 'ump.id_permintaan_pembelian')
                     ->where('ump.void', 0);
             })
+            ->whereBetween('tanggal_permintaan_pembelian', [$startDate, $endDate])
             ->where('pp.id_cabang', $idCabang)
-            ->where('nama_permintaan_pembelian', 'like', '%' . $search . '%')
             ->groupBy('pp.id_permintaan_pembelian')
             ->having(DB::raw('mtotal_permintaan_pembelian - COALESCE(sum(nominal),0)'), '<>', '0')
-            ->orderBy('date_permintaan_pembelian', 'desc')->limit(10)->get();
-        return $datas;
-    }
-
-    public function autoSlip(Request $request)
-    {
-        $search = $request->search;
-        $datas = DB::table('master_slip')->select('id_slip as id', DB::raw("CONCAT(kode_slip,' - ',nama_slip) as text"))
-            ->where(DB::raw("CONCAT(kode_slip,' - ',nama_slip)"), 'like', '%' . $search . '%')
-            ->get();
-        return $datas;
+            ->orderBy('date_permintaan_pembelian', 'desc')->get();
+        return response()->json([
+            'result' => true,
+            'data' => $datas,
+        ]);
     }
 
     public function countPo(Request $request)
