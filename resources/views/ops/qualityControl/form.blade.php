@@ -507,7 +507,7 @@
 
                 if ($(v).prop('name') == 'id_barang') {
                     let findItem = details.filter(p => p.id_barang == $(v).val())
-                    if (findItem.length > 0 && findItem[0].id_barang == id) {
+                    if (findItem.length > 0 && findItem[0].id_barang == id && statusModal == 'create') {
                         message = "Barang sudah ada dalam daftar"
                         valid = false
                     }
