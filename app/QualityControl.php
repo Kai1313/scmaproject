@@ -48,5 +48,15 @@ class QualityControl extends Model
         DB::table('pembelian_detail')->where('id_pembelian', $this->id_pembelian)
             ->where('id_barang', $this->id_barang)->update($array);
 
+        DB::table('master_qr_code')->where('nama_master_qr_code', $this->purchase->nama_pembelian)
+            ->where('id_barang', $this->id_barang)->update([
+            'sg_master_qr_code' => $this->sg_pembelian_detail,
+            'be_master_qr_code' => $this->be_pembelian_detail,
+            'ph_master_qr_code' => $this->ph_pembelian_detail,
+            'warna_master_qr_code' => $this->warna_pembelian_detail,
+            'keterangan_master_qr_code' => $this->keterangan_pembelian_detail,
+        ]);
+
+        return true;
     }
 }
