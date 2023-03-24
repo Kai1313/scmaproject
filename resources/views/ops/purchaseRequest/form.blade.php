@@ -97,46 +97,31 @@
                 </div>
                 <div class="box-body">
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="row">
-                                <label class="col-md-3">Cabang <span>*</span></label>
-                                <div class="col-md-5 form-group">
-                                    <select name="id_cabang" class="form-control select2" data-validation="[NOTEMPTY]"
-                                        data-validation-message="Cabang tidak boleh kosong">
-                                        <option value="">Pilih Cabang</option>
-                                        @foreach ($cabang as $branch)
-                                            <option value="{{ $branch->id_cabang }}"
-                                                {{ old('id_cabang', $data ? $data->id_cabang : '') == $branch->id_cabang ? 'selected' : '' }}>
-                                                {{ $branch->nama_cabang }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Cabang <span>*</span></label>
+                                <select name="id_cabang" class="form-control select2" data-validation="[NOTEMPTY]"
+                                    data-validation-message="Cabang tidak boleh kosong">
+                                    <option value="">Pilih Cabang</option>
+                                    @foreach ($cabang as $branch)
+                                        <option value="{{ $branch->id_cabang }}"
+                                            {{ old('id_cabang', $data ? $data->id_cabang : '') == $branch->id_cabang ? 'selected' : '' }}>
+                                            {{ $branch->nama_cabang }}</option>
+                                    @endforeach
+                                </select>
                             </div>
-                            <div class="row">
-                                <label class="col-md-3">Kode Permintaan</label>
-                                <div class="col-md-9 form-group">
-                                    <input type="text" name="purchase_request_code"
-                                        value="{{ old('purchase_request_code', $data ? $data->purchase_request_code : '') }}"
-                                        class="form-control" readonly placeholder="Otomatis">
-                                </div>
-                            </div>
-                            <div class="row">
-                                <label class="col-md-3">Tanggal <span>*</span></label>
-                                <div class="col-md-5 form-group">
-                                    <input type="text" name="purchase_request_date"
-                                        value="{{ old('purchase_request_date', $data ? $data->purchase_request_date : date('Y-m-d')) }}"
-                                        class="form-control datepicker" data-validation="[NOTEMPTY]"
-                                        data-validation-message="Tanggal tidak boleh kosong">
-                                </div>
-                            </div>
-                            <div class="row">
-                                <label class="col-md-3">Estimasi <span>*</span></label>
-                                <div class="col-md-5 form-group">
-                                    <input type="text" name="purchase_request_estimation_date"
-                                        value="{{ old('purchase_request_estimation_date', $data ? $data->purchase_request_estimation_date : date('Y-m-d')) }}"
-                                        class=" form-control datepicker" data-validation="[NOTEMPTY]"
-                                        data-validation-message="Tanggal estimasi tidak boleh kosong">
-                                </div>
+
+                            <label>Gudang <span>*</span></label>
+                            <div class="form-group">
+                                <select name="id_gudang" class="form-control" data-validation="[NOTEMPTY]"
+                                    data-validation-message="Gudang tidak boleh kosong">
+                                    <option value="">Pilih Gudang</option>
+                                    @if ($data && $data->id_gudang)
+                                        <option value="{{ $data->id_gudang }}" selected>
+                                            {{ $data->gudang->nama_gudang }}
+                                        </option>
+                                    @endif
+                                </select>
                             </div>
                             @if ($data)
                                 <div class="row">
@@ -151,41 +136,32 @@
                                 </div>
                             @endif
                         </div>
-                        <div class="col-md-6">
-                            <div class="row">
-                                <label class="col-md-3">Gudang <span>*</span></label>
-                                <div class="col-md-5 form-group">
-                                    <select name="id_gudang" class="form-control selectAjax"
-                                        data-route="{{ route('purchase-request-auto-werehouse') }}"
-                                        data-validation="[NOTEMPTY]" data-validation-message="Gudang tidak boleh kosong">
-                                        <option value="">Pilih Gudang</option>
-                                        @if ($data && $data->id_gudang)
-                                            <option value="{{ $data->id_gudang }}" selected>
-                                                {{ $data->gudang->nama_gudang }}
-                                            </option>
-                                        @endif
-                                    </select>
-                                </div>
+                        <div class="col-md-4">
+                            <label>Tanggal <span>*</span></label>
+                            <div class="form-group">
+                                <input type="text" name="purchase_request_date"
+                                    value="{{ old('purchase_request_date', $data ? $data->purchase_request_date : date('Y-m-d')) }}"
+                                    class="form-control datepicker" data-validation="[NOTEMPTY]"
+                                    data-validation-message="Tanggal tidak boleh kosong">
                             </div>
-                            <div class="row">
-                                <label class="col-md-3">Pemohon <span>*</span></label>
-                                <div class="col-md-5 form-group">
-                                    <select name="purchase_request_user_id" class="form-control selectAjax"
-                                        data-route="{{ route('purchase-request-auto-user') }}" data-validation="[NOTEMPTY]"
-                                        data-validation-message="Pemohon tidak boleh kosong">
-                                        <option value="">Pilih Pemohon</option>
-                                        @if ($data && $data->purchase_request_user_id)
-                                            <option value="{{ $data->purchase_request_user_id }}" selected>
-                                                {{ $data->pengguna->nama_pengguna }}</option>
-                                        @endif
-                                    </select>
-                                </div>
+                            <label>Estimasi <span>*</span></label>
+                            <div class="form-group">
+                                <input type="text" name="purchase_request_estimation_date"
+                                    value="{{ old('purchase_request_estimation_date', $data ? $data->purchase_request_estimation_date : date('Y-m-d')) }}"
+                                    class=" form-control datepicker" data-validation="[NOTEMPTY]"
+                                    data-validation-message="Tanggal estimasi tidak boleh kosong">
                             </div>
-                            <div class="row">
-                                <label class="col-md-3">Catatan</label>
-                                <div class="col-md-9 form-group">
-                                    <textarea name="catatan" class="form-control" rows="3">{{ old('catatan', $data ? $data->catatan : '') }}</textarea>
-                                </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label>Kode Permintaan</label>
+                            <div class="form-group">
+                                <input type="text" name="purchase_request_code"
+                                    value="{{ old('purchase_request_code', $data ? $data->purchase_request_code : '') }}"
+                                    class="form-control" readonly placeholder="Otomatis">
+                            </div>
+                            <label>Catatan</label>
+                            <div class="form-group">
+                                <textarea name="catatan" class="form-control" rows="3">{{ old('catatan', $data ? $data->catatan : '') }}</textarea>
                             </div>
                         </div>
                     </div>
@@ -206,8 +182,7 @@
                         </div>
                     </div>
                     <div class="table-responsive">
-                        <input type="hidden" name="details"
-                            value="{{ $data ? json_encode($data->formatdetail) : '[]' }}">
+                        <input type="hidden" name="details" value="{{ $data ? json_encode($data->formatdetail) : '[]' }}">
                         <table id="table-detail" class="table table-bordered data-table">
                             <thead>
                                 <tr>
@@ -216,6 +191,7 @@
                                     <th>Satuan</th>
                                     <th>Jumlah</th>
                                     <th>Catatan</th>
+                                    <th>Stok</th>
                                     <th style="width:150px;">Action</th>
                                 </tr>
                             </thead>
@@ -236,16 +212,18 @@
                 <div class="modal-content">
                     <div class="modal-body">
                         <div class="alert alert-danger" style="display:none;" id="alertModal">
-                            Lengkapi Data yang diperlukan
                         </div>
                         <input type="hidden" name="index" value="0">
                         <label>Nama Barang <span>*</span></label>
                         <div class="form-group">
-                            <select name="id_barang" class="form-control selectAjax validate"
-                                data-route="{{ route('purchase-request-auto-item') }}">
+                            <select name="id_barang" class="form-control validate">
                             </select>
                             <input type="hidden" name="nama_barang" class="validate">
                             <input type="hidden" name="kode_barang" class="validate">
+                        </div>
+                        <div class="form-group">
+                            <label>Stok : </label>
+                            <label id="message-stok"></label>
                         </div>
                         <label>Satuan <span>*</span></label>
                         <div class="form-group">
@@ -261,6 +239,7 @@
                         <div class="form-group">
                             <textarea name="notes" class="form-control" rows="5"></textarea>
                         </div>
+                        <input type="hidden" name="stok">
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary cancel-entry btn-flat">Batal</button>
@@ -288,7 +267,6 @@
         let detailSelect = []
         let count = details.length
         let statusModal = 'create'
-        $('.select2').select2()
 
         $('.datepicker').datepicker({
             format: 'yyyy-mm-dd',
@@ -318,6 +296,12 @@
                 {
                     data: 'notes',
                     name: 'notes'
+                },
+                {
+                    data: 'stok',
+                    name: 'stok',
+                    render: $.fn.dataTable.render.number('.', ',', 4),
+                    className: 'text-right'
                 },
                 {
                     data: 'index',
@@ -357,56 +341,77 @@
             }
         })
 
-        $('.selectAjax').each(function(i, v) {
-            let route = $(v).data('route')
-            let name = $(v).prop('name')
-            $(v).select2({
-                ajax: {
-                    url: route,
-                    dataType: 'json',
-                    data: function(params) {
-                        if (name == 'id_gudang') {
-                            return {
-                                search: params.term,
-                                id_cabang: $('[name="id_cabang"]').val()
-                            }
-                        } else {
-                            return {
-                                search: params.term
-                            }
-                        }
-                    },
-                    processResults: function(data) {
-                        return {
-                            results: data
-                        };
+        $('[name="id_cabang"]').select2().on('select2:select', function(e) {
+            let dataselect = e.params.data
+            getGudang(dataselect.id)
+        });
+
+        function getGudang(idCabang) {
+            $.ajax({
+                url: '{{ route('purchase-request-auto-werehouse') }}',
+                data: {
+                    cabang: idCabang
+                },
+                success: function(res) {
+                    $('[name="id_gudang"]').empty()
+                    $('[name="id_gudang"]').select2({
+                        data: [{
+                            'id': "",
+                            'text': 'Pilih Gudang'
+                        }, ...res.data]
+                    })
+                },
+                error: function(error) {
+                    console.log(error)
+                }
+            })
+        }
+
+        $('[name="id_barang"]').select2({
+            ajax: {
+                url: '{{ route('purchase-request-auto-item') }}',
+                dataType: 'json',
+                data: function(params) {
+                    return {
+                        search: params.term
                     }
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.data
+                    };
                 }
-            }).on('select2:select', function(e) {
-                let dataselect = e.params.data
-                if (name == 'id_barang') {
-                    $('#modalEntry').find('[name="nama_barang"]').val(dataselect.text)
-                    $('#modalEntry').find('[name="kode_barang"]').val(dataselect.kode_barang)
-                    $('[name="id_satuan_barang"]').html('')
-                    getSatuan(dataselect.id)
-                }
-            });
-        })
+            }
+        }).on('select2:select', function(e) {
+            let dataselect = e.params.data
+            $('#modalEntry').find('[name="nama_barang"]').val(dataselect.text)
+            $('#modalEntry').find('[name="kode_barang"]').val(dataselect.kode_barang)
+            $('[name="id_satuan_barang"]').html('')
+            getSatuan(dataselect.id)
+
+        });
 
         function getSatuan(id) {
             $.ajax({
-                url: "{{ route('purchase-request-auto-satuan') }}?item=" + id,
+                url: "{{ route('purchase-request-auto-satuan') }}?item=" + id + '&cabang=' + $(
+                    '[name="id_cabang"]').val() + '&gudang=' + $('[name="id_gudang"]').val(),
                 type: 'get',
                 success: function(res) {
+                    $('[name="id_satuan_barang"]').empty()
                     $('[name="id_satuan_barang"]').prop('disabled', false).select2({
-                        data: [{
-                            id: '',
-                            text: 'Pilih Satuan'
-                        }, ...res]
+                        data: res.satuan
                     }).on('select2:select', function(e) {
                         let dataselect = e.params.data
                         $('#modalEntry').find('[name="nama_satuan_barang"]').val(dataselect.text)
                     });
+
+                    if (res.satuan.length > 0) {
+                        $('[name="id_satuan_barang"]').val(res.satuan[0].id).trigger('change')
+                        $('#modalEntry').find('[name="nama_satuan_barang"]').val(res.satuan[0].text)
+                    }
+
+                    $('#message-stok').text(res.stok + ' ' + res.satuan_stok)
+                    $('#modalEntry').find('[name="stok"]').val(res.stok)
                 },
                 error: function(error) {
                     console.log(error)
@@ -420,7 +425,7 @@
                 $(v).val('').trigger('change')
             })
 
-            $('#alertModal').hide()
+            $('#alertModal').text('').hide()
             statusModal = 'create'
             count += 1
             $('#modalEntry').find('[name="index"]').val(count)
@@ -430,6 +435,7 @@
             })
 
             $('[name="id_barang"]').select2('open')
+            $('#message-stok').text('')
 
             $('.handle-number-4').each(function(i, v) {
                 let val = $(v).val().replace('.', ',')
@@ -438,15 +444,16 @@
         })
 
         $('.save-entry').click(function() {
-            let valid = validatorModal()
+            let modal = $('#modalEntry')
+            let valid = validatorModal(modal.find('[name="id_barang"]').val())
             if (!valid.status) {
-                $('#alertModal').show()
+                $('#alertModal').text(valid.message).show()
                 return false
             } else {
-                $('#alertModal').hide()
+                $('#alertModal').text('').hide()
             }
 
-            let modal = $('#modalEntry')
+
             modal.find('input,select,textarea').each(function(i, v) {
                 if ($(v).hasClass('handle-number-4')) {
                     detailSelect[$(v).prop('name')] = normalizeNumber($(v).val())
@@ -483,8 +490,9 @@
             $('#modalEntry').find('input,select,textarea').each(function(i, v) {
                 $(v).val('').trigger('change')
             })
+            $('#message-stok').text('')
 
-            $('#alertModal').hide()
+            $('#alertModal').text('').hide()
             $('#modalEntry').modal({
                 backdrop: 'static',
                 keyboard: false
@@ -500,6 +508,10 @@
                 }
 
                 $('[name="' + select + '"]').val(detailSelect[select]).trigger('change')
+                if (select == 'stok') {
+                    $('#message-stok').text(formatRupiah(detailSelect[select], 4) + ' ' + detailSelect
+                        .nama_satuan_barang)
+                }
             }
 
             $('.handle-number-4').each(function(i, v) {
@@ -537,16 +549,26 @@
             })
         })
 
-        function validatorModal() {
+        function validatorModal(id = 0) {
+            let message = 'Lengkapi inputan yang diperlukan'
             let valid = true
             $('#modalEntry').find('.validate').each(function(i, v) {
                 if ($(v).val() == '') {
                     valid = false
                 }
+
+                if ($(v).prop('name') == 'id_barang') {
+                    let findItem = details.filter(p => p.id_barang == $(v).val())
+                    if (findItem.length > 0 && findItem[0].id_barang == id) {
+                        message = "Barang sudah ada"
+                        valid = false
+                    }
+                }
             })
 
             return {
-                'status': valid
+                'status': valid,
+                'message': message
             }
         }
     </script>

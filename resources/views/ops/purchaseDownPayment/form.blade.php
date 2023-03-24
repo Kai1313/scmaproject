@@ -47,103 +47,95 @@
                 <form action="{{ route('purchase-down-payment-save-entry', $data ? $data->id_uang_muka_pembelian : 0) }}"
                     method="post" class="post-action">
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="row">
-                                <label class="col-md-3">Cabang <span>*</span></label>
-                                <div class="col-md-5 form-group">
-                                    <select name="id_cabang" class="form-control select2" data-validation="[NOTEMPTY]"
-                                        data-validation-message="Cabang tidak boleh kosong">
-                                        <option value="">Pilih Cabang</option>
-                                        @foreach ($cabang as $branch)
-                                            <option value="{{ $branch->id_cabang }}"
-                                                {{ old('id_cabang', $data ? $data->id_cabang : '') == $branch->id_cabang ? 'selected' : '' }}>
-                                                {{ $branch->nama_cabang }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
+                        <div class="col-md-4">
+                            <label>Cabang <span>*</span></label>
+                            <div class="form-group">
+                                <select name="id_cabang" class="form-control select2" data-validation="[NOTEMPTY]"
+                                    data-validation-message="Cabang tidak boleh kosong">
+                                    <option value="">Pilih Cabang</option>
+                                    @foreach ($cabang as $branch)
+                                        <option value="{{ $branch->id_cabang }}"
+                                            {{ old('id_cabang', $data ? $data->id_cabang : '') == $branch->id_cabang ? 'selected' : '' }}>
+                                            {{ $branch->nama_cabang }}</option>
+                                    @endforeach
+                                </select>
                             </div>
-                            <div class="row">
-                                <label class="col-md-3">Kode Uang Muka Pembelian</label>
-                                <div class="col-md-9 form-group">
-                                    <input type="text" name="kode_uang_muka_pembelian"
-                                        value="{{ old('kode_uang_muka_pembelian', $data ? $data->kode_uang_muka_pembelian : '') }}"
-                                        class="form-control" readonly placeholder="Otomatis">
-                                </div>
+                            <label>Kode Uang Muka Pembelian</label>
+                            <div class="form-group">
+                                <input type="text" name="kode_uang_muka_pembelian"
+                                    value="{{ old('kode_uang_muka_pembelian', $data ? $data->kode_uang_muka_pembelian : '') }}"
+                                    class="form-control" readonly placeholder="Otomatis">
                             </div>
-                            <div class="row">
-                                <label class="col-md-3">Tanggal <span>*</span></label>
-                                <div class="col-md-5 form-group">
-                                    <input type="text" name="tanggal"
-                                        value="{{ old('tanggal', $data ? $data->tanggal : date('Y-m-d')) }}"
-                                        class="form-control datepicker" data-validation="[NOTEMPTY]"
-                                        data-validation-message="Tanggal tidak boleh kosong">
-                                </div>
+                            <label>Tanggal <span>*</span></label>
+                            <div class="form-group">
+                                <input type="text" name="tanggal"
+                                    value="{{ old('tanggal', $data ? $data->tanggal : date('Y-m-d')) }}"
+                                    class="form-control datepicker" data-validation="[NOTEMPTY]"
+                                    data-validation-message="Tanggal tidak boleh kosong">
                             </div>
-                            <div class="row">
-                                <label class="col-md-3">ID Permintaan Pembelian (PO) <span>*</span></label>
-                                <div class="col-md-9 form-group">
-                                    <select name="id_permintaan_pembelian" class="form-control selectAjax"
-                                        data-route="{{ route('purchase-down-payment-auto-po') }}"
-                                        data-validation="[NOTEMPTY]"
-                                        data-validation-message="ID permintaan pembelian tidak boleh kosong">
-                                        <option value="">Pilih Permintaan Pembelian (PO)</option>
-                                        @if ($data && $data->id_permintaan_pembelian)
-                                            <option value="{{ $data->id_permintaan_pembelian }}" selected>
-                                                {{ $data->purchaseOrder->nama_permintaan_pembelian }}
-                                            </option>
-                                        @endif
-                                    </select>
-                                </div>
-                            </div>
-                            <input type="hidden" name="id_mata_uang"
-                                value="{{ old('id_mata_uang', $data ? $data->id_mata_uang : '') }}">
-                            <div class="row">
-                                <label class="col-md-3">Slip <span>*</span></label>
-                                <div class="col-md-5 form-group">
-                                    <select name="id_slip" class="form-control selectAjax"
-                                        data-route="{{ route('purchase-down-payment-auto-slip') }}"
-                                        data-validation="[NOTEMPTY]" data-validation-message="Slip tidak boleh kosong">
-                                        <option value="">Pilih Slip</option>
-                                        @if ($data && $data->id_slip)
-                                            <option value="{{ $data->id_slip }}" selected>
-                                                {{ $data->slip->kode_slip }} - {{ $data->slip->nama_slip }}
-                                            </option>
-                                        @endif
-                                    </select>
-                                </div>
+                            <label>ID Permintaan Pembelian (PO) <span>*</span></label>
+                            <div class="form-group">
+                                <select name="id_permintaan_pembelian" class="form-control selectAjax"
+                                    data-validation="[NOTEMPTY]"
+                                    data-validation-message="ID permintaan pembelian tidak boleh kosong">
+                                    <option value="">Pilih Permintaan Pembelian (PO)</option>
+                                    @if ($data && $data->id_permintaan_pembelian)
+                                        <option value="{{ $data->id_permintaan_pembelian }}" selected>
+                                            {{ $data->purchaseOrder->nama_permintaan_pembelian }}
+                                        </option>
+                                    @endif
+                                </select>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="row">
-                                <label class="col-md-3">Rate <span>*</span></label>
-                                <div class="col-md-4 form-group">
-                                    <input type="text" name="rate" class="form-control handle-number-2"
-                                        value="{{ old('rate', $data ? $data->rate : '') }}" data-validation="[NOTEMPTY]"
-                                        data-validation-message="Rate tidak boleh kosong">
-                                </div>
+                        <div class="col-md-4">
+                            <label>Mata Uang</label>
+                            <div class="form-group">
+                                <input type="nama_mata_uang" class="form-control" readonly
+                                    value="{{ old('id_mata_uang', $data ? $data->mataUang->kode_mata_uang . ' - ' . $data->mataUang->nama_mata_uang : '') }}">
+                                <input type="hidden" name="id_mata_uang"
+                                    value="{{ old('id_mata_uang', $data ? $data->id_mata_uang : '') }}">
                             </div>
-                            <div class="row">
-                                <label class="col-md-3">Nominal <span>*</span></label>
-                                <div class="col-md-4 form-group">
-                                    <input type="text" name="nominal" class="form-control handle-number-2"
-                                        value="{{ old('nominal', $data ? $data->nominal : '') }}"
-                                        data-max="{{ $maxPayment }}" data-validation="[NOTEMPTY]"
-                                        data-validation-message="Nominal tidak boleh kosong">
-                                </div>
+                            <label>Rate <span>*</span></label>
+                            <div class="form-group">
+                                <input type="text" name="rate" class="form-control handle-number-2"
+                                    value="{{ old('rate', $data ? $data->rate : '') }}" data-validation="[NOTEMPTY]"
+                                    data-validation-message="Rate tidak boleh kosong">
                             </div>
-                            <div class="row">
-                                <label class="col-md-3">Total <span>*</span></label>
-                                <div class="col-md-4 form-group">
-                                    <input type="text" name="total" class="form-control handle-number-2" readonly
-                                        value="{{ old('total', $data ? $data->total : '') }}" data-validation="[NOTEMPTY]"
-                                        data-validation-message="Total tidak boleh kosong">
-                                </div>
+                            <label>Nominal <span>*</span></label>
+                            <div class="form-group">
+                                <input type="text" name="nominal" class="form-control handle-number-2"
+                                    value="{{ old('nominal', $data ? $data->nominal : '') }}"
+                                    data-max="{{ $maxPayment }}" data-validation="[NOTEMPTY]"
+                                    data-validation-message="Nominal tidak boleh kosong">
                             </div>
-                            <div class="row">
-                                <label class="col-md-3">Catatan</label>
-                                <div class="col-md-9 form-group">
-                                    <textarea name="catatan" class="form-control" rows="5">{{ old('catatan', $data ? $data->catatan : '') }}</textarea>
-                                </div>
+                            <label>Konversi Nominal <span>*</span></label>
+                            <div class="form-group">
+                                <input type="text" name="konversi_nominal" class="form-control handle-number-2" readonly
+                                    value="{{ old('konversi_nominal', $data ? $data->konversi_nominal : '') }}" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label>Total <span>*</span></label>
+                            <div class="form-group">
+                                <input type="text" name="total" class="form-control handle-number-2" readonly
+                                    value="{{ old('total', $data ? $data->total : '') }}" data-validation="[NOTEMPTY]"
+                                    data-validation-message="Total tidak boleh kosong">
+                            </div>
+                            <label>Slip <span>*</span></label>
+                            <div class="form-group">
+                                <select name="id_slip" class="form-control select2" data-validation="[NOTEMPTY]"
+                                    data-validation-message="Slip tidak boleh kosong">
+                                    <option value="">Pilih Slip</option>
+                                    @foreach ($slip as $dataSlip)
+                                        <option value="{{ $dataSlip->id }}"
+                                            {{ old('id_slip', $data ? $data->id_slip : '') == $dataSlip->id ? 'selected' : '' }}>
+                                            {{ $dataSlip->text }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <label>Catatan</label>
+                            <div class="form-group">
+                                <textarea name="catatan" class="form-control" rows="5">{{ old('catatan', $data ? $data->catatan : '') }}</textarea>
                             </div>
                         </div>
                     </div>
@@ -176,9 +168,10 @@
             $('[name="id_permintaan_pembelian"]').prop('disabled', true)
         }
 
-        $('[name="id_cabang"]').change(function() {
+        $('[name="id_cabang"]').select2().on('select2:select', function(e) {
+            let dataselect = e.params.data
             let self = $('[name="id_permintaan_pembelian"]')
-            if ($('[name="id_cabang"]').val() == '') {
+            if (dataselect.id == '') {
                 self.val('').prop('disabled', true).trigger('change')
             } else {
                 self.val('').prop('disabled', false).trigger('change')
@@ -186,61 +179,57 @@
 
             $('[name="nominal"]').val('').attr('data-max', 0)
             $('[name="total"]').val('')
+            getPurchaseOrder()
         })
 
-        $('.selectAjax').each(function(i, v) {
-            let route = $(v).data('route')
-            let name = $(v).prop('name')
-            $(v).select2({
-                ajax: {
-                    url: route,
-                    dataType: 'json',
-                    data: function(params) {
-                        if (name == 'id_permintaan_pembelian') {
-                            return {
-                                search: params.term,
-                                id_cabang: $('[name="id_cabang"]').val()
-                            }
-                        } else {
-                            return {
-                                search: params.term
-                            }
-                        }
-                    },
-                    processResults: function(data) {
-                        return {
-                            results: data
-                        };
-                    }
-                }
-            }).on('select2:select', function(e) {
-                let dataselect = e.params.data
-                if (name == 'id_mata_uang') {
-                    $('[name="rate"]').val(dataselect.nilai_mata_uang)
-                }
-
-                if (name == 'id_permintaan_pembelian') {
-                    $.ajax({
-                        url: '{{ route('purchase-down-payment-count-po') }}',
-                        type: 'get',
-                        data: {
-                            po_id: dataselect.id,
-                            id: '{{ $data ? $data->id_uang_muka_pembelian : 0 }}'
-                        },
-                        success: function(res) {
-                            $('[name="nominal"]').val(formatNumber(res.nominal)).attr(
-                                'data-max', res
-                                .nominal)
-                            $('[name="total"]').val(formatNumber(res.total))
-                            $('[name="id_mata_uang"]').val(res.id_mata_uang)
-                            $('[name="rate"]').val(formatNumber(res.nilai_mata_uang))
-                        },
-                        error(error) {
-                            console.log(error)
-                        }
+        function getPurchaseOrder() {
+            let tag = $('[name="id_permintaan_pembelian"]')
+            $.ajax({
+                url: '{{ route('purchase-down-payment-auto-po') }}',
+                data: {
+                    id_cabang: $('[name="id_cabang"]').val()
+                },
+                success: function(res) {
+                    tag.select2({
+                        data: res.data
+                    }).on('select2:select', function(e) {
+                        let dataselect = e.params.data
+                        getTotalPrice(dataselect.id)
                     })
+                },
+                error(error) {
+                    console.log(error)
                 }
-            });
+            })
+        }
+
+        function getTotalPrice(param) {
+            $.ajax({
+                url: '{{ route('purchase-down-payment-count-po') }}',
+                type: 'get',
+                data: {
+                    po_id: param,
+                    id: '{{ $data ? $data->id_uang_muka_pembelian : 0 }}'
+                },
+                success: function(res) {
+                    $('[name="nominal"]').val(formatNumber(res.nominal)).attr(
+                        'data-max', res
+                        .nominal)
+                    $('[name="total"]').val(formatNumber(res.total))
+                    $('[name="id_mata_uang"]').val(res.id_mata_uang)
+                    $('[name="rate"]').val(formatNumber(res.nilai_mata_uang))
+                    $('[name="konversi_nominal"]').val(formatNumber(res.nilai_mata_uang * res.nominal))
+                },
+                error(error) {
+                    console.log(error)
+                }
+            })
+        }
+
+        $('body').on('input', '[name="rate"],[name="nominal"]', function() {
+            let rate = normalizeNumber($('[name="rate"]').val())
+            let nominal = normalizeNumber($('[name="nominal"]').val())
+            $('[name="konversi_nominal"]').val(formatNumber(rate * nominal))
         })
     </script>
 @endsection

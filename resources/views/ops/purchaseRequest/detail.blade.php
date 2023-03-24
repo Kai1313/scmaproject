@@ -104,6 +104,7 @@
                                 <th>Satuan</th>
                                 <th>Jumlah</th>
                                 <th>Catatan</th>
+                                <th>Stok</th>
                             </tr>
                         </thead>
                     </table>
@@ -147,7 +148,12 @@
                     data: 'notes',
                     name: 'notes'
                 },
-
+                {
+                    data: 'stok',
+                    name: 'stok',
+                    render: $.fn.dataTable.render.number('.', ',', 4),
+                    className: 'text-right'
+                },
             ]
         });
     </script>
