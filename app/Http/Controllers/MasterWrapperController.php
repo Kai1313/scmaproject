@@ -197,6 +197,15 @@ class MasterWrapperController extends Controller
                 $user_access[$value->nama_menu] = ['show' => $value->lihat_akses_menu, 'create' => $value->tambah_akses_menu, 'edit' => $value->ubah_akses_menu, 'delete' => $value->hapus_akses_menu, 'print' => $value->cetak_akses_menu];
             }
 
+            $idGroup = $user->id_grup_pengguna;
+            $menu_access = DB::table('menu')->select('menu.id_menu', 'kepala_menu', 'alias_menu', 'lihat_akses_menu', 'tingkatan_menu', 'nama_menu')
+                ->leftJoin('akses_menu', 'menu.id_menu', '=', 'akses_menu.id_menu')
+                ->where('akses_menu.id_grup_pengguna', $idGroup)
+                ->where('lihat_akses_menu', '1')
+                ->where('alias_menu', 'not like', '%detail')
+                ->get();
+            $request->session()->put('menu_access', $menu_access);
+
             if ($token && $request->session()->has('token') == false) {
                 $request->session()->put('token', $token->nama_token_pengguna);
                 $request->session()->put('user', $user);
