@@ -2,6 +2,7 @@
 
 @section('addedStyles')
     <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables-responsive/css/responsive.dataTables.css') }}">
     <link rel="stylesheet"
         href="{{ asset('assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/bower_components/select2/dist/css/select2.min.css') }}">
@@ -102,10 +103,27 @@
                                 </select>
                             </div>
                         </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Nama Supplier</label>
+                                <input type="text" class="form-control" name="pemasok" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>No PO</label>
+                                <input type="text" class="form-control" name="po" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Tanggal Penerimaan</label>
+                                <input type="text" class="form-control" name="tanggal" readonly>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-
             <div class="box">
                 <div class="box-body">
                     <div class="row">
@@ -121,7 +139,8 @@
                     <div class="table-responsive">
                         <input type="hidden" name="details"
                             value="{{ $data ? json_encode($data->purchasing->qc) : '[]' }}">
-                        <table id="table-detail" class="table table-bordered data-table">
+                        <table id="table-detail" class="table table-bordered data-table display responsive nowrap"
+                            width="100%">
                             <thead>
                                 <tr>
                                     <th>Nama Barang</th>
@@ -181,11 +200,7 @@
                             </div>
                             <label>Status <span>*</span></label>
                             <div class="form-group">
-                                <select name="status_qc" class="form-control select2 validate">
-                                    @foreach ($arrayStatus as $status)
-                                        <option value="{{ $status['id'] }}">
-                                            {{ $status['text'] == '' ? 'Pilih Status' : $status['text'] }}</option>
-                                    @endforeach
+                                <select name="status_qc" class="form-control validate">
                                 </select>
                             </div>
                             <label>Alasan</label>
@@ -248,6 +263,7 @@
 @section('addedScripts')
     <script src="{{ asset('assets/bower_components/datatables.net/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js') }}"></script>
+    <script src="{{ asset('assets/bower_components/datatables-responsive/js/dataTables.responsive.js') }}"></script>
     <script src="{{ asset('assets/plugins/jquery-form-validation-1.5.3/dist/jquery.validation.min.js') }}"></script>
     <script src="{{ asset('assets/bower_components/select2/dist/js/select2.min.js') }}"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -262,6 +278,9 @@
         let statusModal = 'create'
         let indexSelect = 0
         $('.select2').select2()
+        $('[name="status_qc"]').select2({
+            data: arrayStatus
+        })
 
         var resDataTable = $('#table-detail').DataTable({
             data: details,
@@ -340,9 +359,6 @@
                             btn +=
                                 '<li><a href="javascript:void(0)" data-id="' + data +
                                 '" class="btn btn-warning btn-xs mr-1 mb-1 edit-entry"><i class="glyphicon glyphicon-pencil"></i></a></li>';
-                            // btn +=
-                            //     '<li><a href="javascript:void(0)" data-index="' + data +
-                            //     '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1 delete-entry"><i class="glyphicon glyphicon-trash"></i></a></li>';
                             btn += '</ul>';
                         }
 
@@ -373,6 +389,9 @@
                         }, ...res.data]
                     }).on('select2:select', function(e) {
                         let dataselect = e.params.data
+                        $('[name="pemasok"]').val(dataselect.nama_pemasok)
+                        $('[name="tanggal"]').val(dataselect.tanggal_pembelian)
+                        $('[name="po"]').val(dataselect.nomor_po_pembelian)
                         getItem(dataselect.id)
                     });
                 },
@@ -433,6 +452,11 @@
             setTimeout(() => {
                 $('[name="id_barang"]').select2('open')
             }, 500);
+
+            $('[name="status_qc"]').empty()
+            $('[name="status_qc"]').select2({
+                data: arrayStatus
+            })
 
             $('.handle-number-4').each(function(i, v) {
                 let val = $(v).val().replace('.', ',')
@@ -517,6 +541,23 @@
             for (select in detailSelect) {
                 if (['jumlah_pembelian_detail'].includes(select)) {
                     $('#qty').find('span').text(detailSelect['nama_satuan_barang'])
+                }
+
+                if (['id_barang'].includes(select)) {
+                    let nameSelect = 'nama_barang';
+                    $('[name="' + select + '"]').append('<option value="' + detailSelect[select] + '" selected>' +
+                        detailSelect[nameSelect] + '</option>')
+                }
+
+                if (['status_qc'].includes(select)) {
+                    $('[name="' + select + '"]').empty()
+                    $('[name="' + select + '"]').select2({
+                        data: [
+                            arrayStatus[1],
+                            arrayStatus[2],
+                            arrayStatus[3]
+                        ]
+                    })
                 }
 
                 $('[name="' + select + '"]').val(detailSelect[select]).trigger('change')

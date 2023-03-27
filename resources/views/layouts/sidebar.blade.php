@@ -391,7 +391,7 @@
                 </li>
             @endif
             @if (checkAccessMenu('transaksi'))
-                <li class="treeview {{ in_array(request()->segment(1), ['purchase_requisitions', 'uang_muka_pembelian']) ? 'active' : null }}"
+                <li class="treeview {{ in_array(request()->segment(1), ['purchase_requisitions', 'uang_muka_pembelian', 'qc_penerimaan_barang']) ? 'active' : null }}"
                     data-alias="transaksi">
                     <a href="#"><i class="glyphicon glyphicon-list-alt"></i> <span>Transaksi</span>
                         <span class="pull-right-container">
@@ -400,7 +400,7 @@
                     </a>
                     <ul class="treeview-menu">
                         @if (checkAccessMenu('pembelian_kepala'))
-                            <li class="treeview {{ in_array(request()->segment(1), ['purchase_requisitions', 'uang_muka_pembelian']) ? 'active' : null }}"
+                            <li class="treeview {{ in_array(request()->segment(1), ['purchase_requisitions', 'uang_muka_pembelian', 'qc_penerimaan_barang']) ? 'active' : null }}"
                                 data-alias="pembelian_kepala">
                                 <a href="#"><i class="glyphicon glyphicon-arrow-right"></i>
                                     <span>Pembelian</span>
@@ -433,13 +433,15 @@
                                             </a>
                                         </li>
                                     @endif
-                                    {{-- @if (checkAccessMenu('kategori_konigurasi')) --}}
-                                    <li data-alias="">
-                                        <a href="{{ route('qc_receipt') }}">
-                                            <i class="glyphicon glyphicon-option-vertical"></i>QC Penerimaan Barang
-                                            (QC)
-                                        </a>
-                                    </li>
+                                    @if (checkAccessMenu('qc_penerimaan_barang'))
+                                        <li
+                                            class="nav-item {{ request()->segment(1) == 'qc_penerimaan_barang' ? 'active' : null }}">
+                                            <a href="{{ route('qc_receipt') }}">
+                                                <i class="glyphicon glyphicon-option-vertical"></i>QC Penerimaan Barang
+                                                (QC)
+                                            </a>
+                                        </li>
+                                    @endif
                                     @if (checkAccessMenu('pembelian_invoice'))
                                         <li data-alias="pembelian_invoice">
                                             <a href="{{ env('OLD_URL_ROOT') }}#pembelian_invoice">

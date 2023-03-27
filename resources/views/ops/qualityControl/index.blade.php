@@ -2,6 +2,7 @@
 @section('addedStyles')
     <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables-responsive/css/responsive.dataTables.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/bower_components/select2/dist/css/select2.min.css') }}">
     <style>
         ul.horizontal-list {
             min-width: 200px;
@@ -57,7 +58,7 @@
                     <div class="col-md-4">
                         <label>Cabang</label>
                         <div class="form-group">
-                            <select name="id_cabang" class="form-control">
+                            <select name="id_cabang" class="form-control select2">
                                 @foreach ($cabang as $branch)
                                     <option value="{{ $branch->id_cabang }}">{{ $branch->kode_cabang }} -
                                         {{ $branch->nama_cabang }}
@@ -69,14 +70,15 @@
                     <div class="col-md-2">
                         <label>Tanggal Awal</label>
                         <div class="form-group">
-                            <input type="date" name="start_date" class="form-control"
+                            <input type="text" name="start_date" class="form-control datepicker"
                                 value="{{ date('Y-m-d', strtotime('-1 month')) }}">
                         </div>
                     </div>
                     <div class="col-md-2">
                         <label>Tanggal Akhir</label>
                         <div class="form-group">
-                            <input type="date" name="end_date" class="form-control" value="{{ date('Y-m-d') }}">
+                            <input type="text" name="end_date" class="form-control datepicker"
+                                value="{{ date('Y-m-d') }}">
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -88,16 +90,17 @@
             </div>
             <div class="box-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered data-table display responsive nowrap">
+                    <table class="table table-bordered data-table display responsive nowrap" width="100%">
                         <thead>
                             <tr>
-                                <th>Tanggal</th>
+
                                 <th>Kode Pembelian</th>
                                 <th>Nama Barang</th>
                                 <th>Total Qty</th>
                                 <th>Satuan</th>
                                 <th>Status</th>
                                 <th>Alasan</th>
+                                <th>Tanggal QC</th>
                                 <th>SG</th>
                                 <th>BE</th>
                                 <th>PH</th>
@@ -119,16 +122,18 @@
     <script src="{{ asset('assets/bower_components/datatables.net/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js') }}"></script>
     <script src="{{ asset('assets/bower_components/datatables-responsive/js/dataTables.responsive.js') }}"></script>
-    {{-- <script src="{{ asset('assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js') }}"></script> --}}
+    <script src="{{ asset('assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js') }}"></script>
+    <script src="{{ asset('assets/bower_components/select2/dist/js/select2.min.js') }}"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/custom.js') }}"></script>
 @endsection
 
 @section('externalScripts')
     <script>
-        // $('.datepicker').datepicker({
-        //     format: 'yyyy-mm-dd',
-        // });
+        $('.select2').select2()
+        $('.datepicker').datepicker({
+            format: 'yyyy-mm-dd',
+        });
 
         var table = $('.data-table').DataTable({
             processing: true,
@@ -136,9 +141,6 @@
             ajax: "{{ route('qc_receipt') }}?c=" + $('[name="id_cabang"]').val() + '&start_date=' + $(
                 '[name="start_date"]').val() + '&end_date=' + $('[name="end_date"]').val(),
             columns: [{
-                data: 'tanggal_qc',
-                name: 'tanggal_qc'
-            }, {
                 data: 'nama_pembelian',
                 name: 'nama_pembelian'
             }, {
@@ -159,6 +161,9 @@
             }, {
                 data: 'reason',
                 name: 'reason',
+            }, {
+                data: 'tanggal_qc',
+                name: 'tanggal_qc'
             }, {
                 data: 'sg_pembelian_detail',
                 name: 'sg_pembelian_detail',
