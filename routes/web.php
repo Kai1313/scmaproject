@@ -51,6 +51,7 @@ Route::prefix('purchase_requisitions')->group(function () {
     Route::get('/auto_item', 'PurchaseRequestController@autoItem')->name('purchase-request-auto-item');
     Route::get('/auto_satuan', 'PurchaseRequestController@autoSatuan')->name('purchase-request-auto-satuan');
     Route::get('/change_status/{id}/{type}', 'PurchaseRequestController@changeStatus')->name('purchase-request-change-status');
+    Route::get('/print/{id}', 'PurchaseRequestController@printData')->name('purchase-request-print-data');
 });
 
 Route::prefix('uang_muka_pembelian')->group(function () {

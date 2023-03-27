@@ -15,3 +15,15 @@ function handleNull($number)
 {
     return $number ? $number : 0;
 }
+
+function checkAccessMenu($menu_name = '')
+{
+    $datas = session()->get('menu_access');
+    foreach ($datas as $data) {
+        if ($data->alias_menu == $menu_name) {
+            return '1';
+        }
+    }
+
+    return '0';
+}

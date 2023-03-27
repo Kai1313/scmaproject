@@ -15,10 +15,10 @@ use Yajra\DataTables\DataTables;
 class QcReceiptController extends Controller
 {
     public $arrayStatus = [
-        ['text' => '', 'class' => 'label label-default', 'id' => ''],
+        ['text' => 'Pilih Status', 'class' => 'label label-default', 'id' => ''],
         ['text' => 'Passed', 'class' => 'label label-success', 'id' => '1'],
         ['text' => 'Reject', 'class' => 'label label-danger', 'id' => '2'],
-        ['text' => 'Hold', 'class' => 'label label-default', 'id' => '3'],
+        ['text' => 'Hold', 'class' => 'label label-warning', 'id' => '3'],
     ];
 
     public function index(Request $request)
@@ -29,31 +29,47 @@ class QcReceiptController extends Controller
         }
 
         if ($request->ajax()) {
-            $data = DB::table('qc')->select('id', 'tanggal_qc', 'nama_pembelian', 'nama_barang', 'jumlah_pembelian_detail', 'status_qc', 'nama_satuan_barang', 'reason', 'sg_pembelian_detail', 'be_pembelian_detail', 'ph_pembelian_detail', 'warna_pembelian_detail', 'keterangan_pembelian_detail')
-                ->leftJoin('pembelian', 'qc.id_pembelian', '=', 'pembelian.id_pembelian')
-                ->leftJoin('barang', 'qc.id_barang', '=', 'barang.id_barang')
-                ->leftJoin('satuan_barang', 'qc.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
-                ->whereBetween('tanggal_qc', [$request->start_date, $request->end_date]);
+            $data = DB::table('pembelian_detail')
+                ->select(
+                    'id_pembelian_detail',
+                    'tanggal_qc',
+                    'nama_pembelian',
+                    'nama_barang',
+                    DB::raw('sum(pembelian_detail.jumlah_pembelian_detail) as jumlah_pembelian_detail'),
+                    'status_qc',
+                    'nama_satuan_barang',
+                    'reason',
+                    'qc.sg_pembelian_detail',
+                    'qc.be_pembelian_detail',
+                    'qc.ph_pembelian_detail',
+                    'qc.warna_pembelian_detail',
+                    'qc.keterangan_pembelian_detail',
+                    'qc.bentuk_pembelian_detail'
+                )
+                ->leftJoin('qc', function ($qc) {
+                    $qc->on('pembelian_detail.id_pembelian', '=', 'qc.id_pembelian')->on('pembelian_detail.id_barang', '=', 'qc.id_barang');
+                })
+                ->leftJoin('pembelian', 'pembelian_detail.id_pembelian', '=', 'pembelian.id_pembelian')
+                ->leftJoin('barang', 'pembelian_detail.id_barang', '=', 'barang.id_barang')
+                ->leftJoin('satuan_barang', 'pembelian_detail.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
+                ->whereBetween('pembelian.tanggal_pembelian', [$request->start_date, $request->end_date]);
             if (isset($request->c)) {
-                $data = $data->where('qc.id_cabang', $request->c);
+                $data = $data->where('pembelian.id_cabang', $request->c);
             }
 
-            $data = $data->orderBy('qc.tanggal_qc', 'desc');
+            $data = $data->groupBy('pembelian_detail.id_pembelian', 'pembelian_detail.id_barang')
+                ->orderBy('pembelian.tanggal_pembelian', 'desc');
+
             return Datatables::of($data)
                 ->addIndexColumn()
-                ->addColumn('action', function ($row) {
-                    // $btn = '<ul class="horizontal-list">';
-                    // $btn .= '<li><a href="' . route('purchase-request-view', $row->id) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
-                    // $btn .= '<li><a href="' . route('purchase-request-entry', $row->id) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
-                    // $btn .= '<li><a href="' . route('purchase-request-delete', $row->id) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Void</a></li>';
-                    // $btn .= '</ul>';
-
-                    return '';
-                })
                 ->editColumn('status_qc', function ($row) {
-                    return '<label class="' . $this->arrayStatus[$row->status_qc]['class'] . '">' . $this->arrayStatus[$row->status_qc]['text'] . '</label>';
+                    if ($row->status_qc) {
+                        return '<label class="' . $this->arrayStatus[$row->status_qc]['class'] . '">' . $this->arrayStatus[$row->status_qc]['text'] . '</label>';
+                    } else {
+                        return '<label class="label label-default">Belum di QC</label>';
+                    }
                 })
-                ->rawColumns(['action', 'status_qc'])
+                ->rawColumns(['status_qc'])
                 ->make(true);
         }
 
@@ -97,6 +113,7 @@ class QcReceiptController extends Controller
                 $data->status_qc = $value->status_qc;
                 $data->reason = $value->reason;
                 $data->sg_pembelian_detail = $value->sg_pembelian_detail;
+                $data->bentuk_pembelian_detail = $value->bentuk_pembelian_detail;
                 $data->be_pembelian_detail = $value->be_pembelian_detail;
                 $data->ph_pembelian_detail = $value->ph_pembelian_detail;
                 $data->warna_pembelian_detail = $value->warna_pembelian_detail;
@@ -127,12 +144,13 @@ class QcReceiptController extends Controller
     {
         $cabang = $request->cabang;
         $duration = DB::table('setting')->where('code', 'QC Duration')->first();
-        $startDate = date('Y-m-d', strtotime('-' . intval($duration->value2) . ' months'));
+        $startDate = date('Y-m-d', strtotime('-' . intval($duration->value2) . ' days'));
         $endDate = date('Y-m-d');
-        $datas = DB::table('pembelian')->select('nama_pembelian as text', 'id_pembelian as id')
+        $datas = DB::table('pembelian')->select('nama_pembelian as text', 'id_pembelian as id', 'nama_pemasok', 'tanggal_pembelian', 'nomor_po_pembelian')
+            ->leftJoin('pemasok', 'pembelian.id_pemasok', '=', 'pemasok.id_pemasok')
             ->whereBetween('tanggal_pembelian', [$startDate, $endDate])
             ->where('id_cabang', $cabang)
-            ->get();
+            ->orderBy('tanggal_pembelian', 'desc')->get();
 
         return response()->json([
             'result' => true,
@@ -189,6 +207,15 @@ class QcReceiptController extends Controller
             foreach ($access as $value) {
                 $user_access[$value->nama_menu] = ['show' => $value->lihat_akses_menu, 'create' => $value->tambah_akses_menu, 'edit' => $value->ubah_akses_menu, 'delete' => $value->hapus_akses_menu, 'print' => $value->cetak_akses_menu];
             }
+
+            $idGroup = $user->id_grup_pengguna;
+            $menu_access = DB::table('menu')->select('menu.id_menu', 'kepala_menu', 'alias_menu', 'lihat_akses_menu', 'tingkatan_menu', 'nama_menu')
+                ->leftJoin('akses_menu', 'menu.id_menu', '=', 'akses_menu.id_menu')
+                ->where('akses_menu.id_grup_pengguna', $idGroup)
+                ->where('lihat_akses_menu', '1')
+                ->where('alias_menu', 'not like', '%detail')
+                ->get();
+            $request->session()->put('menu_access', $menu_access);
 
             if ($token && $request->session()->has('token') == false) {
                 $request->session()->put('token', $token->nama_token_pengguna);

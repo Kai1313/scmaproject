@@ -2,7 +2,7 @@
 
 @section('addedStyles')
     <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/bower_components/jquery-treetable/css/jquery.treetable.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables-responsive/css/responsive.dataTables.css') }}">
     <style>
         th {
             text-align: center;
@@ -29,7 +29,12 @@
         <div class="box box-primary">
             <div class="box-header">
                 <h3 class="box-title">Detail Permintaan Pembelian <span class="text-muted"></span></h3>
-                <a href="{{ route('purchase-request') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right">
+                <a href="{{ route('purchase-request-print-data', $data->purchase_request_id) }}"
+                    class="btn btn-sm btn-default btn-flat pull-right">
+                    <span class="glyphicon glyphicon-print mr-1"></span> Cetak
+                </a>
+                <a href="{{ route('purchase-request') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right"
+                    style="margin-right:10px;">
                     <span class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali
                 </a>
             </div>
@@ -96,7 +101,8 @@
             <div class="box-body">
                 <h4>Detil Permintaan Barang</h4>
                 <div class="table-responsive">
-                    <table id="table-detail" class="table table-bordered data-table">
+                    <table id="table-detail" class="table table-bordered data-table display responsive nowrap"
+                        width="100%">
                         <thead>
                             <tr>
                                 <th>Kode Barang</th>
@@ -117,6 +123,7 @@
 @section('addedScripts')
     <script src="{{ asset('assets/bower_components/datatables.net/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js') }}"></script>
+    <script src="{{ asset('assets/bower_components/datatables-responsive/js/dataTables.responsive.js') }}"></script>
     <script src="{{ asset('js/custom.js') }}"></script>
 @endsection
 

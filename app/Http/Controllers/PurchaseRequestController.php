@@ -202,15 +202,6 @@ class PurchaseRequestController extends Controller
         ], 200);
     }
 
-    // public function autoUser(Request $request)
-    // {
-    //     $search = $request->search;
-    //     $datas = DB::table('pengguna')->select('id_pengguna as id', 'nama_pengguna as text')
-    //         ->where('status_pengguna', 1)
-    //         ->where('nama_pengguna', 'like', '%' . $search . '%')->get();
-    //     return $datas;
-    // }
-
     public function autoItem(Request $request)
     {
         $search = $request->search;
@@ -343,6 +334,15 @@ class PurchaseRequestController extends Controller
                 $user_access[$value->nama_menu] = ['show' => $value->lihat_akses_menu, 'create' => $value->tambah_akses_menu, 'edit' => $value->ubah_akses_menu, 'delete' => $value->hapus_akses_menu, 'print' => $value->cetak_akses_menu];
             }
 
+            $idGroup = $user->id_grup_pengguna;
+            $menu_access = DB::table('menu')->select('menu.id_menu', 'kepala_menu', 'alias_menu', 'lihat_akses_menu', 'tingkatan_menu', 'nama_menu')
+                ->leftJoin('akses_menu', 'menu.id_menu', '=', 'akses_menu.id_menu')
+                ->where('akses_menu.id_grup_pengguna', $idGroup)
+                ->where('lihat_akses_menu', '1')
+                ->where('alias_menu', 'not like', '%detail')
+                ->get();
+            $request->session()->put('menu_access', $menu_access);
+
             if ($token && $request->session()->has('token') == false) {
                 $request->session()->put('token', $token->nama_token_pengguna);
                 $request->session()->put('user', $user);
@@ -359,5 +359,16 @@ class PurchaseRequestController extends Controller
             $request->session()->flush();
             return ['status' => false];
         }
+    }
+
+    public function printData($id)
+    {
+        $data = PurchaseRequest::find($id);
+
+        return view('ops.purchaseRequest.print', [
+            'data' => $data,
+            'arrayStatus' => $this->arrayStatus,
+            "pageTitle" => "SCA OPS | Permintaan Pembelian | Cetak",
+        ]);
     }
 }

@@ -2,6 +2,7 @@
 
 @section('addedStyles')
     <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables-responsive/css/responsive.dataTables.css') }}">
     <link rel="stylesheet"
         href="{{ asset('assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/bower_components/select2/dist/css/select2.min.css') }}">
@@ -102,10 +103,27 @@
                                 </select>
                             </div>
                         </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Nama Supplier</label>
+                                <input type="text" class="form-control" name="pemasok" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>No PO</label>
+                                <input type="text" class="form-control" name="po" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Tanggal Penerimaan</label>
+                                <input type="text" class="form-control" name="tanggal" readonly>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-
             <div class="box">
                 <div class="box-body">
                     <div class="row">
@@ -121,7 +139,8 @@
                     <div class="table-responsive">
                         <input type="hidden" name="details"
                             value="{{ $data ? json_encode($data->purchasing->qc) : '[]' }}">
-                        <table id="table-detail" class="table table-bordered data-table">
+                        <table id="table-detail" class="table table-bordered data-table display responsive nowrap"
+                            width="100%">
                             <thead>
                                 <tr>
                                     <th>Nama Barang</th>
@@ -134,6 +153,7 @@
                                     <th>BE</th>
                                     <th>PH</th>
                                     <th>Warna</th>
+                                    <th>Bentuk</th>
                                     <th>Keterangan</th>
                                     <th>Action</th>
                                 </tr>
@@ -156,6 +176,7 @@
                 </div>
                 <div class="modal-body">
                     <div class="alert alert-danger" style="display:none;" id="alertModal">
+                        asd
                     </div>
                     <div class="row">
                         <div class="col-md-6">
@@ -179,11 +200,7 @@
                             </div>
                             <label>Status <span>*</span></label>
                             <div class="form-group">
-                                <select name="status_qc" class="form-control select2 validate">
-                                    @foreach ($arrayStatus as $status)
-                                        <option value="{{ $status['id'] }}">
-                                            {{ $status['text'] == '' ? 'Pilih Status' : $status['text'] }}</option>
-                                    @endforeach
+                                <select name="status_qc" class="form-control validate">
                                 </select>
                             </div>
                             <label>Alasan</label>
@@ -192,21 +209,40 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <label>SG </label>
-                            <div class="form-group">
-                                <input type="text" name="sg_pembelian_detail" class="form-control handle-number-4">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <label>SG </label>
+                                    <div class="form-group">
+                                        <input type="text" name="sg_pembelian_detail"
+                                            class="form-control handle-number-4">
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label>BE </label>
+                                    <div class="form-group">
+                                        <input type="text" name="be_pembelian_detail"
+                                            class="form-control handle-number-4">
+                                    </div>
+                                </div>
                             </div>
-                            <label>BE </label>
-                            <div class="form-group">
-                                <input type="text" name="be_pembelian_detail" class="form-control handle-number-4">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <label>PH </label>
+                                    <div class="form-group">
+                                        <input type="text" name="ph_pembelian_detail"
+                                            class="form-control handle-number-4">
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label>Warna</label>
+                                    <div class="form-group">
+                                        <input type="text" name="warna_pembelian_detail" class="form-control">
+                                    </div>
+                                </div>
                             </div>
-                            <label>PH </label>
+                            <label>Bentuk</label>
                             <div class="form-group">
-                                <input type="text" name="ph_pembelian_detail" class="form-control handle-number-4">
-                            </div>
-                            <label>Warna</label>
-                            <div class="form-group">
-                                <input type="text" name="warna_pembelian_detail" class="form-control">
+                                <input type="text" name="bentuk_pembelian_detail" class="form-control">
                             </div>
                             <label>Keterangan</label>
                             <div class="form-group">
@@ -227,6 +263,7 @@
 @section('addedScripts')
     <script src="{{ asset('assets/bower_components/datatables.net/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js') }}"></script>
+    <script src="{{ asset('assets/bower_components/datatables-responsive/js/dataTables.responsive.js') }}"></script>
     <script src="{{ asset('assets/plugins/jquery-form-validation-1.5.3/dist/jquery.validation.min.js') }}"></script>
     <script src="{{ asset('assets/bower_components/select2/dist/js/select2.min.js') }}"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -239,7 +276,11 @@
         let details = [];
         let detailSelect = []
         let statusModal = 'create'
+        let indexSelect = 0
         $('.select2').select2()
+        $('[name="status_qc"]').select2({
+            data: arrayStatus
+        })
 
         var resDataTable = $('#table-detail').DataTable({
             data: details,
@@ -299,6 +340,10 @@
                     name: 'warna_pembelian_detail',
                 },
                 {
+                    data: 'bentuk_pembelian_detail',
+                    name: 'bentuk_pembelian_detail',
+                },
+                {
                     data: 'keterangan_pembelian_detail',
                     name: 'keterangan_pembelian_detail',
                 },
@@ -314,9 +359,6 @@
                             btn +=
                                 '<li><a href="javascript:void(0)" data-id="' + data +
                                 '" class="btn btn-warning btn-xs mr-1 mb-1 edit-entry"><i class="glyphicon glyphicon-pencil"></i></a></li>';
-                            // btn +=
-                            //     '<li><a href="javascript:void(0)" data-index="' + data +
-                            //     '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1 delete-entry"><i class="glyphicon glyphicon-trash"></i></a></li>';
                             btn += '</ul>';
                         }
 
@@ -347,6 +389,9 @@
                         }, ...res.data]
                     }).on('select2:select', function(e) {
                         let dataselect = e.params.data
+                        $('[name="pemasok"]').val(dataselect.nama_pemasok)
+                        $('[name="tanggal"]').val(dataselect.tanggal_pembelian)
+                        $('[name="po"]').val(dataselect.nomor_po_pembelian)
                         getItem(dataselect.id)
                     });
                 },
@@ -357,7 +402,6 @@
         }
 
         function getItem(param) {
-            console.log('tes')
             $('#cover-spin').show()
             $.ajax({
                 url: '{{ route('qc_receipt-auto-item') }}',
@@ -409,6 +453,11 @@
                 $('[name="id_barang"]').select2('open')
             }, 500);
 
+            $('[name="status_qc"]').empty()
+            $('[name="status_qc"]').select2({
+                data: arrayStatus
+            })
+
             $('.handle-number-4').each(function(i, v) {
                 let val = $(v).val().replace('.', ',')
                 $(v).val(formatRupiah(val, 4))
@@ -417,14 +466,13 @@
 
         $('.save-entry').click(function() {
             let modal = $('#modalEntry')
-            let valid = validatorModal(modal.find('[name="id_barang"]').val())
+            let valid = validatorModal(modal.find('[name="id_barang"]').val(), $('[name="id"]').val())
             if (!valid.status) {
                 $('#alertModal').text(valid.message).show()
                 return false
             } else {
                 $('#alertModal').text('').hide()
             }
-
 
             modal.find('input,select,textarea').each(function(i, v) {
                 if ($(v).hasClass('handle-number-4')) {
@@ -433,17 +481,16 @@
                     detailSelect[$(v).prop('name')] = $(v).val()
                 }
             })
-            console.log(detailSelect)
 
             let newObj = Object.assign({}, detailSelect)
             if (statusModal == 'create') {
                 details.push(newObj)
             } else if (statusModal == 'edit') {
-                details[newObj.index - 1] = newObj
+                details[indexSelect] = newObj
+                detailSelect = 0
             }
 
             $('[name="details"]').val(JSON.stringify(details))
-            console.log(details)
             statusModal = ''
             detailSelect = []
 
@@ -455,6 +502,8 @@
             $('[name="reason"]').attr('readonly', true)
             if ($(this).val() == 2) {
                 $('[name="reason"]').attr('readonly', false).addClass('validate')
+            } else if ($(this).val() == 3) {
+                $('[name="reason"]').attr('readonly', false)
             } else {
                 $('[name="reason"]').attr('readonly', true).removeClass('validate')
             }
@@ -482,10 +531,33 @@
             let id = $(this).data('id')
             statusModal = 'edit'
             let findItem = details.filter(p => p.id_barang == id)
-            detailSelect = findItem.length > 0 ? findItem[0] : []
+            if (findItem.length > 0) {
+                detailSelect = findItem[0]
+                indexSelect = details.indexOf(detailSelect)
+            } else {
+                detailSelect = []
+            }
+
             for (select in detailSelect) {
                 if (['jumlah_pembelian_detail'].includes(select)) {
                     $('#qty').find('span').text(detailSelect['nama_satuan_barang'])
+                }
+
+                if (['id_barang'].includes(select)) {
+                    let nameSelect = 'nama_barang';
+                    $('[name="' + select + '"]').append('<option value="' + detailSelect[select] + '" selected>' +
+                        detailSelect[nameSelect] + '</option>')
+                }
+
+                if (['status_qc'].includes(select)) {
+                    $('[name="' + select + '"]').empty()
+                    $('[name="' + select + '"]').select2({
+                        data: [
+                            arrayStatus[1],
+                            arrayStatus[2],
+                            arrayStatus[3]
+                        ]
+                    })
                 }
 
                 $('[name="' + select + '"]').val(detailSelect[select]).trigger('change')
@@ -497,7 +569,7 @@
             })
         })
 
-        function validatorModal(id = 0) {
+        function validatorModal(barang, id) {
             let message = 'Lengkapi inputan yang diperlukan'
             let valid = true
             $('#modalEntry').find('.validate').each(function(i, v) {
@@ -507,7 +579,7 @@
 
                 if ($(v).prop('name') == 'id_barang') {
                     let findItem = details.filter(p => p.id_barang == $(v).val())
-                    if (findItem.length > 0 && findItem[0].id_barang == id) {
+                    if (findItem.length > 0 && id == 0 && findItem[0].id_barang == barang) {
                         message = "Barang sudah ada dalam daftar"
                         valid = false
                     }
