@@ -350,6 +350,7 @@
         });
 
         function getGudang(idCabang) {
+            $('#cover-spin').show()
             $.ajax({
                 url: '{{ route('purchase-request-auto-werehouse') }}',
                 data: {
@@ -363,9 +364,11 @@
                             'text': 'Pilih Gudang'
                         }, ...res.data]
                     })
+                    $('#cover-spin').hide()
                 },
                 error: function(error) {
                     console.log(error)
+                    $('#cover-spin').hide()
                 }
             })
         }
@@ -395,6 +398,7 @@
         });
 
         function getSatuan(id) {
+            $('#cover-spin').show()
             $.ajax({
                 url: "{{ route('purchase-request-auto-satuan') }}?item=" + id + '&cabang=' + $(
                     '[name="id_cabang"]').val() + '&gudang=' + $('[name="id_gudang"]').val(),
@@ -415,9 +419,11 @@
 
                     $('#message-stok').text(res.stok + ' ' + res.satuan_stok)
                     $('#modalEntry').find('[name="stok"]').val(res.stok)
+                    $('#cover-spin').hide()
                 },
                 error: function(error) {
                     console.log(error)
+                    $('#cover-spin').hide()
                 }
             })
         }

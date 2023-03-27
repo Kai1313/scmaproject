@@ -74,9 +74,14 @@ class QcReceiptController extends Controller
         }
 
         $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
+        $duration = DB::table('setting')->where('code', 'QC Duration')->first();
+        $startDate = date('Y-m-d', strtotime('-' . intval($duration->value2) . ' days'));
+        $endDate = date('Y-m-d');
         return view('ops.qualityControl.index', [
             'cabang' => $cabang,
             "pageTitle" => "SCA OPS | QC Permintaan Pembelian | List",
+            "startDate" => $startDate,
+            "endDate" => $endDate,
         ]);
     }
 

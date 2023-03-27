@@ -71,14 +71,14 @@
                         <label>Tanggal Awal</label>
                         <div class="form-group">
                             <input type="text" name="start_date" class="form-control datepicker"
-                                value="{{ date('Y-m-d', strtotime('-1 month')) }}">
+                                value="{{ $startDate }}">
                         </div>
                     </div>
                     <div class="col-md-2">
                         <label>Tanggal Akhir</label>
                         <div class="form-group">
                             <input type="text" name="end_date" class="form-control datepicker"
-                                value="{{ date('Y-m-d') }}">
+                                value="{{ $endDate }}">
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -93,7 +93,6 @@
                     <table class="table table-bordered data-table display responsive nowrap" width="100%">
                         <thead>
                             <tr>
-
                                 <th>Kode Pembelian</th>
                                 <th>Nama Barang</th>
                                 <th>Total Qty</th>

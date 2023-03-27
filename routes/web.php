@@ -47,7 +47,6 @@ Route::prefix('purchase_requisitions')->group(function () {
     Route::post('/save_entry/{id}', 'PurchaseRequestController@saveEntry')->name('purchase-request-save-entry');
     Route::get('/delete/{id}', 'PurchaseRequestController@destroy')->name('purchase-request-delete');
     Route::get('/auto_werehouse', 'PurchaseRequestController@autoWerehouse')->name('purchase-request-auto-werehouse');
-    // Route::get('/auto_user', 'PurchaseRequestController@autoUser')->name('purchase-request-auto-user');
     Route::get('/auto_item', 'PurchaseRequestController@autoItem')->name('purchase-request-auto-item');
     Route::get('/auto_satuan', 'PurchaseRequestController@autoSatuan')->name('purchase-request-auto-satuan');
     Route::get('/change_status/{id}/{type}', 'PurchaseRequestController@changeStatus')->name('purchase-request-change-status');
@@ -62,20 +61,28 @@ Route::prefix('uang_muka_pembelian')->group(function () {
     Route::get('/delete/{id}', 'PurchaseDownPaymentController@destroy')->name('purchase-down-payment-delete');
     Route::get('/auto_po', 'PurchaseDownPaymentController@autoPo')->name('purchase-down-payment-auto-po');
     Route::get('/count_po', 'PurchaseDownPaymentController@countPo')->name('purchase-down-payment-count-po');
-    // Route::get('/auto_slip', 'PurchaseDownPaymentController@autoSlip')->name('purchase-down-payment-auto-slip');
 });
 
 Route::prefix('qc_penerimaan_barang')->group(function () {
     Route::get('/index/{user_id?}', 'QcReceiptController@index')->name('qc_receipt');
     Route::get('/entry/{id?}', 'QcReceiptController@entry')->name('qc_receipt-entry');
-    // Route::get('/view/{id}', 'QcReceiptController@viewData')->name('qc_receipt-view');
     Route::post('/save_entry/{id}', 'QcReceiptController@saveEntry')->name('qc_receipt-save-entry');
-    // Route::get('/delete/{id}', 'QcReceiptController@destroy')->name('qc_receipt-delete');
     Route::get('/auto_purchasing', 'QcReceiptController@autoPurchasing')->name('qc_receipt-auto-purchasing');
     Route::get('/auto-item', 'QcReceiptController@autoItem')->name('qc_receipt-auto-item');
-    // Route::get('/auto_po', 'QcReceiptController@autoPo')->name('purchase-down-payment-auto-po');
-    // Route::get('/count_po', 'QcReceiptController@countPo')->name('purchase-down-payment-count-po');
-    // Route::get('/auto_slip', 'QcReceiptController@autoSlip')->name('purchase-down-payment-auto-slip');
+});
+
+Route::prefix('send_to_branch')->group(function () {
+    Route::get('/index/{user_id?}', 'SendToBranchController@index')->name('send_to_branch');
+    Route::get('/entry/{id?}', 'SendToBranchController@entry')->name('send_to_branch-entry');
+    Route::post('/save_entry/{id}', 'SendToBranchController@saveEntry')->name('send_to_branch-save-entry');
+    Route::get('/view/{id}', 'SendToBranchController@view')->name('send_to_branch-view');
+});
+
+Route::prefix('received_from_branch')->group(function () {
+    Route::get('/index/{user_id?}', 'ReceivedFromBranchController@index')->name('received_from_branch');
+    Route::get('/entry/{id?}', 'ReceivedFromBranchController@entry')->name('received_from_branch-entry');
+    Route::post('/save_entry/{id}', 'ReceivedFromBranchController@saveEntry')->name('received_from_branch-save-entry');
+    Route::get('/view/{id}', 'ReceivedFromBranchController@view')->name('received_from_branch-view');
 });
 
 // Master

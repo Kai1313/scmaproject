@@ -184,6 +184,7 @@
 
         function getPurchaseOrder() {
             let tag = $('[name="id_permintaan_pembelian"]')
+            $('#cover-spin').show()
             $.ajax({
                 url: '{{ route('purchase-down-payment-auto-po') }}',
                 data: {
@@ -196,14 +197,17 @@
                         let dataselect = e.params.data
                         getTotalPrice(dataselect.id)
                     })
+                    $('#cover-spin').hide()
                 },
                 error(error) {
                     console.log(error)
+                    $('#cover-spin').hide()
                 }
             })
         }
 
         function getTotalPrice(param) {
+            $('#cover-spin').show()
             $.ajax({
                 url: '{{ route('purchase-down-payment-count-po') }}',
                 type: 'get',
@@ -219,9 +223,11 @@
                     $('[name="id_mata_uang"]').val(res.id_mata_uang)
                     $('[name="rate"]').val(formatNumber(res.nilai_mata_uang))
                     $('[name="konversi_nominal"]').val(formatNumber(res.nilai_mata_uang * res.nominal))
+                    $('#cover-spin').hide()
                 },
                 error(error) {
                     console.log(error)
+                    $('#cover-spin').hide()
                 }
             })
         }

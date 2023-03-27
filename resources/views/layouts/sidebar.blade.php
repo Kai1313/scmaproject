@@ -391,7 +391,7 @@
                 </li>
             @endif
             @if (checkAccessMenu('transaksi'))
-                <li class="treeview {{ in_array(request()->segment(1), ['purchase_requisitions', 'uang_muka_pembelian', 'qc_penerimaan_barang']) ? 'active' : null }}"
+                <li class="treeview {{ in_array(request()->segment(1), ['purchase_requisitions', 'uang_muka_pembelian', 'qc_penerimaan_barang', 'send_to_branch', 'received_from_branch']) ? 'active' : null }}"
                     data-alias="transaksi">
                     <a href="#"><i class="glyphicon glyphicon-list-alt"></i> <span>Transaksi</span>
                         <span class="pull-right-container">
@@ -477,7 +477,8 @@
                             </li>
                         @endif
                         @if (checkAccessMenu('persediaan_kepala'))
-                            <li class="treeview" data-alias="persediaan_kepala">
+                            <li class="treeview {{ in_array(request()->segment(1), ['send_to_branch', 'received_from_branch']) ? 'active' : null }}"
+                                data-alias="persediaan_kepala">
                                 <a href="#"><i class="glyphicon glyphicon-arrow-right"></i>
                                     <span>Persediaan</span>
                                     <span class="pull-right-container">
@@ -493,14 +494,16 @@
                                         </li>
                                     @endif
                                     {{-- @if (checkAccessMenu('kategori_konigurasi')) --}}
-                                    <li class="">
-                                        <a href="">
+                                    <li
+                                        class="nav-item {{ request()->segment(1) == 'send_to_branch' ? 'active' : null }}">
+                                        <a href="{{ route('send_to_branch') }}">
                                             <i class="glyphicon glyphicon-option-vertical"></i>Kirim Ke Cabang
                                         </a>
                                     </li>
                                     {{-- @if (checkAccessMenu('kategori_konigurasi')) --}}
-                                    <li>
-                                        <a href="">
+                                    <li
+                                        class="nav-item {{ request()->segment(1) == 'received_from_branch' ? 'active' : null }}">
+                                        <a href="{{ route('received_from_branch') }}">
                                             <i class="glyphicon glyphicon-option-vertical"></i>Terima Dari Cabang
                                         </a>
                                     </li>

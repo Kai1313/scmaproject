@@ -199,8 +199,8 @@ class PurchaseDownPaymentController extends Controller
     public function autoPo(Request $request)
     {
         $idCabang = $request->id_cabang;
-        $duration = DB::table('setting')->where('code', 'Uang Muka Pembelian')->first();
-        $startDate = date('Y-m-d', strtotime('-' . intval($duration->value2) . ' months'));
+        $duration = DB::table('setting')->where('code', 'UMP Duration')->first();
+        $startDate = date('Y-m-d', strtotime('-' . intval($duration->value2) . ' days'));
         $endDate = date('Y-m-d');
         $datas = DB::table('permintaan_pembelian as pp')->select('pp.id_permintaan_pembelian as id', 'nama_permintaan_pembelian as text', 'mtotal_permintaan_pembelian')
             ->leftJoin('uang_muka_pembelian as ump', function ($join) {

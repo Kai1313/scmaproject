@@ -375,6 +375,7 @@
 
 
         function getPurchasingNumber() {
+            $('#cover-spin').show()
             $.ajax({
                 url: '{{ route('qc_receipt-auto-purchasing') }}',
                 data: {
@@ -394,9 +395,11 @@
                         $('[name="po"]').val(dataselect.nomor_po_pembelian)
                         getItem(dataselect.id)
                     });
+                    $('#cover-spin').hide()
                 },
                 error: function(error) {
                     console.log(error)
+                    $('#cover-spin').hide()
                 }
             })
         }
@@ -441,7 +444,11 @@
             detailSelect = []
             $('#modalEntry').find('input,select,textarea').each(function(i, v) {
                 if ($(v).hasClass('handle-number-4')) {
-                    $(v).val(0).trigger('change')
+                    if ($(v).prop('name') == 'sg_pembelian_detail') {
+                        $(v).val(1).trigger('change')
+                    } else {
+                        $(v).val(0).trigger('change')
+                    }
                 } else {
                     $(v).val('').trigger('change')
                 }
