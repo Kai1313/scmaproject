@@ -102,8 +102,8 @@
                                 <th>BE</th>
                                 <th>PH</th>
                                 <th>Warna</th>
+                                <th>Bentuk</th>
                                 <th>Keterangan</th>
-                                <th width="150px">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -178,15 +178,12 @@
                 data: 'warna_pembelian_detail',
                 name: 'warna_pembelian_detail',
             }, {
+                data: 'bentuk_pembelian_detail',
+                name: 'bentuk_pembelian_detail',
+            }, {
                 data: 'keterangan_pembelian_detail',
                 name: 'keterangan_pembelian_detail',
-            }, {
-                data: 'action',
-                name: 'action',
-                className: 'text-center',
-                orderable: false,
-                searchable: false
-            }, ]
+            }]
         });
 
         $('[name="id_cabang"],[name="start_date"],[name="end_date"]').change(function() {

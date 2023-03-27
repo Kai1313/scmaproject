@@ -134,6 +134,7 @@
                                     <th>BE</th>
                                     <th>PH</th>
                                     <th>Warna</th>
+                                    <th>Bentuk</th>
                                     <th>Keterangan</th>
                                     <th>Action</th>
                                 </tr>
@@ -156,6 +157,7 @@
                 </div>
                 <div class="modal-body">
                     <div class="alert alert-danger" style="display:none;" id="alertModal">
+                        asd
                     </div>
                     <div class="row">
                         <div class="col-md-6">
@@ -192,21 +194,40 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <label>SG </label>
-                            <div class="form-group">
-                                <input type="text" name="sg_pembelian_detail" class="form-control handle-number-4">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <label>SG </label>
+                                    <div class="form-group">
+                                        <input type="text" name="sg_pembelian_detail"
+                                            class="form-control handle-number-4">
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label>BE </label>
+                                    <div class="form-group">
+                                        <input type="text" name="be_pembelian_detail"
+                                            class="form-control handle-number-4">
+                                    </div>
+                                </div>
                             </div>
-                            <label>BE </label>
-                            <div class="form-group">
-                                <input type="text" name="be_pembelian_detail" class="form-control handle-number-4">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <label>PH </label>
+                                    <div class="form-group">
+                                        <input type="text" name="ph_pembelian_detail"
+                                            class="form-control handle-number-4">
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label>Warna</label>
+                                    <div class="form-group">
+                                        <input type="text" name="warna_pembelian_detail" class="form-control">
+                                    </div>
+                                </div>
                             </div>
-                            <label>PH </label>
+                            <label>Bentuk</label>
                             <div class="form-group">
-                                <input type="text" name="ph_pembelian_detail" class="form-control handle-number-4">
-                            </div>
-                            <label>Warna</label>
-                            <div class="form-group">
-                                <input type="text" name="warna_pembelian_detail" class="form-control">
+                                <input type="text" name="bentuk_pembelian_detail" class="form-control">
                             </div>
                             <label>Keterangan</label>
                             <div class="form-group">
@@ -239,6 +260,7 @@
         let details = [];
         let detailSelect = []
         let statusModal = 'create'
+        let indexSelect = 0
         $('.select2').select2()
 
         var resDataTable = $('#table-detail').DataTable({
@@ -299,6 +321,10 @@
                     name: 'warna_pembelian_detail',
                 },
                 {
+                    data: 'bentuk_pembelian_detail',
+                    name: 'bentuk_pembelian_detail',
+                },
+                {
                     data: 'keterangan_pembelian_detail',
                     name: 'keterangan_pembelian_detail',
                 },
@@ -357,7 +383,6 @@
         }
 
         function getItem(param) {
-            console.log('tes')
             $('#cover-spin').show()
             $.ajax({
                 url: '{{ route('qc_receipt-auto-item') }}',
@@ -417,14 +442,13 @@
 
         $('.save-entry').click(function() {
             let modal = $('#modalEntry')
-            let valid = validatorModal(modal.find('[name="id_barang"]').val())
+            let valid = validatorModal(modal.find('[name="id_barang"]').val(), $('[name="id"]').val())
             if (!valid.status) {
                 $('#alertModal').text(valid.message).show()
                 return false
             } else {
                 $('#alertModal').text('').hide()
             }
-
 
             modal.find('input,select,textarea').each(function(i, v) {
                 if ($(v).hasClass('handle-number-4')) {
@@ -433,17 +457,16 @@
                     detailSelect[$(v).prop('name')] = $(v).val()
                 }
             })
-            console.log(detailSelect)
 
             let newObj = Object.assign({}, detailSelect)
             if (statusModal == 'create') {
                 details.push(newObj)
             } else if (statusModal == 'edit') {
-                details[newObj.index - 1] = newObj
+                details[indexSelect] = newObj
+                detailSelect = 0
             }
 
             $('[name="details"]').val(JSON.stringify(details))
-            console.log(details)
             statusModal = ''
             detailSelect = []
 
@@ -455,6 +478,8 @@
             $('[name="reason"]').attr('readonly', true)
             if ($(this).val() == 2) {
                 $('[name="reason"]').attr('readonly', false).addClass('validate')
+            } else if ($(this).val() == 3) {
+                $('[name="reason"]').attr('readonly', false)
             } else {
                 $('[name="reason"]').attr('readonly', true).removeClass('validate')
             }
@@ -482,7 +507,13 @@
             let id = $(this).data('id')
             statusModal = 'edit'
             let findItem = details.filter(p => p.id_barang == id)
-            detailSelect = findItem.length > 0 ? findItem[0] : []
+            if (findItem.length > 0) {
+                detailSelect = findItem[0]
+                indexSelect = details.indexOf(detailSelect)
+            } else {
+                detailSelect = []
+            }
+
             for (select in detailSelect) {
                 if (['jumlah_pembelian_detail'].includes(select)) {
                     $('#qty').find('span').text(detailSelect['nama_satuan_barang'])
@@ -497,7 +528,7 @@
             })
         })
 
-        function validatorModal(id = 0) {
+        function validatorModal(barang, id) {
             let message = 'Lengkapi inputan yang diperlukan'
             let valid = true
             $('#modalEntry').find('.validate').each(function(i, v) {
@@ -507,7 +538,7 @@
 
                 if ($(v).prop('name') == 'id_barang') {
                     let findItem = details.filter(p => p.id_barang == $(v).val())
-                    if (findItem.length > 0 && findItem[0].id_barang == id && statusModal == 'create') {
+                    if (findItem.length > 0 && id == 0 && findItem[0].id_barang == barang) {
                         message = "Barang sudah ada dalam daftar"
                         valid = false
                     }

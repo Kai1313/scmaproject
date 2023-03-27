@@ -198,5 +198,3 @@ function getCookie(cname) {
     }
     return "";
 }
-
-console.log(getCookie("isi_token2_pengguna"))
