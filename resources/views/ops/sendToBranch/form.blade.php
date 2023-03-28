@@ -86,12 +86,6 @@
                             <div class="form-group">
                                 <select name="id_cabang" class="form-control select2" data-validation="[NOTEMPTY]"
                                     data-validation-message="Cabang tidak boleh kosong">
-                                    <option value="">Pilih Cabang</option>
-                                    @foreach ($cabang as $branch)
-                                        <option value="{{ $branch->id_cabang }}"
-                                            {{ old('id_cabang', $data ? $data->id_cabang : '') == $branch->id_cabang ? 'selected' : '' }}>
-                                            {{ $branch->nama_cabang }}</option>
-                                    @endforeach
                                 </select>
                             </div>
                             <label>Gudang <span>*</span></label>
@@ -106,14 +100,14 @@
                         <div class="col-md-4">
                             <label>Kode Permintaan</label>
                             <div class="form-group">
-                                <input type="text" name="purchase_request_code"
-                                    value="{{ old('purchase_request_code', $data ? $data->purchase_request_code : '') }}"
+                                <input type="text" name="code_pindah_gudang"
+                                    value="{{ old('kode_pindah_gudang', $data ? $data->code_pindah_gudang : '') }}"
                                     class="form-control" readonly placeholder="Otomatis">
                             </div>
                             <label>Tanggal <span>*</span></label>
                             <div class="form-group">
-                                <input type="text" name="purchase_request_date"
-                                    value="{{ old('purchase_request_date', $data ? $data->purchase_request_date : date('Y-m-d')) }}"
+                                <input type="text" name="tanggal_pindah_gudang"
+                                    value="{{ old('tanggal_pindah_gudang', $data ? $data->tanggal_pindah_gudang : date('Y-m-d')) }}"
                                     class="form-control datepicker" data-validation="[NOTEMPTY]"
                                     data-validation-message="Tanggal tidak boleh kosong">
                             </div>
@@ -122,18 +116,12 @@
                             <label>Cabang Tujuan<span>*</span></label>
                             <div class="form-group">
                                 <select name="id_cabang_tujuan" class="form-control select2" data-validation="[NOTEMPTY]"
-                                    data-validation-message="Cabang tidak boleh kosong">
-                                    <option value="">Pilih Cabang</option>
-                                    @foreach ($cabang as $branch)
-                                        <option value="{{ $branch->id_cabang }}"
-                                            {{ old('id_cabang', $data ? $data->id_cabang : '') == $branch->id_cabang ? 'selected' : '' }}>
-                                            {{ $branch->nama_cabang }}</option>
-                                    @endforeach
+                                    data-validation-message="Cabang tujuan tidak boleh kosong">
                                 </select>
                             </div>
                             <label>Catatan</label>
                             <div class="form-group">
-                                <textarea name="catatan" class="form-control" rows="3">{{ old('catatan', $data ? $data->catatan : '') }}</textarea>
+                                <textarea name="keterangan_pindah_gudang" class="form-control" rows="3">{{ old('keterangan_pindah_gudang', $data ? $data->keterangan_pindah_gudang : '') }}</textarea>
                             </div>
                         </div>
                     </div>
@@ -154,28 +142,30 @@
                         </div>
                     </div>
                     <div class="table-responsive">
-                        <input type="hidden" name="details" value="{{ $data ? json_encode($data->formatdetail) : '[]' }}">
+                        <input type="hidden" name="details" value="[]">
                         <table id="table-detail" class="table table-bordered data-table display responsive nowrap"
                             width="100%">
                             <thead>
                                 <tr>
-                                    <th>Kode Barang</th>
+                                    <th>QR Code</th>
                                     <th>Nama Barang</th>
                                     <th>Satuan</th>
                                     <th>Jumlah</th>
-                                    <th>Catatan</th>
-                                    <th>Stok</th>
-                                    <th style="width:150px;">Action</th>
+                                    <th>SG</th>
+                                    <th>BE</th>
+                                    <th>PH</th>
+                                    <th>Bentuk</th>
+                                    <th>Warna</th>
+                                    <th>Keterangan</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                         </table>
                     </div>
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                    @if (!$data || $data->approval_status == 0)
-                        <button class="btn btn-primary btn-flat pull-right" type="submit">
-                            <i class="glyphicon glyphicon-floppy-saved"></i> Simpan Data
-                        </button>
-                    @endif
+                    <button class="btn btn-primary btn-flat pull-right" type="submit">
+                        <i class="glyphicon glyphicon-floppy-saved"></i> Simpan Data
+                    </button>
                 </div>
             </div>
         </form>
@@ -186,33 +176,85 @@
                     <div class="modal-body">
                         <div class="alert alert-danger" style="display:none;" id="alertModal">
                         </div>
-                        <input type="hidden" name="index" value="0">
-                        <label>Nama Barang <span>*</span></label>
+                        <div id="reader"></div>
                         <div class="form-group">
-                            <select name="id_barang" class="form-control validate">
-                            </select>
-                            <input type="hidden" name="nama_barang" class="validate">
-                            <input type="hidden" name="kode_barang" class="validate">
+                            <div class="input-group">
+                                <input type="text" name="search-qrcode" class="form-control"
+                                    placeholder="QRCode barang">
+                                <div class="input-group-btn">
+                                    <button class="btn btn-info btn-search btn-flat">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
+                        <input type="hidden" name="id_pindah_gudang_detail">
+                        <label>QR Code</label>
                         <div class="form-group">
-                            <label>Stok : </label>
-                            <label id="message-stok"></label>
+                            <input type="text" name="kode_batang_lama_pindah_gudang_detail" class="form-control"
+                                readonly>
+                            <input type="hidden" name="kode_batang_pindah_gudang_detail">
                         </div>
-                        <label>Satuan <span>*</span></label>
+                        <label>Nama Barang</label>
                         <div class="form-group">
-                            <select name="id_satuan_barang" class="form-control select2 validate" disabled>
-                            </select>
-                            <input type="hidden" name="nama_satuan_barang" class="validate">
+                            <input type="text" name="nama_barang" class="form-control" readonly>
+                            <input type="hidden" name="id_barang">
                         </div>
-                        <label>Jumlah <span>*</span></label>
+                        <div class="row">
+                            <div class="col-xs-6">
+                                <label>Satuan</label>
+                                <div class="form-group">
+                                    <input type="text" name="nama_satuan_barang" class="form-control" readonly>
+                                    <input type="hidden" name="id_satuan_barang">
+                                </div>
+                            </div>
+                            <div class="col-xs-6">
+                                <label>Jumlah</label>
+                                <div class="form-group">
+                                    <input type="text" name="jumlah_pindah_gudang_detail"
+                                        class="form-control handle-number-4" readonly>
+                                </div>
+                            </div>
+                            <div class="col-xs-4">
+                                <label>SG</label>
+                                <div class="form-group">
+                                    <input type="text" name="sg_pindah_gudang_detail"
+                                        class="form-control handle-number-4" readonly>
+                                </div>
+                            </div>
+                            <div class="col-xs-4">
+                                <label>BE</label>
+                                <div class="form-group">
+                                    <input type="text" name="be_pindah_gudang_detail"
+                                        class="form-control handle-number-4" readonly>
+                                </div>
+                            </div>
+                            <div class="col-xs-4">
+                                <label>PH</label>
+                                <div class="form-group">
+                                    <input type="text" name="ph_pindah_gudang_detail"
+                                        class="form-control handle-number-4" readonly>
+                                </div>
+                            </div>
+                            <div class="col-xs-6">
+                                <label>Bentuk</label>
+                                <div class="form-group">
+                                    <input type="text" name="bentuk_pindah_gudang_detail" class="form-control"
+                                        readonly>
+                                </div>
+                            </div>
+                            <div class="col-xs-6">
+                                <label>Warna</label>
+                                <div class="form-group">
+                                    <input type="text" name="warna_pindah_gudang_detail" class="form-control"
+                                        readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <label>Keterangan</label>
                         <div class="form-group">
-                            <input type="text" name="qty" class="form-control validate handle-number-4">
+                            <textarea name="keterangan_pindah_gudang_detail" rows="3" class="form-control" readonly></textarea>
                         </div>
-                        <label>Catatan</label>
-                        <div class="form-group">
-                            <textarea name="notes" class="form-control" rows="5"></textarea>
-                        </div>
-                        <input type="hidden" name="stok">
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary cancel-entry btn-flat">Batal</button>
@@ -231,325 +273,286 @@
     <script src="{{ asset('assets/bower_components/datatables-responsive/js/dataTables.responsive.js') }}"></script>
     <script src="{{ asset('assets/bower_components/select2/dist/js/select2.min.js') }}"></script>
     <script src="{{ asset('assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js') }}"></script>
+    <script src="{{ asset('js/html5-qrcode.min.js') }}"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/custom.js') }}"></script>
 @endsection
 
 @section('externalScripts')
     <script>
-        // let details = {!! $data ? $data->formatdetail : '[]' !!};
-        // let detailSelect = []
-        // let count = details.length
-        // let statusModal = 'create'
+        let branches = {!! $cabang !!};
+        var audiobarcode = new Audio("{{ asset('files/scan.mp3') }}");
+        let html5QrcodeScanner = new Html5QrcodeScanner("reader", {
+            fps: 10,
+            qrbox: 250
+        });
+        let details = [];
+        let detailSelect = []
+        let statusModal = 'create'
 
-        // $('.datepicker').datepicker({
-        //     format: 'yyyy-mm-dd',
-        // });
+        var resDataTable = $('#table-detail').DataTable({
+            data: details,
+            ordering: false,
+            columns: [{
+                    data: 'kode_batang_lama_pindah_gudang_detail',
+                    name: 'kode_batang_lama_pindah_gudang_detail'
+                }, {
+                    data: 'nama_barang',
+                    name: 'nama_barang'
+                }, {
+                    data: 'nama_satuan_barang',
+                    name: 'nama_satuan_barang'
+                }, {
+                    data: 'jumlah_pindah_gudang_detail',
+                    name: 'jumlah_pindah_gudang_detail',
+                    render: $.fn.dataTable.render.number('.', ',', 4),
+                    className: 'text-right'
+                }, {
+                    data: 'sg_pindah_gudang_detail',
+                    name: 'sg_pindah_gudang_detail',
+                    render: $.fn.dataTable.render.number('.', ',', 4),
+                    className: 'text-right'
+                }, {
+                    data: 'be_pindah_gudang_detail',
+                    name: 'be_pindah_gudang_detail',
+                    render: $.fn.dataTable.render.number('.', ',', 4),
+                    className: 'text-right'
+                }, {
+                    data: 'ph_pindah_gudang_detail',
+                    name: 'ph_pindah_gudang_detail',
+                    render: $.fn.dataTable.render.number('.', ',', 4),
+                    className: 'text-right'
+                }, {
+                    data: 'bentuk_pindah_gudang_detail',
+                    name: 'bentuk_pindah_gudang_detail',
+                },
+                {
+                    data: 'warna_pindah_gudang_detail',
+                    name: 'warna_pindah_gudang_detail',
+                }, {
+                    data: 'keterangan_pindah_gudang_detail',
+                    name: 'keterangan_pindah_gudang_detail',
+                },
+                {
+                    data: 'id_pindah_gudang_detail',
+                    className: 'text-center',
+                    name: 'id_pindah_gudang_detail',
+                    searchable: false,
+                    render: function(data, type, row, meta) {
+                        let btn = '<ul class="horizontal-list">';
+                        btn +=
+                            '<li><a href="javascript:void(0)" class="btn btn-danger btn-xs mr-1 mb-1 delete-entry"><i class="glyphicon glyphicon-trash"></i></a></li>';
+                        btn += '</ul>';
+                        return btn;
+                    }
+                },
+            ]
+        });
 
-        // var resDataTable = $('#table-detail').DataTable({
-        //     data: details,
-        //     ordering: false,
-        //     columns: [{
-        //             data: 'kode_barang',
-        //             name: 'kode_barang'
-        //         },
-        //         {
-        //             data: 'nama_barang',
-        //             name: 'nama_barang'
-        //         },
-        //         {
-        //             data: 'nama_satuan_barang',
-        //             name: 'nama_satuan_barang'
-        //         },
-        //         {
-        //             data: 'qty',
-        //             name: 'qty',
-        //             render: $.fn.dataTable.render.number('.', ',', 4),
-        //             className: 'text-right'
-        //         },
-        //         {
-        //             data: 'notes',
-        //             name: 'notes'
-        //         },
-        //         {
-        //             data: 'stok',
-        //             name: 'stok',
-        //             render: $.fn.dataTable.render.number('.', ',', 4),
-        //             className: 'text-right'
-        //         },
-        //         {
-        //             data: 'index',
-        //             className: 'text-center',
-        //             name: 'index',
-        //             searchable: false,
-        //             render: function(data, type, row, meta) {
-        //                 let btn = '<ul class="horizontal-list">';
-        //                 btn +=
-        //                     '<li><a href="javascript:void(0)" data-index="' + data +
-        //                     '" class="btn btn-warning btn-xs mr-1 mb-1 edit-entry"><i class="glyphicon glyphicon-pencil"></i></a></li>';
-        //                 btn +=
-        //                     '<li><a href="javascript:void(0)" data-index="' + data +
-        //                     '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1 delete-entry"><i class="glyphicon glyphicon-trash"></i></a></li>';
-        //                 btn += '</ul>';
-        //                 return btn;
-        //             }
-        //         },
-        //     ]
-        // });
+        $('.select2').select2()
+        $('.datepicker').datepicker({
+            format: 'yyyy-mm-dd',
+        });
 
-        // if ($('[name="id_cabang"]').val() == '') {
-        //     $('[name="id_gudang"]').prop('disabled', true)
-        // }
+        $('[name="id_cabang"]').select2({
+            data: [{
+                'id': '',
+                'text': 'Pilih Cabang'
+            }, ...branches]
+        }).on('select2:select', function(e) {
+            let dataselect = e.params.data
+            getGudang(dataselect.id)
+        });
 
-        // $('.tag-qty').each(function(i, v) {
-        //     let num = $(v).text()
-        //     $(this).text(formatNumber(num))
-        // })
+        function getGudang(idCabang) {
+            $('#cover-spin').show()
+            $.ajax({
+                url: '{{ route('purchase-request-auto-werehouse') }}',
+                data: {
+                    cabang: idCabang
+                },
+                success: function(res) {
+                    $('[name="id_gudang"]').empty()
+                    $('[name="id_gudang"]').select2({
+                        data: [{
+                            'id': "",
+                            'text': 'Pilih Gudang'
+                        }, ...res.data]
+                    })
 
-        // $('[name="id_cabang"]').change(function() {
-        //     let self = $('[name="id_gudang"]')
-        //     if ($('[name="id_cabang"]').val() == '') {
-        //         self.val('').prop('disabled', true).trigger('change')
-        //     } else {
-        //         self.val('').prop('disabled', false).trigger('change')
-        //     }
-        // })
+                    let branchData = []
+                    for (let i = 0; i < branches.length; i++) {
+                        if (branches[i].id != idCabang) {
+                            branchData.push(branches[i])
+                        }
+                    }
 
-        // $('[name="id_cabang"]').select2().on('select2:select', function(e) {
-        //     let dataselect = e.params.data
-        //     getGudang(dataselect.id)
-        // });
+                    $('[name="id_cabang_tujuan"]').empty()
+                    $('[name="id_cabang_tujuan"]').select2({
+                        data: [{
+                            'id': '',
+                            'text': 'Pilih Cabang Tujuan'
+                        }, ...branchData]
+                    })
+                    $('#cover-spin').hide()
+                },
+                error: function(error) {
+                    console.log(error)
+                    $('#cover-spin').hide()
+                }
+            })
+        }
 
-        // function getGudang(idCabang) {
-        //     $('#cover-spin').show()
-        //     $.ajax({
-        //         url: '{{ route('purchase-request-auto-werehouse') }}',
-        //         data: {
-        //             cabang: idCabang
-        //         },
-        //         success: function(res) {
-        //             $('[name="id_gudang"]').empty()
-        //             $('[name="id_gudang"]').select2({
-        //                 data: [{
-        //                     'id': "",
-        //                     'text': 'Pilih Gudang'
-        //                 }, ...res.data]
-        //             })
-        //             $('#cover-spin').hide()
-        //         },
-        //         error: function(error) {
-        //             console.log(error)
-        //             $('#cover-spin').hide()
-        //         }
-        //     })
-        // }
+        $('.add-entry').click(function() {
+            detailSelect = []
+            $('#modalEntry').find('input,select,textarea').each(function(i, v) {
+                $(v).val('').trigger('change')
+            })
 
-        // $('[name="id_barang"]').select2({
-        //     ajax: {
-        //         url: '{{ route('purchase-request-auto-item') }}',
-        //         dataType: 'json',
-        //         data: function(params) {
-        //             return {
-        //                 search: params.term
-        //             }
-        //         },
-        //         processResults: function(data) {
-        //             return {
-        //                 results: data.data
-        //             };
-        //         }
-        //     }
-        // }).on('select2:select', function(e) {
-        //     let dataselect = e.params.data
-        //     $('#modalEntry').find('[name="nama_barang"]').val(dataselect.text)
-        //     $('#modalEntry').find('[name="kode_barang"]').val(dataselect.kode_barang)
-        //     $('[name="id_satuan_barang"]').html('')
-        //     getSatuan(dataselect.id)
+            $('#alertModal').text('').hide()
+            statusModal = 'create'
+            $('#modalEntry').modal({
+                backdrop: 'static',
+                keyboard: false
+            })
 
-        // });
+            html5QrcodeScanner.render(onScanSuccess, onScanError);
+            $('.handle-number-4').each(function(i, v) {
+                let val = $(v).val().replace('.', ',')
+                $(v).val(formatRupiah(val, 4))
+            })
+        })
 
-        // function getSatuan(id) {
-        //     $('#cover-spin').show()
-        //     $.ajax({
-        //         url: "{{ route('purchase-request-auto-satuan') }}?item=" + id + '&cabang=' + $(
-        //             '[name="id_cabang"]').val() + '&gudang=' + $('[name="id_gudang"]').val(),
-        //         type: 'get',
-        //         success: function(res) {
-        //             $('[name="id_satuan_barang"]').empty()
-        //             $('[name="id_satuan_barang"]').prop('disabled', false).select2({
-        //                 data: res.satuan
-        //             }).on('select2:select', function(e) {
-        //                 let dataselect = e.params.data
-        //                 $('#modalEntry').find('[name="nama_satuan_barang"]').val(dataselect.text)
-        //             });
+        $('.save-entry').click(function() {
+            let modal = $('#modalEntry')
+            let valid = validatorModal(modal.find('[name="id_barang"]').val())
+            if (!valid.status) {
+                $('#alertModal').text(valid.message).show()
+                return false
+            } else {
+                $('#alertModal').text('').hide()
+            }
 
-        //             if (res.satuan.length > 0) {
-        //                 $('[name="id_satuan_barang"]').val(res.satuan[0].id).trigger('change')
-        //                 $('#modalEntry').find('[name="nama_satuan_barang"]').val(res.satuan[0].text)
-        //             }
+            modal.find('input,textarea').each(function(i, v) {
+                if ($(v).hasClass('handle-number-4')) {
+                    detailSelect[$(v).prop('name')] = normalizeNumber($(v).val())
+                } else {
+                    detailSelect[$(v).prop('name')] = $(v).val()
+                }
+            })
 
-        //             $('#message-stok').text(res.stok + ' ' + res.satuan_stok)
-        //             $('#modalEntry').find('[name="stok"]').val(res.stok)
-        //             $('#cover-spin').hide()
-        //         },
-        //         error: function(error) {
-        //             console.log(error)
-        //             $('#cover-spin').hide()
-        //         }
-        //     })
-        // }
+            let newObj = Object.assign({}, detailSelect)
+            if (statusModal == 'create') {
+                details.push(newObj)
+            } else if (statusModal == 'edit') {
+                details[newObj.index - 1] = newObj
+            }
 
-        // $('.add-entry').click(function() {
-        //     detailSelect = []
-        //     $('#modalEntry').find('input,select,textarea').each(function(i, v) {
-        //         $(v).val('').trigger('change')
-        //     })
+            $('[name="details"]').val(JSON.stringify(details))
 
-        //     $('#alertModal').text('').hide()
-        //     statusModal = 'create'
-        //     count += 1
-        //     $('#modalEntry').find('[name="index"]').val(count)
-        //     $('#modalEntry').modal({
-        //         backdrop: 'static',
-        //         keyboard: false
-        //     })
+            statusModal = ''
+            detailSelect = []
 
-        //     $('[name="id_barang"]').select2('open')
-        //     $('#message-stok').text('')
+            resDataTable.clear().rows.add(details).draw()
+            $('#modalEntry').modal('hide')
+        })
 
-        //     $('.handle-number-4').each(function(i, v) {
-        //         let val = $(v).val().replace('.', ',')
-        //         $(v).val(formatRupiah(val, 4))
-        //     })
-        // })
+        $('.cancel-entry').click(function() {
+            $('#modalEntry').modal('hide')
+            html5QrcodeScanner.clear();
+        })
 
-        // $('.save-entry').click(function() {
-        //     let modal = $('#modalEntry')
-        //     let valid = validatorModal(modal.find('[name="id_barang"]').val())
-        //     if (!valid.status) {
-        //         $('#alertModal').text(valid.message).show()
-        //         return false
-        //     } else {
-        //         $('#alertModal').text('').hide()
-        //     }
+        $('body').on('click', '.delete-entry', function() {
+            let index = $(this).parents('tr').index()
+            console.log(index)
+            Swal.fire({
+                title: 'Anda yakin ingin menghapus data ini?',
+                icon: 'info',
+                showDenyButton: true,
+                confirmButtonText: 'Yes',
+                denyButtonText: 'No',
+                reverseButtons: true,
+                customClass: {
+                    actions: 'my-actions',
+                    confirmButton: 'order-1',
+                    denyButton: 'order-3',
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    details.splice(index, 1)
+                    resDataTable.clear().rows.add(details).draw()
+                    $('[name="details"]').val(JSON.stringify(details))
+                }
+            })
+        })
+
+        function validatorModal() {
+            let message = 'Lengkapi inputan yang diperlukan'
+            let valid = true
+            $('#modalEntry').find('.validate').each(function(i, v) {
+                if ($(v).val() == '') {
+                    valid = false
+                }
+
+                if ($(v).prop('name') == 'kode_batang_lama_pindah_gudang_detail') {
+                    let findItem = details.filter(p => p.kode_batang_lama_pindah_gudang_detail == $(v).val())
+                    if (findItem.length > 0 && findItem[0].id_barang == id && statusModal == 'create') {
+                        message = "Barang sudah ada"
+                        valid = false
+                    }
+                }
+            })
+
+            return {
+                'status': valid,
+                'message': message
+            }
+        }
 
 
-        //     modal.find('input,select,textarea').each(function(i, v) {
-        //         if ($(v).hasClass('handle-number-4')) {
-        //             detailSelect[$(v).prop('name')] = normalizeNumber($(v).val())
-        //         } else {
-        //             detailSelect[$(v).prop('name')] = $(v).val()
-        //         }
-        //     })
+        $('.btn-search').click(function() {
+            let self = $('[name="search-qrcode"]').val()
+            html5QrcodeScanner.clear();
+            searchAsset(self)
+        })
 
-        //     let newObj = Object.assign({}, detailSelect)
-        //     if (statusModal == 'create') {
-        //         details.push(newObj)
-        //     } else if (statusModal == 'edit') {
-        //         details[newObj.index - 1] = newObj
-        //     }
+        function searchAsset(string) {
+            $('#cover-spin').show()
+            $.ajax({
+                url: '{{ route('send_to_branch-qrcode') }}',
+                type: 'get',
+                data: {
+                    id_cabang: $('[name="id_cabang"]').val(),
+                    id_gudang: $('[name="id_gudang"]').val(),
+                    qrcode: string
+                },
+                success: function(res) {
+                    for (select in res.data) {
+                        if (['kode_batang_pindah_gudang_detail'].includes(select)) {
+                            $('[name="kode_batang_lama_pindah_gudang_detail"]').val(res.data[select])
+                        }
+                        $('[name="' + select + '"]').val(res.data[select])
+                    }
+                    $('[name="search-qrcode"]').val('')
+                    $('#cover-spin').hide()
+                },
+                error: function(error) {
+                    let textError = error.hasOwnProperty('responseJSON') ? error.responseJSON.message : error
+                        .statusText
+                    $('#alertModal').text(textError).show()
+                    $('#cover-spin').hide()
+                }
+            })
+        }
 
-        //     $('[name="details"]').val(JSON.stringify(details))
+        function onScanSuccess(decodedText, decodedResult) {
+            audiobarcode.play();
+            $('[name="search-qrcode"]').val(decodedText)
+            $('.btn-search').click()
+        }
 
-        //     statusModal = ''
-        //     detailSelect = []
-
-        //     resDataTable.clear().rows.add(details).draw()
-        //     $('#modalEntry').modal('hide')
-        // })
-
-        // $('.cancel-entry').click(function() {
-        //     $('#modalEntry').modal('hide')
-        //     if (statusModal == 'create') {
-        //         count -= 1
-        //     }
-        // })
-
-        // $('body').on('click', '.edit-entry', function() {
-        //     detailSelect = []
-        //     $('#modalEntry').find('input,select,textarea').each(function(i, v) {
-        //         $(v).val('').trigger('change')
-        //     })
-        //     $('#message-stok').text('')
-
-        //     $('#alertModal').text('').hide()
-        //     $('#modalEntry').modal({
-        //         backdrop: 'static',
-        //         keyboard: false
-        //     })
-        //     let index = $(this).data('index')
-        //     statusModal = 'edit'
-        //     detailSelect = details[index - 1]
-        //     for (select in detailSelect) {
-        //         if (['id_barang', 'id_satuan_barang'].includes(select)) {
-        //             let nameSelect = (select == 'id_barang') ? 'nama_barang' : 'nama_satuan_barang';
-        //             $('[name="' + select + '"]').append('<option value="' + detailSelect[select] + '" selected>' +
-        //                 detailSelect[nameSelect] + '</option>')
-        //         }
-
-        //         $('[name="' + select + '"]').val(detailSelect[select]).trigger('change')
-        //         if (select == 'stok') {
-        //             $('#message-stok').text(formatRupiah(detailSelect[select], 4) + ' ' + detailSelect
-        //                 .nama_satuan_barang)
-        //         }
-        //     }
-
-        //     $('.handle-number-4').each(function(i, v) {
-        //         let val = $(v).val().replace('.', ',')
-        //         $(v).val(formatRupiah(val, 4))
-        //     })
-        // })
-
-        // $('body').on('click', '.delete-entry', function() {
-        //     let index = $(this).parents('tr').index()
-        //     Swal.fire({
-        //         title: 'Anda yakin ingin menghapus data ini?',
-        //         icon: 'info',
-        //         showDenyButton: true,
-        //         confirmButtonText: 'Yes',
-        //         denyButtonText: 'No',
-        //         reverseButtons: true,
-        //         customClass: {
-        //             actions: 'my-actions',
-        //             confirmButton: 'order-1',
-        //             denyButton: 'order-3',
-        //         }
-        //     }).then((result) => {
-        //         if (result.isConfirmed) {
-        //             details.splice(index, 1)
-        //             count -= 1
-
-        //             for (let i = 0; i < details.length; i++) {
-        //                 details[i].index = i + 1
-        //             }
-
-        //             resDataTable.clear().rows.add(details).draw()
-        //             $('[name="details"]').val(JSON.stringify(details))
-        //         }
-        //     })
-        // })
-
-        // function validatorModal(id = 0) {
-        //     let message = 'Lengkapi inputan yang diperlukan'
-        //     let valid = true
-        //     $('#modalEntry').find('.validate').each(function(i, v) {
-        //         if ($(v).val() == '') {
-        //             valid = false
-        //         }
-
-        //         if ($(v).prop('name') == 'id_barang') {
-        //             let findItem = details.filter(p => p.id_barang == $(v).val())
-        //             if (findItem.length > 0 && findItem[0].id_barang == id && statusModal == 'create') {
-        //                 message = "Barang sudah ada"
-        //                 valid = false
-        //             }
-        //         }
-        //     })
-
-        //     return {
-        //         'status': valid,
-        //         'message': message
-        //     }
-        // }
+        function onScanError(errorMessage) {
+            toastr.error(JSON.strignify(errorMessage))
+        }
     </script>
 @endsection

@@ -106,19 +106,19 @@
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>Nama Supplier</label>
-                                <input type="text" class="form-control" name="pemasok" readonly>
+                                <input type="text" class="form-control" name="pemasok" disabled>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>No PO</label>
-                                <input type="text" class="form-control" name="po" readonly>
+                                <input type="text" class="form-control" name="po" disabled>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>Tanggal Penerimaan</label>
-                                <input type="text" class="form-control" name="tanggal" readonly>
+                                <input type="text" class="form-control" name="tanggal" disabled>
                             </div>
                         </div>
                     </div>

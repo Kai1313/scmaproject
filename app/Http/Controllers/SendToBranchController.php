@@ -51,7 +51,7 @@ class SendToBranchController extends Controller
     public function entry($id = 0)
     {
         $data = [];
-        $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
+        $cabang = DB::table('cabang')->select('nama_cabang as text', 'id_cabang as id')->where('status_cabang', 1)->get();
 
         return view('ops.sendToBranch.form', [
             'data' => $data,
@@ -141,6 +141,50 @@ class SendToBranchController extends Controller
         //         "message" => "Data gagal dibatalkan",
         //     ]);
         // }
+    }
+
+    public function autoQRCode(Request $request)
+    {
+        $idCabang = $request->id_cabang;
+        $idGudang = $request->id_gudang;
+        $qrcode = $request->qrcode;
+        $data = DB::table('master_qr_code as mqc')
+            ->select(
+                'mqc.id_barang',
+                'nama_barang',
+                'mqc.id_satuan_barang',
+                'nama_satuan_barang',
+                'kode_batang_master_qr_code as kode_batang_pindah_gudang_detail',
+                'jumlah_master_qr_code as jumlah_pindah_gudang_detail',
+                'sg_master_qr_code as sg_pindah_gudang_detail',
+                'be_master_qr_code as be_pindah_gudang_detail',
+                'ph_master_qr_code as ph_pindah_gudang_detail',
+                'bentuk_master_qr_code as bentuk_pindah_gudang_detail',
+                'warna_master_qr_code as warna_pindah_gudang_detail',
+                'keterangan_master_qr_code as keterangan_pindah_gudang_detail',
+                'id_rak',
+            )
+            ->leftJoin('barang', 'mqc.id_barang', '=', 'barang.id_barang')
+            ->leftJoin('satuan_barang', 'mqc.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
+            ->where('id_cabang', $idCabang)->where('mqc.id_gudang', $idGudang)->where('mqc.kode_batang_master_qr_code', $qrcode)
+            ->first();
+
+        if (!$data) {
+            $status = 500;
+            $message = 'Barang tidak ditemukan';
+        } else if ($data && $data->id_rak != null) {
+            $status = 500;
+            $message = "Barang masih berada di rak";
+        } else {
+            $message = '';
+            $status = 200;
+        }
+
+        return response()->json([
+            'status' => $status,
+            'data' => $data,
+            'message' => $message,
+        ], $status);
     }
 
     public function checkUser($request)

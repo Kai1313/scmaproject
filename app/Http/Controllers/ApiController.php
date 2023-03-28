@@ -1996,7 +1996,7 @@ class ApiController extends Controller
                 "result" => true,
                 "message" => "Data berhasil disimpan",
             ], 200);
-        } catch (\Throwable $th) {
+        } catch (\Exception $th) {
             DB::rollback();
             return response()->json([
                 "result" => false,
