@@ -351,7 +351,7 @@ class PurchaseDownPaymentController extends Controller
                     "message" => "Token tidak ditemukan",
                 ]);
             }
-        } catch (\Throwable $th) {
+        } catch (\Exception $th) {
             Log::error("Error when gagal purchase down payment");
             Log::error($th);
             return response()->json([

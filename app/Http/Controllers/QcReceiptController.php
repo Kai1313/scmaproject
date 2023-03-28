@@ -128,6 +128,18 @@ class QcReceiptController extends Controller
                 $data->updatePembelianDetail();
             }
 
+            $resApi = $this->callApiPembelian($request->id_pembelian);
+            $convertResApi = (array) json_decode($resApi);
+            if (count($convertResApi) == 0 || (count($convertResApi) == 1 && $convertResApi[0]->hasil == 0)) {
+                DB::rollback();
+                $message = count($convertResApi) > 0 ? $convertResApi[0]->pesan_hasil : 'Gagal akses API pembelian';
+                Log::error($message);
+                return response()->json([
+                    "result" => false,
+                    "message" => $message,
+                ]);
+            }
+
             DB::commit();
             return response()->json([
                 "result" => true,
@@ -237,6 +249,31 @@ class QcReceiptController extends Controller
         } else {
             $request->session()->flush();
             return ['status' => false];
+        }
+    }
+
+    public function callApiPembelian($data)
+    {
+        try {
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, env('OLD_API_ROOT') . "actions/aa_update_ppn_pembelian.php?id_pembelian=" . $data);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
+
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                'Accept: application/json',
+            ));
+
+            $newData = curl_exec($ch);
+            curl_close($ch);
+            return $newData;
+        } catch (\Exception $th) {
+            Log::error("Error when access api pembelian");
+            Log::error($th);
+            return response()->json([
+                "result" => false,
+                "message" => "Data gagal tersimpan",
+            ], 500);
         }
     }
 }
