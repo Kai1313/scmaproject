@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Accounting\GeneralLedger;
 use App\Models\Accounting\JurnalDetail;
 use App\Models\Accounting\JurnalHeader;
+use App\Models\Accounting\Setting;
 use App\Models\Accounting\TrxSaldo;
 use App\Models\Master\Akun;
 use App\Models\Master\Cabang;
@@ -51,6 +52,8 @@ class GeneralLedgerController extends Controller
         $data_cabang = Cabang::where("status_cabang", 1)->get();
         $data_pelanggan = Pelanggan::all();
         $data_pemasok = Pemasok::all();
+        $data_setting = Setting::all();
+        dd($data_setting);
 
         $data = [
             "pageTitle" => "SCA Accounting | Transaksi Jurnal Umum | Create",
