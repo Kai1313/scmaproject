@@ -567,7 +567,7 @@ class ApiController extends Controller
             }
 
             // Find Header data and delete detail
-            $header_me = JurnalHeader::where("id_transaksi", $id_transaksi)->where('void', 0)->first();
+            $header_me = JurnalHeader::where("id_transaksi", $id_transaksi)->where('jenis_jurnal', 'ME')->where('void', 0)->first();
 
             // Begin save
             DB::beginTransaction();
@@ -914,7 +914,7 @@ class ApiController extends Controller
             }
 
             // Find Header data and delete detail
-            $header_me = JurnalHeader::where("id_transaksi", $id_transaksi)->where('void', 0)->first();
+            $header_me = JurnalHeader::where("id_transaksi", $id_transaksi)->where('jenis_jurnal', 'ME')->where('void', 0)->first();
 
             // Begin save
             DB::beginTransaction();
@@ -1245,7 +1245,7 @@ class ApiController extends Controller
             }
 
             // Find Header data and delete detail
-            $header_me = JurnalHeader::where("id_transaksi", $id_transaksi)->where('void', 0)->first();
+            $header_me = JurnalHeader::where("id_transaksi", $id_transaksi)->where('jenis_jurnal', 'ME')->where('void', 0)->first();
 
             // Begin save
             DB::beginTransaction();
@@ -1567,7 +1567,7 @@ class ApiController extends Controller
             }
 
             // Find Header data and delete detail
-            $header_me = JurnalHeader::where("id_transaksi", $id_transaksi)->where('void', 0)->first();
+            $header_me = JurnalHeader::where("id_transaksi", $id_transaksi)->where('jenis_jurnal', 'ME')->where('void', 0)->first();
 
             // Begin save
             DB::beginTransaction();
