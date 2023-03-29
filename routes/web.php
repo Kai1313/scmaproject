@@ -78,6 +78,8 @@ Route::post('/master/coa/copy/data', 'MasterCoaController@copy_data')->name('mas
 Route::get('/master/coa/get_by_cabang/{id_cabang?}', 'MasterCoaController@getCoaByCabang')->name('master-coa-get-by-cabang');
 Route::get('/master/coa/get_data/{id?}', 'MasterCoaController@getCoa')->name('master-coa-get-data');
 
+Route::get('/master/setting/get_pelunasan/{id?}', 'MasterSettingController@getSettingPelunasan')->name('master-setting-get-pelunasan');
+
 
 // Transaction
 // Jurnal Umum

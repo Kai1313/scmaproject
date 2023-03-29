@@ -5,12 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Accounting\GeneralLedger;
 use App\Models\Accounting\JurnalDetail;
 use App\Models\Accounting\JurnalHeader;
-use App\Models\Accounting\Setting;
 use App\Models\Accounting\TrxSaldo;
 use App\Models\Master\Akun;
 use App\Models\Master\Cabang;
 use App\Models\Master\Pelanggan;
 use App\Models\Master\Pemasok;
+use App\Models\Master\Setting;
 use App\Models\Master\Slip;
 use Illuminate\Http\Request;
 use DB;
@@ -52,14 +52,17 @@ class GeneralLedgerController extends Controller
         $data_cabang = Cabang::where("status_cabang", 1)->get();
         $data_pelanggan = Pelanggan::all();
         $data_pemasok = Pemasok::all();
-        $data_setting = Setting::all();
-        dd($data_setting);
+        $piutang_dagang = Setting::where("code", "Piutang Dagang")->where("id_cabang", "1")->first();
+        $hutang_dagang = Setting::where("code", "Hutang Dagang")->where("id_cabang", "1")->first();
+        // dd(json_encode($piutang_dagang));
 
         $data = [
             "pageTitle" => "SCA Accounting | Transaksi Jurnal Umum | Create",
             "data_cabang" => $data_cabang,
             "data_pelanggan" => $data_pelanggan,
             "data_pemasok" => $data_pemasok,
+            "piutang_dagang" => $piutang_dagang,
+            "hutang_dagang" => $hutang_dagang,
         ];
 
         Log::debug(json_encode($request->session()->get('user')));

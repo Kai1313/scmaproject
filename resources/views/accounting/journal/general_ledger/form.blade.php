@@ -439,6 +439,9 @@
     let coa_by_cabang_route = "{{ route('master-coa-get-by-cabang', ':id') }}"
     let slip_by_cabang_route = "{{ route('master-slip-get-by-cabang', [':id', ':slip']) }}"
     let coa_data_route = "{{ route('master-coa-get-data', ':id') }}"
+    let setting_data_route = "{{ route('master-setting-get-pelunasan', ':id') }}"
+    let piutang_dagang 
+    let hutang_dagang
 
     var validateLedger = {
         submit: {
@@ -526,6 +529,7 @@
 
         getCoa()
         getSlip()
+        getSetting($("#cabang_input").val())
 
         $('.select2').select2({
             width: '100%'
@@ -574,6 +578,11 @@
         })
         $("#kredit").on("change", function() {
             $("#debet").val(0)
+        })
+
+        // On change cabang
+        $("#cabang_input").on("change", function() {
+            getSetting($(this).val())
         })
 
         // Remove detail
@@ -806,9 +815,9 @@
                         })
                         details.push({
                             guid: "trx-" + trx_id,
-                            akun: '34',
-                            nama_akun: 'Piutang Dagang',
-                            kode_akun: '110302',
+                            akun: piutang_dagang.id_akun,
+                            nama_akun: piutang_dagang.nama_akun,
+                            kode_akun: piutang_dagang.kode_akun,
                             notes: 'Jurnal Otomatis Pelunasan - ' + no_jual + ' - ' + pelanggan,
                             trx: no_jual,
                             debet: 0,
@@ -832,9 +841,9 @@
                         })
                         details.push({
                             guid: "trx-" + trx_id,
-                            akun: '34',
-                            nama_akun: 'Piutang Dagang',
-                            kode_akun: '110302',
+                            akun: piutang_dagang.id_akun,
+                            nama_akun: piutang_dagang.nama_akun,
+                            kode_akun: piutang_dagang.kode_akun,
                             notes: 'Jurnal Otomatis Pelunasan - ' + no_jual + ' - ' + pelanggan,
                             trx: no_jual,
                             debet: debet.replace(/,/g, ''),
@@ -858,9 +867,9 @@
                         })
                         details.push({
                             guid: "trx-" + trx_id,
-                            akun: '35',
-                            nama_akun: 'Hutang Dagang',
-                            kode_akun: '999999',
+                            akun: hutang_dagang.id_akun,
+                            nama_akun: hutang_dagang.nama_akun,
+                            kode_akun: hutang_dagang.kode_akun,
                             notes: 'Jurnal Otomatis Pelunasan - ' + no_beli + ' - ' + pemasok,
                             trx: no_beli,
                             debet: debet.replace(/,/g, ''),
@@ -884,9 +893,9 @@
                         })
                         details.push({
                             guid: "trx-" + trx_id,
-                            akun: '35',
-                            nama_akun: 'Hutang Dagang',
-                            kode_akun: '999999',
+                            akun: hutang_dagang.id_akun,
+                            nama_akun: hutang_dagang.nama_akun,
+                            kode_akun: hutang_dagang.kode_akun,
                             notes: 'Jurnal Otomatis Pelunasan - ' + no_beli + ' - ' + pemasok,
                             trx: no_beli,
                             debet: 0,
@@ -1072,6 +1081,22 @@
         });
 
         return data_akun;
+    }
+
+    function getSetting(cabang) {
+        let current_setting_data_route = setting_data_route.replace(':id', cabang);
+        $.ajax({
+            url: current_setting_data_route,
+            async: false,
+            success: function(data) {
+                if (data.result) {
+                    piutang_dagang = data.piutang_dagang
+                    hutang_dagang = data.hutang_dagang
+                    // console.log(piutang_dagang)
+                    // console.log(hutang_dagang)
+                }
+            }
+        })
     }
 
     function submit_detail() {
