@@ -3,15 +3,23 @@
 namespace App\Http\Controllers;
 
 use App\MasterBiaya;
+use App\Models\User;
+use App\Models\UserToken;
+use Carbon\Carbon;
 use DB;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use Log;
 use Yajra\DataTables\DataTables;
 
 class MasterBiayaController extends Controller
 {
     public function index(Request $request)
     {
+        $checkAuth = $this->checkUser($request);
+        if ($checkAuth['status'] == false) {
+            return view('exceptions.forbidden');
+        }
+
         if ($request->ajax()) {
             $data = DB::table('master_biaya as mb')
                 ->select('id_biaya', 'nama_biaya', 'ispph', 'isppn', 'value_pph', 'aktif', 'mb.dt_created as created_at', 'ma.nama_akun as akun_biaya', 'man.nama_akun as akun_pph')
@@ -21,12 +29,15 @@ class MasterBiayaController extends Controller
                 $data = $data->where('mb.id_cabang', $request->c);
             }
 
-            $data = $data->orderBy('created_at', 'asc');
+            $data = $data->orderBy('mb.dt_created', 'desc');
             return Datatables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
-                    $btn = '<a href="' . route('master-biaya-entry', $row->id_biaya) . '" class="btn btn-warning btn-sm">Edit</a>';
-                    $btn .= '<a href="' . route('master-biaya-delete', $row->id_biaya) . '" class="btn btn-danger btn-sm btn-destroy">Delete</a>';
+                    $btn = '<ul class="horizontal-list">';
+                    $btn .= '<li><a href="' . route('master-biaya-view', $row->id_biaya) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
+                    $btn .= '<li><a href="' . route('master-biaya-entry', $row->id_biaya) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
+                    $btn .= '<li><a href="' . route('master-biaya-delete', $row->id_biaya) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Hapus</a></li>';
+                    $btn .= '</ul>';
                     return $btn;
                 })
                 ->editColumn('isppn', function ($row) {
@@ -66,60 +77,159 @@ class MasterBiayaController extends Controller
 
     public function saveEntry(Request $request, $id)
     {
-        $paramValidate = [
-            'id_cabang' => 'required',
-            'nama_biaya' => 'required',
-            'id_akun_biaya' => 'required',
-        ];
-
-        $messages = [
-            'id_cabang.required' => 'Cabang harus diisi',
-            'nama_biaya.required' => 'Nama biaya harus diisi',
-            'id_akun_biaya.required' => 'Akun biaya harus diisi',
-        ];
-
-        if (isset($request->ispph)) {
-            $paramValidate['value_pph'] = 'required';
-            $paramValidate['id_akun_pph'] = 'required';
-            $messages['value_pph.required'] = 'Nilai PPh harus diisi';
-            $messages['id_akun_pph.required'] = 'Akun PPh harus diisi';
-        }
-
-        $valid = Validator::make($request->all(), $paramValidate, $messages);
-        if ($valid->fails()) {
-            return redirect()->back()->withErrors($valid)->withInput($request->all());
-        }
-
         $data = MasterBiaya::find($id);
-        if (!$data) {
-            $data = new MasterBiaya;
-            $data['dt_created'] = date('Y-m-d H:i:s');
-        } else {
-            $data['dt_modified'] = date('Y-m-d H:i:s');
+        try {
+            DB::beginTransaction();
+            if (!$data) {
+                $data = new MasterBiaya;
+                $dat['user_created'] = session()->get('user')['id_pengguna'];
+            } else {
+                $data['user_modified'] = session()->get('user')['id_pengguna'];
+            }
+
+            $checkData = DB::table('master_biaya')
+                ->where('id_cabang', $request->id_cabang)
+                ->where('nama_biaya', $request->nama_biaya)
+                ->where('id_biaya', '!=', $id)->first();
+            if ($checkData) {
+                DB::rollback();
+                return response()->json([
+                    "result" => false,
+                    "message" => "Nama " . $request->nama_biaya . " sudah ada",
+                ]);
+            }
+
+            $data->fill($request->all());
+            $data['isppn'] = isset($request->isppn) ? $request->isppn : 0;
+            $data['ispph'] = isset($request->ispph) ? $request->ispph : 0;
+            $data['value_pph'] = normalizeNumber($request->value_pph);
+            if ($data['ispph'] == 0) {
+                $data['value_pph'] = null;
+                $data['id_akun_pph'] = null;
+            }
+
+            $data['aktif'] = isset($request->aktif) ? $request->aktif : 0;
+            $data->save();
+            DB::commit();
+            return response()->json([
+                "result" => true,
+                "message" => "Data berhasil tersimpan",
+                "redirect" => route('master-biaya'),
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error("Error when save biaya");
+            Log::error($e);
+            return response()->json([
+                "result" => false,
+                "message" => "Data gagal tersimpan",
+            ]);
         }
-
-        $data->fill($request->all());
-        $data['isppn'] = isset($request->isppn) ? $request->isppn : 0;
-        $data['ispph'] = isset($request->ispph) ? $request->ispph : 0;
-        $data['aktif'] = isset($request->aktif) ? $request->aktif : 0;
-        $data->save();
-
-        return redirect()
-            ->route('master-biaya-entry', $data->id_biaya)
-            ->with('success', 'Data berhasil tersimpan');
     }
 
-    public function destroy(Request $request, $id)
+    public function viewData($id)
+    {
+        $data = MasterBiaya::find($id);
+
+        return view('ops.master.biaya.detail', [
+            'data' => $data,
+            "pageTitle" => "SCA OPS | Master Biaya | Detail",
+        ]);
+    }
+
+    public function destroy($id)
     {
         $data = MasterBiaya::find($id);
         if (!$data) {
-            return response()->json(['message' => 'data tidak ditemukan'], 500);
+            return response()->json([
+                "result" => false,
+                "message" => "Data tidak ditemukan",
+            ]);
         }
 
-        $data->delete();
+        try {
+            DB::beginTransaction();
+            $data->delete();
+            DB::commit();
+            return response()->json([
+                "result" => true,
+                "message" => "Data berhasil dihapus",
+                "redirect" => route('master-biaya'),
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error("Error when delete biaya");
+            Log::error($e);
+            return response()->json([
+                "result" => false,
+                "message" => "Data gagal dihapus",
+            ]);
+        }
+    }
 
-        return redirect()
-            ->route('master-biaya-page')
-            ->with('success', 'Data berhasil terhapus');
+    public function checkUser($request)
+    {
+        $user_id = $request->user_id;
+        if ($user_id != '' && $request->session()->has('token') == false || $request->session()->has('token') == true) {
+            if ($request->session()->has('token') == true) {
+                $user_id = $request->session()->get('user')->id_pengguna;
+            }
+            $user = User::where('id_pengguna', $user_id)->first();
+            $token = UserToken::where('id_pengguna', $user_id)->where('status_token_pengguna', 1)->whereRaw("waktu_habis_token_pengguna > STR_TO_DATE(?, '%Y-%m-%d %H:%i:%s')", Carbon::now()->format('Y-m-d H:i:s'))->first();
+
+            $sql = "SELECT
+                a.id_pengguna,
+                a.id_grup_pengguna,
+                d.id_menu,
+                d.nama_menu,
+                c.lihat_akses_menu,
+                c.tambah_akses_menu,
+                c.ubah_akses_menu,
+                c.hapus_akses_menu,
+                c.cetak_akses_menu
+            FROM
+                pengguna a,
+                grup_pengguna b,
+                akses_menu c,
+                menu d
+            WHERE
+                a.id_grup_pengguna = b.id_grup_pengguna
+                AND b.id_grup_pengguna = c.id_grup_pengguna
+                AND c.id_menu = d.id_menu
+                AND a.id_pengguna = $user_id
+                AND d.keterangan_menu = 'Accounting'
+                AND d.status_menu = 1";
+            $access = DB::connection('mysql')->select($sql);
+
+            $user_access = array();
+            foreach ($access as $value) {
+                $user_access[$value->nama_menu] = ['show' => $value->lihat_akses_menu, 'create' => $value->tambah_akses_menu, 'edit' => $value->ubah_akses_menu, 'delete' => $value->hapus_akses_menu, 'print' => $value->cetak_akses_menu];
+            }
+
+            $idGroup = $user->id_grup_pengguna;
+            $menu_access = DB::table('menu')->select('menu.id_menu', 'kepala_menu', 'alias_menu', 'lihat_akses_menu', 'tingkatan_menu', 'nama_menu')
+                ->leftJoin('akses_menu', 'menu.id_menu', '=', 'akses_menu.id_menu')
+                ->where('akses_menu.id_grup_pengguna', $idGroup)
+                ->where('lihat_akses_menu', '1')
+                ->where('alias_menu', 'not like', '%detail')
+                ->get();
+            $request->session()->put('menu_access', $menu_access);
+
+            if ($token && $request->session()->has('token') == false) {
+                $request->session()->put('token', $token->nama_token_pengguna);
+                $request->session()->put('user', $user);
+                $request->session()->put('access', $user_access);
+            } else if ($request->session()->has('token')) {
+            } else {
+                $request->session()->flush();
+            }
+
+            $session = $request->session()->get('access');
+
+            return ['status' => true];
+        } else {
+            $request->session()->flush();
+            return ['status' => false];
+        }
     }
 }

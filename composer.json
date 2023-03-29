@@ -12,6 +12,7 @@
         "ext-zip": "*",
         "barryvdh/laravel-dompdf": "0.9.0",
         "fideloper/proxy": "^4.0",
+        "guzzlehttp/guzzle": "^6.0",
         "intervention/image": "^2.7",
         "laravel/framework": "5.8.*",
         "laravel/passport": "7.5.1",
@@ -45,6 +46,9 @@
         "classmap": [
             "database/seeds",
             "database/factories"
+        ],
+        "files": [
+            "app/Helpers/general.php"
         ]
     },
     "autoload-dev": {

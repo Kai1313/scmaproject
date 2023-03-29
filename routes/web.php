@@ -24,29 +24,68 @@ Route::get('/get-menu/{id}', 'DashboardController@getMenu')->name('get-menu');
 //     return view('accounting.master.slip');
 // });
 
-Route::prefix('master-ops/biaya')->group(function () {
-    Route::get('/', 'MasterBiayaController@index')->name('master-biaya');
-    Route::get('entry/{id?}', 'MasterBiayaController@entry')->name('master-biaya-entry');
-    Route::post('save-entry/{id}', 'MasterBiayaController@saveEntry')->name('master-biaya-save-entry');
-    Route::post('delete/{id}', 'MasterBiayaController@destroy')->name('master-biaya-delete');
+Route::prefix('master_biaya')->group(function () {
+    Route::get('/index/{user_id?}', 'MasterBiayaController@index')->name('master-biaya');
+    Route::get('/entry/{id?}', 'MasterBiayaController@entry')->name('master-biaya-entry');
+    Route::get('/view/{id}', 'MasterBiayaController@viewData')->name('master-biaya-view');
+    Route::post('/save_entry/{id}', 'MasterBiayaController@saveEntry')->name('master-biaya-save-entry');
+    Route::get('/delete/{id}', 'MasterBiayaController@destroy')->name('master-biaya-delete');
 });
 
-Route::prefix('master-ops/wrapper')->group(function () {
-    Route::get('/', 'MasterWrapperController@index')->name('master-wrapper');
-    Route::get('entry/{id?}', 'MasterWrapperController@entry')->name('master-wrapper-entry');
-    Route::post('save-entry/{id}', 'MasterWrapperController@saveEntry')->name('master-wrapper-save-entry');
-    Route::post('delete/{id}', 'MasterWrapperController@destroy')->name('master-wrapper-delete');
+Route::prefix('master_wrapper')->group(function () {
+    Route::get('/index/{user_id?}', 'MasterWrapperController@index')->name('master-wrapper');
+    Route::get('/entry/{id?}', 'MasterWrapperController@entry')->name('master-wrapper-entry');
+    Route::get('/view/{id}', 'MasterWrapperController@viewData')->name('master-wrapper-view');
+    Route::post('/save_entry/{id}', 'MasterWrapperController@saveEntry')->name('master-wrapper-save-entry');
+    Route::get('/delete/{id}', 'MasterWrapperController@destroy')->name('master-wrapper-delete');
 });
 
-Route::prefix('/permintaan-pembelian')->group(function () {
-    Route::get('/', 'PurchaseRequestController@index')->name('purchase-request');
-    Route::get('entry/{id?}', 'PurchaseRequestController@entry')->name('purchase-request-entry');
-    Route::post('save-entry/{id}', 'PurchaseRequestController@saveEntry')->name('purchase-request-save-entry');
-    Route::post('delete/{id}', 'PurchaseRequestController@destroy')->name('purchase-request-delete');
-    Route::get('auto-werehouse', 'PurchaseRequestController@autoWerehouse')->name('purchase-request-auto-werehouse');
-    Route::get('auto-user', 'PurchaseRequestController@autoUser')->name('purchase-request-auto-user');
-    Route::get('auto-item', 'PurchaseRequestController@autoItem')->name('purchase-request-auto-item');
-    Route::get('auto-satuan', 'PurchaseRequestController@autoSatuan')->name('purchase-request-auto-satuan');
+Route::prefix('purchase_requisitions')->group(function () {
+    Route::get('/index/{user_id?}', 'PurchaseRequestController@index')->name('purchase-request');
+    Route::get('/entry/{id?}', 'PurchaseRequestController@entry')->name('purchase-request-entry');
+    Route::get('/view/{id}', 'PurchaseRequestController@viewData')->name('purchase-request-view');
+    Route::post('/save_entry/{id}', 'PurchaseRequestController@saveEntry')->name('purchase-request-save-entry');
+    Route::get('/delete/{id}', 'PurchaseRequestController@destroy')->name('purchase-request-delete');
+    Route::get('/auto_werehouse', 'PurchaseRequestController@autoWerehouse')->name('purchase-request-auto-werehouse');
+    Route::get('/auto_item', 'PurchaseRequestController@autoItem')->name('purchase-request-auto-item');
+    Route::get('/auto_satuan', 'PurchaseRequestController@autoSatuan')->name('purchase-request-auto-satuan');
+    Route::get('/change_status/{id}/{type}', 'PurchaseRequestController@changeStatus')->name('purchase-request-change-status');
+    Route::get('/print/{id}', 'PurchaseRequestController@printData')->name('purchase-request-print-data');
+});
+
+Route::prefix('uang_muka_pembelian')->group(function () {
+    Route::get('/index/{user_id?}', 'PurchaseDownPaymentController@index')->name('purchase-down-payment');
+    Route::get('/entry/{id?}', 'PurchaseDownPaymentController@entry')->name('purchase-down-payment-entry');
+    Route::get('/view/{id}', 'PurchaseDownPaymentController@viewData')->name('purchase-down-payment-view');
+    Route::post('/save_entry/{id}', 'PurchaseDownPaymentController@saveEntry')->name('purchase-down-payment-save-entry');
+    Route::get('/delete/{id}', 'PurchaseDownPaymentController@destroy')->name('purchase-down-payment-delete');
+    Route::get('/auto_po', 'PurchaseDownPaymentController@autoPo')->name('purchase-down-payment-auto-po');
+    Route::get('/count_po', 'PurchaseDownPaymentController@countPo')->name('purchase-down-payment-count-po');
+});
+
+Route::prefix('qc_penerimaan_barang')->group(function () {
+    Route::get('/index/{user_id?}', 'QcReceiptController@index')->name('qc_receipt');
+    Route::get('/entry/{id?}', 'QcReceiptController@entry')->name('qc_receipt-entry');
+    Route::post('/save_entry/{id}', 'QcReceiptController@saveEntry')->name('qc_receipt-save-entry');
+    Route::get('/auto_purchasing', 'QcReceiptController@autoPurchasing')->name('qc_receipt-auto-purchasing');
+    Route::get('/auto-item', 'QcReceiptController@autoItem')->name('qc_receipt-auto-item');
+});
+
+Route::prefix('send_to_branch')->group(function () {
+    Route::get('/index/{user_id?}', 'SendToBranchController@index')->name('send_to_branch');
+    Route::get('/entry/{id?}', 'SendToBranchController@entry')->name('send_to_branch-entry');
+    Route::post('/save_entry/{id}', 'SendToBranchController@saveEntry')->name('send_to_branch-save-entry');
+    Route::get('/view/{id}', 'SendToBranchController@view')->name('send_to_branch-view');
+    Route::get('/delete/{id}', 'SendToBranchController@destroy')->name('send_to_branch-delete');
+    Route::get('/auto-qrcode', 'SendToBranchController@autoQRCode')->name('send_to_branch-qrcode');
+});
+
+Route::prefix('received_from_branch')->group(function () {
+    Route::get('/index/{user_id?}', 'ReceivedFromBranchController@index')->name('received_from_branch');
+    Route::get('/entry/{id?}', 'ReceivedFromBranchController@entry')->name('received_from_branch-entry');
+    Route::post('/save_entry/{id}', 'ReceivedFromBranchController@saveEntry')->name('received_from_branch-save-entry');
+    Route::get('/view/{id}', 'ReceivedFromBranchController@view')->name('received_from_branch-view');
+    Route::get('/delete/{id}', 'ReceivedFromBranchController@destroy')->name('received_from_branch-delete');
 });
 
 // Master
@@ -79,7 +118,6 @@ Route::get('/master/coa/get_by_cabang/{id_cabang?}', 'MasterCoaController@getCoa
 Route::get('/master/coa/get_data/{id?}', 'MasterCoaController@getCoa')->name('master-coa-get-data');
 
 Route::get('/master/setting/get_pelunasan/{id?}', 'MasterSettingController@getSettingPelunasan')->name('master-setting-get-pelunasan');
-
 
 // Transaction
 // Jurnal Umum
