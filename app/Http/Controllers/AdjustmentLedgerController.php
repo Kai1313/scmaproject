@@ -5,8 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Accounting\GeneralLedger;
 use App\Models\Accounting\JurnalDetail;
 use App\Models\Accounting\JurnalHeader;
+use App\Models\Accounting\TrxSaldo;
 use App\Models\Master\Akun;
 use App\Models\Master\Cabang;
+use App\Models\Master\Pelanggan;
+use App\Models\Master\Pemasok;
+use App\Models\Master\Setting;
 use App\Models\Master\Slip;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -46,10 +50,14 @@ class AdjustmentLedgerController extends Controller
     public function create(Request $request)
     {
         $data_cabang = Cabang::where("status_cabang", 1)->get();
+        $data_pelanggan = Pelanggan::all();
+        $data_pemasok = Pemasok::all();
 
         $data = [
             "pageTitle" => "SCA Accounting | Transaksi Jurnal Penyesuaian | Create",
             "data_cabang" => $data_cabang,
+            "data_pelanggan" => $data_pelanggan,
+            "data_pemasok" => $data_pemasok,
         ];
 
         Log::debug(json_encode($request->session()->get('user')));
@@ -117,13 +125,14 @@ class AdjustmentLedgerController extends Controller
             }
 
             // Store Detail and Update
-            foreach ($detailData as $data) {
+            foreach ($detailData as $key => $data) {
                 //Store Detail
                 $detail = new JurnalDetail();
                 $detail->id_jurnal = $header->id_jurnal;
-                $detail->index = ($data['guid'] == 'gen') ? count($detailData) + 1 : $data['guid'];
+                $detail->index = ($data['guid'] == 'gen') ? count($detailData) + 1 : $key+1;
                 $detail->id_akun = $data['akun'];
                 $detail->keterangan = $data['notes'];
+                $detail->id_transaksi = $data['trx'];
                 $detail->debet = str_replace(',', '', $data['debet']);
                 $detail->credit = str_replace(',', '', $data['kredit']);
                 $detail->user_created = $userRecord;
@@ -137,6 +146,19 @@ class AdjustmentLedgerController extends Controller
                         "result" => false,
                         "message" => "Error when store Jurnal data on table detail"
                     ]);
+                }
+
+                // Update Saldo Transaksi
+                $trx_saldo = TrxSaldo::where("id_transaksi", $data["trx"])->first();
+                if ($trx_saldo) {
+                    $update_trx_saldo = $this->updateTrxSaldo($trx_saldo, str_replace(',', '', $data['debet']), str_replace(',', '', $data['kredit']));
+                    if (!$update_trx_saldo) {
+                        DB::rollback();
+                        return response()->json([
+                            "result" => false,
+                            "message" => "Error when store Jurnal data on update saldo transaksi"
+                        ]);
+                    }
                 }
             }
 
@@ -252,18 +274,22 @@ class AdjustmentLedgerController extends Controller
     public function edit(Request $request, $id)
     {
         $data_cabang = Cabang::where("status_cabang", 1)->get();
+        $data_pelanggan = Pelanggan::all();
+        $data_pemasok = Pemasok::all();
         $jurnal_header = JurnalHeader::find($id);
         $jurnal_detail = JurnalDetail::where("id_jurnal", $id)->get();
         $details = [];
         $i = 0;
         foreach ($jurnal_detail as $key => $jurnal) {
             $akun = Akun::find($jurnal->id_akun);
+            $trx_id = TrxSaldo::where("id_transaksi", $jurnal->id_transaksi)->first();
             $details[] = [
-                "guid" => (++$i == count($jurnal_detail)) ? "gen" : $jurnal->index,
+                "guid" => (++$i == count($jurnal_detail)) ? "gen" : (($trx_id)?"trx-".$trx_id->id:$jurnal->index),
                 "akun" => $akun->id_akun,
                 "nama_akun" => $akun->nama_akun,
                 "kode_akun" => $akun->kode_akun,
                 "notes" => $jurnal->keterangan,
+                "trx" => $jurnal->id_transaksi,
                 "debet" => $jurnal->debet,
                 "kredit" => $jurnal->credit
             ];
@@ -272,6 +298,8 @@ class AdjustmentLedgerController extends Controller
         $data = [
             "pageTitle" => "SCA Accounting | Transaksi Jurnal Penyesuaian | Edit",
             "data_cabang" => $data_cabang,
+            "data_pelanggan" => $data_pelanggan,
+            "data_pemasok" => $data_pemasok,
             "jurnal_header" => $jurnal_header,
             "jurnal_detail" => json_encode($details),
             "jurnal_detail_count" => count($details),
@@ -324,6 +352,23 @@ class AdjustmentLedgerController extends Controller
 
             // Find Header data and delete detail
             $header = JurnalHeader::where("id_jurnal", $journalID)->first();
+            // Update saldo transaksi before delete
+            $old_details = JurnalDetail::where("id_jurnal", $journalID)->get();
+            foreach ($old_details as $key => $detail) {
+                $debet = $detail->debet;
+                $kredit = $detail->credit;
+                $trx_saldo = TrxSaldo::where("id_transaksi", $detail->id_transaksi)->first();
+                if ($trx_saldo) {
+                    $update_trx_saldo = $this->revertTrxSaldo($trx_saldo, $debet, $kredit);
+                    if (!$update_trx_saldo) {
+                        DB::rollback();
+                        return response()->json([
+                            "result" => false,
+                            "message" => "Error when store Jurnal data on revert saldo transaksi"
+                        ]);
+                    }
+                }
+            }
             JurnalDetail::where('id_jurnal', $journalID)->delete();
 
             // Store Header
@@ -342,13 +387,14 @@ class AdjustmentLedgerController extends Controller
             }
 
             // Store New Detail
-            foreach ($detailData as $data) {
+            foreach ($detailData as $key => $data) {
                 //Store Detail
                 $detail = new JurnalDetail();
                 $detail->id_jurnal = $header->id_jurnal;
-                $detail->index = ($data['guid'] == 'gen') ? count($detailData) + 1 : $data['guid'];
+                $detail->index = ($data['guid'] == 'gen') ? count($detailData) + 1 : $key+1;
                 $detail->id_akun = $data['akun'];
                 $detail->keterangan = $data['notes'];
+                $detail->id_transaksi = $data['trx'];
                 $detail->debet = str_replace(',', '', $data['debet']);
                 $detail->credit = str_replace(',', '', $data['kredit']);
                 $detail->user_modified = $userModified;
@@ -359,6 +405,19 @@ class AdjustmentLedgerController extends Controller
                         "result" => false,
                         "message" => "Error when store Jurnal data on table detail"
                     ]);
+                }
+
+                //  Update Saldo Transaksi
+                $trx_saldo = TrxSaldo::where("id_transaksi", $data["trx"])->first();
+                if ($trx_saldo) {
+                    $update_trx_saldo = $this->updateTrxSaldo($trx_saldo, str_replace(',', '', $data['debet']), str_replace(',', '', $data['kredit']));
+                    if (!$update_trx_saldo) {
+                        DB::rollback();
+                        return response()->json([
+                            "result" => false,
+                            "message" => "Error when store Jurnal data on update saldo transaksi"
+                        ]);
+                    }
                 }
             }
 
@@ -608,6 +667,139 @@ class AdjustmentLedgerController extends Controller
             return $code;
         } catch (\Exception $e) {
             Log::error("Error when generate journal code");
+        }
+    }
+
+    public function updateTrxSaldo($trx, $debet, $kredit)
+    {
+        try {
+            // DB::beginTransaction();
+            $trx_saldo = TrxSaldo::find($trx->id);
+            $type = $trx->tipe_transaksi;
+            $current_total = $trx->total;
+            $current_bayar = $trx->bayar;
+            $current_sisa = $trx->sisa;
+            switch ($type) {
+                case 'Penjualan':
+                    $trx_saldo->bayar = $current_bayar + $kredit;
+                    $trx_saldo->sisa = $current_sisa - $kredit;
+                    break;
+                case 'Retur Penjualan':
+                    $trx_saldo->bayar = $current_bayar + $debet;
+                    $trx_saldo->sisa = $current_sisa - $debet;
+                    break;
+                case 'Pembelian':
+                    $trx_saldo->bayar = $current_bayar + $debet;
+                    $trx_saldo->sisa = $current_sisa - $debet;
+                    break;
+                case 'Retur Pembelian':
+                    $trx_saldo->bayar = $current_bayar + $kredit;
+                    $trx_saldo->sisa = $current_sisa - $kredit;
+                    break;
+                case 'Piutang Giro':
+                    $trx_saldo->bayar = $current_bayar + $kredit;
+                    $trx_saldo->sisa = $current_sisa - $kredit;
+                    $trx_saldo->status_giro = ($kredit > $debet)?1:2;
+                    break;
+                case 'Hutang Giro':
+                    $trx_saldo->bayar = $current_bayar + $debet;
+                    $trx_saldo->sisa = $current_sisa - $debet;
+                    $trx_saldo->status_giro = ($debet > $kredit)?1:2;
+                    break;
+                case 'Piutang Giro Tolak':
+                    $trx_saldo->bayar = $current_bayar + $kredit;
+                    $trx_saldo->sisa = $current_sisa - $kredit;
+                    $trx_saldo->status_giro = ($debet > $debet)?1:2;
+                    break;
+                case 'Hutang Giro Tolak':
+                    $trx_saldo->bayar = $current_bayar + $debet;
+                    $trx_saldo->sisa = $current_sisa - $debet;
+                    $trx_saldo->status_giro = ($debet > $kredit)?1:2;
+                    break;
+                
+                default:
+                    // DB::rollback();
+                    return false;
+                    break;
+            }
+            if (!$trx_saldo->save()) {
+                // DB::rollback();
+                return false;
+            }
+            return true;
+            // DB::commit();
+        }
+        catch (\Exception $e) {
+            // DB::rollback();
+            Log::error($e);
+            return false;
+        }
+    }
+
+    public function revertTrxSaldo($trx, $debet, $kredit)
+    {
+        try {
+            Log::info("sini");
+            // DB::beginTransaction();
+            $trx_saldo = TrxSaldo::find($trx->id);
+            $type = $trx->tipe_transaksi;
+            $current_total = $trx->total;
+            $current_bayar = $trx->bayar;
+            $current_sisa = $trx->sisa;
+            switch ($type) {
+                case 'Penjualan':
+                    $trx_saldo->bayar = $current_bayar - $kredit;
+                    $trx_saldo->sisa = $current_sisa + $kredit;
+                    break;
+                case 'Retur Penjualan':
+                    $trx_saldo->bayar = $current_bayar - $debet;
+                    $trx_saldo->sisa = $current_sisa + $debet;
+                    break;
+                case 'Pembelian':
+                    $trx_saldo->bayar = $current_bayar - $debet;
+                    $trx_saldo->sisa = $current_sisa + $debet;
+                    break;
+                case 'Retur Pembelian':
+                    $trx_saldo->bayar = $current_bayar - $kredit;
+                    $trx_saldo->sisa = $current_sisa + $kredit;
+                    break;
+                case 'Piutang Giro':
+                    $trx_saldo->bayar = $current_bayar - $kredit;
+                    $trx_saldo->sisa = $current_sisa + $kredit;
+                    $trx_saldo->status_giro = 0;
+                    break;
+                case 'Hutang Giro':
+                    $trx_saldo->bayar = $current_bayar - $debet;
+                    $trx_saldo->sisa = $current_sisa + $debet;
+                    $trx_saldo->status_giro = 0;
+                    break;
+                case 'Piutang Giro Tolak':
+                    $trx_saldo->bayar = $current_bayar - $kredit;
+                    $trx_saldo->sisa = $current_sisa + $kredit;
+                    $trx_saldo->status_giro = 0;
+                    break;
+                case 'Hutang Giro Tolak':
+                    $trx_saldo->bayar = $current_bayar - $debet;
+                    $trx_saldo->sisa = $current_sisa + $debet;
+                    $trx_saldo->status_giro = 0;
+                    break;
+                
+                default:
+                    // DB::rollback();
+                    return false;
+                    break;
+            }
+            if (!$trx_saldo->save()) {
+                // DB::rollback();
+                return false;
+            }
+            return true;
+            // DB::commit();
+        }
+        catch (\Exception $e) {
+            // DB::rollback();
+            Log::error($e);
+            return false;
         }
     }
 }
