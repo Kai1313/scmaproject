@@ -1822,12 +1822,20 @@ class ApiController extends Controller
             }
 
             if(!empty($header_pelunasan)){
-                DB::rollback();
-                return response()->json([
-                    "result" => false,
-                    "code" => 400,
-                    "message" => "Error when void Jurnal data. Transaction " . $id_transaksi . " already paid"
-                ], 400);
+                $header_pelunasan = JurnalDetail::join('jurnal_header', 'jurnal_header.id_jurnal', 'jurnal_detail.id_jurnal')
+                                    ->where("jurnal_detail.id_transaksi", $id_transaksi)
+                                    ->where('jurnal_header.jenis_jurnal', '<>', 'ME')
+                                    ->where('jurnal_header.void', 0)
+                                    ->first();
+
+                if(!empty($header_pelunasan)){
+                    DB::rollback();
+                    return response()->json([
+                        "result" => false,
+                        "code" => 400,
+                        "message" => "Error when void Jurnal data. Transaction " . $id_transaksi . " already paid"
+                    ], 400);
+                }
             }
 
             // Begin save
