@@ -81,9 +81,10 @@
                             <tr>
                                 <th>Tanggal</th>
                                 <th>Kode Pindah Gudang</th>
-                                <th>Gudang</th>
+                                <th>Gudang Asal</th>
                                 <th>Cabang Tujuan</th>
                                 <th>Keterangan</th>
+                                <th>Jasa Pengiriman</th>
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>
@@ -120,14 +121,17 @@
                 data: 'kode_pindah_gudang',
                 name: 'kode_pindah_gudang'
             }, {
-                data: 'id_gudang',
-                name: 'id_gudang'
+                data: 'nama_gudang',
+                name: 'nama_gudang'
             }, {
-                data: 'id_cabang_tujuan',
-                name: 'id_cabang_tujuan',
+                data: 'nama_cabang',
+                name: 'nama_cabang',
             }, {
                 data: 'keterangan_pindah_gudang',
                 name: 'keterangan_pindah_gudang',
+            }, {
+                data: 'transporter',
+                name: 'transporter',
             }, {
                 data: 'status_pindah_gudang',
                 name: 'status_pindah_gudang',

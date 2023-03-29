@@ -70,11 +70,11 @@
 
 @section('main-section')
     <div class="content container-fluid">
-        <form action="{{ route('purchase-request-save-entry', $data ? $data->purchase_request_id : 0) }}" method="post"
+        <form action="{{ route('send_to_branch-save-entry', $data ? $data->id_pindah_gudang : 0) }}" method="post"
             class="post-action">
             <div class="box">
                 <div class="box-header">
-                    <h3 class="box-title">{{ $data ? 'Ubah' : 'Tambah' }} Permintaan Pembelian</h3>
+                    <h3 class="box-title">{{ $data ? 'Ubah' : 'Tambah' }} Kirim Ke Gudang</h3>
                     <a href="{{ route('send_to_branch') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right">
                         <span class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali
                     </a>
@@ -86,6 +86,12 @@
                             <div class="form-group">
                                 <select name="id_cabang" class="form-control select2" data-validation="[NOTEMPTY]"
                                     data-validation-message="Cabang tidak boleh kosong">
+                                    <option value="">Pilih Cabang</option>
+                                    @if ($data && $data->id_cabang)
+                                        <option value="{{ $data->id_cabang }}" selected>
+                                            {{ $data->cabang->nama_cabang }}
+                                        </option>
+                                    @endif
                                 </select>
                             </div>
                             <label>Gudang <span>*</span></label>
@@ -93,16 +99,12 @@
                                 <select name="id_gudang" class="form-control select2" data-validation="[NOTEMPTY]"
                                     data-validation-message="Gudang tidak boleh kosong">
                                     <option value="">Pilih Gudang</option>
-
+                                    @if ($data && $data->id_gudang)
+                                        <option value="{{ $data->id_gudang }}" selected>
+                                            {{ $data->gudang->nama_gudang }}
+                                        </option>
+                                    @endif
                                 </select>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <label>Kode Permintaan</label>
-                            <div class="form-group">
-                                <input type="text" name="code_pindah_gudang"
-                                    value="{{ old('kode_pindah_gudang', $data ? $data->code_pindah_gudang : '') }}"
-                                    class="form-control" readonly placeholder="Otomatis">
                             </div>
                             <label>Tanggal <span>*</span></label>
                             <div class="form-group">
@@ -113,13 +115,38 @@
                             </div>
                         </div>
                         <div class="col-md-4">
+                            <label>Kode Permintaan</label>
+                            <div class="form-group">
+                                <input type="text" name="kode_pindah_gudang"
+                                    value="{{ old('kode_pindah_gudang', $data ? $data->kode_pindah_gudang : '') }}"
+                                    class="form-control" readonly placeholder="Otomatis">
+                            </div>
+                            <label>Nama Jasa Pengiriman</label>
+                            <div class="form-group">
+                                <input type="text" name="transporter"
+                                    value="{{ old('transporter', $data ? $data->transporter : '') }}" class="form-control">
+                            </div>
+                            <label>No Polisi Kendaraan</label>
+                            <div class="form-group">
+                                <input type="text" name="nomor_polisi"
+                                    value="{{ old('nomor_polisi', $data ? $data->nomor_polisi : '') }}"
+                                    class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
                             <label>Cabang Tujuan<span>*</span></label>
                             <div class="form-group">
                                 <select name="id_cabang_tujuan" class="form-control select2" data-validation="[NOTEMPTY]"
                                     data-validation-message="Cabang tujuan tidak boleh kosong">
+                                    <option value="">Pilih Cabang Tujuan</option>
+                                    @if ($data && $data->id_cabang_tujuan)
+                                        <option value="{{ $data->id_cabang_tujuan }}" selected>
+                                            {{ $data->destinationBranch->nama_cabang }}
+                                        </option>
+                                    @endif
                                 </select>
                             </div>
-                            <label>Catatan</label>
+                            <label>Keterangan</label>
                             <div class="form-group">
                                 <textarea name="keterangan_pindah_gudang" class="form-control" rows="3">{{ old('keterangan_pindah_gudang', $data ? $data->keterangan_pindah_gudang : '') }}</textarea>
                             </div>
@@ -131,7 +158,7 @@
                 <div class="box-body">
                     <div class="row">
                         <div class="col-md-6">
-                            <h4>Detil Permintaan Barang</h4>
+                            <h4>Detil Barang</h4>
                         </div>
                         <div class="col-md-6">
                             @if (!$data || $data->approval_status == 0)
@@ -286,7 +313,7 @@
             fps: 10,
             qrbox: 250
         });
-        let details = [];
+        let details = {!! $data ? $data->formatdetail : '[]' !!};
         let detailSelect = []
         let statusModal = 'create'
 

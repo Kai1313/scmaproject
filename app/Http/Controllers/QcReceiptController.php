@@ -52,7 +52,8 @@ class QcReceiptController extends Controller
                 ->leftJoin('pembelian', 'pembelian_detail.id_pembelian', '=', 'pembelian.id_pembelian')
                 ->leftJoin('barang', 'pembelian_detail.id_barang', '=', 'barang.id_barang')
                 ->leftJoin('satuan_barang', 'pembelian_detail.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
-                ->whereBetween('pembelian.tanggal_pembelian', [$request->start_date, $request->end_date]);
+                ->whereBetween('pembelian.tanggal_pembelian', [$request->start_date, $request->end_date])
+                ->whereIn('id_kategori_barang', [2, 3, 9]);
             if (isset($request->c)) {
                 $data = $data->where('pembelian.id_cabang', $request->c);
             }

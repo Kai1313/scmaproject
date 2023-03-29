@@ -418,7 +418,7 @@
                                             </a>
                                         </li>
                                     @endif
-                                    @if (checkAccessMenu('pemerintaan_pembelian'))
+                                    @if (checkAccessMenu('permintaan_pembelian'))
                                         <li data-alias="permintaan_pembelian">
                                             <a href="{{ env('OLD_URL_ROOT') }}#permintaan_pembelian">
                                                 <i class="glyphicon glyphicon-option-vertical"></i>Purchase Order (PO)
@@ -453,7 +453,7 @@
                                     @if (checkAccessMenu('retur_pembelian'))
                                         <li data-alias="retur_pembelian">
                                             <a href="{{ env('OLD_URL_ROOT') }}#retur_pembelian">
-                                                <i class="glyphicon glyphicon-option-vertical"></i>Retur Pembelian
+                                                <i class="glyphicon glyphicon-option-vertical"></i>Retur Pembelian (RB)
                                             </a>
                                         </li>
                                     @endif
@@ -470,6 +470,7 @@
                                         <li data-alias="dd_pembayaran_pembelian">
                                             <a href="{{ env('OLD_URL_ROOT') }}#dd_pembayaran_pembelian">
                                                 <i class="glyphicon glyphicon-option-vertical"></i>Pembayaran Pembelian
+                                                (PP)
                                             </a>
                                         </li>
                                     @endif

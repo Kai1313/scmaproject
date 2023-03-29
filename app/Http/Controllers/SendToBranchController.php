@@ -8,6 +8,7 @@ use App\MoveWarehouse;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Http\Request;
+use Log;
 use Yajra\DataTables\DataTables;
 
 class SendToBranchController extends Controller
@@ -20,7 +21,10 @@ class SendToBranchController extends Controller
         }
 
         if ($request->ajax()) {
-            $data = DB::table('pindah_gudang');
+            $data = DB::table('pindah_gudang')
+                ->select('id_pindah_gudang', 'type', 'nama_gudang', 'tanggal_pindah_gudang', 'kode_pindah_gudang', 'nama_cabang', 'status_pindah_gudang', 'keterangan_pindah_gudang', 'transporter')
+                ->leftJoin('gudang', 'pindah_gudang.id_gudang', '=', 'gudang.id_gudang')
+                ->leftJoin('cabang', 'pindah_gudang.id_cabang_tujuan', '=', 'cabang.id_cabang');
             if (isset($request->c)) {
                 $data = $data->where('pindah_gudang.id_cabang', $request->c);
             }
@@ -36,8 +40,16 @@ class SendToBranchController extends Controller
                     $btn .= '</ul>';
                     return $btn;
                 })
-
-                ->rawColumns(['action'])
+                ->editColumn('status_pindah_gudang', function ($row) {
+                    if ($row->status_pindah_gudang == '0') {
+                        return '<label class="label label-warning">Dalam Perjalanan</label>';
+                    } else if ($row->status_pindah_gudang == '1') {
+                        return '<label class="label label-success">Diterima</label>';
+                    } else {
+                        return '';
+                    }
+                })
+                ->rawColumns(['action', 'status_pindah_gudang'])
                 ->make(true);
         }
 
@@ -50,7 +62,7 @@ class SendToBranchController extends Controller
 
     public function entry($id = 0)
     {
-        $data = [];
+        $data = MoveWarehouse::find($id);
         $cabang = DB::table('cabang')->select('nama_cabang as text', 'id_cabang as id')->where('status_cabang', 1)->get();
 
         return view('ops.sendToBranch.form', [
@@ -62,42 +74,40 @@ class SendToBranchController extends Controller
 
     public function saveEntry(Request $request, $id = 0)
     {
-        // $data = PurchaseRequest::find($id);
-        // try {
-        //     DB::beginTransaction();
-        //     if (!$data) {
-        //         $data = new PurchaseRequest;
-        //     }
+        $data = MoveWarehouse::find($id);
+        if (!$data) {
+            $data = new MoveWarehouse;
+        }
 
-        //     $data->fill($request->all());
-        //     if ($id == 0) {
-        //         $data->purchase_request_code = PurchaseRequest::createcode($request->id_cabang);
-        //         $data->approval_status = 0;
-        //         $data->user_created = session()->get('user')['id_pengguna'];
-        //         $data->void = 0;
-        //         $data->purchase_request_user_id = session()->get('user')['id_pengguna'];
-        //     } else {
-        //         $data->user_modified = session()->get('user')['id_pengguna'];
-        //     }
+        try {
+            DB::beginTransaction();
+            $data->fill($request->all());
+            if ($id == 0) {
+                $data->kode_pindah_gudang = MoveWarehouse::createcode($request->id_cabang);
+                $data->status_pindah_gudang = 0;
+                $data->tujuan_pindah_gudang = $request->id_cabang_tujuan;
+                $data->type = 0;
+            }
 
-        //     $data->save();
-        //     $data->savedetails($request->details);
-
-        //     DB::commit();
-        //     return response()->json([
-        //         "result" => true,
-        //         "message" => "Data berhasil disimpan",
-        //         "redirect" => route('purchase-request'),
-        //     ]);
-        // } catch (\Exception $e) {
-        //     DB::rollback();
-        //     Log::error("Error when save purchase request");
-        //     Log::error($e);
-        //     return response()->json([
-        //         "result" => false,
-        //         "message" => "Data gagal tersimpan",
-        //     ]);
-        // }
+            $data->user_pindah_gudang = session()->get('user')['id_pengguna'];
+            $data->date_pindah_gudang = date('Y-m-d H:i:s');
+            $data->save();
+            $data->saveDetails($request->details);
+            DB::commit();
+            return response()->json([
+                "result" => true,
+                "message" => "Data berhasil disimpan",
+                "redirect" => route('send_to_branch'),
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error("Error when save send to branch");
+            Log::error($e);
+            return response()->json([
+                "result" => false,
+                "message" => "Data gagal tersimpan",
+            ]);
+        }
     }
 
     public function viewData($id)
