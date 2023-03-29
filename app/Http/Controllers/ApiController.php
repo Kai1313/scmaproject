@@ -1801,6 +1801,70 @@ class ApiController extends Controller
         }
     }
 
+    public function voidJournalOtomatis(Request $request){
+        try {
+            // init data
+            // header
+            $id_transaksi = $request->no_transaksi;
+            $user_void = $request->user;
+
+            // Find Header data and delete detail
+            $header_me = JurnalHeader::where("id_transaksi", $id_transaksi)->where('jenis_jurnal', 'ME')->where('void', 0)->first();
+            $header_pelunasan = JurnalHeader::where("id_transaksi", $id_transaksi)->where('jenis_jurnal', '<>', 'ME')->where('void', 0)->first();
+
+            if(empty($header_me)){
+                DB::rollback();
+                return response()->json([
+                    "result" => false,
+                    "code" => 400,
+                    "message" => "Error when void Jurnal data. Journal Memorial transaction " . $id_transaksi . " not found"
+                ], 400);
+            }
+
+            if(!empty($header_pelunasan)){
+                DB::rollback();
+                return response()->json([
+                    "result" => false,
+                    "code" => 400,
+                    "message" => "Error when void Jurnal data. Transaction " . $id_transaksi . " already paid"
+                ], 400);
+            }
+
+            // Begin save
+            DB::beginTransaction();
+            $header_me->void = 1;
+            $header_me->user_void = $user_void;
+            $header_me->dt_void = date('Y-m-d h:i:s');
+
+            if (!$header_me->save()) {
+                DB::rollback();
+                return response()->json([
+                    "result" => false,
+                    "code" => 400,
+                    "message" => "Error when void Jurnal data on table header"
+                ], 400);
+            }
+
+            DB::commit();
+            return response()->json([
+                "result" => true,
+                "code" => 200,
+                "message" => "Successfully void Jurnal data",
+            ], 200);
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::info("Error when void Jurnal data");
+            Log::info($e);
+            return response()->json([
+                "result" => false,
+                "code" => 400,
+                "message" => "Error when void Jurnal data",
+                "exception" => $e
+            ], 400);
+        }
+    }
+
     public function updateTrxSaldo($trx, $debet, $credit)
     {
         try {
