@@ -11,8 +11,8 @@ use App\Models\User;
 use App\Models\UserToken;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use DB;
-use Log;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Excel;
 
 class MasterSlipController extends Controller
@@ -303,7 +303,7 @@ class MasterSlipController extends Controller
         $data_slip = Slip::find($id);
         $kode_slip = $data_slip->kode_slip;
         $session = $request->session()->get('access');
-        if (($request->session()->has('token') && array_key_exists('Master Slip', $session)) && $session['Master Slip']['edit'] == 1) {
+        if (($request->session()->has('token') && array_key_exists('Master Slip', $session)) && $session['Master Slip']['delete'] == 1) {
             if ($data_journal_header->isNotEmpty()) {
                 // return back()->with("failed", "Maaf, tidak bisa menghapus slip" . $data_slip->kode_slip . "karena sudah digunakan pada jurnal");
                 return response()->json([

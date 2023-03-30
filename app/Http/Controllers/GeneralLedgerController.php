@@ -12,10 +12,13 @@ use App\Models\Master\Pelanggan;
 use App\Models\Master\Pemasok;
 use App\Models\Master\Setting;
 use App\Models\Master\Slip;
-use Illuminate\Http\Request;
-use DB;
-use Log;
+use App\Models\User;
+use App\Models\UserToken;
 use PDF;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class GeneralLedgerController extends Controller
 {
@@ -28,16 +31,68 @@ class GeneralLedgerController extends Controller
     {
         $cabang = Cabang::find(1);
         $data_cabang = Cabang::all();
+        $user_id = $request->user_id;
 
-        $data = [
-            "pageTitle" => "SCA Accounting | Transaksi Jurnal Umum | List",
-            "cabang" => $cabang,
-            "data_cabang" => $data_cabang
-        ];
+        if (($user_id != '' && $request->session()->has('token') == false) || $request->session()->has('token') == true) {
+            if ($request->session()->has('token') == true) {
+                $user_id = $request->session()->get('user')->id_pengguna;
+            }
+            $user       = User::where('id_pengguna', $user_id)->first();
+            $token      = UserToken::where('id_pengguna', $user_id)->where('status_token_pengguna', 1)->whereRaw("waktu_habis_token_pengguna > STR_TO_DATE(?, '%Y-%m-%d %H:%i:%s')", Carbon::now()->format('Y-m-d H:i:s'))->first();
 
-        if ($request->session()->has('token')) {
-            return view('accounting.journal.general_ledger.index', $data);
+            $sql = "SELECT
+                a.id_pengguna,
+                a.id_grup_pengguna,
+                d.id_menu,
+                d.nama_menu,
+                c.lihat_akses_menu,
+                c.tambah_akses_menu,
+                c.ubah_akses_menu,
+                c.hapus_akses_menu,
+                c.cetak_akses_menu 
+            FROM
+                pengguna a,
+                grup_pengguna b,
+                akses_menu c,
+                menu d 
+            WHERE
+                a.id_grup_pengguna = b.id_grup_pengguna 
+                AND b.id_grup_pengguna = c.id_grup_pengguna 
+                AND c.id_menu = d.id_menu 
+                AND a.id_pengguna = $user_id
+                AND d.keterangan_menu = 'Accounting' 
+                AND d.status_menu = 1";
+            $access = DB::connection('mysql')->select($sql);
+
+            $user_access = array();
+            foreach ($access as $value) {
+                $user_access[$value->nama_menu] = ['show' => $value->lihat_akses_menu, 'create' => $value->tambah_akses_menu, 'edit' => $value->ubah_akses_menu, 'delete' => $value->hapus_akses_menu, 'print' => $value->cetak_akses_menu];
+            }
+
+            if ($token && $request->session()->has('token') == false) {
+                $request->session()->put('token', $token->nama_token_pengguna);
+                $request->session()->put('user', $user);
+                $request->session()->put('access', $user_access);
+            } else if ($request->session()->has('token')) {
+            } else {
+                $request->session()->flush();
+            }
+
+            $session = $request->session()->get('access');
+
+            $data = [
+                "pageTitle" => "SCA Accounting | Transaksi Jurnal Umum | List",
+                "cabang" => $cabang,
+                "data_cabang" => $data_cabang
+            ];
+
+            if (($request->session()->has('token') && array_key_exists('Jurnal Umum', $session)) && $session['Jurnal Umum']['show'] == 1) {
+                return view('accounting.journal.general_ledger.index', $data);
+            } else {
+                return view('exceptions.forbidden');
+            }
         } else {
+            $request->session()->flush();
             return view('exceptions.forbidden');
         }
     }
@@ -67,7 +122,9 @@ class GeneralLedgerController extends Controller
 
         Log::debug(json_encode($request->session()->get('user')));
 
-        if ($request->session()->has('token')) {
+        $session = $request->session()->get('access');
+
+        if (($request->session()->has('token') && array_key_exists('Jurnal Umum', $session)) && $session['Jurnal Umum']['create'] == 1) {
             return view('accounting.journal.general_ledger.form', $data);
         } else {
             return view('exceptions.forbidden');
@@ -97,9 +154,9 @@ class GeneralLedgerController extends Controller
 
             // Init data
             $journalDate = date('Y-m-d', strtotime($request->header[0]["tanggal"]));
-            $giroNo = ($request->header[0]["nomor_giro"])?$request->header[0]["nomor_giro"]:NULL;
-            $giroDate = ($request->header[0]["tanggal_giro"])?date('Y-m-d', strtotime($request->header[0]["tanggal_giro"])):NULL;
-            $giroDueDate = ($request->header[0]["tanggal_jt_giro"])?date('Y-m-d', strtotime($request->header[0]["tanggal_jt_giro"])):NULL;
+            $giroNo = ($request->header[0]["nomor_giro"]) ? $request->header[0]["nomor_giro"] : NULL;
+            $giroDate = ($request->header[0]["tanggal_giro"]) ? date('Y-m-d', strtotime($request->header[0]["tanggal_giro"])) : NULL;
+            $giroDueDate = ($request->header[0]["tanggal_jt_giro"]) ? date('Y-m-d', strtotime($request->header[0]["tanggal_jt_giro"])) : NULL;
             $slipID = $request->header[0]["slip"];
             $journalType = $request->header[0]["jenis"];
             $cabangID = $request->header[0]["cabang"];
@@ -141,10 +198,10 @@ class GeneralLedgerController extends Controller
             if ($journalType == "PG" || $journalType == "HG") {
                 $sum = 0;
                 foreach ($detailData as $key => $item) {
-                    $sum += ($journalType == "PG")?$item["debet"]:$item["kredit"];
+                    $sum += ($journalType == "PG") ? $item["debet"] : $item["kredit"];
                 }
                 $trx_saldo = new TrxSaldo;
-                $trx_saldo->tipe_transaksi = ($journalType == "PG")?"Piutang Giro":"Hutang Giro";
+                $trx_saldo->tipe_transaksi = ($journalType == "PG") ? "Piutang Giro" : "Hutang Giro";
                 $trx_saldo->id_transaksi = $header->kode_jurnal;
                 $trx_saldo->tanggal = $journalDate;
                 $trx_saldo->total = $sum;
@@ -169,7 +226,7 @@ class GeneralLedgerController extends Controller
                 // Store Detail
                 $detail = new JurnalDetail();
                 $detail->id_jurnal = $header->id_jurnal;
-                $detail->index = ($data['guid'] == 'gen') ? count($detailData) + 1 : $key+1;
+                $detail->index = ($data['guid'] == 'gen') ? count($detailData) + 1 : $key + 1;
                 $detail->id_akun = $data['akun'];
                 $detail->keterangan = $data['notes'];
                 $detail->id_transaksi = $data['trx'];
@@ -254,7 +311,9 @@ class GeneralLedgerController extends Controller
             "data_jurnal_detail" => $data_jurnal_detail
         ];
 
-        if ($request->session()->has('token')) {
+        $session = $request->session()->get('access');
+
+        if (($request->session()->has('token') && array_key_exists('Jurnal Umum', $session)) && $session['Jurnal Umum']['show'] == 1) {
             return view('accounting.journal.general_ledger.detail', $data);
         } else {
             return view('exceptions.forbidden');
@@ -332,7 +391,7 @@ class GeneralLedgerController extends Controller
             $akun = Akun::find($jurnal->id_akun);
             $trx_id = TrxSaldo::where("id_transaksi", $jurnal->id_transaksi)->first();
             $details[] = [
-                "guid" => (++$i == count($jurnal_detail)) ? "gen" : (($trx_id)?"trx-".$trx_id->id:$jurnal->index),
+                "guid" => (++$i == count($jurnal_detail)) ? "gen" : (($trx_id) ? "trx-" . $trx_id->id : $jurnal->index),
                 "akun" => $akun->id_akun,
                 "nama_akun" => $akun->nama_akun,
                 "kode_akun" => $akun->kode_akun,
@@ -356,7 +415,9 @@ class GeneralLedgerController extends Controller
 
         Log::debug(json_encode($request->session()->get('user')));
 
-        if ($request->session()->has('token')) {
+        $session = $request->session()->get('access');
+
+        if (($request->session()->has('token') && array_key_exists('Jurnal Umum', $session)) && $session['Jurnal Umum']['edit'] == 1) {
             return view('accounting.journal.general_ledger.form_edit', $data);
         } else {
             return view('exceptions.forbidden');
@@ -386,9 +447,9 @@ class GeneralLedgerController extends Controller
 
             // Init data
             $journalDate = date('Y-m-d', strtotime($request->header[0]["tanggal"]));
-            $giroNo = ($request->header[0]["nomor_giro"])?$request->header[0]["nomor_giro"]:NULL;
-            $giroDate = ($request->header[0]["tanggal_giro"])?date('Y-m-d', strtotime($request->header[0]["tanggal_giro"])):NULL;
-            $giroDueDate = ($request->header[0]["tanggal_jt_giro"])?date('Y-m-d', strtotime($request->header[0]["tanggal_jt_giro"])):NULL;
+            $giroNo = ($request->header[0]["nomor_giro"]) ? $request->header[0]["nomor_giro"] : NULL;
+            $giroDate = ($request->header[0]["tanggal_giro"]) ? date('Y-m-d', strtotime($request->header[0]["tanggal_giro"])) : NULL;
+            $giroDueDate = ($request->header[0]["tanggal_jt_giro"]) ? date('Y-m-d', strtotime($request->header[0]["tanggal_jt_giro"])) : NULL;
             $journalID = $request->header[0]["id_jurnal"];
             $slipID = $request->header[0]["slip"];
             $journalType = $request->header[0]["jenis"];
@@ -447,10 +508,10 @@ class GeneralLedgerController extends Controller
                 $check = TrxSaldo::where("id_jurnal", $journalID)->first();
                 $sum = 0;
                 foreach ($detailData as $key => $item) {
-                    $sum += ($journalType == "PG")?$item["debet"]:$item["kredit"];
+                    $sum += ($journalType == "PG") ? $item["debet"] : $item["kredit"];
                 }
-                $trx_saldo = ($check)?TrxSaldo::where("id_jurnal", $journalID)->first():new TrxSaldo;
-                $trx_saldo->tipe_transaksi = ($journalType == "PG")?"Piutang Giro":"Hutang Giro";
+                $trx_saldo = ($check) ? TrxSaldo::where("id_jurnal", $journalID)->first() : new TrxSaldo;
+                $trx_saldo->tipe_transaksi = ($journalType == "PG") ? "Piutang Giro" : "Hutang Giro";
                 $trx_saldo->id_transaksi = $header->kode_jurnal;
                 $trx_saldo->tanggal = $journalDate;
                 $trx_saldo->total = $sum;
@@ -475,7 +536,7 @@ class GeneralLedgerController extends Controller
                 // Store Detail
                 $detail = new JurnalDetail();
                 $detail->id_jurnal = $header->id_jurnal;
-                $detail->index = ($data['guid'] == 'gen') ? count($detailData) + 1 : $key+1;
+                $detail->index = ($data['guid'] == 'gen') ? count($detailData) + 1 : $key + 1;
                 $detail->id_akun = $data['akun'];
                 $detail->keterangan = $data['notes'];
                 $detail->id_transaksi = $data['trx'];
@@ -656,24 +717,32 @@ class GeneralLedgerController extends Controller
 
             // Find Header data
             $header = JurnalHeader::where("id_jurnal", $id)->first();
+            $session = $request->session()->get('access');
 
-            // Update Header Status
-            $header->void = 1;
-            $header->user_void = $userVoid;
-            $header->dt_void = $dateVoid;
-            if (!$header->save()) {
-                DB::rollback();
+            if (($request->session()->has('token') && array_key_exists('Jurnal Umum', $session)) && $session['Jurnal Umum']['delete'] == 1) {
+                // Update Header Status
+                $header->void = 1;
+                $header->user_void = $userVoid;
+                $header->dt_void = $dateVoid;
+                if (!$header->save()) {
+                    DB::rollback();
+                    return response()->json([
+                        "result" => false,
+                        "message" => "Error when void Jurnal data"
+                    ]);
+                }
+
+                DB::commit();
                 return response()->json([
-                    "result" => false,
-                    "message" => "Error when void Jurnal data"
+                    "result" => true,
+                    "message" => "Successfully void Jurnal data",
+                ]);
+            } else {
+                return response()->json([
+                    "result" => FALSE,
+                    "message" => "Maaf, tidak bisa void jurnal dengan id " . $id . ", anda tidak punya akses!"
                 ]);
             }
-
-            DB::commit();
-            return response()->json([
-                "result" => true,
-                "message" => "Successfully void Jurnal data",
-            ]);
         } catch (\Exception $e) {
             DB::rollback();
             Log::info("Error when void Jurnal data");
@@ -747,8 +816,7 @@ class GeneralLedgerController extends Controller
                     $max = (int)substr($check[0]->kode_jurnal, -4);
                     $max += 1;
                     $code = $prefix . "." . sprintf("%04s", $max);
-                }
-                else {
+                } else {
                     $code = $prefix . ".0001";
                 }
                 $ex++;
@@ -758,8 +826,7 @@ class GeneralLedgerController extends Controller
                 }
             } while (JurnalHeader::where("kode_jurnal", $code)->first());
             return $code;
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             Log::error("Error when generate journal code");
         }
     }
@@ -797,8 +864,7 @@ class GeneralLedgerController extends Controller
             }
             if ($type == "piutang giro" || $type == "hutang giro") {
                 $data_saldo = $data_saldo->where("saldo_transaksi.tanggal_giro_jt", "<=", date("Y-m-d"))->join("jurnal_header", "jurnal_header.id_jurnal", "saldo_transaksi.id_jurnal")->join("master_slip", "master_slip.id_slip", "jurnal_header.id_slip")->join("master_akun", "master_akun.id_akun", "master_slip.id_akun")->select("saldo_transaksi.*", "pelanggan.nama_pelanggan as nama_pelanggan", "pemasok.nama_pemasok as nama_pemasok", "master_akun.nama_akun as nama_akun", "master_akun.kode_akun as kode_akun", "master_akun.id_akun as id_akun");
-            }
-            else {
+            } else {
                 $data_saldo = $data_saldo->select("saldo_transaksi.*", "pelanggan.nama_pelanggan as nama_pelanggan", "pemasok.nama_pemasok as nama_pemasok");
             }
             if (isset($keyword)) {
@@ -815,10 +881,10 @@ class GeneralLedgerController extends Controller
                         ->orWhere('total', 'LIKE', "%$keyword%")
                         ->orWhere('bayar', 'LIKE', "%$keyword%")
                         ->orWhere('sisa', 'LIKE', "%$keyword%");
-                        if ($type == "piutang giro" || $type == "hutang giro") {
-                            $query->orWhere('tanggal', 'LIKE', "%$keyword%")
-                                ->orWhere('saldo_transaksi.no_giro', 'LIKE', "%$keyword%");
-                        }
+                    if ($type == "piutang giro" || $type == "hutang giro") {
+                        $query->orWhere('tanggal', 'LIKE', "%$keyword%")
+                            ->orWhere('saldo_transaksi.no_giro', 'LIKE', "%$keyword%");
+                    }
                 });
             }
             $filtered_data = $data_saldo->get();
@@ -841,8 +907,7 @@ class GeneralLedgerController extends Controller
                         $data_saldo->orderBy($column, $directon);
                     }
                 }
-            } 
-            else {
+            } else {
                 $data_saldo->orderBy('tanggal', 'ASC');
             }
 
@@ -868,18 +933,17 @@ class GeneralLedgerController extends Controller
             $table['recordsFiltered'] = $filtered_data->count();
             $table['data'] = $data_saldo->get();
             return json_encode($table);
-            
+
             // Get transaction saldo
             // switch ($type) {
             //     case 'penjualan':
             //         break;
-                
+
             //     default:
             //         $result = NULL;
             //         break;
             // }
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             Log::info("Error when get trx saldo data");
             Log::info($e);
             return response()->json([
@@ -919,24 +983,24 @@ class GeneralLedgerController extends Controller
                 case 'Piutang Giro':
                     $trx_saldo->bayar = $current_bayar + $kredit;
                     $trx_saldo->sisa = $current_sisa - $kredit;
-                    $trx_saldo->status_giro = ($kredit > $debet)?1:2;
+                    $trx_saldo->status_giro = ($kredit > $debet) ? 1 : 2;
                     break;
                 case 'Hutang Giro':
                     $trx_saldo->bayar = $current_bayar + $debet;
                     $trx_saldo->sisa = $current_sisa - $debet;
-                    $trx_saldo->status_giro = ($debet > $kredit)?1:2;
+                    $trx_saldo->status_giro = ($debet > $kredit) ? 1 : 2;
                     break;
                 case 'Piutang Giro Tolak':
                     $trx_saldo->bayar = $current_bayar + $kredit;
                     $trx_saldo->sisa = $current_sisa - $kredit;
-                    $trx_saldo->status_giro = ($debet > $debet)?1:2;
+                    $trx_saldo->status_giro = ($debet > $debet) ? 1 : 2;
                     break;
                 case 'Hutang Giro Tolak':
                     $trx_saldo->bayar = $current_bayar + $debet;
                     $trx_saldo->sisa = $current_sisa - $debet;
-                    $trx_saldo->status_giro = ($debet > $kredit)?1:2;
+                    $trx_saldo->status_giro = ($debet > $kredit) ? 1 : 2;
                     break;
-                
+
                 default:
                     // DB::rollback();
                     return false;
@@ -948,8 +1012,7 @@ class GeneralLedgerController extends Controller
             }
             return true;
             // DB::commit();
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             // DB::rollback();
             Log::error($e);
             return false;
@@ -1002,7 +1065,7 @@ class GeneralLedgerController extends Controller
                     $trx_saldo->sisa = $current_sisa + $debet;
                     $trx_saldo->status_giro = 0;
                     break;
-                
+
                 default:
                     // DB::rollback();
                     return false;
@@ -1014,8 +1077,7 @@ class GeneralLedgerController extends Controller
             }
             return true;
             // DB::commit();
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             // DB::rollback();
             Log::error($e);
             return false;

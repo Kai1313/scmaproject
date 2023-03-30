@@ -49,8 +49,8 @@
                     </span>
                 </a>
                 <ul class="treeview-menu">
-                    <li class="{{ request()->segment(2) == 'general_ledger' ? 'active' : null }}"><a href="{{ route('transaction-general-ledger') }}">Jurnal Umum</a></li>
-                    <li class="{{ request()->segment(2) == 'adjustment_ledger' ? 'active' : null }}"><a href="{{ route('transaction-adjustment-ledger') }}">Jurnal Penyesuaian</a></li>
+                    <li class="{{ request()->segment(2) == 'general_ledger' ? 'active' : null }}"><a href="{{ route('transaction-general-ledger', 1) }}">Jurnal Umum</a></li>
+                    <li class="{{ request()->segment(2) == 'adjustment_ledger' ? 'active' : null }}"><a href="{{ route('transaction-adjustment-ledger', 1) }}">Jurnal Penyesuaian</a></li>
                 </ul>
             </li>
             <li class="treeview ">
