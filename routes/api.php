@@ -28,5 +28,6 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::post('/pembelian', 'ApiController@journalPembelian')->name('jurnal-otomatis-pembelian');
         Route::post('/retur_penjualan', 'ApiController@journalReturPenjualan')->name('jurnal-otomatis-retur-penjualan');
         Route::post('/retur_pembelian', 'ApiController@journalReturPembelian')->name('jurnal-otomatis-retur-pembelian');
+        Route::post('/void_jurnal_otomatis', 'ApiController@voidJournalOtomatis')->name('jurnal-otomatis-void');
     });
 });

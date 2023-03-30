@@ -117,9 +117,11 @@ Route::post('/master/coa/copy/data', 'MasterCoaController@copy_data')->name('mas
 Route::get('/master/coa/get_by_cabang/{id_cabang?}', 'MasterCoaController@getCoaByCabang')->name('master-coa-get-by-cabang');
 Route::get('/master/coa/get_data/{id?}', 'MasterCoaController@getCoa')->name('master-coa-get-data');
 
+Route::get('/master/setting/get_pelunasan/{id?}', 'MasterSettingController@getSettingPelunasan')->name('master-setting-get-pelunasan');
+
 // Transaction
 // Jurnal Umum
-Route::get('/transaction/general_ledger', 'GeneralLedgerController@index')->name('transaction-general-ledger');
+Route::get('/transaction/general_ledger/index/{user_id?}', 'GeneralLedgerController@index')->name('transaction-general-ledger');
 Route::get('/transaction/general_ledger/form/create', 'GeneralLedgerController@create')->name('transaction-general-ledger-create');
 Route::get('/transaction/general_ledger/form/edit/{id?}', 'GeneralLedgerController@edit')->name('transaction-general-ledger-edit');
 Route::get('/transaction/general_ledger/show/{id?}', 'GeneralLedgerController@show')->name('transaction-general-ledger-show');
@@ -132,7 +134,7 @@ Route::get('/transaction/general_ledger/void/{id?}', 'GeneralLedgerController@vo
 Route::get('/transaction/general_ledger/active/{id?}', 'GeneralLedgerController@active')->name('transaction-general-ledger-active');
 
 // Jurnal Penyesuaian
-Route::get('/transaction/adjustment_ledger', 'AdjustmentLedgerController@index')->name('transaction-adjustment-ledger');
+Route::get('/transaction/adjustment_ledger/index/{user_id?}', 'AdjustmentLedgerController@index')->name('transaction-adjustment-ledger');
 Route::get('/transaction/adjustment_ledger/form/create', 'AdjustmentLedgerController@create')->name('transaction-adjustment-ledger-create');
 Route::get('/transaction/adjustment_ledger/form/edit/{id?}', 'AdjustmentLedgerController@edit')->name('transaction-adjustment-ledger-edit');
 Route::get('/transaction/adjustment_ledger/show/{id?}', 'AdjustmentLedgerController@show')->name('transaction-adjustment-ledger-show');
