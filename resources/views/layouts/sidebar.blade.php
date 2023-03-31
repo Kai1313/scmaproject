@@ -1058,10 +1058,10 @@
                 </a>
                 <ul class="treeview-menu">
                     <li class="{{ request()->segment(2) == 'coa' ? 'active' : null }}">
-                        <a href="{{ route('master-coa', 1) }}">Master CoA</a>
+                        <a href="{{ route('master-coa') }}">Master CoA</a>
                     </li>
                     <li class="{{ request()->segment(2) == 'slip' ? 'active' : null }}">
-                        <a href="{{ route('master-slip', 1) }}">Master Slip</a>
+                        <a href="{{ route('master-slip') }}">Master Slip</a>
                     </li>
                 </ul>
             </li>

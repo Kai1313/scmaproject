@@ -57,12 +57,12 @@
 @section('header')
     <section class="content-header">
         <h1>
-            Kirim ke Gudang
+            Kirim ke Cabang
             <small>| {{ $data ? 'Edit' : 'Tambah' }}</small>
         </h1>
         <ol class="breadcrumb">
             <li><a href="#"><i class="fa fa-dashboard"></i> Dashboard</a></li>
-            <li><a href="{{ route('purchase-request') }}">Kirim ke Gudang</a></li>
+            <li><a href="{{ route('purchase-request') }}">Kirim ke Cabang</a></li>
             <li class="active">Form</li>
         </ol>
     </section>
@@ -74,7 +74,7 @@
             class="post-action">
             <div class="box">
                 <div class="box-header">
-                    <h3 class="box-title">{{ $data ? 'Ubah' : 'Tambah' }} Kirim Ke Gudang</h3>
+                    <h3 class="box-title">{{ $data ? 'Ubah' : 'Tambah' }} Kirim Ke Cabang</h3>
                     <a href="{{ route('send_to_branch') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right">
                         <span class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali
                     </a>
@@ -115,7 +115,7 @@
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <label>Kode Permintaan</label>
+                            <label>Kode Pindah Gudang</label>
                             <div class="form-group">
                                 <input type="text" name="kode_pindah_gudang"
                                     value="{{ old('kode_pindah_gudang', $data ? $data->kode_pindah_gudang : '') }}"

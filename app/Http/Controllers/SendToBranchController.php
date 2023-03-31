@@ -16,15 +16,16 @@ class SendToBranchController extends Controller
     public function index(Request $request)
     {
         $checkAuth = $this->checkUser($request);
-        if ($checkAuth['status'] == false) {
-            return view('exceptions.forbidden');
-        }
+        // if ($checkAuth['status'] == false) {
+        return view('exceptions.forbidden');
+        // }
 
         if ($request->ajax()) {
             $data = DB::table('pindah_gudang')
                 ->select('id_pindah_gudang', 'type', 'nama_gudang', 'tanggal_pindah_gudang', 'kode_pindah_gudang', 'nama_cabang', 'status_pindah_gudang', 'keterangan_pindah_gudang', 'transporter')
                 ->leftJoin('gudang', 'pindah_gudang.id_gudang', '=', 'gudang.id_gudang')
-                ->leftJoin('cabang', 'pindah_gudang.id_cabang_tujuan', '=', 'cabang.id_cabang');
+                ->leftJoin('cabang', 'pindah_gudang.id_cabang_tujuan', '=', 'cabang.id_cabang')
+                ->where('type', 0);
             if (isset($request->c)) {
                 $data = $data->where('pindah_gudang.id_cabang', $request->c);
             }
@@ -173,10 +174,12 @@ class SendToBranchController extends Controller
                 'warna_master_qr_code as warna_pindah_gudang_detail',
                 'keterangan_master_qr_code as keterangan_pindah_gudang_detail',
                 'id_rak',
+                'sisa_master_qr_code'
             )
             ->leftJoin('barang', 'mqc.id_barang', '=', 'barang.id_barang')
             ->leftJoin('satuan_barang', 'mqc.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
-            ->where('id_cabang', $idCabang)->where('mqc.id_gudang', $idGudang)->where('mqc.kode_batang_master_qr_code', $qrcode)
+            ->where('id_cabang', $idCabang)->where('mqc.id_gudang', $idGudang)
+            ->where('mqc.kode_batang_master_qr_code', $qrcode)
             ->first();
 
         if (!$data) {
@@ -185,6 +188,9 @@ class SendToBranchController extends Controller
         } else if ($data && $data->id_rak != null) {
             $status = 500;
             $message = "Barang masih berada di rak";
+        } else if ($data && $data->sisa_master_qr_code <= 0) {
+            $status = 500;
+            $message = "Barang sudah habis";
         } else {
             $message = '';
             $status = 200;
@@ -235,6 +241,8 @@ class SendToBranchController extends Controller
             foreach ($access as $value) {
                 $user_access[$value->nama_menu] = ['show' => $value->lihat_akses_menu, 'create' => $value->tambah_akses_menu, 'edit' => $value->ubah_akses_menu, 'delete' => $value->hapus_akses_menu, 'print' => $value->cetak_akses_menu];
             }
+
+            return $user_access;
 
             $idGroup = $user->id_grup_pengguna;
             $menu_access = DB::table('menu')->select('menu.id_menu', 'kepala_menu', 'alias_menu', 'lihat_akses_menu', 'tingkatan_menu', 'nama_menu')

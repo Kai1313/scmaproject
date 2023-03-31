@@ -14,7 +14,7 @@ class MoveWarehouse extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'id_pindah_gudang', 'id_pindah_gudang2', 'type', 'id_cabang', 'id_gudang', 'tanggal_pindah_gudang', 'nama_pindah_gudang', 'kode_pindah_gudang', 'id_cabang_tujuan', 'tujuan_pindah_gudang', 'nomot_polisi', 'transporter', 'dokumen_pindah_gudang', 'keterangan_pindah_gudang', 'status_pindah_gudang', 'user_pindah_gudang', 'date_pindah_gudang',
+        'id_pindah_gudang', 'id_pindah_gudang2', 'type', 'id_cabang', 'id_gudang', 'tanggal_pindah_gudang', 'nama_pindah_gudang', 'kode_pindah_gudang', 'id_cabang_tujuan', 'tujuan_pindah_gudang', 'nomor_polisi', 'transporter', 'dokumen_pindah_gudang', 'keterangan_pindah_gudang', 'status_pindah_gudang', 'user_pindah_gudang', 'date_pindah_gudang',
     ];
 
     public function cabang()
@@ -60,6 +60,30 @@ class MoveWarehouse extends Model
             ->leftJoin('satuan_barang', 'pindah_gudang_detail.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang');
     }
 
+    public function formatReceivedDetail()
+    {
+        return $this->hasMany(MoveWarehouseDetail::class, 'id_pindah_gudang')
+            ->select(
+                'be_pindah_gudang_detail',
+                'bentuk_pindah_gudang_detail',
+                'pindah_gudang_detail.id_barang',
+                'id_pindah_gudang_detail',
+                'pindah_gudang_detail.id_satuan_barang',
+                'jumlah_pindah_gudang_detail',
+                'keterangan_pindah_gudang_detail',
+                'kode_batang_lama_pindah_gudang_detail',
+                'kode_batang_pindah_gudang_detail',
+                'nama_barang',
+                'nama_satuan_barang',
+                'ph_pindah_gudang_detail',
+                'sg_pindah_gudang_detail',
+                'warna_pindah_gudang_detail',
+                DB::raw('0 as status_received')
+            )
+            ->leftJoin('barang', 'pindah_gudang_detail.id_barang', '=', 'barang.id_barang')
+            ->leftJoin('satuan_barang', 'pindah_gudang_detail.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang');
+    }
+
     public static function createcode($id_cabang)
     {
         $branchCode = DB::table('cabang')->where('id_cabang', $id_cabang)->first();
@@ -78,16 +102,13 @@ class MoveWarehouse extends Model
     {
         $detail = json_decode($details);
         $ids = array_column($detail, 'id_pindah_gudang_detail');
-        dd($ids);
-        foreach ($ids as $detailId) {
-            $trash = MoveWarehouseDetail::find($detailId);
-            // if ($trash) {
-            $trashQrCode = MasterQrCode::where('kode_batang_master_qr_code', $trash->kode_batang_pindah_gudang_detail)->first();
+        $selectTrash = MoveWarehouseDetail::whereNotIn('id_pindah_gudang_detail', $ids)->get();
+        foreach ($selectTrash as $trash) {
+            $trashQrCode = MasterQrCode::where('kode_batang_master_qr_code', $trash->kode_batang_lama_pindah_gudang_detail)->first();
             $trashQrCode->sisa_master_qr_code = $trashQrCode->jumlah_master_qr_code;
             $trashQrCode->save();
 
             $trash->delete();
-            // }
         }
 
         foreach ($detail as $data) {

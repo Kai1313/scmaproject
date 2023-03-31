@@ -86,6 +86,8 @@ Route::prefix('received_from_branch')->group(function () {
     Route::post('/save_entry/{id}', 'ReceivedFromBranchController@saveEntry')->name('received_from_branch-save-entry');
     Route::get('/view/{id}', 'ReceivedFromBranchController@view')->name('received_from_branch-view');
     Route::get('/delete/{id}', 'ReceivedFromBranchController@destroy')->name('received_from_branch-delete');
+    Route::get('/auto-code', 'ReceivedFromBranchController@autoCode')->name('received_from_branch-code');
+    Route::get('/auto-detail-item', 'ReceivedFromBranchController@getDetailItem')->name('received_from_branch-detail-item');
 });
 
 // Master
