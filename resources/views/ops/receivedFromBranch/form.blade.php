@@ -120,9 +120,13 @@
                             <div class="form-group">
                                 <select name="kode_pindah_gudang" class="form-control select2" data-validation="[NOTEMPTY]"
                                     data-validation-message="Kode pindah gudang tidak boleh kosong">
-                                    <option value="">Pilih Kode Pindah Gudang</option>
+                                    @if ($data && $data->parent)
+                                        <option value="{{ $data->parent->kode_pindah_gudang }}">
+                                            {{ $data->parent->kode_pindah_gudang }}</option>
+                                    @endif
                                 </select>
-                                <input type="hidden" name="id_pindah_gudang2">
+                                <input type="hidden" name="id_pindah_gudang2"
+                                    {{ old('id_pindah_gudang2', $data ? $data->id_pindah_gudang2 : '') }}>
                             </div>
                             <label>Nama Jasa Pengiriman</label>
                             <div class="form-group">
@@ -203,7 +207,22 @@
 @section('externalScripts')
     <script>
         let branches = {!! $cabang !!};
-        let details = [];
+        let oldDetails = {!! $data && $data->parent ? $data->parent->formatdetail : '[]' !!};
+        let newDetails = {!! $data ? $data->formatdetail : '[]' !!};
+        let details = []
+
+        for (let i = 0; i < oldDetails.length; i++) {
+            details.push(oldDetails[i])
+            if (oldDetails[i] == newDetails[i]) {
+                details[i]['received_status'] = 1
+            } else {
+                details[i]['id_pindah_gudang_detail'] = 0
+                details[i]['received_status'] = 0
+            }
+        }
+
+        $('[name="details"]').val(JSON.stringify(details))
+
         var resDataTable = $('#table-detail').DataTable({
             data: details,
             ordering: false,
@@ -248,13 +267,13 @@
                     name: 'keterangan_pindah_gudang_detail',
                 },
                 {
-                    data: 'status_received',
+                    data: 'id_pindah_gudang_detail',
                     className: 'text-center',
-                    name: 'status_received',
+                    name: 'id_pindah_gudang_detail',
                     searchable: false,
                     render: function(data, type, row, meta) {
                         let btn = '';
-                        if (data == 1) {
+                        if (row.received_status == 1) {
                             btn = '<input name="checked_data" type="checkbox" checked>';
                         } else {
                             btn = '<input name="checked_data" type="checkbox">';

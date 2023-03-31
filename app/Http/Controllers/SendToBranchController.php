@@ -16,9 +16,9 @@ class SendToBranchController extends Controller
     public function index(Request $request)
     {
         $checkAuth = $this->checkUser($request);
-        // if ($checkAuth['status'] == false) {
-        return view('exceptions.forbidden');
-        // }
+        if ($checkAuth['status'] == false) {
+            return view('exceptions.forbidden');
+        }
 
         if ($request->ajax()) {
             $data = DB::table('pindah_gudang')
@@ -93,7 +93,7 @@ class SendToBranchController extends Controller
             $data->user_pindah_gudang = session()->get('user')['id_pengguna'];
             $data->date_pindah_gudang = date('Y-m-d H:i:s');
             $data->save();
-            $data->saveDetails($request->details);
+            $data->saveDetails($request->details, 'out');
             DB::commit();
             return response()->json([
                 "result" => true,

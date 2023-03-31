@@ -35,9 +35,9 @@ class ReceivedFromBranchController extends Controller
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
                     $btn = '<ul class="horizontal-list">';
-                    $btn .= '<li><a href="' . route('send_to_branch-view', $row->id_pindah_gudang) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
-                    $btn .= '<li><a href="' . route('send_to_branch-entry', $row->id_pindah_gudang) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
-                    $btn .= '<li><a href="' . route('send_to_branch-delete', $row->id_pindah_gudang) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Void</a></li>';
+                    $btn .= '<li><a href="' . route('received_from_branch-view', $row->id_pindah_gudang) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
+                    $btn .= '<li><a href="' . route('received_from_branch-entry', $row->id_pindah_gudang) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
+                    $btn .= '<li><a href="' . route('received_from_branch-delete', $row->id_pindah_gudang) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Void</a></li>';
                     $btn .= '</ul>';
                     return $btn;
                 })
@@ -64,7 +64,7 @@ class ReceivedFromBranchController extends Controller
 
     public function entry($id = 0)
     {
-        $data = [];
+        $data = MoveWarehouse::find($id);
         $cabang = DB::table('cabang')->select('nama_cabang as text', 'id_cabang as id')->where('status_cabang', 1)->get();
 
         return view('ops.receivedFromBranch.form', [
@@ -93,7 +93,7 @@ class ReceivedFromBranchController extends Controller
             $data->user_pindah_gudang = session()->get('user')['id_pengguna'];
             $data->date_pindah_gudang = date('Y-m-d H:i:s');
             $data->save();
-            // $data->saveDetails($request->details);
+            $data->saveDetails($request->details, 'in');
 
             DB::commit();
             return response()->json([
