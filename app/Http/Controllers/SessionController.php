@@ -3,11 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\UserToken;
-use App\Models\User;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class SessionController extends Controller
 {
@@ -32,18 +27,18 @@ class SessionController extends Controller
         //         c.tambah_akses_menu,
         //         c.ubah_akses_menu,
         //         c.hapus_akses_menu,
-        //         c.cetak_akses_menu 
+        //         c.cetak_akses_menu
         //     FROM
         //         pengguna a,
         //         grup_pengguna b,
         //         akses_menu c,
-        //         menu d 
+        //         menu d
         //     WHERE
-        //         a.id_grup_pengguna = b.id_grup_pengguna 
-        //         AND b.id_grup_pengguna = c.id_grup_pengguna 
-        //         AND c.id_menu = d.id_menu 
-        //         AND a.id_pengguna = $user_id 
-        //         AND d.keterangan_menu = 'Accounting' 
+        //         a.id_grup_pengguna = b.id_grup_pengguna
+        //         AND b.id_grup_pengguna = c.id_grup_pengguna
+        //         AND c.id_menu = d.id_menu
+        //         AND a.id_pengguna = $user_id
+        //         AND d.keterangan_menu = 'Accounting'
         //         AND d.status_menu = 1";
         //     $access = DB::connection('mysql')->select($sql);
 
@@ -51,7 +46,6 @@ class SessionController extends Controller
         //     foreach ($access as $value) {
         //         $user_access[$value->nama_menu] = ['show' => $value->lihat_akses_menu, 'create' => $value->tambah_akses_menu, 'edit' => $value->ubah_akses_menu, 'delete' => $value->hapus_akses_menu, 'print' => $value->cetak_akses_menu];
         //     }
-
 
         //     if ($token && $request->session()->has('token') == false) {
         //         $request->session()->put('token', $token->nama_token_pengguna);
@@ -72,7 +66,7 @@ class SessionController extends Controller
         //     return view('exceptions.forbidden');
         // }
         $data = [
-            "pageTitle" => "SCA Accounting | Dashboard"
+            "pageTitle" => "SCA Accounting | Dashboard",
         ];
         return view('master', $data);
     }
@@ -80,6 +74,6 @@ class SessionController extends Controller
     public function logout(Request $request)
     {
         $request->session()->flush();
-        return view('goodbye');
+        return redirect()->to(env('OLD_URL_ROOT') . '#keluar');
     }
 }

@@ -115,11 +115,11 @@
             serverSide: true,
             ajax: "{{ route('send_to_branch') }}?c=" + $('[name="id_cabang"]').val(),
             columns: [{
-                data: 'tanggal_pindah_gudang',
-                name: 'tanggal_pindah_gudang'
+                data: 'tanggal_pindah_barang',
+                name: 'tanggal_pindah_barang'
             }, {
-                data: 'kode_pindah_gudang',
-                name: 'kode_pindah_gudang'
+                data: 'kode_pindah_barang',
+                name: 'kode_pindah_barang'
             }, {
                 data: 'nama_gudang',
                 name: 'nama_gudang'
@@ -127,14 +127,14 @@
                 data: 'nama_cabang',
                 name: 'nama_cabang',
             }, {
-                data: 'keterangan_pindah_gudang',
-                name: 'keterangan_pindah_gudang',
+                data: 'keterangan_pindah_barang',
+                name: 'keterangan_pindah_barang',
             }, {
                 data: 'transporter',
                 name: 'transporter',
             }, {
-                data: 'status_pindah_gudang',
-                name: 'status_pindah_gudang',
+                data: 'status_pindah_barang',
+                name: 'status_pindah_barang',
             }, {
                 data: 'action',
                 name: 'action',

@@ -2,11 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Models\UserToken;
 use App\Purchase;
 use App\QualityControl;
-use Carbon\Carbon;
 use DB;
 use Illuminate\Http\Request;
 use Log;
@@ -23,9 +20,8 @@ class QcReceiptController extends Controller
 
     public function index(Request $request)
     {
-        $checkAuth = $this->checkUser($request);
-        if ($checkAuth['status'] == false) {
-            return view('exceptions.forbidden');
+        if (checkUserSession($request, 'qc_penerimaan_barang', 'show') == false) {
+            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
         if ($request->ajax()) {
@@ -52,8 +48,7 @@ class QcReceiptController extends Controller
                 ->leftJoin('pembelian', 'pembelian_detail.id_pembelian', '=', 'pembelian.id_pembelian')
                 ->leftJoin('barang', 'pembelian_detail.id_barang', '=', 'barang.id_barang')
                 ->leftJoin('satuan_barang', 'pembelian_detail.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
-                ->whereBetween('pembelian.tanggal_pembelian', [$request->start_date, $request->end_date])
-                ->whereIn('id_kategori_barang', [2, 3, 9]);
+                ->whereBetween('pembelian.tanggal_pembelian', [$request->start_date, $request->end_date]);
             if (isset($request->c)) {
                 $data = $data->where('pembelian.id_cabang', $request->c);
             }
@@ -88,6 +83,10 @@ class QcReceiptController extends Controller
 
     public function entry($id = 0)
     {
+        if (checkAccessMenu('qc_penerimaan_barang', $id == 0 ? 'create' : 'edit') == false) {
+            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+        }
+
         $data = QualityControl::find($id);
         $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
 
@@ -136,7 +135,7 @@ class QcReceiptController extends Controller
                 "result" => true,
                 "message" => "Data berhasil disimpan",
                 "redirect" => route('qc_receipt'),
-            ]);
+            ], 200);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error("Error when save qc receipt");
@@ -144,7 +143,7 @@ class QcReceiptController extends Controller
             return response()->json([
                 "result" => false,
                 "message" => "Data gagal tersimpan",
-            ]);
+            ], 500);
         }
     }
 
@@ -163,7 +162,7 @@ class QcReceiptController extends Controller
         return response()->json([
             'result' => true,
             'data' => $datas,
-        ]);
+        ], 200);
     }
 
     public function autoItem(Request $request)
@@ -174,73 +173,7 @@ class QcReceiptController extends Controller
             'result' => true,
             'list_item' => $parent->detailgroup,
             'qc' => $parent->qc,
-        ]);
-    }
-
-    public function checkUser($request)
-    {
-        $user_id = $request->user_id;
-        if ($user_id != '' && $request->session()->has('token') == false || $request->session()->has('token') == true) {
-            if ($request->session()->has('token') == true) {
-                $user_id = $request->session()->get('user')->id_pengguna;
-            }
-            $user = User::where('id_pengguna', $user_id)->first();
-            $token = UserToken::where('id_pengguna', $user_id)->where('status_token_pengguna', 1)->whereRaw("waktu_habis_token_pengguna > STR_TO_DATE(?, '%Y-%m-%d %H:%i:%s')", Carbon::now()->format('Y-m-d H:i:s'))->first();
-
-            $sql = "SELECT
-                a.id_pengguna,
-                a.id_grup_pengguna,
-                d.id_menu,
-                d.nama_menu,
-                c.lihat_akses_menu,
-                c.tambah_akses_menu,
-                c.ubah_akses_menu,
-                c.hapus_akses_menu,
-                c.cetak_akses_menu
-            FROM
-                pengguna a,
-                grup_pengguna b,
-                akses_menu c,
-                menu d
-            WHERE
-                a.id_grup_pengguna = b.id_grup_pengguna
-                AND b.id_grup_pengguna = c.id_grup_pengguna
-                AND c.id_menu = d.id_menu
-                AND a.id_pengguna = $user_id
-                AND d.keterangan_menu = 'Accounting'
-                AND d.status_menu = 1";
-            $access = DB::connection('mysql')->select($sql);
-
-            $user_access = array();
-            foreach ($access as $value) {
-                $user_access[$value->nama_menu] = ['show' => $value->lihat_akses_menu, 'create' => $value->tambah_akses_menu, 'edit' => $value->ubah_akses_menu, 'delete' => $value->hapus_akses_menu, 'print' => $value->cetak_akses_menu];
-            }
-
-            $idGroup = $user->id_grup_pengguna;
-            $menu_access = DB::table('menu')->select('menu.id_menu', 'kepala_menu', 'alias_menu', 'lihat_akses_menu', 'tingkatan_menu', 'nama_menu')
-                ->leftJoin('akses_menu', 'menu.id_menu', '=', 'akses_menu.id_menu')
-                ->where('akses_menu.id_grup_pengguna', $idGroup)
-                ->where('lihat_akses_menu', '1')
-                ->where('alias_menu', 'not like', '%detail')
-                ->get();
-            $request->session()->put('menu_access', $menu_access);
-
-            if ($token && $request->session()->has('token') == false) {
-                $request->session()->put('token', $token->nama_token_pengguna);
-                $request->session()->put('user', $user);
-                $request->session()->put('access', $user_access);
-            } else if ($request->session()->has('token')) {
-            } else {
-                $request->session()->flush();
-            }
-
-            $session = $request->session()->get('access');
-
-            return ['status' => true];
-        } else {
-            $request->session()->flush();
-            return ['status' => false];
-        }
+        ], 200);
     }
 
     public function callApiPembelian($data)

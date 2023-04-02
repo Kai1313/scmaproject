@@ -70,7 +70,7 @@
 
 @section('main-section')
     <div class="content container-fluid">
-        <form action="{{ route('received_from_branch-save-entry', $data ? $data->id_pindah_gudang : 0) }}" method="post"
+        <form action="{{ route('received_from_branch-save-entry', $data ? $data->id_pindah_barang : 0) }}" method="post"
             class="post-action">
             <div class="box">
                 <div class="box-header">
@@ -109,8 +109,8 @@
                             </div>
                             <label>Tanggal Penerimaan <span>*</span></label>
                             <div class="form-group">
-                                <input type="text" name="tanggal_pindah_gudang"
-                                    value="{{ old('tanggal_pindah_gudang', $data ? $data->tanggal_pindah_gudang : date('Y-m-d')) }}"
+                                <input type="text" name="tanggal_pindah_barang"
+                                    value="{{ old('tanggal_pindah_barang', $data ? $data->tanggal_pindah_barang : date('Y-m-d')) }}"
                                     class="form-control datepicker" data-validation="[NOTEMPTY]"
                                     data-validation-message="Tanggal penerimaan tidak boleh kosong">
                             </div>
@@ -118,15 +118,15 @@
                         <div class="col-md-4">
                             <label>Kode Pindah Gudang</label>
                             <div class="form-group">
-                                <select name="kode_pindah_gudang" class="form-control select2" data-validation="[NOTEMPTY]"
+                                <select name="kode_pindah_barang" class="form-control select2" data-validation="[NOTEMPTY]"
                                     data-validation-message="Kode pindah gudang tidak boleh kosong">
                                     @if ($data && $data->parent)
-                                        <option value="{{ $data->parent->kode_pindah_gudang }}">
-                                            {{ $data->parent->kode_pindah_gudang }}</option>
+                                        <option value="{{ $data->parent->kode_pindah_barang }}">
+                                            {{ $data->parent->kode_pindah_barang }}</option>
                                     @endif
                                 </select>
-                                <input type="hidden" name="id_pindah_gudang2"
-                                    {{ old('id_pindah_gudang2', $data ? $data->id_pindah_gudang2 : '') }}>
+                                <input type="hidden" name="id_pindah_barang2"
+                                    value="{{ old('id_pindah_barang2', $data ? $data->id_pindah_barang2 : '') }}">
                             </div>
                             <label>Nama Jasa Pengiriman</label>
                             <div class="form-group">
@@ -148,7 +148,7 @@
                             </div>
                             <label>Keterangan</label>
                             <div class="form-group">
-                                <textarea name="keterangan_pindah_gudang" class="form-control" rows="3" readonly>{{ old('keterangan_pindah_gudang', $data ? $data->keterangan_pindah_gudang : '') }}</textarea>
+                                <textarea name="keterangan_pindah_barang" class="form-control" rows="3" readonly>{{ old('keterangan_pindah_barang', $data ? $data->keterangan_pindah_barang : '') }}</textarea>
                             </div>
                         </div>
                     </div>
@@ -214,10 +214,10 @@
         for (let i = 0; i < oldDetails.length; i++) {
             details.push(oldDetails[i])
             if (oldDetails[i] == newDetails[i]) {
-                details[i]['received_status'] = 1
+                details[i]['status_diterima'] = 1
             } else {
-                details[i]['id_pindah_gudang_detail'] = 0
-                details[i]['received_status'] = 0
+                details[i]['id_pindah_barang_detail'] = 0
+                details[i]['status_diterima'] = 0
             }
         }
 
@@ -227,8 +227,8 @@
             data: details,
             ordering: false,
             columns: [{
-                    data: 'kode_batang_lama_pindah_gudang_detail',
-                    name: 'kode_batang_lama_pindah_gudang_detail'
+                    data: 'qr_code',
+                    name: 'qr_code'
                 }, {
                     data: 'nama_barang',
                     name: 'nama_barang'
@@ -236,44 +236,44 @@
                     data: 'nama_satuan_barang',
                     name: 'nama_satuan_barang'
                 }, {
-                    data: 'jumlah_pindah_gudang_detail',
-                    name: 'jumlah_pindah_gudang_detail',
+                    data: 'qty',
+                    name: 'qty',
                     render: $.fn.dataTable.render.number('.', ',', 4),
                     className: 'text-right'
                 }, {
-                    data: 'sg_pindah_gudang_detail',
-                    name: 'sg_pindah_gudang_detail',
+                    data: 'sg',
+                    name: 'sg',
                     render: $.fn.dataTable.render.number('.', ',', 4),
                     className: 'text-right'
                 }, {
-                    data: 'be_pindah_gudang_detail',
-                    name: 'be_pindah_gudang_detail',
+                    data: 'be',
+                    name: 'be',
                     render: $.fn.dataTable.render.number('.', ',', 4),
                     className: 'text-right'
                 }, {
-                    data: 'ph_pindah_gudang_detail',
-                    name: 'ph_pindah_gudang_detail',
+                    data: 'ph',
+                    name: 'ph',
                     render: $.fn.dataTable.render.number('.', ',', 4),
                     className: 'text-right'
                 }, {
-                    data: 'bentuk_pindah_gudang_detail',
-                    name: 'bentuk_pindah_gudang_detail',
+                    data: 'bentuk',
+                    name: 'bentuk',
                 },
                 {
-                    data: 'warna_pindah_gudang_detail',
-                    name: 'warna_pindah_gudang_detail',
+                    data: 'warna',
+                    name: 'warna',
                 }, {
-                    data: 'keterangan_pindah_gudang_detail',
-                    name: 'keterangan_pindah_gudang_detail',
+                    data: 'keterangan',
+                    name: 'keterangan',
                 },
                 {
-                    data: 'id_pindah_gudang_detail',
+                    data: 'id_pindah_barang_detail',
                     className: 'text-center',
-                    name: 'id_pindah_gudang_detail',
+                    name: 'id_pindah_barang_detail',
                     searchable: false,
                     render: function(data, type, row, meta) {
                         let btn = '';
-                        if (row.received_status == 1) {
+                        if (row.status_terima == 1) {
                             btn = '<input name="checked_data" type="checkbox" checked>';
                         } else {
                             btn = '<input name="checked_data" type="checkbox">';
@@ -334,21 +334,21 @@
                     cabang: idCabang
                 },
                 success: function(res) {
-                    $('[name="kode_pindah_gudang"]').empty()
-                    $('[name="kode_pindah_gudang"]').select2({
+                    $('[name="kode_pindah_barang"]').empty()
+                    $('[name="kode_pindah_barang"]').select2({
                         data: [{
                             'id': "",
                             'text': 'Pilih Kode Pindah Gudang'
                         }, ...res.data]
                     }).on('select2:select', function(e) {
                         let dataselect = e.params.data
-                        $('[name="id_pindah_gudang2"]').val(dataselect.id_pindah_gudang)
+                        $('[name="id_pindah_barang2"]').val(dataselect.id_pindah_barang)
                         $('[name="transporter"]').val(dataselect.transporter)
                         $('[name="nomor_polisi"]').val(dataselect.nomor_polisi)
-                        $('[name="keterangan_pindah_gudang"]').val(dataselect.keterangan_pindah_gudang)
+                        $('[name="keterangan_pindah_barang"]').val(dataselect.keterangan_pindah_barang)
                         $('[name="nama_gudang"]').val(dataselect.nama_gudang)
 
-                        getDetailItem(dataselect.id_pindah_gudang)
+                        getDetailItem(dataselect.id_pindah_barang)
                     });
 
                     $('#cover-spin').hide()
@@ -360,12 +360,12 @@
             })
         }
 
-        function getDetailItem(id_pindah_gudang) {
+        function getDetailItem(id_pindah_barang) {
             $('#cover-spin').show()
             $.ajax({
                 url: '{{ route('received_from_branch-detail-item') }}',
                 data: {
-                    id: id_pindah_gudang
+                    id: id_pindah_barang
                 },
                 success: function(res) {
                     details = res.data

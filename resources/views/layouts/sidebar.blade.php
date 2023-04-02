@@ -494,20 +494,22 @@
                                             </a>
                                         </li>
                                     @endif
-                                    {{-- @if (checkAccessMenu('kategori_konigurasi')) --}}
-                                    <li
-                                        class="nav-item {{ request()->segment(1) == 'send_to_branch' ? 'active' : null }}">
-                                        <a href="{{ route('send_to_branch') }}">
-                                            <i class="glyphicon glyphicon-option-vertical"></i>Kirim Ke Cabang
-                                        </a>
-                                    </li>
-                                    {{-- @if (checkAccessMenu('kategori_konigurasi')) --}}
-                                    <li
-                                        class="nav-item {{ request()->segment(1) == 'received_from_branch' ? 'active' : null }}">
-                                        <a href="{{ route('received_from_branch') }}">
-                                            <i class="glyphicon glyphicon-option-vertical"></i>Terima Dari Cabang
-                                        </a>
-                                    </li>
+                                    @if (checkAccessMenu('kirim_ke_cabang'))
+                                        <li
+                                            class="nav-item {{ request()->segment(1) == 'send_to_branch' ? 'active' : null }}">
+                                            <a href="{{ route('send_to_branch') }}">
+                                                <i class="glyphicon glyphicon-option-vertical"></i>Kirim Ke Cabang
+                                            </a>
+                                        </li>
+                                    @endif
+                                    @if (checkAccessMenu('terima_dari_cabang'))
+                                        <li
+                                            class="nav-item {{ request()->segment(1) == 'received_from_branch' ? 'active' : null }}">
+                                            <a href="{{ route('received_from_branch') }}">
+                                                <i class="glyphicon glyphicon-option-vertical"></i>Terima Dari Cabang
+                                            </a>
+                                        </li>
+                                    @endif
                                     @if (checkAccessMenu('pindah_gudang2'))
                                         <li data-alias="pindah_gudang2">
                                             <a href="{{ env('OLD_URL_ROOT') }}#pindah_gudang2">
