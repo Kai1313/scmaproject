@@ -30,27 +30,27 @@ class ReceivedFromBranchController extends Controller
                     'transporter'
                 )
                 ->leftJoin('gudang', 'pindah_barang.id_gudang', '=', 'gudang.id_gudang')
-                ->leftJoin('cabang', 'pindah_barang.id_cabang_tujuan', '=', 'cabang.id_cabang')
+                ->leftJoin('cabang', 'pindah_barang.id_cabang_asal', '=', 'cabang.id_cabang')
                 ->where('type', 1);
             if (isset($request->c)) {
                 $data = $data->where('pindah_barang.id_cabang', $request->c);
             }
 
-            $data = $data->orderBy('pindah_barang.tanggal_pindah_barang', 'desc');
+            $data = $data->orderBy('pindah_barang.kode_pindah_barang', 'desc');
             return Datatables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
                     $btn = '<ul class="horizontal-list">';
                     $btn .= '<li><a href="' . route('received_from_branch-view', $row->id_pindah_barang) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
                     $btn .= '<li><a href="' . route('received_from_branch-entry', $row->id_pindah_barang) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
-                    $btn .= '<li><a href="' . route('received_from_branch-delete', $row->id_pindah_barang) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Void</a></li>';
+                    // $btn .= '<li><a href="' . route('received_from_branch-delete', $row->id_pindah_barang) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Void</a></li>';
                     $btn .= '</ul>';
                     return $btn;
                 })
                 ->editColumn('status_pindah_barang', function ($row) {
                     if ($row->status_pindah_barang == '0') {
                         return '<label class="label label-warning">Dalam Perjalanan</label>';
-                    } else if ($row->status_pindah_gudang == '1') {
+                    } else if ($row->status_pindah_barang == '1') {
                         return '<label class="label label-success">Diterima</label>';
                     } else {
                         return '';
@@ -79,7 +79,7 @@ class ReceivedFromBranchController extends Controller
         return view('ops.receivedFromBranch.form', [
             'data' => $data,
             'cabang' => $cabang,
-            "pageTitle" => "SCA OPS | Terima Dari Cabang | " . ($id == 0 ? 'Create' : 'Edit'),
+            "pageTitle" => "SCA OPS | Terima Dari Cabang | Lihat",
         ]);
     }
 
@@ -131,8 +131,8 @@ class ReceivedFromBranchController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        $data = [];
-        return view('ops.purchaseRequest.detail', [
+        $data = MoveWarehouse::where('type', 1)->where('id_pindah_barang', $id)->first();
+        return view('ops.receivedFromBranch.detail', [
             'data' => $data,
             "pageTitle" => "SCA OPS | Terima Dari Cabang | Detail",
         ]);
@@ -178,10 +178,21 @@ class ReceivedFromBranchController extends Controller
     public function autoCode(Request $request)
     {
         $idCabang = $request->cabang;
-        $data = MoveWarehouse::where('status_pindah_barang', 0)
-            ->select('kode_pindah_barang as text', 'kode_pindah_barang as id', 'id_pindah_barang', 'transporter', 'nomor_polisi', 'nama_gudang', 'keterangan_pindah_barang')
-            ->leftJoin('gudang', 'pindah_barang.id_gudang', '=', 'gudang.id_gudang')
-            ->where('id_cabang_tujuan', $idCabang)->get();
+        $data = MoveWarehouse::select(
+            'kode_pindah_barang as text',
+            'kode_pindah_barang as id',
+            'id_pindah_barang',
+            'transporter',
+            'nomor_polisi',
+            'nama_cabang',
+            'keterangan_pindah_barang',
+            'pindah_barang.id_cabang'
+        )
+            ->leftJoin('cabang', 'pindah_barang.id_cabang', '=', 'cabang.id_cabang')
+            ->where('id_cabang_tujuan', $idCabang)
+            ->where('status_pindah_barang', 0)
+            ->where('void', 0)
+            ->get();
 
         return response()->json([
             'status' => 200,

@@ -32,6 +32,9 @@ class MoveWarehouse extends Model
         'dt_created',
         'user_modified',
         'dt_modified',
+        'void',
+        'void_user_id',
+        'id_cabang_asal',
     ];
 
     public function cabang()
@@ -54,9 +57,19 @@ class MoveWarehouse extends Model
         return $this->belongsTo(Cabang::class, 'id_cabang_tujuan');
     }
 
+    public function originBranch()
+    {
+        return $this->belongsTo(Cabang::class, 'id_cabang_asal');
+    }
+
     public function details()
     {
         return $this->hasMany(MoveWarehouseDetail::class, 'id_pindah_barang');
+    }
+
+    public function getDetailQRCode()
+    {
+        return $this->hasMany(MoveWarehouseDetail::class, 'id_pindah_barang')->select('qr_code');
     }
 
     public function formatdetail()
@@ -76,7 +89,9 @@ class MoveWarehouse extends Model
                 'ph',
                 'sg',
                 'warna',
-                'status_diterima'
+                'status_diterima',
+                'batch',
+                'tanggal_kadaluarsa'
             )
             ->leftJoin('barang', 'pindah_barang_detail.id_barang', '=', 'barang.id_barang')
             ->leftJoin('satuan_barang', 'pindah_barang_detail.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang');
@@ -100,7 +115,9 @@ class MoveWarehouse extends Model
     {
         $detail = json_decode($details);
         $ids = array_column($detail, 'id_pindah_barang_detail');
-        $selectTrash = MoveWarehouseDetail::whereNotIn('id_pindah_barang_detail', $ids)->get();
+        $selectTrash = MoveWarehouseDetail::where('id_pindah_barang', $this->id_pindah_barang)
+            ->whereNotIn('id_pindah_barang_detail', $ids)
+            ->get();
         foreach ($selectTrash as $trash) {
             $trashQrCode = MasterQrCode::where('kode_batang_master_qr_code', $trash->qr_code)->first();
             if ($type == 'out') {
@@ -114,8 +131,8 @@ class MoveWarehouse extends Model
         }
 
         foreach ($detail as $data) {
-            $check = DB::table('pindah_barang_detail')
-                ->where('id_pindah_barang_detail', $data->id_pindah_barang_detail)->first();
+            $check = MoveWarehouseDetail::where('id_pindah_barang_detail', $data->id_pindah_barang_detail)->first();
+
             if (!$check) {
                 DB::table('pindah_barang_detail')->insert([
                     'id_pindah_barang' => $this->id_pindah_barang,
@@ -132,18 +149,35 @@ class MoveWarehouse extends Model
                     'status_diterima' => isset($data->status_diterima) ? $data->status_diterima : 0,
                     'user_created' => session()->get('user')['id_pengguna'],
                     'dt_created' => date('Y-m-d H:i:s'),
+                    'batch' => $data->batch,
+                    'tanggal_kadaluarsa' => $data->tanggal_kadaluarsa,
                 ]);
 
                 $master = MasterQrCode::where('kode_batang_master_qr_code', $data->qr_code)->first();
                 if ($master) {
-                    if ($type == 'in' && array_key_exists('status_diterima', $data) && $data->status_diterima == '1') {
+                    if ($type == 'in' && $data->status_diterima == 1) {
                         $master->sisa_master_qr_code = $master->jumlah_master_qr_code;
+                        $master->id_cabang = $this->id_cabang;
+                        $master->id_gudang = $this->id_gudang;
                     } else {
                         $master->sisa_master_qr_code = 0;
                     }
 
                     $master->save();
                 }
+            }
+        }
+
+        return ['status' => 'success'];
+    }
+
+    public function voidDetails()
+    {
+        foreach ($this->details as $detail) {
+            $master = MasterQrCode::where('kode_batang_master_qr_code', $detail->qr_code)->first();
+            if ($master) {
+                $master->sisa_master_qr_code = $master->jumlah_master_qr_code;
+                $master->save();
             }
         }
 

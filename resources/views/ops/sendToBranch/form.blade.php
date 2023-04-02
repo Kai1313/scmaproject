@@ -51,6 +51,16 @@
         .handle-number-4 {
             text-align: right;
         }
+
+        #reader {
+            width: 50%;
+        }
+
+        @media only screen and (max-width: 412px) {
+            #reader {
+                width: 100%;
+            }
+        }
     </style>
 @endsection
 
@@ -115,7 +125,7 @@
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <label>Kode Pindah Gudang</label>
+                            <label>Kode Pindah Barang</label>
                             <div class="form-group">
                                 <input type="text" name="kode_pindah_barang"
                                     value="{{ old('kode_pindah_barang', $data ? $data->kode_pindah_barang : '') }}"
@@ -176,6 +186,8 @@
                                     <th>Nama Barang</th>
                                     <th>Satuan</th>
                                     <th>Jumlah</th>
+                                    <th>Batch</th>
+                                    <th>Kadaluarsa</th>
                                     <th>SG</th>
                                     <th>BE</th>
                                     <th>PH</th>
@@ -196,12 +208,14 @@
         </form>
 
         <div class="modal fade" id="modalEntry" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-body">
                         <div class="alert alert-danger" style="display:none;" id="alertModal">
                         </div>
-                        <div id="reader"></div>
+                        <center>
+                            <div id="reader"></div>
+                        </center>
                         <div class="form-group">
                             <div class="input-group">
                                 <input type="text" name="search-qrcode" class="form-control"
@@ -213,17 +227,24 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="alert alert-info">
+                            Pastikan QR Code sudah keluar rak dan stok tidak habis
+                        </div>
                         <input type="hidden" name="id_pindah_barang_detail">
-                        <label>QR Code</label>
-                        <div class="form-group">
-                            <input type="text" name="qr_code" class="form-control" readonly>
-                        </div>
-                        <label>Nama Barang</label>
-                        <div class="form-group">
-                            <input type="text" name="nama_barang" class="form-control" readonly>
-                            <input type="hidden" name="id_barang">
-                        </div>
                         <div class="row">
+                            <div class="col-xs-6">
+                                <label>QR Code</label>
+                                <div class="form-group">
+                                    <input type="text" name="qr_code" class="form-control" readonly>
+                                </div>
+                            </div>
+                            <div class="col-xs-6">
+                                <label>Nama Barang</label>
+                                <div class="form-group">
+                                    <input type="text" name="nama_barang" class="form-control" readonly>
+                                    <input type="hidden" name="id_barang">
+                                </div>
+                            </div>
                             <div class="col-xs-6">
                                 <label>Satuan</label>
                                 <div class="form-group">
@@ -265,6 +286,18 @@
                                 <label>Warna</label>
                                 <div class="form-group">
                                     <input type="text" name="warna" class="form-control" readonly>
+                                </div>
+                            </div>
+                            <div class="col-xs-6">
+                                <label>Batch</label>
+                                <div class="form-group">
+                                    <input type="text" name="batch" class="form-control" readonly>
+                                </div>
+                            </div>
+                            <div class="col-xs-6">
+                                <label>Kadaluarsa</label>
+                                <div class="form-group">
+                                    <input type="text" name="tanggal_kadaluarsa" class="form-control" readonly>
                                 </div>
                             </div>
                         </div>
@@ -324,6 +357,13 @@
                     name: 'qty',
                     render: $.fn.dataTable.render.number('.', ',', 4),
                     className: 'text-right'
+                }, {
+                    data: 'batch',
+                    name: 'batch',
+                    className: 'text-right'
+                }, {
+                    data: 'tanggal_kadaluarsa',
+                    name: 'tanggal_kadaluarsa',
                 }, {
                     data: 'sg',
                     name: 'sg',

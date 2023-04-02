@@ -142,9 +142,12 @@
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <label>Dari Gudang <span>*</span></label>
+                            <label>Dari Cabang <span>*</span></label>
                             <div class="form-group">
-                                <input type="text" class="form-control" name="nama_gudang" readonly>
+                                <input type="text" class="form-control" name="nama_cabang_asal" readonly
+                                    value="{{ old('nama_cabang_asal', $data ? $data->originBranch->nama_cabang : '') }}">
+                                <input type="hidden" name="id_cabang_asal"
+                                    value="{{ old('id_cabang_asal', $data ? $data->id_cabang_asal : '') }}">
                             </div>
                             <label>Keterangan</label>
                             <div class="form-group">
@@ -171,6 +174,8 @@
                                     <th>Nama Barang</th>
                                     <th>Satuan</th>
                                     <th>Jumlah</th>
+                                    <th>Batch</th>
+                                    <th>Kadaluarsa</th>
                                     <th>SG</th>
                                     <th>BE</th>
                                     <th>PH</th>
@@ -208,18 +213,19 @@
     <script>
         let branches = {!! $cabang !!};
         let oldDetails = {!! $data && $data->parent ? $data->parent->formatdetail : '[]' !!};
-        let newDetails = {!! $data ? $data->formatdetail : '[]' !!};
+        let arrayQRCode = {!! $data ? $data->getDetailQRCode->pluck('qr_code') : '[]' !!};
         let details = []
 
         for (let i = 0; i < oldDetails.length; i++) {
             details.push(oldDetails[i])
-            if (oldDetails[i] == newDetails[i]) {
+            if (arrayQRCode.includes(oldDetails[i]['qr_code'])) {
                 details[i]['status_diterima'] = 1
             } else {
                 details[i]['id_pindah_barang_detail'] = 0
                 details[i]['status_diterima'] = 0
             }
         }
+        console.log(details)
 
         $('[name="details"]').val(JSON.stringify(details))
 
@@ -240,6 +246,13 @@
                     name: 'qty',
                     render: $.fn.dataTable.render.number('.', ',', 4),
                     className: 'text-right'
+                }, {
+                    data: 'batch',
+                    name: 'batch',
+                    className: 'text-right'
+                }, {
+                    data: 'tanggal_kadaluarsa',
+                    name: 'tanggal_kadaluarsa',
                 }, {
                     data: 'sg',
                     name: 'sg',
@@ -273,8 +286,12 @@
                     searchable: false,
                     render: function(data, type, row, meta) {
                         let btn = '';
-                        if (row.status_terima == 1) {
-                            btn = '<input name="checked_data" type="checkbox" checked>';
+                        if (row.status_diterima == 1) {
+                            if (arrayQRCode.includes(row.qr_code)) {
+                                btn = '<i class="fa fa-check" aria-hidden="true"></i>';
+                            } else {
+                                btn = '<input name="checked_data" type="checkbox" checked>';
+                            }
                         } else {
                             btn = '<input name="checked_data" type="checkbox">';
                         }
@@ -346,7 +363,8 @@
                         $('[name="transporter"]').val(dataselect.transporter)
                         $('[name="nomor_polisi"]').val(dataselect.nomor_polisi)
                         $('[name="keterangan_pindah_barang"]').val(dataselect.keterangan_pindah_barang)
-                        $('[name="nama_gudang"]').val(dataselect.nama_gudang)
+                        $('[name="nama_cabang_asal"]').val(dataselect.nama_cabang)
+                        $('[name="id_cabang_asal"]').val(dataselect.id_cabang)
 
                         getDetailItem(dataselect.id_pindah_barang)
                     });
@@ -385,9 +403,9 @@
             let index = $(this).parents('tr').index()
             let detailSelect = details[index]
             if ($(this).is(':checked')) {
-                detailSelect['status_received'] = 1
+                detailSelect['status_diterima'] = 1
             } else {
-                detailSelect['status_received'] = 0
+                detailSelect['status_diterima'] = 0
             }
 
             details[index] = detailSelect

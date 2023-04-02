@@ -83,7 +83,7 @@ $('body').on('click', '.btn-destroy', function (e) {
     let self = $(this)
     e.preventDefault();
     Swal.fire({
-        title: 'Anda yakin ingin menghapus data ini?',
+        title: 'Anda yakin ingin membatalkan data ini?',
         icon: 'info',
         showDenyButton: true,
         confirmButtonText: 'Yes',

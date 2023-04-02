@@ -75,7 +75,7 @@ Route::prefix('send_to_branch')->group(function () {
     Route::get('/index/{user_id?}', 'SendToBranchController@index')->name('send_to_branch');
     Route::get('/entry/{id?}', 'SendToBranchController@entry')->name('send_to_branch-entry');
     Route::post('/save_entry/{id}', 'SendToBranchController@saveEntry')->name('send_to_branch-save-entry');
-    Route::get('/view/{id}', 'SendToBranchController@view')->name('send_to_branch-view');
+    Route::get('/view/{id}', 'SendToBranchController@viewData')->name('send_to_branch-view');
     Route::get('/delete/{id}', 'SendToBranchController@destroy')->name('send_to_branch-delete');
     Route::get('/auto-qrcode', 'SendToBranchController@autoQRCode')->name('send_to_branch-qrcode');
 });
@@ -84,7 +84,7 @@ Route::prefix('received_from_branch')->group(function () {
     Route::get('/index/{user_id?}', 'ReceivedFromBranchController@index')->name('received_from_branch');
     Route::get('/entry/{id?}', 'ReceivedFromBranchController@entry')->name('received_from_branch-entry');
     Route::post('/save_entry/{id}', 'ReceivedFromBranchController@saveEntry')->name('received_from_branch-save-entry');
-    Route::get('/view/{id}', 'ReceivedFromBranchController@view')->name('received_from_branch-view');
+    Route::get('/view/{id}', 'ReceivedFromBranchController@viewData')->name('received_from_branch-view');
     Route::get('/delete/{id}', 'ReceivedFromBranchController@destroy')->name('received_from_branch-delete');
     Route::get('/auto-code', 'ReceivedFromBranchController@autoCode')->name('received_from_branch-code');
     Route::get('/auto-detail-item', 'ReceivedFromBranchController@getDetailItem')->name('received_from_branch-detail-item');

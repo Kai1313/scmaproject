@@ -68,7 +68,14 @@
                         </div>
                     </div>
                     <div class="col-md-8">
-                        <a href="{{ route('send_to_branch-entry') }}" class="btn btn-success pull-right btn-flat btn-sm ">
+                        <span class="badge badge-default rounded-0 pull-right">
+                            <input class="form-check-input" type="checkbox" id="void" name="show_void">
+                            <label class="form-check-label" for="void">
+                                Void
+                            </label>
+                        </span>
+                        <a href="{{ route('send_to_branch-entry') }}"
+                            class="btn btn-success pull-right btn-flat btn-sm mr-1">
                             <i class="glyphicon glyphicon-plus"></i> Tambah Kirim Ke Cabang
                         </a>
                     </div>
@@ -81,7 +88,7 @@
                             <tr>
                                 <th>Tanggal</th>
                                 <th>Kode Pindah Gudang</th>
-                                <th>Gudang Asal</th>
+                                <th>Gudang</th>
                                 <th>Cabang Tujuan</th>
                                 <th>Keterangan</th>
                                 <th>Jasa Pengiriman</th>
@@ -113,7 +120,8 @@
         var table = $('.data-table').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route('send_to_branch') }}?c=" + $('[name="id_cabang"]').val(),
+            ajax: "{{ route('send_to_branch') }}?c=" + $('[name="id_cabang"]').val() + '&show_void=' + $(
+                '[name="show_void"]').is(':checked'),
             columns: [{
                 data: 'tanggal_pindah_barang',
                 name: 'tanggal_pindah_barang'
@@ -145,7 +153,13 @@
         });
 
         $('[name="id_cabang"]').change(function() {
-            table.ajax.url("?c=" + $('[name="id_cabang"]').val()).load()
+            table.ajax.url("?c=" + $('[name="id_cabang"]').val() + '&show_void=' + $('[name="show_void"]').is(
+                ':checked')).load()
+        })
+
+        $('[name="show_void"]').change(function() {
+            table.ajax.url("?c=" + $('[name="id_cabang"]').val() + '&show_void=' + $('[name="show_void"]').is(
+                ':checked')).load()
         })
     </script>
 @endsection

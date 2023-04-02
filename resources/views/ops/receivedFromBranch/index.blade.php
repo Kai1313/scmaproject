@@ -82,8 +82,8 @@
                             <tr>
                                 <th>Tanggal</th>
                                 <th>Kode Pindah Gudang</th>
-                                <th>Gudang Asal</th>
-                                <th>Cabang Tujuan</th>
+                                <th>Gudang</th>
+                                <th>Cabang Asal</th>
                                 <th>Keterangan</th>
                                 <th>Jasa Pengiriman</th>
                                 <th>Status</th>

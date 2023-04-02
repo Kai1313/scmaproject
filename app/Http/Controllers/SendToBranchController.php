@@ -18,7 +18,7 @@ class SendToBranchController extends Controller
 
         if ($request->ajax()) {
             $data = DB::table('pindah_barang')
-                ->select('id_pindah_barang', 'type', 'nama_gudang', 'tanggal_pindah_barang', 'kode_pindah_barang', 'nama_cabang', 'status_pindah_barang', 'keterangan_pindah_barang', 'transporter')
+                ->select('id_pindah_barang', 'type', 'nama_gudang', 'tanggal_pindah_barang', 'kode_pindah_barang', 'nama_cabang', 'status_pindah_barang', 'keterangan_pindah_barang', 'transporter', 'void')
                 ->leftJoin('gudang', 'pindah_barang.id_gudang', '=', 'gudang.id_gudang')
                 ->leftJoin('cabang', 'pindah_barang.id_cabang_tujuan', '=', 'cabang.id_cabang')
                 ->where('type', 0);
@@ -26,19 +26,30 @@ class SendToBranchController extends Controller
                 $data = $data->where('pindah_barang.id_cabang', $request->c);
             }
 
-            $data = $data->orderBy('pindah_barang.tanggal_pindah_barang', 'desc');
+            if ($request->show_void == 'false') {
+                $data = $data->where('pindah_barang.void', '0');
+            }
+
+            $data = $data->orderBy('pindah_barang.kode_pindah_barang', 'desc');
             return Datatables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
                     $btn = '<ul class="horizontal-list">';
                     $btn .= '<li><a href="' . route('send_to_branch-view', $row->id_pindah_barang) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
-                    $btn .= '<li><a href="' . route('send_to_branch-entry', $row->id_pindah_barang) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
-                    $btn .= '<li><a href="' . route('send_to_branch-delete', $row->id_pindah_barang) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Void</a></li>';
+                    if ($row->status_pindah_barang == 0 && $row->void == 0) {
+                        $btn .= '<li><a href="' . route('send_to_branch-entry', $row->id_pindah_barang) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
+                        $btn .= '<li><a href="' . route('send_to_branch-delete', $row->id_pindah_barang) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Void</a></li>';
+                    }
+
                     $btn .= '</ul>';
                     return $btn;
                 })
                 ->editColumn('status_pindah_barang', function ($row) {
                     if ($row->status_pindah_barang == '0') {
+                        if ($row->void == 1) {
+                            return '<label class="label label-default">Batal</label>';
+                        }
+
                         return '<label class="label label-warning">Dalam Perjalanan</label>';
                     } else if ($row->status_pindah_barang == '1') {
                         return '<label class="label label-success">Diterima</label>';
@@ -116,10 +127,10 @@ class SendToBranchController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        $data = MoveWarehouse::find($id);
+        $data = MoveWarehouse::where('type', 0)->where('id_pindah_barang', $id)->first();
         return view('ops.sendToBranch.detail', [
             'data' => $data,
-            "pageTitle" => "SCA OPS | kirim Ke Cabang | Detail",
+            "pageTitle" => "SCA OPS | kirim Ke Cabang | Lihat",
         ]);
     }
 
@@ -129,35 +140,36 @@ class SendToBranchController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        // $data = PurchaseRequest::find($id);
-        // if (!$data) {
-        //     return response()->json([
-        //         "result" => false,
-        //         "message" => "Data tidak ditemukan",
-        //     ]);
-        // }
+        $data = MoveWarehouse::find($id);
+        if (!$data) {
+            return response()->json([
+                "result" => false,
+                "message" => "Data tidak ditemukan",
+            ]);
+        }
 
-        // try {
-        //     DB::beginTransaction();
-        //     $data->void = 1;
-        //     $data->void_user_id = session()->get('user')['id_pengguna'];
-        //     $data->save();
+        try {
+            DB::beginTransaction();
+            $data->void = 1;
+            $data->void_user_id = session()->get('user')['id_pengguna'];
+            $data->save();
+            $data->voidDetails();
 
-        //     DB::commit();
-        //     return response()->json([
-        //         "result" => true,
-        //         "message" => "Data berhasil dibatalkan",
-        //         "redirect" => route('purchase-request'),
-        //     ]);
-        // } catch (\Exception $e) {
-        //     DB::rollback();
-        //     Log::error("Error when void purchase request");
-        //     Log::error($e);
-        //     return response()->json([
-        //         "result" => false,
-        //         "message" => "Data gagal dibatalkan",
-        //     ]);
-        // }
+            DB::commit();
+            return response()->json([
+                "result" => true,
+                "message" => "Data berhasil dibatalkan",
+                "redirect" => route('send_to_branch'),
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error("Error when void pindah barang");
+            Log::error($e);
+            return response()->json([
+                "result" => false,
+                "message" => "Data gagal dibatalkan",
+            ]);
+        }
     }
 
     public function autoQRCode(Request $request)
@@ -180,7 +192,9 @@ class SendToBranchController extends Controller
                 'warna_master_qr_code as warna',
                 'keterangan_master_qr_code as keterangan',
                 'id_rak',
-                'sisa_master_qr_code'
+                'sisa_master_qr_code',
+                'tanggal_expired_master_qr_code as tanggal_kadaluarsa',
+                'batch_master_qr_code as batch'
             )
             ->leftJoin('barang', 'mqc.id_barang', '=', 'barang.id_barang')
             ->leftJoin('satuan_barang', 'mqc.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
