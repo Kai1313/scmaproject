@@ -100,7 +100,7 @@ class MoveWarehouse extends Model
     public static function createcode($id_cabang)
     {
         $branchCode = DB::table('cabang')->where('id_cabang', $id_cabang)->first();
-        $string = 'PG.' . $branchCode->kode_cabang . '.' . date('ym');
+        $string = 'TC.' . $branchCode->kode_cabang . '.' . date('ym');
         $check = DB::table('pindah_barang')->where('kode_pindah_barang', 'like', $string . '%')->count();
         $check += 1;
         $nol = '';
