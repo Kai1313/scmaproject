@@ -391,7 +391,7 @@
                 </li>
             @endif
             @if (checkAccessMenu('transaksi'))
-                <li class="treeview {{ in_array(request()->segment(1), ['purchase_requisitions', 'uang_muka_pembelian', 'qc_penerimaan_barang']) ? 'active' : null }}"
+                <li class="treeview {{ in_array(request()->segment(1), ['purchase_requisitions', 'uang_muka_pembelian', 'qc_penerimaan_barang', 'send_to_branch', 'received_from_branch', 'received_from_branch', 'send_to_branch']) ? 'active' : null }}"
                     data-alias="transaksi">
                     <a href="#"><i class="glyphicon glyphicon-list-alt"></i> <span>Transaksi</span>
                         <span class="pull-right-container">
@@ -418,7 +418,7 @@
                                             </a>
                                         </li>
                                     @endif
-                                    @if (checkAccessMenu('pemerintaan_pembelian'))
+                                    @if (checkAccessMenu('permintaan_pembelian'))
                                         <li data-alias="permintaan_pembelian">
                                             <a href="{{ env('OLD_URL_ROOT') }}#permintaan_pembelian">
                                                 <i class="glyphicon glyphicon-option-vertical"></i>Purchase Order (PO)
@@ -453,7 +453,7 @@
                                     @if (checkAccessMenu('retur_pembelian'))
                                         <li data-alias="retur_pembelian">
                                             <a href="{{ env('OLD_URL_ROOT') }}#retur_pembelian">
-                                                <i class="glyphicon glyphicon-option-vertical"></i>Retur Pembelian
+                                                <i class="glyphicon glyphicon-option-vertical"></i>Retur Pembelian (RB)
                                             </a>
                                         </li>
                                     @endif
@@ -470,6 +470,7 @@
                                         <li data-alias="dd_pembayaran_pembelian">
                                             <a href="{{ env('OLD_URL_ROOT') }}#dd_pembayaran_pembelian">
                                                 <i class="glyphicon glyphicon-option-vertical"></i>Pembayaran Pembelian
+                                                (PP)
                                             </a>
                                         </li>
                                     @endif
@@ -477,7 +478,8 @@
                             </li>
                         @endif
                         @if (checkAccessMenu('persediaan_kepala'))
-                            <li class="treeview" data-alias="persediaan_kepala">
+                            <li class="treeview {{ in_array(request()->segment(1), ['send_to_branch', 'received_from_branch', 'received_from_branch', 'send_to_branch']) ? 'active' : null }}"
+                                data-alias="persediaan_kepala">
                                 <a href="#"><i class="glyphicon glyphicon-arrow-right"></i>
                                     <span>Persediaan</span>
                                     <span class="pull-right-container">
@@ -492,18 +494,22 @@
                                             </a>
                                         </li>
                                     @endif
-                                    {{-- @if (checkAccessMenu('kategori_konigurasi')) --}}
-                                    <li class="">
-                                        <a href="">
-                                            <i class="glyphicon glyphicon-option-vertical"></i>Kirim Ke Cabang
-                                        </a>
-                                    </li>
-                                    {{-- @if (checkAccessMenu('kategori_konigurasi')) --}}
-                                    <li>
-                                        <a href="">
-                                            <i class="glyphicon glyphicon-option-vertical"></i>Terima Dari Cabang
-                                        </a>
-                                    </li>
+                                    @if (checkAccessMenu('kirim_ke_cabang'))
+                                        <li
+                                            class="nav-item {{ request()->segment(1) == 'send_to_branch' ? 'active' : null }}">
+                                            <a href="{{ route('send_to_branch') }}">
+                                                <i class="glyphicon glyphicon-option-vertical"></i>Kirim Ke Cabang
+                                            </a>
+                                        </li>
+                                    @endif
+                                    @if (checkAccessMenu('terima_dari_cabang'))
+                                        <li
+                                            class="nav-item {{ request()->segment(1) == 'received_from_branch' ? 'active' : null }}">
+                                            <a href="{{ route('received_from_branch') }}">
+                                                <i class="glyphicon glyphicon-option-vertical"></i>Terima Dari Cabang
+                                            </a>
+                                        </li>
+                                    @endif
                                     @if (checkAccessMenu('pindah_gudang2'))
                                         <li data-alias="pindah_gudang2">
                                             <a href="{{ env('OLD_URL_ROOT') }}#pindah_gudang2">
@@ -1054,10 +1060,10 @@
                 </a>
                 <ul class="treeview-menu">
                     <li class="{{ request()->segment(2) == 'coa' ? 'active' : null }}">
-                        <a href="{{ route('master-coa', 1) }}">Master CoA</a>
+                        <a href="{{ route('master-coa') }}">Master CoA</a>
                     </li>
                     <li class="{{ request()->segment(2) == 'slip' ? 'active' : null }}">
-                        <a href="{{ route('master-slip', 1) }}">Master Slip</a>
+                        <a href="{{ route('master-slip') }}">Master Slip</a>
                     </li>
                 </ul>
             </li>

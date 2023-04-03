@@ -47,7 +47,6 @@ Route::prefix('purchase_requisitions')->group(function () {
     Route::post('/save_entry/{id}', 'PurchaseRequestController@saveEntry')->name('purchase-request-save-entry');
     Route::get('/delete/{id}', 'PurchaseRequestController@destroy')->name('purchase-request-delete');
     Route::get('/auto_werehouse', 'PurchaseRequestController@autoWerehouse')->name('purchase-request-auto-werehouse');
-    // Route::get('/auto_user', 'PurchaseRequestController@autoUser')->name('purchase-request-auto-user');
     Route::get('/auto_item', 'PurchaseRequestController@autoItem')->name('purchase-request-auto-item');
     Route::get('/auto_satuan', 'PurchaseRequestController@autoSatuan')->name('purchase-request-auto-satuan');
     Route::get('/change_status/{id}/{type}', 'PurchaseRequestController@changeStatus')->name('purchase-request-change-status');
@@ -62,20 +61,33 @@ Route::prefix('uang_muka_pembelian')->group(function () {
     Route::get('/delete/{id}', 'PurchaseDownPaymentController@destroy')->name('purchase-down-payment-delete');
     Route::get('/auto_po', 'PurchaseDownPaymentController@autoPo')->name('purchase-down-payment-auto-po');
     Route::get('/count_po', 'PurchaseDownPaymentController@countPo')->name('purchase-down-payment-count-po');
-    // Route::get('/auto_slip', 'PurchaseDownPaymentController@autoSlip')->name('purchase-down-payment-auto-slip');
 });
 
 Route::prefix('qc_penerimaan_barang')->group(function () {
     Route::get('/index/{user_id?}', 'QcReceiptController@index')->name('qc_receipt');
     Route::get('/entry/{id?}', 'QcReceiptController@entry')->name('qc_receipt-entry');
-    // Route::get('/view/{id}', 'QcReceiptController@viewData')->name('qc_receipt-view');
     Route::post('/save_entry/{id}', 'QcReceiptController@saveEntry')->name('qc_receipt-save-entry');
-    // Route::get('/delete/{id}', 'QcReceiptController@destroy')->name('qc_receipt-delete');
     Route::get('/auto_purchasing', 'QcReceiptController@autoPurchasing')->name('qc_receipt-auto-purchasing');
     Route::get('/auto-item', 'QcReceiptController@autoItem')->name('qc_receipt-auto-item');
-    // Route::get('/auto_po', 'QcReceiptController@autoPo')->name('purchase-down-payment-auto-po');
-    // Route::get('/count_po', 'QcReceiptController@countPo')->name('purchase-down-payment-count-po');
-    // Route::get('/auto_slip', 'QcReceiptController@autoSlip')->name('purchase-down-payment-auto-slip');
+});
+
+Route::prefix('send_to_branch')->group(function () {
+    Route::get('/index/{user_id?}', 'SendToBranchController@index')->name('send_to_branch');
+    Route::get('/entry/{id?}', 'SendToBranchController@entry')->name('send_to_branch-entry');
+    Route::post('/save_entry/{id}', 'SendToBranchController@saveEntry')->name('send_to_branch-save-entry');
+    Route::get('/view/{id}', 'SendToBranchController@viewData')->name('send_to_branch-view');
+    Route::get('/delete/{id}', 'SendToBranchController@destroy')->name('send_to_branch-delete');
+    Route::get('/auto-qrcode', 'SendToBranchController@autoQRCode')->name('send_to_branch-qrcode');
+});
+
+Route::prefix('received_from_branch')->group(function () {
+    Route::get('/index/{user_id?}', 'ReceivedFromBranchController@index')->name('received_from_branch');
+    Route::get('/entry/{id?}', 'ReceivedFromBranchController@entry')->name('received_from_branch-entry');
+    Route::post('/save_entry/{id}', 'ReceivedFromBranchController@saveEntry')->name('received_from_branch-save-entry');
+    Route::get('/view/{id}', 'ReceivedFromBranchController@viewData')->name('received_from_branch-view');
+    Route::get('/delete/{id}', 'ReceivedFromBranchController@destroy')->name('received_from_branch-delete');
+    Route::get('/auto-code', 'ReceivedFromBranchController@autoCode')->name('received_from_branch-code');
+    Route::get('/auto-detail-item', 'ReceivedFromBranchController@getDetailItem')->name('received_from_branch-detail-item');
 });
 
 // Master
@@ -107,9 +119,11 @@ Route::post('/master/coa/copy/data', 'MasterCoaController@copy_data')->name('mas
 Route::get('/master/coa/get_by_cabang/{id_cabang?}', 'MasterCoaController@getCoaByCabang')->name('master-coa-get-by-cabang');
 Route::get('/master/coa/get_data/{id?}', 'MasterCoaController@getCoa')->name('master-coa-get-data');
 
+Route::get('/master/setting/get_pelunasan/{id?}', 'MasterSettingController@getSettingPelunasan')->name('master-setting-get-pelunasan');
+
 // Transaction
 // Jurnal Umum
-Route::get('/transaction/general_ledger', 'GeneralLedgerController@index')->name('transaction-general-ledger');
+Route::get('/transaction/general_ledger/index/{user_id?}', 'GeneralLedgerController@index')->name('transaction-general-ledger');
 Route::get('/transaction/general_ledger/form/create', 'GeneralLedgerController@create')->name('transaction-general-ledger-create');
 Route::get('/transaction/general_ledger/form/edit/{id?}', 'GeneralLedgerController@edit')->name('transaction-general-ledger-edit');
 Route::get('/transaction/general_ledger/show/{id?}', 'GeneralLedgerController@show')->name('transaction-general-ledger-show');
@@ -122,7 +136,7 @@ Route::get('/transaction/general_ledger/void/{id?}', 'GeneralLedgerController@vo
 Route::get('/transaction/general_ledger/active/{id?}', 'GeneralLedgerController@active')->name('transaction-general-ledger-active');
 
 // Jurnal Penyesuaian
-Route::get('/transaction/adjustment_ledger', 'AdjustmentLedgerController@index')->name('transaction-adjustment-ledger');
+Route::get('/transaction/adjustment_ledger/index/{user_id?}', 'AdjustmentLedgerController@index')->name('transaction-adjustment-ledger');
 Route::get('/transaction/adjustment_ledger/form/create', 'AdjustmentLedgerController@create')->name('transaction-adjustment-ledger-create');
 Route::get('/transaction/adjustment_ledger/form/edit/{id?}', 'AdjustmentLedgerController@edit')->name('transaction-adjustment-ledger-edit');
 Route::get('/transaction/adjustment_ledger/show/{id?}', 'AdjustmentLedgerController@show')->name('transaction-adjustment-ledger-show');

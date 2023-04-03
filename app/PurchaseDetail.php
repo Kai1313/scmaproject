@@ -9,7 +9,6 @@ class PurchaseDetail extends Model
     protected $table = 'pembelian_detail';
     protected $primaryKey = 'id_pembelian_detail';
     public $timestamps = false;
-    //
 
     public function purchase()
     {

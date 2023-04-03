@@ -106,19 +106,19 @@
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>Nama Supplier</label>
-                                <input type="text" class="form-control" name="pemasok" readonly>
+                                <input type="text" class="form-control" name="pemasok" disabled>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>No PO</label>
-                                <input type="text" class="form-control" name="po" readonly>
+                                <input type="text" class="form-control" name="po" disabled>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>Tanggal Penerimaan</label>
-                                <input type="text" class="form-control" name="tanggal" readonly>
+                                <input type="text" class="form-control" name="tanggal" disabled>
                             </div>
                         </div>
                     </div>
@@ -375,6 +375,7 @@
 
 
         function getPurchasingNumber() {
+            $('#cover-spin').show()
             $.ajax({
                 url: '{{ route('qc_receipt-auto-purchasing') }}',
                 data: {
@@ -394,9 +395,11 @@
                         $('[name="po"]').val(dataselect.nomor_po_pembelian)
                         getItem(dataselect.id)
                     });
+                    $('#cover-spin').hide()
                 },
                 error: function(error) {
                     console.log(error)
+                    $('#cover-spin').hide()
                 }
             })
         }
@@ -441,7 +444,11 @@
             detailSelect = []
             $('#modalEntry').find('input,select,textarea').each(function(i, v) {
                 if ($(v).hasClass('handle-number-4')) {
-                    $(v).val(0).trigger('change')
+                    if ($(v).prop('name') == 'sg_pembelian_detail') {
+                        $(v).val(1).trigger('change')
+                    } else {
+                        $(v).val(0).trigger('change')
+                    }
                 } else {
                     $(v).val('').trigger('change')
                 }
