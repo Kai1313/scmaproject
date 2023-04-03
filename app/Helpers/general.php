@@ -80,3 +80,12 @@ function checkAccessMenu($alias_menu = 'home', $type = 'show')
 
     return '0';
 }
+
+function replaceMessage($array, $message)
+{
+    foreach ($array as $key => $val) {
+        $message = str_replace($key, $val, $message);
+    }
+
+    return $message;
+}
