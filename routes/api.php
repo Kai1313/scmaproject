@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -12,13 +11,15 @@ use Illuminate\Support\Facades\Route;
 | routes are loaded by the RouteServiceProvider within a group which
 | is assigned the "api" middleware group. Enjoy building your API!
 |
-*/
+ */
 
 Route::post('login', 'ApiController@login');
 
 Route::group(['middleware' => ['auth:api']], function () {
     Route::get('profile', 'ApiController@profile');
     Route::post('logout', 'ApiController@logout');
+
+    Route::post('transaction-balance', 'ApiController@transactionBalance')->name('transaction-balance');
 
     Route::prefix('/jurnal_otomatis')->group(function () {
         Route::post('/uangmuka_penjualan', 'ApiController@journalUangMukaPenjualan')->name('jurnal-otomatis-uangmuka-penjualan');
@@ -30,4 +31,3 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::post('/void_jurnal_otomatis', 'ApiController@voidJournalOtomatis')->name('jurnal-otomatis-void');
     });
 });
-

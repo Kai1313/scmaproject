@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Models\Master\Cabang;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 
@@ -16,6 +17,11 @@ class PurchaseRequest extends Model
 
     const CREATED_AT = 'dt_created';
     const UPDATED_AT = 'dt_modified';
+
+    public function cabang()
+    {
+        return $this->belongsTo(Cabang::class, 'id_cabang');
+    }
 
     public function gudang()
     {
@@ -32,31 +38,58 @@ class PurchaseRequest extends Model
         return $this->hasMany(PurchaseRequestDetail::class, 'purchase_request_id');
     }
 
+    public function formatdetail()
+    {
+        $arrayCabang = [
+            '1' => [1, 2, 3, 4],
+            '2' => [5, 7, 8],
+        ];
+
+        $gudang = $arrayCabang[$this->id_cabang];
+
+        return $this->hasMany(PurchaseRequestDetail::class, 'purchase_request_id')
+            ->select('index', 'purchase_request_detail.id_barang', 'nama_barang', 'kode_barang', 'purchase_request_detail.id_satuan_barang', 'nama_satuan_barang', 'qty', 'notes',
+                DB::raw('(case when sum(debit_kartu_stok) - sum(kredit_kartu_stok) > 0 then sum(debit_kartu_stok) - sum(kredit_kartu_stok) else 0 end) as stok'))
+            ->leftJoin('barang', 'purchase_request_detail.id_barang', '=', 'barang.id_barang')
+            ->leftJoin('satuan_barang', 'purchase_request_detail.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
+            ->leftJoin('kartu_stok', function ($kartuStok) use ($gudang) {
+                $kartuStok->on('purchase_request_detail.id_barang', '=', 'kartu_stok.id_barang')
+                    ->whereIn('kartu_stok.id_gudang', $gudang);
+            })->groupBy('id_barang');
+    }
+
     public function savedetails($details)
     {
         $detail = json_decode($details);
         $ids = array_column($detail, 'index');
+
+        DB::table('purchase_request_detail')
+            ->where('purchase_request_id', $this->purchase_request_id)
+            ->whereNotIn('index', $ids)->delete();
+
         foreach ($detail as $data) {
             $check = DB::table('purchase_request_detail')
                 ->where('purchase_request_id', $this->purchase_request_id)
                 ->where('index', $data->index)->first();
             if ($check) {
-                $check->update([
-                    'index' => $data->index,
-                    'id_barang' => $data->id_barang,
-                    'id_satuan_barang' => $data->id_satuan_barang,
-                    'qty' => $data->jumlah,
-                    'notes' => $data->notes,
-                ]);
+                DB::table('purchase_request_detail')
+                    ->where('purchase_request_id', $this->purchase_request_id)
+                    ->where('index', $data->index)
+                    ->update([
+                        'id_barang' => $data->id_barang,
+                        'id_satuan_barang' => $data->id_satuan_barang,
+                        'qty' => normalizeNumber($data->qty),
+                        'notes' => $data->notes,
+                    ]);
             } else {
                 DB::table('purchase_request_detail')->insert([
                     'index' => $data->index,
                     'id_barang' => $data->id_barang,
                     'id_satuan_barang' => $data->id_satuan_barang,
-                    'qty' => $data->jumlah,
+                    'qty' => normalizeNumber($data->qty),
                     'notes' => $data->notes,
                     'purchase_request_id' => $this->purchase_request_id,
-                    'closed' => '1',
+                    'closed' => '0',
                 ]);
             }
         }
@@ -68,7 +101,7 @@ class PurchaseRequest extends Model
     {
         $branchCode = DB::table('cabang')->where('id_cabang', $id_cabang)->first();
         $string = 'PR.' . $branchCode->kode_cabang . '.' . date('ym');
-        $check = DB::table('purchase_request_header')->where('purchase_request_code', 'like', '%' . $string)->count();
+        $check = DB::table('purchase_request_header')->where('purchase_request_code', 'like', $string . '%')->count();
         $check += 1;
         $nol = '';
         for ($i = 0; $i < (4 - strlen((string) $check)); $i++) {
