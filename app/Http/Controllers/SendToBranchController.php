@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\MoveWarehouse;
+use App\MoveBranch;
 use DB;
 use Illuminate\Http\Request;
 use Log;
@@ -74,7 +74,7 @@ class SendToBranchController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        $data = MoveWarehouse::find($id);
+        $data = MoveBranch::find($id);
         $cabang = DB::table('cabang')->select('nama_cabang as text', 'id_cabang as id')->where('status_cabang', 1)->get();
         return view('ops.sendToBranch.form', [
             'data' => $data,
@@ -85,16 +85,16 @@ class SendToBranchController extends Controller
 
     public function saveEntry(Request $request, $id = 0)
     {
-        $data = MoveWarehouse::find($id);
+        $data = MoveBranch::find($id);
         if (!$data) {
-            $data = new MoveWarehouse;
+            $data = new MoveBranch;
         }
 
         try {
             DB::beginTransaction();
             $data->fill($request->all());
             if ($id == 0) {
-                $data->kode_pindah_barang = MoveWarehouse::createcode($request->id_cabang);
+                $data->kode_pindah_barang = MoveBranch::createcode($request->id_cabang);
                 $data->status_pindah_barang = 0;
                 $data->type = 0;
                 $data->user_created = session()->get('user')['id_pengguna'];
@@ -127,7 +127,7 @@ class SendToBranchController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        $data = MoveWarehouse::where('type', 0)->where('id_pindah_barang', $id)->first();
+        $data = MoveBranch::where('type', 0)->where('id_pindah_barang', $id)->first();
         return view('ops.sendToBranch.detail', [
             'data' => $data,
             "pageTitle" => "SCA OPS | kirim Ke Cabang | Lihat",
@@ -137,15 +137,18 @@ class SendToBranchController extends Controller
     public function destroy($id)
     {
         if (checkAccessMenu('kirim_ke_cabang', 'delete') == false) {
-            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+            return response()->json([
+                "result" => false,
+                "message" => "Tidak mendapatkan akses halaman",
+            ], 500);
         }
 
-        $data = MoveWarehouse::find($id);
+        $data = MoveBranch::find($id);
         if (!$data) {
             return response()->json([
                 "result" => false,
                 "message" => "Data tidak ditemukan",
-            ]);
+            ], 500);
         }
 
         try {
@@ -160,7 +163,7 @@ class SendToBranchController extends Controller
                 "result" => true,
                 "message" => "Data berhasil dibatalkan",
                 "redirect" => route('send_to_branch'),
-            ]);
+            ], 200);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error("Error when void pindah barang");
@@ -168,7 +171,7 @@ class SendToBranchController extends Controller
             return response()->json([
                 "result" => false,
                 "message" => "Data gagal dibatalkan",
-            ]);
+            ], 500);
         }
     }
 
