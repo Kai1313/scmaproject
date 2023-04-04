@@ -63,6 +63,16 @@ Route::prefix('uang_muka_pembelian')->group(function () {
     Route::get('/count_po', 'PurchaseDownPaymentController@countPo')->name('purchase-down-payment-count-po');
 });
 
+Route::prefix('uang_muka_penjualan')->group(function () {
+    Route::get('/index/{user_id?}', 'SalesDownPaymentController@index')->name('sales-down-payment');
+    Route::get('/entry/{id?}', 'SalesDownPaymentController@entry')->name('sales-down-payment-entry');
+    Route::get('/view/{id}', 'SalesDownPaymentController@viewData')->name('sales-down-payment-view');
+    Route::post('/save_entry/{id}', 'SalesDownPaymentController@saveEntry')->name('sales-down-payment-save-entry');
+    Route::get('/delete/{id}', 'SalesDownPaymentController@destroy')->name('sales-down-payment-delete');
+    Route::get('/auto_so', 'SalesDownPaymentController@autoSo')->name('sales-down-payment-auto-so');
+    Route::get('/count_so', 'SalesDownPaymentController@countSo')->name('sales-down-payment-count-so');
+});
+
 Route::prefix('qc_penerimaan_barang')->group(function () {
     Route::get('/index/{user_id?}', 'QcReceiptController@index')->name('qc_receipt');
     Route::get('/entry/{id?}', 'QcReceiptController@entry')->name('qc_receipt-entry');

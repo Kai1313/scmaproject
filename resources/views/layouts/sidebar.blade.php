@@ -391,7 +391,7 @@
                 </li>
             @endif
             @if (checkAccessMenu('transaksi'))
-                <li class="treeview {{ in_array(request()->segment(1), ['purchase_requisitions', 'uang_muka_pembelian', 'qc_penerimaan_barang', 'send_to_branch', 'received_from_branch', 'received_from_branch', 'send_to_branch']) ? 'active' : null }}"
+                <li class="treeview {{ in_array(request()->segment(1), ['purchase_requisitions', 'uang_muka_pembelian', 'qc_penerimaan_barang', 'send_to_branch', 'received_from_branch', 'received_from_branch', 'send_to_branch', 'uang_muka_penjualan']) ? 'active' : null }}"
                     data-alias="transaksi">
                     <a href="#"><i class="glyphicon glyphicon-list-alt"></i> <span>Transaksi</span>
                         <span class="pull-right-container">
@@ -596,7 +596,8 @@
                             </li>
                         @endif
                         @if (checkAccessMenu('penjualan_kepala'))
-                            <li class="treeview" data-alias="penjualan_kepala">
+                            <li class="treeview {{ in_array(request()->segment(1), ['uang_muka_penjualan']) ? 'active' : null }}"
+                                data-alias="penjualan_kepala">
                                 <a href="#"><i class="glyphicon glyphicon-arrow-right"></i>
                                     <span>Penjualan</span>
                                     <span class="pull-right-container">
@@ -630,6 +631,15 @@
                                         <li data-alias="retur_penjualan">
                                             <a href="{{ env('OLD_URL_ROOT') }}#retur_penjualan">
                                                 <i class="glyphicon glyphicon-option-vertical"></i>Retur Penjualan
+                                            </a>
+                                        </li>
+                                    @endif
+                                    @if (checkAccessMenu('uang_muka_penjualan'))
+                                        <li class="nav-item {{ request()->segment(1) == 'uang_muka_penjualan' ? 'active' : null }}"
+                                            data-alias="uang_muka_penjualan">
+                                            <a href="{{ route('sales-down-payment') }}">
+                                                <i class="glyphicon glyphicon-option-vertical"></i> Uang Muka
+                                                Jual (UMJ)
                                             </a>
                                         </li>
                                     @endif

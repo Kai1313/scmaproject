@@ -23,12 +23,12 @@
 @section('header')
     <section class="content-header">
         <h1>
-            Uang Muka Pembelian
+            Uang Muka Penjualan
             <small>| {{ $data ? 'Edit' : 'Tambah' }}</small>
         </h1>
         <ol class="breadcrumb">
             <li><a href="#"><i class="fa fa-dashboard"></i> Dashboard</a></li>
-            <li><a href="{{ route('purchase-down-payment') }}">Uang Muka Pembelian</a></li>
+            <li><a href="{{ route('sales-down-payment') }}">Uang Muka Penjualan</a></li>
             <li class="active">Form</li>
         </ol>
     </section>
@@ -38,13 +38,13 @@
     <div class="content container-fluid">
         <div class="box">
             <div class="box-header">
-                <h3 class="box-title">{{ $data ? 'Ubah' : 'Tambah' }} Uang Muka Pembelian</h3>
-                <a href="{{ route('purchase-down-payment') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right">
+                <h3 class="box-title">{{ $data ? 'Ubah' : 'Tambah' }} Uang Muka Penjualan</h3>
+                <a href="{{ route('sales-down-payment') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right">
                     <span class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali
                 </a>
             </div>
             <div class="box-body">
-                <form action="{{ route('purchase-down-payment-save-entry', $data ? $data->id_uang_muka_pembelian : 0) }}"
+                <form action="{{ route('sales-down-payment-save-entry', $data ? $data->id_uang_muka_penjualan : 0) }}"
                     method="post" class="post-action">
                     <div class="row">
                         <div class="col-md-4">
@@ -60,10 +60,10 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <label>Kode Uang Muka Pembelian</label>
+                            <label>Kode Uang Muka Penjualan</label>
                             <div class="form-group">
-                                <input type="text" name="kode_uang_muka_pembelian"
-                                    value="{{ old('kode_uang_muka_pembelian', $data ? $data->kode_uang_muka_pembelian : '') }}"
+                                <input type="text" name="kode_uang_muka_penjualan"
+                                    value="{{ old('kode_uang_muka_penjualan', $data ? $data->kode_uang_muka_penjualan : '') }}"
                                     class="form-control" readonly placeholder="Otomatis">
                             </div>
                             <label>Tanggal <span>*</span></label>
@@ -73,15 +73,15 @@
                                     class="form-control datepicker" data-validation="[NOTEMPTY]"
                                     data-validation-message="Tanggal tidak boleh kosong">
                             </div>
-                            <label>ID Permintaan Pembelian (PO) <span>*</span></label>
+                            <label>ID Permintaan Penjualan (SO) <span>*</span></label>
                             <div class="form-group">
-                                <select name="id_permintaan_pembelian" class="form-control selectAjax"
+                                <select name="id_permintaan_penjualan" class="form-control selectAjax"
                                     data-validation="[NOTEMPTY]"
-                                    data-validation-message="ID permintaan pembelian tidak boleh kosong">
-                                    <option value="">Pilih Permintaan Pembelian (PO)</option>
-                                    @if ($data && $data->id_permintaan_pembelian)
-                                        <option value="{{ $data->id_permintaan_pembelian }}" selected>
-                                            {{ $data->purchaseOrder->nama_permintaan_pembelian }}
+                                    data-validation-message="ID permintaan penjualan tidak boleh kosong">
+                                    <option value="">Pilih Permintaan Penjualan (SO)</option>
+                                    @if ($data && $data->id_permintaan_penjualan)
+                                        <option value="{{ $data->id_permintaan_penjualan }}" selected>
+                                            {{ $data->salesOrder->nama_permintaan_penjualan }}
                                         </option>
                                     @endif
                                 </select>
@@ -165,12 +165,12 @@
         });
 
         if ($('[name="id_cabang"]').val() == '') {
-            $('[name="id_permintaan_pembelian"]').prop('disabled', true)
+            $('[name="id_permintaan_penjualan"]').prop('disabled', true)
         }
 
         $('[name="id_cabang"]').select2().on('select2:select', function(e) {
             let dataselect = e.params.data
-            let self = $('[name="id_permintaan_pembelian"]')
+            let self = $('[name="id_permintaan_penjualan"]')
             if (dataselect.id == '') {
                 self.val('').prop('disabled', true).trigger('change')
             } else {
@@ -179,14 +179,14 @@
 
             $('[name="nominal"]').val('').attr('data-max', 0)
             $('[name="total"]').val('')
-            getPurchaseOrder()
+            getSalesOrder()
         })
 
-        function getPurchaseOrder() {
-            let tag = $('[name="id_permintaan_pembelian"]')
+        function getSalesOrder() {
+            let tag = $('[name="id_permintaan_penjualan"]')
             $('#cover-spin').show()
             $.ajax({
-                url: '{{ route('purchase-down-payment-auto-po') }}',
+                url: '{{ route('sales-down-payment-auto-so') }}',
                 data: {
                     id_cabang: $('[name="id_cabang"]').val()
                 },
@@ -209,11 +209,11 @@
         function getTotalPrice(param) {
             $('#cover-spin').show()
             $.ajax({
-                url: '{{ route('purchase-down-payment-count-po') }}',
+                url: '{{ route('sales-down-payment-count-so') }}',
                 type: 'get',
                 data: {
-                    po_id: param,
-                    id: '{{ $data ? $data->id_uang_muka_pembelian : 0 }}'
+                    so_id: param,
+                    id: '{{ $data ? $data->id_uang_muka_penjualan : 0 }}'
                 },
                 success: function(res) {
                     $('[name="nominal"]').val(formatNumber(res.nominal)).attr(
