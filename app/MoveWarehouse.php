@@ -113,6 +113,7 @@ class MoveWarehouse extends Model
 
     public function savedetails($details, $type = 'in')
     {
+        $idJenisTransaksi = ($type == 'out') ? '21' : '22';
         $detail = json_decode($details);
         $ids = array_column($detail, 'id_pindah_barang_detail');
         $selectTrash = MoveWarehouseDetail::where('id_pindah_barang', $this->id_pindah_barang)
@@ -120,21 +121,28 @@ class MoveWarehouse extends Model
             ->get();
         foreach ($selectTrash as $trash) {
             $trashQrCode = MasterQrCode::where('kode_batang_master_qr_code', $trash->qr_code)->first();
-            if ($type == 'out') {
-                $trashQrCode->sisa_master_qr_code = $trashQrCode->jumlah_master_qr_code;
-            } else {
-                $trashQrCode->sisa_master_qr_code = 0;
+            if ($trashQrCode) {
+                if ($type == 'out') {
+                    $trashQrCode->sisa_master_qr_code = $trashQrCode->jumlah_master_qr_code;
+                } else {
+                    $trashQrCode->sisa_master_qr_code = 0;
+                }
+
+                $trashQrCode->save();
             }
 
-            $trashQrCode->save();
+            $kartuStok = KartuStok::where('id_jenis_transaksi', $idJenisTransaksi)
+                ->where('kode_batang_kartu_stok', $trash->qr_code)
+                ->where('kode_kartu_stok', $this->kode_pindah_barang)
+                ->delete();
+
             $trash->delete();
         }
 
         foreach ($detail as $data) {
             $check = MoveWarehouseDetail::where('id_pindah_barang_detail', $data->id_pindah_barang_detail)->first();
-
             if (!$check) {
-                DB::table('pindah_barang_detail')->insert([
+                $array = [
                     'id_pindah_barang' => $this->id_pindah_barang,
                     'id_barang' => $data->id_barang,
                     'id_satuan_barang' => $data->id_satuan_barang,
@@ -151,7 +159,10 @@ class MoveWarehouse extends Model
                     'dt_created' => date('Y-m-d H:i:s'),
                     'batch' => $data->batch,
                     'tanggal_kadaluarsa' => $data->tanggal_kadaluarsa,
-                ]);
+                ];
+                $store = new MoveWarehouseDetail;
+                $store->fill($array);
+                $store->save();
 
                 $master = MasterQrCode::where('kode_batang_master_qr_code', $data->qr_code)->first();
                 if ($master) {
@@ -159,12 +170,42 @@ class MoveWarehouse extends Model
                         $master->sisa_master_qr_code = $master->jumlah_master_qr_code;
                         $master->id_cabang = $this->id_cabang;
                         $master->id_gudang = $this->id_gudang;
+                        $master->id_jenis_transaksi = $idJenisTransaksi;
                     } else {
                         $master->sisa_master_qr_code = 0;
                     }
 
                     $master->save();
                 }
+
+                DB::table('kartu_stok')->insert([
+                    'id_gudang' => $this->id_gudang,
+                    'id_jenis_transaksi' => $idJenisTransaksi,
+                    'kode_kartu_stok' => $this->kode_pindah_barang,
+                    'id_barang' => $data->id_barang,
+                    'id_satuan_barang' => $data->id_satuan_barang,
+                    'nama_kartu_stok' => $this->id_pindah_barang,
+                    'nomor_kartu_stok' => $store->id_pindah_barang_detail,
+                    'tanggal_kartu_stok' => date('Y-m-d'),
+                    'debit_kartu_stok' => 0,
+                    'kredit_kartu_stok' => ($type == 'in' && $data->status_diterima == 1) ? '-' . $store->qty : $store->qty,
+                    'tanggal_kadaluarsa_kartu_stok' => $data->tanggal_kadaluarsa,
+                    'mtotal_debit_kartu_stok' => 0,
+                    'mtotal_kredit_kartu_stok' => 0,
+                    'kode_batang_kartu_stok' => $data->qr_code,
+                    'kode_batang_lama_kartu_stok' => $data->qr_code,
+                    'rak_kartu_stok' => '',
+                    'batch_kartu_stok' => $data->batch,
+                    'id_perkiraan' => 34,
+                    'sg_kartu_stok' => $data->sg,
+                    'be_kartu_stok' => $data->be,
+                    'ph_kartu_stok' => $data->ph,
+                    'warna_kartu_stok' => $data->warna,
+                    'keterangan_kartu_stok' => $data->keterangan,
+                    'status_kartu_stok' => 1,
+                    'user_kartu_stok' => session()->get('user')['id_pengguna'],
+                    'date_kartu_stok' => date('Y-m-d H:i:s'),
+                ]);
             }
         }
 
