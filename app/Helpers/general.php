@@ -1,5 +1,9 @@
 <?php
 
+use App\Models\User;
+use App\Models\UserToken;
+use Illuminate\Support\Facades\DB;
+
 function normalizeNumber($number = 0)
 {
     if (strpos($number, ',')) {
@@ -24,8 +28,8 @@ function checkUserSession($request, $alias_menu, $type)
             $user_id = session()->get('user')->id_pengguna;
         }
 
-        $user = \App\Models\User::where('id_pengguna', $user_id)->first();
-        $token = \App\Models\UserToken::where('id_pengguna', $user_id)->where('status_token_pengguna', 1)->whereRaw("waktu_habis_token_pengguna > STR_TO_DATE(?, '%Y-%m-%d %H:%i:%s')", \Carbon\Carbon::now()->format('Y-m-d H:i:s'))->first();
+        $user = User::where('id_pengguna', $user_id)->first();
+        $token = UserToken::where('id_pengguna', $user_id)->where('status_token_pengguna', 1)->whereRaw("waktu_habis_token_pengguna > STR_TO_DATE(?, '%Y-%m-%d %H:%i:%s')", \Carbon\Carbon::now()->format('Y-m-d H:i:s'))->first();
 
         $idGroup = $user->id_grup_pengguna;
         $menu_access = DB::table('menu')
