@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Accounting\GeneralLedger;
 use App\Models\Accounting\JurnalDetail;
 use App\Models\Accounting\JurnalHeader;
 use App\Models\Accounting\TrxSaldo;
@@ -10,11 +9,6 @@ use App\Models\Master\Akun;
 use App\Models\Master\Cabang;
 use App\Models\Master\Pelanggan;
 use App\Models\Master\Pemasok;
-use App\Models\Master\Setting;
-use App\Models\Master\Slip;
-use App\Models\User;
-use App\Models\UserToken;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -29,72 +23,20 @@ class AdjustmentLedgerController extends Controller
      */
     public function index(Request $request)
     {
+        if (checkUserSession($request, 'adjustment_ledger', 'show') == false) {
+            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+        }
+
         $cabang = Cabang::find(1);
         $data_cabang = Cabang::all();
-        $user_id = $request->user_id;
 
-        if (($user_id != '' && $request->session()->has('token') == false) || $request->session()->has('token') == true) {
-            if ($request->session()->has('token') == true) {
-                $user_id = $request->session()->get('user')->id_pengguna;
-            }
-            $user       = User::where('id_pengguna', $user_id)->first();
-            $token      = UserToken::where('id_pengguna', $user_id)->where('status_token_pengguna', 1)->whereRaw("waktu_habis_token_pengguna > STR_TO_DATE(?, '%Y-%m-%d %H:%i:%s')", Carbon::now()->format('Y-m-d H:i:s'))->first();
+        $data = [
+            "pageTitle" => "SCA Accounting | Transaksi Jurnal Penyesuaian | List",
+            "cabang" => $cabang,
+            "data_cabang" => $data_cabang,
+        ];
 
-            $sql = "SELECT
-                a.id_pengguna,
-                a.id_grup_pengguna,
-                d.id_menu,
-                d.nama_menu,
-                c.lihat_akses_menu,
-                c.tambah_akses_menu,
-                c.ubah_akses_menu,
-                c.hapus_akses_menu,
-                c.cetak_akses_menu 
-            FROM
-                pengguna a,
-                grup_pengguna b,
-                akses_menu c,
-                menu d 
-            WHERE
-                a.id_grup_pengguna = b.id_grup_pengguna 
-                AND b.id_grup_pengguna = c.id_grup_pengguna 
-                AND c.id_menu = d.id_menu 
-                AND a.id_pengguna = $user_id
-                AND d.keterangan_menu = 'Accounting' 
-                AND d.status_menu = 1";
-            $access = DB::connection('mysql')->select($sql);
-
-            $user_access = array();
-            foreach ($access as $value) {
-                $user_access[$value->nama_menu] = ['show' => $value->lihat_akses_menu, 'create' => $value->tambah_akses_menu, 'edit' => $value->ubah_akses_menu, 'delete' => $value->hapus_akses_menu, 'print' => $value->cetak_akses_menu];
-            }
-
-            if ($token && $request->session()->has('token') == false) {
-                $request->session()->put('token', $token->nama_token_pengguna);
-                $request->session()->put('user', $user);
-                $request->session()->put('access', $user_access);
-            } else if ($request->session()->has('token')) {
-            } else {
-                $request->session()->flush();
-            }
-
-            $session = $request->session()->get('access');
-
-            $data = [
-                "pageTitle" => "SCA Accounting | Transaksi Jurnal Penyesuaian | List",
-                "cabang" => $cabang,
-                "data_cabang" => $data_cabang
-            ];
-
-            if (($request->session()->has('token') && array_key_exists('Jurnal Umum', $session)) && $session['Jurnal Umum']['show'] == 1) {
-                return view('accounting.journal.adjusting_journal.index', $data);
-            } else {
-                return view('exceptions.forbidden');
-            }
-        } else {
-            $request->session()->flush();
-            return view('exceptions.forbidden');
-        }
+        return view('accounting.journal.adjusting_journal.index', $data);
     }
 
     /**
@@ -104,6 +46,10 @@ class AdjustmentLedgerController extends Controller
      */
     public function create(Request $request)
     {
+        if (checkAccessMenu('adjustment_ledger', 'create') == false) {
+            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+        }
+
         $data_cabang = Cabang::where("status_cabang", 1)->get();
         $data_pelanggan = Pelanggan::all();
         $data_pemasok = Pemasok::all();
@@ -117,13 +63,7 @@ class AdjustmentLedgerController extends Controller
 
         Log::debug(json_encode($request->session()->get('user')));
 
-        $session = $request->session()->get('access');
-
-        if (($request->session()->has('token') && array_key_exists('Jurnal Umum', $session)) && $session['Jurnal Umum']['create'] == 1) {
-            return view('accounting.journal.adjusting_journal.form', $data);
-        } else {
-            return view('exceptions.forbidden');
-        }
+        return view('accounting.journal.adjusting_journal.form', $data);
     }
 
     /**
@@ -143,7 +83,7 @@ class AdjustmentLedgerController extends Controller
             if (count($request->detail) <= 0) {
                 return response()->json([
                     "result" => false,
-                    "message" => "Error. There is no detail"
+                    "message" => "Error. There is no detail",
                 ]);
             }
 
@@ -177,7 +117,7 @@ class AdjustmentLedgerController extends Controller
                 DB::rollback();
                 return response()->json([
                     "result" => false,
-                    "message" => "Error when store Jurnal data on table header"
+                    "message" => "Error when store Jurnal data on table header",
                 ]);
             }
 
@@ -201,7 +141,7 @@ class AdjustmentLedgerController extends Controller
                     DB::rollback();
                     return response()->json([
                         "result" => false,
-                        "message" => "Error when store Jurnal data on table detail"
+                        "message" => "Error when store Jurnal data on table detail",
                     ]);
                 }
 
@@ -213,7 +153,7 @@ class AdjustmentLedgerController extends Controller
                         DB::rollback();
                         return response()->json([
                             "result" => false,
-                            "message" => "Error when store Jurnal data on update saldo transaksi"
+                            "message" => "Error when store Jurnal data on update saldo transaksi",
                         ]);
                     }
                 }
@@ -231,7 +171,7 @@ class AdjustmentLedgerController extends Controller
             return response()->json([
                 "result" => false,
                 "message" => "Error when store Jurnal data",
-                "exception" => $e
+                "exception" => $e,
             ]);
         }
     }
@@ -244,6 +184,10 @@ class AdjustmentLedgerController extends Controller
      */
     public function show(Request $request, $id)
     {
+        if (checkAccessMenu('adjustment_ledger', 'show') == false) {
+            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+        }
+
         $data_jurnal_header = JurnalHeader::join('cabang', 'cabang.id_cabang', 'jurnal_header.id_cabang')
             ->where('id_jurnal', $id)
             ->select('jurnal_header.*', 'cabang.kode_cabang', 'cabang.nama_cabang', DB::raw(
@@ -267,16 +211,10 @@ class AdjustmentLedgerController extends Controller
         $data = [
             "pageTitle" => "SCA Accounting | Transaksi Jurnal Umum | Detail",
             "data_jurnal_header" => $data_jurnal_header,
-            "data_jurnal_detail" => $data_jurnal_detail
+            "data_jurnal_detail" => $data_jurnal_detail,
         ];
 
-        $session = $request->session()->get('access');
-
-        if (($request->session()->has('token') && array_key_exists('Jurnal Umum', $session)) && $session['Jurnal Umum']['show'] == 1) {
-            return view('accounting.journal.adjusting_journal.detail', $data);
-        } else {
-            return view('exceptions.forbidden');
-        }
+        return view('accounting.journal.adjusting_journal.detail', $data);
     }
 
     public function printSlip(Request $request, $id)
@@ -312,7 +250,7 @@ class AdjustmentLedgerController extends Controller
 
         $data = [
             "data_jurnal_header" => $data_jurnal_header,
-            "data_jurnal_detail" => $data_jurnal_detail
+            "data_jurnal_detail" => $data_jurnal_detail,
         ];
 
         // dd($data);
@@ -332,6 +270,10 @@ class AdjustmentLedgerController extends Controller
      */
     public function edit(Request $request, $id)
     {
+        if (checkAccessMenu('adjustment_ledger', 'edit') == false) {
+            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+        }
+
         $data_cabang = Cabang::where("status_cabang", 1)->get();
         $data_pelanggan = Pelanggan::all();
         $data_pemasok = Pemasok::all();
@@ -350,7 +292,7 @@ class AdjustmentLedgerController extends Controller
                 "notes" => $jurnal->keterangan,
                 "trx" => $jurnal->id_transaksi,
                 "debet" => $jurnal->debet,
-                "kredit" => $jurnal->credit
+                "kredit" => $jurnal->credit,
             ];
         }
 
@@ -367,13 +309,7 @@ class AdjustmentLedgerController extends Controller
 
         Log::debug(json_encode($request->session()->get('user')));
 
-        $session = $request->session()->get('access');
-
-        if (($request->session()->has('token') && array_key_exists('Jurnal Umum', $session)) && $session['Jurnal Umum']['edit'] == 1) {
-            return view('accounting.journal.adjusting_journal.form_edit', $data);
-        } else {
-            return view('exceptions.forbidden');
-        }
+        return view('accounting.journal.adjusting_journal.form_edit', $data);
     }
 
     /**
@@ -394,7 +330,7 @@ class AdjustmentLedgerController extends Controller
             if (count($request->detail) <= 0) {
                 return response()->json([
                     "result" => false,
-                    "message" => "Error. There is no detail"
+                    "message" => "Error. There is no detail",
                 ]);
             }
 
@@ -425,7 +361,7 @@ class AdjustmentLedgerController extends Controller
                         DB::rollback();
                         return response()->json([
                             "result" => false,
-                            "message" => "Error when store Jurnal data on revert saldo transaksi"
+                            "message" => "Error when store Jurnal data on revert saldo transaksi",
                         ]);
                     }
                 }
@@ -443,7 +379,7 @@ class AdjustmentLedgerController extends Controller
                 DB::rollback();
                 return response()->json([
                     "result" => false,
-                    "message" => "Error when store Jurnal data on table header"
+                    "message" => "Error when store Jurnal data on table header",
                 ]);
             }
 
@@ -464,7 +400,7 @@ class AdjustmentLedgerController extends Controller
                     DB::rollback();
                     return response()->json([
                         "result" => false,
-                        "message" => "Error when store Jurnal data on table detail"
+                        "message" => "Error when store Jurnal data on table detail",
                     ]);
                 }
 
@@ -476,7 +412,7 @@ class AdjustmentLedgerController extends Controller
                         DB::rollback();
                         return response()->json([
                             "result" => false,
-                            "message" => "Error when store Jurnal data on update saldo transaksi"
+                            "message" => "Error when store Jurnal data on update saldo transaksi",
                         ]);
                     }
                 }
@@ -494,7 +430,7 @@ class AdjustmentLedgerController extends Controller
             return response()->json([
                 "result" => false,
                 "message" => "Error when store Jurnal data",
-                "exception" => $e
+                "exception" => $e,
             ]);
         }
     }
@@ -524,7 +460,7 @@ class AdjustmentLedgerController extends Controller
             $sortDir = $order['dir'];
             $sort[] = [
                 'column' => $request->columns[$columnIdx]['name'],
-                'dir' => $sortDir
+                'dir' => $sortDir,
             ];
         }
 
@@ -568,7 +504,7 @@ class AdjustmentLedgerController extends Controller
                 $message = "Invalid array for parameter sort";
                 $data = [
                     'result' => false,
-                    'message' => $message
+                    'message' => $message,
                 ];
                 return response()->json($data);
             }
@@ -602,7 +538,6 @@ class AdjustmentLedgerController extends Controller
             $data_general_ledger_table->skip($offset)->take($limit_data);
         }
 
-
         $table['draw'] = $draw;
         $table['recordsTotal'] = $data_general_ledger_table->count();
         $table['recordsFiltered'] = $filtered_data->count();
@@ -613,6 +548,13 @@ class AdjustmentLedgerController extends Controller
 
     public function void(Request $request, $id)
     {
+        if (checkAccessMenu('adjustment_ledger', 'edit') == false) {
+            return response()->json([
+                "result" => false,
+                "message" => "Error when void Jurnal data, user has no access!",
+            ]);
+        }
+
         try {
             Log::info("Void Jurnal Data");
             // exit();
@@ -626,33 +568,40 @@ class AdjustmentLedgerController extends Controller
 
             // Find Header data
             $header = JurnalHeader::where("id_jurnal", $id)->first();
-            $session = $request->session()->get('access');
-
-            if (($request->session()->has('token') && array_key_exists('Jurnal Umum', $session)) && $session['Jurnal Umum']['delete'] == 1) {
-
-                // Update Header Status
-                $header->void = 1;
-                $header->user_void = $userVoid;
-                $header->dt_void = $dateVoid;
-                if (!$header->save()) {
-                    DB::rollback();
-                    return response()->json([
-                        "result" => false,
-                        "message" => "Error when void Jurnal data"
-                    ]);
-                }
-
-                DB::commit();
+            if (checkAccessMenu('adjustment_ledger', 'delete') == false) {
                 return response()->json([
-                    "result" => true,
-                    "message" => "Successfully void Jurnal data",
-                ]);
-            } else {
-                return response()->json([
-                    "result" => FALSE,
-                    "message" => "Maaf, tidak bisa void jurnal dengan id " . $id . ", anda tidak punya akses!"
+                    "result" => false,
+                    "message" => "Maaf, tidak bisa void jurnal dengan id " . $id . ", anda tidak punya akses!",
                 ]);
             }
+
+            // $session = $request->session()->get('access');
+
+            // if (($request->session()->has('token') && array_key_exists('Transaksi Jurnal Umum', $session)) && $session['Transaksi Jurnal Umum']['delete'] == 1) {
+
+            // Update Header Status
+            $header->void = 1;
+            $header->user_void = $userVoid;
+            $header->dt_void = $dateVoid;
+            if (!$header->save()) {
+                DB::rollback();
+                return response()->json([
+                    "result" => false,
+                    "message" => "Error when void Jurnal data",
+                ]);
+            }
+
+            DB::commit();
+            return response()->json([
+                "result" => true,
+                "message" => "Successfully void Jurnal data",
+            ]);
+            // } else {
+            //     return response()->json([
+            //         "result" => false,
+            //         "message" => "Maaf, tidak bisa void jurnal dengan id " . $id . ", anda tidak punya akses!",
+            //     ]);
+            // }
         } catch (\Exception $e) {
             DB::rollback();
             Log::info("Error when void Jurnal data");
@@ -660,13 +609,20 @@ class AdjustmentLedgerController extends Controller
             return response()->json([
                 "result" => false,
                 "message" => "Error when void Jurnal data",
-                "exception" => $e
+                "exception" => $e,
             ]);
         }
     }
 
     public function active(Request $request, $id)
     {
+        if (checkAccessMenu('adjustment_ledger', 'edit') == false) {
+            return response()->json([
+                "result" => false,
+                "message" => "Error when activate Jurnal data, user has no access!",
+            ]);
+        }
+
         try {
             Log::info("Activate Jurnal Data");
             // exit();
@@ -689,7 +645,7 @@ class AdjustmentLedgerController extends Controller
                 DB::rollback();
                 return response()->json([
                     "result" => false,
-                    "message" => "Error when activate Jurnal data"
+                    "message" => "Error when activate Jurnal data",
                 ]);
             }
 
@@ -705,7 +661,7 @@ class AdjustmentLedgerController extends Controller
             return response()->json([
                 "result" => false,
                 "message" => "Error when activate Jurnal data",
-                "exception" => $e
+                "exception" => $e,
             ]);
         }
     }
@@ -722,7 +678,7 @@ class AdjustmentLedgerController extends Controller
                 // Check exist
                 $check = JurnalHeader::where("kode_jurnal", "LIKE", "$prefix%")->orderBy("kode_jurnal", "DESC")->get();
                 if (count($check) > 0) {
-                    $max = (int)substr($check[0]->kode_jurnal, -4);
+                    $max = (int) substr($check[0]->kode_jurnal, -4);
                     $max += 1;
                     $code = $prefix . "." . sprintf("%04s", $max);
                 } else {

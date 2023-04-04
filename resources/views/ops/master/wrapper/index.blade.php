@@ -1,107 +1,101 @@
 @extends('layouts.main')
 
 @section('addedStyles')
-    <!-- DataTables -->
     <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css') }}">
-    <!-- Treetable -->
-    <link rel="stylesheet" href="{{ asset('assets/bower_components/jquery-treetable/css/jquery.treetable.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/bower_components/jquery-treetable/css/jquery.treetable.theme.default.css') }}">
-    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables-responsive/css/responsive.dataTables.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/bower_components/select2/dist/css/select2.min.css') }}">
     <style>
-        #table_master_akun th{
-            text-align: center !important;
-            font-size: 1.5rem !important;
-            border-color: white !important;
-            padding: 0.6rem 0.4rem;
-        }
-
-        #table_master_akun td{
-            font-size: 1.3rem !important;
-            padding: 0.5rem !important;
-        }
-
-        #table_master_akun td.btn-column{
-            text-align: center !important;
-            font-size: 12px;
-            padding: 8px;
-        }
-
-        #table_master_akun td.btn-column span{
-            padding: 2px !important;
-        }
-
-        .dropdown-menu>li>a.text-danger{
-            color: #843534 !important;
-        }
-
-        ul#horizontal-list {
+        ul.horizontal-list {
             min-width: 200px;
             list-style: none;
             margin: 0;
             padding: 0;
         }
 
-        ul#horizontal-list li {
+        ul.horizontal-list li {
             display: inline;
         }
 
-        .mb-1 { margin-bottom:.25rem!important; }
+        .mb-1 {
+            margin-bottom: .25rem !important;
+        }
+
+        th {
+            text-align: center;
+        }
+
+        .rounded-0 {
+            border-radius: 0;
+        }
     </style>
 @endsection
 
 @section('header')
-    <p>Daftar Master Pembungkus</p>
+    <section class="content-header">
+        <h1>
+            Master Pembungkus
+            <small></small>
+        </h1>
+        <ol class="breadcrumb">
+            <li><a href="#"><i class="fa fa-dashboard"></i> Dashboard</a></li>
+            <li class="active">Master Pembungkus</li>
+        </ol>
+    </section>
 @endsection
 
 @section('main-section')
-    <div class="panel">
-        <div class="panel-body">
-            <div style="margin-bottom:10px;">
-                <a href="{{ route('master-wrapper-entry') }}" class="btn btn-primary">Tambah Data Pembungkus</a>
-                <br><br>
-                <select name="id_cabang" class="form-control" style="width:200px;">
-                    @foreach ($cabang as $branch)
-                        <option value="{{ $branch->id_cabang }}">{{$branch->kode_cabang}} - {{ $branch->nama_cabang }}</option>
-                    @endforeach
-                </select>
-                Tampilkan Gambar <input type="checkbox" name="show_image">
+    <div class="content container-fluid">
+        <div class="box">
+            <div class="box-header">
+                <div class="row">
+                    <div class="col-md-4">
+                        <label>Cabang</label>
+                        <div class="form-group">
+                            <select name="id_cabang" class="form-control select2">
+                                @foreach ($cabang as $branch)
+                                    <option value="{{ $branch->id_cabang }}">{{ $branch->kode_cabang }} -
+                                        {{ $branch->nama_cabang }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <span class="badge badge-default rounded-0 pull-right">
+                            <input class="form-check-input" type="checkbox" id="show_image" name="show_image">
+                            <label class="form-check-label" for="show_image">
+                                Gambar
+                            </label>
+                        </span>
+                        <a href="{{ route('master-wrapper-entry') }}"
+                            class="btn btn-success pull-right btn-flat btn-sm mr-1">
+                            <i class="glyphicon glyphicon-plus"></i> Tambah Data Pembungkus
+                        </a>
+                    </div>
+                </div>
             </div>
-            @if (session()->has('success'))
-                <div class="alert alert-success">
-                    <ul>
-                        <li>{!! session()->get('success') !!}</li>
-                    </ul>
-                </div>
-            @endif
-            <table class="table table-bordered data-table">
-                <thead>
-                    <tr>
-                        <th>Nama Pembungkus</th>
-                        <th class="text-right">Berat</th>
-                        <th>Catatan</th>
-                        <th>Gambar</th>
-                        <th width="150px">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <div class="modal fade" id="approvalDelete" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-sm" role="document">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <h4>Anda akan menghapus data ini!</h4>
-                </div>
-                <div class="modal-footer">
-                    <form action="" method="post">
-                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary">Lanjutkan</button>
-                    </form>
+            <div class="box-body">
+                @if (session()->has('success'))
+                    <div class="alert alert-success">
+                        <ul>
+                            <li>{!! session()->get('success') !!}</li>
+                        </ul>
+                    </div>
+                @endif
+                <div class="table-responsive">
+                    <table class="table table-bordered data-table display responsive nowrap" width="100%">
+                        <thead>
+                            <tr>
+                                <th>Nama Pembungkus</th>
+                                <th class="text-right">Berat</th>
+                                <th>Catatan</th>
+                                <th>Gambar</th>
+                                <th width="150px">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -109,20 +103,17 @@
 @endsection
 
 @section('addedScripts')
-    <!-- DataTables -->
     <script src="{{ asset('assets/bower_components/datatables.net/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js') }}"></script>
-    <!-- SlimScroll -->
-    <script src="{{ asset('assets/bower_components/jquery-slimscroll/jquery.slimscroll.min.js') }}"></script>
-    <!-- FastClick -->
-    <script src="{{ asset('assets/bower_components/fastclick/lib/fastclick.js') }}"></script>
-    <!-- TreeTable -->
-    <script src="{{ asset('assets/bower_components/jquery-treetable/jquery.treetable.js') }}"></script>
+    <script src="{{ asset('assets/bower_components/datatables-responsive/js/dataTables.responsive.js') }}"></script>
+    <script src="{{ asset('assets/bower_components/select2/dist/js/select2.min.js') }}"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ asset('js/custom.js') }}"></script>
 @endsection
 
 @section('externalScripts')
-    <script src="{{ asset('assets/bower_components/datatables.net/js/jquery.dataTables.min.js') }}"></script>
     <script>
+        $('.select2').select2()
         var table = $('.data-table').DataTable({
             processing: true,
             serverSide: true,
@@ -134,26 +125,23 @@
             }, {
                 data: 'weight',
                 name: 'weight',
+                render: $.fn.dataTable.render.number('.', ',', 4),
                 className: "text-right"
             }, {
                 data: 'catatan',
                 name: 'catatan'
             }, {
                 data: 'path2',
-                name: 'path2'
+                name: 'path2',
+                className: 'text-center',
             }, {
                 data: 'action',
                 name: 'action',
+                className: 'text-center',
                 orderable: false,
                 searchable: false
             }]
         });
-
-        $(document).on('click', '.btn-destroy', function(e) {
-            e.preventDefault()
-            let route = $(this).prop('href')
-            $('#approvalDelete').modal('show').find('form').attr('action', route)
-        })
 
         $('[name="id_cabang"]').change(function() {
             table.ajax.url("?c=" + $('[name="id_cabang"]').val() + '&show_img=' + $('[name="show_image"]').is(

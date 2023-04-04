@@ -22,4 +22,11 @@ class PurchaseRequestDetail extends Model
     {
         return $this->belongsTo(SatuanBarang::class, 'id_satuan_barang');
     }
+
+    public function kartuStok()
+    {
+        return $this->belongsTo(KartuStok::class, 'id_barang')
+            ->select(\DB::raw('sum(debit_kartu_stok) - sum(kredit_kartu_stok)'))
+            ->groupBy('id_barang');
+    }
 }

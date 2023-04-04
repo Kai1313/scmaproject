@@ -9,6 +9,7 @@ use App\Models\Master\Cabang;
 use App\Models\Master\Slip;
 use App\Models\User;
 use App\Models\UserToken;
+use App\TransactionBalance;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -21,22 +22,22 @@ class ApiController extends Controller
     {
         $user_id = $request->id_pengguna;
 
-        $user       = User::where('id_pengguna', $user_id)->first();
-        $token      = UserToken::where('id_pengguna', $user_id)->where('status_token_pengguna', 1)->whereRaw("waktu_habis_token_pengguna > STR_TO_DATE(?, '%Y-%m-%d %H:%i:%s')", Carbon::now()->format('Y-m-d H:i:s'))->first();
+        $user = User::where('id_pengguna', $user_id)->first();
+        $token = UserToken::where('id_pengguna', $user_id)->where('status_token_pengguna', 1)->whereRaw("waktu_habis_token_pengguna > STR_TO_DATE(?, '%Y-%m-%d %H:%i:%s')", Carbon::now()->format('Y-m-d H:i:s'))->first();
 
         if ($token) {
-            $token = $user->createToken('Token Passport User '. Carbon::now()->format('Y-m-d H:i:s') . '[' . $user->id_pengguna . '] ' .$user->nama_pengguna)->accessToken;
+            $token = $user->createToken('Token Passport User ' . Carbon::now()->format('Y-m-d H:i:s') . '[' . $user->id_pengguna . '] ' . $user->nama_pengguna)->accessToken;
             return response()->json([
                 "result" => true,
                 "code" => 200,
                 "message" => "Login Success",
-                "token" => $token
+                "token" => $token,
             ], 200);
         } else {
             return response()->json([
                 "result" => false,
                 "code" => 401,
-                "message" => "Error, User has no Authorization"
+                "message" => "Error, User has no Authorization",
             ], 401);
         }
     }
@@ -44,7 +45,7 @@ class ApiController extends Controller
     public function profile(Request $request)
     {
         return response()->json([
-            'user' => Auth::guard('api')->user()
+            'user' => Auth::guard('api')->user(),
         ], 200);
     }
 
@@ -55,13 +56,13 @@ class ApiController extends Controller
             return response()->json([
                 "result" => true,
                 "code" => 200,
-                "message" => "Log Out Success"
+                "message" => "Log Out Success",
             ], 200);
         } else {
             return response()->json([
                 "result" => false,
                 "code" => 400,
-                "message" => "Error, Log Out Failed"
+                "message" => "Error, Log Out Failed",
             ], 401);
         }
     }
@@ -95,7 +96,7 @@ class ApiController extends Controller
                 return response()->json([
                     "result" => false,
                     "code" => 400,
-                    "message" => "Error, please use slip Kas Masuk or Bank Masuk"
+                    "message" => "Error, please use slip Kas Masuk or Bank Masuk",
                 ], 400);
             }
 
@@ -105,7 +106,7 @@ class ApiController extends Controller
                 return response()->json([
                     "result" => false,
                     "code" => 404,
-                    "message" => "Error, Setting Uang Muka Penjualan not found"
+                    "message" => "Error, Setting Uang Muka Penjualan not found",
                 ], 404);
             }
 
@@ -114,7 +115,7 @@ class ApiController extends Controller
                 return response()->json([
                     "result" => false,
                     "code" => 404,
-                    "message" => "Error, Setting PPN Keluaran not found"
+                    "message" => "Error, Setting PPN Keluaran not found",
                 ], 404);
             }
 
@@ -131,22 +132,22 @@ class ApiController extends Controller
 
             $jurnal_detail = [
                 [
-                    'akun'          => $akun_slip,
-                    'debet'         => $total,
-                    'credit'        => 0,
-                    'keterangan'    => 'Jurnal Otomatis ' . $jurnal_type_detail . ' Uang Muka Penjualan - ' . $id_transaksi . ' - ' . $nama_pelanggan,
+                    'akun' => $akun_slip,
+                    'debet' => $total,
+                    'credit' => 0,
+                    'keterangan' => 'Jurnal Otomatis ' . $jurnal_type_detail . ' Uang Muka Penjualan - ' . $id_transaksi . ' - ' . $nama_pelanggan,
                 ],
                 [
-                    'akun'          => $akun_uang_muka_penjualan,
-                    'debet'         => 0,
-                    'credit'        => $uang_muka,
-                    'keterangan'    => 'Jurnal Otomatis Uang Muka Penjualan - ' . $id_transaksi . ' - ' . $nama_pelanggan,
+                    'akun' => $akun_uang_muka_penjualan,
+                    'debet' => 0,
+                    'credit' => $uang_muka,
+                    'keterangan' => 'Jurnal Otomatis Uang Muka Penjualan - ' . $id_transaksi . ' - ' . $nama_pelanggan,
                 ],
                 [
-                    'akun'          => $akun_ppn_keluaran,
-                    'debet'         => 0,
-                    'credit'        => $nominal_ppn,
-                    'keterangan'    => 'Jurnal Otomatis PPN Keluaran - ' . $id_transaksi . ' - ' . $nama_pelanggan,
+                    'akun' => $akun_ppn_keluaran,
+                    'debet' => 0,
+                    'credit' => $nominal_ppn,
+                    'keterangan' => 'Jurnal Otomatis PPN Keluaran - ' . $id_transaksi . ' - ' . $nama_pelanggan,
                 ],
             ];
 
@@ -188,7 +189,7 @@ class ApiController extends Controller
                 return response()->json([
                     "result" => false,
                     "code" => 400,
-                    "message" => "Error when store Jurnal data on table header"
+                    "message" => "Error when store Jurnal data on table header",
                 ], 404);
             }
 
@@ -217,7 +218,7 @@ class ApiController extends Controller
                             return response()->json([
                                 "result" => false,
                                 "code" => 400,
-                                "message" => "Error when store Jurnal data on table detail"
+                                "message" => "Error when store Jurnal data on table detail",
                             ], 400);
                         }
 
@@ -227,12 +228,12 @@ class ApiController extends Controller
             }
 
             // check balance
-            if($check_balance_debit != $check_balance_credit){
+            if ($check_balance_debit != $check_balance_credit) {
                 DB::rollback();
                 return response()->json([
                     "result" => false,
                     "code" => 400,
-                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance"
+                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance",
                 ], 400);
             }
 
@@ -250,7 +251,7 @@ class ApiController extends Controller
                 "result" => false,
                 "code" => 400,
                 "message" => "Error when store Jurnal data",
-                "exception" => $e
+                "exception" => $e,
             ], 400);
         }
     }
@@ -284,7 +285,7 @@ class ApiController extends Controller
                 return response()->json([
                     "result" => false,
                     "code" => 400,
-                    "message" => "Error, please use slip Kas Keluar or Bank Keluar"
+                    "message" => "Error, please use slip Kas Keluar or Bank Keluar",
                 ], 400);
             }
 
@@ -294,16 +295,16 @@ class ApiController extends Controller
                 return response()->json([
                     "result" => false,
                     "code" => 404,
-                    "message" => "Error, Setting Uang Muka Pembelian not found"
+                    "message" => "Error, Setting Uang Muka Pembelian not found",
                 ], 404);
             }
 
             $data_akun_ppn_masukan = DB::table('setting')->where('code', 'PPN Masukkan')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
-            if(empty($data_akun_ppn_masukan)){
+            if (empty($data_akun_ppn_masukan)) {
                 return response()->json([
                     "result" => false,
                     "code" => 404,
-                    "message" => "Error, Setting PPN Masukkan not found"
+                    "message" => "Error, Setting PPN Masukkan not found",
                 ], 404);
             }
 
@@ -320,22 +321,22 @@ class ApiController extends Controller
 
             $jurnal_detail = [
                 [
-                    'akun'          => $akun_slip,
-                    'debet'         => 0,
-                    'credit'        => $total,
-                    'keterangan'    => 'Jurnal Otomatis ' . $jurnal_type_detail . ' Uang Muka Pembelian - ' . $id_transaksi . ' - ' . $nama_pemasok,
+                    'akun' => $akun_slip,
+                    'debet' => 0,
+                    'credit' => $total,
+                    'keterangan' => 'Jurnal Otomatis ' . $jurnal_type_detail . ' Uang Muka Pembelian - ' . $id_transaksi . ' - ' . $nama_pemasok,
                 ],
                 [
-                    'akun'          => $akun_uang_muka_pembelian,
-                    'debet'         => $uang_muka,
-                    'credit'        => 0,
-                    'keterangan'    => 'Jurnal Otomatis Uang Muka Pembelian - ' . $id_transaksi . ' - ' . $nama_pemasok,
+                    'akun' => $akun_uang_muka_pembelian,
+                    'debet' => $uang_muka,
+                    'credit' => 0,
+                    'keterangan' => 'Jurnal Otomatis Uang Muka Pembelian - ' . $id_transaksi . ' - ' . $nama_pemasok,
                 ],
                 [
-                    'akun'          => $akun_ppn_masukan,
-                    'debet'         => $nominal_ppn,
-                    'credit'        => 0,
-                    'keterangan'    => 'Jurnal Otomatis PPN Masukkan - ' . $id_transaksi . ' - ' . $nama_pemasok,
+                    'akun' => $akun_ppn_masukan,
+                    'debet' => $nominal_ppn,
+                    'credit' => 0,
+                    'keterangan' => 'Jurnal Otomatis PPN Masukkan - ' . $id_transaksi . ' - ' . $nama_pemasok,
                 ],
             ];
 
@@ -377,7 +378,7 @@ class ApiController extends Controller
                 return response()->json([
                     "result" => false,
                     "code" => 400,
-                    "message" => "Error when store Jurnal data on table header"
+                    "message" => "Error when store Jurnal data on table header",
                 ], 400);
             }
 
@@ -406,7 +407,7 @@ class ApiController extends Controller
                             return response()->json([
                                 "result" => false,
                                 "code" => 400,
-                                "message" => "Error when store Jurnal data on table detail"
+                                "message" => "Error when store Jurnal data on table detail",
                             ], 400);
                         }
 
@@ -416,12 +417,12 @@ class ApiController extends Controller
             }
 
             // check balance
-            if($check_balance_debit != $check_balance_credit){
+            if ($check_balance_debit != $check_balance_credit) {
                 DB::rollback();
                 return response()->json([
                     "result" => false,
                     "code" => 400,
-                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance"
+                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance",
                 ], 400);
             }
 
@@ -439,7 +440,7 @@ class ApiController extends Controller
                 "result" => false,
                 "code" => 400,
                 "message" => "Error when store Jurnal data",
-                "exception" => $e
+                "exception" => $e,
             ], 400);
         }
     }
@@ -464,52 +465,51 @@ class ApiController extends Controller
 
             // init setting
             $data_akun_piutang_dagang = DB::table('setting')->where('code', 'Piutang Dagang')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
-            if(empty($data_akun_piutang_dagang)){
+            if (empty($data_akun_piutang_dagang)) {
                 return response()->json([
                     "result" => false,
                     "code" => 404,
-                    "message" => "Error, Setting Piutang Dagang not found"
+                    "message" => "Error, Setting Piutang Dagang not found",
                 ], 404);
             }
 
             $data_akun_uang_muka_penjualan = DB::table('setting')->where('code', 'Uang Muka Penjualan')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
-            if(empty($data_akun_uang_muka_penjualan)){
+            if (empty($data_akun_uang_muka_penjualan)) {
                 return response()->json([
                     "result" => false,
                     "code" => 404,
-                    "message" => "Error, Setting Uang Muka Penjualan not found"
+                    "message" => "Error, Setting Uang Muka Penjualan not found",
                 ], 404);
             }
 
             $data_akun_ppn_keluaran = DB::table('setting')->where('code', 'PPN Keluaran')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
-            if(empty($data_akun_ppn_keluaran)){
+            if (empty($data_akun_ppn_keluaran)) {
                 return response()->json([
                     "result" => false,
                     "code" => 404,
-                    "message" => "Error, Setting PPN Keluaran not found"
+                    "message" => "Error, Setting PPN Keluaran not found",
                 ], 404);
             }
 
             $data_akun_penjualan = DB::table('setting')->where('code', 'Penjualan')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
-            if(empty($data_akun_penjualan)){
+            if (empty($data_akun_penjualan)) {
                 return response()->json([
                     "result" => false,
                     "code" => 404,
-                    "message" => "Error, Setting Penjualan not found"
+                    "message" => "Error, Setting Penjualan not found",
                 ], 404);
             }
 
             // cek apakah ada saldo_transaksi
             $check_trx_saldo = TrxSaldo::where("id_transaksi", $id_transaksi)->first();
-            if(empty($check_trx_saldo)){
+            if (empty($check_trx_saldo)) {
                 DB::rollback();
                 return response()->json([
                     "result" => false,
                     "code" => 404,
-                    "message" => "Error saldo transaksi belum ada"
+                    "message" => "Error saldo transaksi belum ada",
                 ], 404);
             }
-
 
             // detail
             // Memorial
@@ -527,42 +527,42 @@ class ApiController extends Controller
 
             $jurnal_detail_me = [
                 [
-                    'akun'          => $akun_uang_muka_penjualan,
-                    'debet'         => $uang_muka,
-                    'credit'        => 0,
-                    'keterangan'    => 'Jurnal Otomatis Uang Muka Penjualan - ' . $id_transaksi . ' - ' . $nama_pelanggan,
-                    'id_transaksi'  => null
+                    'akun' => $akun_uang_muka_penjualan,
+                    'debet' => $uang_muka,
+                    'credit' => 0,
+                    'keterangan' => 'Jurnal Otomatis Uang Muka Penjualan - ' . $id_transaksi . ' - ' . $nama_pelanggan,
+                    'id_transaksi' => null,
                 ],
                 [
-                    'akun'          => $akun_piutang_dagang,
-                    'debet'         => 0,
-                    'credit'        => $uang_muka,
-                    'keterangan'    => 'Jurnal Otomatis Pelunasan - ' . $id_transaksi . ' - ' . $nama_pelanggan,
-                    'id_transaksi'  => $id_transaksi
+                    'akun' => $akun_piutang_dagang,
+                    'debet' => 0,
+                    'credit' => $uang_muka,
+                    'keterangan' => 'Jurnal Otomatis Pelunasan - ' . $id_transaksi . ' - ' . $nama_pelanggan,
+                    'id_transaksi' => $id_transaksi,
                 ],
                 [
-                    'akun'          => $akun_piutang_dagang,
-                    'debet'         => ($total + $uang_muka),
-                    'credit'        => 0,
-                    'keterangan'    => 'Jurnal Otomatis Penjualan ' . $id_transaksi . ' - ' . $nama_pelanggan,
-                    'id_transaksi'  => null
+                    'akun' => $akun_piutang_dagang,
+                    'debet' => ($total + $uang_muka),
+                    'credit' => 0,
+                    'keterangan' => 'Jurnal Otomatis Penjualan ' . $id_transaksi . ' - ' . $nama_pelanggan,
+                    'id_transaksi' => null,
                 ],
                 [
-                    'akun'          => $akun_ppn_keluaran,
-                    'debet'         => 0,
-                    'credit'        => $nominal_ppn,
-                    'keterangan'    => 'Jurnal Otomatis PPN Keluaran - ' . $id_transaksi . ' - ' . $nama_pelanggan,
-                    'id_transaksi'  => null
+                    'akun' => $akun_ppn_keluaran,
+                    'debet' => 0,
+                    'credit' => $nominal_ppn,
+                    'keterangan' => 'Jurnal Otomatis PPN Keluaran - ' . $id_transaksi . ' - ' . $nama_pelanggan,
+                    'id_transaksi' => null,
                 ],
             ];
 
-            foreach($detail_inventory as $d_inv){
+            foreach ($detail_inventory as $d_inv) {
                 array_push($jurnal_detail_me, [
-                    'akun'          => $akun_penjualan,
-                    'debet'         => 0,
-                    'credit'        => $d_inv['total'],
-                    'keterangan'    => 'Jurnal Otomatis Penjualan - ' . $id_transaksi . ' - ' . $nama_pelanggan . ' - ' . $d_inv['nama_barang'],
-                    'id_transaksi'  => null
+                    'akun' => $akun_penjualan,
+                    'debet' => 0,
+                    'credit' => $d_inv['total'],
+                    'keterangan' => 'Jurnal Otomatis Penjualan - ' . $id_transaksi . ' - ' . $nama_pelanggan . ' - ' . $d_inv['nama_barang'],
+                    'id_transaksi' => null,
                 ]);
             }
 
@@ -599,14 +599,14 @@ class ApiController extends Controller
                 return response()->json([
                     "result" => false,
                     "code" => 400,
-                    "message" => "Error when store Jurnal data on table header"
+                    "message" => "Error when store Jurnal data on table header",
                 ], 400);
             }
 
             if (!empty($jurnal_detail_me)) {
                 $index = 1;
                 foreach ($jurnal_detail_me as $jd) {
-                    if(($jd['debet'] > 0 && $jd['credit'] == 0) || ($jd['debet'] == 0 && $jd['credit'] > 0)){
+                    if (($jd['debet'] > 0 && $jd['credit'] == 0) || ($jd['debet'] == 0 && $jd['credit'] > 0)) {
                         $detail_me = new JurnalDetail();
                         $detail_me->id_jurnal = $header_me->id_jurnal;
                         $detail_me->index = $index;
@@ -629,7 +629,7 @@ class ApiController extends Controller
                             return response()->json([
                                 "result" => false,
                                 "code" => 400,
-                                "message" => "Error when store Jurnal data on table detail"
+                                "message" => "Error when store Jurnal data on table detail",
                             ], 400);
                         }
 
@@ -639,16 +639,16 @@ class ApiController extends Controller
             }
 
             // check balance
-            if($check_balance_debit != $check_balance_credit){
+            if ($check_balance_debit != $check_balance_credit) {
                 DB::rollback();
                 return response()->json([
                     "result" => false,
                     "code" => 400,
-                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance"
+                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance",
                 ], 400);
             }
 
-            if($id_slip != null){
+            if ($id_slip != null) {
                 // init slip
                 $data_slip = Slip::find($id_slip);
 
@@ -662,7 +662,7 @@ class ApiController extends Controller
                     return response()->json([
                         "result" => false,
                         "code" => 400,
-                        "message" => "Error, please use slip Kas Masuk or Bank Masuk"
+                        "message" => "Error, please use slip Kas Masuk or Bank Masuk",
                     ], 400);
                 }
 
@@ -672,19 +672,19 @@ class ApiController extends Controller
 
                 $jurnal_detail_pelunasan = [
                     [
-                        'akun'          => $akun_slip,
-                        'debet'         => $total,
-                        'credit'        => 0,
-                        'keterangan'    => 'Jurnal Otomatis ' . $jurnal_type_detail . ' Pelunasan - ' . $id_transaksi . ' - ' . $nama_pelanggan,
-                        'id_transaksi'  => null
+                        'akun' => $akun_slip,
+                        'debet' => $total,
+                        'credit' => 0,
+                        'keterangan' => 'Jurnal Otomatis ' . $jurnal_type_detail . ' Pelunasan - ' . $id_transaksi . ' - ' . $nama_pelanggan,
+                        'id_transaksi' => null,
                     ],
                     [
-                        'akun'          => $akun_piutang_dagang,
-                        'debet'         => 0,
-                        'credit'        => $total,
-                        'keterangan'    => 'Jurnal Otomatis Pelunasan - ' . $id_transaksi . ' - ' . $nama_pelanggan,
-                        'id_transaksi'  => $id_transaksi
-                    ]
+                        'akun' => $akun_piutang_dagang,
+                        'debet' => 0,
+                        'credit' => $total,
+                        'keterangan' => 'Jurnal Otomatis Pelunasan - ' . $id_transaksi . ' - ' . $nama_pelanggan,
+                        'id_transaksi' => $id_transaksi,
+                    ],
                 ];
 
                 // Find Header data and delete detail
@@ -700,7 +700,7 @@ class ApiController extends Controller
                     $header->user_modified = $user_created;
                     $header->dt_modified = date('Y-m-d h:i:s');
                 } else {
-                    if(!empty($header) && $header->id_slip != $id_slip){
+                    if (!empty($header) && $header->id_slip != $id_slip) {
                         $header->void = 1;
                         $header->user_void = $user_created;
                         $header->dt_void = date('Y-m-d h:i:s');
@@ -726,14 +726,14 @@ class ApiController extends Controller
                     return response()->json([
                         "result" => false,
                         "code" => 400,
-                        "message" => "Error when store Jurnal data on table header"
+                        "message" => "Error when store Jurnal data on table header",
                     ], 400);
                 }
 
                 if (!empty($jurnal_detail_pelunasan)) {
                     $index = 1;
                     foreach ($jurnal_detail_pelunasan as $jd) {
-                        if(($jd['debet'] > 0 && $jd['credit'] == 0) || ($jd['debet'] == 0 && $jd['credit'] > 0)){
+                        if (($jd['debet'] > 0 && $jd['credit'] == 0) || ($jd['debet'] == 0 && $jd['credit'] > 0)) {
                             $detail = new JurnalDetail();
                             $detail->id_jurnal = $header->id_jurnal;
                             $detail->index = $index;
@@ -752,7 +752,7 @@ class ApiController extends Controller
                                 return response()->json([
                                     "result" => false,
                                     "code" => 400,
-                                    "message" => "Error when store Jurnal data on table detail"
+                                    "message" => "Error when store Jurnal data on table detail",
                                 ], 400);
                             }
 
@@ -760,7 +760,7 @@ class ApiController extends Controller
                             $trx_saldo = TrxSaldo::where("id_transaksi", $jd["id_transaksi"])->first();
                             if ($trx_saldo) {
                                 // cek untuk revert
-                                if($trx_saldo->bayar > 0){
+                                if ($trx_saldo->bayar > 0) {
                                     $update_trx_saldo = $this->revertTrxSaldo($trx_saldo, $jd['debet'], $jd['credit']);
                                 }
 
@@ -771,7 +771,7 @@ class ApiController extends Controller
                                     DB::rollback();
                                     return response()->json([
                                         "result" => false,
-                                        "message" => "Error when store Jurnal data on update saldo transaksi"
+                                        "message" => "Error when store Jurnal data on update saldo transaksi",
                                     ]);
                                 }
                             }
@@ -796,7 +796,7 @@ class ApiController extends Controller
                 "result" => false,
                 "code" => 400,
                 "message" => "Error when store Jurnal data",
-                "exception" => $e
+                "exception" => $e,
             ], 400);
         }
     }
@@ -810,7 +810,7 @@ class ApiController extends Controller
             $tanggal_jurnal = date('Y-m-d', strtotime($request->tanggal));
             $void = $request->void;
             $user_created = $request->user;
-            $id_pemasok= $request->pemasok;
+            $id_pemasok = $request->pemasok;
             $id_cabang = $request->cabang;
             $id_slip = $request->slip;
             $detail_inventory = array_values($request->detail);
@@ -821,43 +821,42 @@ class ApiController extends Controller
 
             // init setting
             $data_akun_hutang_dagang = DB::table('setting')->where('code', 'Hutang Dagang')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
-            if(empty($data_akun_hutang_dagang)){
+            if (empty($data_akun_hutang_dagang)) {
                 return response()->json([
                     "result" => false,
                     "code" => 404,
-                    "message" => "Error, Setting Hutang Dagang not found"
+                    "message" => "Error, Setting Hutang Dagang not found",
                 ], 404);
             }
 
             $data_akun_uang_muka_pembelian = DB::table('setting')->where('code', 'Uang Muka Pembelian')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
-            if(empty($data_akun_uang_muka_pembelian)){
+            if (empty($data_akun_uang_muka_pembelian)) {
                 return response()->json([
                     "result" => false,
                     "code" => 404,
-                    "message" => "Error, Setting Uang Muka Pembelian not found"
+                    "message" => "Error, Setting Uang Muka Pembelian not found",
                 ], 404);
             }
 
             $data_akun_ppn_masukkan = DB::table('setting')->where('code', 'PPN Masukkan')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
-            if(empty($data_akun_ppn_masukkan)){
+            if (empty($data_akun_ppn_masukkan)) {
                 return response()->json([
                     "result" => false,
                     "code" => 404,
-                    "message" => "Error, Setting PPN Masukkan not found"
+                    "message" => "Error, Setting PPN Masukkan not found",
                 ], 404);
             }
 
             // cek apakah ada saldo_transaksi
             $check_trx_saldo = TrxSaldo::where("id_transaksi", $id_transaksi)->first();
-            if(empty($check_trx_saldo)){
+            if (empty($check_trx_saldo)) {
                 DB::rollback();
                 return response()->json([
                     "result" => false,
                     "code" => 404,
-                    "message" => "Error saldo transaksi belum ada"
+                    "message" => "Error saldo transaksi belum ada",
                 ], 404);
             }
-
 
             // detail
             // Memorial
@@ -874,42 +873,42 @@ class ApiController extends Controller
 
             $jurnal_detail_me = [
                 [
-                    'akun'          => $akun_uang_muka_pembelian,
-                    'debet'         => 0,
-                    'credit'        => $uang_muka,
-                    'keterangan'    => 'Jurnal Otomatis Uang Muka Pembelian - ' . $id_transaksi . ' - ' . $nama_pemasok,
-                    'id_transaksi'  => null
+                    'akun' => $akun_uang_muka_pembelian,
+                    'debet' => 0,
+                    'credit' => $uang_muka,
+                    'keterangan' => 'Jurnal Otomatis Uang Muka Pembelian - ' . $id_transaksi . ' - ' . $nama_pemasok,
+                    'id_transaksi' => null,
                 ],
                 [
-                    'akun'          => $akun_hutang_dagang,
-                    'debet'         => $uang_muka,
-                    'credit'        => 0,
-                    'keterangan'    => 'Jurnal Otomatis Pelunasan - ' . $id_transaksi . ' - ' . $nama_pemasok,
-                    'id_transaksi'  => $id_transaksi
+                    'akun' => $akun_hutang_dagang,
+                    'debet' => $uang_muka,
+                    'credit' => 0,
+                    'keterangan' => 'Jurnal Otomatis Pelunasan - ' . $id_transaksi . ' - ' . $nama_pemasok,
+                    'id_transaksi' => $id_transaksi,
                 ],
                 [
-                    'akun'          => $akun_hutang_dagang,
-                    'debet'         => 0,
-                    'credit'        => ($total + $uang_muka),
-                    'keterangan'    => 'Jurnal Otomatis Pembelian ' . $id_transaksi . ' - ' . $nama_pemasok,
-                    'id_transaksi'  => null
+                    'akun' => $akun_hutang_dagang,
+                    'debet' => 0,
+                    'credit' => ($total + $uang_muka),
+                    'keterangan' => 'Jurnal Otomatis Pembelian ' . $id_transaksi . ' - ' . $nama_pemasok,
+                    'id_transaksi' => null,
                 ],
                 [
-                    'akun'          => $akun_ppn_masukkan,
-                    'debet'         => $nominal_ppn,
-                    'credit'        => 0,
-                    'keterangan'    => 'Jurnal Otomatis PPN Masukkan - ' . $id_transaksi . ' - ' . $nama_pemasok,
-                    'id_transaksi'  => null
+                    'akun' => $akun_ppn_masukkan,
+                    'debet' => $nominal_ppn,
+                    'credit' => 0,
+                    'keterangan' => 'Jurnal Otomatis PPN Masukkan - ' . $id_transaksi . ' - ' . $nama_pemasok,
+                    'id_transaksi' => null,
                 ],
             ];
 
-            foreach($detail_inventory as $d_inv){
+            foreach ($detail_inventory as $d_inv) {
                 array_push($jurnal_detail_me, [
-                    'akun'          => $d_inv['akun_id'],
-                    'debet'         => $d_inv['total'],
-                    'credit'        => 0,
-                    'keterangan'    => 'Jurnal Otomatis Pembelian Persediaan - ' . $id_transaksi . ' - ' . $nama_pemasok . ' - ' . $d_inv['nama_barang'],
-                    'id_transaksi'  => null
+                    'akun' => $d_inv['akun_id'],
+                    'debet' => $d_inv['total'],
+                    'credit' => 0,
+                    'keterangan' => 'Jurnal Otomatis Pembelian Persediaan - ' . $id_transaksi . ' - ' . $nama_pemasok . ' - ' . $d_inv['nama_barang'],
+                    'id_transaksi' => null,
                 ]);
             }
 
@@ -946,14 +945,14 @@ class ApiController extends Controller
                 return response()->json([
                     "result" => false,
                     "code" => 400,
-                    "message" => "Error when store Jurnal data on table header"
+                    "message" => "Error when store Jurnal data on table header",
                 ], 400);
             }
 
             if (!empty($jurnal_detail_me)) {
                 $index = 1;
                 foreach ($jurnal_detail_me as $jd) {
-                    if(($jd['debet'] > 0 && $jd['credit'] == 0) || ($jd['debet'] == 0 && $jd['credit'] > 0)){
+                    if (($jd['debet'] > 0 && $jd['credit'] == 0) || ($jd['debet'] == 0 && $jd['credit'] > 0)) {
                         $detail_me = new JurnalDetail();
                         $detail_me->id_jurnal = $header_me->id_jurnal;
                         $detail_me->index = $index;
@@ -976,7 +975,7 @@ class ApiController extends Controller
                             return response()->json([
                                 "result" => false,
                                 "code" => 400,
-                                "message" => "Error when store Jurnal data on table detail"
+                                "message" => "Error when store Jurnal data on table detail",
                             ], 400);
                         }
 
@@ -986,16 +985,16 @@ class ApiController extends Controller
             }
 
             // check balance
-            if($check_balance_debit != $check_balance_credit){
+            if ($check_balance_debit != $check_balance_credit) {
                 DB::rollback();
                 return response()->json([
                     "result" => false,
                     "code" => 400,
-                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance"
+                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance",
                 ], 400);
             }
 
-            if($id_slip != null){
+            if ($id_slip != null) {
                 // init slip
                 $data_slip = Slip::find($id_slip);
 
@@ -1009,7 +1008,7 @@ class ApiController extends Controller
                     return response()->json([
                         "result" => false,
                         "code" => 400,
-                        "message" => "Error, please use slip Kas Keluar or Bank Keluar"
+                        "message" => "Error, please use slip Kas Keluar or Bank Keluar",
                     ], 400);
                 }
 
@@ -1019,19 +1018,19 @@ class ApiController extends Controller
 
                 $jurnal_detail_pelunasan = [
                     [
-                        'akun'          => $akun_slip,
-                        'debet'         => 0,
-                        'credit'        => $total,
-                        'keterangan'    => 'Jurnal Otomatis ' . $jurnal_type_detail . ' Pelunasan - ' . $id_transaksi . ' - ' . $nama_pemasok,
-                        'id_transaksi'  => null
+                        'akun' => $akun_slip,
+                        'debet' => 0,
+                        'credit' => $total,
+                        'keterangan' => 'Jurnal Otomatis ' . $jurnal_type_detail . ' Pelunasan - ' . $id_transaksi . ' - ' . $nama_pemasok,
+                        'id_transaksi' => null,
                     ],
                     [
-                        'akun'          => $akun_hutang_dagang,
-                        'debet'         => $total,
-                        'credit'        => 0,
-                        'keterangan'    => 'Jurnal Otomatis Pelunasan - ' . $id_transaksi . ' - ' . $nama_pemasok,
-                        'id_transaksi'  => $id_transaksi
-                    ]
+                        'akun' => $akun_hutang_dagang,
+                        'debet' => $total,
+                        'credit' => 0,
+                        'keterangan' => 'Jurnal Otomatis Pelunasan - ' . $id_transaksi . ' - ' . $nama_pemasok,
+                        'id_transaksi' => $id_transaksi,
+                    ],
                 ];
 
                 // Find Header data and delete detail
@@ -1047,7 +1046,7 @@ class ApiController extends Controller
                     $header->user_modified = $user_created;
                     $header->dt_modified = date('Y-m-d h:i:s');
                 } else {
-                    if(!empty($header) && $header->id_slip != $id_slip){
+                    if (!empty($header) && $header->id_slip != $id_slip) {
                         $header->void = 1;
                         $header->user_void = $user_created;
                         $header->dt_void = date('Y-m-d h:i:s');
@@ -1073,14 +1072,14 @@ class ApiController extends Controller
                     return response()->json([
                         "result" => false,
                         "code" => 400,
-                        "message" => "Error when store Jurnal data on table header"
+                        "message" => "Error when store Jurnal data on table header",
                     ], 400);
                 }
 
                 if (!empty($jurnal_detail_pelunasan)) {
                     $index = 1;
                     foreach ($jurnal_detail_pelunasan as $jd) {
-                        if(($jd['debet'] > 0 && $jd['credit'] == 0) || ($jd['debet'] == 0 && $jd['credit'] > 0)){
+                        if (($jd['debet'] > 0 && $jd['credit'] == 0) || ($jd['debet'] == 0 && $jd['credit'] > 0)) {
                             $detail = new JurnalDetail();
                             $detail->id_jurnal = $header->id_jurnal;
                             $detail->index = $index;
@@ -1099,7 +1098,7 @@ class ApiController extends Controller
                                 return response()->json([
                                     "result" => false,
                                     "code" => 400,
-                                    "message" => "Error when store Jurnal data on table detail"
+                                    "message" => "Error when store Jurnal data on table detail",
                                 ], 400);
                             }
 
@@ -1107,7 +1106,7 @@ class ApiController extends Controller
                             $trx_saldo = TrxSaldo::where("id_transaksi", $jd["id_transaksi"])->first();
                             if ($trx_saldo) {
                                 // cek untuk revert
-                                if($trx_saldo->bayar > 0){
+                                if ($trx_saldo->bayar > 0) {
                                     $update_trx_saldo = $this->revertTrxSaldo($trx_saldo, $jd['debet'], $jd['credit']);
                                 }
 
@@ -1118,7 +1117,7 @@ class ApiController extends Controller
                                     DB::rollback();
                                     return response()->json([
                                         "result" => false,
-                                        "message" => "Error when store Jurnal data on update saldo transaksi"
+                                        "message" => "Error when store Jurnal data on update saldo transaksi",
                                     ]);
                                 }
                             }
@@ -1143,7 +1142,7 @@ class ApiController extends Controller
                 "result" => false,
                 "code" => 400,
                 "message" => "Error when store Jurnal data",
-                "exception" => $e
+                "exception" => $e,
             ], 400);
         }
     }
@@ -1168,40 +1167,40 @@ class ApiController extends Controller
 
             // init setting
             $data_akun_piutang_dagang = DB::table('setting')->where('code', 'Piutang Dagang')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
-            if(empty($data_akun_piutang_dagang)){
+            if (empty($data_akun_piutang_dagang)) {
                 return response()->json([
                     "result" => false,
                     "code" => 404,
-                    "message" => "Error, Setting Piutang Dagang not found"
+                    "message" => "Error, Setting Piutang Dagang not found",
                 ], 404);
             }
 
             $data_akun_ppn_keluaran = DB::table('setting')->where('code', 'PPN Keluaran')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
-            if(empty($data_akun_ppn_keluaran)){
+            if (empty($data_akun_ppn_keluaran)) {
                 return response()->json([
                     "result" => false,
                     "code" => 404,
-                    "message" => "Error, Setting PPN Keluaran not found"
+                    "message" => "Error, Setting PPN Keluaran not found",
                 ], 404);
             }
 
             $data_akun_penjualan = DB::table('setting')->where('code', 'Penjualan')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
-            if(empty($data_akun_penjualan)){
+            if (empty($data_akun_penjualan)) {
                 return response()->json([
                     "result" => false,
                     "code" => 404,
-                    "message" => "Error, Setting Penjualan not found"
+                    "message" => "Error, Setting Penjualan not found",
                 ], 404);
             }
 
             // cek apakah ada saldo_transaksi
             $check_trx_saldo = TrxSaldo::where("id_transaksi", $id_transaksi)->first();
-            if(empty($check_trx_saldo)){
+            if (empty($check_trx_saldo)) {
                 DB::rollback();
                 return response()->json([
                     "result" => false,
                     "code" => 404,
-                    "message" => "Error saldo transaksi belum ada"
+                    "message" => "Error saldo transaksi belum ada",
                 ], 404);
             }
 
@@ -1219,28 +1218,28 @@ class ApiController extends Controller
 
             $jurnal_detail_me = [
                 [
-                    'akun'          => $akun_piutang_dagang,
-                    'debet'         => 0,
-                    'credit'        => $total,
-                    'keterangan'    => 'Jurnal Otomatis Retur Penjualan ' . $id_transaksi . ' - ' . $nama_pelanggan,
-                    'id_transaksi'  => null
+                    'akun' => $akun_piutang_dagang,
+                    'debet' => 0,
+                    'credit' => $total,
+                    'keterangan' => 'Jurnal Otomatis Retur Penjualan ' . $id_transaksi . ' - ' . $nama_pelanggan,
+                    'id_transaksi' => null,
                 ],
                 [
-                    'akun'          => $akun_ppn_keluaran,
-                    'debet'         => $nominal_ppn,
-                    'credit'        => 0,
-                    'keterangan'    => 'Jurnal Otomatis PPN Keluaran - ' . $id_transaksi . ' - ' . $nama_pelanggan,
-                    'id_transaksi'  => null
+                    'akun' => $akun_ppn_keluaran,
+                    'debet' => $nominal_ppn,
+                    'credit' => 0,
+                    'keterangan' => 'Jurnal Otomatis PPN Keluaran - ' . $id_transaksi . ' - ' . $nama_pelanggan,
+                    'id_transaksi' => null,
                 ],
             ];
 
-            foreach($detail_inventory as $d_inv){
+            foreach ($detail_inventory as $d_inv) {
                 array_push($jurnal_detail_me, [
-                    'akun'          => $akun_penjualan,
-                    'debet'         => $d_inv['total'],
-                    'credit'        => 0,
-                    'keterangan'    => 'Jurnal Otomatis Retur Penjualan - ' . $id_transaksi . ' - ' . $nama_pelanggan . ' - ' . $d_inv['nama_barang'],
-                    'id_transaksi'  => null
+                    'akun' => $akun_penjualan,
+                    'debet' => $d_inv['total'],
+                    'credit' => 0,
+                    'keterangan' => 'Jurnal Otomatis Retur Penjualan - ' . $id_transaksi . ' - ' . $nama_pelanggan . ' - ' . $d_inv['nama_barang'],
+                    'id_transaksi' => null,
                 ]);
             }
 
@@ -1277,14 +1276,14 @@ class ApiController extends Controller
                 return response()->json([
                     "result" => false,
                     "code" => 400,
-                    "message" => "Error when store Jurnal data on table header"
+                    "message" => "Error when store Jurnal data on table header",
                 ], 400);
             }
 
             if (!empty($jurnal_detail_me)) {
                 $index = 1;
                 foreach ($jurnal_detail_me as $jd) {
-                    if(($jd['debet'] > 0 && $jd['credit'] == 0) || ($jd['debet'] == 0 && $jd['credit'] > 0)){
+                    if (($jd['debet'] > 0 && $jd['credit'] == 0) || ($jd['debet'] == 0 && $jd['credit'] > 0)) {
                         $detail_me = new JurnalDetail();
                         $detail_me->id_jurnal = $header_me->id_jurnal;
                         $detail_me->index = $index;
@@ -1307,7 +1306,7 @@ class ApiController extends Controller
                             return response()->json([
                                 "result" => false,
                                 "code" => 400,
-                                "message" => "Error when store Jurnal data on table detail"
+                                "message" => "Error when store Jurnal data on table detail",
                             ], 400);
                         }
 
@@ -1317,16 +1316,16 @@ class ApiController extends Controller
             }
 
             // check balance
-            if($check_balance_debit != $check_balance_credit){
+            if ($check_balance_debit != $check_balance_credit) {
                 DB::rollback();
                 return response()->json([
                     "result" => false,
                     "code" => 400,
-                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance"
+                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance",
                 ], 400);
             }
 
-            if($id_slip != null){
+            if ($id_slip != null) {
                 // init slip
                 $data_slip = Slip::find($id_slip);
 
@@ -1340,7 +1339,7 @@ class ApiController extends Controller
                     return response()->json([
                         "result" => false,
                         "code" => 400,
-                        "message" => "Error, please use slip Kas Masuk or Bank Masuk"
+                        "message" => "Error, please use slip Kas Masuk or Bank Masuk",
                     ], 400);
                 }
 
@@ -1350,19 +1349,19 @@ class ApiController extends Controller
 
                 $jurnal_detail_pelunasan = [
                     [
-                        'akun'          => $akun_slip,
-                        'debet'         => 0,
-                        'credit'        => $total,
-                        'keterangan'    => 'Jurnal Otomatis ' . $jurnal_type_detail . ' Pelunasan - ' . $id_transaksi . ' - ' . $nama_pelanggan,
-                        'id_transaksi'  => null
+                        'akun' => $akun_slip,
+                        'debet' => 0,
+                        'credit' => $total,
+                        'keterangan' => 'Jurnal Otomatis ' . $jurnal_type_detail . ' Pelunasan - ' . $id_transaksi . ' - ' . $nama_pelanggan,
+                        'id_transaksi' => null,
                     ],
                     [
-                        'akun'          => $akun_piutang_dagang,
-                        'debet'         => $total,
-                        'credit'        => 0,
-                        'keterangan'    => 'Jurnal Otomatis Pelunasan - ' . $id_transaksi . ' - ' . $nama_pelanggan,
-                        'id_transaksi'  => $id_transaksi
-                    ]
+                        'akun' => $akun_piutang_dagang,
+                        'debet' => $total,
+                        'credit' => 0,
+                        'keterangan' => 'Jurnal Otomatis Pelunasan - ' . $id_transaksi . ' - ' . $nama_pelanggan,
+                        'id_transaksi' => $id_transaksi,
+                    ],
                 ];
 
                 // Find Header data and delete detail
@@ -1378,7 +1377,7 @@ class ApiController extends Controller
                     $header->user_modified = $user_created;
                     $header->dt_modified = date('Y-m-d h:i:s');
                 } else {
-                    if(!empty($header) && $header->id_slip != $id_slip){
+                    if (!empty($header) && $header->id_slip != $id_slip) {
                         $header->void = 1;
                         $header->user_void = $user_created;
                         $header->dt_void = date('Y-m-d h:i:s');
@@ -1404,14 +1403,14 @@ class ApiController extends Controller
                     return response()->json([
                         "result" => false,
                         "code" => 400,
-                        "message" => "Error when store Jurnal data on table header"
+                        "message" => "Error when store Jurnal data on table header",
                     ], 400);
                 }
 
                 if (!empty($jurnal_detail_pelunasan)) {
                     $index = 1;
                     foreach ($jurnal_detail_pelunasan as $jd) {
-                        if(($jd['debet'] > 0 && $jd['credit'] == 0) || ($jd['debet'] == 0 && $jd['credit'] > 0)){
+                        if (($jd['debet'] > 0 && $jd['credit'] == 0) || ($jd['debet'] == 0 && $jd['credit'] > 0)) {
                             $detail = new JurnalDetail();
                             $detail->id_jurnal = $header->id_jurnal;
                             $detail->index = $index;
@@ -1430,7 +1429,7 @@ class ApiController extends Controller
                                 return response()->json([
                                     "result" => false,
                                     "code" => 400,
-                                    "message" => "Error when store Jurnal data on table detail"
+                                    "message" => "Error when store Jurnal data on table detail",
                                 ], 400);
                             }
 
@@ -1438,7 +1437,7 @@ class ApiController extends Controller
                             $trx_saldo = TrxSaldo::where("id_transaksi", $jd["id_transaksi"])->first();
                             if ($trx_saldo) {
                                 // cek untuk revert
-                                if($trx_saldo->bayar > 0){
+                                if ($trx_saldo->bayar > 0) {
                                     $update_trx_saldo = $this->revertTrxSaldo($trx_saldo, $jd['debet'], $jd['credit']);
                                 }
 
@@ -1449,7 +1448,7 @@ class ApiController extends Controller
                                     DB::rollback();
                                     return response()->json([
                                         "result" => false,
-                                        "message" => "Error when store Jurnal data on update saldo transaksi"
+                                        "message" => "Error when store Jurnal data on update saldo transaksi",
                                     ]);
                                 }
                             }
@@ -1474,7 +1473,7 @@ class ApiController extends Controller
                 "result" => false,
                 "code" => 400,
                 "message" => "Error when store Jurnal data",
-                "exception" => $e
+                "exception" => $e,
             ], 400);
         }
     }
@@ -1488,7 +1487,7 @@ class ApiController extends Controller
             $tanggal_jurnal = date('Y-m-d', strtotime($request->tanggal));
             $void = $request->void;
             $user_created = $request->user;
-            $id_pemasok= $request->pemasok;
+            $id_pemasok = $request->pemasok;
             $id_cabang = $request->cabang;
             $id_slip = $request->slip;
             $detail_inventory = array_values($request->detail);
@@ -1499,31 +1498,31 @@ class ApiController extends Controller
 
             // init setting
             $data_akun_hutang_dagang = DB::table('setting')->where('code', 'Hutang Dagang')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
-            if(empty($data_akun_hutang_dagang)){
+            if (empty($data_akun_hutang_dagang)) {
                 return response()->json([
                     "result" => false,
                     "code" => 404,
-                    "message" => "Error, Setting Hutang Dagang not found"
+                    "message" => "Error, Setting Hutang Dagang not found",
                 ], 404);
             }
 
             $data_akun_ppn_masukkan = DB::table('setting')->where('code', 'PPN Masukkan')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
-            if(empty($data_akun_ppn_masukkan)){
+            if (empty($data_akun_ppn_masukkan)) {
                 return response()->json([
                     "result" => false,
                     "code" => 404,
-                    "message" => "Error, Setting PPN Masukkan not found"
+                    "message" => "Error, Setting PPN Masukkan not found",
                 ], 404);
             }
 
             // cek apakah ada saldo_transaksi
             $check_trx_saldo = TrxSaldo::where("id_transaksi", $id_transaksi)->first();
-            if(empty($check_trx_saldo)){
+            if (empty($check_trx_saldo)) {
                 DB::rollback();
                 return response()->json([
                     "result" => false,
                     "code" => 404,
-                    "message" => "Error saldo transaksi belum ada"
+                    "message" => "Error saldo transaksi belum ada",
                 ], 404);
             }
 
@@ -1541,28 +1540,28 @@ class ApiController extends Controller
 
             $jurnal_detail_me = [
                 [
-                    'akun'          => $akun_hutang_dagang,
-                    'debet'         => ($total + $uang_muka),
-                    'credit'        => 0,
-                    'keterangan'    => 'Jurnal Otomatis Retur Pembelian ' . $id_transaksi . ' - ' . $nama_pemasok,
-                    'id_transaksi'  => null
+                    'akun' => $akun_hutang_dagang,
+                    'debet' => ($total + $uang_muka),
+                    'credit' => 0,
+                    'keterangan' => 'Jurnal Otomatis Retur Pembelian ' . $id_transaksi . ' - ' . $nama_pemasok,
+                    'id_transaksi' => null,
                 ],
                 [
-                    'akun'          => $akun_ppn_masukkan,
-                    'debet'         => 0,
-                    'credit'        => $nominal_ppn,
-                    'keterangan'    => 'Jurnal Otomatis PPN Masukkan - ' . $id_transaksi . ' - ' . $nama_pemasok,
-                    'id_transaksi'  => null
+                    'akun' => $akun_ppn_masukkan,
+                    'debet' => 0,
+                    'credit' => $nominal_ppn,
+                    'keterangan' => 'Jurnal Otomatis PPN Masukkan - ' . $id_transaksi . ' - ' . $nama_pemasok,
+                    'id_transaksi' => null,
                 ],
             ];
 
-            foreach($detail_inventory as $d_inv){
+            foreach ($detail_inventory as $d_inv) {
                 array_push($jurnal_detail_me, [
-                    'akun'          => $d_inv['akun_id'],
-                    'debet'         => 0,
-                    'credit'        => $d_inv['total'],
-                    'keterangan'    => 'Jurnal Otomatis Retur Pembelian Persediaan - ' . $id_transaksi . ' - ' . $nama_pemasok . ' - ' . $d_inv['nama_barang'],
-                    'id_transaksi'  => null
+                    'akun' => $d_inv['akun_id'],
+                    'debet' => 0,
+                    'credit' => $d_inv['total'],
+                    'keterangan' => 'Jurnal Otomatis Retur Pembelian Persediaan - ' . $id_transaksi . ' - ' . $nama_pemasok . ' - ' . $d_inv['nama_barang'],
+                    'id_transaksi' => null,
                 ]);
             }
 
@@ -1599,14 +1598,14 @@ class ApiController extends Controller
                 return response()->json([
                     "result" => false,
                     "code" => 400,
-                    "message" => "Error when store Jurnal data on table header"
+                    "message" => "Error when store Jurnal data on table header",
                 ], 400);
             }
 
             if (!empty($jurnal_detail_me)) {
                 $index = 1;
                 foreach ($jurnal_detail_me as $jd) {
-                    if(($jd['debet'] > 0 && $jd['credit'] == 0) || ($jd['debet'] == 0 && $jd['credit'] > 0)){
+                    if (($jd['debet'] > 0 && $jd['credit'] == 0) || ($jd['debet'] == 0 && $jd['credit'] > 0)) {
                         $detail_me = new JurnalDetail();
                         $detail_me->id_jurnal = $header_me->id_jurnal;
                         $detail_me->index = $index;
@@ -1629,7 +1628,7 @@ class ApiController extends Controller
                             return response()->json([
                                 "result" => false,
                                 "code" => 400,
-                                "message" => "Error when store Jurnal data on table detail"
+                                "message" => "Error when store Jurnal data on table detail",
                             ], 400);
                         }
 
@@ -1639,16 +1638,16 @@ class ApiController extends Controller
             }
 
             // check balance
-            if($check_balance_debit != $check_balance_credit){
+            if ($check_balance_debit != $check_balance_credit) {
                 DB::rollback();
                 return response()->json([
                     "result" => false,
                     "code" => 400,
-                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance"
+                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance",
                 ], 400);
             }
 
-            if($id_slip != null){
+            if ($id_slip != null) {
                 // init slip
                 $data_slip = Slip::find($id_slip);
 
@@ -1662,7 +1661,7 @@ class ApiController extends Controller
                     return response()->json([
                         "result" => false,
                         "code" => 400,
-                        "message" => "Error, please use slip Kas Keluar or Bank Keluar"
+                        "message" => "Error, please use slip Kas Keluar or Bank Keluar",
                     ], 400);
                 }
 
@@ -1672,19 +1671,19 @@ class ApiController extends Controller
 
                 $jurnal_detail_pelunasan = [
                     [
-                        'akun'          => $akun_slip,
-                        'debet'         => $total,
-                        'credit'        => 0,
-                        'keterangan'    => 'Jurnal Otomatis ' . $jurnal_type_detail . ' Pelunasan - ' . $id_transaksi . ' - ' . $nama_pemasok,
-                        'id_transaksi'  => null
+                        'akun' => $akun_slip,
+                        'debet' => $total,
+                        'credit' => 0,
+                        'keterangan' => 'Jurnal Otomatis ' . $jurnal_type_detail . ' Pelunasan - ' . $id_transaksi . ' - ' . $nama_pemasok,
+                        'id_transaksi' => null,
                     ],
                     [
-                        'akun'          => $akun_hutang_dagang,
-                        'debet'         => 0,
-                        'credit'        => $total,
-                        'keterangan'    => 'Jurnal Otomatis Pelunasan - ' . $id_transaksi . ' - ' . $nama_pemasok,
-                        'id_transaksi'  => $id_transaksi
-                    ]
+                        'akun' => $akun_hutang_dagang,
+                        'debet' => 0,
+                        'credit' => $total,
+                        'keterangan' => 'Jurnal Otomatis Pelunasan - ' . $id_transaksi . ' - ' . $nama_pemasok,
+                        'id_transaksi' => $id_transaksi,
+                    ],
                 ];
 
                 // Find Header data and delete detail
@@ -1700,7 +1699,7 @@ class ApiController extends Controller
                     $header->user_modified = $user_created;
                     $header->dt_modified = date('Y-m-d h:i:s');
                 } else {
-                    if(!empty($header) && $header->id_slip != $id_slip){
+                    if (!empty($header) && $header->id_slip != $id_slip) {
                         $header->void = 1;
                         $header->user_void = $user_created;
                         $header->dt_void = date('Y-m-d h:i:s');
@@ -1726,14 +1725,14 @@ class ApiController extends Controller
                     return response()->json([
                         "result" => false,
                         "code" => 400,
-                        "message" => "Error when store Jurnal data on table header"
+                        "message" => "Error when store Jurnal data on table header",
                     ], 400);
                 }
 
                 if (!empty($jurnal_detail_pelunasan)) {
                     $index = 1;
                     foreach ($jurnal_detail_pelunasan as $jd) {
-                        if(($jd['debet'] > 0 && $jd['credit'] == 0) || ($jd['debet'] == 0 && $jd['credit'] > 0)){
+                        if (($jd['debet'] > 0 && $jd['credit'] == 0) || ($jd['debet'] == 0 && $jd['credit'] > 0)) {
                             $detail = new JurnalDetail();
                             $detail->id_jurnal = $header->id_jurnal;
                             $detail->index = $index;
@@ -1752,7 +1751,7 @@ class ApiController extends Controller
                                 return response()->json([
                                     "result" => false,
                                     "code" => 400,
-                                    "message" => "Error when store Jurnal data on table detail"
+                                    "message" => "Error when store Jurnal data on table detail",
                                 ], 400);
                             }
 
@@ -1760,7 +1759,7 @@ class ApiController extends Controller
                             $trx_saldo = TrxSaldo::where("id_transaksi", $jd["id_transaksi"])->first();
                             if ($trx_saldo) {
                                 // cek untuk revert
-                                if($trx_saldo->bayar > 0){
+                                if ($trx_saldo->bayar > 0) {
                                     $update_trx_saldo = $this->revertTrxSaldo($trx_saldo, $jd['debet'], $jd['credit']);
                                 }
 
@@ -1771,7 +1770,7 @@ class ApiController extends Controller
                                     DB::rollback();
                                     return response()->json([
                                         "result" => false,
-                                        "message" => "Error when store Jurnal data on update saldo transaksi"
+                                        "message" => "Error when store Jurnal data on update saldo transaksi",
                                     ]);
                                 }
                             }
@@ -1796,7 +1795,7 @@ class ApiController extends Controller
                 "result" => false,
                 "code" => 400,
                 "message" => "Error when store Jurnal data",
-                "exception" => $e
+                "exception" => $e,
             ], 400);
         }
     }
@@ -1919,8 +1918,7 @@ class ApiController extends Controller
             }
             return true;
             // DB::commit();
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             // DB::rollback();
             Log::error($e);
             return false;
@@ -1973,8 +1971,7 @@ class ApiController extends Controller
             }
             return true;
             // DB::commit();
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             // DB::rollback();
             Log::error($e);
             return false;
@@ -1988,17 +1985,17 @@ class ApiController extends Controller
             do {
                 // Init data
                 $kodeCabang = Cabang::find($cabang);
-                if($slip != null){
+                if ($slip != null) {
                     $kodeSlip = Slip::find($slip);
                     $prefix = $kodeCabang->kode_cabang . "." . $jenis . "." . $kodeSlip->kode_slip . "." . date("ym");
-                }else{
+                } else {
                     $prefix = $kodeCabang->kode_cabang . "." . $jenis . "." . date("ym");
                 }
 
                 // Check exist
                 $check = JurnalHeader::where("kode_jurnal", "LIKE", "$prefix%")->orderBy("kode_jurnal", "DESC")->get();
                 if (count($check) > 0) {
-                    $max = (int)substr($check[0]->kode_jurnal, -4);
+                    $max = (int) substr($check[0]->kode_jurnal, -4);
                     $max += 1;
                     $code = $prefix . "." . sprintf("%04s", $max);
                 } else {
@@ -2013,6 +2010,70 @@ class ApiController extends Controller
             return $code;
         } catch (\Exception $e) {
             Log::error("Error when generate journal code");
+        }
+    }
+
+    public function transactionBalance(Request $req)
+    {
+        //param : tipe_transaksi,id_transaksi,tanggal,ref_id,catatan,target(supplier/customer),dpp,ppn,uang_muka,biaya,payment_status
+        $data = TransactionBalance::where('id_transaksi', $req->id_transaksi)->where('tipe_transaksi', $req->tipe_transaksi)->first();
+        try {
+            DB::beginTransaction();
+
+            $total = (handleNull($req->dpp) + handleNull($req->ppn) - handleNull($req->uang_muka) + handleNull($req->biaya));
+            $array = [
+                'tanggal' => $req->tanggal,
+                'tipe_pembayaran' => $req->tipe_pembayaran,
+                'ref_id' => $req->ref_id,
+                'catatan' => $req->catatan,
+                'id_pelanggan' => $req->id_pelanggan,
+                'id_pemasok' => $req->id_pemasok,
+                'dpp' => handleNull($req->dpp),
+                'ppn' => handleNull($req->ppn),
+                'uang_muka' => handleNull($req->uang_muka),
+                'biaya' => handleNull($req->biaya),
+                'total' => $total,
+            ];
+
+            $newTipePembayaran = $req->tipe_pembayaran;
+            if (!$data) {
+                $data = new transactionBalance;
+                $payment = $newTipePembayaran == '1' ? $total : 0;
+                $remaining = $newTipePembayaran == '1' ? 0 : ($total - $payment);
+
+                $array['tipe_transaksi'] = $req->tipe_transaksi;
+                $array['id_transaksi'] = $req->id_transaksi;
+                $array['bayar'] = $payment;
+                $array['sisa'] = $remaining;
+            } else {
+                $oldTipePembayaran = $data->tipe_pembayaran;
+                $payment = $newTipePembayaran == '1' ? $total : ($oldTipePembayaran == $newTipePembayaran ? $data->bayar : 0);
+                $remaining = $newTipePembayaran == '1' ? 0 : ($total - $payment);
+                if ($oldTipePembayaran == $newTipePembayaran) {
+                    $array['sisa'] = $remaining;
+                    if ($newTipePembayaran == '1') {
+                        $array['bayar'] = $payment;
+                    }
+                } else {
+                    $array['bayar'] = $payment;
+                    $array['sisa'] = $remaining;
+                }
+            }
+
+            $data->fill($array);
+            $data->save();
+
+            DB::commit();
+            return response()->json([
+                "result" => true,
+                "message" => "Data berhasil disimpan",
+            ], 200);
+        } catch (\Exception $th) {
+            DB::rollback();
+            return response()->json([
+                "result" => false,
+                "message" => "Data gagal disimpan",
+            ], 500);
         }
     }
 
