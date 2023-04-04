@@ -2015,4 +2015,35 @@ class ApiController extends Controller
             Log::error("Error when generate journal code");
         }
     }
+
+    public function productionSupplies(Request $request){
+        $production_id = $request->production_id;
+
+        $data_production_supplies = DB::table("produksi_detail")
+                                    ->join('barang', 'barang.id_barang', 'produksi_detail.id_barang')
+                                    ->join('master_qr_code', 'master_qr_code.kode_batang_master_qr_code', 'produksi_detail.kode_batang_lama_produksi_detail')
+                                    ->selectRaw('produksi_detail.id_barang,
+                                    ROUND(IFNULL(SUM(produksi_detail.kredit_produksi_detail * master_qr_code.beli_master_qr_code), 0), 2) as beli,
+                                    ROUND(IFNULL(SUM(produksi_detail.kredit_produksi_detail * master_qr_code.biaya_beli_master_qr_code), 0), 2) as biaya,
+                                    ROUND(IFNULL(SUM(produksi_detail.kredit_produksi_detail * master_qr_code.produksi_master_qr_code), 0), 2) as produksi,
+                                    ROUND(IFNULL(SUM(produksi_detail.kredit_produksi_detail * master_qr_code.listrik_master_qr_code), 0), 2) as listrik,
+                                    ROUND(IFNULL(SUM(produksi_detail.kredit_produksi_detail * master_qr_code.pegawai_master_qr_code), 0), 2) as pegawai,
+                                    barang.akun_persediaan_barang as id_akun')
+                                    ->where('produksi_detail.id_produksi', $production_id)
+                                    ->groupBy('produksi_detail.id_barang')
+                                    ->orderBy('produksi_detail.id_barang', 'ASC')
+                                    ->get();
+
+        $data = [];
+
+        foreach($data_production_supplies as $production){
+            $data[$production->id_barang] = [
+                'total' => ($production->beli + $production->biaya + $production->produksi + $production->listrik + $production->pegawai),
+                'id_akun' => $production->id_akun,
+            ];
+        }
+
+        Log::debug(json_encode($data_production_supplies));
+        Log::debug($data);
+    }
 }
