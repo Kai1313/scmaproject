@@ -1007,6 +1007,7 @@ class GeneralLedgerController extends Controller
                     $trx_saldo->bayar = $current_bayar + $debet;
                     $trx_saldo->sisa = $current_sisa - $debet;
                     $trx_saldo->status_giro = ($debet > $kredit) ? 1 : 2;
+                    break;
                 case 'Piutang Giro Tolak':
                     $trx_saldo->bayar = $current_bayar + $kredit;
                     $trx_saldo->sisa = $current_sisa - $kredit;
