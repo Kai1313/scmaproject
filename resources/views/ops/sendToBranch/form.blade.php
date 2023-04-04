@@ -51,18 +51,28 @@
         .handle-number-4 {
             text-align: right;
         }
+
+        #reader {
+            width: 50%;
+        }
+
+        @media only screen and (max-width: 412px) {
+            #reader {
+                width: 100%;
+            }
+        }
     </style>
 @endsection
 
 @section('header')
     <section class="content-header">
         <h1>
-            Kirim ke Gudang
+            Kirim ke Cabang
             <small>| {{ $data ? 'Edit' : 'Tambah' }}</small>
         </h1>
         <ol class="breadcrumb">
             <li><a href="#"><i class="fa fa-dashboard"></i> Dashboard</a></li>
-            <li><a href="{{ route('purchase-request') }}">Kirim ke Gudang</a></li>
+            <li><a href="{{ route('purchase-request') }}">Kirim ke Cabang</a></li>
             <li class="active">Form</li>
         </ol>
     </section>
@@ -70,11 +80,11 @@
 
 @section('main-section')
     <div class="content container-fluid">
-        <form action="{{ route('send_to_branch-save-entry', $data ? $data->id_pindah_gudang : 0) }}" method="post"
+        <form action="{{ route('send_to_branch-save-entry', $data ? $data->id_pindah_barang : 0) }}" method="post"
             class="post-action">
             <div class="box">
                 <div class="box-header">
-                    <h3 class="box-title">{{ $data ? 'Ubah' : 'Tambah' }} Kirim Ke Gudang</h3>
+                    <h3 class="box-title">{{ $data ? 'Ubah' : 'Tambah' }} Kirim Ke Cabang</h3>
                     <a href="{{ route('send_to_branch') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right">
                         <span class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali
                     </a>
@@ -108,17 +118,17 @@
                             </div>
                             <label>Tanggal <span>*</span></label>
                             <div class="form-group">
-                                <input type="text" name="tanggal_pindah_gudang"
-                                    value="{{ old('tanggal_pindah_gudang', $data ? $data->tanggal_pindah_gudang : date('Y-m-d')) }}"
+                                <input type="text" name="tanggal_pindah_barang"
+                                    value="{{ old('tanggal_pindah_barang', $data ? $data->tanggal_pindah_barang : date('Y-m-d')) }}"
                                     class="form-control datepicker" data-validation="[NOTEMPTY]"
                                     data-validation-message="Tanggal tidak boleh kosong">
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <label>Kode Permintaan</label>
+                            <label>Kode Pindah Cabang</label>
                             <div class="form-group">
-                                <input type="text" name="kode_pindah_gudang"
-                                    value="{{ old('kode_pindah_gudang', $data ? $data->kode_pindah_gudang : '') }}"
+                                <input type="text" name="kode_pindah_barang"
+                                    value="{{ old('kode_pindah_barang', $data ? $data->kode_pindah_barang : '') }}"
                                     class="form-control" readonly placeholder="Otomatis">
                             </div>
                             <label>Nama Jasa Pengiriman</label>
@@ -148,7 +158,7 @@
                             </div>
                             <label>Keterangan</label>
                             <div class="form-group">
-                                <textarea name="keterangan_pindah_gudang" class="form-control" rows="3">{{ old('keterangan_pindah_gudang', $data ? $data->keterangan_pindah_gudang : '') }}</textarea>
+                                <textarea name="keterangan_pindah_barang" class="form-control" rows="3">{{ old('keterangan_pindah_barang', $data ? $data->keterangan_pindah_barang : '') }}</textarea>
                             </div>
                         </div>
                     </div>
@@ -161,11 +171,9 @@
                             <h4>Detil Barang</h4>
                         </div>
                         <div class="col-md-6">
-                            @if (!$data || $data->approval_status == 0)
-                                <button class="btn btn-info add-entry btn-flat pull-right" type="button">
-                                    <i class="glyphicon glyphicon-plus"></i> Tambah Barang
-                                </button>
-                            @endif
+                            <button class="btn btn-info add-entry btn-flat pull-right" type="button">
+                                <i class="glyphicon glyphicon-plus"></i> Tambah Barang
+                            </button>
                         </div>
                     </div>
                     <div class="table-responsive">
@@ -178,6 +186,8 @@
                                     <th>Nama Barang</th>
                                     <th>Satuan</th>
                                     <th>Jumlah</th>
+                                    <th>Batch</th>
+                                    <th>Kadaluarsa</th>
                                     <th>SG</th>
                                     <th>BE</th>
                                     <th>PH</th>
@@ -198,12 +208,14 @@
         </form>
 
         <div class="modal fade" id="modalEntry" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-body">
                         <div class="alert alert-danger" style="display:none;" id="alertModal">
                         </div>
-                        <div id="reader"></div>
+                        <center>
+                            <div id="reader"></div>
+                        </center>
                         <div class="form-group">
                             <div class="input-group">
                                 <input type="text" name="search-qrcode" class="form-control"
@@ -215,19 +227,24 @@
                                 </div>
                             </div>
                         </div>
-                        <input type="hidden" name="id_pindah_gudang_detail">
-                        <label>QR Code</label>
-                        <div class="form-group">
-                            <input type="text" name="kode_batang_lama_pindah_gudang_detail" class="form-control"
-                                readonly>
-                            <input type="hidden" name="kode_batang_pindah_gudang_detail">
+                        <div class="alert alert-info">
+                            Pastikan QR Code sudah keluar rak dan stok tidak habis
                         </div>
-                        <label>Nama Barang</label>
-                        <div class="form-group">
-                            <input type="text" name="nama_barang" class="form-control" readonly>
-                            <input type="hidden" name="id_barang">
-                        </div>
+                        <input type="hidden" name="id_pindah_barang_detail">
                         <div class="row">
+                            <div class="col-xs-6">
+                                <label>QR Code</label>
+                                <div class="form-group">
+                                    <input type="text" name="qr_code" class="form-control" readonly>
+                                </div>
+                            </div>
+                            <div class="col-xs-6">
+                                <label>Nama Barang</label>
+                                <div class="form-group">
+                                    <input type="text" name="nama_barang" class="form-control" readonly>
+                                    <input type="hidden" name="id_barang">
+                                </div>
+                            </div>
                             <div class="col-xs-6">
                                 <label>Satuan</label>
                                 <div class="form-group">
@@ -238,49 +255,55 @@
                             <div class="col-xs-6">
                                 <label>Jumlah</label>
                                 <div class="form-group">
-                                    <input type="text" name="jumlah_pindah_gudang_detail"
-                                        class="form-control handle-number-4" readonly>
+                                    <input type="text" name="qty" class="form-control handle-number-4" readonly>
                                 </div>
                             </div>
                             <div class="col-xs-4">
                                 <label>SG</label>
                                 <div class="form-group">
-                                    <input type="text" name="sg_pindah_gudang_detail"
-                                        class="form-control handle-number-4" readonly>
+                                    <input type="text" name="sg" class="form-control handle-number-4" readonly>
                                 </div>
                             </div>
                             <div class="col-xs-4">
                                 <label>BE</label>
                                 <div class="form-group">
-                                    <input type="text" name="be_pindah_gudang_detail"
-                                        class="form-control handle-number-4" readonly>
+                                    <input type="text" name="be" class="form-control handle-number-4" readonly>
                                 </div>
                             </div>
                             <div class="col-xs-4">
                                 <label>PH</label>
                                 <div class="form-group">
-                                    <input type="text" name="ph_pindah_gudang_detail"
-                                        class="form-control handle-number-4" readonly>
+                                    <input type="text" name="ph" class="form-control handle-number-4" readonly>
                                 </div>
                             </div>
                             <div class="col-xs-6">
                                 <label>Bentuk</label>
                                 <div class="form-group">
-                                    <input type="text" name="bentuk_pindah_gudang_detail" class="form-control"
-                                        readonly>
+                                    <input type="text" name="bentuk" class="form-control" readonly>
                                 </div>
                             </div>
                             <div class="col-xs-6">
                                 <label>Warna</label>
                                 <div class="form-group">
-                                    <input type="text" name="warna_pindah_gudang_detail" class="form-control"
-                                        readonly>
+                                    <input type="text" name="warna" class="form-control" readonly>
+                                </div>
+                            </div>
+                            <div class="col-xs-6">
+                                <label>Batch</label>
+                                <div class="form-group">
+                                    <input type="text" name="batch" class="form-control" readonly>
+                                </div>
+                            </div>
+                            <div class="col-xs-6">
+                                <label>Kadaluarsa</label>
+                                <div class="form-group">
+                                    <input type="text" name="tanggal_kadaluarsa" class="form-control" readonly>
                                 </div>
                             </div>
                         </div>
                         <label>Keterangan</label>
                         <div class="form-group">
-                            <textarea name="keterangan_pindah_gudang_detail" rows="3" class="form-control" readonly></textarea>
+                            <textarea name="keterangan" rows="3" class="form-control" readonly></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -321,8 +344,8 @@
             data: details,
             ordering: false,
             columns: [{
-                    data: 'kode_batang_lama_pindah_gudang_detail',
-                    name: 'kode_batang_lama_pindah_gudang_detail'
+                    data: 'qr_code',
+                    name: 'qr_code'
                 }, {
                     data: 'nama_barang',
                     name: 'nama_barang'
@@ -330,40 +353,47 @@
                     data: 'nama_satuan_barang',
                     name: 'nama_satuan_barang'
                 }, {
-                    data: 'jumlah_pindah_gudang_detail',
-                    name: 'jumlah_pindah_gudang_detail',
+                    data: 'qty',
+                    name: 'qty',
                     render: $.fn.dataTable.render.number('.', ',', 4),
                     className: 'text-right'
                 }, {
-                    data: 'sg_pindah_gudang_detail',
-                    name: 'sg_pindah_gudang_detail',
+                    data: 'batch',
+                    name: 'batch',
+                    className: 'text-right'
+                }, {
+                    data: 'tanggal_kadaluarsa',
+                    name: 'tanggal_kadaluarsa',
+                }, {
+                    data: 'sg',
+                    name: 'sg',
                     render: $.fn.dataTable.render.number('.', ',', 4),
                     className: 'text-right'
                 }, {
-                    data: 'be_pindah_gudang_detail',
-                    name: 'be_pindah_gudang_detail',
+                    data: 'be',
+                    name: 'be',
                     render: $.fn.dataTable.render.number('.', ',', 4),
                     className: 'text-right'
                 }, {
-                    data: 'ph_pindah_gudang_detail',
-                    name: 'ph_pindah_gudang_detail',
+                    data: 'ph',
+                    name: 'ph',
                     render: $.fn.dataTable.render.number('.', ',', 4),
                     className: 'text-right'
                 }, {
-                    data: 'bentuk_pindah_gudang_detail',
-                    name: 'bentuk_pindah_gudang_detail',
+                    data: 'bentuk',
+                    name: 'bentuk',
                 },
                 {
-                    data: 'warna_pindah_gudang_detail',
-                    name: 'warna_pindah_gudang_detail',
+                    data: 'warna',
+                    name: 'warna',
                 }, {
-                    data: 'keterangan_pindah_gudang_detail',
-                    name: 'keterangan_pindah_gudang_detail',
+                    data: 'keterangan',
+                    name: 'keterangan',
                 },
                 {
-                    data: 'id_pindah_gudang_detail',
+                    data: 'id_pindah_barang_detail',
                     className: 'text-center',
-                    name: 'id_pindah_gudang_detail',
+                    name: 'id_pindah_barang_detail',
                     searchable: false,
                     render: function(data, type, row, meta) {
                         let btn = '<ul class="horizontal-list">';
@@ -521,7 +551,7 @@
                     valid = false
                 }
 
-                if ($(v).prop('name') == 'kode_batang_lama_pindah_gudang_detail') {
+                if ($(v).prop('name') == 'qr_code') {
                     let findItem = details.filter(p => p.kode_batang_lama_pindah_gudang_detail == $(v).val())
                     if (findItem.length > 0 && findItem[0].id_barang == id && statusModal == 'create') {
                         message = "Barang sudah ada"
@@ -555,9 +585,6 @@
                 },
                 success: function(res) {
                     for (select in res.data) {
-                        if (['kode_batang_pindah_gudang_detail'].includes(select)) {
-                            $('[name="kode_batang_lama_pindah_gudang_detail"]').val(res.data[select])
-                        }
                         $('[name="' + select + '"]').val(res.data[select])
                     }
                     $('[name="search-qrcode"]').val('')

@@ -68,14 +68,8 @@
                         </div>
                     </div>
                     <div class="col-md-8">
-                        {{-- <span class="badge badge-default rounded-0 pull-right">
-                            <input class="form-check-input" type="checkbox" id="void" name="show_void">
-                            <label class="form-check-label" for="void">
-                                Void
-                            </label>
-                        </span> --}}
                         <a href="{{ route('received_from_branch-entry') }}"
-                            class="btn btn-success pull-right btn-flat btn-sm mr-1">
+                            class="btn btn-success pull-right btn-flat btn-sm ">
                             <i class="glyphicon glyphicon-plus"></i> Tambah Terima Dari Cabang
                         </a>
                     </div>
@@ -87,13 +81,12 @@
                         <thead>
                             <tr>
                                 <th>Tanggal</th>
-                                <th>Estimasi</th>
+                                <th>Kode Pindah Gudang</th>
                                 <th>Gudang</th>
-                                <th>Pemohon</th>
-                                <th>Catatan</th>
+                                <th>Cabang Asal</th>
+                                <th>Keterangan</th>
+                                <th>Jasa Pengiriman</th>
                                 <th>Status</th>
-                                <th>Otorisasi</th>
-                                <th>Tanggal Otorisasi</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -118,50 +111,42 @@
 @section('externalScripts')
     <script>
         $('.select2').select2()
-        // var table = $('.data-table').DataTable({
-        //     processing: true,
-        //     serverSide: true,
-        //     ajax: "{{ route('purchase-request') }}?c=" + $('[name="id_cabang"]').val() + '&show_void=' + $(
-        //         '[name="show_void"]').is(':checked'),
-        //     columns: [{
-        //         data: 'purchase_request_code',
-        //         name: 'purchase_request_code'
-        //     }, {
-        //         data: 'purchase_request_date',
-        //         name: 'purchase_request_date'
-        //     }, {
-        //         data: 'purchase_request_estimation_date',
-        //         name: 'purchase_request_estimation_date',
-        //     }, {
-        //         data: 'nama_gudang',
-        //         name: 'nama_gudang',
-        //     }, {
-        //         data: 'user',
-        //         name: 'user',
-        //     }, {
-        //         data: 'catatan',
-        //         name: 'catatan'
-        //     }, {
-        //         data: 'approval_status',
-        //         name: 'approval_status',
-        //         className: 'text-center'
-        //     }, {
-        //         data: 'approval_user',
-        //         name: 'approval_user',
-        //     }, {
-        //         data: 'approval_date',
-        //         name: 'approval_date',
-        //     }, {
-        //         data: 'action',
-        //         name: 'action',
-        //         className: 'text-center',
-        //         orderable: false,
-        //         searchable: false
-        //     }, ]
-        // });
+        var table = $('.data-table').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: "{{ route('received_from_branch') }}?c=" + $('[name="id_cabang"]').val(),
+            columns: [{
+                data: 'tanggal_pindah_barang',
+                name: 'tanggal_pindah_barang'
+            }, {
+                data: 'kode_pindah_barang',
+                name: 'kode_pindah_barang'
+            }, {
+                data: 'nama_gudang',
+                name: 'nama_gudang'
+            }, {
+                data: 'nama_cabang',
+                name: 'nama_cabang',
+            }, {
+                data: 'keterangan_pindah_barang',
+                name: 'keterangan_pindah_barang',
+            }, {
+                data: 'transporter',
+                name: 'transporter',
+            }, {
+                data: 'status_pindah_barang',
+                name: 'status_pindah_barang',
+            }, {
+                data: 'action',
+                name: 'action',
+                className: 'text-center',
+                orderable: false,
+                searchable: false
+            }, ]
+        });
 
-        // $('[name="id_cabang"]').change(function() {
-        //     table.ajax.url("?c=" + $('[name="id_cabang"]').val()).load()
-        // })
+        $('[name="id_cabang"]').change(function() {
+            table.ajax.url("?c=" + $('[name="id_cabang"]').val()).load()
+        })
     </script>
 @endsection

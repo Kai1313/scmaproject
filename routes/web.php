@@ -63,6 +63,16 @@ Route::prefix('uang_muka_pembelian')->group(function () {
     Route::get('/count_po', 'PurchaseDownPaymentController@countPo')->name('purchase-down-payment-count-po');
 });
 
+Route::prefix('uang_muka_penjualan')->group(function () {
+    Route::get('/index/{user_id?}', 'SalesDownPaymentController@index')->name('sales-down-payment');
+    Route::get('/entry/{id?}', 'SalesDownPaymentController@entry')->name('sales-down-payment-entry');
+    Route::get('/view/{id}', 'SalesDownPaymentController@viewData')->name('sales-down-payment-view');
+    Route::post('/save_entry/{id}', 'SalesDownPaymentController@saveEntry')->name('sales-down-payment-save-entry');
+    Route::get('/delete/{id}', 'SalesDownPaymentController@destroy')->name('sales-down-payment-delete');
+    Route::get('/auto_so', 'SalesDownPaymentController@autoSo')->name('sales-down-payment-auto-so');
+    Route::get('/count_so', 'SalesDownPaymentController@countSo')->name('sales-down-payment-count-so');
+});
+
 Route::prefix('qc_penerimaan_barang')->group(function () {
     Route::get('/index/{user_id?}', 'QcReceiptController@index')->name('qc_receipt');
     Route::get('/entry/{id?}', 'QcReceiptController@entry')->name('qc_receipt-entry');
@@ -75,7 +85,7 @@ Route::prefix('send_to_branch')->group(function () {
     Route::get('/index/{user_id?}', 'SendToBranchController@index')->name('send_to_branch');
     Route::get('/entry/{id?}', 'SendToBranchController@entry')->name('send_to_branch-entry');
     Route::post('/save_entry/{id}', 'SendToBranchController@saveEntry')->name('send_to_branch-save-entry');
-    Route::get('/view/{id}', 'SendToBranchController@view')->name('send_to_branch-view');
+    Route::get('/view/{id}', 'SendToBranchController@viewData')->name('send_to_branch-view');
     Route::get('/delete/{id}', 'SendToBranchController@destroy')->name('send_to_branch-delete');
     Route::get('/auto-qrcode', 'SendToBranchController@autoQRCode')->name('send_to_branch-qrcode');
 });
@@ -84,8 +94,10 @@ Route::prefix('received_from_branch')->group(function () {
     Route::get('/index/{user_id?}', 'ReceivedFromBranchController@index')->name('received_from_branch');
     Route::get('/entry/{id?}', 'ReceivedFromBranchController@entry')->name('received_from_branch-entry');
     Route::post('/save_entry/{id}', 'ReceivedFromBranchController@saveEntry')->name('received_from_branch-save-entry');
-    Route::get('/view/{id}', 'ReceivedFromBranchController@view')->name('received_from_branch-view');
+    Route::get('/view/{id}', 'ReceivedFromBranchController@viewData')->name('received_from_branch-view');
     Route::get('/delete/{id}', 'ReceivedFromBranchController@destroy')->name('received_from_branch-delete');
+    Route::get('/auto-code', 'ReceivedFromBranchController@autoCode')->name('received_from_branch-code');
+    Route::get('/auto-detail-item', 'ReceivedFromBranchController@getDetailItem')->name('received_from_branch-detail-item');
 });
 
 // Master
@@ -121,7 +133,7 @@ Route::get('/master/setting/get_pelunasan/{id?}', 'MasterSettingController@getSe
 
 // Transaction
 // Jurnal Umum
-Route::get('/transaction/general_ledger', 'GeneralLedgerController@index')->name('transaction-general-ledger');
+Route::get('/transaction/general_ledger/index/{user_id?}', 'GeneralLedgerController@index')->name('transaction-general-ledger');
 Route::get('/transaction/general_ledger/form/create', 'GeneralLedgerController@create')->name('transaction-general-ledger-create');
 Route::get('/transaction/general_ledger/form/edit/{id?}', 'GeneralLedgerController@edit')->name('transaction-general-ledger-edit');
 Route::get('/transaction/general_ledger/show/{id?}', 'GeneralLedgerController@show')->name('transaction-general-ledger-show');
@@ -134,7 +146,7 @@ Route::get('/transaction/general_ledger/void/{id?}', 'GeneralLedgerController@vo
 Route::get('/transaction/general_ledger/active/{id?}', 'GeneralLedgerController@active')->name('transaction-general-ledger-active');
 
 // Jurnal Penyesuaian
-Route::get('/transaction/adjustment_ledger', 'AdjustmentLedgerController@index')->name('transaction-adjustment-ledger');
+Route::get('/transaction/adjustment_ledger/index/{user_id?}', 'AdjustmentLedgerController@index')->name('transaction-adjustment-ledger');
 Route::get('/transaction/adjustment_ledger/form/create', 'AdjustmentLedgerController@create')->name('transaction-adjustment-ledger-create');
 Route::get('/transaction/adjustment_ledger/form/edit/{id?}', 'AdjustmentLedgerController@edit')->name('transaction-adjustment-ledger-edit');
 Route::get('/transaction/adjustment_ledger/show/{id?}', 'AdjustmentLedgerController@show')->name('transaction-adjustment-ledger-show');

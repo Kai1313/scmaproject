@@ -3,9 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\MasterWrapper;
-use App\Models\User;
-use App\Models\UserToken;
-use Carbon\Carbon;
 use DB;
 use Illuminate\Http\Request;
 use Log;
@@ -15,9 +12,8 @@ class MasterWrapperController extends Controller
 {
     public function index(Request $request)
     {
-        $checkAuth = $this->checkUser($request);
-        if ($checkAuth['status'] == false) {
-            return view('exceptions.forbidden');
+        if (checkUserSession($request, 'master_wrapper', 'show') == false) {
+            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
         if ($request->ajax()) {
@@ -60,9 +56,12 @@ class MasterWrapperController extends Controller
 
     public function entry($id = 0)
     {
+        if (checkAccessMenu('master_wrapper', $id == 0 ? 'create' : 'edit') == false) {
+            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+        }
+
         $data = MasterWrapper::find($id);
         $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
-
         return view('ops.master.wrapper.form', [
             'data' => $data,
             'cabang' => $cabang,
@@ -91,7 +90,7 @@ class MasterWrapperController extends Controller
                 return response()->json([
                     "result" => false,
                     "message" => "Nama " . $request->nama_wrapper . " sudah ada",
-                ]);
+                ], 500);
             }
 
             $data->fill($request->all());
@@ -105,7 +104,7 @@ class MasterWrapperController extends Controller
                 "result" => true,
                 "message" => "Data berhasil disimpan",
                 "redirect" => route('master-wrapper'),
-            ]);
+            ], 200);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error("Error when save wrapper");
@@ -113,12 +112,16 @@ class MasterWrapperController extends Controller
             return response()->json([
                 "result" => false,
                 "message" => "Data gagal tersimpan",
-            ]);
+            ], 500);
         }
     }
 
     public function viewData($id)
     {
+        if (checkAccessMenu('master_wrapper', 'show') == false) {
+            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+        }
+
         $data = MasterWrapper::find($id);
 
         return view('ops.master.wrapper.detail', [
@@ -129,6 +132,10 @@ class MasterWrapperController extends Controller
 
     public function destroy($id)
     {
+        if (checkAccessMenu('master_wrapper', 'delete') == false) {
+            return response()->json(['message' => 'Tidak mempunyai akses'], 500);
+        }
+
         $data = MasterWrapper::find($id);
         if (!$data) {
             return response()->json(['message' => 'data tidak ditemukan'], 500);
@@ -146,7 +153,7 @@ class MasterWrapperController extends Controller
                 "result" => true,
                 "message" => "Data berhasil dihapus",
                 "redirect" => route('master-wrapper'),
-            ]);
+            ], 200);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error("Error when delete biaya");
@@ -154,73 +161,7 @@ class MasterWrapperController extends Controller
             return response()->json([
                 "result" => false,
                 "message" => "Data gagal dihapus",
-            ]);
-        }
-    }
-
-    public function checkUser($request)
-    {
-        $user_id = $request->user_id;
-        if ($user_id != '' && $request->session()->has('token') == false || $request->session()->has('token') == true) {
-            if ($request->session()->has('token') == true) {
-                $user_id = $request->session()->get('user')->id_pengguna;
-            }
-            $user = User::where('id_pengguna', $user_id)->first();
-            $token = UserToken::where('id_pengguna', $user_id)->where('status_token_pengguna', 1)->whereRaw("waktu_habis_token_pengguna > STR_TO_DATE(?, '%Y-%m-%d %H:%i:%s')", Carbon::now()->format('Y-m-d H:i:s'))->first();
-
-            $sql = "SELECT
-                a.id_pengguna,
-                a.id_grup_pengguna,
-                d.id_menu,
-                d.nama_menu,
-                c.lihat_akses_menu,
-                c.tambah_akses_menu,
-                c.ubah_akses_menu,
-                c.hapus_akses_menu,
-                c.cetak_akses_menu
-            FROM
-                pengguna a,
-                grup_pengguna b,
-                akses_menu c,
-                menu d
-            WHERE
-                a.id_grup_pengguna = b.id_grup_pengguna
-                AND b.id_grup_pengguna = c.id_grup_pengguna
-                AND c.id_menu = d.id_menu
-                AND a.id_pengguna = $user_id
-                AND d.keterangan_menu = 'Accounting'
-                AND d.status_menu = 1";
-            $access = DB::connection('mysql')->select($sql);
-
-            $user_access = array();
-            foreach ($access as $value) {
-                $user_access[$value->nama_menu] = ['show' => $value->lihat_akses_menu, 'create' => $value->tambah_akses_menu, 'edit' => $value->ubah_akses_menu, 'delete' => $value->hapus_akses_menu, 'print' => $value->cetak_akses_menu];
-            }
-
-            $idGroup = $user->id_grup_pengguna;
-            $menu_access = DB::table('menu')->select('menu.id_menu', 'kepala_menu', 'alias_menu', 'lihat_akses_menu', 'tingkatan_menu', 'nama_menu')
-                ->leftJoin('akses_menu', 'menu.id_menu', '=', 'akses_menu.id_menu')
-                ->where('akses_menu.id_grup_pengguna', $idGroup)
-                ->where('lihat_akses_menu', '1')
-                ->where('alias_menu', 'not like', '%detail')
-                ->get();
-            $request->session()->put('menu_access', $menu_access);
-
-            if ($token && $request->session()->has('token') == false) {
-                $request->session()->put('token', $token->nama_token_pengguna);
-                $request->session()->put('user', $user);
-                $request->session()->put('access', $user_access);
-            } else if ($request->session()->has('token')) {
-            } else {
-                $request->session()->flush();
-            }
-
-            $session = $request->session()->get('access');
-
-            return ['status' => true];
-        } else {
-            $request->session()->flush();
-            return ['status' => false];
+            ], 500);
         }
     }
 }

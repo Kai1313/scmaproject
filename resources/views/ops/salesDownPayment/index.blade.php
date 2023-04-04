@@ -40,12 +40,12 @@
 @section('header')
     <section class="content-header">
         <h1>
-            Kirim Ke Cabang
+            Uang Muka Penjualan
             <small></small>
         </h1>
         <ol class="breadcrumb">
             <li><a href="#"><i class="fa fa-dashboard"></i> Dashboard</a></li>
-            <li class="active">Kirim Ke Cabang</li>
+            <li class="active">Uang Muka Penjualan</li>
         </ol>
     </section>
 @endsection
@@ -74,9 +74,9 @@
                                 Void
                             </label>
                         </span>
-                        <a href="{{ route('send_to_branch-entry') }}"
+                        <a href="{{ route('sales-down-payment-entry') }}"
                             class="btn btn-success pull-right btn-flat btn-sm mr-1">
-                            <i class="glyphicon glyphicon-plus"></i> Tambah Kirim Ke Cabang
+                            <i class="glyphicon glyphicon-plus"></i> Tambah Uang Muka Penjualan
                         </a>
                     </div>
                 </div>
@@ -86,14 +86,16 @@
                     <table class="table table-bordered data-table display responsive nowrap" width="100%">
                         <thead>
                             <tr>
+                                <th>ID Uang Muka Penjualan</th>
                                 <th>Tanggal</th>
-                                <th>Kode Pindah Gudang</th>
-                                <th>Gudang</th>
-                                <th>Cabang Tujuan</th>
-                                <th>Keterangan</th>
-                                <th>Jasa Pengiriman</th>
-                                <th>Status</th>
-                                <th>Action</th>
+                                <th>ID Permintaan Penjualan (SO)</th>
+                                <th>Pelanggan</th>
+                                <th>Mata Uang</th>
+                                <th>Rate</th>
+                                <th>Nominal</th>
+                                <th>Total</th>
+                                <th>Catatan</th>
+                                <th width="150px">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -120,29 +122,41 @@
         var table = $('.data-table').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route('send_to_branch') }}?c=" + $('[name="id_cabang"]').val() + '&show_void=' + $(
+            ajax: "{{ route('sales-down-payment') }}?c=" + $('[name="id_cabang"]').val() + '&show_void=' + $(
                 '[name="show_void"]').is(':checked'),
             columns: [{
-                data: 'tanggal_pindah_barang',
-                name: 'tanggal_pindah_barang'
+                data: 'kode_uang_muka_penjualan',
+                name: 'kode_uang_muka_penjualan'
             }, {
-                data: 'kode_pindah_barang',
-                name: 'kode_pindah_barang'
+                data: 'tanggal',
+                name: 'tanggal'
             }, {
-                data: 'nama_gudang',
-                name: 'nama_gudang'
+                data: 'nama_permintaan_penjualan',
+                name: 'nama_permintaan_penjualan',
             }, {
-                data: 'nama_cabang',
-                name: 'nama_cabang',
+                data: 'nama_pelanggan',
+                name: 'nama_pelanggan',
             }, {
-                data: 'keterangan_pindah_barang',
-                name: 'keterangan_pindah_barang',
+                data: 'nama_mata_uang',
+                name: 'nama_mata_uang',
             }, {
-                data: 'transporter',
-                name: 'transporter',
+                data: 'rate',
+                name: 'rate',
+                render: $.fn.dataTable.render.number('.', ',', 2),
+                className: 'text-right'
             }, {
-                data: 'status_pindah_barang',
-                name: 'status_pindah_barang',
+                data: 'nominal',
+                name: 'nominal',
+                render: $.fn.dataTable.render.number('.', ',', 2),
+                className: 'text-right'
+            }, {
+                data: 'total',
+                name: 'total',
+                render: $.fn.dataTable.render.number('.', ',', 2),
+                className: 'text-right'
+            }, {
+                data: 'catatan',
+                name: 'catatan',
             }, {
                 data: 'action',
                 name: 'action',
