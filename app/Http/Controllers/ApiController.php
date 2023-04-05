@@ -2078,6 +2078,7 @@ class ApiController extends Controller
     }
 
     public function productionSupplies($production_id){
+        // cari data produksi input
         $data_production_supplies = DB::table("produksi_detail")
                                     ->join('barang', 'barang.id_barang', 'produksi_detail.id_barang')
                                     ->join('master_qr_code', 'master_qr_code.kode_batang_master_qr_code', 'produksi_detail.kode_batang_lama_produksi_detail')
@@ -2093,10 +2094,11 @@ class ApiController extends Controller
                                     ->orderBy('produksi_detail.id_barang', 'ASC')
                                     ->get();
 
+        // init array kosong untuk memasukkan data persediaan dan total persediaan
         $data_supplies = [];
-
         $total_supplies = 0;
 
+        // input persediaan dan jumlahkan total persediaan
         foreach($data_production_supplies as $production){
             $total = ($production->beli + $production->biaya + $production->produksi + $production->listrik + $production->pegawai);
             $total_supplies += $total;
@@ -2107,6 +2109,7 @@ class ApiController extends Controller
             ];
         }
 
+        // data yang direturn
         $data = [
             'data_supplies' => $data_supplies,
             'total_supplies' => $total_supplies
@@ -2119,15 +2122,16 @@ class ApiController extends Controller
     }
 
     public function productionCost($production_id, $id_cabang){
+        // cari beban produksi dari produksi yang diinput
         $data_production_cost = DB::table("beban_produksi")
                                 ->where('beban_produksi.id_produksi', $production_id)
                                 ->first();
-        Log::debug('tes');
-        Log::debug(json_encode($data_production_cost));
 
+        // init beban listrik dan pegawai
         $beban_listrik = round($data_production_cost->kwh_beban_produksi, 2);
         $beban_pegawai = round(($data_production_cost->tenaga_kerja_beban_produksi * $data_production_cost->listrik_beban_produksi), 2);
 
+        // cari nominal biaya listrik dan gaji dari table setting
         $setting_nominal_listrik = DB::table('setting')
                                     ->where('code', 'Nominal Biaya Listrik')
                                     ->where('tipe', 1)
@@ -2140,17 +2144,21 @@ class ApiController extends Controller
                                     ->where('id_cabang', $id_cabang)
                                     ->first();
 
+        // init nominal listrik dan gaji
         $nominal_listrik = $setting_nominal_listrik->value2;
         $nominal_gaji = $setting_nominal_gaji->value2;
 
+        // hitung biaya listrik dan pegawai
         $biaya_listrik = round(($beban_listrik * $nominal_listrik), 2);
         $biaya_pegawai = round(($beban_pegawai * $nominal_gaji), 2);
 
+        // cari data produksi detail untuk melakukan update beban biaya
         $data_production_detail = DB::table("produksi_detail")
                                     ->join('master_qr_code', 'master_qr_code.kode_batang_master_qr_code', 'produksi_detail.kode_batang_lama_produksi_detail')
                                     ->where('produksi_detail.id_produksi', $production_id)
                                     ->get();
 
+        // update beban biaya dari tiap produksi detail yang ada pada master qr
         foreach($data_production_detail as $detail){
             DB::table("master_qr_code")
             ->where('id_barang', $detail->id_barang)
@@ -2161,6 +2169,7 @@ class ApiController extends Controller
             ]);
         }
 
+        // data return biaya listrik dan pegawai
         $data = [
             'biaya_listrik' => $biaya_listrik,
             'biaya_pegawai' => $biaya_pegawai,
@@ -2173,6 +2182,7 @@ class ApiController extends Controller
     }
 
     public function productionResults($production_id, $total_supplies, $biaya_listrik, $biaya_pegawai){
+        // cari hasil produksi dari input produksi yang berlangsung
         $data_production_results = DB::table("produksi_detail")
                                     ->join('produksi', 'produksi.id_produksi', 'produksi_detail.id_produksi')
                                     ->join('barang', 'barang.id_barang', 'produksi_detail.id_barang')
@@ -2182,16 +2192,19 @@ class ApiController extends Controller
                                     ->orderBy('produksi_detail.id_barang', 'ASC')
                                     ->get();
 
+        // hitung total kredit hasil produksi
         $total_kredit_produksi = 0;
 
         foreach($data_production_results as $production){
             $total_kredit_produksi += $production->kredit_produksi_detail;
         }
 
+        // hitung harga produksi, listrik dan pegawai
         $harga_produksi = round(($total_supplies/$total_kredit_produksi), 2);
         $harga_listrik = round(($biaya_listrik/$total_kredit_produksi), 2);
         $harga_pegawai = round(($biaya_pegawai/$total_kredit_produksi), 2);
 
+        // update beban biaya dari tiap produksi detail
         foreach($data_production_results as $production){
             DB::table("master_qr_code")
             ->where('id_barang', $production->id_barang)
@@ -2204,6 +2217,7 @@ class ApiController extends Controller
         }
 
 
+        // cari total hasil produksi detail
         $data_production_results_groupby_barang = DB::table("produksi_detail")
                                                 ->join('produksi', 'produksi.id_produksi', 'produksi_detail.id_produksi')
                                                 ->join('barang', 'barang.id_barang', 'produksi_detail.id_barang')
@@ -2211,7 +2225,7 @@ class ApiController extends Controller
                                                 ->selectRaw('produksi_detail.id_barang,
                                                 ROUND(SUM(kredit_produksi_detail),2) as kredit_produksi_detail,
                                                 barang.id_akun,
-                                                ROUND(IFNULL(SUM((master_qr_code.produksi_master_qr_code + master_qr_code.listrik_master_qr_code) + master_qr_code.pegawai_master_qr_code), 0), 2) as total')
+                                                ROUND(SUM(ROUND(master_qr_code.listrik_master_qr_code * produksi_detail.kredit_produksi_detail, 2) + ROUND(master_qr_code.pegawai_master_qr_code * produksi_detail.kredit_produksi_detail, 2) + ROUND(master_qr_code.produksi_master_qr_code * produksi_detail.kredit_produksi_detail, 2)), 2) as total')
                                                 ->where('produksi.nomor_referensi_produksi', $production_id)
                                                 ->groupBy('produksi_detail.id_barang')
                                                 ->orderBy('produksi_detail.id_barang', 'ASC')
