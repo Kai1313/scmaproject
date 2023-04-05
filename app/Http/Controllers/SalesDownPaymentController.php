@@ -226,7 +226,7 @@ class SalesDownPaymentController extends Controller
                 $join->on('pp.id_permintaan_penjualan', '=', 'ump.id_permintaan_penjualan')
                     ->where('ump.void', 0);
             })
-        // ->whereBetween('tanggal_permintaan_penjualan', [$startDate, $endDate])
+            ->whereBetween('tanggal_permintaan_penjualan', [$startDate, $endDate])
             ->where('pp.id_cabang', $idCabang)
             ->groupBy('pp.id_permintaan_penjualan')
             ->having(DB::raw('mtotal_permintaan_penjualan - COALESCE(sum(nominal),0)'), '<>', '0')
