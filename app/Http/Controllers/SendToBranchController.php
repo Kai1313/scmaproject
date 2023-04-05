@@ -130,7 +130,7 @@ class SendToBranchController extends Controller
         $data = MoveBranch::where('type', 0)->where('id_pindah_barang', $id)->first();
         return view('ops.sendToBranch.detail', [
             'data' => $data,
-            "pageTitle" => "SCA OPS | kirim Ke Cabang | Lihat",
+            "pageTitle" => "SCA OPS | Kirim Ke Cabang | Lihat",
         ]);
     }
 
@@ -224,5 +224,18 @@ class SendToBranchController extends Controller
             'data' => $data,
             'message' => $message,
         ], $status);
+    }
+
+    public function printData($id)
+    {
+        if (checkAccessMenu('kirim_ke_cabang', 'print') == false) {
+            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+        }
+
+        $data = MoveBranch::find($id);
+        return view('ops.sendToBranch.print', [
+            'data' => $data,
+            "pageTitle" => "SCA OPS | Kirim Ke Cabang | Cetak",
+        ]);
     }
 }

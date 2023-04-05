@@ -204,10 +204,8 @@ class QcReceiptController extends Controller
         $data = Purchase::find($id);
         return view('ops.qualityControl.print', [
             'data' => $data,
-            'arrayStatus' => $arrayStatus,
+            'arrayStatus' => $this->arrayStatus,
             "pageTitle" => "SCA OPS | QC Penerimaan Pembelian | Cetak",
         ]);
-
-        return $data;
     }
 }

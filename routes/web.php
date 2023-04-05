@@ -89,6 +89,7 @@ Route::prefix('send_to_branch')->group(function () {
     Route::get('/view/{id}', 'SendToBranchController@viewData')->name('send_to_branch-view');
     Route::get('/delete/{id}', 'SendToBranchController@destroy')->name('send_to_branch-delete');
     Route::get('/auto-qrcode', 'SendToBranchController@autoQRCode')->name('send_to_branch-qrcode');
+    Route::get('/print/{id}', 'SendToBranchController@printData')->name('send_to_branch-print-data');
 });
 
 Route::prefix('received_from_branch')->group(function () {

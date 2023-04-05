@@ -108,6 +108,18 @@
         border-collapse: collapse;
     }
 
+    td {
+        vertical-align: top;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .text-right {
+        text-align: right;
+    }
+
     @media print {
 
         .no-print,
@@ -126,16 +138,16 @@
                 <h1>PT. SINAR CEMARAMAS ABADI</h1>
             </td>
             <td style="text-align:right;width:150px;">
-                <h1>Permintaan Pembelian</h1>
+                <h1>Kirim Ke Cabang</h1>
             </td>
         </tr>
     </table>
     <table>
         <tr>
-            <td valign="top" style="width:70%;">
+            <td valign="top" style="width:67%;">
                 <table class='kiri' style="width:100%;">
                     <tr>
-                        <td width="80"><b>Cabang</b></td>
+                        <td width="100"><b>Cabang</b></td>
                         <td width="5">:</td>
                         <td>{{ $data->cabang->nama_cabang }}</td>
                     </tr>
@@ -147,31 +159,31 @@
                     <tr>
                         <td><b>Tanggal</b></td>
                         <td>:</td>
-                        <td>{{ $data->purchase_request_date }}</td>
+                        <td>{{ $data->tanggal_pindah_barang }}</td>
                     </tr>
                     <tr>
-                        <td><b>Estimasi</b></td>
+                        <td><b>Tujuan</b></td>
                         <td>:</td>
-                        <td>{{ $data->purchase_request_estimation_date }}</td>
+                        <td>{{ $data->destinationBranch->nama_cabang }}</td>
                     </tr>
                 </table>
             </td>
-            <td valign="top" style="width:80%;">
+            <td valign="top">
                 <table class='kanan' style="width:100%;">
                     <tr>
-                        <td width="80"><b>Kode Permintaan</b></td>
+                        <td width="100"><b>Kode Pindah Cabang</b></td>
                         <td width="5">:</td>
-                        <td>{{ $data->purchase_request_code }}</td>
+                        <td>{{ $data->kode_pindah_barang }}</td>
                     </tr>
                     <tr>
-                        <td><b>Pemohon</b></td>
-                        <td>:</td>
-                        <td>{{ $data->pengguna->nama_pengguna }}</td>
+                        <td width="80"><b>Pengirim</b></td>
+                        <td width="5">:</td>
+                        <td>{{ $data->transporter }}</td>
                     </tr>
                     <tr>
-                        <td><b>Status</b></td>
+                        <td><b>Nomor Polisi</b></td>
                         <td>:</td>
-                        <td>{{ $arrayStatus[$data->approval_status]['text'] }}</td>
+                        <td>{{ $data->nomor_polisi }}</td>
                     </tr>
                 </table>
             </td>
@@ -181,28 +193,32 @@
 <table class="grid" width="100%">
     <tr>
         <th width="20">No</th>
-        <th width="200">Nama Barang</th>
-        <th width="50">Jumlah</th>
-        <th width="50">Satuan</th>
-        <th>Catatan</th>
+        <th width="50">QR Code</th>
+        <th width="150">Nama Barang</th>
+        <th width="70">Qty</th>
+        <th width="70">Batch</th>
+        <th width="50">kadaluarsa</th>
     </tr>
     @foreach ($data->formatdetail as $key => $detail)
         <tr>
-            <td align="center">{{ $key + 1 }}</td>
+            <td class="text-center">{{ $key + 1 }}</td>
+            <td class="text-center">{{ $detail->qr_code }}</td>
             <td>{{ $detail->nama_barang }}</td>
-            <td align="right">{{ number_format($detail->qty, 2, ',', '.') }}</td>
-            <td align="center">{{ $detail->nama_satuan_barang }}</td>
-            <td>{{ $detail->notes }}</td>
+            <td class="text-right">{{ number_format($detail->qty, 4, ',', '.') }}
+                {{ $detail->nama_satuan_barang }}</td>
+            <td class="text-center">{{ $detail->batch }}</td>
+            <td class="text-center">
+                {{ $detail->tanggal_kadaluarsa == '0000-00-00' ? '' : $detail->tanggal_kadaluarsa }}</td>
         </tr>
     @endforeach
 </table>
-<table width="100%" class="footer" style="margin-top: 4px">
+{{-- <table width="100%" class="footer" style="margin-top: 4px">
     <tr>
         <td width="100%" valign="top" align="left" colspan="3">
             <b>Catatan : </b> {{ $data->catatan }}<br /><br />
         </td>
     </tr>
-</table>
+</table> --}}
 <script>
     //window.print();
 </script>
