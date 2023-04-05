@@ -2456,12 +2456,17 @@ class ApiController extends Controller
         $id_cabang = $request->id_cabang;
         $void = $request->void;
 
+        // tahap 1
         $data_production_supplies = $this->productionSupplies($id_produksi);
+
+        // tahap 2 dan 3
         $data_production_cost = $this->productionCost($id_produksi, $id_cabang);
 
         $total_supplies = $data_production_supplies['total_supplies'];
         $biaya_listrik = $data_production_cost['biaya_listrik'];
         $biaya_operator = $data_production_cost['biaya_operator'];
+
+        // tahap 4
         $data_production_results = $this->productionResults($id_produksi, $total_supplies, $biaya_listrik, $biaya_operator);
 
         // init data jurnal
@@ -2483,6 +2488,7 @@ class ApiController extends Controller
             'void' => $void
         ];
 
+        // tahap 5
         $store_data =  $this->storeHppJournal($data);
 
         if($store_data){
