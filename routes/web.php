@@ -100,6 +100,7 @@ Route::prefix('received_from_branch')->group(function () {
     Route::get('/delete/{id}', 'ReceivedFromBranchController@destroy')->name('received_from_branch-delete');
     Route::get('/auto-code', 'ReceivedFromBranchController@autoCode')->name('received_from_branch-code');
     Route::get('/auto-detail-item', 'ReceivedFromBranchController@getDetailItem')->name('received_from_branch-detail-item');
+    Route::get('/print/{id}', 'ReceivedFromBranchController@printData')->name('received_from_branch-print-data');
 });
 
 // Master

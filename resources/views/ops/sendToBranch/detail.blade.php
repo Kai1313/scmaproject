@@ -54,7 +54,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <label class="col-md-4">Kode Pindah Barang</label>
+                            <label class="col-md-4">Kode Pindah Cabang</label>
                             <div class="col-md-8">
                                 : {{ $data->kode_pindah_barang }}
                             </div>

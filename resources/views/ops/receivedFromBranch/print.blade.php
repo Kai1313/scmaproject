@@ -139,7 +139,7 @@
                 <h1>PT. SINAR CEMARAMAS ABADI</h1>
             </td>
             <td style="text-align:right;width:150px;">
-                <h1>Kirim Ke Cabang</h1>
+                <h1>Terima Dari Cabang</h1>
             </td>
         </tr>
     </table>
@@ -163,9 +163,9 @@
                         <td>{{ $data->tanggal_pindah_barang }}</td>
                     </tr>
                     <tr>
-                        <td><b>Tujuan</b></td>
+                        <td><b>Dari Cabang</b></td>
                         <td>:</td>
-                        <td>{{ $data->destinationBranch->nama_cabang }}</td>
+                        <td>{{ $data->originBranch->nama_cabang }}</td>
                     </tr>
                 </table>
             </td>
@@ -175,6 +175,11 @@
                         <td width="100"><b>Kode Transaksi</b></td>
                         <td width="5">:</td>
                         <td>{{ $data->kode_pindah_barang }}</td>
+                    </tr>
+                    <tr>
+                        <td width="100"><b>Kode Referensi</b></td>
+                        <td width="5">:</td>
+                        <td>{{ $data->parent->kode_pindah_barang }}</td>
                     </tr>
                     <tr>
                         <td width="80"><b>Pengirim</b></td>

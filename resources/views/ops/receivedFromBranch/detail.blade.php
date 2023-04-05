@@ -29,6 +29,10 @@
         <div class="box box-primary">
             <div class="box-header">
                 <h3 class="box-title">Detail Terima Dari Cabang <span class="text-muted"></span></h3>
+                <a href="{{ route('received_from_branch-print-data', $data->id_pindah_barang) }}" target="_blank"
+                    class="btn btn-sm btn-default btn-flat pull-right">
+                    <span class="glyphicon glyphicon-print mr-1"></span> Cetak
+                </a>
                 <a href="{{ route('received_from_branch') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right"
                     style="margin-right:10px;">
                     <span class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali
@@ -50,7 +54,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <label class="col-md-4">Kode Pindah Barang</label>
+                            <label class="col-md-4">Kode Pindah Cabang</label>
                             <div class="col-md-8">
                                 : {{ $data->kode_pindah_barang }}
                             </div>

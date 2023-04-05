@@ -139,42 +139,42 @@ class ReceivedFromBranchController extends Controller
         ]);
     }
 
-    public function destroy($id)
-    {
-        if (checkAccessMenu('terima_dari_cabang', 'delete') == false) {
-            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
-        }
+    // public function destroy($id)
+    // {
+    //     if (checkAccessMenu('terima_dari_cabang', 'delete') == false) {
+    //         return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+    //     }
 
-        // $data = PurchaseRequest::find($id);
-        // if (!$data) {
-        //     return response()->json([
-        //         "result" => false,
-        //         "message" => "Data tidak ditemukan",
-        //     ]);
-        // }
+    // $data = PurchaseRequest::find($id);
+    // if (!$data) {
+    //     return response()->json([
+    //         "result" => false,
+    //         "message" => "Data tidak ditemukan",
+    //     ]);
+    // }
 
-        // try {
-        //     DB::beginTransaction();
-        //     $data->void = 1;
-        //     $data->void_user_id = session()->get('user')['id_pengguna'];
-        //     $data->save();
+    // try {
+    //     DB::beginTransaction();
+    //     $data->void = 1;
+    //     $data->void_user_id = session()->get('user')['id_pengguna'];
+    //     $data->save();
 
-        //     DB::commit();
-        //     return response()->json([
-        //         "result" => true,
-        //         "message" => "Data berhasil dibatalkan",
-        //         "redirect" => route('purchase-request'),
-        //     ]);
-        // } catch (\Exception $e) {
-        //     DB::rollback();
-        //     Log::error("Error when void purchase request");
-        //     Log::error($e);
-        //     return response()->json([
-        //         "result" => false,
-        //         "message" => "Data gagal dibatalkan",
-        //     ]);
-        // }
-    }
+    //     DB::commit();
+    //     return response()->json([
+    //         "result" => true,
+    //         "message" => "Data berhasil dibatalkan",
+    //         "redirect" => route('purchase-request'),
+    //     ]);
+    // } catch (\Exception $e) {
+    //     DB::rollback();
+    //     Log::error("Error when void purchase request");
+    //     Log::error($e);
+    //     return response()->json([
+    //         "result" => false,
+    //         "message" => "Data gagal dibatalkan",
+    //     ]);
+    // }
+    // }
 
     public function autoCode(Request $request)
     {
@@ -215,5 +215,18 @@ class ReceivedFromBranchController extends Controller
             'data' => $datas,
             'message' => '',
         ], 200);
+    }
+
+    public function printData($id)
+    {
+        if (checkAccessMenu('terima_dari_cabang', 'print') == false) {
+            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+        }
+
+        $data = MoveBranch::find($id);
+        return view('ops.receivedFromBranch.print', [
+            'data' => $data,
+            "pageTitle" => "SCA OPS | Terima Dari Cabang | Cetak",
+        ]);
     }
 }
