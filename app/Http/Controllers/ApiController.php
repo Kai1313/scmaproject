@@ -2081,91 +2081,198 @@ class ApiController extends Controller
     public function storeHppJournal($data)
     {
         try {
-            DB::beginTransaction();
             // Init Data
-            $id_transaksi = "TRX"; // Diisi dengan ID/Nomor transaksi produksi
-            $pemakaian = []; // Diisi dengan data pemakaian
-            $hasil_produksi = []; // Diisi dengan data hasil produksi
-            $biaya_listrik = 0; // Diisi dengan data biaya listrik
-            $biaya_operator = 0; // Diisi dengan data biaya operator
+            $id_transaksi = $data['id_transaksi']; // Diisi dengan ID/Nomor transaksi produksi
+            $pemakaian = $data['data_pemakaian']; // Diisi dengan data pemakaian
+            $hasil_produksi = $data['data_hasil']; // Diisi dengan data hasil produksi
+            $biaya_listrik = $data['biaya_listrik']; // Diisi dengan data biaya listrik
+            $biaya_operator =  $data['biaya_operator']; // Diisi dengan data biaya operator
             $journalDate = date('Y-m-d');
             $journalType = "ME";
-            $cabangID = "cabang";
+            $cabangID = $data['cabang'];
+            $void = $data['void'];
             $noteHeader = "notes";
-            $userData = $request->session()->get('user');
+            $userData = $data['user_data'];
             $userRecord = $userData->id_pengguna;
             $userModified = $userData->id_pengguna;
             $dateRecord = date('Y-m-d');
-            $detailData = $request->detail;
 
             // Get akun biaya listrik, biaya operator, pembulatan
-            $cabang = Cabang::find(1); // Diganti sesuai auth atau user session
-            $get_akun_biaya_listrik = Setting::where("id_cabang", $cabang)->where("code", "Biaya Listrik")->first();
-            $get_akun_biaya_operator = Setting::where("id_cabang", $cabang)->where("code", "Biaya Operator")->first();
-            $get_akun_pembulatan = Setting::where("id_cabang", $cabang)->where("code", "Pembulatan")->first();
+            // $cabang = Cabang::find(1); // Diganti sesuai auth atau user session
+            $get_akun_biaya_listrik = Setting::where("id_cabang", $cabangID)->where("code", "Biaya Listrik")->first();
+            $get_akun_biaya_operator = Setting::where("id_cabang", $cabangID)->where("code", "Biaya Operator")->first();
+            $get_akun_pembulatan = Setting::where("id_cabang", $cabangID)->where("code", "Pembulatan")->first();
 
-            // Posting jurnal 
-            // Header
-            $header = (JurnalHeader::where("id_transaksi", $id_transaksi)->first())?JurnalHeader::where("id_transaksi", $id_transaksi)->first(): new JurnalHeader;
-            $header->id_cabang = $cabangID;
-            $header->jenis_jurnal = $journalType;
-            $header->id_transaksi = $id_transaksi;
-            $header->catatan = $noteHeader;
-            $header->void = 0;
-            $header->tanggal_jurnal = $journalDate;
-            $header->user_created = $userRecord;
-            $header->user_modified = $userModified;
-            $header->dt_created = $dateRecord;
-            $header->dt_modified = $dateRecord;
-            $header->kode_jurnal = $this->generateJournalCode($cabangID, $journalType, $slipID);
-            if (!$header->save()) {
-                DB::rollback();
-                Log::error("Error when storing journal header on storeHppJournal");
-                return FALSE;
-            }
+            Log::debug('steeing');
+            Log::debug(json_encode($get_akun_biaya_listrik));
 
-            // Detail
-            $index = 1;
-            foreach ($pemakaian as $key => $val) {
-                //Store Detail
-                $detail = new JurnalDetail();
-                $detail->id_jurnal = $header->id_jurnal;
-                $detail->index = $index;
-                $detail->id_akun = $val['akun'];
-                $detail->keterangan = "Pemakaian produksi ".$val['notes'];
-                $detail->id_transaksi = NULL;
-                $detail->debet = str_replace(',', '', $val['debet']);
-                $detail->credit = str_replace(',', '', $val['kredit']);
-                $detail->user_created = $userRecord;
-                $detail->user_modified = $userModified;
-                $detail->dt_created = $dateRecord;
-                $detail->dt_modified = $dateRecord;
-                // dd(json_encode($detail));
-                if (!$detail->save()) {
+            $jurnal_header = JurnalHeader::where("id_transaksi", $id_transaksi)->first();
+
+            if(!empty($jurnal_header) && $void == 1){
+                $jurnal_header->void = $void;
+                $jurnal_header->user_void = $userRecord;
+                $jurnal_header->dt_void = date('Y-m-d');
+
+                if (!$jurnal_header->save()) {
+                    DB::rollback();
+                    Log::error("Error when update journal header on storeHppJournal");
+                    return FALSE;
+                }
+            }else{
+                // Posting jurnal
+                // Header
+                $header = ($jurnal_header) ? $jurnal_header : new JurnalHeader;
+                $header->id_cabang = $cabangID;
+                $header->jenis_jurnal = $journalType;
+                $header->id_transaksi = $id_transaksi;
+                $header->catatan = $noteHeader;
+                $header->void = 0;
+                $header->tanggal_jurnal = $journalDate;
+                $header->user_created = $userRecord;
+                $header->user_modified = $userModified;
+                $header->dt_created = $dateRecord;
+                $header->dt_modified = $dateRecord;
+                $header->kode_jurnal = $this->generateJournalCode($cabangID, $journalType);
+                if (!$header->save()) {
                     DB::rollback();
                     Log::error("Error when storing journal header on storeHppJournal");
                     return FALSE;
                 }
-                $index++;
-            }
-            // Detail Biaya Listrik
-            $detail = new JurnalDetail();
-            $detail->id_jurnal = $header->id_jurnal;
-            $detail->index = $index;
-            $detail->id_akun = $get_akun_biaya_listrik->val2;
-            $detail->keterangan = "Biaya Listrik Produksi";
-            $detail->id_transaksi = "Biaya Listrik";
-            $detail->debet = str_replace(',', '', $xx['debet']);
-            $detail->credit = str_replace(',', '', $xx['kredit']);
-            $detail->user_created = $userRecord;
-            $detail->user_modified = $userModified;
-            $detail->dt_created = $dateRecord;
-            $detail->dt_modified = $dateRecord;
 
+                // Detail
+                $index = 1;
+                $total_debet = 0;
+                $total_credit = 0;
+                foreach ($pemakaian as $key => $val) {
+                    //Store Detail
+                    $detail = new JurnalDetail();
+                    $detail->id_jurnal = $header->id_jurnal;
+                    $detail->index = $index;
+                    $detail->id_akun = $val['akun'];
+                    $detail->keterangan = "Pemakaian produksi ". $val['notes'] . " " . $id_transaksi;
+                    $detail->id_transaksi = NULL;
+                    $detail->debet = floatval($val['debet']);
+                    $detail->credit = floatval($val['kredit']);
+                    $detail->user_created = $userRecord;
+                    $detail->user_modified = $userModified;
+                    $detail->dt_created = $dateRecord;
+                    $detail->dt_modified = $dateRecord;
+                    // dd(json_encode($detail));
+                    if (!$detail->save()) {
+                        DB::rollback();
+                        Log::error("Error when storing journal detail on storeHppJournal");
+                        return FALSE;
+                    }
+                    $total_debet += $detail->debet;
+                    $total_credit += $detail->credit;
+                    $index++;
+                }
+
+                // Detail Biaya Listrik
+                $detail = new JurnalDetail();
+                $detail->id_jurnal = $header->id_jurnal;
+                $detail->index = $index;
+                $detail->id_akun = $get_akun_biaya_listrik->value2;
+                $detail->keterangan = "Biaya Listrik Produksi " . $id_transaksi;
+                $detail->id_transaksi = "Biaya Listrik";
+                $detail->debet = 0;
+                $detail->credit = floatval($biaya_listrik);
+                $detail->user_created = $userRecord;
+                $detail->user_modified = $userModified;
+                $detail->dt_created = $dateRecord;
+                $detail->dt_modified = $dateRecord;
+
+                if (!$detail->save()) {
+                    DB::rollback();
+                    Log::error("Error when storing journal detail on storeHppJournal");
+                    return FALSE;
+                }
+                $total_debet += $detail->debet;
+                $total_credit += $detail->credit;
+                $index++;
+
+
+                // Detail Biaya Operator
+                $detail = new JurnalDetail();
+                $detail->id_jurnal = $header->id_jurnal;
+                $detail->index = $index;
+                $detail->id_akun = $get_akun_biaya_operator->value2;
+                $detail->keterangan = "Biaya Operator Produksi " . $id_transaksi;
+                $detail->id_transaksi = "Biaya Operator";
+                $detail->debet = 0;
+                $detail->credit = floatval($biaya_operator);
+                $detail->user_created = $userRecord;
+                $detail->user_modified = $userModified;
+                $detail->dt_created = $dateRecord;
+                $detail->dt_modified = $dateRecord;
+
+                if (!$detail->save()) {
+                    DB::rollback();
+                    Log::error("Error when storing journal detail on storeHppJournal");
+                    return FALSE;
+                }
+                $total_debet += $detail->debet;
+                $total_credit += $detail->credit;
+                $index++;
+
+                foreach ($hasil_produksi as $key => $val) {
+                    //Store Detail
+                    $detail = new JurnalDetail();
+                    $detail->id_jurnal = $header->id_jurnal;
+                    $detail->index = $index;
+                    $detail->id_akun = $val['akun'];
+                    $detail->keterangan = "Hasil produksi ". $val['notes'] . " " . $id_transaksi;
+                    $detail->id_transaksi = $val['notes'];
+                    $detail->debet = floatval($val['debet']);
+                    $detail->credit = floatval($val['kredit']);
+                    $detail->user_created = $userRecord;
+                    $detail->user_modified = $userModified;
+                    $detail->dt_created = $dateRecord;
+                    $detail->dt_modified = $dateRecord;
+                    // dd(json_encode($detail));
+                    if (!$detail->save()) {
+                        DB::rollback();
+                        Log::error("Error when storing journal detail on storeHppJournal");
+                        return FALSE;
+                    }
+                    $total_debet += $detail->debet;
+                    $total_credit += $detail->credit;
+                    $index++;
+                }
+
+                // pembulatan
+                if($total_debet != $total_credit){
+                    $selisih = $total_credit - $total_debet;
+                    // Detail Biaya Listrik
+                    $detail = new JurnalDetail();
+                    $detail->id_jurnal = $header->id_jurnal;
+                    $detail->index = $index;
+                    $detail->id_akun = $get_akun_pembulatan->value2;
+                    $detail->keterangan = "Pembulatan Produksi " . $id_transaksi;
+                    $detail->id_transaksi = "Pembulatan";
+                    if($selisih > 0){
+                        $detail->debet = floatval($selisih);
+                        $detail->credit = 0;
+                    }else{
+                        $detail->debet = 0;
+                        $detail->credit = floatval(abs($selisih));
+                    }
+                    $detail->user_created = $userRecord;
+                    $detail->user_modified = $userModified;
+                    $detail->dt_created = $dateRecord;
+                    $detail->dt_modified = $dateRecord;
+
+                    if (!$detail->save()) {
+                        DB::rollback();
+                        Log::error("Error when storing journal detail on storeHppJournal");
+                        return FALSE;
+                    }
+                }
+            }
 
             DB::commit();
             return TRUE;
-        } 
+        }
         catch (\Exception $e) {
             DB::rollback();
             $message = "Error when storing HPP Journal";
@@ -2178,9 +2285,11 @@ class ApiController extends Controller
     public function productionSupplies($production_id){
         // cari data produksi input
         $data_production_supplies = DB::table("produksi_detail")
+                                    ->join('produksi', 'produksi.id_produksi', 'produksi_detail.id_produksi')
                                     ->join('barang', 'barang.id_barang', 'produksi_detail.id_barang')
                                     ->join('master_qr_code', 'master_qr_code.kode_batang_master_qr_code', 'produksi_detail.kode_batang_lama_produksi_detail')
                                     ->selectRaw('produksi_detail.id_barang,
+                                    produksi.nama_produksi,
                                     ROUND(IFNULL(SUM(produksi_detail.kredit_produksi_detail * master_qr_code.beli_master_qr_code), 0), 2) as beli,
                                     ROUND(IFNULL(SUM(produksi_detail.kredit_produksi_detail * master_qr_code.biaya_beli_master_qr_code), 0), 2) as biaya,
                                     ROUND(IFNULL(SUM(produksi_detail.kredit_produksi_detail * master_qr_code.produksi_master_qr_code), 0), 2) as produksi,
@@ -2201,10 +2310,12 @@ class ApiController extends Controller
             $total = ($production->beli + $production->biaya + $production->produksi + $production->listrik + $production->pegawai);
             $total_supplies += $total;
 
-            $data_supplies[$production->id_barang] = [
-                'total' => round($total, 2),
-                'id_akun' => $production->id_akun,
-            ];
+            array_push($data_supplies, [
+                'akun' => $production->id_akun,
+                'notes' => $production->id_barang,
+                'debet' => 0,
+                'kredit' => round($total, 2),
+            ]);
         }
 
         // data yang direturn
@@ -2212,10 +2323,6 @@ class ApiController extends Controller
             'data_supplies' => $data_supplies,
             'total_supplies' => $total_supplies
         ];
-
-        Log::debug('----- Tahap 1 -----');
-        Log::debug(json_encode($data));
-
         return $data;
     }
 
@@ -2248,7 +2355,7 @@ class ApiController extends Controller
 
         // hitung biaya listrik dan pegawai
         $biaya_listrik = round(($beban_listrik * $nominal_listrik), 2);
-        $biaya_pegawai = round(($beban_pegawai * $nominal_gaji), 2);
+        $biaya_operator = round(($beban_pegawai * $nominal_gaji), 2);
 
         // cari data produksi detail untuk melakukan update beban biaya
         $data_production_detail = DB::table("produksi_detail")
@@ -2270,16 +2377,14 @@ class ApiController extends Controller
         // data return biaya listrik dan pegawai
         $data = [
             'biaya_listrik' => $biaya_listrik,
-            'biaya_pegawai' => $biaya_pegawai,
+            'biaya_operator' => $biaya_operator,
         ];
 
-        Log::debug('----- Tahap 2 -----');
-        Log::debug(json_encode($data));
         return $data;
 
     }
 
-    public function productionResults($production_id, $total_supplies, $biaya_listrik, $biaya_pegawai){
+    public function productionResults($production_id, $total_supplies, $biaya_listrik, $biaya_operator){
         // cari hasil produksi dari input produksi yang berlangsung
         $data_production_results = DB::table("produksi_detail")
                                     ->join('produksi', 'produksi.id_produksi', 'produksi_detail.id_produksi')
@@ -2300,7 +2405,7 @@ class ApiController extends Controller
         // hitung harga produksi, listrik dan pegawai
         $harga_produksi = round(($total_supplies/$total_kredit_produksi), 2);
         $harga_listrik = round(($biaya_listrik/$total_kredit_produksi), 2);
-        $harga_pegawai = round(($biaya_pegawai/$total_kredit_produksi), 2);
+        $harga_pegawai = round(($biaya_operator/$total_kredit_produksi), 2);
 
         // update beban biaya dari tiap produksi detail
         foreach($data_production_results as $production){
@@ -2329,25 +2434,72 @@ class ApiController extends Controller
                                                 ->orderBy('produksi_detail.id_barang', 'ASC')
                                                 ->get();
 
-        Log::debug('----- Tahap 3 -----');
-        Log::debug(json_encode($data_production_results_groupby_barang));
+        $data_results = [];
+
+        foreach($data_production_results_groupby_barang as $production){
+            array_push($data_results, [
+                'akun' => $production->id_akun,
+                'notes' => $production->id_barang,
+                'debet' => round($production->total, 2),
+                'kredit' => 0,
+            ]);
+        }
+
+        // data yang direturn
+        $data = [
+            'data_results' => $data_results
+        ];
+
+        return $data;
     }
 
     public function journalHpp(Request $request){
+        DB::beginTransaction();
         $id_produksi = $request->id_produksi;
         $id_cabang = $request->id_cabang;
+        $void = $request->void;
 
         $data_production_supplies = $this->productionSupplies($id_produksi);
         $data_production_cost = $this->productionCost($id_produksi, $id_cabang);
 
         $total_supplies = $data_production_supplies['total_supplies'];
         $biaya_listrik = $data_production_cost['biaya_listrik'];
-        $biaya_pegawai = $data_production_cost['biaya_pegawai'];
+        $biaya_operator = $data_production_cost['biaya_operator'];
+        $data_production_results = $this->productionResults($id_produksi, $total_supplies, $biaya_listrik, $biaya_operator);
 
-        Log::debug('final');
-        Log::debug(json_encode($data_production_supplies));
-        Log::debug(json_encode($data_production_cost));
-        $this->productionResults($id_produksi, $total_supplies, $biaya_listrik, $biaya_pegawai);
-        // $this->productionCost($production_id);
+        // init data jurnal
+        $data_production = DB::table('produksi')->where('id_produksi', $id_produksi)->first();
+
+        $id_transaksi = $data_production->nama_produksi;
+        $data_pemakaian = $data_production_supplies['data_supplies'];
+        $data_hasil = $data_production_results['data_results'];
+        $user_data = Auth::guard('api')->user();
+
+        $data = [
+            'id_transaksi' => $id_transaksi,
+            'cabang' => $id_cabang,
+            'data_pemakaian' => $data_pemakaian,
+            'biaya_listrik' => $biaya_listrik,
+            'biaya_operator' => $biaya_operator,
+            'data_hasil' => $data_hasil,
+            'user_data' => $user_data,
+            'void' => $void
+        ];
+
+        $store_data =  $this->storeHppJournal($data);
+
+        if($store_data){
+            return response()->json([
+                "result" => true,
+                "code" => 200,
+                "message" => "Successfully stored Jurnal Hpp data",
+            ], 200);
+        }else{
+            return response()->json([
+                "result" => false,
+                "code" => 400,
+                "message" => "Error when store Jurnal Hpp data",
+            ], 400);
+        }
     }
 }
