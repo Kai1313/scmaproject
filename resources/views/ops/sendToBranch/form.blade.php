@@ -125,7 +125,7 @@
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <label>Kode Pindah Barang</label>
+                            <label>Kode Pindah Cabang</label>
                             <div class="form-group">
                                 <input type="text" name="kode_pindah_barang"
                                     value="{{ old('kode_pindah_barang', $data ? $data->kode_pindah_barang : '') }}"

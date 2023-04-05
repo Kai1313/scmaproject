@@ -30,53 +30,6 @@ class MasterSlipController extends Controller
         $data_cabang = Cabang::get();
         $user_id = $request->user_id;
 
-        // if (($user_id != '' && $request->session()->has('token') == false) || $request->session()->has('token') == true) {
-        //     if ($request->session()->has('token') == true) {
-        //         $user_id = $request->session()->get('user')->id_pengguna;
-        //     }
-        //     $user = User::where('id_pengguna', $user_id)->first();
-        //     $token = UserToken::where('id_pengguna', $user_id)->where('status_token_pengguna', 1)->whereRaw("waktu_habis_token_pengguna > STR_TO_DATE(?, '%Y-%m-%d %H:%i:%s')", Carbon::now()->format('Y-m-d H:i:s'))->first();
-
-        //     $sql = "SELECT
-        //         a.id_pengguna,
-        //         a.id_grup_pengguna,
-        //         d.id_menu,
-        //         d.nama_menu,
-        //         c.lihat_akses_menu,
-        //         c.tambah_akses_menu,
-        //         c.ubah_akses_menu,
-        //         c.hapus_akses_menu,
-        //         c.cetak_akses_menu
-        //     FROM
-        //         pengguna a,
-        //         grup_pengguna b,
-        //         akses_menu c,
-        //         menu d
-        //     WHERE
-        //         a.id_grup_pengguna = b.id_grup_pengguna
-        //         AND b.id_grup_pengguna = c.id_grup_pengguna
-        //         AND c.id_menu = d.id_menu
-        //         AND a.id_pengguna = $user_id
-        //         AND d.keterangan_menu = 'Accounting'
-        //         AND d.status_menu = 1";
-        //     $access = DB::connection('mysql')->select($sql);
-
-        //     $user_access = array();
-        //     foreach ($access as $value) {
-        //         $user_access[$value->nama_menu] = ['show' => $value->lihat_akses_menu, 'create' => $value->tambah_akses_menu, 'edit' => $value->ubah_akses_menu, 'delete' => $value->hapus_akses_menu, 'print' => $value->cetak_akses_menu];
-        //     }
-
-        //     if ($token && $request->session()->has('token') == false) {
-        //         $request->session()->put('token', $token->nama_token_pengguna);
-        //         $request->session()->put('user', $user);
-        //         $request->session()->put('access', $user_access);
-        //     } else if ($request->session()->has('token')) {
-        //     } else {
-        //         $request->session()->flush();
-        //     }
-
-        //     $session = $request->session()->get('access');
-
         $data = [
             "pageTitle" => "SCA Accounting | Master Slip | List",
             "cabang" => $cabang,
@@ -84,15 +37,7 @@ class MasterSlipController extends Controller
             "data_slip" => $data_slip,
         ];
 
-        // if (($request->session()->has('token') && array_key_exists('Master Slip', $session)) && $session['Master Slip']['show'] == 1) {
         return view('accounting.master.slip.index', $data);
-        // } else {
-        // return view('exceptions.forbidden');
-        // }
-        // } else {
-        //     $request->session()->flush();
-        //     return view('exceptions.forbidden');
-        // }
     }
 
     /**
@@ -116,13 +61,7 @@ class MasterSlipController extends Controller
             "data_cabang" => $data_cabang,
         ];
 
-        // $session = $request->session()->get('access');
-
-        // if (($request->session()->has('token') && array_key_exists('Master Slip', $session)) && $session['Master Slip']['create'] == 1) {
         return view('accounting.master.slip.form', $data);
-        // } else {
-        //     return view('exceptions.forbidden');
-        // }
     }
 
     /**
@@ -200,13 +139,8 @@ class MasterSlipController extends Controller
             "pageTitle" => "SCA Accounting | Master Slip | List",
             "data_slip" => $data_slip,
         ];
-        // $session = $request->session()->get('access');
 
-        // if (($request->session()->has('token') && array_key_exists('Master Slip', $session)) && $session['Master Slip']['show'] == 1) {
         return view('accounting.master.slip.detail', $data);
-        // } else {
-        //     return view('exceptions.forbidden');
-        // }
     }
 
     /**
@@ -217,7 +151,7 @@ class MasterSlipController extends Controller
      */
     public function edit(Request $request, $id = null)
     {
-        if (checkAccessMenu('terima_dari_cabang', 'edit') == false) {
+        if (checkAccessMenu('master_slip', 'edit') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
@@ -233,11 +167,7 @@ class MasterSlipController extends Controller
             "data_cabang" => $data_cabang,
         ];
 
-        // if (($request->session()->has('token') && array_key_exists('Master Slip', $session)) && $session['Master Slip']['edit'] == 1) {
         return view('accounting.master.slip.form', $data);
-        // } else {
-        //     return view('exceptions.forbidden');
-        // }
     }
 
     /**
@@ -314,6 +244,7 @@ class MasterSlipController extends Controller
         $data_journal_header = JurnalHeader::where('id_slip', $id)->get();
         $data_slip = Slip::find($id);
         $kode_slip = $data_slip->kode_slip;
+        
         if (checkAccessMenu('master_slip', 'delete') == false) {
             return response()->json([
                 "result" => false,
@@ -321,8 +252,6 @@ class MasterSlipController extends Controller
             ]);
         }
 
-        // $session = $request->session()->get('access');
-        // if (($request->session()->has('token') && array_key_exists('Master Slip', $session)) && $session['Master Slip']['delete'] == 1) {
         if ($data_journal_header->isNotEmpty()) {
             // return back()->with("failed", "Maaf, tidak bisa menghapus slip" . $data_slip->kode_slip . "karena sudah digunakan pada jurnal");
             return response()->json([
@@ -337,12 +266,6 @@ class MasterSlipController extends Controller
             "result" => true,
             "message" => "Berhasil menghapus slip dengan kode slip " . $kode_slip,
         ]);
-        // } else {
-        // return response()->json([
-        //     "result" => false,
-        //     "message" => "Maaf, tidak bisa menghapus slip dengan kode slip " . $kode_slip . ", anda tidak punya akses!",
-        // ]);
-        // }
     }
 
     /**
@@ -444,23 +367,15 @@ class MasterSlipController extends Controller
 
     public function export_excel(Request $request)
     {
-        try {
-            if (checkAccessMenu('master_slip', 'print') == false) {
-                return response()->json([
-                    "result" => false,
-                    "message" => "Error, anda tidak punya akses!",
-                ]);
-            }
+        if (checkAccessMenu('master_slip', 'print') == false) {
+            return response()->json([
+                "result" => false,
+                "message" => "Error, anda tidak punya akses!",
+            ]);
+        }
 
-            // $session = $request->session()->get('access');
-            // if (($request->session()->has('token') && array_key_exists('Master Slip', $session)) && $session['Master Slip']['print'] == 1) {
+        try {
             return Excel::download(new SlipsExport, 'slips.xlsx');
-            // } else {
-            //     return response()->json([
-            //         "result" => false,
-            //         "message" => "Error, anda tidak punya akses!",
-            //     ]);
-            // }
         } catch (\Exception $e) {
             Log::error("Error when export excel master slip");
             Log::error($e);

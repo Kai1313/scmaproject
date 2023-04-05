@@ -116,9 +116,9 @@
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <label>Kode Pindah Gudang</label>
+                            <label>Referensi Kode Pindah Cabang</label>
                             <div class="form-group">
-                                <select name="kode_pindah_barang" class="form-control select2" data-validation="[NOTEMPTY]"
+                                <select name="kode_pindah_barang2" class="form-control select2" data-validation="[NOTEMPTY]"
                                     data-validation-message="Kode pindah gudang tidak boleh kosong">
                                     @if ($data && $data->parent)
                                         <option value="{{ $data->parent->kode_pindah_barang }}">
@@ -142,6 +142,12 @@
                             </div>
                         </div>
                         <div class="col-md-4">
+                            <label>Kode Pindah Cabang</label>
+                            <div class="form-group">
+                                <input type="text" name="kode_pindah_barang"
+                                    value="{{ old('kode_pindah_barang', $data ? $data->kode_pindah_barang : '') }}"
+                                    class="form-control" readonly placeholder="Otomatis">
+                            </div>
                             <label>Dari Cabang <span>*</span></label>
                             <div class="form-group">
                                 <input type="text" class="form-control" name="nama_cabang_asal" readonly
@@ -351,8 +357,8 @@
                     cabang: idCabang
                 },
                 success: function(res) {
-                    $('[name="kode_pindah_barang"]').empty()
-                    $('[name="kode_pindah_barang"]').select2({
+                    $('[name="kode_pindah_barang2"]').empty()
+                    $('[name="kode_pindah_barang2"]').select2({
                         data: [{
                             'id': "",
                             'text': 'Pilih Kode Pindah Gudang'
@@ -386,9 +392,19 @@
                     id: id_pindah_barang
                 },
                 success: function(res) {
-                    details = res.data
-                    $('[name="details"]').val(JSON.stringify(details))
+                    details = []
+                    oldDetails = res.data
+                    for (let i = 0; i < oldDetails.length; i++) {
+                        details.push(oldDetails[i])
+                        if (arrayQRCode.includes(oldDetails[i]['qr_code'])) {
+                            details[i]['status_diterima'] = 1
+                        } else {
+                            details[i]['id_pindah_barang_detail'] = 0
+                            details[i]['status_diterima'] = 0
+                        }
+                    }
 
+                    $('[name="details"]').val(JSON.stringify(details))
                     resDataTable.clear().rows.add(details).draw()
                     $('#cover-spin').hide()
                 },

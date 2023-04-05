@@ -36,7 +36,8 @@ class PurchaseRequestController extends Controller
                     'approval.nama_pengguna as approval_user',
                     'approval_date',
                     'dt_created as created_at',
-                    'prh.void'
+                    'prh.void',
+                    'purchase_request_user_id'
                 )
                 ->leftJoin('gudang', 'prh.id_gudang', '=', 'gudang.id_gudang')
                 ->leftJoin('pengguna as user', 'prh.purchase_request_user_id', '=', 'user.id_pengguna')
@@ -61,10 +62,15 @@ class PurchaseRequestController extends Controller
                         $btn = '<ul class="horizontal-list">';
                         $btn .= '<li><a href="' . route('purchase-request-view', $row->purchase_request_id) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
                         if ($row->approval_status == 0) {
-                            $btn .= '<li><a href="' . route('purchase-request-change-status', [$row->purchase_request_id, 'approval']) . '" class="btn btn-success btn-xs mr-1 mb-1 btn-change-status" data-param="menyetujui"><i class="glyphicon glyphicon-check"></i> Approval</a></li>';
-                            $btn .= '<li><a href="' . route('purchase-request-change-status', [$row->purchase_request_id, 'reject']) . '" class="btn btn-default btn-xs mr-1 mb-1 btn-change-status" data-param="menolak"><i class="fa fa-times"></i> Reject</a></li>';
-                            $btn .= '<li><a href="' . route('purchase-request-entry', $row->purchase_request_id) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
-                            $btn .= '<li><a href="' . route('purchase-request-delete', $row->purchase_request_id) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Void</a></li>';
+                            if (session()->get('user')['id_grup_pengguna'] == 1) {
+                                $btn .= '<li><a href="' . route('purchase-request-change-status', [$row->purchase_request_id, 'approval']) . '" class="btn btn-success btn-xs mr-1 mb-1 btn-change-status" data-param="menyetujui"><i class="glyphicon glyphicon-check"></i> Approval</a></li>';
+                                $btn .= '<li><a href="' . route('purchase-request-change-status', [$row->purchase_request_id, 'reject']) . '" class="btn btn-default btn-xs mr-1 mb-1 btn-change-status" data-param="menolak"><i class="fa fa-times"></i> Reject</a></li>';
+                            }
+
+                            if (session()->get('user')['id_grup_pengguna'] == $row->purchase_request_user_id) {
+                                $btn .= '<li><a href="' . route('purchase-request-entry', $row->purchase_request_id) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
+                                $btn .= '<li><a href="' . route('purchase-request-delete', $row->purchase_request_id) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Void</a></li>';
+                            }
                         }
 
                         $btn .= '</ul>';
@@ -127,6 +133,21 @@ class PurchaseRequestController extends Controller
 
             $data->save();
             $data->savedetails($request->details);
+
+            $userSendWa = DB::table('pengguna')
+                ->select('nama_pengguna', 'telepon1_pengguna')
+                ->whereIn('id_grup_pengguna', [7, 13])
+                ->where('status_pengguna', 1)->get();
+            $settingMessage = DB::table('setting')->where('code', 'Pesan Permintaan Beli')->first();
+            $strParam = [
+                '[[pembuat]]' => $data->pengguna->nama_pengguna,
+                '[[code]]' => $data->purchase_request_code,
+                '[[date]]' => date('d/m/Y'),
+            ];
+            foreach ($userSendWa as $user) {
+                $messageText = replaceMessage($strParam, $settingMessage->value1);
+                $this->sendToWa($user->telepon1_pengguna, $messageText);
+            }
 
             DB::commit();
             return response()->json([
@@ -285,6 +306,22 @@ class PurchaseRequestController extends Controller
             $data->approval_date = date('Y-m-d H:i:s');
             $data->save();
 
+            $userSendWa = DB::table('pengguna')
+                ->select('nama_pengguna', 'telepon1_pengguna')
+                ->whereIn('id_grup_pengguna', [7])
+                ->where('status_pengguna', 1)->get();
+            $settingMessage = DB::table('setting')->where('code', 'Pesan Persetujuan Beli')->first();
+            $strParam = [
+                '[[pembuat]]' => $data->pengguna->nama_pengguna,
+                '[[code]]' => $data->purchase_request_code,
+                '[[date]]' => date('d/m/Y'),
+                '[[status]]' => $type == 'approval' ? 'disetujui' : 'ditolak',
+            ];
+            foreach ($userSendWa as $user) {
+                $messageText = replaceMessage($strParam, $settingMessage->value1);
+                $this->sendToWa($user->telepon1_pengguna, $messageText);
+            }
+
             DB::commit();
             return response()->json([
                 "result" => true,
@@ -314,5 +351,30 @@ class PurchaseRequestController extends Controller
             'arrayStatus' => $this->arrayStatus,
             "pageTitle" => "SCA OPS | Permintaan Pembelian | Cetak",
         ]);
+    }
+
+    public function sendToWa($targetNumber, $message)
+    {
+        $token_pengguna = "fb176fda94ad70ec8cc65456d1d5906a";
+        $url = "https://wa.scasda.my.id/actions/aaa_api_kirim_webhook.php";
+        $data = array(
+            "id_jenis_kirim" => 4,
+            "nomor_pengirim_kirim" => '*',
+            "nomor_tujuan_kirim" => $targetNumber,
+            "token_pengguna" => $token_pengguna,
+            "pesan_kirim" => $message,
+            "gambar_kirim" => '',
+            "file_kirim" => '',
+            "base64_string" => '',
+        );
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_VERBOSE, 0);
+        curl_exec($ch);
+        curl_close($ch);
+
+        return ['status' => 'true'];
     }
 }

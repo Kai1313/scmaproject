@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\MoveWarehouse;
+use App\MoveBranch;
 use DB;
 use Illuminate\Http\Request;
 use Log;
@@ -73,7 +73,7 @@ class ReceivedFromBranchController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        $data = MoveWarehouse::find($id);
+        $data = MoveBranch::find($id);
         $cabang = DB::table('cabang')->select('nama_cabang as text', 'id_cabang as id')->where('status_cabang', 1)->get();
 
         return view('ops.receivedFromBranch.form', [
@@ -85,15 +85,16 @@ class ReceivedFromBranchController extends Controller
 
     public function saveEntry(Request $request, $id = 0)
     {
-        $data = MoveWarehouse::find($id);
+        $data = MoveBranch::find($id);
         try {
             DB::beginTransaction();
             if (!$data) {
-                $data = new MoveWarehouse;
+                $data = new MoveBranch;
             }
 
             $data->fill($request->all());
             if ($id == 0) {
+                $data->kode_pindah_barang = MoveBranch::createcode($request->id_cabang);
                 $data->status_pindah_barang = 1;
                 $data->type = 1;
                 $data->user_created = session()->get('user')['id_pengguna'];
@@ -104,7 +105,7 @@ class ReceivedFromBranchController extends Controller
             $data->save();
             $data->saveDetails($request->details, 'in');
 
-            $parent = MoveWarehouse::find($data->id_pindah_barang2);
+            $parent = MoveBranch::find($data->id_pindah_barang2);
             $parent->status_pindah_barang = 1;
             $parent->save();
 
@@ -131,7 +132,7 @@ class ReceivedFromBranchController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        $data = MoveWarehouse::where('type', 1)->where('id_pindah_barang', $id)->first();
+        $data = MoveBranch::where('type', 1)->where('id_pindah_barang', $id)->first();
         return view('ops.receivedFromBranch.detail', [
             'data' => $data,
             "pageTitle" => "SCA OPS | Terima Dari Cabang | Detail",
@@ -178,7 +179,7 @@ class ReceivedFromBranchController extends Controller
     public function autoCode(Request $request)
     {
         $idCabang = $request->cabang;
-        $data = MoveWarehouse::select(
+        $data = MoveBranch::select(
             'kode_pindah_barang as text',
             'kode_pindah_barang as id',
             'id_pindah_barang',
@@ -203,7 +204,7 @@ class ReceivedFromBranchController extends Controller
 
     public function getDetailItem(Request $request)
     {
-        $data = MoveWarehouse::find($request->id);
+        $data = MoveBranch::find($request->id);
         $datas = [];
         if ($data) {
             $datas = $data->formatdetail;
