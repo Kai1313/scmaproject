@@ -2076,4 +2076,166 @@ class ApiController extends Controller
             ], 500);
         }
     }
+
+    public function productionSupplies($production_id){
+        $data_production_supplies = DB::table("produksi_detail")
+                                    ->join('barang', 'barang.id_barang', 'produksi_detail.id_barang')
+                                    ->join('master_qr_code', 'master_qr_code.kode_batang_master_qr_code', 'produksi_detail.kode_batang_lama_produksi_detail')
+                                    ->selectRaw('produksi_detail.id_barang,
+                                    ROUND(IFNULL(SUM(produksi_detail.kredit_produksi_detail * master_qr_code.beli_master_qr_code), 0), 2) as beli,
+                                    ROUND(IFNULL(SUM(produksi_detail.kredit_produksi_detail * master_qr_code.biaya_beli_master_qr_code), 0), 2) as biaya,
+                                    ROUND(IFNULL(SUM(produksi_detail.kredit_produksi_detail * master_qr_code.produksi_master_qr_code), 0), 2) as produksi,
+                                    ROUND(IFNULL(SUM(produksi_detail.kredit_produksi_detail * master_qr_code.listrik_master_qr_code), 0), 2) as listrik,
+                                    ROUND(IFNULL(SUM(produksi_detail.kredit_produksi_detail * master_qr_code.pegawai_master_qr_code), 0), 2) as pegawai,
+                                    barang.id_akun as id_akun')
+                                    ->where('produksi_detail.id_produksi', $production_id)
+                                    ->groupBy('produksi_detail.id_barang')
+                                    ->orderBy('produksi_detail.id_barang', 'ASC')
+                                    ->get();
+
+        $data_supplies = [];
+
+        $total_supplies = 0;
+
+        foreach($data_production_supplies as $production){
+            $total = ($production->beli + $production->biaya + $production->produksi + $production->listrik + $production->pegawai);
+            $total_supplies += $total;
+
+            $data_supplies[$production->id_barang] = [
+                'total' => round($total, 2),
+                'id_akun' => $production->id_akun,
+            ];
+        }
+
+        $data = [
+            'data_supplies' => $data_supplies,
+            'total_supplies' => $total_supplies
+        ];
+
+        Log::debug('----- Tahap 1 -----');
+        Log::debug(json_encode($data));
+
+        return $data;
+    }
+
+    public function productionCost($production_id, $id_cabang){
+        $data_production_cost = DB::table("beban_produksi")
+                                ->where('beban_produksi.id_produksi', $production_id)
+                                ->first();
+        Log::debug('tes');
+        Log::debug(json_encode($data_production_cost));
+
+        $beban_listrik = round($data_production_cost->kwh_beban_produksi, 2);
+        $beban_pegawai = round(($data_production_cost->tenaga_kerja_beban_produksi * $data_production_cost->listrik_beban_produksi), 2);
+
+        $setting_nominal_listrik = DB::table('setting')
+                                    ->where('code', 'Nominal Biaya Listrik')
+                                    ->where('tipe', 1)
+                                    ->where('id_cabang', $id_cabang)
+                                    ->first();
+
+        $setting_nominal_gaji = DB::table('setting')
+                                    ->where('code', 'Nominal Biaya Gaji')
+                                    ->where('tipe', 1)
+                                    ->where('id_cabang', $id_cabang)
+                                    ->first();
+
+        $nominal_listrik = $setting_nominal_listrik->value2;
+        $nominal_gaji = $setting_nominal_gaji->value2;
+
+        $biaya_listrik = round(($beban_listrik * $nominal_listrik), 2);
+        $biaya_pegawai = round(($beban_pegawai * $nominal_gaji), 2);
+
+        $data_production_detail = DB::table("produksi_detail")
+                                    ->join('master_qr_code', 'master_qr_code.kode_batang_master_qr_code', 'produksi_detail.kode_batang_lama_produksi_detail')
+                                    ->where('produksi_detail.id_produksi', $production_id)
+                                    ->get();
+
+        foreach($data_production_detail as $detail){
+            DB::table("master_qr_code")
+            ->where('id_barang', $detail->id_barang)
+            ->where('kode_batang_master_qr_code', $detail->kode_batang_lama_produksi_detail)
+            ->update([
+                'listrik_master_qr_code' => $beban_listrik,
+                'pegawai_master_qr_code' => $beban_pegawai,
+            ]);
+        }
+
+        $data = [
+            'biaya_listrik' => $biaya_listrik,
+            'biaya_pegawai' => $biaya_pegawai,
+        ];
+
+        Log::debug('----- Tahap 2 -----');
+        Log::debug(json_encode($data));
+        return $data;
+
+    }
+
+    public function productionResults($production_id, $total_supplies, $biaya_listrik, $biaya_pegawai){
+        $data_production_results = DB::table("produksi_detail")
+                                    ->join('produksi', 'produksi.id_produksi', 'produksi_detail.id_produksi')
+                                    ->join('barang', 'barang.id_barang', 'produksi_detail.id_barang')
+                                    ->join('master_qr_code', 'master_qr_code.kode_batang_master_qr_code', 'produksi_detail.kode_batang_lama_produksi_detail')
+                                    ->select('produksi_detail.*')
+                                    ->where('produksi.nomor_referensi_produksi', $production_id)
+                                    ->orderBy('produksi_detail.id_barang', 'ASC')
+                                    ->get();
+
+        $total_kredit_produksi = 0;
+
+        foreach($data_production_results as $production){
+            $total_kredit_produksi += $production->kredit_produksi_detail;
+        }
+
+        $harga_produksi = round(($total_supplies/$total_kredit_produksi), 2);
+        $harga_listrik = round(($biaya_listrik/$total_kredit_produksi), 2);
+        $harga_pegawai = round(($biaya_pegawai/$total_kredit_produksi), 2);
+
+        foreach($data_production_results as $production){
+            DB::table("master_qr_code")
+            ->where('id_barang', $production->id_barang)
+            ->where('kode_batang_master_qr_code', $production->kode_batang_lama_produksi_detail)
+            ->update([
+                'produksi_master_qr_code' => $harga_produksi,
+                'listrik_master_qr_code' => $harga_listrik,
+                'pegawai_master_qr_code' => $harga_pegawai,
+            ]);
+        }
+
+
+        $data_production_results_groupby_barang = DB::table("produksi_detail")
+                                                ->join('produksi', 'produksi.id_produksi', 'produksi_detail.id_produksi')
+                                                ->join('barang', 'barang.id_barang', 'produksi_detail.id_barang')
+                                                ->join('master_qr_code', 'master_qr_code.kode_batang_master_qr_code', 'produksi_detail.kode_batang_lama_produksi_detail')
+                                                ->selectRaw('produksi_detail.id_barang,
+                                                ROUND(SUM(kredit_produksi_detail),2) as kredit_produksi_detail,
+                                                barang.id_akun,
+                                                ROUND(IFNULL(SUM((master_qr_code.produksi_master_qr_code + master_qr_code.listrik_master_qr_code) + master_qr_code.pegawai_master_qr_code), 0), 2) as total')
+                                                ->where('produksi.nomor_referensi_produksi', $production_id)
+                                                ->groupBy('produksi_detail.id_barang')
+                                                ->orderBy('produksi_detail.id_barang', 'ASC')
+                                                ->get();
+
+        Log::debug('----- Tahap 3 -----');
+        Log::debug(json_encode($data_production_results_groupby_barang));
+    }
+
+    public function journalHpp(Request $request){
+        $id_produksi = $request->id_produksi;
+        $id_cabang = $request->id_cabang;
+
+        $data_production_supplies = $this->productionSupplies($id_produksi);
+        $data_production_cost = $this->productionCost($id_produksi, $id_cabang);
+
+        $total_supplies = $data_production_supplies['total_supplies'];
+        $biaya_listrik = $data_production_cost['biaya_listrik'];
+        $biaya_pegawai = $data_production_cost['biaya_pegawai'];
+
+        Log::debug('final');
+        Log::debug(json_encode($data_production_supplies));
+        Log::debug(json_encode($data_production_cost));
+        $this->productionResults($id_produksi, $total_supplies, $biaya_listrik, $biaya_pegawai);
+        // $this->productionCost($production_id);
+    }
 }

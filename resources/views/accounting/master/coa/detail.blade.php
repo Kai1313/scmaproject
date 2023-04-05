@@ -83,7 +83,7 @@
                                     </div>
                                     <div class="col-md-9">
                                         <p class="nomarg">
-                                            @switch($data_akun->jenis_slip)
+                                            @switch($data_akun->isshown)
                                                 @case(0)
                                                     Tidak Tampil
                                                 @break
