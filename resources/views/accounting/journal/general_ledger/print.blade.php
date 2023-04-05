@@ -135,18 +135,18 @@
                     </td>
                     @if (in_array($data_jurnal_header->jenis_jurnal, ['KK', 'BK', 'PG']))
                         <td style="text-align: right">
-                            {{ number_format($detail->debet, 2) }}
+                            {{ number_format($detail->debet, 2,",",".") }}
                         </td>
                     @elseif(in_array($data_jurnal_header->jenis_jurnal, ['KM', 'BM', 'HG']))
                         <td style="text-align: right">
-                            {{ number_format($detail->credit, 2) }}
+                            {{ number_format($detail->credit, 2,",",".") }}
                         </td>
                     @else
                         <td style="text-align: right">
-                            {{ number_format($detail->debet, 2) }}
+                            {{ number_format($detail->debet, 2,",",".") }}
                         </td>
                         <td style="text-align: right">
-                            {{ number_format($detail->credit, 2) }}
+                            {{ number_format($detail->credit, 2,",",".") }}
                         </td>
                     @endif
                 </tr>
@@ -154,12 +154,12 @@
             <tr>
                 <td colspan="2" style="text-align: center;">Total</td>
                 @if (in_array($data_jurnal_header->jenis_jurnal, ['KK', 'BK', 'PG']))
-                    <td style="text-align: right">{{ number_format($totalDebet, 2) }}</td>
+                    <td style="text-align: right">{{ number_format($totalDebet, 2,",",".") }}</td>
                 @elseif(in_array($data_jurnal_header->jenis_jurnal, ['KM', 'BM', 'HG']))
-                    <td style="text-align: right">{{ number_format($totalCredit, 2) }}</td>
+                    <td style="text-align: right">{{ number_format($totalCredit, 2,",",".") }}</td>
                 @else
-                    <td style="text-align: right">{{ number_format($totalDebet, 2) }}</td>
-                    <td style="text-align: right">{{ number_format($totalCredit, 2) }}</td>
+                    <td style="text-align: right">{{ number_format($totalDebet, 2,",",".") }}</td>
+                    <td style="text-align: right">{{ number_format($totalCredit, 2,",",".") }}</td>
                 @endif
             </tr>
         </tbody>
