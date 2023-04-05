@@ -2103,15 +2103,12 @@ class ApiController extends Controller
             $get_akun_biaya_operator = Setting::where("id_cabang", $cabangID)->where("code", "Biaya Operator")->first();
             $get_akun_pembulatan = Setting::where("id_cabang", $cabangID)->where("code", "Pembulatan")->first();
 
-            Log::debug('steeing');
-            Log::debug(json_encode($get_akun_biaya_listrik));
-
             $jurnal_header = JurnalHeader::where("id_transaksi", $id_transaksi)->first();
 
             if(!empty($jurnal_header) && $void == 1){
                 $jurnal_header->void = $void;
                 $jurnal_header->user_void = $userRecord;
-                $jurnal_header->dt_void = date('Y-m-d');
+                $jurnal_header->dt_void = date('Y-m-d h:i:s');
 
                 if (!$jurnal_header->save()) {
                     DB::rollback();
