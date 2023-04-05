@@ -1070,10 +1070,10 @@
                 </a>
                 <ul class="treeview-menu">
                     <li class="{{ request()->segment(2) == 'coa' ? 'active' : null }}">
-                        <a href="{{ route('master-coa', 1) }}">Master CoA</a>
+                        <a href="{{ route('master-coa') }}">Master CoA</a>
                     </li>
                     <li class="{{ request()->segment(2) == 'slip' ? 'active' : null }}">
-                        <a href="{{ route('master-slip', 1) }}">Master Slip</a>
+                        <a href="{{ route('master-slip') }}">Master Slip</a>
                     </li>
                 </ul>
             </li>
@@ -1085,10 +1085,10 @@
                 </a>
                 <ul class="treeview-menu">
                     <li class="{{ request()->segment(2) == 'general_ledger' ? 'active' : null }}">
-                        <a href="{{ route('transaction-general-ledger', 1) }}">Jurnal Umum</a>
+                        <a href="{{ route('transaction-general-ledger') }}">Jurnal Umum</a>
                     </li>
                     <li class="{{ request()->segment(2) == 'adjustment_ledger' ? 'active' : null }}">
-                        <a href="{{ route('transaction-adjustment-ledger', 1) }}">Jurnal Penyesuaian</a>
+                        <a href="{{ route('transaction-adjustment-ledger') }}">Jurnal Penyesuaian</a>
                     </li>
                 </ul>
             </li>

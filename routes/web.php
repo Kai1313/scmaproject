@@ -79,6 +79,7 @@ Route::prefix('qc_penerimaan_barang')->group(function () {
     Route::post('/save_entry/{id}', 'QcReceiptController@saveEntry')->name('qc_receipt-save-entry');
     Route::get('/auto_purchasing', 'QcReceiptController@autoPurchasing')->name('qc_receipt-auto-purchasing');
     Route::get('/auto-item', 'QcReceiptController@autoItem')->name('qc_receipt-auto-item');
+    Route::get('/print/{id}', 'QcReceiptController@printData')->name('qc_receipt-print-data');
 });
 
 Route::prefix('send_to_branch')->group(function () {
@@ -161,4 +162,3 @@ Route::prefix('transaction')->group(function () {
         Route::get('/active/{id?}', 'AdjustmentLedgerController@active')->name('transaction-adjustment-ledger-active');
     });
 });
-
