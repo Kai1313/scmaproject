@@ -74,7 +74,12 @@
             <div class="box">
                 <div class="box-header">
                     <h3 class="box-title">Cari Penerimaan Pembelian</h3>
-                    <a href="{{ route('qc_receipt') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right">
+                    <a href="javascript:void(0)" class="btn btn-default btn-flat pull-right btn-print pull-right btn-sm"
+                        target="_blank" style="display:none;margin-right:10px;">
+                        <span class="glyphicon glyphicon-print mr-1"></span> Cetak
+                    </a>
+                    <a href="{{ route('qc_receipt') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right"
+                        style="margin-right:10px;">
                         <span class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali
                     </a>
                 </div>
@@ -429,6 +434,7 @@
                     });
 
                     details = res.qc
+                    $('.btn-print').attr('href', res.route_print).css('display', 'block')
                     resDataTable.clear().rows.add(details).draw()
                     $('#cover-spin').hide()
                 },

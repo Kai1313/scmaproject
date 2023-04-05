@@ -29,7 +29,7 @@
         <div class="box box-primary">
             <div class="box-header">
                 <h3 class="box-title">Detail Permintaan Pembelian <span class="text-muted"></span></h3>
-                <a href="{{ route('purchase-request-print-data', $data->purchase_request_id) }}"
+                <a href="{{ route('purchase-request-print-data', $data->purchase_request_id) }}" target="_blank"
                     class="btn btn-sm btn-default btn-flat pull-right">
                     <span class="glyphicon glyphicon-print mr-1"></span> Cetak
                 </a>

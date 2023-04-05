@@ -173,6 +173,7 @@ class QcReceiptController extends Controller
             'result' => true,
             'list_item' => $parent->detailgroup,
             'qc' => $parent->qc,
+            'route_print' => route('qc_receipt-print-data', $idPembelian),
         ], 200);
     }
 
@@ -192,5 +193,21 @@ class QcReceiptController extends Controller
                 "message" => "Data gagal tersimpan",
             ], 500);
         }
+    }
+
+    public function printData($id)
+    {
+        if (checkAccessMenu('qc_penerimaan_barang', 'print') == false) {
+            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+        }
+
+        $data = Purchase::find($id);
+        return view('ops.qualityControl.print', [
+            'data' => $data,
+            'arrayStatus' => $arrayStatus,
+            "pageTitle" => "SCA OPS | QC Penerimaan Pembelian | Cetak",
+        ]);
+
+        return $data;
     }
 }
