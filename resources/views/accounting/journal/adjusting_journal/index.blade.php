@@ -227,7 +227,7 @@
                         width: '10%',
                         className: 'text-right',
                         render: function(data, type, row) {
-                            return numberWithCommas(data);
+                            return formatCurr(formatNumberAsFloatFromDB(data));
                         },
                     },
                     {
@@ -360,8 +360,35 @@
             })
         }
 
-        function numberWithCommas(x) {
-            return x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+        function formatCurr(num) {
+            num = String(num);
+            num = num.split('.').join("");
+            num = num.replace(/,/g, '.');
+            num = num.toString().replace(/\,/gi, "");
+
+            num += '';
+            x = num.split('.');
+            x1 = x[0];
+            x2 = x.length > 1 ? ',' + x[1] : ',00';
+            var rgx = /(\d+)(\d{3})/;
+            while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + '.' + '$2');
+            }
+            return x1 + x2;
+        }
+
+        function formatNumberAsFloat(num) {
+            num = String(num);
+            num = num.split('.').join("");
+            
+            return num;
+        }
+        
+        function formatNumberAsFloatFromDB(num) {
+            num = String(num);
+            num = num.replace('.', ',');
+            
+            return num;
         }
     </script>
 @endsection
