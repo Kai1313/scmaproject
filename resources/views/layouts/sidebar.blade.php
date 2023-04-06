@@ -391,7 +391,7 @@
                 </li>
             @endif
             @if (checkAccessMenu('transaksi'))
-                <li class="treeview {{ in_array(request()->segment(1), ['purchase_requisitions', 'uang_muka_pembelian', 'qc_penerimaan_barang', 'send_to_branch', 'received_from_branch', 'received_from_branch', 'send_to_branch', 'uang_muka_penjualan', 'received_from_warehouse']) ? 'active' : null }}"
+                <li class="treeview {{ in_array(request()->segment(1), ['purchase_requisitions', 'uang_muka_pembelian', 'qc_penerimaan_barang', 'kirim_ke_cabang', 'terima_dari_cabang', 'uang_muka_penjualan', 'terima_dari_gudang']) ? 'active' : null }}"
                     data-alias="transaksi">
                     <a href="#"><i class="glyphicon glyphicon-list-alt"></i> <span>Transaksi</span>
                         <span class="pull-right-container">
@@ -478,7 +478,7 @@
                             </li>
                         @endif
                         @if (checkAccessMenu('persediaan_kepala'))
-                            <li class="treeview {{ in_array(request()->segment(1), ['send_to_branch', 'received_from_branch', 'received_from_branch', 'send_to_branch', 'received_from_warehouse']) ? 'active' : null }}"
+                            <li class="treeview {{ in_array(request()->segment(1), ['kirim_ke_cabang', 'terima_dari_cabang', 'terima_dari_gudang']) ? 'active' : null }}"
                                 data-alias="persediaan_kepala">
                                 <a href="#"><i class="glyphicon glyphicon-arrow-right"></i>
                                     <span>Persediaan</span>
@@ -510,7 +510,7 @@
                                     @endif
                                     @if (checkAccessMenu('kirim_ke_cabang'))
                                         <li
-                                            class="nav-item {{ request()->segment(1) == 'send_to_branch' ? 'active' : null }}">
+                                            class="nav-item {{ request()->segment(1) == 'kirim_ke_cabang' ? 'active' : null }}">
                                             <a href="{{ route('send_to_branch') }}">
                                                 <i class="glyphicon glyphicon-option-vertical"></i>Kirim Ke Cabang
                                                 (TC-OUT)
@@ -519,7 +519,7 @@
                                     @endif
                                     @if (checkAccessMenu('terima_dari_cabang'))
                                         <li
-                                            class="nav-item {{ request()->segment(1) == 'received_from_branch' ? 'active' : null }}">
+                                            class="nav-item {{ request()->segment(1) == 'terima_dari_cabang' ? 'active' : null }}">
                                             <a href="{{ route('received_from_branch') }}">
                                                 <i class="glyphicon glyphicon-option-vertical"></i>Terima Dari Cabang
                                                 (TC-IN)
@@ -536,7 +536,7 @@
                                     @endif
                                     @if (checkAccessMenu('terima_dari_gudang'))
                                         <li data-alias="terima_dari_gudang"
-                                            class="nav-item {{ request()->segment(1) == 'received_from_warehouse' ? 'active' : null }}">
+                                            class="nav-item {{ request()->segment(1) == 'terima_dari_gudang' ? 'active' : null }}">
                                             <a href="{{ route('received_from_warehouse') }}">
                                                 <i class="glyphicon glyphicon-option-vertical"></i>Terima Dari Gudang
                                                 (TG-IN)

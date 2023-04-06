@@ -82,7 +82,7 @@ Route::prefix('qc_penerimaan_barang')->group(function () {
     Route::get('/print/{id}', 'QcReceiptController@printData')->name('qc_receipt-print-data');
 });
 
-Route::prefix('send_to_branch')->group(function () {
+Route::prefix('kirim_ke_cabang')->group(function () {
     Route::get('/index/{user_id?}', 'SendToBranchController@index')->name('send_to_branch');
     Route::get('/entry/{id?}', 'SendToBranchController@entry')->name('send_to_branch-entry');
     Route::post('/save_entry/{id}', 'SendToBranchController@saveEntry')->name('send_to_branch-save-entry');
@@ -92,7 +92,7 @@ Route::prefix('send_to_branch')->group(function () {
     Route::get('/print/{id}', 'SendToBranchController@printData')->name('send_to_branch-print-data');
 });
 
-Route::prefix('received_from_branch')->group(function () {
+Route::prefix('terima_dari_cabang')->group(function () {
     Route::get('/index/{user_id?}', 'ReceivedFromBranchController@index')->name('received_from_branch');
     Route::get('/entry/{id?}', 'ReceivedFromBranchController@entry')->name('received_from_branch-entry');
     Route::post('/save_entry/{id}', 'ReceivedFromBranchController@saveEntry')->name('received_from_branch-save-entry');
@@ -103,12 +103,13 @@ Route::prefix('received_from_branch')->group(function () {
     Route::get('/print/{id}', 'ReceivedFromBranchController@printData')->name('received_from_branch-print-data');
 });
 
-Route::prefix('received_from_warehouse')->group(function () {
+Route::prefix('terima_dari_gudang')->group(function () {
     Route::get('/index/{user_id?}', 'ReceivedFromWarehouseController@index')->name('received_from_warehouse');
     Route::get('/entry/{id?}', 'ReceivedFromWarehouseController@entry')->name('received_from_warehouse-entry');
     Route::post('/save_entry/{id}', 'ReceivedFromWarehouseController@saveEntry')->name('received_from_warehouse-save-entry');
     Route::get('/view/{id}', 'ReceivedFromWarehouseController@viewData')->name('received_from_warehouse-view');
     Route::get('/delete/{id}', 'ReceivedFromWarehouseController@destroy')->name('received_from_warehouse-delete');
+    Route::get('/auto-qrcode', 'ReceivedFromWarehouseController@autoQRCode')->name('received_from_warehouse-qrcode');
     // Route::get('/auto-code', 'ReceivedFromBranchController@autoCode')->name('received_from_branch-code');
     // Route::get('/auto-detail-item', 'ReceivedFromBranchController@getDetailItem')->name('received_from_branch-detail-item');
     // Route::get('/print/{id}', 'ReceivedFromBranchController@printData')->name('received_from_branch-print-data');

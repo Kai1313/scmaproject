@@ -136,4 +136,14 @@ class ReceivedFromWarehouseController extends Controller
             "pageTitle" => "SCA OPS | Terima Dari Gudang | Detail",
         ]);
     }
+
+    public function autoQRCode(Request $request)
+    {
+        $data = MoveWarehouse::where('type', 0)->where('nama_pindah_gudang', $request->qrcode)->first();
+        return response()->json([
+            'data' => $data,
+            'details' => $data->formatdetail,
+            'parent' => $data->parent,
+        ]);
+    }
 }
