@@ -391,7 +391,7 @@
                 </li>
             @endif
             @if (checkAccessMenu('transaksi'))
-                <li class="treeview {{ in_array(request()->segment(1), ['purchase_requisitions', 'uang_muka_pembelian', 'qc_penerimaan_barang', 'send_to_branch', 'received_from_branch', 'received_from_branch', 'send_to_branch', 'uang_muka_penjualan']) ? 'active' : null }}"
+                <li class="treeview {{ in_array(request()->segment(1), ['purchase_requisitions', 'uang_muka_pembelian', 'qc_penerimaan_barang', 'send_to_branch', 'received_from_branch', 'received_from_branch', 'send_to_branch', 'uang_muka_penjualan', 'received_from_warehouse']) ? 'active' : null }}"
                     data-alias="transaksi">
                     <a href="#"><i class="glyphicon glyphicon-list-alt"></i> <span>Transaksi</span>
                         <span class="pull-right-container">
@@ -478,7 +478,7 @@
                             </li>
                         @endif
                         @if (checkAccessMenu('persediaan_kepala'))
-                            <li class="treeview {{ in_array(request()->segment(1), ['send_to_branch', 'received_from_branch', 'received_from_branch', 'send_to_branch']) ? 'active' : null }}"
+                            <li class="treeview {{ in_array(request()->segment(1), ['send_to_branch', 'received_from_branch', 'received_from_branch', 'send_to_branch', 'received_from_warehouse']) ? 'active' : null }}"
                                 data-alias="persediaan_kepala">
                                 <a href="#"><i class="glyphicon glyphicon-arrow-right"></i>
                                     <span>Persediaan</span>
@@ -494,22 +494,6 @@
                                             </a>
                                         </li>
                                     @endif
-                                    @if (checkAccessMenu('kirim_ke_cabang'))
-                                        <li
-                                            class="nav-item {{ request()->segment(1) == 'send_to_branch' ? 'active' : null }}">
-                                            <a href="{{ route('send_to_branch') }}">
-                                                <i class="glyphicon glyphicon-option-vertical"></i>Kirim Ke Cabang
-                                            </a>
-                                        </li>
-                                    @endif
-                                    @if (checkAccessMenu('terima_dari_cabang'))
-                                        <li
-                                            class="nav-item {{ request()->segment(1) == 'received_from_branch' ? 'active' : null }}">
-                                            <a href="{{ route('received_from_branch') }}">
-                                                <i class="glyphicon glyphicon-option-vertical"></i>Terima Dari Cabang
-                                            </a>
-                                        </li>
-                                    @endif
                                     @if (checkAccessMenu('pindah_gudang2'))
                                         <li data-alias="pindah_gudang2">
                                             <a href="{{ env('OLD_URL_ROOT') }}#pindah_gudang2">
@@ -521,6 +505,41 @@
                                         <li data-alias="koreksi_stok">
                                             <a href="{{ env('OLD_URL_ROOT') }}#koreksi_stok">
                                                 <i class="glyphicon glyphicon-option-vertical"></i>Koreksi Stok
+                                            </a>
+                                        </li>
+                                    @endif
+                                    @if (checkAccessMenu('kirim_ke_cabang'))
+                                        <li
+                                            class="nav-item {{ request()->segment(1) == 'send_to_branch' ? 'active' : null }}">
+                                            <a href="{{ route('send_to_branch') }}">
+                                                <i class="glyphicon glyphicon-option-vertical"></i>Kirim Ke Cabang
+                                                (TC-OUT)
+                                            </a>
+                                        </li>
+                                    @endif
+                                    @if (checkAccessMenu('terima_dari_cabang'))
+                                        <li
+                                            class="nav-item {{ request()->segment(1) == 'received_from_branch' ? 'active' : null }}">
+                                            <a href="{{ route('received_from_branch') }}">
+                                                <i class="glyphicon glyphicon-option-vertical"></i>Terima Dari Cabang
+                                                (TC-IN)
+                                            </a>
+                                        </li>
+                                    @endif
+                                    @if (checkAccessMenu('kirim_ke_gudang'))
+                                        <li data-alias="terima_dari_gudang" class="nav-item">
+                                            <a href="{{ env('OLD_URL_ROOT') }}#kirim_ke_gudang">
+                                                <i class="glyphicon glyphicon-option-vertical"></i>Kirim Ke Gudang
+                                                (TG-OUT)
+                                            </a>
+                                        </li>
+                                    @endif
+                                    @if (checkAccessMenu('terima_dari_gudang'))
+                                        <li data-alias="terima_dari_gudang"
+                                            class="nav-item {{ request()->segment(1) == 'received_from_warehouse' ? 'active' : null }}">
+                                            <a href="{{ route('received_from_warehouse') }}">
+                                                <i class="glyphicon glyphicon-option-vertical"></i>Terima Dari Gudang
+                                                (TG-IN)
                                             </a>
                                         </li>
                                     @endif

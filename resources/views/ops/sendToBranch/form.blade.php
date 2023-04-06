@@ -521,7 +521,6 @@
 
         $('body').on('click', '.delete-entry', function() {
             let index = $(this).parents('tr').index()
-            console.log(index)
             Swal.fire({
                 title: 'Anda yakin ingin menghapus data ini?',
                 icon: 'info',

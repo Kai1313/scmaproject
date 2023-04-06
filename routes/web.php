@@ -103,6 +103,17 @@ Route::prefix('received_from_branch')->group(function () {
     Route::get('/print/{id}', 'ReceivedFromBranchController@printData')->name('received_from_branch-print-data');
 });
 
+Route::prefix('received_from_warehouse')->group(function () {
+    Route::get('/index/{user_id?}', 'ReceivedFromWarehouseController@index')->name('received_from_warehouse');
+    Route::get('/entry/{id?}', 'ReceivedFromWarehouseController@entry')->name('received_from_warehouse-entry');
+    Route::post('/save_entry/{id}', 'ReceivedFromWarehouseController@saveEntry')->name('received_from_warehouse-save-entry');
+    Route::get('/view/{id}', 'ReceivedFromWarehouseController@viewData')->name('received_from_warehouse-view');
+    Route::get('/delete/{id}', 'ReceivedFromWarehouseController@destroy')->name('received_from_warehouse-delete');
+    // Route::get('/auto-code', 'ReceivedFromBranchController@autoCode')->name('received_from_branch-code');
+    // Route::get('/auto-detail-item', 'ReceivedFromBranchController@getDetailItem')->name('received_from_branch-detail-item');
+    // Route::get('/print/{id}', 'ReceivedFromBranchController@printData')->name('received_from_branch-print-data');
+});
+
 // Master
 Route::get('/master/slip/index/{user_id?}', 'MasterSlipController@index')->name('master-slip');
 Route::get('/master/slip/form/create', 'MasterSlipController@create')->name('master-slip-create');
