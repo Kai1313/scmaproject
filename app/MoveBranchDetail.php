@@ -28,5 +28,8 @@ class MoveBranchDetail extends Model
         'status_diterima',
         'user_created',
         'dt_created',
+        'zak',
+        'id_wrapper_zak',
+        'weight_zak',
     ];
 }

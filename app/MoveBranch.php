@@ -23,7 +23,8 @@ class MoveBranch extends Model
         'id_gudang',
         'tanggal_pindah_barang',
         'kode_pindah_barang',
-        'id_cabang_tujuan',
+        'id_cabang2',
+        'id_gudang2',
         'nomor_polisi',
         'transporter',
         'keterangan_pindah_barang',
@@ -34,7 +35,6 @@ class MoveBranch extends Model
         'dt_modified',
         'void',
         'void_user_id',
-        'id_cabang_asal',
     ];
 
     public function cabang()
@@ -52,14 +52,14 @@ class MoveBranch extends Model
         return $this->belongsTo(MoveBranch::class, 'id_pindah_barang2', 'id_pindah_barang');
     }
 
-    public function destinationBranch()
+    public function cabang2()
     {
-        return $this->belongsTo(Cabang::class, 'id_cabang_tujuan');
+        return $this->belongsTo(Cabang::class, 'id_cabang');
     }
 
-    public function originBranch()
+    public function gudang2()
     {
-        return $this->belongsTo(Cabang::class, 'id_cabang_asal');
+        return $this->belongsTo(Gudang::class, 'id_gudang');
     }
 
     public function details()
@@ -91,16 +91,33 @@ class MoveBranch extends Model
                 'warna',
                 'status_diterima',
                 'batch',
-                'tanggal_kadaluarsa'
+                'tanggal_kadaluarsa',
+                'zak',
+                'weight_zak',
+                'id_wrapper_zak'
             )
             ->leftJoin('barang', 'pindah_barang_detail.id_barang', '=', 'barang.id_barang')
             ->leftJoin('satuan_barang', 'pindah_barang_detail.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang');
     }
 
-    public static function createcode($id_cabang)
+    public static function createcodeCabang($id_cabang)
     {
         $branchCode = DB::table('cabang')->where('id_cabang', $id_cabang)->first();
         $string = 'TC.' . $branchCode->kode_cabang . '.' . date('ym');
+        $check = DB::table('pindah_barang')->where('kode_pindah_barang', 'like', $string . '%')->count();
+        $check += 1;
+        $nol = '';
+        for ($i = 0; $i < (4 - strlen((string) $check)); $i++) {
+            $nol .= '0';
+        }
+
+        return $string . '.' . $nol . $check;
+    }
+
+    public static function createcodeGudang($id_cabang)
+    {
+        $branchCode = DB::table('cabang')->where('id_cabang', $id_cabang)->first();
+        $string = 'TG.' . $branchCode->kode_cabang . '.' . date('ym');
         $check = DB::table('pindah_barang')->where('kode_pindah_barang', 'like', $string . '%')->count();
         $check += 1;
         $nol = '';
@@ -159,6 +176,9 @@ class MoveBranch extends Model
                     'dt_created' => date('Y-m-d H:i:s'),
                     'batch' => $data->batch,
                     'tanggal_kadaluarsa' => $data->tanggal_kadaluarsa,
+                    'zak' => $data->zak,
+                    'id_wrapper_zak' => $data->id_wrapper_zak,
+                    'weight_zak' => $data->weight_zak,
                 ];
                 $store = new MoveBranchDetail;
                 $store->fill($array);
@@ -205,6 +225,9 @@ class MoveBranch extends Model
                     'status_kartu_stok' => 1,
                     'user_kartu_stok' => session()->get('user')['id_pengguna'],
                     'date_kartu_stok' => date('Y-m-d H:i:s'),
+                    'zak' => $data->zak,
+                    'id_wrapper_zak' => $data->id_wrapper_zak,
+                    'weight_zak' => $data->weight_zak,
                 ]);
             }
         }

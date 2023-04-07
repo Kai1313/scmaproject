@@ -72,7 +72,7 @@
         </h1>
         <ol class="breadcrumb">
             <li><a href="#"><i class="fa fa-dashboard"></i> Dashboard</a></li>
-            <li><a href="{{ route('purchase-request') }}">Kirim ke Cabang</a></li>
+            <li><a href="{{ route('send_to_branch') }}">Kirim ke Cabang</a></li>
             <li class="active">Form</li>
         </ol>
     </section>
@@ -146,12 +146,12 @@
                         <div class="col-md-4">
                             <label>Cabang Tujuan<span>*</span></label>
                             <div class="form-group">
-                                <select name="id_cabang_tujuan" class="form-control select2" data-validation="[NOTEMPTY]"
+                                <select name="id_cabang2" class="form-control select2" data-validation="[NOTEMPTY]"
                                     data-validation-message="Cabang tujuan tidak boleh kosong">
                                     <option value="">Pilih Cabang Tujuan</option>
-                                    @if ($data && $data->id_cabang_tujuan)
-                                        <option value="{{ $data->id_cabang_tujuan }}" selected>
-                                            {{ $data->destinationBranch->nama_cabang }}
+                                    @if ($data && $data->id_cabang2)
+                                        <option value="{{ $data->id_cabang2 }}" selected>
+                                            {{ $data->cabang2->nama_cabang }}
                                         </option>
                                     @endif
                                 </select>
@@ -208,7 +208,7 @@
         </form>
 
         <div class="modal fade" id="modalEntry" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
+            <div class="modal-dialog modal-sm" role="document">
                 <div class="modal-content">
                     <div class="modal-body">
                         <div class="alert alert-danger" style="display:none;" id="alertModal">
@@ -231,7 +231,79 @@
                             Pastikan QR Code sudah keluar rak dan stok tidak habis
                         </div>
                         <input type="hidden" name="id_pindah_barang_detail">
-                        <div class="row">
+                        <table class="table table-bordered">
+                            <tr>
+                                <td width="100"><b>QR Code</b></td>
+                                <td width="20">:</td>
+                                <td id="qr_code" class="setData"></td>
+                                <td id="id_pindah_barang_detail" class="setData" style="display:none;"></td>
+                            </tr>
+                            <tr>
+                                <td><b>Nama Barang</b></td>
+                                <td>:</td>
+                                <td id="nama_barang" class="setData"></td>
+                                <td id="id_barang" class="setData" style="display:none;"></td>
+                            </tr>
+                            <tr>
+                                <td><b>Jumlah</b></td>
+                                <td>:</td>
+                                <td id="qty" class="setData"></td>
+                            </tr>
+                            <tr>
+                                <td><b>Satuan</b></td>
+                                <td>:</td>
+                                <td id="nama_satuan_barang" class="setData"></td>
+                                <td id="id_satuan_barang" class="setData" style="display:none;"></td>
+                            </tr>
+                            <tr>
+                                <td><b>Jumlah Zak</b></td>
+                                <td>:</td>
+                                <td id="zak" class="setData"></td>
+                                <td id="id_wrapper_zak" class="setData" style="display:none;"></td>
+                                <td id="weight_zak" class="setData" style="display:none;"></td>
+                            </tr>
+                            <tr>
+                                <td><b>SG</b></td>
+                                <td>:</td>
+                                <td id="sg" class="setData"></td>
+                            </tr>
+                            <tr>
+                                <td><b>BE</b></td>
+                                <td>:</td>
+                                <td id="be" class="setData"></td>
+                            </tr>
+                            <tr>
+                                <td><b>PH</b></td>
+                                <td>:</td>
+                                <td id="ph" class="setData"></td>
+                            </tr>
+                            <tr>
+                                <td><b>Bentuk</b></td>
+                                <td>:</td>
+                                <td id="bentuk" class="setData"></td>
+                            </tr>
+                            <tr>
+                                <td><b>Warna</b></td>
+                                <td>:</td>
+                                <td id="warna" class="setData"></td>
+                            </tr>
+                            <tr>
+                                <td><b>Keterangan</b></td>
+                                <td>:</td>
+                                <td id="keterangan" class="setData"></td>
+                            </tr>
+                            <tr>
+                                <td><b>Batch</b></td>
+                                <td>:</td>
+                                <td id="batch" class="setData"></td>
+                            </tr>
+                            <tr>
+                                <td><b>Kadaluarsa</b></td>
+                                <td>:</td>
+                                <td id="tanggal_kadaluarsa" class="setData"></td>
+                            </tr>
+                        </table>
+                        {{-- <div class="row">
                             <div class="col-xs-6">
                                 <label>QR Code</label>
                                 <div class="form-group">
@@ -245,17 +317,25 @@
                                     <input type="hidden" name="id_barang">
                                 </div>
                             </div>
-                            <div class="col-xs-6">
+                            <div class="col-xs-4">
                                 <label>Satuan</label>
                                 <div class="form-group">
                                     <input type="text" name="nama_satuan_barang" class="form-control" readonly>
                                     <input type="hidden" name="id_satuan_barang">
                                 </div>
                             </div>
-                            <div class="col-xs-6">
+                            <div class="col-xs-4">
                                 <label>Jumlah</label>
                                 <div class="form-group">
                                     <input type="text" name="qty" class="form-control handle-number-4" readonly>
+                                </div>
+                            </div>
+                            <div class="col-xs-4">
+                                <label>Jumlah Zak</label>
+                                <div class="form-group">
+                                    <input type="text" name="zak" class="form-control handle-number-4" readonly>
+                                    <input type="hidden" name="id_wrapper_zak">
+                                    <input type="hidden" name="weight_zak">
                                 </div>
                             </div>
                             <div class="col-xs-4">
@@ -304,7 +384,7 @@
                         <label>Keterangan</label>
                         <div class="form-group">
                             <textarea name="keterangan" rows="3" class="form-control" readonly></textarea>
-                        </div>
+                        </div> --}}
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary cancel-entry btn-flat">Batal</button>
@@ -444,8 +524,8 @@
                         }
                     }
 
-                    $('[name="id_cabang_tujuan"]').empty()
-                    $('[name="id_cabang_tujuan"]').select2({
+                    $('[name="id_cabang2"]').empty()
+                    $('[name="id_cabang2"]').select2({
                         data: [{
                             'id': '',
                             'text': 'Pilih Cabang Tujuan'
@@ -490,13 +570,19 @@
                 $('#alertModal').text('').hide()
             }
 
-            modal.find('input,textarea').each(function(i, v) {
-                if ($(v).hasClass('handle-number-4')) {
-                    detailSelect[$(v).prop('name')] = normalizeNumber($(v).val())
-                } else {
-                    detailSelect[$(v).prop('name')] = $(v).val()
-                }
+            modal.find('.setData').each(function(i, v) {
+                let id = $(v).prop('id')
+                detailSelect[id] = $(v).text()
             })
+
+            console.log(detailSelect)
+            // modal.find('input,textarea').each(function(i, v) {
+            //     if ($(v).hasClass('handle-number-4')) {
+            //         detailSelect[$(v).prop('name')] = normalizeNumber($(v).val())
+            //     } else {
+            //         detailSelect[$(v).prop('name')] = $(v).val()
+            //     }
+            // })
 
             let newObj = Object.assign({}, detailSelect)
             if (statusModal == 'create') {
@@ -584,7 +670,7 @@
                 },
                 success: function(res) {
                     for (select in res.data) {
-                        $('[name="' + select + '"]').val(res.data[select])
+                        $('#' + select).text(res.data[select])
                     }
                     $('[name="search-qrcode"]').val('')
                     $('#cover-spin').hide()

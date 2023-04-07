@@ -20,7 +20,7 @@ class SendToBranchController extends Controller
             $data = DB::table('pindah_barang')
                 ->select('id_pindah_barang', 'type', 'nama_gudang', 'tanggal_pindah_barang', 'kode_pindah_barang', 'nama_cabang', 'status_pindah_barang', 'keterangan_pindah_barang', 'transporter', 'void')
                 ->leftJoin('gudang', 'pindah_barang.id_gudang', '=', 'gudang.id_gudang')
-                ->leftJoin('cabang', 'pindah_barang.id_cabang_tujuan', '=', 'cabang.id_cabang')
+                ->leftJoin('cabang', 'pindah_barang.id_cabang2', '=', 'cabang.id_cabang')
                 ->where('type', 0);
             if (isset($request->c)) {
                 $data = $data->where('pindah_barang.id_cabang', $request->c);
@@ -94,7 +94,7 @@ class SendToBranchController extends Controller
             DB::beginTransaction();
             $data->fill($request->all());
             if ($id == 0) {
-                $data->kode_pindah_barang = MoveBranch::createcode($request->id_cabang);
+                $data->kode_pindah_barang = MoveBranch::createcodeCabang($request->id_cabang);
                 $data->status_pindah_barang = 0;
                 $data->type = 0;
                 $data->user_created = session()->get('user')['id_pengguna'];
@@ -197,7 +197,10 @@ class SendToBranchController extends Controller
                 'id_rak',
                 'sisa_master_qr_code',
                 'tanggal_expired_master_qr_code as tanggal_kadaluarsa',
-                'batch_master_qr_code as batch'
+                'batch_master_qr_code as batch',
+                'zak',
+                'id_wrapper_zak',
+                'weight_zak'
             )
             ->leftJoin('barang', 'mqc.id_barang', '=', 'barang.id_barang')
             ->leftJoin('satuan_barang', 'mqc.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')

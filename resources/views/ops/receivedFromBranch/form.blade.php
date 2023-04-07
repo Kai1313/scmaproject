@@ -151,9 +151,9 @@
                             <label>Dari Cabang <span>*</span></label>
                             <div class="form-group">
                                 <input type="text" class="form-control" name="nama_cabang_asal" readonly
-                                    value="{{ old('nama_cabang_asal', $data ? $data->originBranch->nama_cabang : '') }}">
-                                <input type="hidden" name="id_cabang_asal"
-                                    value="{{ old('id_cabang_asal', $data ? $data->id_cabang_asal : '') }}">
+                                    value="{{ old('nama_cabang_asal', $data ? $data->cabang2->nama_cabang : '') }}">
+                                <input type="hidden" name="id_cabang2"
+                                    value="{{ old('id_cabang2', $data ? $data->id_cabang2 : '') }}">
                             </div>
                             <label>Keterangan</label>
                             <div class="form-group">
@@ -370,7 +370,7 @@
                         $('[name="nomor_polisi"]').val(dataselect.nomor_polisi)
                         $('[name="keterangan_pindah_barang"]').val(dataselect.keterangan_pindah_barang)
                         $('[name="nama_cabang_asal"]').val(dataselect.nama_cabang)
-                        $('[name="id_cabang_asal"]').val(dataselect.id_cabang)
+                        $('[name="id_cabang2"]').val(dataselect.id_cabang)
 
                         getDetailItem(dataselect.id_pindah_barang)
                     });

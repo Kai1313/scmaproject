@@ -70,7 +70,7 @@
                         <div class="row">
                             <label class="col-md-4">Cabang Tujuan</label>
                             <div class="col-md-8">
-                                : {{ $data->destinationBranch->nama_cabang }}
+                                : {{ $data->cabang2->nama_cabang }}
                             </div>
                         </div>
                         <div class="row">

@@ -165,7 +165,7 @@
                     <tr>
                         <td><b>Dari Cabang</b></td>
                         <td>:</td>
-                        <td>{{ $data->originBranch->nama_cabang }}</td>
+                        <td>{{ $data->cabang2->nama_cabang }}</td>
                     </tr>
                 </table>
             </td>

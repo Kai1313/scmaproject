@@ -30,7 +30,7 @@ class ReceivedFromBranchController extends Controller
                     'transporter'
                 )
                 ->leftJoin('gudang', 'pindah_barang.id_gudang', '=', 'gudang.id_gudang')
-                ->leftJoin('cabang', 'pindah_barang.id_cabang_asal', '=', 'cabang.id_cabang')
+                ->leftJoin('cabang', 'pindah_barang.id_cabang2', '=', 'cabang.id_cabang')
                 ->where('type', 1);
             if (isset($request->c)) {
                 $data = $data->where('pindah_barang.id_cabang', $request->c);
@@ -94,7 +94,7 @@ class ReceivedFromBranchController extends Controller
 
             $data->fill($request->all());
             if ($id == 0) {
-                $data->kode_pindah_barang = MoveBranch::createcode($request->id_cabang);
+                $data->kode_pindah_barang = MoveBranch::createcodeGudang($request->id_cabang);
                 $data->status_pindah_barang = 1;
                 $data->type = 1;
                 $data->user_created = session()->get('user')['id_pengguna'];
@@ -190,7 +190,7 @@ class ReceivedFromBranchController extends Controller
             'pindah_barang.id_cabang'
         )
             ->leftJoin('cabang', 'pindah_barang.id_cabang', '=', 'cabang.id_cabang')
-            ->where('id_cabang_tujuan', $idCabang)
+            ->where('id_cabang2', $idCabang)
             ->where('status_pindah_barang', 0)
             ->where('void', 0)
             ->get();
