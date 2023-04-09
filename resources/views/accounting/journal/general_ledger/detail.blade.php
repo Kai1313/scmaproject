@@ -43,7 +43,7 @@
                                 </div>
                                 <div class="col-md-8">
                                     <p class="nomarg">
-                                        {{ date('d-m-Y', strtotime($data_jurnal_header->tanggal_jurnal)) }}
+                                        {{ $data_jurnal_header->tanggal_jurnal }}
                                     </p>
                                 </div>
                             </div>
@@ -83,7 +83,7 @@
                                     <label>Notes</label>
                                 </div>
                                 <div class="col-md-8">
-                                    <p class="nomarg">{{ $data_jurnal_header->catatan }}</p>
+                                    <p class="nomarg">{!! $data_jurnal_header->catatan !!}</p>
                                 </div>
                             </div>
                             @endif
@@ -107,7 +107,7 @@
                                     <label>Notes</label>
                                 </div>
                                 <div class="col-md-8">
-                                    <p class="nomarg">{{ $data_jurnal_header->catatan }}</p>
+                                    <p class="nomarg">{!! $data_jurnal_header->catatan !!}</p>
                                 </div>
                             </div>
                             @endif
@@ -153,7 +153,7 @@
                                 </div>
                                 <div class="col-md-8">
                                     <p class="nomarg">
-                                        {{ date('d-m-Y', strtotime($data_jurnal_header->tanggal_giro)) }}
+                                        {{ $data_jurnal_header->tanggal_giro }}
                                     </p>
                                 </div>
                             </div>
@@ -163,7 +163,7 @@
                                 </div>
                                 <div class="col-md-8">
                                     <p class="nomarg">
-                                        {{ date('d-m-Y', strtotime($data_jurnal_header->tanggal_giro_jt)) }}
+                                        {{ $data_jurnal_header->tanggal_giro_jt }}
                                     </p>
                                 </div>
                             </div>
@@ -196,7 +196,7 @@
                                     <tr>
                                         <td>{{ $detail->kode_akun }}</td>
                                         <td>{{ $detail->nama_akun }}</td>
-                                        <td>{{ $detail->keterangan }}</td>
+                                        <td>{!! $detail->keterangan !!}</td>
                                         <td style="text-align: right">{{ number_format($detail->debet, 2,",",".") }}</td>
                                         <td style="text-align: right">{{ number_format($detail->credit, 2,",",".") }}</td>
                                     </tr>

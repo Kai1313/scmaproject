@@ -38,32 +38,32 @@
                 <td width="50%">
                     <table>
                         <tr>
-                            <td width="35%">Kode Jurnal</td>
+                            <td width="20%">Kode Jurnal</td>
                             <td width="2%">:</td>
-                            <td width="63%">{{ $data_jurnal_header->kode_jurnal }}</td>
+                            <td width="78%">{{ $data_jurnal_header->kode_jurnal }}</td>
                         </tr>
                         <tr>
-                            <td width="35%">Tanggal Jurnal</td>
+                            <td width="20%">Tanggal Jurnal</td>
                             <td width="2%">:</td>
-                            <td width="63%">
-                                <b>{{ date('d-m-Y', strtotime($data_jurnal_header->tanggal_jurnal)) }}</b>
+                            <td width="78%">
+                                <b>{{ $data_jurnal_header->tanggal_jurnal }}</b>
                             </td>
                         </tr>
                         <tr>
-                            <td width="35%">Cabang</td>
+                            <td width="20%">Cabang</td>
                             <td width="2%">:</td>
-                            <td width="63%">{{ $data_jurnal_header->nama_cabang }}</td>
+                            <td width="78%">{{ $data_jurnal_header->nama_cabang }}</td>
                         </tr>
                         @if ($data_jurnal_header->jenis_jurnal != 'ME')
                         <tr>
-                            <td width="35%">Slip</td>
+                            <td width="20%">Slip</td>
                             <td width="2%">:</td>
-                            <td width="63%">{{ $data_jurnal_header->kode_slip }}</td>
+                            <td width="78%">{{ $data_jurnal_header->kode_slip }}</td>
                         </tr>
                         <tr>
-                            <td width="35%">Akun Slip</td>
+                            <td width="20%">Akun Slip</td>
                             <td width="2%">:</td>
-                            <td width="63%">{{ $data_jurnal_header->kode_akun }} - {{ $data_jurnal_header->nama_akun }}</td>
+                            <td width="78%">{{ $data_jurnal_header->kode_akun }} - {{ $data_jurnal_header->nama_akun }}</td>
                         </tr>
                         @endif
                     </table>
@@ -72,31 +72,31 @@
                     <table>
                         @if($data_jurnal_header->jenis_jurnal == 'PG' || $data_jurnal_header->jenis_jurnal == 'HG')
                         <tr>
-                            <td width="35%">Nomor Giro</td>
+                            <td width="20%">Nomor Giro</td>
                             <td width="2%">:</td>
-                            <td width="63%">
+                            <td width="78%">
                                 {{ $data_jurnal_header->no_giro }}
                             </td>
                         </tr>
                         <tr>
-                            <td width="35%">Tanggal Giro</td>
+                            <td width="20%">Tanggal Giro</td>
                             <td width="2%">:</td>
-                            <td width="63%">
-                                {{ date('d-m-Y', strtotime($data_jurnal_header->tanggal_giro)) }}
+                            <td width="78%">
+                                {{ $data_jurnal_header->tanggal_giro }}
                             </td>
                         </tr>
                         <tr>
-                            <td width="35%">Tanggal Jatuh Tempo</td>
+                            <td width="20%">Tanggal Jatuh Tempo</td>
                             <td width="2%">:</td>
-                            <td width="63%">
-                                {{ date('d-m-Y', strtotime($data_jurnal_header->tanggal_giro_jt)) }}
+                            <td width="78%">
+                                {{ $data_jurnal_header->tanggal_giro_jt }}
                             </td>
                         </tr>
                         @endif
                         <tr>
-                            <td width="35%">Catatan</td>
+                            <td width="20%">Catatan</td>
                             <td width="2%">:</td>
-                            <td width="63%">{{ $data_jurnal_header->catatan }}</td>
+                            <td width="78%">{!! $data_jurnal_header->catatan !!}</td>
                         </tr>
                     </table>
                 </td>
@@ -107,12 +107,12 @@
         <thead>
             <tr>
                 <th width="25%">Akun</th>
-                <th width="35%">Keterangan</th>
+                <th width="55%">Keterangan</th>
                 @if ($data_jurnal_header->jenis_jurnal == 'ME')
                 <th width="20%">Debet</th>
                 <th width="20%">Kredit</th>
                 @else
-                <th width="40%">Jumlah</th>
+                <th width="20%">Jumlah</th>
                 @endif
             </tr>
         </thead>
@@ -131,7 +131,7 @@
                     {{ $detail->kode_akun }} - {{ $detail->nama_akun }}
                 </td>
                 <td>
-                    {{ $detail->keterangan }}
+                    {!! $detail->keterangan !!}
                 </td>
                 @if (in_array($data_jurnal_header->jenis_jurnal, ['KK', 'BK', 'PG']))
                 <td style="text-align: right">

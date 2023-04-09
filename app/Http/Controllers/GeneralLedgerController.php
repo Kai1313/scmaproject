@@ -257,6 +257,13 @@ class GeneralLedgerController extends Controller
             ->select('jurnal_detail.*', 'master_akun.kode_akun', 'master_akun.nama_akun')
             ->get();
 
+        $data_jurnal_header->catatan = str_replace("\n", '<br/>', $data_jurnal_header->catatan);
+
+        foreach ($data_jurnal_detail as $key => $value) {
+            $notes = str_replace("\n", '<br/>', $value->keterangan);
+            $value->keterangan = $notes;
+        }
+
         $data = [
             "pageTitle" => "SCA Accounting | Transaksi Jurnal Umum | Detail",
             "data_jurnal_header" => $data_jurnal_header,
@@ -304,12 +311,17 @@ class GeneralLedgerController extends Controller
             ->select('jurnal_detail.*', 'master_akun.kode_akun', 'master_akun.nama_akun')
             ->get();
 
+        $data_jurnal_header->catatan = str_replace("\n", '<br/>', $data_jurnal_header->catatan);
+
+        foreach ($data_jurnal_detail as $key => $value) {
+            $notes = str_replace("\n", '<br/>', $value->keterangan);
+            $value->keterangan = $notes;
+        }
+
         $data = [
             "data_jurnal_header" => $data_jurnal_header,
             "data_jurnal_detail" => $data_jurnal_detail,
         ];
-
-        // dd($data);
 
         // return view('accounting.journal.general_ledger.print', $data);
 
@@ -340,12 +352,13 @@ class GeneralLedgerController extends Controller
         foreach ($jurnal_detail as $key => $jurnal) {
             $akun = Akun::find($jurnal->id_akun);
             $trx_id = TrxSaldo::where("id_transaksi", $jurnal->id_transaksi)->first();
+            $notes = str_replace("\n", '<br/>', $jurnal->keterangan);
             $details[] = [
                 "guid" => (++$i == count($jurnal_detail)) ? "gen" : (($trx_id) ? "trx-" . $trx_id->id : $jurnal->index),
                 "akun" => $akun->id_akun,
                 "nama_akun" => $akun->nama_akun,
                 "kode_akun" => $akun->kode_akun,
-                "notes" => $jurnal->keterangan,
+                "notes" => $notes,
                 "trx" => $jurnal->id_transaksi,
                 "debet" => $jurnal->debet,
                 "kredit" => $jurnal->credit,
@@ -604,7 +617,7 @@ class GeneralLedgerController extends Controller
 
         $filtered_data = $data_general_ledger_table->get();
 
-        if ($sort) {
+        if ($sort[0]['column']) {
             if (!is_array($sort)) {
                 $message = "Invalid array for parameter sort";
                 $data = [
@@ -623,7 +636,7 @@ class GeneralLedgerController extends Controller
                 }
             }
         } else {
-            $data_general_ledger_table->orderBy('id_jurnal', 'ASC');
+            $data_general_ledger_table->orderBy('jurnal_header.dt_modified', 'DESC');
         }
 
         // pagination

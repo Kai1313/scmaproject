@@ -176,12 +176,14 @@
                     alert('Error loading data. Exception: ' + ThrownException + '\n' + textStatus);
                 }
             },
-            columns: [{
+            columns: [
+                {
                     orderable: false,
                     searchable: false,
                     data: null,
                     name: null,
                     targets: 0,
+                    width: '3%',
                     render: function(data, type) {
                         if (!data.LatestStatusRecord) {
                             return '';
@@ -198,7 +200,7 @@
                 {
                     data: 'tanggal_jurnal',
                     name: 'tanggal_jurnal',
-                    width: '15%',
+                    width: '12%',
                     responsivePriority: 2
                 },
                 {
@@ -219,7 +221,12 @@
                 {
                     data: 'catatan',
                     name: 'catatan',
-                    width: '20%'
+                    width: '20%',
+                    render: function(data, type, row) {
+                        let width = $(window).width();
+                        width = width > 500 ? width - 330 : width - 100;
+                        return "<div style='white-space:normal;width:" + width + "px;'>" + data + "</div>";
+                    },
                 },
                 {
                     data: 'jumlah',
@@ -380,14 +387,14 @@
     function formatNumberAsFloat(num) {
         num = String(num);
         num = num.split('.').join("");
-        
+
         return num;
     }
-    
+
     function formatNumberAsFloatFromDB(num) {
         num = String(num);
         num = num.replace('.', ',');
-        
+
         return num;
     }
 </script>
