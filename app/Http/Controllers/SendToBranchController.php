@@ -21,6 +21,7 @@ class SendToBranchController extends Controller
                 ->select('id_pindah_barang', 'type', 'nama_gudang', 'tanggal_pindah_barang', 'kode_pindah_barang', 'nama_cabang', 'status_pindah_barang', 'keterangan_pindah_barang', 'transporter', 'void')
                 ->leftJoin('gudang', 'pindah_barang.id_gudang', '=', 'gudang.id_gudang')
                 ->leftJoin('cabang', 'pindah_barang.id_cabang2', '=', 'cabang.id_cabang')
+                ->where('id_jenis_transaksi', 21)
                 ->where('type', 0);
             if (isset($request->c)) {
                 $data = $data->where('pindah_barang.id_cabang', $request->c);

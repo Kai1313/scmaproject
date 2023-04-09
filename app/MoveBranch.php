@@ -18,6 +18,7 @@ class MoveBranch extends Model
     protected $fillable = [
         'id_pindah_barang',
         'id_pindah_barang2',
+        'id_jenis_transaksi',
         'type',
         'id_cabang',
         'id_gudang',

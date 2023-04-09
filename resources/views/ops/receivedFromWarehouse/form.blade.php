@@ -154,7 +154,7 @@
                     </div>
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
                     <button class="btn btn-primary btn-flat pull-right" type="submit">
-                        <i class="glyphicon glyphicon-floppy-saved"></i> Simpan Data
+                        <i class="glyphicon glyphicon-check"></i> Terima
                     </button>
                 </div>
             </div>
@@ -201,7 +201,7 @@
             data: details,
             ordering: false,
             columns: [{
-                data: 'kode_batang_lama_pindah_gudang_detail',
+                data: 'qr_code',
                 name: 'qr_code'
             }, {
                 data: 'nama_barang',
@@ -210,21 +210,21 @@
                 data: 'nama_satuan_barang',
                 name: 'nama_satuan_barang'
             }, {
-                data: 'jumlah_pindah_gudang_detail',
-                name: 'jumlah_pindah_gudang_detail',
+                data: 'qty',
+                name: 'qty',
                 render: $.fn.dataTable.render.number('.', ',', 4),
                 className: 'text-right'
             }, {
-                data: 'batch_pindah_gudang_detail',
-                name: 'batch_pindah_gudang_detail',
+                data: 'batch',
+                name: 'batch',
                 className: 'text-right'
             }, {
-                data: 'tanggal_kadaluarsa_pindah_gudang_detail',
-                name: 'tanggal_kadaluarsa_pindah_gudang_detail',
+                data: 'tanggal_kadaluarsa',
+                name: 'tanggal_kadaluarsa',
             }, {
-                data: 'id_pindah_gudang_detail',
+                data: 'id_pindah_barang_detail',
                 className: 'text-center',
-                name: 'id_pindah_gudang_detail',
+                name: 'id_pindah_barang_detail',
                 searchable: false,
                 render: function(data, type, row, meta) {
                     let btn = '';

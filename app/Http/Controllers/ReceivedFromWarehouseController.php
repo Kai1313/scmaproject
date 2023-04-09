@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\MoveWarehouse;
+use App\MoveBranch;
 use DB;
 use Illuminate\Http\Request;
+use Yajra\DataTables\DataTables;
 
 class ReceivedFromWarehouseController extends Controller
 {
@@ -14,49 +15,49 @@ class ReceivedFromWarehouseController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        // if ($request->ajax()) {
-        //     $data = DB::table('pindah_barang')
-        //         ->select(
-        //             'id_pindah_barang',
-        //             'type',
-        //             'nama_gudang',
-        //             'tanggal_pindah_barang',
-        //             'kode_pindah_barang',
-        //             'nama_cabang',
-        //             'status_pindah_barang',
-        //             'keterangan_pindah_barang',
-        //             'transporter'
-        //         )
-        //         ->leftJoin('gudang', 'pindah_barang.id_gudang', '=', 'gudang.id_gudang')
-        //         ->leftJoin('cabang', 'pindah_barang.id_cabang_asal', '=', 'cabang.id_cabang')
-        //         ->where('type', 1);
-        //     if (isset($request->c)) {
-        //         $data = $data->where('pindah_barang.id_cabang', $request->c);
-        //     }
+        if ($request->ajax()) {
+            $data = DB::table('pindah_barang')
+                ->select(
+                    'id_pindah_barang',
+                    'type',
+                    'g.nama_gudang as g_nama_gudang',
+                    'tanggal_pindah_barang',
+                    'kode_pindah_barang',
+                    'g2.nama_gudang as g2_nama_gudang',
+                    'status_pindah_barang',
+                    'keterangan_pindah_barang',
+                )
+                ->leftJoin('gudang as g', 'pindah_barang.id_gudang', '=', 'g.id_gudang')
+                ->leftJoin('gudang as g2', 'pindah_barang.id_gudang2', '=', 'g2.id_gudang')
+                ->where('id_jenis_transaksi', 24)
+                ->where('type', 1);
+            if (isset($request->c)) {
+                $data = $data->where('pindah_barang.id_cabang', $request->c);
+            }
 
-        //     $data = $data->orderBy('pindah_barang.kode_pindah_barang', 'desc');
-        //     return Datatables::of($data)
-        //         ->addIndexColumn()
-        //         ->addColumn('action', function ($row) {
-        //             $btn = '<ul class="horizontal-list">';
-        //             $btn .= '<li><a href="' . route('received_from_branch-view', $row->id_pindah_barang) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
-        //             $btn .= '<li><a href="' . route('received_from_branch-entry', $row->id_pindah_barang) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
-        //             // $btn .= '<li><a href="' . route('received_from_branch-delete', $row->id_pindah_barang) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Void</a></li>';
-        //             $btn .= '</ul>';
-        //             return $btn;
-        //         })
-        //         ->editColumn('status_pindah_barang', function ($row) {
-        //             if ($row->status_pindah_barang == '0') {
-        //                 return '<label class="label label-warning">Dalam Perjalanan</label>';
-        //             } else if ($row->status_pindah_barang == '1') {
-        //                 return '<label class="label label-success">Diterima</label>';
-        //             } else {
-        //                 return '';
-        //             }
-        //         })
-        //         ->rawColumns(['action', 'status_pindah_barang'])
-        //         ->make(true);
-        // }
+            $data = $data->orderBy('pindah_barang.kode_pindah_barang', 'desc');
+            return Datatables::of($data)
+                ->addIndexColumn()
+                ->addColumn('action', function ($row) {
+                    $btn = '<ul class="horizontal-list">';
+                    $btn .= '<li><a href="' . route('received_from_warehouse-view', $row->id_pindah_barang) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
+                    $btn .= '<li><a href="' . route('received_from_warehouse-entry', $row->id_pindah_barang) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
+                    // $btn .= '<li><a href="' . route('received_from_branch-delete', $row->id_pindah_barang) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Void</a></li>';
+                    $btn .= '</ul>';
+                    return $btn;
+                })
+                ->editColumn('status_pindah_barang', function ($row) {
+                    if ($row->status_pindah_barang == '0') {
+                        return '<label class="label label-warning">Dalam Perjalanan</label>';
+                    } else if ($row->status_pindah_barang == '1') {
+                        return '<label class="label label-success">Diterima</label>';
+                    } else {
+                        return '';
+                    }
+                })
+                ->rawColumns(['action', 'status_pindah_barang'])
+                ->make(true);
+        }
 
         $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
         return view('ops.receivedFromWarehouse.index', [
@@ -71,7 +72,7 @@ class ReceivedFromWarehouseController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        $data = MoveWarehouse::find($id);
+        $data = MoveBranch::find($id);
         $cabang = DB::table('cabang')->select('nama_cabang as text', 'id_cabang as id')->where('status_cabang', 1)->get();
 
         return view('ops.receivedFromWarehouse.form', [
@@ -83,7 +84,7 @@ class ReceivedFromWarehouseController extends Controller
 
     public function saveEntry(Request $request, $id = 0)
     {
-        $data = MoveWarehouse::find($id);
+        $data = MoveBranch::find($id);
         // try {
         //     DB::beginTransaction();
         //     if (!$data) {
@@ -139,7 +140,10 @@ class ReceivedFromWarehouseController extends Controller
 
     public function autoQRCode(Request $request)
     {
-        $data = MoveWarehouse::where('type', 0)->where('nama_pindah_gudang', $request->qrcode)->first();
+        $data = MoveBranch::where('id_jenis_transaksi', 23)
+            ->where('type', 0)
+            ->where('kode_pindah_barang', $request->qrcode)
+            ->first();
         return response()->json([
             'data' => $data,
             'details' => $data->formatdetail,

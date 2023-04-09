@@ -31,6 +31,7 @@ class ReceivedFromBranchController extends Controller
                 )
                 ->leftJoin('gudang', 'pindah_barang.id_gudang', '=', 'gudang.id_gudang')
                 ->leftJoin('cabang', 'pindah_barang.id_cabang2', '=', 'cabang.id_cabang')
+                ->where('id_jenis_transaksi', 22)
                 ->where('type', 1);
             if (isset($request->c)) {
                 $data = $data->where('pindah_barang.id_cabang', $request->c);
@@ -192,6 +193,7 @@ class ReceivedFromBranchController extends Controller
             ->leftJoin('cabang', 'pindah_barang.id_cabang', '=', 'cabang.id_cabang')
             ->where('id_cabang2', $idCabang)
             ->where('status_pindah_barang', 0)
+            ->where('id_jenis_transaksi', 21)
             ->where('void', 0)
             ->get();
 

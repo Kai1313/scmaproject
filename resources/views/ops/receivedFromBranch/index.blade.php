@@ -81,7 +81,7 @@
                         <thead>
                             <tr>
                                 <th>Tanggal</th>
-                                <th>Kode Pindah Gudang</th>
+                                <th>Kode Pindah Cabang</th>
                                 <th>Gudang</th>
                                 <th>Cabang Asal</th>
                                 <th>Keterangan</th>

@@ -177,6 +177,8 @@
                         </div>
                     </div>
                     <div class="table-responsive">
+                        <input name="id_jenis_transaksi" type="hidden"
+                            value="{{ old('id_jenis_transaksi', $data ? $data->id_jenis_transaksi : '21') }}">
                         <input type="hidden" name="details" value="[]">
                         <table id="table-detail" class="table table-bordered data-table display responsive nowrap"
                             width="100%">
