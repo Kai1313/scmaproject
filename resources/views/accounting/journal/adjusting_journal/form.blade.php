@@ -236,8 +236,8 @@
                                         <option value="retur_pembelian">Retur Pembelian</option>
                                         <option value="piutang_giro">Piutang Giro</option>
                                         <option value="hutang_giro">Hutang Giro</option>
-                                        {{--<option value="piutang_giro_tolak">Piutang Giro Tolak</option>
-                                        <option value="hutang_giro_tolak">Hutang Giro Tolak</option> --}}
+                                        <option value="piutang_giro_tolak">Piutang Giro Tolak</option>
+                                        <option value="hutang_giro_tolak">Hutang GiroTolak</option>
                                     </select>
                                 </div>
                             </div>
@@ -385,6 +385,23 @@
                                 </table>
                             </div>
                         </div>
+                        <div class="row box-transaction" id="box-hutang-giro-tolak">
+                            <div class="col-md-12">
+                                <table id="table_hutang_giro_tolak" class="table table-bordered table-striped table-transaction" style="width:100%">
+                                    <thead width="100%">
+                                        <tr>
+                                            <th class="text-center"></th>
+                                            <th class="text-center">Tanggal</th>
+                                            <th class="text-center">Tanggal JT</th>
+                                            <th class="text-center">Nomor Giro Tolak</th>
+                                            <th class="text-center">Note</th>
+                                            <th class="text-center">Total</th>
+                                            <th class="text-center">Bayar</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -422,6 +439,7 @@
     let slip_by_cabang_route = "{{ route('master-slip-get-by-cabang', ':id') }}"
     let coa_data_route = "{{ route('master-coa-get-data', ':id') }}"
     let setting_data_route = "{{ route('master-setting-get-pelunasan', ':id') }}"
+    let giro_reject_data_route = "{{ route('transaction-adjustment-ledger-get-giro-reject', ':id') }}"
     let piutang_dagang 
     let hutang_dagang
 
@@ -617,7 +635,13 @@
                     populate_transaction(type)
                     $("#box-hutang-giro").show()
                     break;
-            
+                case "hutang_giro_tolak":
+                    $(".box-transaction").hide()
+                    $(".transaction-filter").hide()
+                    populate_transaction(type)
+                    $("#box-hutang-giro-tolak").show()
+                    break;
+
                 default:
                     $(".box-transaction").hide()
                     $(".transaction-filter").hide()
@@ -645,6 +669,9 @@
                     populate_transaction(trx_type)
                     break;
                 case "hutang_giro":
+                    populate_transaction(trx_type)
+                    break;
+                case "hutang_giro_tolak":
                     populate_transaction(trx_type)
                     break;
             
@@ -675,6 +702,9 @@
                     populate_transaction(trx_type)
                     break;
                 case "hutang_giro":
+                    populate_transaction(trx_type)
+                    break;
+                case "hutang_giro_tolak":
                     populate_transaction(trx_type)
                     break;
             
@@ -852,6 +882,38 @@
                     }).get()
                     populate_detail(details)
                     break;
+                case "hutang_giro_tolak":
+                    let table_hutang_giro_tolak = $('#table_hutang_giro_tolak')
+                    $('.dt-checkboxes:checked', table_hutang_giro_tolak).each(function() {
+                        // Init data from row
+                        let trx_id = $(this).closest('tr').find('.transaction-id').val()
+                        let no_giro = $(this).closest('tr').find('td:eq(3)').text()
+                        let debet = $(this).closest('tr').find('.transaction-bayar').val()
+                        let id_akun = $(this).closest('tr').find('.akun-id').val()
+                        let nama_akun = $(this).closest('tr').find('.akun-nama').val()
+                        let kode_akun = $(this).closest('tr').find('.akun-kode').val()
+                        let no_trx = $(this).closest('tr').find('.transaction-no').val()
+
+                        // Get Giro Reject records
+                        getGiroReject(trx_id)
+
+                        // Remove data from details
+                        details = details.filter(function(item) {
+                            return item['guid'] != "trx-" + trx_id
+                        })
+                        details.push({
+                            guid: "trx-" + trx_id,
+                            akun: id_akun,
+                            nama_akun: nama_akun,
+                            kode_akun: kode_akun,
+                            notes: 'Jurnal Otomatis Penolakan - ' + no_giro,
+                            trx: no_trx,
+                            debet: formatNumberAsLocalFloat(debet),
+                            kredit: 0
+                        })
+                    }).get()
+                    populate_detail(details)
+                    break;
             
                 default:
                     alert("Nothing to add")
@@ -969,8 +1031,6 @@
                 if (data.result) {
                     piutang_dagang = data.piutang_dagang
                     hutang_dagang = data.hutang_dagang
-                    // console.log(piutang_dagang)
-                    // console.log(hutang_dagang)
                 }
             }
         })
@@ -1714,6 +1774,81 @@
                      'order': [[1, 'asc']]
                 })
                 break;
+            case "hutang_giro_tolak":
+                $("#table_hutang_giro_tolak").DataTable().destroy()
+                let get_hutang_giro_tolak_url = "{{ route('transaction-general-ledger-populate-transaction') }}"
+                get_hutang_giro_tolak_url += '?transaction_type=' + $("#transaction_type").val() + '&supplier=' + $("#supplier_transaction").val()
+                $('#table_hutang_giro_tolak').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    "scrollX": true,
+                    "bDestroy": true,
+                    responsive: true,
+                    ajax: {
+                        'url': get_hutang_giro_tolak_url,
+                        'type': 'GET',
+                        'dataType': 'JSON',
+                        'error': function(xhr, textStatus, ThrownException) {
+                            alert('Error loading data. Exception: ' + ThrownException + '\n' + textStatus);
+                        }
+                    },
+                    columns: [
+                        {
+                            data: 'id',
+                            name: 'id',
+                        },
+                        {
+                            data: 'tanggal_giro',
+                            name: 'tanggal_giro',
+                            width: '10%'
+                        },
+                        {
+                            data: 'tanggal_giro_jt',
+                            name: 'tanggal_giro_jt',
+                            width: '15%'
+                        },
+                        {
+                            data: 'no_giro',
+                            name: 'no_giro',
+                            width: '10%'
+                        },
+                        {
+                            data: 'catatan',
+                            name: 'catatan',
+                            width: '10%'
+                        },
+                        {
+                            data: 'total',
+                            name: 'total',
+                            width: '10%',
+                            className: 'text-right',
+                            render: function(data, type, row) {
+                                return formatCurr(formatNumberAsFloatFromDB(data));
+                            },
+                        },
+                        {
+                            data: 'sisa',
+                            width: '10%',
+                            render: function(data, type, row) {
+                                return '<input type="text" class="form-control transaction-bayar" value="'+formatCurr(formatNumberAsFloatFromDB(data))+'" onblur="this.value=formatCurr(this.value)" readonly><input type="hidden" class="form-control transaction-id" value="'+row["id"]+'"><input type="hidden" class="form-control akun-id" value="'+row["id_akun"]+'"><input type="hidden" class="form-control akun-nama" value="'+row["nama_akun"]+'"><input type="hidden" class="form-control akun-kode" value="'+row["kode_akun"]+'"><input type="hidden" class="form-control transaction-no" value="'+row["id_transaksi"]+'">';
+                            },
+                            orderable: false
+                        }
+                    ],
+                    'columnDefs': [
+                        {
+                           'targets': 0,
+                           'checkboxes': {
+                              'selectRow': true
+                           }
+                        }
+                     ],
+                     'select': {
+                        'style': 'multi'
+                     },
+                     'order': [[1, 'asc']]
+                })
+                break;
         
             default:
                 $(".table-transaction").DataTable().destroy()
@@ -1737,18 +1872,21 @@
         }
         return x1 + x2;
     }
+
     function formatNumberAsFloat(num) {
         num = String(num);
         num = num.replace(',', '.');
         
         return num;
     }
+
     function formatNumberAsLocalFloat(num) {
         num = String(num);
         num = num.split('.').join("");
         
         return num;
     }
+
     function formatNumberAsFloatFromDB(num) {
         num = String(num);
         console.log(num);
@@ -1758,6 +1896,19 @@
         console.log(num);
         
         return num;
+    }
+
+    function getGiroReject(ids) {
+        let giro_reject_data_route = giro_reject_data_route.replace(':id', ids);
+        $.ajax({
+            url: current_setting_data_route,
+            async: false,
+            success: function(data) {
+                if (data.result) {
+                    console.log(data)
+                }
+            }
+        })
     }
 </script>
 @endsection

@@ -838,4 +838,37 @@ class AdjustmentLedgerController extends Controller
             return false;
         }
     }
+
+    public function getGiroReject(Request $request)
+    {
+        try {
+            $id = $request->header;
+            $jurnal_detail = JurnalDetail::where("id_jurnal", $id)->get();
+            $details = [];
+            $i = 0;
+            foreach ($jurnal_detail as $key => $jurnal) {
+                $akun = Akun::find($jurnal->id_akun);
+                $trx_id = TrxSaldo::where("id_transaksi", $jurnal->id_transaksi)->first();
+                $details[] = [
+                    "guid" => (++$i == count($jurnal_detail)) ? "gen" : (($trx_id) ? "trx-" . $trx_id->id : $jurnal->index),
+                    "akun" => $akun->id_akun,
+                    "nama_akun" => $akun->nama_akun,
+                    "kode_akun" => $akun->kode_akun,
+                    "notes" => $jurnal->keterangan,
+                    "trx" => $jurnal->id_transaksi,
+                    "debet" => $jurnal->debet,
+                    "kredit" => $jurnal->credit,
+                ];
+            }
+        }
+        catch (\Exception $e) {
+            $message = "Error when get giro tolak record";
+            Log::error($message);
+            Log::error($e);
+            return response()->json([
+                "result" => FALSE,
+                "message" => $message
+            ]);
+        }
+    }
 }
