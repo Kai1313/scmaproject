@@ -576,8 +576,8 @@
             // Set data on form
             $("#akun_detail").val(detail[0]["akun"]).trigger("change.select2")
             $("#notes_detail").val(detail[0]["notes"])
-            $("#debet").val(detail[0]["debet"])
-            $("#kredit").val(detail[0]["kredit"])
+            $("#debet").val(formatCurr(detail[0]["debet"]))
+            $("#kredit").val(formatCurr(detail[0]["kredit"]))
             $("#edit_id").val(detail[0]["guid"])
         })
 
