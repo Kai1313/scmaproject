@@ -2452,7 +2452,7 @@ class ApiController extends Controller
 
     public function journalHpp(Request $request){
         DB::beginTransaction();
-        $id_produksi = $request->id_produksi;
+        $id_produksi = $request->no_transaksi;
         $id_cabang = $request->id_cabang;
         $void = $request->void;
 
