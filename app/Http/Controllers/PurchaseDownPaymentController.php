@@ -217,7 +217,7 @@ class PurchaseDownPaymentController extends Controller
             ->where('pp.id_cabang', $idCabang)
             ->groupBy('pp.id_permintaan_pembelian')
             ->having(DB::raw('mtotal_permintaan_pembelian - COALESCE(sum(nominal),0)'), '<>', '0')
-            ->orderBy('tanggal_permintaan_penjualan', 'desc')->get();
+            ->orderBy('tanggal_permintaan_pembelian', 'desc')->get();
         return response()->json([
             'result' => true,
             'data' => $datas,

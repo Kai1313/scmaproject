@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\MaterialUsage;
 use DB;
 use Illuminate\Http\Request;
+use Yajra\DataTables\DataTables;
 
 class MaterialUsageController extends Controller
 {
@@ -48,6 +50,22 @@ class MaterialUsageController extends Controller
         return view('ops.materialUsage.index', [
             'cabang' => $cabang,
             "pageTitle" => "SCA OPS | Pemakaian | List",
+        ]);
+    }
+
+    public function entry($id = 0)
+    {
+        if (checkAccessMenu('pemakaian_header', $id == 0 ? 'create' : 'edit') == false) {
+            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+        }
+
+        $data = MaterialUsage::find($id);
+        $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
+
+        return view('ops.materialUsage.form', [
+            'data' => $data,
+            'cabang' => $cabang,
+            "pageTitle" => "SCA OPS | Pemakaian | " . ($id == 0 ? 'Create' : 'Edit'),
         ]);
     }
 }
