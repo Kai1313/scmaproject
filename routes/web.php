@@ -97,7 +97,7 @@ Route::prefix('terima_dari_cabang')->group(function () {
     Route::get('/entry/{id?}', 'ReceivedFromBranchController@entry')->name('received_from_branch-entry');
     Route::post('/save_entry/{id}', 'ReceivedFromBranchController@saveEntry')->name('received_from_branch-save-entry');
     Route::get('/view/{id}', 'ReceivedFromBranchController@viewData')->name('received_from_branch-view');
-    Route::get('/delete/{id}', 'ReceivedFromBranchController@destroy')->name('received_from_branch-delete');
+    // Route::get('/delete/{id}', 'ReceivedFromBranchController@destroy')->name('received_from_branch-delete');
     Route::get('/auto-code', 'ReceivedFromBranchController@autoCode')->name('received_from_branch-code');
     Route::get('/auto-detail-item', 'ReceivedFromBranchController@getDetailItem')->name('received_from_branch-detail-item');
     Route::get('/print/{id}', 'ReceivedFromBranchController@printData')->name('received_from_branch-print-data');
@@ -108,11 +108,17 @@ Route::prefix('terima_dari_gudang')->group(function () {
     Route::get('/entry/{id?}', 'ReceivedFromWarehouseController@entry')->name('received_from_warehouse-entry');
     Route::post('/save_entry/{id}', 'ReceivedFromWarehouseController@saveEntry')->name('received_from_warehouse-save-entry');
     Route::get('/view/{id}', 'ReceivedFromWarehouseController@viewData')->name('received_from_warehouse-view');
-    Route::get('/delete/{id}', 'ReceivedFromWarehouseController@destroy')->name('received_from_warehouse-delete');
+    // Route::get('/delete/{id}', 'ReceivedFromWarehouseController@destroy')->name('received_from_warehouse-delete');
     Route::get('/auto-qrcode', 'ReceivedFromWarehouseController@autoQRCode')->name('received_from_warehouse-qrcode');
-    // Route::get('/auto-code', 'ReceivedFromBranchController@autoCode')->name('received_from_branch-code');
-    // Route::get('/auto-detail-item', 'ReceivedFromBranchController@getDetailItem')->name('received_from_branch-detail-item');
-    // Route::get('/print/{id}', 'ReceivedFromBranchController@printData')->name('received_from_branch-print-data');
+});
+
+Route::prefix('pemakaian')->group(function () {
+    Route::get('/index/{user_id?}', 'MaterialUsageController@index')->name('material_usage');
+    Route::get('/entry/{id?}', 'MaterialUsageController@entry')->name('material_usage-entry');
+    Route::post('/save_entry/{id}', 'MaterialUsageController@saveEntry')->name('material_usage-save-entry');
+    Route::get('/view/{id}', 'MaterialUsageController@viewData')->name('material_usage-view');
+    // Route::get('/delete/{id}', 'ReceivedFromWarehouseController@destroy')->name('received_from_warehouse-delete');
+    // Route::get('/auto-qrcode', 'ReceivedFromWarehouseController@autoQRCode')->name('received_from_warehouse-qrcode');
 });
 
 Route::get('kirim_ke_gudang/print/{id}', 'SendToWarehouseController@print')->name('send_to_warehouse-print');

@@ -85,7 +85,6 @@ class ReceivedFromWarehouseController extends Controller
 
     public function saveEntry(Request $request, $id = 0)
     {
-        // return $request->all();
         $data = MoveBranch::find($id);
         try {
             DB::beginTransaction();

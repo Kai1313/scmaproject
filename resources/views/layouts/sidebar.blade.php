@@ -391,7 +391,7 @@
                 </li>
             @endif
             @if (checkAccessMenu('transaksi'))
-                <li class="treeview {{ in_array(request()->segment(1), ['purchase_requisitions', 'uang_muka_pembelian', 'qc_penerimaan_barang', 'kirim_ke_cabang', 'terima_dari_cabang', 'uang_muka_penjualan', 'terima_dari_gudang']) ? 'active' : null }}"
+                <li class="treeview {{ in_array(request()->segment(1), ['purchase_requisitions', 'uang_muka_pembelian', 'qc_penerimaan_barang', 'kirim_ke_cabang', 'terima_dari_cabang', 'uang_muka_penjualan', 'terima_dari_gudang', 'pemakaian']) ? 'active' : null }}"
                     data-alias="transaksi">
                     <a href="#"><i class="glyphicon glyphicon-list-alt"></i> <span>Transaksi</span>
                         <span class="pull-right-container">
@@ -478,7 +478,7 @@
                             </li>
                         @endif
                         @if (checkAccessMenu('persediaan_kepala'))
-                            <li class="treeview {{ in_array(request()->segment(1), ['kirim_ke_cabang', 'terima_dari_cabang', 'terima_dari_gudang']) ? 'active' : null }}"
+                            <li class="treeview {{ in_array(request()->segment(1), ['kirim_ke_cabang', 'terima_dari_cabang', 'terima_dari_gudang', 'pemakaian']) ? 'active' : null }}"
                                 data-alias="persediaan_kepala">
                                 <a href="#"><i class="glyphicon glyphicon-arrow-right"></i>
                                     <span>Persediaan</span>
@@ -540,6 +540,14 @@
                                             <a href="{{ route('received_from_warehouse') }}">
                                                 <i class="glyphicon glyphicon-option-vertical"></i>Terima Dari Gudang
                                                 (TG-IN)
+                                            </a>
+                                        </li>
+                                    @endif
+                                    @if (checkAccessMenu('pemakaian_header'))
+                                        <li data-alias="terima_dari_gudang"
+                                            class="nav-item {{ request()->segment(1) == 'pemakaian' ? 'active' : null }}">
+                                            <a href="{{ route('material_usage') }}">
+                                                <i class="glyphicon glyphicon-option-vertical"></i>Pemakaian
                                             </a>
                                         </li>
                                     @endif

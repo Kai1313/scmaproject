@@ -214,7 +214,7 @@ class MoveBranch extends Model
                     'mtotal_debit_kartu_stok' => 0,
                     'mtotal_kredit_kartu_stok' => 0,
                     'kode_batang_kartu_stok' => $data->qr_code,
-                    'kode_batang_lama_kartu_stok' => $data->qr_code,
+                    'kode_batang_lama_kartu_stok' => '',
                     'rak_kartu_stok' => '',
                     'batch_kartu_stok' => $data->batch,
                     'id_perkiraan' => 34,
