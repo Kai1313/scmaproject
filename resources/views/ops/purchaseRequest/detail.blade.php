@@ -98,8 +98,21 @@
             </div>
         </div>
         <div class="box box-primary">
+            <div class="box-header">
+                <h3 class="box-title">Detil Permintaan Barang</h3>
+                @if (session()->get('user')['id_grup_pengguna'] == 13 && $data->approval_status == 0)
+                    <a href="{{ route('purchase-request-change-status', [$data->purchase_request_id, 'reject']) }}"
+                        class="btn btn-default btn-change-status btn-flat btn-sm pull-right" data-param="reject">
+                        <i class="fa fa-times"></i> Reject
+                    </a>
+                    <a href="{{ route('purchase-request-change-status', [$data->purchase_request_id, 'approval']) }}"
+                        class="btn btn-success btn-change-status btn-flat btn-sm pull-right" data-param="approval"
+                        style="margin-right:10px;">
+                        <i class="glyphicon glyphicon-check"></i> Approval
+                    </a>
+                @endif
+            </div>
             <div class="box-body">
-                <h4>Detil Permintaan Barang</h4>
                 <div class="table-responsive">
                     <table id="table-detail" class="table table-bordered data-table display responsive nowrap"
                         width="100%">
@@ -124,6 +137,7 @@
     <script src="{{ asset('assets/bower_components/datatables.net/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js') }}"></script>
     <script src="{{ asset('assets/bower_components/datatables-responsive/js/dataTables.responsive.js') }}"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/custom.js') }}"></script>
 @endsection
 
@@ -163,5 +177,53 @@
                 },
             ]
         });
+
+        $('body').on('click', '.btn-change-status', function(e) {
+            let self = $(this)
+            e.preventDefault();
+            Swal.fire({
+                title: 'Anda yakin ingin ' + self.data('param') + ' data ini?',
+                icon: 'info',
+                showDenyButton: true,
+                confirmButtonText: 'Yes',
+                denyButtonText: 'No',
+                reverseButtons: true,
+                customClass: {
+                    actions: 'my-actions',
+                    confirmButton: 'order-1',
+                    denyButton: 'order-3',
+                }
+            }).then((result) => {
+                $('#cover-spin').hide()
+                if (result.isConfirmed) {
+                    changeData(self.prop('href'))
+                }
+            })
+        })
+
+        function changeData(url) {
+            $('#cover-spin').show()
+            $.ajax({
+                url: url,
+                type: "get",
+                dataType: "JSON",
+                success: function(data) {
+                    $('#cover-spin').hide()
+                    if (data.result) {
+                        Swal.fire('Berhasil', data.message, 'success').then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = data.redirect;
+                            }
+                        })
+                    } else {
+                        Swal.fire("Gagal", data.message, 'error')
+                    }
+                },
+                error: function(data) {
+                    $('#cover-spin').hide()
+                    Swal.fire("Gagal", data.responseJSON.message, 'error')
+                }
+            })
+        }
     </script>
 @endsection

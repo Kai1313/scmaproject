@@ -115,6 +115,8 @@ Route::prefix('terima_dari_gudang')->group(function () {
     // Route::get('/print/{id}', 'ReceivedFromBranchController@printData')->name('received_from_branch-print-data');
 });
 
+Route::get('kirim_ke_gudang/print/{id}', 'SendToWarehouseController@print')->name('send_to_warehouse-print');
+
 // Master
 Route::get('/master/slip/index/{user_id?}', 'MasterSlipController@index')->name('master-slip');
 Route::get('/master/slip/form/create', 'MasterSlipController@create')->name('master-slip-create');

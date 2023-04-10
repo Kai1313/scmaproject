@@ -70,7 +70,7 @@
 
 @section('main-section')
     <div class="content container-fluid">
-        <form action="{{ route('received_from_branch-save-entry', $data ? $data->id_pindah_barang : 0) }}" method="post"
+        <form action="{{ route('received_from_warehouse-save-entry', $data ? $data->id_pindah_barang : 0) }}" method="post"
             class="post-action">
             <div class="box">
                 <div class="box-header">
@@ -86,43 +86,78 @@
                             <center>
                                 <div id="reader"></div>
                             </center>
-                            <div class="form-group">
-                                <div class="input-group">
-                                    <input type="text" name="search-qrcode" class="form-control"
-                                        placeholder="Scan QRCode">
-                                    <div class="input-group-btn">
-                                        <button class="btn btn-info btn-search btn-flat" type="button">
-                                            <i class="fa fa-search"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                     <div class="row">
+                        @if (!$data)
+                            <div class="col-md-4">
+                                <label>Scan Kode Pengiriman</label>
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <input type="text" name="search-qrcode" class="form-control"
+                                            placeholder="Scan QRCode">
+                                        <div class="input-group-btn">
+                                            <button class="btn btn-info btn-search btn-flat" type="button">
+                                                <i class="fa fa-search"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
                         <div class="col-md-4">
                             <label>Tanggal Penerimaan <span>*</span></label>
                             <div class="form-group">
-                                <input type="text" name="tanggal_pindah_gudang"
-                                    value="{{ old('tanggal_pindah_gudang', $data ? $data->tanggal_pindah_gudang : date('Y-m-d')) }}"
+                                <input type="text" name="tanggal_pindah_barang"
+                                    value="{{ old('tanggal_pindah_barang', $data ? $data->tanggal_pindah_barang : date('Y-m-d')) }}"
                                     class="form-control datepicker" data-validation="[NOTEMPTY]"
                                     data-validation-message="Tanggal penerimaan tidak boleh kosong" readonly>
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <label>Referensi Kode Pindah Cabang</label>
+                            <label>Kode Terima Dari Gudang</label>
                             <div class="form-group">
-                                <input type="text" name="referensi_id_pindah_gudang" class="form-control" readonly>
-                                <input type="hidden" name="id_pindah_gudang2"
-                                    value="{{ old('id_pindah_gudang2', $data ? $data->id_pindah_gudang2 : '') }}">
+                                <input type="text" name="kode_pindah_barang"
+                                    value="{{ old('kode_pindah_barang', $data ? $data->kode_pindah_barang : '') }}"
+                                    class="form-control" readonly placeholder="Otomatis">
+                                <input type="hidden" name="id_pindah_barang2"
+                                    value="{{ old('id_pindah_barang2', $data ? $data->id_pindah_barang2 : '') }}">
+                                <input type="hidden" name="keterangan_pindah_barang"
+                                    value="{{ old('keterangan_pindah_barang', $data ? $data->keterangan_pindah_barang : '') }}">
+                                <input name="id_jenis_transaksi" type="hidden"
+                                    value="{{ old('id_jenis_transaksi', $data ? $data->id_jenis_transaksi : '24') }}">
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <label>Kode Pindah Barang</label>
+                            <label>Cabang</label>
                             <div class="form-group">
-                                <input type="text" name="nama_pindah_gudang"
-                                    value="{{ old('nama_pindah_gudang', $data ? $data->nama_pindah_gudang : '') }}"
-                                    class="form-control" readonly placeholder="Otomatis">
+                                <input type="text" name="nama_cabang"
+                                    value="{{ old('nama_cabang', $data ? $data->cabang->nama_cabang : '') }}"
+                                    class="form-control" readonly>
+                                <input type="hidden" name="id_cabang"
+                                    value="{{ old('id_cabang', $data ? $data->id_cabang : '') }}">
+                                <input type="hidden" name="id_cabang2"
+                                    value="{{ old('id_cabang2', $data ? $data->id_cabang2 : '') }}">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label>Gudang</label>
+                            <div class="form-group">
+                                <input type="text" name="nama_gudang"
+                                    value="{{ old('nama_gudang', $data ? $data->gudang->nama_gudang : '') }}"
+                                    class="form-control" readonly>
+                                <input type="hidden" name="id_gudang"
+                                    value="{{ old('id_gudang', $data ? $data->id_gudang : '') }}">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label>Gudang Asal</label>
+                            <div class="form-group">
+                                <input type="text" name="nama_gudang2"
+                                    value="{{ old('nama_gudang2', $data ? $data->gudang2->nama_gudang : '') }}"
+                                    class="form-control" readonly>
+                                <input type="hidden" name="id_gudang2"
+                                    value="{{ old('id_gudang2', $data ? $data->id_gudang2 : '') }}">
                             </div>
                         </div>
                     </div>
@@ -147,15 +182,17 @@
                                     <th>Jumlah</th>
                                     <th>Batch</th>
                                     <th>Kadaluarsa</th>
-                                    <th>Action</th>
+                                    <th>Status</th>
                                 </tr>
                             </thead>
                         </table>
                     </div>
-                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                    <button class="btn btn-primary btn-flat pull-right" type="submit">
-                        <i class="glyphicon glyphicon-check"></i> Terima
-                    </button>
+                    @if (!$data)
+                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                        <button class="btn btn-primary btn-flat pull-right btn-sm" type="submit">
+                            <i class="glyphicon glyphicon-check"></i> Terima Semua Barang
+                        </button>
+                    @endif
                 </div>
             </div>
         </form>
@@ -176,26 +213,27 @@
 
 @section('externalScripts')
     <script>
-        // let branches = {!! $cabang !!};
-        // let oldDetails = {!! $data && $data->parent ? $data->parent->formatdetail : '[]' !!};
-        // let arrayQRCode = {!! $data ? $data->getDetailQRCode->pluck('qr_code') : '[]' !!};
+        let oldDetails = {!! $data && $data->parent ? $data->parent->formatdetail : '[]' !!};
+        let arrayQRCode = {!! $data ? $data->getDetailQRCode->pluck('qr_code') : '[]' !!};
         let details = []
         let html5QrcodeScanner = new Html5QrcodeScanner("reader", {
             fps: 10,
             qrbox: 250
         });
 
-        // for (let i = 0; i < oldDetails.length; i++) {
-        //     details.push(oldDetails[i])
-        //     if (arrayQRCode.includes(oldDetails[i]['qr_code'])) {
-        //         details[i]['status_diterima'] = 1
-        //     } else {
-        //         details[i]['id_pindah_barang_detail'] = 0
-        //         details[i]['status_diterima'] = 0
-        //     }
-        // }
+        html5QrcodeScanner.render(onScanSuccess, onScanError);
 
-        // $('[name="details"]').val(JSON.stringify(details))
+        for (let i = 0; i < oldDetails.length; i++) {
+            details.push(oldDetails[i])
+            if (arrayQRCode.includes(oldDetails[i]['qr_code'])) {
+                details[i]['status_diterima'] = 1
+            } else {
+                details[i]['id_pindah_barang_detail'] = 0
+                details[i]['status_diterima'] = 0
+            }
+        }
+
+        $('[name="details"]').val(JSON.stringify(details))
 
         var resDataTable = $('#table-detail').DataTable({
             data: details,
@@ -228,155 +266,16 @@
                 searchable: false,
                 render: function(data, type, row, meta) {
                     let btn = '';
-                    if (row.status_diterima == 1) {
-                        if (arrayQRCode.includes(row.qr_code)) {
-                            btn = '<i class="fa fa-check" aria-hidden="true"></i>';
-                        } else {
-                            btn = '<input name="checked_data" type="checkbox" checked>';
-                        }
+                    if (row.status_diterima == 1 && arrayQRCode.includes(row.qr_code)) {
+                        btn = '<label class="label label-success">Diterima</label>';
                     } else {
-                        btn = '<input name="checked_data" type="checkbox">';
+                        btn = '<label class="label label-default">Belum diterima</label>';
                     }
 
                     return btn;
                 }
             }, ]
         });
-
-        // $('.select2').select2()
-        // $('.datepicker').datepicker({
-        //     format: 'yyyy-mm-dd',
-        // });
-
-        // $('[name="id_cabang"]').select2({
-        //     data: [{
-        //         'id': '',
-        //         'text': 'Pilih Cabang'
-        //     }, ...branches]
-        // }).on('select2:select', function(e) {
-        //     let dataselect = e.params.data
-        //     getGudang(dataselect.id)
-        //     getCodePindahGudang(dataselect.id)
-        // });
-
-        // function getGudang(idCabang) {
-        //     $('#cover-spin').show()
-        //     $.ajax({
-        //         url: '{{ route('purchase-request-auto-werehouse') }}',
-        //         data: {
-        //             cabang: idCabang
-        //         },
-        //         success: function(res) {
-        //             $('[name="id_gudang"]').empty()
-        //             $('[name="id_gudang"]').select2({
-        //                 data: [{
-        //                     'id': "",
-        //                     'text': 'Pilih Gudang'
-        //                 }, ...res.data]
-        //             })
-
-        //             $('#cover-spin').hide()
-        //         },
-        //         error: function(error) {
-        //             console.log(error)
-        //             $('#cover-spin').hide()
-        //         }
-        //     })
-        // }
-
-        // function getCodePindahGudang(idCabang) {
-        //     $('#cover-spin').show()
-        //     $.ajax({
-        //         url: '{{ route('received_from_branch-code') }}',
-        //         data: {
-        //             cabang: idCabang
-        //         },
-        //         success: function(res) {
-        //             $('[name="kode_pindah_barang2"]').empty()
-        //             $('[name="kode_pindah_barang2"]').select2({
-        //                 data: [{
-        //                     'id': "",
-        //                     'text': 'Pilih Kode Pindah Gudang'
-        //                 }, ...res.data]
-        //             }).on('select2:select', function(e) {
-        //                 let dataselect = e.params.data
-        //                 $('[name="id_pindah_barang2"]').val(dataselect.id_pindah_barang)
-        //                 $('[name="transporter"]').val(dataselect.transporter)
-        //                 $('[name="nomor_polisi"]').val(dataselect.nomor_polisi)
-        //                 $('[name="keterangan_pindah_barang"]').val(dataselect.keterangan_pindah_barang)
-        //                 $('[name="nama_cabang_asal"]').val(dataselect.nama_cabang)
-        //                 $('[name="id_cabang_asal"]').val(dataselect.id_cabang)
-
-        //                 getDetailItem(dataselect.id_pindah_barang)
-        //             });
-
-        //             $('#cover-spin').hide()
-        //         },
-        //         error: function(error) {
-        //             console.log(error)
-        //             $('#cover-spin').hide()
-        //         }
-        //     })
-        // }
-
-        // function getDetailItem(id_pindah_barang) {
-        //     $('#cover-spin').show()
-        //     $.ajax({
-        //         url: '{{ route('received_from_branch-detail-item') }}',
-        //         data: {
-        //             id: id_pindah_barang
-        //         },
-        //         success: function(res) {
-        //             details = []
-        //             oldDetails = res.data
-        //             for (let i = 0; i < oldDetails.length; i++) {
-        //                 details.push(oldDetails[i])
-        //                 if (arrayQRCode.includes(oldDetails[i]['qr_code'])) {
-        //                     details[i]['status_diterima'] = 1
-        //                 } else {
-        //                     details[i]['id_pindah_barang_detail'] = 0
-        //                     details[i]['status_diterima'] = 0
-        //                 }
-        //             }
-
-        //             $('[name="details"]').val(JSON.stringify(details))
-        //             resDataTable.clear().rows.add(details).draw()
-        //             $('#cover-spin').hide()
-        //         },
-        //         error: function(error) {
-        //             console.log(error)
-        //             $('#cover-spin').hide()
-        //         }
-        //     })
-        // }
-
-        // $('body').on('change', '[name="checked_data"]', function() {
-        //     let index = $(this).parents('tr').index()
-        //     let detailSelect = details[index]
-        //     if ($(this).is(':checked')) {
-        //         detailSelect['status_diterima'] = 1
-        //     } else {
-        //         detailSelect['status_diterima'] = 0
-        //     }
-
-        //     details[index] = detailSelect
-        //     $('[name="details"]').val(JSON.stringify(details))
-        // })
-
-        // function validatorModal() {
-        //     let message = 'Lengkapi inputan yang diperlukan'
-        //     let valid = true
-        //     $('#modalEntry').find('.validate').each(function(i, v) {
-        //         if ($(v).val() == '') {
-        //             valid = false
-        //         }
-        //     })
-
-        //     return {
-        //         'status': valid,
-        //         'message': message
-        //     }
-        // }
 
         $('.btn-search').click(function() {
             let self = $('[name="search-qrcode"]').val()
@@ -393,19 +292,38 @@
                     qrcode: string
                 },
                 success: function(res) {
-                    // for (select in res.data) {
-                    //     $('[name="' + select + '"]').val(res.data[select])
-                    // }
-                    details = res.details
+                    details = []
+                    oldDetails = res.details
+                    for (let i = 0; i < oldDetails.length; i++) {
+                        details.push(oldDetails[i])
+                        if (arrayQRCode.includes(oldDetails[i]['qr_code'])) {
+                            details[i]['status_diterima'] = 1
+                        } else {
+                            details[i]['id_pindah_barang_detail'] = 0
+                            details[i]['status_diterima'] = 0
+                        }
+                    }
+
                     resDataTable.clear().rows.add(details).draw()
                     $('[name="details"]').val(JSON.stringify(details))
                     $('[name="search-qrcode"]').val('')
+                    $('[name="id_cabang"]').val(res.data.id_cabang2)
+                    $('[name="id_cabang2"]').val(res.data.id_cabang)
+                    $('[name="nama_cabang"]').val(res.data.cabang2.nama_cabang)
+                    $('[name="id_gudang"]').val(res.data.id_gudang2)
+                    $('[name="nama_gudang"]').val(res.data.gudang2.nama_gudang)
+                    $('[name="id_gudang2"]').val(res.data.id_gudang)
+                    $('[name="nama_gudang2"]').val(res.data.gudang.nama_gudang)
+                    $('[name="id_pindah_barang2"]').val(res.data.id_pindah_barang)
+                    $('[name="keterangan_pindah_barang"]').val(res.data.keterangan_pindah_barang)
                     $('#cover-spin').hide()
                 },
                 error: function(error) {
                     let textError = error.hasOwnProperty('responseJSON') ? error.responseJSON.message : error
                         .statusText
-                    $('#alertModal').text(textError).show()
+                    Swal.fire("Gagal Mengambil Data. ", textError, 'error')
+                    html5QrcodeScanner.render(onScanSuccess, onScanError);
+                    $('[name="search-qrcode"]').val('')
                     $('#cover-spin').hide()
                 }
             })

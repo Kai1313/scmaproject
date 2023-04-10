@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\MoveBranch;
 use DB;
 use Illuminate\Http\Request;
+use Log;
 use Yajra\DataTables\DataTables;
 
 class ReceivedFromWarehouseController extends Controller
@@ -84,45 +85,46 @@ class ReceivedFromWarehouseController extends Controller
 
     public function saveEntry(Request $request, $id = 0)
     {
+        // return $request->all();
         $data = MoveBranch::find($id);
-        // try {
-        //     DB::beginTransaction();
-        //     if (!$data) {
-        //         $data = new MoveWarehouse;
-        //     }
+        try {
+            DB::beginTransaction();
+            if (!$data) {
+                $data = new MoveBranch;
+            }
 
-        //     $data->fill($request->all());
-        //     if ($id == 0) {
-        //         $data->kode_pindah_barang = MoveWarehouse::createcode($request->id_cabang);
-        //         $data->status_pindah_barang = 1;
-        //         $data->type = 1;
-        //         $data->user_created = session()->get('user')['id_pengguna'];
-        //     } else {
-        //         $data->user_modified = session()->get('user')['id_pengguna'];
-        //     }
+            $data->fill($request->all());
+            if ($id == 0) {
+                $data->kode_pindah_barang = MoveBranch::createcodeGudang($request->id_cabang);
+                $data->status_pindah_barang = 1;
+                $data->type = 1;
+                $data->user_created = session()->get('user')['id_pengguna'];
+            } else {
+                $data->user_modified = session()->get('user')['id_pengguna'];
+            }
 
-        //     $data->save();
-        //     $data->saveDetails($request->details, 'in');
+            $data->save();
+            $data->saveDetails($request->details, 'in');
 
-        //     $parent = MoveWarehouse::find($data->id_pindah_barang2);
-        //     $parent->status_pindah_barang = 1;
-        //     $parent->save();
+            $parent = MoveBranch::find($data->id_pindah_barang2);
+            $parent->status_pindah_barang = 1;
+            $parent->save();
 
-        //     DB::commit();
-        //     return response()->json([
-        //         "result" => true,
-        //         "message" => "Data berhasil disimpan",
-        //         "redirect" => route('received_from_branch'),
-        //     ], 200);
-        // } catch (\Exception $e) {
-        //     DB::rollback();
-        //     Log::error("Error when save purchase request");
-        //     Log::error($e);
-        //     return response()->json([
-        //         "result" => false,
-        //         "message" => "Data gagal tersimpan",
-        //     ], 500);
-        // }
+            DB::commit();
+            return response()->json([
+                "result" => true,
+                "message" => "Data berhasil disimpan",
+                "redirect" => route('received_from_warehouse'),
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error("Error when save received from warehouse");
+            Log::error($e);
+            return response()->json([
+                "result" => false,
+                "message" => "Data gagal tersimpan",
+            ], 500);
+        }
     }
 
     public function viewData($id)
@@ -141,9 +143,25 @@ class ReceivedFromWarehouseController extends Controller
     public function autoQRCode(Request $request)
     {
         $data = MoveBranch::where('id_jenis_transaksi', 23)
+            ->with(['cabang', 'cabang2', 'gudang', 'gudang2'])
             ->where('type', 0)
             ->where('kode_pindah_barang', $request->qrcode)
+
             ->first();
+        if (!$data) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Kode tidak ditemukan',
+            ], 500);
+        }
+
+        if ($data && $data->status_pindah_barang == 1) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Pindah barang sudah diterima',
+            ], 500);
+        }
+
         return response()->json([
             'data' => $data,
             'details' => $data->formatdetail,

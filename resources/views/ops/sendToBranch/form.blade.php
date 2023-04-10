@@ -305,88 +305,6 @@
                                 <td id="tanggal_kadaluarsa" class="setData"></td>
                             </tr>
                         </table>
-                        {{-- <div class="row">
-                            <div class="col-xs-6">
-                                <label>QR Code</label>
-                                <div class="form-group">
-                                    <input type="text" name="qr_code" class="form-control" readonly>
-                                </div>
-                            </div>
-                            <div class="col-xs-6">
-                                <label>Nama Barang</label>
-                                <div class="form-group">
-                                    <input type="text" name="nama_barang" class="form-control" readonly>
-                                    <input type="hidden" name="id_barang">
-                                </div>
-                            </div>
-                            <div class="col-xs-4">
-                                <label>Satuan</label>
-                                <div class="form-group">
-                                    <input type="text" name="nama_satuan_barang" class="form-control" readonly>
-                                    <input type="hidden" name="id_satuan_barang">
-                                </div>
-                            </div>
-                            <div class="col-xs-4">
-                                <label>Jumlah</label>
-                                <div class="form-group">
-                                    <input type="text" name="qty" class="form-control handle-number-4" readonly>
-                                </div>
-                            </div>
-                            <div class="col-xs-4">
-                                <label>Jumlah Zak</label>
-                                <div class="form-group">
-                                    <input type="text" name="zak" class="form-control handle-number-4" readonly>
-                                    <input type="hidden" name="id_wrapper_zak">
-                                    <input type="hidden" name="weight_zak">
-                                </div>
-                            </div>
-                            <div class="col-xs-4">
-                                <label>SG</label>
-                                <div class="form-group">
-                                    <input type="text" name="sg" class="form-control handle-number-4" readonly>
-                                </div>
-                            </div>
-                            <div class="col-xs-4">
-                                <label>BE</label>
-                                <div class="form-group">
-                                    <input type="text" name="be" class="form-control handle-number-4" readonly>
-                                </div>
-                            </div>
-                            <div class="col-xs-4">
-                                <label>PH</label>
-                                <div class="form-group">
-                                    <input type="text" name="ph" class="form-control handle-number-4" readonly>
-                                </div>
-                            </div>
-                            <div class="col-xs-6">
-                                <label>Bentuk</label>
-                                <div class="form-group">
-                                    <input type="text" name="bentuk" class="form-control" readonly>
-                                </div>
-                            </div>
-                            <div class="col-xs-6">
-                                <label>Warna</label>
-                                <div class="form-group">
-                                    <input type="text" name="warna" class="form-control" readonly>
-                                </div>
-                            </div>
-                            <div class="col-xs-6">
-                                <label>Batch</label>
-                                <div class="form-group">
-                                    <input type="text" name="batch" class="form-control" readonly>
-                                </div>
-                            </div>
-                            <div class="col-xs-6">
-                                <label>Kadaluarsa</label>
-                                <div class="form-group">
-                                    <input type="text" name="tanggal_kadaluarsa" class="form-control" readonly>
-                                </div>
-                            </div>
-                        </div>
-                        <label>Keterangan</label>
-                        <div class="form-group">
-                            <textarea name="keterangan" rows="3" class="form-control" readonly></textarea>
-                        </div> --}}
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary cancel-entry btn-flat">Batal</button>
@@ -577,7 +495,7 @@
                 detailSelect[id] = $(v).text()
             })
 
-            console.log(detailSelect)
+            // console.log(detailSelect)
             // modal.find('input,textarea').each(function(i, v) {
             //     if ($(v).hasClass('handle-number-4')) {
             //         detailSelect[$(v).prop('name')] = normalizeNumber($(v).val())
@@ -652,7 +570,6 @@
                 'message': message
             }
         }
-
 
         $('.btn-search').click(function() {
             let self = $('[name="search-qrcode"]').val()

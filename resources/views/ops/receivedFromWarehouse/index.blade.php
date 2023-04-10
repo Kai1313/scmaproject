@@ -81,7 +81,7 @@
                         <thead>
                             <tr>
                                 <th>Tanggal</th>
-                                <th>Kode Pindah Gudang</th>
+                                <th>Kode Terima Dari Gudang</th>
                                 <th>Gudang</th>
                                 <th>Gudang Asal</th>
                                 <th>Keterangan</th>

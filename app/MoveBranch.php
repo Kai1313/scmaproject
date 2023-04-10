@@ -60,7 +60,7 @@ class MoveBranch extends Model
 
     public function gudang2()
     {
-        return $this->belongsTo(Gudang::class, 'id_gudang');
+        return $this->belongsTo(Gudang::class, 'id_gudang2');
     }
 
     public function details()
@@ -131,7 +131,7 @@ class MoveBranch extends Model
 
     public function savedetails($details, $type = 'in')
     {
-        $idJenisTransaksi = ($type == 'out') ? '21' : '22';
+        $idJenisTransaksi = $this->id_jenis_transaksi;
         $detail = json_decode($details);
         $ids = array_column($detail, 'id_pindah_barang_detail');
         $selectTrash = MoveBranchDetail::where('id_pindah_barang', $this->id_pindah_barang)
@@ -209,7 +209,7 @@ class MoveBranch extends Model
                     'nomor_kartu_stok' => $store->id_pindah_barang_detail,
                     'tanggal_kartu_stok' => date('Y-m-d'),
                     'debit_kartu_stok' => 0,
-                    'kredit_kartu_stok' => ($type == 'in' && $data->status_diterima == 1) ? '-' . $store->qty : $store->qty,
+                    'kredit_kartu_stok' => ($type == 'in' && in_array($idJenisTransaksi, [22, 24])) ? '-' . $store->qty : $store->qty,
                     'tanggal_kadaluarsa_kartu_stok' => $data->tanggal_kadaluarsa,
                     'mtotal_debit_kartu_stok' => 0,
                     'mtotal_kredit_kartu_stok' => 0,
