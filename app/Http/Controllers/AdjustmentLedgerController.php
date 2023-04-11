@@ -162,12 +162,33 @@ class AdjustmentLedgerController extends Controller
                             "message" => "Error when store Jurnal data on update saldo transaksi",
                         ]);
                     }
+                    if ($tolak) {
+                        // Cek if journal have another trx
+                        $jouDetail = JurnalDetail::where("id_jurnal", $trx_saldo->id_jurnal)->get();
+                        if ($jouDetail) {
+                            foreach ($jouDetail as $key => $detail) {
+                                if ($detail->id_transaksi != "") {
+                                    $trx_saldo_detail = TrxSaldo::where("id_transaksi", $detail->id_transaksi)->first();
+                                    if ($trx_saldo_detail) {
+                                        $update_trx_saldo_detail = $this->revertTrxSaldo($trx_saldo_detail, $detail->debet, $detail->credit);
+                                        if (!$update_trx_saldo_detail) {
+                                            DB::rollback();
+                                            return response()->json([
+                                                "result" => false,
+                                                "message" => "Error when update saldo trnasaksi piutang giro tolak on revert saldo transaksi",
+                                            ]);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
 
             DB::commit();
             return response()->json([
-                "result" => true,
+                "result" => FALSE,
                 "message" => "Successfully stored Jurnal data",
             ]);
         } catch (\Exception $e) {
@@ -442,6 +463,27 @@ class AdjustmentLedgerController extends Controller
                             "result" => false,
                             "message" => "Error when store Jurnal data on update saldo transaksi",
                         ]);
+                    }
+                    if ($tolak) {
+                        // Cek if journal have another trx
+                        $jouDetail = JurnalDetail::where("id_jurnal", $trx_saldo->id_jurnal)->get();
+                        if ($jouDetail) {
+                            foreach ($jouDetail as $key => $detail) {
+                                if ($detail->id_transaksi != "") {
+                                    $trx_saldo_detail = TrxSaldo::where("id_transaksi", $detail->id_transaksi)->first();
+                                    if ($trx_saldo_detail) {
+                                        $update_trx_saldo_detail = $this->revertTrxSaldo($trx_saldo_detail, $detail->debet, $detail->credit);
+                                        if (!$update_trx_saldo_detail) {
+                                            DB::rollback();
+                                            return response()->json([
+                                                "result" => false,
+                                                "message" => "Error when update saldo trnasaksi piutang giro tolak on revert saldo transaksi",
+                                            ]);
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -800,8 +842,11 @@ class AdjustmentLedgerController extends Controller
             $current_sisa = $trx->sisa;
             switch ($type) {
                 case 'Penjualan':
+                    Log::info("Debet ".$debet);
+                    Log::info("Kredit ".$kredit);
                     $trx_saldo->bayar = $current_bayar - $kredit;
                     $trx_saldo->sisa = $current_sisa + $kredit;
+                    Log::info(json_encode($trx_saldo));
                     break;
                 case 'Retur Penjualan':
                     $trx_saldo->bayar = $current_bayar - $debet;
