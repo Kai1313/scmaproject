@@ -219,16 +219,17 @@
                         <div class="form-group">
                             <input type="text" name="jumlah" class="form-control validate handle-number-4">
                             <input type="hidden" name="weight_zak">
+                            <input type="hidden" name="wrapper_weight">
                         </div>
                         <label>Timbangan</label>
                         <div class="form-group">
-                            <select name="id_timbangan" class="form-control">
-
+                            <select name="id_timbangan" class="form-control select2">
                             </select>
                         </div>
                         <label>Berat Barang</label>
                         <div class="form-group">
-                            <input type="text" name="weight" class="form-control">
+                            <input type="text" name="weight" class="form-control" readonly>
+                            <input type="hidden" name="max_weight">
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -255,6 +256,7 @@
 
 @section('externalScripts')
     <script>
+        let timbangan = {!! $timbangan !!}
         let details = {!! $data ? $data->formatdetail : '[]' !!};
         let detailSelect = []
         let count = details.length
@@ -274,8 +276,8 @@
             data: details,
             ordering: false,
             columns: [{
-                    data: 'qrcode',
-                    name: 'qrcode'
+                    data: 'kode_batang',
+                    name: 'kode_batang'
                 }, {
                     data: 'nama_barang',
                     name: 'nama_barang'
@@ -325,24 +327,6 @@
             ]
         });
 
-        // if ($('[name="id_cabang"]').val() == '') {
-        //     $('[name="id_gudang"]').prop('disabled', true)
-        // }
-
-        // $('.tag-qty').each(function(i, v) {
-        //     let num = $(v).text()
-        //     $(this).text(formatNumber(num))
-        // })
-
-        // $('[name="id_cabang"]').change(function() {
-        //     let self = $('[name="id_gudang"]')
-        //     if ($('[name="id_cabang"]').val() == '') {
-        //         self.val('').prop('disabled', true).trigger('change')
-        //     } else {
-        //         self.val('').prop('disabled', false).trigger('change')
-        //     }
-        // })
-
         $('[name="id_cabang"]').select2().on('select2:select', function(e) {
             let dataselect = e.params.data
             getGudang(dataselect.id)
@@ -372,60 +356,12 @@
             })
         }
 
-        // $('[name="id_barang"]').select2({
-        //     ajax: {
-        //         url: '{{ route('purchase-request-auto-item') }}',
-        //         dataType: 'json',
-        //         data: function(params) {
-        //             return {
-        //                 search: params.term
-        //             }
-        //         },
-        //         processResults: function(data) {
-        //             return {
-        //                 results: data.data
-        //             };
-        //         }
-        //     }
-        // }).on('select2:select', function(e) {
-        //     let dataselect = e.params.data
-        //     $('#modalEntry').find('[name="nama_barang"]').val(dataselect.text)
-        //     $('#modalEntry').find('[name="kode_barang"]').val(dataselect.kode_barang)
-        //     $('[name="id_satuan_barang"]').html('')
-        //     getSatuan(dataselect.id)
-
-        // });
-
-        // function getSatuan(id) {
-        //     $('#cover-spin').show()
-        //     $.ajax({
-        //         url: "{{ route('purchase-request-auto-satuan') }}?item=" + id + '&cabang=' + $(
-        //             '[name="id_cabang"]').val() + '&gudang=' + $('[name="id_gudang"]').val(),
-        //         type: 'get',
-        //         success: function(res) {
-        //             $('[name="id_satuan_barang"]').empty()
-        //             $('[name="id_satuan_barang"]').prop('disabled', false).select2({
-        //                 data: res.satuan
-        //             }).on('select2:select', function(e) {
-        //                 let dataselect = e.params.data
-        //                 $('#modalEntry').find('[name="nama_satuan_barang"]').val(dataselect.text)
-        //             });
-
-        //             if (res.satuan.length > 0) {
-        //                 $('[name="id_satuan_barang"]').val(res.satuan[0].id).trigger('change')
-        //                 $('#modalEntry').find('[name="nama_satuan_barang"]').val(res.satuan[0].text)
-        //             }
-
-        //             $('#message-stok').text(res.stok + ' ' + res.satuan_stok)
-        //             $('#modalEntry').find('[name="stok"]').val(res.stok)
-        //             $('#cover-spin').hide()
-        //         },
-        //         error: function(error) {
-        //             console.log(error)
-        //             $('#cover-spin').hide()
-        //         }
-        //     })
-        // }
+        $('[name="id_timbangan"]').select2({
+            data: timbangan
+        }).on('select2:select', function(e) {
+            let dataselect = e.params.data
+            $('#modalEntry').find('[name="weight"]').val(dataselect.value)
+        })
 
         $('.add-entry').click(function() {
             detailSelect = []
@@ -442,50 +378,53 @@
                 keyboard: false
             })
 
-            // $('[name="id_barang"]').select2('open')
             $('#message-stok').text('')
-
-            // $('.handle-number-4').each(function(i, v) {
-            //     let val = $(v).val().replace('.', ',')
-            //     $(v).val(formatRupiah(val, 4))
-            // })
             html5QrcodeScanner.render(onScanSuccess, onScanError);
         })
 
-        // $('.save-entry').click(function() {
-        //     let modal = $('#modalEntry')
-        //     let valid = validatorModal(modal.find('[name="id_barang"]').val())
-        //     if (!valid.status) {
-        //         $('#alertModal').text(valid.message).show()
-        //         return false
-        //     } else {
-        //         $('#alertModal').text('').hide()
-        //     }
+        $('#modalEntry').on('input', '[name="jumlah"]', function() {
+            let weightWrapper = $('[name="wrapper_weight"]').val()
+            let jumlah = $(this).val()
+            $('[name="weight_zak"]').val(jumlah * weightWrapper)
+        })
 
+        $('.save-entry').click(function() {
+            let modal = $('#modalEntry')
+            let valid = validatorModal(modal.find('[name="kode_batang"]').val())
+            if (!valid.status) {
+                $('#alertModal').text(valid.message).show()
+                return false
+            } else {
+                $('#alertModal').text('').hide()
+            }
 
-        //     modal.find('input,select,textarea').each(function(i, v) {
-        //         if ($(v).hasClass('handle-number-4')) {
-        //             detailSelect[$(v).prop('name')] = normalizeNumber($(v).val())
-        //         } else {
-        //             detailSelect[$(v).prop('name')] = $(v).val()
-        //         }
-        //     })
+            modal.find('input,select').each(function(i, v) {
+                if ($(v).hasClass('handle-number-4')) {
+                    detailSelect[$(v).prop('name')] = normalizeNumber($(v).val())
+                } else {
+                    detailSelect[$(v).prop('name')] = $(v).val()
+                }
+            })
 
-        //     let newObj = Object.assign({}, detailSelect)
-        //     if (statusModal == 'create') {
-        //         details.push(newObj)
-        //     } else if (statusModal == 'edit') {
-        //         details[newObj.index - 1] = newObj
-        //     }
+            detailSelect['tare'] = detailSelect['weight_zak']
+            detailSelect['nett'] = detailSelect['weight'] - detailSelect['tare']
 
-        //     $('[name="details"]').val(JSON.stringify(details))
+            let newObj = Object.assign({}, detailSelect)
+            if (statusModal == 'create') {
+                details.push(newObj)
+            } else if (statusModal == 'edit') {
+                details[newObj.index - 1] = newObj
+            }
 
-        //     statusModal = ''
-        //     detailSelect = []
+            console.log(details)
+            $('[name="details"]').val(JSON.stringify(details))
 
-        //     resDataTable.clear().rows.add(details).draw()
-        //     $('#modalEntry').modal('hide')
-        // })
+            statusModal = ''
+            detailSelect = []
+
+            resDataTable.clear().rows.add(details).draw()
+            $('#modalEntry').modal('hide')
+        })
 
         $('.cancel-entry').click(function() {
             $('#modalEntry').modal('hide')
@@ -559,6 +498,49 @@
         //     })
         // })
 
+        $('.btn-search').click(function() {
+            let self = $('[name="search-qrcode"]').val()
+            html5QrcodeScanner.clear();
+            searchAsset(self)
+        })
+
+        function searchAsset(string) {
+            $('#cover-spin').show()
+            $.ajax({
+                url: '{{ route('material_usage-qrcode') }}',
+                type: 'get',
+                data: {
+                    qrcode: string,
+                    id_cabang: $('[name="id_cabang"]').val(),
+                    id_gudang: $('[name="id_gudang"]').val()
+                },
+                success: function(res) {
+                    let modal = $('#modalEntry')
+                    let data = res.data
+                    for (let key in data) {
+                        modal.find('[name="' + key + '"]').val(data[key])
+                    }
+
+                    modal.find('[name="max_weight"]').val(data.sisa_master_qr_code)
+                    if (data.isweighed == 1) {
+                        modal.find('[name="weight"]').prop('readonly', true)
+                    } else {
+                        modal.find('[name="weight"]').prop('readonly', false)
+                    }
+
+                    $('#cover-spin').hide()
+                },
+                error: function(error) {
+                    let textError = error.hasOwnProperty('responseJSON') ? error.responseJSON.message : error
+                        .statusText
+                    Swal.fire("Gagal Mengambil Data. ", textError, 'error')
+                    html5QrcodeScanner.render(onScanSuccess, onScanError);
+                    $('[name="search-qrcode"]').val('')
+                    $('#cover-spin').hide()
+                }
+            })
+        }
+
         function validatorModal(id = 0) {
             let message = 'Lengkapi inputan yang diperlukan'
             let valid = true
@@ -567,10 +549,10 @@
                     valid = false
                 }
 
-                if ($(v).prop('name') == 'id_barang') {
-                    let findItem = details.filter(p => p.id_barang == $(v).val())
-                    if (findItem.length > 0 && findItem[0].id_barang == id && statusModal == 'create') {
-                        message = "Barang sudah ada"
+                if ($(v).prop('name') == 'kode_batang') {
+                    let findItem = details.filter(p => p.kode_batang == $(v).val())
+                    if (findItem.length > 0 && findItem[0].kode_batang == id && statusModal == 'create') {
+                        message = "QR Code sudah ada"
                         valid = false
                     }
                 }

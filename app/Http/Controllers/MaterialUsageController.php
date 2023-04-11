@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\MaterialUsage;
 use DB;
 use Illuminate\Http\Request;
+use Log;
 use Yajra\DataTables\DataTables;
 
 class MaterialUsageController extends Controller
@@ -61,11 +62,85 @@ class MaterialUsageController extends Controller
 
         $data = MaterialUsage::find($id);
         $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
+        $timbangan = DB::table('konfigurasi')->select('id_konfigurasi as id', 'nama_konfigurasi as text', 'keterangan_konfigurasi as value')
+            ->where('id_kategori_konfigurasi', 5)->get();
 
         return view('ops.materialUsage.form', [
             'data' => $data,
             'cabang' => $cabang,
             "pageTitle" => "SCA OPS | Pemakaian | " . ($id == 0 ? 'Create' : 'Edit'),
+            "timbangan" => $timbangan,
         ]);
+    }
+
+    public function saveEntry(Request $request, $id = 0)
+    {
+        $data = MaterialUsage::find($id);
+        try {
+            DB::beginTransaction();
+            if (!$data) {
+                $data = new MaterialUsage;
+            }
+
+            $data->fill($request->all());
+            if ($id == 0) {
+                $data->kode_pemakaian = MaterialUsage::createcode($request->id_cabang);
+                $data->user_created = session()->get('user')['id_pengguna'];
+            } else {
+                $data->user_modified = session()->get('user')['id_pengguna'];
+            }
+
+            $data->save();
+            $data->savedetails($request->details);
+
+            DB::commit();
+            return response()->json([
+                "result" => true,
+                "message" => "Data berhasil disimpan",
+                "redirect" => route('material_usage'),
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error("Error when save material usage");
+            Log::error($e);
+            return response()->json([
+                "result" => false,
+                "message" => "Data gagal tersimpan",
+            ], 500);
+        }
+    }
+
+    public function autoQRCode(Request $request)
+    {
+        $idCabang = $request->id_cabang;
+        $idGudang = $request->id_gudang;
+        $qrcode = $request->qrcode;
+
+        $data = DB::table('master_qr_code as mqc')
+            ->select(
+                'kode_batang_master_qr_code as kode_batang',
+                'nama_barang',
+                'mqc.id_barang',
+                'nama_satuan_barang',
+                'mqc.id_satuan_barang',
+                'sisa_master_qr_code',
+                'isweighed',
+                'master_wrapper.weight as wrapper_weight',
+                'id_wrapper_zak'
+            )
+            ->leftJoin('barang', 'mqc.id_barang', '=', 'barang.id_barang')
+            ->leftJoin('satuan_barang as sb', 'mqc.id_satuan_barang', '=', 'sb.id_satuan_barang')
+            ->leftJoin('master_wrapper', 'mqc.id_wrapper_zak', '=', 'master_wrapper.id_wrapper')
+            ->where('mqc.id_cabang', $idCabang)
+            ->where('mqc.id_gudang', $idGudang)
+            ->where('kode_batang_master_qr_code', $qrcode)->first();
+        return response()->json([
+            'data' => $data,
+        ]);
+    }
+
+    public function reloadWeight($id)
+    {
+        // $data = DB::table('konfigurasi')->where()
     }
 }
