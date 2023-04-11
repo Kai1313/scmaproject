@@ -188,7 +188,7 @@ class AdjustmentLedgerController extends Controller
 
             DB::commit();
             return response()->json([
-                "result" => FALSE,
+                "result" => true,
                 "message" => "Successfully stored Jurnal data",
             ]);
         } catch (\Exception $e) {
