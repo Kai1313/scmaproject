@@ -842,11 +842,8 @@ class AdjustmentLedgerController extends Controller
             $current_sisa = $trx->sisa;
             switch ($type) {
                 case 'Penjualan':
-                    Log::info("Debet ".$debet);
-                    Log::info("Kredit ".$kredit);
                     $trx_saldo->bayar = $current_bayar - $kredit;
                     $trx_saldo->sisa = $current_sisa + $kredit;
-                    Log::info(json_encode($trx_saldo));
                     break;
                 case 'Retur Penjualan':
                     $trx_saldo->bayar = $current_bayar - $debet;
