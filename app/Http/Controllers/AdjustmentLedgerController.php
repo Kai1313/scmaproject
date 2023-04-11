@@ -394,10 +394,13 @@ class AdjustmentLedgerController extends Controller
             // Update saldo transaksi before delete
             $old_details = JurnalDetail::where("id_jurnal", $journalID)->get();
             foreach ($old_details as $key => $detail) {
+                $tolak = (str_contains($detail->keterangan, "GIRO-TOLAK"))?TRUE:FALSE;
                 $debet = $detail->debet;
                 $kredit = $detail->credit;
                 $trx_saldo = TrxSaldo::where("id_transaksi", $detail->id_transaksi)->first();
                 if ($trx_saldo) {
+                    Log::info("Masuk sini2");
+                    Log::info(json_encode($trx_saldo));
                     $update_trx_saldo = $this->revertTrxSaldo($trx_saldo, $debet, $kredit);
                     if (!$update_trx_saldo) {
                         DB::rollback();
@@ -405,6 +408,27 @@ class AdjustmentLedgerController extends Controller
                             "result" => false,
                             "message" => "Error when store Jurnal data on revert saldo transaksi",
                         ]);
+                    }
+                }
+                if ($tolak) {
+                    // Cek if journal have another trx
+                    $jouDetail = JurnalDetail::where("id_jurnal", $journalID)->get();
+                    if ($jouDetail) {
+                        foreach ($jouDetail as $key => $detail) {
+                            if ($detail->id_transaksi != "" && !str_contains($detail->keterangan, "GIRO-TOLAK")) {
+                                $trx_saldo_detail = TrxSaldo::where("id_transaksi", $detail->id_transaksi)->first();
+                                if ($trx_saldo_detail) {
+                                    $update_trx_saldo_detail = $this->updateTrxSaldo($trx_saldo_detail, $detail->credit, $detail->debet);
+                                    if (!$update_trx_saldo_detail) {
+                                        DB::rollback();
+                                        return response()->json([
+                                            "result" => false,
+                                            "message" => "Error when update saldo trnasaksi piutang giro tolak on revert saldo transaksi",
+                                        ]);
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -490,7 +514,7 @@ class AdjustmentLedgerController extends Controller
 
             DB::commit();
             return response()->json([
-                "result" => true,
+                "result" => TRUE,
                 "message" => "Successfully stored Jurnal data",
             ]);
         } catch (\Exception $e) {
