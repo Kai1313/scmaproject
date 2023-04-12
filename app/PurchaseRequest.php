@@ -40,9 +40,14 @@ class PurchaseRequest extends Model
 
     public function formatdetail()
     {
+        // $arrayCabang = [
+        //     '1' => [1, 2, 3, 4],
+        //     '2' => [5, 7, 8],
+        // ];
+
         $arrayCabang = [
-            '1' => [1, 2, 3, 4],
-            '2' => [5, 7, 8],
+            '1' => [1],
+            '2' => [5],
         ];
 
         $gudang = $arrayCabang[$this->id_cabang];

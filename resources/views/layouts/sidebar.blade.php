@@ -442,6 +442,13 @@
                                             </a>
                                         </li>
                                     @endif
+                                    @if (checkAccessMenu('qc_per_qr_code'))
+                                        <li data-alias="qc_per_qr_code">
+                                            <a href="{{ env('OLD_URL_ROOT') }}#qc_per_qr_code">
+                                                <i class="glyphicon glyphicon-option-vertical"></i>QC Per QR Code (QCP)
+                                            </a>
+                                        </li>
+                                    @endif
                                     @if (checkAccessMenu('pembelian_invoice'))
                                         <li data-alias="pembelian_invoice">
                                             <a href="{{ env('OLD_URL_ROOT') }}#pembelian_invoice">
@@ -616,6 +623,20 @@
                                         <li data-alias="produksi2">
                                             <a href="{{ env('OLD_URL_ROOT') }}#produksi2">
                                                 <i class="glyphicon glyphicon-option-vertical"></i>Produksi (Qnt)
+                                            </a>
+                                        </li>
+                                    @endif
+                                    @if (checkAccessMenu('cc_produksi'))
+                                        <li data-alias="cc_produksi">
+                                            <a href="{{ env('OLD_URL_ROOT') }}#cc_produksi">
+                                                <i class="glyphicon glyphicon-option-vertical"></i>CC Produksi
+                                            </a>
+                                        </li>
+                                    @endif
+                                    @if (checkAccessMenu('produksi_timbang_akhir'))
+                                        <li data-alias="produksi_timbang_akhir">
+                                            <a href="{{ env('OLD_URL_ROOT') }}#produksi_timbang_akhir">
+                                                <i class="glyphicon glyphicon-option-vertical"></i>Timbang Akhir
                                             </a>
                                         </li>
                                     @endif

@@ -110,6 +110,19 @@ class MaterialUsageController extends Controller
         }
     }
 
+    public function viewData($id)
+    {
+        if (checkAccessMenu('pemakaian_header', 'show') == false) {
+            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+        }
+
+        $data = MaterialUsage::find($id);
+        return view('ops.materialUsage.detail', [
+            'data' => $data,
+            "pageTitle" => "SCA OPS | Pemakaian | Detail",
+        ]);
+    }
+
     public function autoQRCode(Request $request)
     {
         $idCabang = $request->id_cabang;
@@ -139,8 +152,20 @@ class MaterialUsageController extends Controller
         ]);
     }
 
-    public function reloadWeight($id)
+    public function reloadWeight(Request $request)
     {
-        // $data = DB::table('konfigurasi')->where()
+        $id = $request->id;
+        $value = 0;
+        $data = DB::table('konfigurasi')
+            ->where('id_kategori_konfigurasi', 5)
+            ->where('id_konfigurasi', $id)
+            ->value('keterangan_konfigurasi');
+        if ($data) {
+            $value = $data;
+        }
+
+        return response()->json([
+            'data' => $value,
+        ], 200);
     }
 }

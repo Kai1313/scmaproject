@@ -258,9 +258,13 @@ class PurchaseRequestController extends Controller
         $messageStock = '0';
         $messageSatuanStok = '';
         if ($cabang) {
+            // $arrayCabang = [
+            //     '1' => [1, 2, 3, 4],
+            //     '2' => [5, 7, 8],
+            // ];
             $arrayCabang = [
-                '1' => [1, 2, 3, 4],
-                '2' => [5, 7, 8],
+                '1' => [1],
+                '2' => [5],
             ];
 
             $gudang = $arrayCabang[$cabang];

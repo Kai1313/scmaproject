@@ -17,6 +17,7 @@ class MaterialUsageDetail extends Model
         'id_satuan_barang',
         'jumlah',
         'weight',
+        'jumlah_zak',
         'weight_zak',
     ];
 

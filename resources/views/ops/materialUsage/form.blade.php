@@ -57,12 +57,12 @@
 @section('header')
     <section class="content-header">
         <h1>
-            Permintaan Pembelian
+            Pemakaian
             <small>| {{ $data ? 'Edit' : 'Tambah' }}</small>
         </h1>
         <ol class="breadcrumb">
             <li><a href="#"><i class="fa fa-dashboard"></i> Dashboard</a></li>
-            <li><a href="{{ route('purchase-request') }}">Permintaan Pembelian</a></li>
+            <li><a href="{{ route('material_usage') }}">Pemakaian</a></li>
             <li class="active">Form</li>
         </ol>
     </section>
@@ -165,11 +165,11 @@
                                     <th>Kode</th>
                                     <th>Nama Barang</th>
                                     <th>Satuan</th>
-                                    <th>Jumlah Zak</th>
                                     <th>Gross</th>
+                                    <th>Jumlah Zak</th>
                                     <th>Tare</th>
                                     <th>Nett</th>
-                                    <th style="width:150px;">Action</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                         </table>
@@ -189,11 +189,12 @@
                         <div class="alert alert-danger" style="display:none;" id="alertModal">
                         </div>
                         <input type="hidden" name="index" value="0">
+                        {{-- <input type="hidden" name="id_pemakaian_detail" value="0"> --}}
                         <div id="reader"></div>
                         <div class="form-group">
                             <div class="input-group">
                                 <input type="text" name="search-qrcode" class="form-control"
-                                    placeholder="Scan QRCode">
+                                    placeholder="Scan QRCode" autocomplete="off">
                                 <div class="input-group-btn">
                                     <button class="btn btn-info btn-search btn-flat" type="button">
                                         <i class="fa fa-search"></i>
@@ -201,35 +202,38 @@
                                 </div>
                             </div>
                         </div>
-                        <label>QR Code <span>*</span></label>
+                        <label>QR Code</label>
                         <div class="form-group">
                             <input type="text" name="kode_batang" class="validate form-control" readonly>
                         </div>
-                        <label>Nama Barang <span>*</span></label>
+                        <label>Nama Barang</label>
                         <div class="form-group">
                             <input type="text" name="nama_barang" class="validate form-control" readonly>
                             <input type="hidden" name="id_barang" class="validate">
                         </div>
-                        <label>Satuan <span>*</span></label>
+                        <label>Satuan</label>
                         <div class="form-group">
                             <input type="text" name="nama_satuan_barang" class="validate form-control" readonly>
                             <input type="hidden" name="id_satuan_barang" class="validate">
                         </div>
-                        <label>Jumlah Zak<span>*</span></label>
+                        <label>Jumlah Zak <span>*</span></label>
                         <div class="form-group">
-                            <input type="text" name="jumlah" class="form-control validate handle-number-4">
-                            <input type="hidden" name="weight_zak">
-                            <input type="hidden" name="wrapper_weight">
+                            <input type="text" name="jumlah_zak" class="form-control validate handle-number-4"
+                                autocomplete="off">
+                            <input type="hidden" name="weight_zak" class="validate">
+                            <input type="hidden" name="wrapper_weight" class="validate">
                         </div>
-                        <label>Timbangan</label>
+                        <label id="label-timbangan">Timbangan</label>
                         <div class="form-group">
                             <select name="id_timbangan" class="form-control select2">
                             </select>
                         </div>
-                        <label>Berat Barang</label>
+                        <label id="label-berat">Berat Barang</label>
                         <div class="form-group">
-                            <input type="text" name="weight" class="form-control" readonly>
-                            <input type="hidden" name="max_weight">
+                            <input type="text" name="jumlah" class="form-control handle-number-4"
+                                autocomplete="off">
+                            <input type="hidden" name="max_weight" class="validate">
+                            <label id="alertWeight" style="display:none;color:red;"></label>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -258,9 +262,11 @@
     <script>
         let timbangan = {!! $timbangan !!}
         let details = {!! $data ? $data->formatdetail : '[]' !!};
+        console.log(details)
         let detailSelect = []
         let count = details.length
         let statusModal = 'create'
+        let intervalReloadTimbangan = ''
         let html5QrcodeScanner = new Html5QrcodeScanner("reader", {
             fps: 10,
             qrbox: 250
@@ -271,60 +277,59 @@
         });
 
         $('.select2').select2()
-
         var resDataTable = $('#table-detail').DataTable({
             data: details,
             ordering: false,
             columns: [{
-                    data: 'kode_batang',
-                    name: 'kode_batang'
-                }, {
-                    data: 'nama_barang',
-                    name: 'nama_barang'
-                }, {
-                    data: 'nama_satuan_barang',
-                    name: 'nama_satuan_barang'
-                }, {
-                    data: 'jumlah',
-                    name: 'jumlah',
-                    render: $.fn.dataTable.render.number('.', ',', 0),
-                    className: 'text-right'
-                }, {
-                    data: 'weight',
-                    name: 'weight',
-                    render: $.fn.dataTable.render.number('.', ',', 4),
-                    className: 'text-right'
-                },
-                {
-                    data: 'tare',
-                    name: 'tare',
-                    render: $.fn.dataTable.render.number('.', ',', 4),
-                    className: 'text-right'
-                },
-                {
-                    data: 'nett',
-                    name: 'nett',
-                    render: $.fn.dataTable.render.number('.', ',', 4),
-                    className: 'text-right'
-                },
-                {
-                    data: 'index',
-                    className: 'text-center',
-                    name: 'index',
-                    searchable: false,
-                    render: function(data, type, row, meta) {
-                        let btn = '<ul class="horizontal-list">';
-                        btn +=
-                            '<li><a href="javascript:void(0)" data-index="' + data +
-                            '" class="btn btn-warning btn-xs mr-1 mb-1 edit-entry"><i class="glyphicon glyphicon-pencil"></i></a></li>';
+                data: 'kode_batang',
+                name: 'kode_batang'
+            }, {
+                data: 'nama_barang',
+                name: 'nama_barang'
+            }, {
+                data: 'nama_satuan_barang',
+                name: 'nama_satuan_barang'
+            }, {
+                data: 'jumlah',
+                name: 'jumlah',
+                render: $.fn.dataTable.render.number('.', ',', 4),
+                className: 'text-right'
+            }, {
+                data: 'jumlah_zak',
+                name: 'jumlah_zak',
+                render: $.fn.dataTable.render.number('.', ',', 4),
+                className: 'text-right'
+            }, {
+                data: 'tare',
+                name: 'tare',
+                render: $.fn.dataTable.render.number('.', ',', 4),
+                className: 'text-right'
+            }, {
+                data: 'nett',
+                name: 'nett',
+                render: $.fn.dataTable.render.number('.', ',', 4),
+                className: 'text-right'
+            }, {
+                data: 'index',
+                className: 'text-center',
+                name: 'index',
+                searchable: false,
+                render: function(data, type, row, meta) {
+                    let btn = ''
+                    if (!row.hasOwnProperty('id_pemakaian')) {
+                        btn += '<ul class="horizontal-list">';
+                        // btn +=
+                        //     '<li><a href="javascript:void(0)" data-index="' + data +
+                        //     '" class="btn btn-warning btn-xs mr-1 mb-1 edit-entry"><i class="glyphicon glyphicon-pencil"></i></a></li>';
                         btn +=
                             '<li><a href="javascript:void(0)" data-index="' + data +
                             '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1 delete-entry"><i class="glyphicon glyphicon-trash"></i></a></li>';
                         btn += '</ul>';
-                        return btn;
                     }
-                },
-            ]
+
+                    return btn;
+                }
+            }, ]
         });
 
         $('[name="id_cabang"]').select2().on('select2:select', function(e) {
@@ -360,8 +365,32 @@
             data: timbangan
         }).on('select2:select', function(e) {
             let dataselect = e.params.data
-            $('#modalEntry').find('[name="weight"]').val(dataselect.value)
+            let beratTimbangan = dataselect.value
+            let beratMax = $('[name="max_weight"]').val()
+            if (parseFloat(beratTimbangan) > parseFloat(beratMax)) {
+                $('#alertWeight').text('Berat melebihi stok').show()
+            } else {
+                $('#alertWeight').text('').hide()
+            }
+
+            intervalReloadTimbangan = setInterval(reloadTimbangan, 2000)
+            $('#modalEntry').find('[name="jumlah"]').val(formatNumber(dataselect.value))
         })
+
+        function reloadTimbangan() {
+            $.ajax({
+                url: '{{ route('material_usage-reload-weight') }}',
+                data: {
+                    id: $('[name="id_timbangan"]').val()
+                },
+                success: function(res) {
+                    $('#modalEntry').find('[name="jumlah"]').val(formatNumber(res.data))
+                },
+                error: function(error) {
+                    console.log(error)
+                }
+            })
+        }
 
         $('.add-entry').click(function() {
             detailSelect = []
@@ -373,16 +402,21 @@
             statusModal = 'create'
             count += 1
             $('#modalEntry').find('[name="index"]').val(count)
+            // $('#modalEntry').find('[name="id_pemakaian_detail"]').val(0)
             $('#modalEntry').modal({
                 backdrop: 'static',
                 keyboard: false
             })
 
             $('#message-stok').text('')
+            $('#label-timbangan').html('Timbangan')
+            $('#label-berat').html('Berat Barang')
+            $('[name="jumlah_zak"]').val(0)
+            $('[name="weight_zak"]').val(0)
             html5QrcodeScanner.render(onScanSuccess, onScanError);
         })
 
-        $('#modalEntry').on('input', '[name="jumlah"]', function() {
+        $('#modalEntry').on('input', '[name="jumlah_zak"]', function() {
             let weightWrapper = $('[name="wrapper_weight"]').val()
             let jumlah = $(this).val()
             $('[name="weight_zak"]').val(jumlah * weightWrapper)
@@ -407,7 +441,7 @@
             })
 
             detailSelect['tare'] = detailSelect['weight_zak']
-            detailSelect['nett'] = detailSelect['weight'] - detailSelect['tare']
+            detailSelect['nett'] = detailSelect['jumlah'] - detailSelect['tare']
 
             let newObj = Object.assign({}, detailSelect)
             if (statusModal == 'create') {
@@ -416,22 +450,25 @@
                 details[newObj.index - 1] = newObj
             }
 
-            console.log(details)
             $('[name="details"]').val(JSON.stringify(details))
+            console.log(details)
 
             statusModal = ''
             detailSelect = []
 
             resDataTable.clear().rows.add(details).draw()
+            clearInterval(intervalReloadTimbangan);
             $('#modalEntry').modal('hide')
         })
 
         $('.cancel-entry').click(function() {
-            $('#modalEntry').modal('hide')
             html5QrcodeScanner.clear();
+            clearInterval(intervalReloadTimbangan);
             if (statusModal == 'create') {
                 count -= 1
             }
+
+            $('#modalEntry').modal('hide')
         })
 
         // $('body').on('click', '.edit-entry', function() {
@@ -469,34 +506,34 @@
         //     })
         // })
 
-        // $('body').on('click', '.delete-entry', function() {
-        //     let index = $(this).parents('tr').index()
-        //     Swal.fire({
-        //         title: 'Anda yakin ingin menghapus data ini?',
-        //         icon: 'info',
-        //         showDenyButton: true,
-        //         confirmButtonText: 'Yes',
-        //         denyButtonText: 'No',
-        //         reverseButtons: true,
-        //         customClass: {
-        //             actions: 'my-actions',
-        //             confirmButton: 'order-1',
-        //             denyButton: 'order-3',
-        //         }
-        //     }).then((result) => {
-        //         if (result.isConfirmed) {
-        //             details.splice(index, 1)
-        //             count -= 1
+        $('body').on('click', '.delete-entry', function() {
+            let index = $(this).parents('tr').index()
+            Swal.fire({
+                title: 'Anda yakin ingin menghapus data ini?',
+                icon: 'info',
+                showDenyButton: true,
+                confirmButtonText: 'Yes',
+                denyButtonText: 'No',
+                reverseButtons: true,
+                customClass: {
+                    actions: 'my-actions',
+                    confirmButton: 'order-1',
+                    denyButton: 'order-3',
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    details.splice(index, 1)
+                    count -= 1
 
-        //             for (let i = 0; i < details.length; i++) {
-        //                 details[i].index = i + 1
-        //             }
+                    for (let i = 0; i < details.length; i++) {
+                        details[i].index = i + 1
+                    }
 
-        //             resDataTable.clear().rows.add(details).draw()
-        //             $('[name="details"]').val(JSON.stringify(details))
-        //         }
-        //     })
-        // })
+                    resDataTable.clear().rows.add(details).draw()
+                    $('[name="details"]').val(JSON.stringify(details))
+                }
+            })
+        })
 
         $('.btn-search').click(function() {
             let self = $('[name="search-qrcode"]').val()
@@ -523,9 +560,13 @@
 
                     modal.find('[name="max_weight"]').val(data.sisa_master_qr_code)
                     if (data.isweighed == 1) {
-                        modal.find('[name="weight"]').prop('readonly', true)
+                        modal.find('[name="jumlah"]').prop('readonly', true).removeClass('validate')
+                        modal.find('[name="id_timbangan"]').prop('disabled', false).addClass('validate')
+                        $('#label-timbangan').html('Timbangan <span>*</span>')
                     } else {
-                        modal.find('[name="weight"]').prop('readonly', false)
+                        modal.find('[name="jumlah"]').prop('readonly', false).addClass('validate')
+                        modal.find('[name="id_timbangan"]').prop('disabled', true).removeClass('validate')
+                        $('#label-berat').html('Berat barang <span>*</span>')
                     }
 
                     $('#cover-spin').hide()
