@@ -936,8 +936,8 @@
                     break;
                 case "hutang_giro_tolak":
                     let table_hutang_giro_tolak = $('#table_hutang_giro_tolak')
-                    let countChecked = $('.dt-checkboxes:checked', table_hutang_giro_tolak).length
-                    if (countChecked == 1) {
+                    let countChecked2 = $('.dt-checkboxes:checked', table_hutang_giro_tolak).length
+                    if (countChecked2 == 1) {
                         $('.dt-checkboxes:checked', table_hutang_giro_tolak).each(function() {
                             // Init data from row
                             let trx_id = $(this).closest('tr').find('.transaction-id').val()
