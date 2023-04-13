@@ -2136,6 +2136,10 @@ class ApiController extends Controller
                     return FALSE;
                 }
 
+                if(!empty($jurnal_header)){
+                    JurnalDetail::where('id_jurnal', $jurnal_header->id_jurnal)->delete();
+                }
+
                 // Detail
                 $index = 1;
                 $total_debet = 0;
@@ -2360,17 +2364,6 @@ class ApiController extends Controller
                                     ->where('produksi_detail.id_produksi', $production_id)
                                     ->get();
 
-        // update beban biaya dari tiap produksi detail yang ada pada master qr
-        foreach($data_production_detail as $detail){
-            DB::table("master_qr_code")
-            ->where('id_barang', $detail->id_barang)
-            ->where('kode_batang_master_qr_code', $detail->kode_batang_lama_produksi_detail)
-            ->update([
-                'listrik_master_qr_code' => $beban_listrik,
-                'pegawai_master_qr_code' => $beban_pegawai,
-            ]);
-        }
-
         // data return biaya listrik dan pegawai
         $data = [
             'biaya_listrik' => $biaya_listrik,
@@ -2452,9 +2445,12 @@ class ApiController extends Controller
 
     public function journalHpp(Request $request){
         DB::beginTransaction();
-        $id_produksi = $request->no_transaksi;
+        $no_transaksi = $request->no_transaksi;
         $id_cabang = $request->id_cabang;
         $void = $request->void;
+
+        $data_produksi = DB::table('produksi')->where('nama_produksi', $no_transaksi)->first();
+        $id_produksi = $data_produksi->id_produksi;
 
         // tahap 1
         $data_production_supplies = $this->productionSupplies($id_produksi);
