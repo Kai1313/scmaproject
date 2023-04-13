@@ -147,9 +147,16 @@ class MaterialUsageController extends Controller
             ->where('mqc.id_cabang', $idCabang)
             ->where('mqc.id_gudang', $idGudang)
             ->where('kode_batang_master_qr_code', $qrcode)->first();
+        if (!$data) {
+            return response()->json([
+                'message' => 'Barang tidak ditemukan',
+                'status' => 'error',
+            ], 500);
+        }
+
         return response()->json([
             'data' => $data,
-        ]);
+        ], 200);
     }
 
     public function reloadWeight(Request $request)

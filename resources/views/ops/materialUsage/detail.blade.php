@@ -7,6 +7,10 @@
         th {
             text-align: center;
         }
+
+        tfoot>tr>td {
+            font-weight: bold;
+        }
     </style>
 @endsection
 

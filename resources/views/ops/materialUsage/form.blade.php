@@ -51,6 +51,10 @@
         .handle-number-4 {
             text-align: right;
         }
+
+        tfoot>tr>td {
+            font-weight: bold;
+        }
     </style>
 @endsection
 
