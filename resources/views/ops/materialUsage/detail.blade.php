@@ -143,7 +143,33 @@
                 name: 'nett',
                 render: $.fn.dataTable.render.number('.', ',', 4),
                 className: 'text-right'
-            }, ]
+            }],
+            initComplete: function(settings, json) {
+                sumDetail()
+            }
         });
+
+        function sumDetail() {
+            let totalJumlah = 0;
+            let totalJumlahZak = 0;
+            let totalTare = 0;
+            let totalNett = 0;
+            for (let i = 0; i < details.length; i++) {
+                totalJumlah += parseFloat(details[i].jumlah)
+                totalJumlahZak += parseFloat(details[i].jumlah_zak)
+                totalTare += parseFloat(details[i].tare)
+                totalNett += parseFloat(details[i].nett)
+            }
+
+            $('#table-detail tbody').after(
+                '<tfoot><tr>' +
+                '<td colspan="3" class="text-left"><b>Total</b></td>' +
+                '<td class="text-right">' + formatNumber(totalJumlah) + '</td>' +
+                '<td class="text-right">' + formatNumber(totalJumlahZak) + '</td>' +
+                '<td class="text-right">' + formatNumber(totalTare) + '</td>' +
+                '<td class="text-right">' + formatNumber(totalNett) + '</td>' +
+                '</tr></tfoot>'
+            );
+        }
     </script>
 @endsection
