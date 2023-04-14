@@ -248,4 +248,17 @@ class MoveBranch extends Model
 
         return ['status' => 'success'];
     }
+
+    public function saveChangeStatusFromParent()
+    {
+        $details = MoveBranchDetail::where('id_pindah_barang', $this->id_pindah_barang)->get();
+        foreach ($details as $detail) {
+            $detail->status_diterima = 1;
+            $detail->save();
+        }
+
+        return response()->json([
+            'status' => 'success',
+        ]);
+    }
 }

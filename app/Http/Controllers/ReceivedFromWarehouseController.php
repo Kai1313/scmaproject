@@ -99,6 +99,7 @@ class ReceivedFromWarehouseController extends Controller
             $parent = MoveBranch::find($data->id_pindah_barang2);
             $parent->status_pindah_barang = 1;
             $parent->save();
+            $parent->saveChangeStatusFromParent();
 
             DB::commit();
             return response()->json([

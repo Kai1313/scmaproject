@@ -53,7 +53,7 @@
         }
 
         #reader {
-            width: 50%;
+            width: 100%;
         }
 
         @media only screen and (max-width: 412px) {
@@ -213,15 +213,13 @@
             <div class="modal-dialog modal-sm" role="document">
                 <div class="modal-content">
                     <div class="modal-body">
-                        <div class="alert alert-danger" style="display:none;" id="alertModal">
-                        </div>
                         <center>
                             <div id="reader"></div>
                         </center>
                         <div class="form-group">
                             <div class="input-group">
                                 <input type="text" name="search-qrcode" class="form-control"
-                                    placeholder="QRCode barang">
+                                    placeholder="QRCode barang" autocomplete="off">
                                 <div class="input-group-btn">
                                     <button class="btn btn-info btn-search btn-flat">
                                         <i class="fa fa-search"></i>
@@ -466,7 +464,10 @@
                 $(v).val('').trigger('change')
             })
 
-            $('#alertModal').text('').hide()
+            $('#modalEntry').find('.setData').each(function(i, v) {
+                $(v).text('')
+            })
+
             statusModal = 'create'
             $('#modalEntry').modal({
                 backdrop: 'static',
@@ -482,27 +483,16 @@
 
         $('.save-entry').click(function() {
             let modal = $('#modalEntry')
-            let valid = validatorModal(modal.find('[name="id_barang"]').val())
+            let valid = validatorModal($('#qr_code').text())
             if (!valid.status) {
-                $('#alertModal').text(valid.message).show()
+                Swal.fire("Gagal proses data. ", valid.message, 'error')
                 return false
-            } else {
-                $('#alertModal').text('').hide()
             }
 
             modal.find('.setData').each(function(i, v) {
                 let id = $(v).prop('id')
                 detailSelect[id] = $(v).text()
             })
-
-            // console.log(detailSelect)
-            // modal.find('input,textarea').each(function(i, v) {
-            //     if ($(v).hasClass('handle-number-4')) {
-            //         detailSelect[$(v).prop('name')] = normalizeNumber($(v).val())
-            //     } else {
-            //         detailSelect[$(v).prop('name')] = $(v).val()
-            //     }
-            // })
 
             let newObj = Object.assign({}, detailSelect)
             if (statusModal == 'create') {
@@ -548,22 +538,14 @@
             })
         })
 
-        function validatorModal() {
+        function validatorModal(id = 0) {
             let message = 'Lengkapi inputan yang diperlukan'
             let valid = true
-            $('#modalEntry').find('.validate').each(function(i, v) {
-                if ($(v).val() == '') {
-                    valid = false
-                }
-
-                if ($(v).prop('name') == 'qr_code') {
-                    let findItem = details.filter(p => p.kode_batang_lama_pindah_gudang_detail == $(v).val())
-                    if (findItem.length > 0 && findItem[0].id_barang == id && statusModal == 'create') {
-                        message = "Barang sudah ada"
-                        valid = false
-                    }
-                }
-            })
+            let findItem = details.filter(p => p.qr_code == id)
+            if (findItem.length > 0 && findItem[0].qr_code == id && statusModal == 'create') {
+                message = "Barang sudah ada"
+                valid = false
+            }
 
             return {
                 'status': valid,
@@ -597,7 +579,7 @@
                 error: function(error) {
                     let textError = error.hasOwnProperty('responseJSON') ? error.responseJSON.message : error
                         .statusText
-                    $('#alertModal').text(textError).show()
+                    Swal.fire("Gagal Mengambil Data. ", textError, 'error')
                     $('#cover-spin').hide()
                 }
             })
