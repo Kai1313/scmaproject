@@ -190,8 +190,8 @@
                                 <tr>
                                     <th>Kode Barang</th>
                                     <th>Nama Barang</th>
-                                    <th>Satuan</th>
                                     <th>Jumlah</th>
+                                    <th>Satuan</th>
                                     <th>Catatan</th>
                                     <th>Stok</th>
                                     <th style="width:150px;">Action</th>
@@ -279,51 +279,48 @@
             data: details,
             ordering: false,
             columns: [{
-                    data: 'kode_barang',
-                    name: 'kode_barang'
+                data: 'kode_barang',
+                name: 'kode_barang'
+            }, {
+                data: 'nama_barang',
+                name: 'nama_barang'
+            }, {
+                data: 'qty',
+                name: 'qty',
+                render: function(data) {
+                    return formatNumber(data, 4)
                 },
-                {
-                    data: 'nama_barang',
-                    name: 'nama_barang'
+                className: 'text-right'
+            }, {
+                data: 'nama_satuan_barang',
+                name: 'nama_satuan_barang'
+            }, {
+                data: 'notes',
+                name: 'notes'
+            }, {
+                data: 'stok',
+                name: 'stok',
+                render: function(data) {
+                    return formatNumber(data, 4)
                 },
-                {
-                    data: 'nama_satuan_barang',
-                    name: 'nama_satuan_barang'
-                },
-                {
-                    data: 'qty',
-                    name: 'qty',
-                    render: $.fn.dataTable.render.number('.', ',', 4),
-                    className: 'text-right'
-                },
-                {
-                    data: 'notes',
-                    name: 'notes'
-                },
-                {
-                    data: 'stok',
-                    name: 'stok',
-                    render: $.fn.dataTable.render.number('.', ',', 4),
-                    className: 'text-right'
-                },
-                {
-                    data: 'index',
-                    className: 'text-center',
-                    name: 'index',
-                    searchable: false,
-                    render: function(data, type, row, meta) {
-                        let btn = '<ul class="horizontal-list">';
-                        btn +=
-                            '<li><a href="javascript:void(0)" data-index="' + data +
-                            '" class="btn btn-warning btn-xs mr-1 mb-1 edit-entry"><i class="glyphicon glyphicon-pencil"></i></a></li>';
-                        btn +=
-                            '<li><a href="javascript:void(0)" data-index="' + data +
-                            '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1 delete-entry"><i class="glyphicon glyphicon-trash"></i></a></li>';
-                        btn += '</ul>';
-                        return btn;
-                    }
-                },
-            ]
+                className: 'text-right'
+            }, {
+                data: 'index',
+                className: 'text-center',
+                name: 'index',
+                searchable: false,
+                render: function(data, type, row, meta) {
+                    let btn = '<ul class="horizontal-list">';
+                    btn +=
+                        '<li><a href="javascript:void(0)" data-index="' + data +
+                        '" class="btn btn-warning btn-xs mr-1 mb-1 edit-entry"><i class="glyphicon glyphicon-pencil"></i></a></li>';
+                    btn +=
+                        '<li><a href="javascript:void(0)" data-index="' + data +
+                        '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1 delete-entry"><i class="glyphicon glyphicon-trash"></i></a></li>';
+                    btn += '</ul>';
+                    return btn;
+                }
+            }]
         });
 
         if ($('[name="id_cabang"]').val() == '') {
@@ -332,7 +329,7 @@
 
         $('.tag-qty').each(function(i, v) {
             let num = $(v).text()
-            $(this).text(formatNumber(num))
+            $(this).text(formatNumber(num, 4))
         })
 
         $('[name="id_cabang"]').change(function() {

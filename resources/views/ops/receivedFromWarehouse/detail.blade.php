@@ -196,7 +196,9 @@
             }, {
                 data: 'qty',
                 name: 'qty',
-                render: $.fn.dataTable.render.number('.', ',', 4),
+                render: function(data) {
+                    return data ? formatNumber(data, 4) : 0
+                },
                 className: 'text-right'
             }, {
                 data: 'batch',

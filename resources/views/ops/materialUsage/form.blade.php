@@ -296,22 +296,30 @@
             }, {
                 data: 'jumlah',
                 name: 'jumlah',
-                render: $.fn.dataTable.render.number('.', ',', 4),
+                render: function(data) {
+                    return data ? formatNumber(data, 4) : 0
+                },
                 className: 'text-right'
             }, {
                 data: 'jumlah_zak',
                 name: 'jumlah_zak',
-                render: $.fn.dataTable.render.number('.', ',', 4),
+                render: function(data) {
+                    return data ? formatNumber(data, 4) : 0
+                },
                 className: 'text-right'
             }, {
                 data: 'tare',
                 name: 'tare',
-                render: $.fn.dataTable.render.number('.', ',', 4),
+                render: function(data) {
+                    return data ? formatNumber(data, 4) : 0
+                },
                 className: 'text-right'
             }, {
                 data: 'nett',
                 name: 'nett',
-                render: $.fn.dataTable.render.number('.', ',', 4),
+                render: function(data) {
+                    return data ? formatNumber(data, 4) : 0
+                },
                 className: 'text-right'
             }, {
                 data: 'index',
@@ -358,10 +366,10 @@
             $('#table-detail tbody').after(
                 '<tfoot><tr>' +
                 '<td colspan="3" class="text-left"><b>Total</b></td>' +
-                '<td class="text-right">' + formatNumber(totalJumlah) + '</td>' +
-                '<td class="text-right">' + formatNumber(totalJumlahZak) + '</td>' +
-                '<td class="text-right">' + formatNumber(totalTare) + '</td>' +
-                '<td class="text-right">' + formatNumber(totalNett) + '</td>' +
+                '<td class="text-right">' + formatNumber(totalJumlah, 4) + '</td>' +
+                '<td class="text-right">' + formatNumber(totalJumlahZak, 4) + '</td>' +
+                '<td class="text-right">' + formatNumber(totalTare, 4) + '</td>' +
+                '<td class="text-right">' + formatNumber(totalNett, 4) + '</td>' +
                 '<td></td>' +
                 '</tr></tfoot>'
             );
@@ -409,7 +417,7 @@
             }
 
             intervalReloadTimbangan = setInterval(reloadTimbangan, 2000)
-            $('#modalEntry').find('[name="jumlah"]').val(formatNumber(dataselect.value))
+            $('#modalEntry').find('[name="jumlah"]').val(formatNumber(dataselect.value, 4))
         })
 
         function reloadTimbangan() {
@@ -419,7 +427,7 @@
                     id: $('[name="id_timbangan"]').val()
                 },
                 success: function(res) {
-                    $('#modalEntry').find('[name="jumlah"]').val(formatNumber(res.data))
+                    $('#modalEntry').find('[name="jumlah"]').val(formatNumber(res.data, 4))
                 },
                 error: function(error) {
                     console.log(error)
@@ -486,19 +494,19 @@
             }
 
             $('[name="details"]').val(JSON.stringify(details))
-            console.log(details)
 
             statusModal = ''
             detailSelect = []
 
             resDataTable.clear().rows.add(details).draw()
-            clearInterval(intervalReloadTimbangan);
+            stopInterval()
+            console.log('lalala')
             $('#modalEntry').modal('hide')
         })
 
         $('.cancel-entry').click(function() {
             html5QrcodeScanner.clear();
-            clearInterval(intervalReloadTimbangan);
+            stopInterval()
             if (statusModal == 'create') {
                 count -= 1
             }
@@ -648,6 +656,10 @@
 
         function onScanError(errorMessage) {
             toastr.error(JSON.strignify(errorMessage))
+        }
+
+        function stopInterval() {
+            clearInterval(intervalReloadTimbangan);
         }
     </script>
 @endsection

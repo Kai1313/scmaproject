@@ -125,7 +125,9 @@
             }, {
                 data: 'weight',
                 name: 'weight',
-                render: $.fn.dataTable.render.number('.', ',', 4),
+                render: function(data) {
+                    return formatNumber(data, 4)
+                },
                 className: "text-right"
             }, {
                 data: 'catatan',

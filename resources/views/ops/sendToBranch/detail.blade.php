@@ -105,8 +105,8 @@
                             <tr>
                                 <th>QR Code</th>
                                 <th>Nama Barang</th>
-                                <th>Satuan</th>
                                 <th>Jumlah</th>
+                                <th>Satuan</th>
                                 <th>Batch</th>
                                 <th>Kadaluarsa</th>
                                 <th>SG</th>
@@ -144,13 +144,15 @@
                     data: 'nama_barang',
                     name: 'nama_barang'
                 }, {
-                    data: 'nama_satuan_barang',
-                    name: 'nama_satuan_barang'
-                }, {
                     data: 'qty',
                     name: 'qty',
-                    render: $.fn.dataTable.render.number('.', ',', 4),
+                    render: function(data) {
+                        return data ? formatNumber(data, 4) : 0
+                    },
                     className: 'text-right'
+                }, {
+                    data: 'nama_satuan_barang',
+                    name: 'nama_satuan_barang'
                 }, {
                     data: 'batch',
                     name: 'batch',
@@ -161,17 +163,23 @@
                 }, {
                     data: 'sg',
                     name: 'sg',
-                    render: $.fn.dataTable.render.number('.', ',', 4),
+                    render: function(data) {
+                        return data ? formatNumber(data, 4) : 0
+                    },
                     className: 'text-right'
                 }, {
                     data: 'be',
                     name: 'be',
-                    render: $.fn.dataTable.render.number('.', ',', 4),
+                    render: function(data) {
+                        return data ? formatNumber(data, 4) : 0
+                    },
                     className: 'text-right'
                 }, {
                     data: 'ph',
                     name: 'ph',
-                    render: $.fn.dataTable.render.number('.', ',', 4),
+                    render: function(data) {
+                        return data ? formatNumber(data, 4) : 0
+                    },
                     className: 'text-right'
                 }, {
                     data: 'bentuk',

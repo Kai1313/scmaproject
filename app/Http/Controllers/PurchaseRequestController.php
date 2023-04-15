@@ -67,7 +67,7 @@ class PurchaseRequestController extends Controller
                                 $btn .= '<li><a href="' . route('purchase-request-change-status', [$row->purchase_request_id, 'reject']) . '" class="btn btn-default btn-xs mr-1 mb-1 btn-change-status" data-param="menolak"><i class="fa fa-times"></i> Reject</a></li>';
                             }
 
-                            if (session()->get('user')['id_grup_pengguna'] == $row->purchase_request_user_id) {
+                            if (session()->get('user')['id_pengguna'] == $row->purchase_request_user_id) {
                                 $btn .= '<li><a href="' . route('purchase-request-entry', $row->purchase_request_id) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
                                 $btn .= '<li><a href="' . route('purchase-request-delete', $row->purchase_request_id) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Void</a></li>';
                             }
@@ -361,25 +361,25 @@ class PurchaseRequestController extends Controller
 
     public function sendToWa($targetNumber, $message)
     {
-        $token_pengguna = "fb176fda94ad70ec8cc65456d1d5906a";
-        $url = "https://wa.scasda.my.id/actions/aaa_api_kirim_webhook.php";
-        $data = array(
-            "id_jenis_kirim" => 4,
-            "nomor_pengirim_kirim" => '*',
-            "nomor_tujuan_kirim" => $targetNumber,
-            "token_pengguna" => $token_pengguna,
-            "pesan_kirim" => $message,
-            "gambar_kirim" => '',
-            "file_kirim" => '',
-            "base64_string" => '',
-        );
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_VERBOSE, 0);
-        curl_exec($ch);
-        curl_close($ch);
+        // $token_pengguna = "fb176fda94ad70ec8cc65456d1d5906a";
+        // $url = "https://wa.scasda.my.id/actions/aaa_api_kirim_webhook.php";
+        // $data = array(
+        //     "id_jenis_kirim" => 4,
+        //     "nomor_pengirim_kirim" => '*',
+        //     "nomor_tujuan_kirim" => $targetNumber,
+        //     "token_pengguna" => $token_pengguna,
+        //     "pesan_kirim" => $message,
+        //     "gambar_kirim" => '',
+        //     "file_kirim" => '',
+        //     "base64_string" => '',
+        // );
+        // $ch = curl_init($url);
+        // curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        // curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        // curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        // curl_setopt($ch, CURLOPT_VERBOSE, 0);
+        // curl_exec($ch);
+        // curl_close($ch);
 
         return ['status' => 'true'];
     }

@@ -216,13 +216,13 @@
                     id: '{{ $data ? $data->id_uang_muka_penjualan : 0 }}'
                 },
                 success: function(res) {
-                    $('[name="nominal"]').val(formatNumber(res.nominal)).attr(
+                    $('[name="nominal"]').val(formatNumber(res.nominal, 2)).attr(
                         'data-max', res
                         .nominal)
-                    $('[name="total"]').val(formatNumber(res.total))
+                    $('[name="total"]').val(formatNumber(res.total, 2))
                     $('[name="id_mata_uang"]').val(res.id_mata_uang)
-                    $('[name="rate"]').val(formatNumber(res.nilai_mata_uang))
-                    $('[name="konversi_nominal"]').val(formatNumber(res.nilai_mata_uang * res.nominal))
+                    $('[name="rate"]').val(formatNumber(res.nilai_mata_uang, 2))
+                    $('[name="konversi_nominal"]').val(formatNumber(res.nilai_mata_uang * res.nominal, 2))
                     $('[name="nama_mata_uang"]').val(res.nama_mata_uang)
                     $('#cover-spin').hide()
                 },
@@ -236,7 +236,7 @@
         $('body').on('input', '[name="rate"],[name="nominal"]', function() {
             let rate = normalizeNumber($('[name="rate"]').val())
             let nominal = normalizeNumber($('[name="nominal"]').val())
-            $('[name="konversi_nominal"]').val(formatNumber(rate * nominal))
+            $('[name="konversi_nominal"]').val(formatNumber(rate * nominal, 2))
         })
     </script>
 @endsection

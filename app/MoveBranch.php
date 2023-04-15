@@ -164,7 +164,7 @@ class MoveBranch extends Model
                     'id_pindah_barang' => $this->id_pindah_barang,
                     'id_barang' => $data->id_barang,
                     'id_satuan_barang' => $data->id_satuan_barang,
-                    'qty' => normalizeNumber($data->qty),
+                    'qty' => $data->qty,
                     'qr_code' => $data->qr_code,
                     'sg' => $data->sg,
                     'be' => $data->be,

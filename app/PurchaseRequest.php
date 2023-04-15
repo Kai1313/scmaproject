@@ -83,7 +83,7 @@ class PurchaseRequest extends Model
                     ->update([
                         'id_barang' => $data->id_barang,
                         'id_satuan_barang' => $data->id_satuan_barang,
-                        'qty' => normalizeNumber($data->qty),
+                        'qty' => $data->qty,
                         'notes' => $data->notes,
                     ]);
             } else {
@@ -91,7 +91,7 @@ class PurchaseRequest extends Model
                     'index' => $data->index,
                     'id_barang' => $data->id_barang,
                     'id_satuan_barang' => $data->id_satuan_barang,
-                    'qty' => normalizeNumber($data->qty),
+                    'qty' => $data->qty,
                     'notes' => $data->notes,
                     'purchase_request_id' => $this->purchase_request_id,
                     'closed' => '0',

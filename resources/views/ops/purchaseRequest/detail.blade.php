@@ -120,8 +120,8 @@
                             <tr>
                                 <th>Kode Barang</th>
                                 <th>Nama Barang</th>
-                                <th>Satuan</th>
                                 <th>Jumlah</th>
+                                <th>Satuan</th>
                                 <th>Catatan</th>
                                 <th>Stok</th>
                             </tr>
@@ -148,34 +148,32 @@
             data: details,
             ordering: false,
             columns: [{
-                    data: 'kode_barang',
-                    name: 'kode_barang'
+                data: 'kode_barang',
+                name: 'kode_barang'
+            }, {
+                data: 'nama_barang',
+                name: 'nama_barang'
+            }, {
+                data: 'qty',
+                name: 'qty',
+                render: function(data) {
+                    return formatNumber(data, 4)
                 },
-                {
-                    data: 'nama_barang',
-                    name: 'nama_barang'
+                className: 'text-right'
+            }, {
+                data: 'nama_satuan_barang',
+                name: 'nama_satuan_barang'
+            }, {
+                data: 'notes',
+                name: 'notes'
+            }, {
+                data: 'stok',
+                name: 'stok',
+                render: function(data) {
+                    return formatNumber(data, 4)
                 },
-                {
-                    data: 'nama_satuan_barang',
-                    name: 'nama_satuan_barang'
-                },
-                {
-                    data: 'qty',
-                    name: 'qty',
-                    render: $.fn.dataTable.render.number('.', ',', 4),
-                    className: 'text-right'
-                },
-                {
-                    data: 'notes',
-                    name: 'notes'
-                },
-                {
-                    data: 'stok',
-                    name: 'stok',
-                    render: $.fn.dataTable.render.number('.', ',', 4),
-                    className: 'text-right'
-                },
-            ]
+                className: 'text-right'
+            }]
         });
 
         $('body').on('click', '.btn-change-status', function(e) {

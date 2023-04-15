@@ -119,7 +119,9 @@
             }, {
                 data: 'value_pph',
                 name: 'value_pph',
-                render: $.fn.dataTable.render.number('.', ',', 2),
+                render: function(data) {
+                    return data ? formatNumber(data, 2) : 0
+                },
                 className: 'text-right'
             }, {
                 data: 'akun_pph',

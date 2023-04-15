@@ -142,17 +142,23 @@
             }, {
                 data: 'rate',
                 name: 'rate',
-                render: $.fn.dataTable.render.number('.', ',', 2),
+                render: function(data) {
+                    return data ? formatNumber(data, 2) : 0
+                },
                 className: 'text-right'
             }, {
                 data: 'nominal',
                 name: 'nominal',
-                render: $.fn.dataTable.render.number('.', ',', 2),
+                render: function(data) {
+                    return data ? formatNumber(data, 2) : 0
+                },
                 className: 'text-right'
             }, {
                 data: 'total',
                 name: 'total',
-                render: $.fn.dataTable.render.number('.', ',', 2),
+                render: function(data) {
+                    return data ? formatNumber(data, 2) : 0
+                },
                 className: 'text-right'
             }, {
                 data: 'catatan',

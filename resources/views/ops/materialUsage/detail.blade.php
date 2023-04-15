@@ -130,22 +130,30 @@
             }, {
                 data: 'jumlah',
                 name: 'jumlah',
-                render: $.fn.dataTable.render.number('.', ',', 4),
+                render: function(data) {
+                    return data ? formatNumber(data, 4) : 0
+                },
                 className: 'text-right'
             }, {
                 data: 'jumlah_zak',
                 name: 'jumlah_zak',
-                render: $.fn.dataTable.render.number('.', ',', 4),
+                render: function(data) {
+                    return data ? formatNumber(data, 4) : 0
+                },
                 className: 'text-right'
             }, {
                 data: 'tare',
                 name: 'tare',
-                render: $.fn.dataTable.render.number('.', ',', 4),
+                render: function(data) {
+                    return data ? formatNumber(data, 4) : 0
+                },
                 className: 'text-right'
             }, {
                 data: 'nett',
                 name: 'nett',
-                render: $.fn.dataTable.render.number('.', ',', 4),
+                render: function(data) {
+                    return data ? formatNumber(data, 4) : 0
+                },
                 className: 'text-right'
             }],
             initComplete: function(settings, json) {
@@ -168,10 +176,10 @@
             $('#table-detail tbody').after(
                 '<tfoot><tr>' +
                 '<td colspan="3" class="text-left"><b>Total</b></td>' +
-                '<td class="text-right">' + formatNumber(totalJumlah) + '</td>' +
-                '<td class="text-right">' + formatNumber(totalJumlahZak) + '</td>' +
-                '<td class="text-right">' + formatNumber(totalTare) + '</td>' +
-                '<td class="text-right">' + formatNumber(totalNett) + '</td>' +
+                '<td class="text-right">' + formatNumber(totalJumlah, 4) + '</td>' +
+                '<td class="text-right">' + formatNumber(totalJumlahZak, 4) + '</td>' +
+                '<td class="text-right">' + formatNumber(totalTare, 4) + '</td>' +
+                '<td class="text-right">' + formatNumber(totalNett, 4) + '</td>' +
                 '</tr></tfoot>'
             );
         }

@@ -95,7 +95,7 @@
                             <tr>
                                 <th>Kode Pembelian</th>
                                 <th>Nama Barang</th>
-                                <th>Total Qty</th>
+                                <th>Jumlah</th>
                                 <th>Satuan</th>
                                 <th>Status</th>
                                 <th>Alasan</th>
@@ -148,7 +148,9 @@
             }, {
                 data: 'jumlah_pembelian_detail',
                 name: 'jumlah_pembelian_detail',
-                render: $.fn.dataTable.render.number('.', ',', 4),
+                render: function(data) {
+                    return data ? formatNumber(data, 4) : 0
+                },
                 className: 'text-right'
             }, {
                 data: 'nama_satuan_barang',
@@ -166,17 +168,23 @@
             }, {
                 data: 'sg_pembelian_detail',
                 name: 'sg_pembelian_detail',
-                render: $.fn.dataTable.render.number('.', ',', 4),
+                render: function(data) {
+                    return data ? formatNumber(data, 4) : 0
+                },
                 className: 'text-right'
             }, {
                 data: 'be_pembelian_detail',
                 name: 'be_pembelian_detail',
-                render: $.fn.dataTable.render.number('.', ',', 4),
+                render: function(data) {
+                    return data ? formatNumber(data, 4) : 0
+                },
                 className: 'text-right'
             }, {
                 data: 'ph_pembelian_detail',
                 name: 'ph_pembelian_detail',
-                render: $.fn.dataTable.render.number('.', ',', 4),
+                render: function(data) {
+                    return data ? formatNumber(data, 4) : 0
+                },
                 className: 'text-right'
             }, {
                 data: 'warna_pembelian_detail',
