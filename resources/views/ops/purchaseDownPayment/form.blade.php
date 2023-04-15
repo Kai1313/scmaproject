@@ -53,11 +53,11 @@
                                 <select name="id_cabang" class="form-control select2" data-validation="[NOTEMPTY]"
                                     data-validation-message="Cabang tidak boleh kosong">
                                     <option value="">Pilih Cabang</option>
-                                    @foreach ($cabang as $branch)
-                                        <option value="{{ $branch->id_cabang }}"
-                                            {{ old('id_cabang', $data ? $data->id_cabang : '') == $branch->id_cabang ? 'selected' : '' }}>
-                                            {{ $branch->nama_cabang }}</option>
-                                    @endforeach
+                                    @if ($data && $data->id_cabang)
+                                        <option value="{{ $data->id_cabang }}" selected>
+                                            {{ $data->cabang->kode_cabang }} - {{ $data->cabang->nama_cabang }}
+                                        </option>
+                                    @endif
                                 </select>
                             </div>
                             <label>Kode Uang Muka Pembelian</label>
@@ -75,7 +75,7 @@
                             </div>
                             <label>ID Permintaan Pembelian (PO) <span>*</span></label>
                             <div class="form-group">
-                                <select name="id_permintaan_pembelian" class="form-control selectAjax"
+                                <select name="id_permintaan_pembelian" class="form-control select2"
                                     data-validation="[NOTEMPTY]"
                                     data-validation-message="ID permintaan pembelian tidak boleh kosong">
                                     <option value="">Pilih Permintaan Pembelian (PO)</option>
@@ -159,24 +159,16 @@
 
 @section('externalScripts')
     <script>
+        let branch = {!! json_encode($cabang) !!}
         $('.select2').select2()
         $('.datepicker').datepicker({
             format: 'yyyy-mm-dd',
         });
 
-        if ($('[name="id_cabang"]').val() == '') {
-            $('[name="id_permintaan_pembelian"]').prop('disabled', true)
-        }
-
-        $('[name="id_cabang"]').select2().on('select2:select', function(e) {
+        $('[name="id_cabang"]').select2({
+            data: branch
+        }).on('select2:select', function(e) {
             let dataselect = e.params.data
-            let self = $('[name="id_permintaan_pembelian"]')
-            if (dataselect.id == '') {
-                self.val('').prop('disabled', true).trigger('change')
-            } else {
-                self.val('').prop('disabled', false).trigger('change')
-            }
-
             $('[name="nominal"]').val('').attr('data-max', 0)
             $('[name="total"]').val('')
             getPurchaseOrder()

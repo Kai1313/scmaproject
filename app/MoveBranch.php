@@ -36,6 +36,7 @@ class MoveBranch extends Model
         'dt_modified',
         'void',
         'void_user_id',
+        'id_produksi',
     ];
 
     public function cabang()
@@ -71,6 +72,11 @@ class MoveBranch extends Model
     public function getDetailQRCode()
     {
         return $this->hasMany(MoveBranchDetail::class, 'id_pindah_barang')->select('qr_code');
+    }
+
+    public function produksi()
+    {
+        return $this->belongsTo(Production::class, 'id_produksi');
     }
 
     public function formatdetail()

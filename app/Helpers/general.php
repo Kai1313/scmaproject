@@ -56,10 +56,36 @@ function checkUserSession($request, $alias_menu, $type)
             $arrayMenuAccess[$menu->alias_menu] = $menu;
         }
 
+        $aksesCabang = DB::table('pengguna')->select('cabang.id_cabang', 'nama_cabang', 'gudang.id_gudang', 'nama_gudang', 'kode_cabang', 'kode_gudang')
+            ->join('akses_gudang', 'pengguna.id_grup_pengguna', '=', 'akses_gudang.id_grup_pengguna')
+            ->join('gudang', 'akses_gudang.id_gudang', '=', 'gudang.id_gudang')
+            ->join('cabang', 'gudang.id_cabang', '=', 'cabang.id_cabang')
+            ->where('status_akses_gudang', 1)->where('status_cabang', 1)->where('status_gudang', 1)
+            ->where('id_pengguna', session()->get('user')['id_pengguna'])
+            ->get();
+
+        $arrayCabang = [];
+        foreach ($aksesCabang as $ac) {
+            if (isset($array[$ac->id_cabang])) {
+                $arrayCabang[$ac->id_cabang]['gudang'][] = ['id' => $ac->id_gudang, 'text' => $ac->kode_gudang . ' - ' . $ac->nama_gudang];
+            } else {
+                $arrayCabang[$ac->id_cabang] = [
+                    'id' => $ac->id_cabang,
+                    'text' => $ac->kode_cabang . ' - ' . $ac->nama_cabang,
+                    'gudang' => [
+                        ['id' => $ac->id_gudang, 'text' => $ac->kode_gudang . ' - ' . $ac->nama_gudang],
+                    ],
+                ];
+            }
+        }
+
+        $arrayCabang = array_values($arrayCabang);
+        // session()->flush();
         if ($token && session()->has('token') == false) {
             session()->put('token', $token->nama_token_pengguna);
             session()->put('user', $user);
             session()->put('access', $arrayMenuAccess);
+            session()->put('access_cabang', $arrayCabang);
         } else if (session()->has('token')) {
         } else {
             session()->flush();

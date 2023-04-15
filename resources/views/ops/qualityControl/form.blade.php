@@ -91,11 +91,6 @@
                                 <select name="id_cabang" class="form-control select2" data-validation="[NOTEMPTY]"
                                     data-validation-message="Cabang tidak boleh kosong">
                                     <option value="">Pilih Cabang</option>
-                                    @foreach ($cabang as $branch)
-                                        <option value="{{ $branch->id_cabang }}"
-                                            {{ old('id_cabang', $data ? $data->id_cabang : '') == $branch->id_cabang ? 'selected' : '' }}>
-                                            {{ $branch->nama_cabang }}</option>
-                                    @endforeach
                                 </select>
                             </div>
                         </div>
@@ -277,6 +272,7 @@
 
 @section('externalScripts')
     <script>
+        let branch = {!! json_encode($cabang) !!}
         let arrayStatus = {!! json_encode($arrayStatus) !!};
         let details = [];
         let detailSelect = []
@@ -368,7 +364,9 @@
             }]
         });
 
-        $('[name="id_cabang"]').select2().on('select2:select', function(e) {
+        $('[name="id_cabang"]').select2({
+            data: branch
+        }).on('select2:select', function(e) {
             let dataselect = e.params.data
             getPurchasingNumber()
         });

@@ -99,7 +99,7 @@
                                     <option value="">Pilih Cabang</option>
                                     @if ($data && $data->id_cabang)
                                         <option value="{{ $data->id_cabang }}" selected>
-                                            {{ $data->cabang->nama_cabang }}
+                                            {{ $data->cabang->kode_cabang }} - {{ $data->cabang->nama_cabang }}
                                         </option>
                                     @endif
                                 </select>
@@ -111,7 +111,7 @@
                                     <option value="">Pilih Gudang</option>
                                     @if ($data && $data->id_gudang)
                                         <option value="{{ $data->id_gudang }}" selected>
-                                            {{ $data->gudang->nama_gudang }}
+                                            {{ $data->gudang->kode_gudang }} - {{ $data->gudang->nama_gudang }}
                                         </option>
                                     @endif
                                 </select>
@@ -328,7 +328,7 @@
 
 @section('externalScripts')
     <script>
-        let branches = {!! $cabang !!};
+        let branches = {!! json_encode($cabang) !!};
         var audiobarcode = new Audio("{{ asset('files/scan.mp3') }}");
         let html5QrcodeScanner = new Html5QrcodeScanner("reader", {
             fps: 10,
@@ -424,45 +424,15 @@
             }, ...branches]
         }).on('select2:select', function(e) {
             let dataselect = e.params.data
-            getGudang(dataselect.id)
+            getGudang(dataselect)
         });
 
-        function getGudang(idCabang) {
-            $('#cover-spin').show()
-            $.ajax({
-                url: '{{ route('purchase-request-auto-werehouse') }}',
-                data: {
-                    cabang: idCabang
-                },
-                success: function(res) {
-                    $('[name="id_gudang"]').empty()
-                    $('[name="id_gudang"]').select2({
-                        data: [{
-                            'id': "",
-                            'text': 'Pilih Gudang'
-                        }, ...res.data]
-                    })
-
-                    let branchData = []
-                    for (let i = 0; i < branches.length; i++) {
-                        if (branches[i].id != idCabang) {
-                            branchData.push(branches[i])
-                        }
-                    }
-
-                    $('[name="id_cabang2"]').empty()
-                    $('[name="id_cabang2"]').select2({
-                        data: [{
-                            'id': '',
-                            'text': 'Pilih Cabang Tujuan'
-                        }, ...branchData]
-                    })
-                    $('#cover-spin').hide()
-                },
-                error: function(error) {
-                    console.log(error)
-                    $('#cover-spin').hide()
-                }
+        function getGudang(data) {
+            $('[name="id_gudang"]').select2({
+                data: [{
+                    'id': "",
+                    'text': 'Pilih Gudang'
+                }, ...data.gudang]
             })
         }
 

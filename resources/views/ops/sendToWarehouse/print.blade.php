@@ -169,31 +169,36 @@
                 <td valign="top">
                     <table class='kanan' style="width:100%;">
                         <tr>
-                            <td width="100"><b>Kode Transaksi</b></td>
-                            <td width="5">:</td>
-                            <td>{{ $data->kode_pindah_barang }}</td>
-                        </tr>
-                        <tr>
                             <td><b>Tanggal</b></td>
                             <td>:</td>
                             <td>{{ $data->tanggal_pindah_barang }}</td>
                         </tr>
+                        <tr>
+                            <td width="100"><b>Kode Transaksi</b></td>
+                            <td width="5">:</td>
+                            <td>{{ $data->kode_pindah_barang }}</td>
+                        </tr>
+                        @if ($data->id_produksi)
+                            <tr>
+                                <td width="100"><b>Kode Produksi</b></td>
+                                <td width="5">:</td>
+                                <td>{{ $data->produksi->nama_produksi }}</td>
+                            </tr>
+                        @endif
                     </table>
                 </td>
             </tr>
-            <tr>
-                <td colspan="2"><b>Keterangan :</b> {{ $data->keterangan_pindah_barang }}</td>
-            </tr>
         </table>
     </div>
-    <table class="grid" width="100%">
+    <table class="grid" width="100%" style="margin-top:10px;">
         <tr>
             <th width="20">No</th>
-            <th width="50">QR Code</th>
-            <th width="150">Nama Barang</th>
-            <th width="70">Qty</th>
+            <th width="80">QR Code</th>
+            <th>Nama Barang</th>
+            <th width="100">Qty</th>
             <th width="70">Batch</th>
-            <th width="50">kadaluarsa</th>
+            <th width="80">kadaluarsa</th>
+            <th width="80">Koreksi Stok</th>
         </tr>
         @foreach ($data->formatdetail as $key => $detail)
             <tr>
@@ -208,11 +213,29 @@
                 <td class="text-center">
                     {{ $detail->tanggal_kadaluarsa == '0000-00-00' ? '' : $detail->tanggal_kadaluarsa }}
                 </td>
+                <td></td>
             </tr>
         @endforeach
     </table>
-    <div class="text-right" style="margin:10px;">
-        {!! DNS2D::getBarcodeSVG($data->kode_pindah_barang, 'QRCODE', 4.5, 4.5) !!}
+    <div style="display: flex;justify-content:space-between;">
+        <div>
+            <p><b>Keterangan :</b> {{ $data->keterangan_pindah_barang }}</p>
+            <table style="margin-left:30px;">
+                <tr>
+                    <td>Pengirim</td>
+                    <td style="width:150px;height:70px;"></td>
+                    <td>Penerima</td>
+                </tr>
+                <tr>
+                    <td>.................</td>
+                    <td></td>
+                    <td>.................</td>
+                </tr>
+            </table>
+        </div>
+        <div class="text-right" style="margin:10px;">
+            {!! DNS2D::getBarcodeSVG($data->kode_pindah_barang, 'QRCODE', 5, 5) !!}
+        </div>
     </div>
     <script>
         //window.print();

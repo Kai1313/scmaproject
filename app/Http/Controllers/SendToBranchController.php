@@ -62,7 +62,7 @@ class SendToBranchController extends Controller
                 ->make(true);
         }
 
-        $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
+        $cabang = session()->get('access_cabang');
         return view('ops.sendToBranch.index', [
             'cabang' => $cabang,
             "pageTitle" => "SCA OPS | Kirim Ke Cabang | List",
@@ -76,7 +76,7 @@ class SendToBranchController extends Controller
         }
 
         $data = MoveBranch::find($id);
-        $cabang = DB::table('cabang')->select('nama_cabang as text', 'id_cabang as id')->where('status_cabang', 1)->get();
+        $cabang = session()->get('access_cabang');
         return view('ops.sendToBranch.form', [
             'data' => $data,
             'cabang' => $cabang,
@@ -236,7 +236,11 @@ class SendToBranchController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        $data = MoveBranch::find($id);
+        $data = MoveBranch::where('id_jenis_transaksi', 21)->where('id_pindah_barang', $id)->first();
+        if (!$data) {
+            return 'data tidak ditemukan';
+        }
+
         return view('ops.sendToBranch.print', [
             'data' => $data,
             "pageTitle" => "SCA OPS | Kirim Ke Cabang | Cetak",

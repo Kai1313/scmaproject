@@ -45,11 +45,11 @@
                                 <select name="id_cabang" class="form-control select2" data-validation="[NOTEMPTY]"
                                     data-validation-message="Cabang tidak boleh kosong">
                                     <option value="">Pilih Cabang</option>
-                                    @foreach ($cabang as $branch)
-                                        <option value="{{ $branch->id_cabang }}"
-                                            {{ old('id_cabang', $data ? $data->id_cabang : '') == $branch->id_cabang ? 'selected' : '' }}>
-                                            {{ $branch->nama_cabang }}</option>
-                                    @endforeach
+                                    @if ($data && $data->id_cabang)
+                                        <option value="{{ $data->id_cabang }}" selected>
+                                            {{ $data->cabang->kode_cabang }} - {{ $data->cabang->nama_cabang }}
+                                        </option>
+                                    @endif
                                 </select>
                             </div>
                             <div class="form-group">
@@ -111,7 +111,10 @@
 
 @section('externalScripts')
     <script>
-        $('.select2').select2()
+        let branch = {!! json_encode($cabang) !!}
+        $('[name="id_cabang"]').select2({
+            data: branch
+        })
 
         $('[name="file_upload"]').change(function() {
             let oFReader = new FileReader();

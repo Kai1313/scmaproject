@@ -70,23 +70,6 @@
 
 @section('main-section')
     <div class="content container-fluid">
-        @if (session()->has('success'))
-            <div class="alert alert-success">
-                <ul>
-                    <li>{!! session()->get('success') !!}</li>
-                </ul>
-            </div>
-        @endif
-        @if (count($errors) > 0)
-            <div class="alert alert-danger">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
         <form action="{{ route('purchase-request-save-entry', $data ? $data->purchase_request_id : 0) }}" method="post"
             class="post-action">
             <div class="box">
@@ -104,22 +87,22 @@
                                 <select name="id_cabang" class="form-control select2" data-validation="[NOTEMPTY]"
                                     data-validation-message="Cabang tidak boleh kosong">
                                     <option value="">Pilih Cabang</option>
-                                    @foreach ($cabang as $branch)
-                                        <option value="{{ $branch->id_cabang }}"
-                                            {{ old('id_cabang', $data ? $data->id_cabang : '') == $branch->id_cabang ? 'selected' : '' }}>
-                                            {{ $branch->nama_cabang }}</option>
-                                    @endforeach
+                                    @if ($data && $data->id_cabang)
+                                        <option value="{{ $data->id_cabang }}" selected>
+                                            {{ $data->cabang->kode_cabang }} - {{ $data->cabang->nama_cabang }}
+                                        </option>
+                                    @endif
                                 </select>
                             </div>
 
                             <label>Gudang <span>*</span></label>
                             <div class="form-group">
-                                <select name="id_gudang" class="form-control" data-validation="[NOTEMPTY]"
+                                <select name="id_gudang" class="form-control select2" data-validation="[NOTEMPTY]"
                                     data-validation-message="Gudang tidak boleh kosong">
                                     <option value="">Pilih Gudang</option>
                                     @if ($data && $data->id_gudang)
                                         <option value="{{ $data->id_gudang }}" selected>
-                                            {{ $data->gudang->nama_gudang }}
+                                            {{ $data->gudang->kode_gudang }} - {{ $data->gudang->nama_gudang }}
                                         </option>
                                     @endif
                                 </select>
@@ -169,19 +152,15 @@
                 </div>
             </div>
             <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">Detil Permintaan Barang</h3>
+                    @if (!$data || $data->approval_status == 0)
+                        <button class="btn btn-info add-entry btn-flat pull-right btn-sm" type="button">
+                            <i class="glyphicon glyphicon-plus"></i> Tambah Barang
+                        </button>
+                    @endif
+                </div>
                 <div class="box-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h4>Detil Permintaan Barang</h4>
-                        </div>
-                        <div class="col-md-6">
-                            @if (!$data || $data->approval_status == 0)
-                                <button class="btn btn-info add-entry btn-flat pull-right" type="button">
-                                    <i class="glyphicon glyphicon-plus"></i> Tambah Barang
-                                </button>
-                            @endif
-                        </div>
-                    </div>
                     <div class="table-responsive">
                         <input type="hidden" name="details" value="{{ $data ? json_encode($data->formatdetail) : '[]' }}">
                         <table id="table-detail" class="table table-bordered data-table display responsive nowrap"
@@ -213,8 +192,6 @@
             <div class="modal-dialog modal-sm" role="document">
                 <div class="modal-content">
                     <div class="modal-body">
-                        <div class="alert alert-danger" style="display:none;" id="alertModal">
-                        </div>
                         <input type="hidden" name="index" value="0">
                         <label>Nama Barang <span>*</span></label>
                         <div class="form-group">
@@ -235,7 +212,8 @@
                         </div>
                         <label>Jumlah <span>*</span></label>
                         <div class="form-group">
-                            <input type="text" name="qty" class="form-control validate handle-number-4">
+                            <input type="text" name="qty" class="form-control validate handle-number-4"
+                                autocomplete="off">
                         </div>
                         <label>Catatan</label>
                         <div class="form-group">
@@ -266,6 +244,7 @@
 
 @section('externalScripts')
     <script>
+        let branch = {!! json_encode($cabang) !!}
         let details = {!! $data ? $data->formatdetail : '[]' !!};
         let detailSelect = []
         let count = details.length
@@ -275,6 +254,7 @@
             format: 'yyyy-mm-dd',
         });
 
+        $('.select2').select2()
         var resDataTable = $('#table-detail').DataTable({
             data: details,
             ordering: false,
@@ -323,50 +303,24 @@
             }]
         });
 
-        if ($('[name="id_cabang"]').val() == '') {
-            $('[name="id_gudang"]').prop('disabled', true)
-        }
-
         $('.tag-qty').each(function(i, v) {
             let num = $(v).text()
             $(this).text(formatNumber(num, 4))
         })
 
-        $('[name="id_cabang"]').change(function() {
-            let self = $('[name="id_gudang"]')
-            if ($('[name="id_cabang"]').val() == '') {
-                self.val('').prop('disabled', true).trigger('change')
-            } else {
-                self.val('').prop('disabled', false).trigger('change')
-            }
-        })
-
-        $('[name="id_cabang"]').select2().on('select2:select', function(e) {
+        $('[name="id_cabang"]').select2({
+            data: branch
+        }).on('select2:select', function(e) {
             let dataselect = e.params.data
-            getGudang(dataselect.id)
+            getGudang(dataselect)
         });
 
-        function getGudang(idCabang) {
-            $('#cover-spin').show()
-            $.ajax({
-                url: '{{ route('purchase-request-auto-werehouse') }}',
-                data: {
-                    cabang: idCabang
-                },
-                success: function(res) {
-                    $('[name="id_gudang"]').empty()
-                    $('[name="id_gudang"]').select2({
-                        data: [{
-                            'id': "",
-                            'text': 'Pilih Gudang'
-                        }, ...res.data]
-                    })
-                    $('#cover-spin').hide()
-                },
-                error: function(error) {
-                    console.log(error)
-                    $('#cover-spin').hide()
-                }
+        function getGudang(data) {
+            $('[name="id_gudang"]').select2({
+                data: [{
+                    'id': "",
+                    'text': 'Pilih Gudang'
+                }, ...data.gudang]
             })
         }
 
@@ -406,7 +360,8 @@
                         data: res.satuan
                     }).on('select2:select', function(e) {
                         let dataselect = e.params.data
-                        $('#modalEntry').find('[name="nama_satuan_barang"]').val(dataselect.text)
+                        $('#modalEntry').find('[name="nama_satuan_barang"]').val(dataselect
+                            .text)
                     });
 
                     if (res.satuan.length > 0) {
@@ -414,7 +369,7 @@
                         $('#modalEntry').find('[name="nama_satuan_barang"]').val(res.satuan[0].text)
                     }
 
-                    $('#message-stok').text(res.stok + ' ' + res.satuan_stok)
+                    $('#message-stok').text(formatNumber(res.stok, 4) + ' ' + res.satuan_stok)
                     $('#modalEntry').find('[name="stok"]').val(res.stok)
                     $('#cover-spin').hide()
                 },
@@ -431,7 +386,6 @@
                 $(v).val('').trigger('change')
             })
 
-            $('#alertModal').text('').hide()
             statusModal = 'create'
             count += 1
             $('#modalEntry').find('[name="index"]').val(count)
@@ -453,12 +407,9 @@
             let modal = $('#modalEntry')
             let valid = validatorModal(modal.find('[name="id_barang"]').val())
             if (!valid.status) {
-                $('#alertModal').text(valid.message).show()
+                Swal.fire("Gagal tambah data. ", valid.message, 'error')
                 return false
-            } else {
-                $('#alertModal').text('').hide()
             }
-
 
             modal.find('input,select,textarea').each(function(i, v) {
                 if ($(v).hasClass('handle-number-4')) {
@@ -498,7 +449,6 @@
             })
             $('#message-stok').text('')
 
-            $('#alertModal').text('').hide()
             $('#modalEntry').modal({
                 backdrop: 'static',
                 keyboard: false
@@ -509,7 +459,8 @@
             for (select in detailSelect) {
                 if (['id_barang', 'id_satuan_barang'].includes(select)) {
                     let nameSelect = (select == 'id_barang') ? 'nama_barang' : 'nama_satuan_barang';
-                    $('[name="' + select + '"]').append('<option value="' + detailSelect[select] + '" selected>' +
+                    $('[name="' + select + '"]').append('<option value="' + detailSelect[select] +
+                        '" selected>' +
                         detailSelect[nameSelect] + '</option>')
                 }
 

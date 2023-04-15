@@ -61,7 +61,7 @@ class ReceivedFromBranchController extends Controller
                 ->make(true);
         }
 
-        $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
+        $cabang = session()->get('access_cabang');
         return view('ops.receivedFromBranch.index', [
             'cabang' => $cabang,
             "pageTitle" => "SCA OPS | Terima Dari Cabang | List",
@@ -75,8 +75,7 @@ class ReceivedFromBranchController extends Controller
         }
 
         $data = MoveBranch::find($id);
-        $cabang = DB::table('cabang')->select('nama_cabang as text', 'id_cabang as id')->where('status_cabang', 1)->get();
-
+        $cabang = session()->get('access_cabang');
         return view('ops.receivedFromBranch.form', [
             'data' => $data,
             'cabang' => $cabang,
@@ -226,6 +225,10 @@ class ReceivedFromBranchController extends Controller
         }
 
         $data = MoveBranch::find($id);
+        if (!$data) {
+            return 'data tidak ditemukan';
+        }
+
         return view('ops.receivedFromBranch.print', [
             'data' => $data,
             "pageTitle" => "SCA OPS | Terima Dari Cabang | Cetak",

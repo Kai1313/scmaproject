@@ -31,7 +31,7 @@ class QcReceiptController extends Controller
                     'tanggal_qc',
                     'nama_pembelian',
                     'nama_barang',
-                    DB::raw('sum(pembelian_detail.jumlah_pembelian_detail) as jumlah_pembelian_detail'),
+                    DB::raw('sum(pembelian_detail.jumlah_purchase) as jumlah_pembelian_detail'),
                     'status_qc',
                     'nama_satuan_barang',
                     'reason',
@@ -69,7 +69,7 @@ class QcReceiptController extends Controller
                 ->make(true);
         }
 
-        $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
+        $cabang = session()->get('access_cabang');
         $duration = DB::table('setting')->where('code', 'QC Duration')->first();
         $startDate = date('Y-m-d', strtotime('-' . intval($duration->value2) . ' days'));
         $endDate = date('Y-m-d');
@@ -88,8 +88,7 @@ class QcReceiptController extends Controller
         }
 
         $data = QualityControl::find($id);
-        $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
-
+        $cabang = session()->get('access_cabang');
         return view('ops.qualityControl.form', [
             'data' => $data,
             'cabang' => $cabang,
@@ -112,7 +111,7 @@ class QcReceiptController extends Controller
                     $data->id_pembelian = $request->id_pembelian;
                     $data->id_barang = $value->id_barang;
                     $data->id_satuan_barang = $value->id_satuan_barang;
-                    $data->jumlah_pembelian_detail = $value->jumlah_pembelian_detail;
+                    $data->jumlah_pembelian_detail = $value->jumlah_purchase;
                 }
 
                 $data->status_qc = $value->status_qc;

@@ -47,7 +47,7 @@ class MaterialUsageController extends Controller
                 ->make(true);
         }
 
-        $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
+        $cabang = session()->get('access_cabang');
         return view('ops.materialUsage.index', [
             'cabang' => $cabang,
             "pageTitle" => "SCA OPS | Pemakaian | List",
@@ -61,7 +61,7 @@ class MaterialUsageController extends Controller
         }
 
         $data = MaterialUsage::find($id);
-        $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
+        $cabang = session()->get('access_cabang');
         $timbangan = DB::table('konfigurasi')->select('id_konfigurasi as id', 'nama_konfigurasi as text', 'keterangan_konfigurasi as value')
             ->where('id_kategori_konfigurasi', 5)->get();
 

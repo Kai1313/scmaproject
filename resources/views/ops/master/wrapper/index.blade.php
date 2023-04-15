@@ -53,9 +53,7 @@
                         <div class="form-group">
                             <select name="id_cabang" class="form-control select2">
                                 @foreach ($cabang as $branch)
-                                    <option value="{{ $branch->id_cabang }}">{{ $branch->kode_cabang }} -
-                                        {{ $branch->nama_cabang }}
-                                    </option>
+                                    <option value="{{ $branch['id'] }}">{{ $branch['text'] }}</option>
                                 @endforeach
                             </select>
                         </div>

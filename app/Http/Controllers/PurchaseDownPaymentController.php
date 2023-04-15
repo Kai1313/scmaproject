@@ -49,7 +49,7 @@ class PurchaseDownPaymentController extends Controller
                 ->make(true);
         }
 
-        $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
+        $cabang = session()->get('access_cabang');
         return view('ops.purchaseDownPayment.index', [
             'cabang' => $cabang,
             "pageTitle" => "SCA OPS | Uang Muka Pembelian | List",
@@ -75,7 +75,7 @@ class PurchaseDownPaymentController extends Controller
             $remainingPayment = $totalPO - $totalPayment;
         }
 
-        $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
+        $cabang = session()->get('access_cabang');
         $slip = DB::table('master_slip')->select('id_slip as id', DB::raw("CONCAT(kode_slip,' - ',nama_slip) as text"))
             ->get();
         return view('ops.purchaseDownPayment.form', [
@@ -205,8 +205,13 @@ class PurchaseDownPaymentController extends Controller
     public function autoPo(Request $request)
     {
         $idCabang = $request->id_cabang;
-        $duration = DB::table('setting')->where('code', 'UMP Duration')->first();
-        $startDate = date('Y-m-d', strtotime('-' . intval($duration->value2) . ' days'));
+        $duration = DB::table('setting')->where('code', 'UMB Duration')->first();
+        $valDuration = '1';
+        if ($duration) {
+            $valDuration = $duration->value2;
+        }
+
+        $startDate = date('Y-m-d', strtotime('-' . intval($valDuration) . ' days'));
         $endDate = date('Y-m-d');
         $datas = DB::table('permintaan_pembelian as pp')->select('pp.id_permintaan_pembelian as id', 'nama_permintaan_pembelian as text', 'mtotal_permintaan_pembelian')
             ->leftJoin('uang_muka_pembelian as ump', function ($join) {

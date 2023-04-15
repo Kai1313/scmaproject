@@ -51,7 +51,7 @@ class ReceivedFromWarehouseController extends Controller
                 ->make(true);
         }
 
-        $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
+        $cabang = session()->get('access_cabang');
         return view('ops.receivedFromWarehouse.index', [
             'cabang' => $cabang,
             "pageTitle" => "SCA OPS | Terima Dari Gudang | List",
@@ -65,8 +65,7 @@ class ReceivedFromWarehouseController extends Controller
         }
 
         $data = MoveBranch::find($id);
-        $cabang = DB::table('cabang')->select('nama_cabang as text', 'id_cabang as id')->where('status_cabang', 1)->get();
-
+        $cabang = session()->get('access_cabang');
         return view('ops.receivedFromWarehouse.form', [
             'data' => $data,
             'cabang' => $cabang,

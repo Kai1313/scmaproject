@@ -83,11 +83,9 @@ class PurchaseRequestController extends Controller
                 })
                 ->rawColumns(['action', 'approval_status'])
                 ->make(true);
-
         }
 
-        $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
-
+        $cabang = session()->get('access_cabang');
         return view('ops.purchaseRequest.index', [
             'cabang' => $cabang,
             "pageTitle" => "SCA OPS | Permintaan Pembelian | List",
@@ -101,8 +99,7 @@ class PurchaseRequestController extends Controller
         }
 
         $data = PurchaseRequest::find($id);
-        $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
-
+        $cabang = session()->get('access_cabang');
         return view('ops.purchaseRequest.form', [
             'data' => $data,
             'cabang' => $cabang,
@@ -361,25 +358,25 @@ class PurchaseRequestController extends Controller
 
     public function sendToWa($targetNumber, $message)
     {
-        // $token_pengguna = "fb176fda94ad70ec8cc65456d1d5906a";
-        // $url = "https://wa.scasda.my.id/actions/aaa_api_kirim_webhook.php";
-        // $data = array(
-        //     "id_jenis_kirim" => 4,
-        //     "nomor_pengirim_kirim" => '*',
-        //     "nomor_tujuan_kirim" => $targetNumber,
-        //     "token_pengguna" => $token_pengguna,
-        //     "pesan_kirim" => $message,
-        //     "gambar_kirim" => '',
-        //     "file_kirim" => '',
-        //     "base64_string" => '',
-        // );
-        // $ch = curl_init($url);
-        // curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-        // curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-        // curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        // curl_setopt($ch, CURLOPT_VERBOSE, 0);
-        // curl_exec($ch);
-        // curl_close($ch);
+        $token_pengguna = "fb176fda94ad70ec8cc65456d1d5906a";
+        $url = "https://wa.scasda.my.id/actions/aaa_api_kirim_webhook.php";
+        $data = array(
+            "id_jenis_kirim" => 4,
+            "nomor_pengirim_kirim" => '*',
+            "nomor_tujuan_kirim" => $targetNumber,
+            "token_pengguna" => $token_pengguna,
+            "pesan_kirim" => $message,
+            "gambar_kirim" => '',
+            "file_kirim" => '',
+            "base64_string" => '',
+        );
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_VERBOSE, 0);
+        curl_exec($ch);
+        curl_close($ch);
 
         return ['status' => 'true'];
     }
