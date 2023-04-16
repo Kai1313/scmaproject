@@ -140,7 +140,12 @@ class GeneralLedgerController extends Controller
             if ($journalType == "PG" || $journalType == "HG") {
                 $sum = 0;
                 foreach ($detailData as $key => $item) {
-                    $sum += ($journalType == "PG") ? $item["debet"] : $item["kredit"];
+                    $debet = str_replace('.', '', $item['debet']);
+                    $debet = str_replace(',', '.', $debet);
+
+                    $kredit = str_replace('.', '', $item['kredit']);
+                    $kredit = str_replace(',', '.', $kredit);
+                    $sum += ($journalType == "PG") ? $debet : $kredit;
                 }
                 $trx_saldo = new TrxSaldo;
                 $trx_saldo->tipe_transaksi = ($journalType == "PG") ? "Piutang Giro" : "Hutang Giro";
@@ -465,7 +470,12 @@ class GeneralLedgerController extends Controller
                 $check = TrxSaldo::where("id_jurnal", $journalID)->first();
                 $sum = 0;
                 foreach ($detailData as $key => $item) {
-                    $sum += ($journalType == "PG") ? $item["debet"] : $item["kredit"];
+                    $debet = str_replace('.', '', $item['debet']);
+                    $debet = str_replace(',', '.', $debet);
+    
+                    $kredit = str_replace('.', '', $item['kredit']);
+                    $kredit = str_replace(',', '.', $kredit);
+                    $sum += ($journalType == "PG") ? $debet : $kredit;
                 }
                 $trx_saldo = ($check) ? TrxSaldo::where("id_jurnal", $journalID)->first() : new TrxSaldo;
                 $trx_saldo->tipe_transaksi = ($journalType == "PG") ? "Piutang Giro" : "Hutang Giro";
@@ -811,6 +821,9 @@ class GeneralLedgerController extends Controller
         try {
             // Init
             $type = str_replace("_", " ", $request->transaction_type);
+            if (str_contains($type, "tolak")) {
+                $type = str_replace(" tolak", "", $type);
+            }
             $customer = $request->customer;
             $supplier = $request->supplier;
             $offset = $request->start;
