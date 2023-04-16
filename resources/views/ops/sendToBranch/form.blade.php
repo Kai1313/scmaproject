@@ -227,9 +227,6 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="alert alert-info">
-                            Pastikan QR Code sudah keluar rak dan stok tidak habis
-                        </div>
                         <input type="hidden" name="id_pindah_barang_detail">
                         <table class="table table-bordered">
                             <tr>
@@ -329,6 +326,7 @@
 @section('externalScripts')
     <script>
         let branches = {!! json_encode($cabang) !!};
+        let allBranch = {!! $allCabang !!}
         var audiobarcode = new Audio("{{ asset('files/scan.mp3') }}");
         let html5QrcodeScanner = new Html5QrcodeScanner("reader", {
             fps: 10,
@@ -433,6 +431,20 @@
                     'id': "",
                     'text': 'Pilih Gudang'
                 }, ...data.gudang]
+            })
+
+            let branchData = []
+            for (let i = 0; i < allBranch.length; i++) {
+                if (allBranch[i].id != data.id) {
+                    branchData.push(allBranch[i])
+                }
+            }
+            $('[name="id_cabang2"]').empty()
+            $('[name="id_cabang2"]').select2({
+                data: [{
+                    'id': '',
+                    'text': 'Pilih Cabang Tujuan'
+                }, ...branchData]
             })
         }
 
@@ -567,6 +579,7 @@
                     let textError = error.hasOwnProperty('responseJSON') ? error.responseJSON.message : error
                         .statusText
                     Swal.fire("Gagal Mengambil Data. ", textError, 'error')
+                    html5QrcodeScanner.render(onScanSuccess, onScanError);
                     $('#cover-spin').hide()
                 }
             })

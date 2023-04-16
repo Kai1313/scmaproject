@@ -77,9 +77,11 @@ class SendToBranchController extends Controller
 
         $data = MoveBranch::find($id);
         $cabang = session()->get('access_cabang');
+        $allCabang = DB::table('cabang')->select('id_cabang as id', 'nama_cabang as text')->where('status_cabang', 1)->get();
         return view('ops.sendToBranch.form', [
             'data' => $data,
             'cabang' => $cabang,
+            'allCabang' => $allCabang,
             "pageTitle" => "SCA OPS | Kirim Ke Cabang | " . ($id == 0 ? 'Create' : 'Edit'),
         ]);
     }

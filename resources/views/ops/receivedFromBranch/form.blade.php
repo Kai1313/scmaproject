@@ -118,15 +118,14 @@
                         <div class="col-md-4">
                             <label>Referensi Kode Pindah Cabang</label>
                             <div class="form-group">
-                                <select name="kode_pindah_barang2" class="form-control select2" data-validation="[NOTEMPTY]"
-                                    data-validation-message="Kode pindah gudang tidak boleh kosong">
+                                <select name="id_pindah_barang2" class="form-control select2" data-validation="[NOTEMPTY]"
+                                    data-validation-message="Kode pindah cabang tidak boleh kosong">
+                                    <option value="">Pilih Kode Pindah Cabang</option>
                                     @if ($data && $data->parent)
-                                        <option value="{{ $data->parent->kode_pindah_barang }}">
+                                        <option value="{{ $data->id_pindah_barang2 }}" selected>
                                             {{ $data->parent->kode_pindah_barang }}</option>
                                     @endif
                                 </select>
-                                <input type="hidden" name="id_pindah_barang2"
-                                    value="{{ old('id_pindah_barang2', $data ? $data->id_pindah_barang2 : '') }}">
                             </div>
                             <label>Nama Jasa Pengiriman</label>
                             <div class="form-group">
@@ -164,12 +163,13 @@
                 </div>
             </div>
             <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">Detil Barang</h3>
+                    <button type="button" class="btn btn-sm btn-info btn-flat pull-right add-entry">
+                        <i class="glyphicon glyphicon-plus"></i> Tambah Barang
+                    </button>
+                </div>
                 <div class="box-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h4>Detil Barang</h4>
-                        </div>
-                    </div>
                     <div class="table-responsive">
                         <input name="id_jenis_transaksi" type="hidden"
                             value="{{ old('id_jenis_transaksi', $data ? $data->id_jenis_transaksi : '22') }}">
@@ -196,12 +196,112 @@
                         </table>
                     </div>
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                    <button class="btn btn-primary btn-flat pull-right" type="submit">
+                    <button class="btn btn-primary btn-flat pull-right btn-sm" type="submit">
                         <i class="glyphicon glyphicon-floppy-saved"></i> Simpan Data
                     </button>
                 </div>
             </div>
         </form>
+    </div>
+
+    <div class="modal fade" id="modalEntry" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <center>
+                        <div id="reader"></div>
+                    </center>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input type="text" name="search-qrcode" class="form-control" placeholder="QRCode barang"
+                                autocomplete="off">
+                            <div class="input-group-btn">
+                                <button class="btn btn-info btn-search btn-flat">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="table table-bordered">
+                        <tr>
+                            <td width="100"><b>QR Code</b></td>
+                            <td width="20">:</td>
+                            <td id="qr_code" class="setData"></td>
+                            <td id="id_pindah_barang_detail" class="setData" style="display:none;"></td>
+                            <td id="status_diterima" class="setData" style="display:none;"></td>
+                        </tr>
+                        <tr>
+                            <td><b>Nama Barang</b></td>
+                            <td>:</td>
+                            <td id="nama_barang" class="setData"></td>
+                            <td id="id_barang" class="setData" style="display:none;"></td>
+                        </tr>
+                        <tr>
+                            <td><b>Jumlah</b></td>
+                            <td>:</td>
+                            <td id="qty" class="setData"></td>
+                        </tr>
+                        <tr>
+                            <td><b>Satuan</b></td>
+                            <td>:</td>
+                            <td id="nama_satuan_barang" class="setData"></td>
+                            <td id="id_satuan_barang" class="setData" style="display:none;"></td>
+                        </tr>
+                        <tr>
+                            <td><b>Jumlah Zak</b></td>
+                            <td>:</td>
+                            <td id="zak" class="setData"></td>
+                            <td id="id_wrapper_zak" class="setData" style="display:none;"></td>
+                            <td id="weight_zak" class="setData" style="display:none;"></td>
+                        </tr>
+                        <tr>
+                            <td><b>SG</b></td>
+                            <td>:</td>
+                            <td id="sg" class="setData"></td>
+                        </tr>
+                        <tr>
+                            <td><b>BE</b></td>
+                            <td>:</td>
+                            <td id="be" class="setData"></td>
+                        </tr>
+                        <tr>
+                            <td><b>PH</b></td>
+                            <td>:</td>
+                            <td id="ph" class="setData"></td>
+                        </tr>
+                        <tr>
+                            <td><b>Bentuk</b></td>
+                            <td>:</td>
+                            <td id="bentuk" class="setData"></td>
+                        </tr>
+                        <tr>
+                            <td><b>Warna</b></td>
+                            <td>:</td>
+                            <td id="warna" class="setData"></td>
+                        </tr>
+                        <tr>
+                            <td><b>Keterangan</b></td>
+                            <td>:</td>
+                            <td id="keterangan" class="setData"></td>
+                        </tr>
+                        <tr>
+                            <td><b>Batch</b></td>
+                            <td>:</td>
+                            <td id="batch" class="setData"></td>
+                        </tr>
+                        <tr>
+                            <td><b>Kadaluarsa</b></td>
+                            <td>:</td>
+                            <td id="tanggal_kadaluarsa" class="setData"></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary cancel-entry btn-flat">Batal</button>
+                    <button type="button" class="btn btn-primary save-entry btn-flat">Simpan</button>
+                </div>
+            </div>
+        </div>
     </div>
 @endsection
 
@@ -220,21 +320,11 @@
 @section('externalScripts')
     <script>
         let branches = {!! json_encode($cabang) !!};
-        let oldDetails = {!! $data && $data->parent ? $data->parent->formatdetail : '[]' !!};
-        let arrayQRCode = {!! $data ? $data->getDetailQRCode->pluck('qr_code') : '[]' !!};
-        let details = []
-
-        for (let i = 0; i < oldDetails.length; i++) {
-            details.push(oldDetails[i])
-            if (arrayQRCode.includes(oldDetails[i]['qr_code'])) {
-                details[i]['status_diterima'] = 1
-            } else {
-                details[i]['id_pindah_barang_detail'] = 0
-                details[i]['status_diterima'] = 0
-            }
-        }
-
-        $('[name="details"]').val(JSON.stringify(details))
+        let details = {!! $data ? $data->formatdetail : '[]' !!};
+        let html5QrcodeScanner = new Html5QrcodeScanner("reader", {
+            fps: 10,
+            qrbox: 250
+        });
 
         var resDataTable = $('#table-detail').DataTable({
             data: details,
@@ -301,14 +391,11 @@
                     searchable: false,
                     render: function(data, type, row, meta) {
                         let btn = '';
-                        if (row.status_diterima == 1) {
-                            if (arrayQRCode.includes(row.qr_code)) {
-                                btn = '<i class="fa fa-check" aria-hidden="true"></i>';
-                            } else {
-                                btn = '<input name="checked_data" type="checkbox" checked>';
-                            }
-                        } else {
-                            btn = '<input name="checked_data" type="checkbox">';
+                        if (row.id_pindah_barang_detail == '') {
+                            btn = '<ul class="horizontal-list">';
+                            btn +=
+                                '<li><a href="javascript:void(0)" class="btn btn-danger btn-xs mr-1 mb-1 delete-entry"><i class="glyphicon glyphicon-trash"></i></a></li>';
+                            btn += '</ul>';
                         }
 
                         return btn;
@@ -334,6 +421,7 @@
         });
 
         function getGudang(data) {
+            $('[name="id_gudang"]').empty()
             $('[name="id_gudang"]').select2({
                 data: [{
                     'id': "",
@@ -350,22 +438,20 @@
                     cabang: idCabang
                 },
                 success: function(res) {
-                    $('[name="kode_pindah_barang2"]').empty()
-                    $('[name="kode_pindah_barang2"]').select2({
+                    $('[name="id_pindah_barang2"]').empty()
+                    $('[name="id_pindah_barang2"]').select2({
                         data: [{
                             'id': "",
-                            'text': 'Pilih Kode Pindah Gudang'
+                            'text': 'Pilih Kode Pindah Cabang'
                         }, ...res.data]
                     }).on('select2:select', function(e) {
                         let dataselect = e.params.data
-                        $('[name="id_pindah_barang2"]').val(dataselect.id_pindah_barang)
+                        $('[name="id_pindah_barang2"]').val(dataselect.id)
                         $('[name="transporter"]').val(dataselect.transporter)
                         $('[name="nomor_polisi"]').val(dataselect.nomor_polisi)
                         $('[name="keterangan_pindah_barang"]').val(dataselect.keterangan_pindah_barang)
                         $('[name="nama_cabang_asal"]').val(dataselect.nama_cabang)
                         $('[name="id_cabang2"]').val(dataselect.id_cabang)
-
-                        getDetailItem(dataselect.id_pindah_barang)
                     });
 
                     $('#cover-spin').hide()
@@ -377,48 +463,194 @@
             })
         }
 
-        function getDetailItem(id_pindah_barang) {
+        $('.add-entry').click(function() {
+            detailSelect = []
+            $('#modalEntry').find('input,select,textarea').each(function(i, v) {
+                $(v).val('').trigger('change')
+            })
+
+            $('#modalEntry').find('.setData').each(function(i, v) {
+                $(v).text('')
+            })
+
+            statusModal = 'create'
+            $('#modalEntry').modal({
+                backdrop: 'static',
+                keyboard: false
+            })
+
+            html5QrcodeScanner.render(onScanSuccess, onScanError);
+        })
+
+        $('.save-entry').click(function() {
+            let modal = $('#modalEntry')
+            let valid = validatorModal($('#qr_code').text())
+            if (!valid.status) {
+                Swal.fire("Gagal proses data. ", valid.message, 'error')
+                return false
+            }
+
+            modal.find('.setData').each(function(i, v) {
+                let id = $(v).prop('id')
+                if (id == 'qty') {
+                    detailSelect[id] = normalizeNumber($(v).text())
+                } else {
+                    detailSelect[id] = $(v).text()
+                }
+            })
+
+            let newObj = Object.assign({}, detailSelect)
+            if (statusModal == 'create') {
+                details.push(newObj)
+            } else if (statusModal == 'edit') {
+                details[newObj.index - 1] = newObj
+            }
+
+            console.log(details)
+
+            $('[name="details"]').val(JSON.stringify(details))
+
+            statusModal = ''
+            detailSelect = []
+
+            resDataTable.clear().rows.add(details).draw()
+            $('#modalEntry').modal('hide')
+        })
+
+        $('body').on('click', '.delete-entry', function() {
+            let index = $(this).parents('tr').index()
+            Swal.fire({
+                title: 'Anda yakin ingin menghapus data ini?',
+                icon: 'info',
+                showDenyButton: true,
+                confirmButtonText: 'Yes',
+                denyButtonText: 'No',
+                reverseButtons: true,
+                customClass: {
+                    actions: 'my-actions',
+                    confirmButton: 'order-1',
+                    denyButton: 'order-3',
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    details.splice(index, 1)
+                    resDataTable.clear().rows.add(details).draw()
+                    $('[name="details"]').val(JSON.stringify(details))
+                }
+            })
+        })
+
+        // function getDetailItem(id_pindah_barang) {
+        //     $('#cover-spin').show()
+        //     $.ajax({
+        //         url: '{{ route('received_from_branch-detail-item') }}',
+        //         data: {
+        //             id: id_pindah_barang
+        //         },
+        //         success: function(res) {
+        //             details = []
+        //             oldDetails = res.data
+        //             for (let i = 0; i < oldDetails.length; i++) {
+        //                 details.push(oldDetails[i])
+        //                 if (arrayQRCode.includes(oldDetails[i]['qr_code'])) {
+        //                     details[i]['status_diterima'] = 1
+        //                 } else {
+        //                     details[i]['id_pindah_barang_detail'] = 0
+        //                     details[i]['status_diterima'] = 0
+        //                 }
+        //             }
+
+        //             $('[name="details"]').val(JSON.stringify(details))
+        //             resDataTable.clear().rows.add(details).draw()
+        //             $('#cover-spin').hide()
+        //         },
+        //         error: function(error) {
+        //             console.log(error)
+        //             $('#cover-spin').hide()
+        //         }
+        //     })
+        // }
+
+        // $('body').on('change', '[name="checked_data"]', function() {
+        //     let index = $(this).parents('tr').index()
+        //     let detailSelect = details[index]
+        //     if ($(this).is(':checked')) {
+        //         detailSelect['status_diterima'] = 1
+        //     } else {
+        //         detailSelect['status_diterima'] = 0
+        //     }
+
+        //     details[index] = detailSelect
+        //     $('[name="details"]').val(JSON.stringify(details))
+        // })
+
+        $('.cancel-entry').click(function() {
+            $('#modalEntry').modal('hide')
+            html5QrcodeScanner.clear();
+        })
+
+        function validatorModal(id = 0) {
+            let message = 'Lengkapi inputan yang diperlukan'
+            let valid = true
+            let findItem = details.filter(p => p.qr_code == id)
+            if (findItem.length > 0 && findItem[0].qr_code == id && statusModal == 'create') {
+                message = "Barang sudah ada"
+                valid = false
+            }
+
+            return {
+                'status': valid,
+                'message': message
+            }
+        }
+
+        $('.btn-search').click(function() {
+            let self = $('[name="search-qrcode"]').val()
+            html5QrcodeScanner.clear();
+            searchAsset(self)
+        })
+
+        function searchAsset(string) {
             $('#cover-spin').show()
             $.ajax({
                 url: '{{ route('received_from_branch-detail-item') }}',
+                type: 'get',
                 data: {
-                    id: id_pindah_barang
+                    id_pindah_barang: $('[name="id_pindah_barang2"]').val(),
+                    qrcode: string
                 },
                 success: function(res) {
-                    details = []
-                    oldDetails = res.data
-                    for (let i = 0; i < oldDetails.length; i++) {
-                        details.push(oldDetails[i])
-                        if (arrayQRCode.includes(oldDetails[i]['qr_code'])) {
-                            details[i]['status_diterima'] = 1
+                    for (select in res.data) {
+                        if (select == 'qty') {
+                            $('#' + select).text(formatNumber(res.data[select]))
                         } else {
-                            details[i]['id_pindah_barang_detail'] = 0
-                            details[i]['status_diterima'] = 0
+                            $('#' + select).text(res.data[select])
                         }
+
+                        $('#status_diterima').text(1)
                     }
 
-                    $('[name="details"]').val(JSON.stringify(details))
-                    resDataTable.clear().rows.add(details).draw()
+                    $('[name="search-qrcode"]').val('')
                     $('#cover-spin').hide()
                 },
                 error: function(error) {
-                    console.log(error)
+                    let textError = error.hasOwnProperty('responseJSON') ? error.responseJSON.message : error
+                        .statusText
+                    Swal.fire("Gagal Mengambil Data. ", textError, 'error')
+                    html5QrcodeScanner.render(onScanSuccess, onScanError);
                     $('#cover-spin').hide()
                 }
             })
         }
 
-        $('body').on('change', '[name="checked_data"]', function() {
-            let index = $(this).parents('tr').index()
-            let detailSelect = details[index]
-            if ($(this).is(':checked')) {
-                detailSelect['status_diterima'] = 1
-            } else {
-                detailSelect['status_diterima'] = 0
-            }
+        function onScanSuccess(decodedText, decodedResult) {
+            audiobarcode.play();
+            $('[name="search-qrcode"]').val(decodedText)
+            $('.btn-search').click()
+        }
 
-            details[index] = detailSelect
-            $('[name="details"]').val(JSON.stringify(details))
-        })
+        function onScanError(errorMessage) {
+            toastr.error(JSON.strignify(errorMessage))
+        }
     </script>
 @endsection

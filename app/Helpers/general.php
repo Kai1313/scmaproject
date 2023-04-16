@@ -66,7 +66,7 @@ function checkUserSession($request, $alias_menu, $type)
 
         $arrayCabang = [];
         foreach ($aksesCabang as $ac) {
-            if (isset($array[$ac->id_cabang])) {
+            if (isset($arrayCabang[$ac->id_cabang])) {
                 $arrayCabang[$ac->id_cabang]['gudang'][] = ['id' => $ac->id_gudang, 'text' => $ac->kode_gudang . ' - ' . $ac->nama_gudang];
             } else {
                 $arrayCabang[$ac->id_cabang] = [
@@ -80,7 +80,7 @@ function checkUserSession($request, $alias_menu, $type)
         }
 
         $arrayCabang = array_values($arrayCabang);
-        // session()->flush();
+        session()->flush();
         if ($token && session()->has('token') == false) {
             session()->put('token', $token->nama_token_pengguna);
             session()->put('user', $user);
