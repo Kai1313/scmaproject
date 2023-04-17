@@ -166,7 +166,7 @@
         });
 
         $('[name="id_cabang"]').select2({
-            data: cabang
+            data: branch
         }).on('select2:select', function(e) {
             let dataselect = e.params.data
             $('[name="nominal"]').val('').attr('data-max', 0)
