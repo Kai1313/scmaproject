@@ -558,9 +558,11 @@
             detail = details.filter(function(item) {
                 return item['guid'] == guid
             })
+            let notes = detail[0]["notes"].replace('<br/>', '\n')
+
             // Set data on form
             $("#akun_detail").val(detail[0]["akun"]).trigger("change.select2")
-            $("#notes_detail").val(detail[0]["notes"])
+            $("#notes_detail").val(notes)
             $("#debet").val(formatCurr(detail[0]["debet"]))
             $("#kredit").val(formatCurr(detail[0]["kredit"]))
             $("#edit_id").val(detail[0]["guid"])

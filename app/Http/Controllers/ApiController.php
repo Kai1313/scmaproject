@@ -2501,4 +2501,388 @@ class ApiController extends Controller
             ], 400);
         }
     }
+
+    public function getPemakaian($tanggal_closing)
+    {
+        $data_pemakaian = DB::table("pemakaian_header as head")
+            ->join('pemakaian_detail as det', 'head.id_pemakaian', 'det.id_pemakaian')
+            ->join('barang as good', 'good.id_barang', 'det.id_barang')
+            ->join('master_qr_code as qr', 'qr.kode_batang_master_qr_code', 'det.kode_batang')
+            ->selectRaw('head.kode_pemakaian,
+                det.id_barang,
+                good.id_akun,
+                ROUND(SUM(jumlah),2) as jumlah,
+                ROUND(SUM(ROUND(qr.listrik_master_qr_code * det.jumlah, 2) + ROUND(qr.pegawai_master_qr_code * det.jumlah, 2) + ROUND(qr.produksi_master_qr_code * det.jumlah, 2) + ROUND(qr.beli_master_qr_code * det.jumlah, 2) + ROUND(qr.biaya_beli_master_qr_code * det.jumlah, 2)), 2) as total')
+            ->where('head.tanggal', $tanggal_closing)
+            ->orderBy('head.id_pemakaian', 'ASC')
+            ->groupBy('det.id_pemakaian', 'det.id_barang')
+            ->get();
+
+        $data_results = [];
+
+        foreach($data_pemakaian as $pemakaian){
+            array_push($data_results, [
+                'nama_transaksi' => $pemakaian->kode_pemakaian,
+                'akun' => $pemakaian->id_akun,
+                'notes' => $pemakaian->id_barang,
+                'debet' => 0,
+                'kredit' => round($pemakaian->total, 2),
+            ]);
+        }
+
+        return $data_results;
+    }
+
+    public function jurnalClosingPemakaian(Request $request)
+    {
+        DB::beginTransaction();
+        $id_cabang = $request->id_cabang;
+        $tanggal = $request->periode_closing;
+
+        // Pemakaian
+        $data_pemakaian = $this->getPemakaian($tanggal);
+
+        $data_hasil = $data_pemakaian;
+        $user_data = Auth::guard('api')->user();
+
+        $data = [
+            'cabang' => $id_cabang,
+            'data_hasil' => $data_hasil,
+            'user_data' => $user_data
+        ];
+
+        // dd($data);
+
+        $store_data =  $this->storeClosingJournalPemakaian($data);
+
+        if($store_data){
+            return response()->json([
+                "result" => true,
+                "code" => 200,
+                "message" => "Successfully stored Jurnal Closing Pemakaian data",
+            ], 200);
+        }else{
+            return response()->json([
+                "result" => false,
+                "code" => 400,
+                "message" => "Error when store Jurnal Closing Pemakaian data",
+            ], 400);
+        }
+    }
+
+    public function storeClosingJournalPemakaian($data)
+    {
+        try{
+            // Init Data
+            $hasil = $data['data_hasil']; // Diisi dengan data hasil
+            $journalDate = date('Y-m-d');
+            $journalDate = date("Y-m-t", strtotime($journalDate));
+            $journalType = "ME";
+            $cabangID = $data['cabang'];
+            $noteHeader = "";
+            $userData = $data['user_data'];
+            $userRecord = $userData->id_pengguna;
+            $userModified = $userData->id_pengguna;
+            $dateRecord = date('Y-m-d');
+
+            $get_akun_hpp_pemakaian = Setting::where("id_cabang", $cabangID)->where("code", "HPP Pemakaian")->first();
+
+            $header = new JurnalHeader();
+            $header->id_cabang = $cabangID;
+            $header->jenis_jurnal = $journalType;
+            $header->id_transaksi = NULL;
+            $header->catatan = $noteHeader;
+            $header->void = 0;
+            $header->tanggal_jurnal = $journalDate;
+            $header->user_created = $userRecord;
+            $header->user_modified = $userModified;
+            $header->dt_created = $dateRecord;
+            $header->dt_modified = $dateRecord;
+            $header->kode_jurnal = $this->generateJournalCode($cabangID, $journalType);
+            if (!$header->save()) {
+                DB::rollback();
+                Log::error("Error when storing journal header.");
+                return FALSE;
+            }
+
+            Log::debug($header);
+
+            // Detail
+            $index = 1;
+            $total_debet = 0;
+            $total_credit = 0;
+            $list_transaksi = '';
+
+            foreach ($hasil as $key => $value) {
+                //Store Detail
+                $detail = new JurnalDetail();
+                $detail->id_jurnal = $header->id_jurnal;
+                $detail->index = $index;
+                $detail->id_akun = $value['akun'];
+                $detail->keterangan = "Pemakaian barang " . $value['nama_transaksi'];
+                $detail->id_transaksi = $value['nama_transaksi'];
+                $detail->debet = floatval($value['debet']);
+                $detail->credit = floatval($value['kredit']);
+                $detail->user_created = $userRecord;
+                $detail->user_modified = $userModified;
+                $detail->dt_created = $dateRecord;
+                $detail->dt_modified = $dateRecord;
+                if (!$detail->save()) {
+                    DB::rollback();
+                    Log::error("Error when storing journal detail.");
+                    return FALSE;
+                }
+                Log::debug($detail);
+                
+                $total_debet += $detail->debet;
+                $total_credit += $detail->credit;
+                $list_transaksi .= $value['nama_transaksi'] . ';';
+                $index++;
+            }
+
+            $list_transaksi = substr_replace($list_transaksi,"",-1);
+            $list_transaksi = explode(';', $list_transaksi);
+            $list_transaksi = array_unique($list_transaksi);
+
+            $transaksi = '';
+            foreach ($list_transaksi as $key => $value) {
+                $transaksi .= $value;
+                if($key < count($list_transaksi) - 1){
+                    $transaksi .= ', ';
+                }
+            }
+
+            // pembulatan
+            if($total_debet != $total_credit){
+                $selisih = $total_credit - $total_debet;
+
+                $detail = new JurnalDetail();
+                $detail->id_jurnal = $header->id_jurnal;
+                $detail->index = $index;
+                $detail->id_akun = 'Test';
+                // $detail->id_akun = $get_akun_hpp_pemakaian->value2;
+                $detail->keterangan = "Pembulatan Pemakaian Barang " . $transaksi;
+                $detail->id_transaksi = "Pembulatan";
+                if($selisih > 0){
+                    $detail->debet = floatval($selisih);
+                    $detail->credit = 0;
+                }else{
+                    $detail->debet = 0;
+                    $detail->credit = floatval(abs($selisih));
+                }
+                $detail->user_created = $userRecord;
+                $detail->user_modified = $userModified;
+                $detail->dt_created = $dateRecord;
+                $detail->dt_modified = $dateRecord;
+
+                if (!$detail->save()) {
+                    DB::rollback();
+                    Log::error("Error when storing journal detail pembulatan.");
+                    return FALSE;
+                }
+                Log::debug($detail);
+            }
+            
+            DB::commit();
+            return TRUE;
+        } catch (\Exception $e) {
+            DB::rollback();
+            $message = "Error when storing Journal Closing Pemakaian";
+            Log::error($message);
+            Log::error($e);
+            return FALSE;
+        }
+    }
+
+    public function getReturJual($tanggal_closing)
+    {
+        $data_retur_jual = DB::table("retur_penjualan as head")
+            ->join('retur_penjualan_detail as det', 'head.id_retur_penjualan', 'det.id_retur_penjualan')
+            ->join('barang as good', 'good.id_barang', 'det.id_barang')
+            ->join('master_qr_code as qr', 'qr.kode_batang_master_qr_code', 'det.kode_batang_retur_penjualan_detail')
+            ->selectRaw('det.nama_retur_penjualan_detail,
+                det.id_barang,
+                good.id_akun,
+                ROUND(SUM(jumlah_retur_penjualan_detail),2) as jumlah_retur_penjualan_detail,
+                ROUND(SUM(ROUND(qr.listrik_master_qr_code * det.jumlah_retur_penjualan_detail, 2) + ROUND(qr.pegawai_master_qr_code * det.jumlah_retur_penjualan_detail, 2) + ROUND(qr.produksi_master_qr_code * det.jumlah_retur_penjualan_detail, 2) + ROUND(qr.beli_master_qr_code * det.jumlah_retur_penjualan_detail, 2) + ROUND(qr.biaya_beli_master_qr_code * det.jumlah_retur_penjualan_detail, 2)), 2) as total')
+            ->where('head.tanggal_retur_penjualan', $tanggal_closing)
+            ->orderBy('head.id_retur_penjualan', 'ASC')
+            ->groupBy('det.id_retur_penjualan', 'det.id_barang')
+            ->get();
+
+        $data_results = [];
+
+        foreach($data_retur_jual as $retur_jual){
+            array_push($data_results, [
+                'nama_transaksi' => $retur_jual->nama_retur_penjualan_detail,
+                'akun' => $retur_jual->id_akun,
+                'notes' => $retur_jual->id_barang,
+                'debet' => round($retur_jual->total, 2),
+                'kredit' => 0
+            ]);
+        }
+
+        return $data_results;
+    }
+
+    public function jurnalClosingReturJual(Request $request)
+    {
+        DB::beginTransaction();
+        $id_cabang = $request->id_cabang;
+        $tanggal = $request->periode_closing;
+
+        // Retur jual
+        $data_retur_jual = $this->getReturJual($tanggal);
+
+        $data_hasil = $data_retur_jual;
+        $user_data = Auth::guard('api')->user();
+
+        $data = [
+            'cabang' => $id_cabang,
+            'data_hasil' => $data_hasil,
+            'user_data' => $user_data
+        ];
+
+        // dd($data);
+
+        $store_data =  $this->storeClosingJournalReturJual($data);
+
+        if($store_data){
+            return response()->json([
+                "result" => true,
+                "code" => 200,
+                "message" => "Successfully stored Jurnal Closing Retur Jual data",
+            ], 200);
+        }else{
+            return response()->json([
+                "result" => false,
+                "code" => 400,
+                "message" => "Error when store Jurnal Closing Retur Jual data",
+            ], 400);
+        }
+    }
+
+    public function storeClosingJournalReturJual($data)
+    {
+        try{
+            // Init Data
+            $hasil = $data['data_hasil']; // Diisi dengan data hasil
+            $journalDate = date('Y-m-d');
+            $journalDate = date("Y-m-t", strtotime($journalDate));
+            $journalType = "ME";
+            $cabangID = $data['cabang'];
+            $noteHeader = "";
+            $userData = $data['user_data'];
+            $userRecord = $userData->id_pengguna;
+            $userModified = $userData->id_pengguna;
+            $dateRecord = date('Y-m-d');
+
+            $get_akun_hpp_retur_jual = Setting::where("id_cabang", $cabangID)->where("code", "HPP Retur Penjualan")->first();
+
+            $header = new JurnalHeader();
+            $header->id_cabang = $cabangID;
+            $header->jenis_jurnal = $journalType;
+            $header->id_transaksi = NULL;
+            $header->catatan = $noteHeader;
+            $header->void = 0;
+            $header->tanggal_jurnal = $journalDate;
+            $header->user_created = $userRecord;
+            $header->user_modified = $userModified;
+            $header->dt_created = $dateRecord;
+            $header->dt_modified = $dateRecord;
+            $header->kode_jurnal = $this->generateJournalCode($cabangID, $journalType);
+            if (!$header->save()) {
+                DB::rollback();
+                Log::error("Error when storing journal header.");
+                return FALSE;
+            }
+
+            Log::debug($header);
+
+            // Detail
+            $index = 1;
+            $total_debet = 0;
+            $total_credit = 0;
+            $list_transaksi = '';
+
+            foreach ($hasil as $key => $value) {
+                //Store Detail
+                $detail = new JurnalDetail();
+                $detail->id_jurnal = $header->id_jurnal;
+                $detail->index = $index;
+                $detail->id_akun = $value['akun'];
+                $detail->keterangan = "Persediaan jurnal penjualan " . $value['nama_transaksi'];
+                $detail->id_transaksi = $value['nama_transaksi'];
+                $detail->debet = floatval($value['debet']);
+                $detail->credit = floatval($value['kredit']);
+                $detail->user_created = $userRecord;
+                $detail->user_modified = $userModified;
+                $detail->dt_created = $dateRecord;
+                $detail->dt_modified = $dateRecord;
+                if (!$detail->save()) {
+                    DB::rollback();
+                    Log::error("Error when storing journal detail.");
+                    return FALSE;
+                }
+                Log::debug($detail);
+                
+                $total_debet += $detail->debet;
+                $total_credit += $detail->credit;
+                $list_transaksi .= $value['nama_transaksi'] . ';';
+                $index++;
+            }
+
+            $list_transaksi = substr_replace($list_transaksi,"",-1);
+            $list_transaksi = explode(';', $list_transaksi);
+            $list_transaksi = array_unique($list_transaksi);
+
+            $transaksi = '';
+            foreach ($list_transaksi as $key => $value) {
+                $transaksi .= $value;
+                if($key < count($list_transaksi) - 1){
+                    $transaksi .= ', ';
+                }
+            }
+
+            // pembulatan
+            if($total_debet != $total_credit){
+                $selisih = $total_credit - $total_debet;
+
+                $detail = new JurnalDetail();
+                $detail->id_jurnal = $header->id_jurnal;
+                $detail->index = $index;
+                $detail->id_akun = 'Test';
+                // $detail->id_akun = $get_akun_hpp_retur_jual->value2;
+                $detail->keterangan = "Pembulatan Persediaan jurnal penjualan " . $transaksi;
+                $detail->id_transaksi = "Pembulatan";
+                if($selisih > 0){
+                    $detail->debet = floatval($selisih);
+                    $detail->credit = 0;
+                }else{
+                    $detail->debet = 0;
+                    $detail->credit = floatval(abs($selisih));
+                }
+                $detail->user_created = $userRecord;
+                $detail->user_modified = $userModified;
+                $detail->dt_created = $dateRecord;
+                $detail->dt_modified = $dateRecord;
+
+                if (!$detail->save()) {
+                    DB::rollback();
+                    Log::error("Error when storing journal detail pembulatan.");
+                    return FALSE;
+                }
+                Log::debug($detail);
+            }
+            
+            DB::commit();
+            return TRUE;
+        } catch (\Exception $e) {
+            DB::rollback();
+            $message = "Error when storing Journal Closing Retur Jual";
+            Log::error($message);
+            Log::error($e);
+            return FALSE;
+        }
+    }
 }
