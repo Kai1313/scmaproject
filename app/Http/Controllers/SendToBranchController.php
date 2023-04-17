@@ -190,7 +190,7 @@ class SendToBranchController extends Controller
                 'mqc.id_satuan_barang',
                 'nama_satuan_barang',
                 'kode_batang_master_qr_code as qr_code',
-                'jumlah_master_qr_code as qty',
+                'sisa_master_qr_code as qty',
                 'sg_master_qr_code as sg',
                 'be_master_qr_code as be',
                 'ph_master_qr_code as ph',
