@@ -336,6 +336,8 @@
         let detailSelect = []
         let statusModal = 'create'
 
+        $('[name="details"]').val(JSON.stringify(details))
+
         var resDataTable = $('#table-detail').DataTable({
             data: details,
             ordering: false,

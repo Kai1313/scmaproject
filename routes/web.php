@@ -117,7 +117,7 @@ Route::prefix('pemakaian')->group(function () {
     Route::get('/entry/{id?}', 'MaterialUsageController@entry')->name('material_usage-entry');
     Route::post('/save_entry/{id}', 'MaterialUsageController@saveEntry')->name('material_usage-save-entry');
     Route::get('/view/{id}', 'MaterialUsageController@viewData')->name('material_usage-view');
-    // Route::get('/delete/{id}', 'ReceivedFromWarehouseController@destroy')->name('received_from_warehouse-delete');
+    Route::get('/delete/{id}', 'MaterialUsageController@destroy')->name('material_usage-delete');
     Route::get('/auto-qrcode', 'MaterialUsageController@autoQRCode')->name('material_usage-qrcode');
     Route::get('/reload-timbangan', 'MaterialUsageController@reloadWeight')->name('material_usage-reload-weight');
 });

@@ -39,7 +39,7 @@ class MaterialUsageController extends Controller
                     $btn = '<ul class="horizontal-list">';
                     $btn .= '<li><a href="' . route('material_usage-view', $row->id_pemakaian) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
                     $btn .= '<li><a href="' . route('material_usage-entry', $row->id_pemakaian) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
-                    // $btn .= '<li><a href="' . route('received_from_branch-delete', $row->id_pindah_barang) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Void</a></li>';
+                    // $btn .= '<li><a href="' . route('material_usage-delete-delete', $row->id_pemakaian) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Void</a></li>';
                     $btn .= '</ul>';
                     return $btn;
                 })
@@ -121,6 +121,43 @@ class MaterialUsageController extends Controller
             'data' => $data,
             "pageTitle" => "SCA OPS | Pemakaian | Detail",
         ]);
+    }
+
+    public function destroy($id)
+    {
+        // if (checkAccessMenu('pemakaian_header', 'delete') == false) {
+        //     return response()->json(['message' => 'Tidak mempunyai akses'], 500);
+        // }
+
+        // $data = MateialUsage::find($id);
+        // if (!$data) {
+        //     return response()->json([
+        //         "result" => false,
+        //         "message" => "Data tidak ditemukan",
+        //     ], 500);
+        // }
+
+        // try {
+        //     DB::beginTransaction();
+        //     $data->void = 1;
+        //     $data->void_user_id = session()->get('user')['id_pengguna'];
+        //     $data->save();
+
+        //     DB::commit();
+        //     return response()->json([
+        //         "result" => true,
+        //         "message" => "Data berhasil dibatalkan",
+        //         "redirect" => route('purchase-request'),
+        //     ], 200);
+        // } catch (\Exception $e) {
+        //     DB::rollback();
+        //     Log::error("Error when void purchase request");
+        //     Log::error($e);
+        //     return response()->json([
+        //         "result" => false,
+        //         "message" => "Data gagal dibatalkan",
+        //     ], 500);
+        // }
     }
 
     public function autoQRCode(Request $request)

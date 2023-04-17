@@ -326,6 +326,8 @@
             qrbox: 250
         });
 
+        $('[name="details"]').val(JSON.stringify(details))
+
         var resDataTable = $('#table-detail').DataTable({
             data: details,
             ordering: false,
@@ -505,8 +507,6 @@
             } else if (statusModal == 'edit') {
                 details[newObj.index - 1] = newObj
             }
-
-            console.log(details)
 
             $('[name="details"]').val(JSON.stringify(details))
 
