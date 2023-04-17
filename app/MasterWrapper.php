@@ -9,7 +9,9 @@ class MasterWrapper extends Model
 {
     protected $table = 'master_wrapper';
     protected $primaryKey = 'id_wrapper';
-    public $timestamps = false;
+
+    const CREATED_AT = 'dt_created';
+    const UPDATED_AT = 'dt_modified';
 
     protected $fillable = [
         'id_cabang', 'nama_wrapper', 'weight', 'path', 'path2', 'catatan', 'user_created', 'dt_created', 'user_modified', 'dt_modified', 'id_kategori_wrapper',

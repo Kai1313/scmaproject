@@ -18,7 +18,7 @@ class MasterWrapperController extends Controller
 
         if ($request->ajax()) {
             $data = DB::table('master_wrapper')
-                ->select('id_wrapper', 'nama_wrapper', 'weight', 'catatan', 'path2', 'path', 'dt_created as created_at');
+                ->select('id_wrapper', 'nama_wrapper', 'weight', 'catatan', 'path2', 'path', 'dt_created as created_at', DB::raw('(CASE WHEN id_kategori_wrapper = 1 THEN "Palet" ELSE "Zak" END) AS kategori_wrapper'));
             if (isset($request->c)) {
                 $data = $data->where('id_cabang', $request->c);
             }
@@ -75,9 +75,9 @@ class MasterWrapperController extends Controller
             DB::beginTransaction();
             if (!$data) {
                 $data = new MasterWrapper;
-                $data['dt_created'] = date('Y-m-d H:i:s');
+                $dat['user_created'] = session()->get('user')['id_pengguna'];
             } else {
-                $data['dt_modified'] = date('Y-m-d H:i:s');
+                $dat['user_modified'] = session()->get('user')['id_pengguna'];
             }
 
             $checkData = DB::table('master_wrapper')

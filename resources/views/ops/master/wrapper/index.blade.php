@@ -85,6 +85,7 @@
                         <thead>
                             <tr>
                                 <th>Nama Pembungkus</th>
+                                <th>Kategori Pembungkus</th>
                                 <th class="text-right">Berat</th>
                                 <th>Catatan</th>
                                 <th>Gambar</th>
@@ -120,6 +121,9 @@
             columns: [{
                 data: 'nama_wrapper',
                 name: 'nama_wrapper'
+            }, {
+                data: 'kategori_wrapper',
+                name: 'kategori_wrapper'
             }, {
                 data: 'weight',
                 name: 'weight',
