@@ -40,9 +40,9 @@ $('select.select2').on('select2:closing', function (e) {
     })
 })
 
-function formatNumber(angka) {
+function formatNumber(angka, lengthComa) {
     angka = angka.toString().replace('.', ',')
-    return formatRupiah(angka, 4)
+    return formatRupiah(angka, lengthComa)
 }
 
 function formatRupiah(angka, prefix, self = '') {

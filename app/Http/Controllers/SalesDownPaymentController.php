@@ -62,7 +62,7 @@ class SalesDownPaymentController extends Controller
                 ->make(true);
         }
 
-        $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
+        $cabang = session()->get('access_cabang');
         return view('ops.salesDownPayment.index', [
             'cabang' => $cabang,
             "pageTitle" => "SCA OPS | Uang Muka Penjualan | List",
@@ -88,7 +88,7 @@ class SalesDownPaymentController extends Controller
             $remainingPayment = $totalPO - $totalPayment;
         }
 
-        $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
+        $cabang = session()->get('access_cabang');
         $slip = DB::table('master_slip')->select('id_slip as id', DB::raw("CONCAT(kode_slip,' - ',nama_slip) as text"))
             ->get();
         return view('ops.salesDownPayment.form', [

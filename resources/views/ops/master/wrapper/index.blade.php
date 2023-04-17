@@ -53,9 +53,7 @@
                         <div class="form-group">
                             <select name="id_cabang" class="form-control select2">
                                 @foreach ($cabang as $branch)
-                                    <option value="{{ $branch->id_cabang }}">{{ $branch->kode_cabang }} -
-                                        {{ $branch->nama_cabang }}
-                                    </option>
+                                    <option value="{{ $branch['id'] }}">{{ $branch['text'] }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -125,7 +123,9 @@
             }, {
                 data: 'weight',
                 name: 'weight',
-                render: $.fn.dataTable.render.number('.', ',', 4),
+                render: function(data) {
+                    return formatNumber(data, 4)
+                },
                 className: "text-right"
             }, {
                 data: 'catatan',

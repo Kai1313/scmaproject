@@ -20,7 +20,7 @@ class SessionController extends Controller
             "pageTitle" => "SCA Accounting | Dashboard",
         ];
         $request->session()->flush();
-        return view('master', $data);
-        // return redirect()->to(env('OLD_URL_ROOT') . '#keluar');
+        // return view('master', $data);
+        return redirect()->to(env('OLD_URL_ROOT') . '#keluar');
     }
 }

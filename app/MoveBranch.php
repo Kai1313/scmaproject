@@ -18,12 +18,14 @@ class MoveBranch extends Model
     protected $fillable = [
         'id_pindah_barang',
         'id_pindah_barang2',
+        'id_jenis_transaksi',
         'type',
         'id_cabang',
         'id_gudang',
         'tanggal_pindah_barang',
         'kode_pindah_barang',
-        'id_cabang_tujuan',
+        'id_cabang2',
+        'id_gudang2',
         'nomor_polisi',
         'transporter',
         'keterangan_pindah_barang',
@@ -34,7 +36,7 @@ class MoveBranch extends Model
         'dt_modified',
         'void',
         'void_user_id',
-        'id_cabang_asal',
+        'id_produksi',
     ];
 
     public function cabang()
@@ -52,14 +54,14 @@ class MoveBranch extends Model
         return $this->belongsTo(MoveBranch::class, 'id_pindah_barang2', 'id_pindah_barang');
     }
 
-    public function destinationBranch()
+    public function cabang2()
     {
-        return $this->belongsTo(Cabang::class, 'id_cabang_tujuan');
+        return $this->belongsTo(Cabang::class, 'id_cabang');
     }
 
-    public function originBranch()
+    public function gudang2()
     {
-        return $this->belongsTo(Cabang::class, 'id_cabang_asal');
+        return $this->belongsTo(Gudang::class, 'id_gudang2');
     }
 
     public function details()
@@ -70,6 +72,11 @@ class MoveBranch extends Model
     public function getDetailQRCode()
     {
         return $this->hasMany(MoveBranchDetail::class, 'id_pindah_barang')->select('qr_code');
+    }
+
+    public function produksi()
+    {
+        return $this->belongsTo(Production::class, 'id_produksi');
     }
 
     public function formatdetail()
@@ -91,13 +98,16 @@ class MoveBranch extends Model
                 'warna',
                 'status_diterima',
                 'batch',
-                'tanggal_kadaluarsa'
+                'tanggal_kadaluarsa',
+                'zak',
+                'weight_zak',
+                'id_wrapper_zak'
             )
             ->leftJoin('barang', 'pindah_barang_detail.id_barang', '=', 'barang.id_barang')
             ->leftJoin('satuan_barang', 'pindah_barang_detail.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang');
     }
 
-    public static function createcode($id_cabang)
+    public static function createcodeCabang($id_cabang)
     {
         $branchCode = DB::table('cabang')->where('id_cabang', $id_cabang)->first();
         $string = 'TC.' . $branchCode->kode_cabang . '.' . date('ym');
@@ -111,9 +121,23 @@ class MoveBranch extends Model
         return $string . '.' . $nol . $check;
     }
 
+    public static function createcodeGudang($id_cabang)
+    {
+        $branchCode = DB::table('cabang')->where('id_cabang', $id_cabang)->first();
+        $string = 'TG.' . $branchCode->kode_cabang . '.' . date('ym');
+        $check = DB::table('pindah_barang')->where('kode_pindah_barang', 'like', $string . '%')->count();
+        $check += 1;
+        $nol = '';
+        for ($i = 0; $i < (4 - strlen((string) $check)); $i++) {
+            $nol .= '0';
+        }
+
+        return $string . '.' . $nol . $check;
+    }
+
     public function savedetails($details, $type = 'in')
     {
-        $idJenisTransaksi = ($type == 'out') ? '21' : '22';
+        $idJenisTransaksi = $this->id_jenis_transaksi;
         $detail = json_decode($details);
         $ids = array_column($detail, 'id_pindah_barang_detail');
         $selectTrash = MoveBranchDetail::where('id_pindah_barang', $this->id_pindah_barang)
@@ -146,7 +170,7 @@ class MoveBranch extends Model
                     'id_pindah_barang' => $this->id_pindah_barang,
                     'id_barang' => $data->id_barang,
                     'id_satuan_barang' => $data->id_satuan_barang,
-                    'qty' => normalizeNumber($data->qty),
+                    'qty' => $data->qty,
                     'qr_code' => $data->qr_code,
                     'sg' => $data->sg,
                     'be' => $data->be,
@@ -159,6 +183,9 @@ class MoveBranch extends Model
                     'dt_created' => date('Y-m-d H:i:s'),
                     'batch' => $data->batch,
                     'tanggal_kadaluarsa' => $data->tanggal_kadaluarsa,
+                    'zak' => $data->zak,
+                    'id_wrapper_zak' => $data->id_wrapper_zak,
+                    'weight_zak' => $data->weight_zak,
                 ];
                 $store = new MoveBranchDetail;
                 $store->fill($array);
@@ -188,12 +215,12 @@ class MoveBranch extends Model
                     'nomor_kartu_stok' => $store->id_pindah_barang_detail,
                     'tanggal_kartu_stok' => date('Y-m-d'),
                     'debit_kartu_stok' => 0,
-                    'kredit_kartu_stok' => ($type == 'in' && $data->status_diterima == 1) ? '-' . $store->qty : $store->qty,
+                    'kredit_kartu_stok' => ($type == 'in' && in_array($idJenisTransaksi, [22, 24])) ? '-' . $store->qty : $store->qty,
                     'tanggal_kadaluarsa_kartu_stok' => $data->tanggal_kadaluarsa,
                     'mtotal_debit_kartu_stok' => 0,
                     'mtotal_kredit_kartu_stok' => 0,
                     'kode_batang_kartu_stok' => $data->qr_code,
-                    'kode_batang_lama_kartu_stok' => $data->qr_code,
+                    'kode_batang_lama_kartu_stok' => '',
                     'rak_kartu_stok' => '',
                     'batch_kartu_stok' => $data->batch,
                     'id_perkiraan' => 34,
@@ -205,6 +232,9 @@ class MoveBranch extends Model
                     'status_kartu_stok' => 1,
                     'user_kartu_stok' => session()->get('user')['id_pengguna'],
                     'date_kartu_stok' => date('Y-m-d H:i:s'),
+                    'zak' => $data->zak,
+                    'id_wrapper_zak' => $data->id_wrapper_zak,
+                    'weight_zak' => $data->weight_zak,
                 ]);
             }
         }
@@ -223,5 +253,18 @@ class MoveBranch extends Model
         }
 
         return ['status' => 'success'];
+    }
+
+    public function saveChangeStatusFromParent()
+    {
+        $details = MoveBranchDetail::where('id_pindah_barang', $this->id_pindah_barang)->get();
+        foreach ($details as $detail) {
+            $detail->status_diterima = 1;
+            $detail->save();
+        }
+
+        return response()->json([
+            'status' => 'success',
+        ]);
     }
 }

@@ -67,7 +67,7 @@ class PurchaseRequestController extends Controller
                                 $btn .= '<li><a href="' . route('purchase-request-change-status', [$row->purchase_request_id, 'reject']) . '" class="btn btn-default btn-xs mr-1 mb-1 btn-change-status" data-param="menolak"><i class="fa fa-times"></i> Reject</a></li>';
                             }
 
-                            if (session()->get('user')['id_grup_pengguna'] == $row->purchase_request_user_id) {
+                            if (session()->get('user')['id_pengguna'] == $row->purchase_request_user_id) {
                                 $btn .= '<li><a href="' . route('purchase-request-entry', $row->purchase_request_id) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
                                 $btn .= '<li><a href="' . route('purchase-request-delete', $row->purchase_request_id) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Void</a></li>';
                             }
@@ -83,11 +83,9 @@ class PurchaseRequestController extends Controller
                 })
                 ->rawColumns(['action', 'approval_status'])
                 ->make(true);
-
         }
 
-        $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
-
+        $cabang = session()->get('access_cabang');
         return view('ops.purchaseRequest.index', [
             'cabang' => $cabang,
             "pageTitle" => "SCA OPS | Permintaan Pembelian | List",
@@ -101,8 +99,7 @@ class PurchaseRequestController extends Controller
         }
 
         $data = PurchaseRequest::find($id);
-        $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
-
+        $cabang = session()->get('access_cabang');
         return view('ops.purchaseRequest.form', [
             'data' => $data,
             'cabang' => $cabang,
@@ -134,19 +131,21 @@ class PurchaseRequestController extends Controller
             $data->save();
             $data->savedetails($request->details);
 
-            $userSendWa = DB::table('pengguna')
-                ->select('nama_pengguna', 'telepon1_pengguna')
-                ->whereIn('id_grup_pengguna', [7, 13])
-                ->where('status_pengguna', 1)->get();
-            $settingMessage = DB::table('setting')->where('code', 'Pesan Permintaan Beli')->first();
-            $strParam = [
-                '[[pembuat]]' => $data->pengguna->nama_pengguna,
-                '[[code]]' => $data->purchase_request_code,
-                '[[date]]' => date('d/m/Y'),
-            ];
-            foreach ($userSendWa as $user) {
-                $messageText = replaceMessage($strParam, $settingMessage->value1);
-                $this->sendToWa($user->telepon1_pengguna, $messageText);
+            if ($id == 0) {
+                $userSendWa = DB::table('pengguna')
+                    ->select('nama_pengguna', 'telepon1_pengguna')
+                    ->whereIn('id_grup_pengguna', [7, 13])
+                    ->where('status_pengguna', 1)->get();
+                $settingMessage = DB::table('setting')->where('code', 'Pesan Permintaan Beli')->first();
+                $strParam = [
+                    '[[pembuat]]' => $data->pengguna->nama_pengguna,
+                    '[[code]]' => $data->purchase_request_code,
+                    '[[date]]' => date('d/m/Y'),
+                ];
+                foreach ($userSendWa as $user) {
+                    $messageText = replaceMessage($strParam, $settingMessage->value1);
+                    $this->sendToWa($user->telepon1_pengguna, $messageText);
+                }
             }
 
             DB::commit();
@@ -256,9 +255,13 @@ class PurchaseRequestController extends Controller
         $messageStock = '0';
         $messageSatuanStok = '';
         if ($cabang) {
+            // $arrayCabang = [
+            //     '1' => [1, 2, 3, 4],
+            //     '2' => [5, 7, 8],
+            // ];
             $arrayCabang = [
-                '1' => [1, 2, 3, 4],
-                '2' => [5, 7, 8],
+                '1' => [1],
+                '2' => [5],
             ];
 
             $gudang = $arrayCabang[$cabang];

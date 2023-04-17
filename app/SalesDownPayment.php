@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Models\Master\Cabang;
+use App\Models\Master\MataUang;
 use App\Models\Master\Slip;
 use DB;
 use Illuminate\Database\Eloquent\Model;

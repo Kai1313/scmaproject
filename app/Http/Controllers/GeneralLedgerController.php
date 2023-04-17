@@ -140,7 +140,12 @@ class GeneralLedgerController extends Controller
             if ($journalType == "PG" || $journalType == "HG") {
                 $sum = 0;
                 foreach ($detailData as $key => $item) {
-                    $sum += ($journalType == "PG") ? $item["debet"] : $item["kredit"];
+                    $debet = str_replace('.', '', $item['debet']);
+                    $debet = str_replace(',', '.', $debet);
+
+                    $kredit = str_replace('.', '', $item['kredit']);
+                    $kredit = str_replace(',', '.', $kredit);
+                    $sum += ($journalType == "PG") ? $debet : $kredit;
                 }
                 $trx_saldo = new TrxSaldo;
                 $trx_saldo->tipe_transaksi = ($journalType == "PG") ? "Piutang Giro" : "Hutang Giro";
@@ -166,14 +171,20 @@ class GeneralLedgerController extends Controller
             // Store Detail and Update Saldo Transaksi
             foreach ($detailData as $key => $data) {
                 // Store Detail
+                $debet = str_replace('.', '', $data['debet']);
+                $debet = str_replace(',', '.', $debet);
+
+                $kredit = str_replace('.', '', $data['kredit']);
+                $kredit = str_replace(',', '.', $kredit);
+
                 $detail = new JurnalDetail();
                 $detail->id_jurnal = $header->id_jurnal;
                 $detail->index = ($data['guid'] == 'gen') ? count($detailData) + 1 : $key + 1;
                 $detail->id_akun = $data['akun'];
                 $detail->keterangan = $data['notes'];
                 $detail->id_transaksi = $data['trx'];
-                $detail->debet = str_replace(',', '', $data['debet']);
-                $detail->credit = str_replace(',', '', $data['kredit']);
+                $detail->debet = $debet;
+                $detail->credit = $kredit;
                 $detail->user_created = $userRecord;
                 $detail->user_modified = $userModified;
                 $detail->dt_created = $dateRecord;
@@ -190,7 +201,7 @@ class GeneralLedgerController extends Controller
                 // Update Saldo Transaksi
                 $trx_saldo = TrxSaldo::where("id_transaksi", $data["trx"])->first();
                 if ($trx_saldo) {
-                    $update_trx_saldo = $this->updateTrxSaldo($trx_saldo, str_replace(',', '', $data['debet']), str_replace(',', '', $data['kredit']));
+                    $update_trx_saldo = $this->updateTrxSaldo($trx_saldo, $debet, $kredit);
                     if (!$update_trx_saldo) {
                         DB::rollback();
                         return response()->json([
@@ -251,6 +262,13 @@ class GeneralLedgerController extends Controller
             ->select('jurnal_detail.*', 'master_akun.kode_akun', 'master_akun.nama_akun')
             ->get();
 
+        $data_jurnal_header->catatan = str_replace("\n", '<br/>', $data_jurnal_header->catatan);
+
+        foreach ($data_jurnal_detail as $key => $value) {
+            $notes = str_replace("\n", '<br/>', $value->keterangan);
+            $value->keterangan = $notes;
+        }
+
         $data = [
             "pageTitle" => "SCA Accounting | Transaksi Jurnal Umum | Detail",
             "data_jurnal_header" => $data_jurnal_header,
@@ -298,12 +316,17 @@ class GeneralLedgerController extends Controller
             ->select('jurnal_detail.*', 'master_akun.kode_akun', 'master_akun.nama_akun')
             ->get();
 
+        $data_jurnal_header->catatan = str_replace("\n", '<br/>', $data_jurnal_header->catatan);
+
+        foreach ($data_jurnal_detail as $key => $value) {
+            $notes = str_replace("\n", '<br/>', $value->keterangan);
+            $value->keterangan = $notes;
+        }
+
         $data = [
             "data_jurnal_header" => $data_jurnal_header,
             "data_jurnal_detail" => $data_jurnal_detail,
         ];
-
-        // dd($data);
 
         // return view('accounting.journal.general_ledger.print', $data);
 
@@ -334,12 +357,13 @@ class GeneralLedgerController extends Controller
         foreach ($jurnal_detail as $key => $jurnal) {
             $akun = Akun::find($jurnal->id_akun);
             $trx_id = TrxSaldo::where("id_transaksi", $jurnal->id_transaksi)->first();
+            $notes = str_replace("\n", '<br/>', $jurnal->keterangan);
             $details[] = [
                 "guid" => (++$i == count($jurnal_detail)) ? "gen" : (($trx_id) ? "trx-" . $trx_id->id : $jurnal->index),
                 "akun" => $akun->id_akun,
                 "nama_akun" => $akun->nama_akun,
                 "kode_akun" => $akun->kode_akun,
-                "notes" => $jurnal->keterangan,
+                "notes" => $notes,
                 "trx" => $jurnal->id_transaksi,
                 "debet" => $jurnal->debet,
                 "kredit" => $jurnal->credit,
@@ -446,7 +470,12 @@ class GeneralLedgerController extends Controller
                 $check = TrxSaldo::where("id_jurnal", $journalID)->first();
                 $sum = 0;
                 foreach ($detailData as $key => $item) {
-                    $sum += ($journalType == "PG") ? $item["debet"] : $item["kredit"];
+                    $debet = str_replace('.', '', $item['debet']);
+                    $debet = str_replace(',', '.', $debet);
+    
+                    $kredit = str_replace('.', '', $item['kredit']);
+                    $kredit = str_replace(',', '.', $kredit);
+                    $sum += ($journalType == "PG") ? $debet : $kredit;
                 }
                 $trx_saldo = ($check) ? TrxSaldo::where("id_jurnal", $journalID)->first() : new TrxSaldo;
                 $trx_saldo->tipe_transaksi = ($journalType == "PG") ? "Piutang Giro" : "Hutang Giro";
@@ -472,14 +501,20 @@ class GeneralLedgerController extends Controller
             // Store Detail
             foreach ($detailData as $key => $data) {
                 // Store Detail
+                $debet = str_replace('.', '', $data['debet']);
+                $debet = str_replace(',', '.', $debet);
+
+                $kredit = str_replace('.', '', $data['kredit']);
+                $kredit = str_replace(',', '.', $kredit);
+
                 $detail = new JurnalDetail();
                 $detail->id_jurnal = $header->id_jurnal;
                 $detail->index = ($data['guid'] == 'gen') ? count($detailData) + 1 : $key + 1;
                 $detail->id_akun = $data['akun'];
                 $detail->keterangan = $data['notes'];
                 $detail->id_transaksi = $data['trx'];
-                $detail->debet = str_replace(',', '', $data['debet']);
-                $detail->credit = str_replace(',', '', $data['kredit']);
+                $detail->debet = $debet;
+                $detail->credit = $kredit;
                 $detail->user_modified = $userModified;
                 $detail->dt_modified = $dateModified;
                 if (!$detail->save()) {
@@ -493,7 +528,7 @@ class GeneralLedgerController extends Controller
                 //  Update Saldo Transaksi
                 $trx_saldo = TrxSaldo::where("id_transaksi", $data["trx"])->first();
                 if ($trx_saldo) {
-                    $update_trx_saldo = $this->updateTrxSaldo($trx_saldo, str_replace(',', '', $data['debet']), str_replace(',', '', $data['kredit']));
+                    $update_trx_saldo = $this->updateTrxSaldo($trx_saldo, $debet, $kredit);
                     if (!$update_trx_saldo) {
                         DB::rollback();
                         return response()->json([
@@ -592,7 +627,7 @@ class GeneralLedgerController extends Controller
 
         $filtered_data = $data_general_ledger_table->get();
 
-        if ($sort) {
+        if ($sort[0]['column']) {
             if (!is_array($sort)) {
                 $message = "Invalid array for parameter sort";
                 $data = [
@@ -611,7 +646,7 @@ class GeneralLedgerController extends Controller
                 }
             }
         } else {
-            $data_general_ledger_table->orderBy('id_jurnal', 'ASC');
+            $data_general_ledger_table->orderBy('jurnal_header.dt_modified', 'DESC');
         }
 
         // pagination
@@ -786,6 +821,9 @@ class GeneralLedgerController extends Controller
         try {
             // Init
             $type = str_replace("_", " ", $request->transaction_type);
+            if (str_contains($type, "tolak")) {
+                $type = str_replace(" tolak", "", $type);
+            }
             $customer = $request->customer;
             $supplier = $request->supplier;
             $offset = $request->start;

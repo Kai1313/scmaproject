@@ -60,9 +60,7 @@
                         <div class="form-group">
                             <select name="id_cabang" class="form-control select2">
                                 @foreach ($cabang as $branch)
-                                    <option value="{{ $branch->id_cabang }}">{{ $branch->kode_cabang }} -
-                                        {{ $branch->nama_cabang }}
-                                    </option>
+                                    <option value="{{ $branch['id'] }}">{{ $branch['text'] }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -142,17 +140,23 @@
             }, {
                 data: 'rate',
                 name: 'rate',
-                render: $.fn.dataTable.render.number('.', ',', 2),
+                render: function(data) {
+                    return data ? formatNumber(data, 2) : 0
+                },
                 className: 'text-right'
             }, {
                 data: 'nominal',
                 name: 'nominal',
-                render: $.fn.dataTable.render.number('.', ',', 2),
+                render: function(data) {
+                    return data ? formatNumber(data, 2) : 0
+                },
                 className: 'text-right'
             }, {
                 data: 'total',
                 name: 'total',
-                render: $.fn.dataTable.render.number('.', ',', 2),
+                render: function(data) {
+                    return data ? formatNumber(data, 2) : 0
+                },
                 className: 'text-right'
             }, {
                 data: 'catatan',

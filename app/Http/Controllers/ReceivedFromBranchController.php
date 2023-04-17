@@ -30,7 +30,8 @@ class ReceivedFromBranchController extends Controller
                     'transporter'
                 )
                 ->leftJoin('gudang', 'pindah_barang.id_gudang', '=', 'gudang.id_gudang')
-                ->leftJoin('cabang', 'pindah_barang.id_cabang_asal', '=', 'cabang.id_cabang')
+                ->leftJoin('cabang', 'pindah_barang.id_cabang2', '=', 'cabang.id_cabang')
+                ->where('id_jenis_transaksi', 22)
                 ->where('type', 1);
             if (isset($request->c)) {
                 $data = $data->where('pindah_barang.id_cabang', $request->c);
@@ -60,7 +61,7 @@ class ReceivedFromBranchController extends Controller
                 ->make(true);
         }
 
-        $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
+        $cabang = session()->get('access_cabang');
         return view('ops.receivedFromBranch.index', [
             'cabang' => $cabang,
             "pageTitle" => "SCA OPS | Terima Dari Cabang | List",
@@ -74,8 +75,7 @@ class ReceivedFromBranchController extends Controller
         }
 
         $data = MoveBranch::find($id);
-        $cabang = DB::table('cabang')->select('nama_cabang as text', 'id_cabang as id')->where('status_cabang', 1)->get();
-
+        $cabang = session()->get('access_cabang');
         return view('ops.receivedFromBranch.form', [
             'data' => $data,
             'cabang' => $cabang,
@@ -94,7 +94,7 @@ class ReceivedFromBranchController extends Controller
 
             $data->fill($request->all());
             if ($id == 0) {
-                $data->kode_pindah_barang = MoveBranch::createcode($request->id_cabang);
+                $data->kode_pindah_barang = MoveBranch::createcodeCabang($request->id_cabang);
                 $data->status_pindah_barang = 1;
                 $data->type = 1;
                 $data->user_created = session()->get('user')['id_pengguna'];
@@ -108,6 +108,7 @@ class ReceivedFromBranchController extends Controller
             $parent = MoveBranch::find($data->id_pindah_barang2);
             $parent->status_pindah_barang = 1;
             $parent->save();
+            $parent->saveChangeStatusFromParent();
 
             DB::commit();
             return response()->json([
@@ -139,50 +140,49 @@ class ReceivedFromBranchController extends Controller
         ]);
     }
 
-    public function destroy($id)
-    {
-        if (checkAccessMenu('terima_dari_cabang', 'delete') == false) {
-            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
-        }
+    // public function destroy($id)
+    // {
+    //     if (checkAccessMenu('terima_dari_cabang', 'delete') == false) {
+    //         return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+    //     }
 
-        // $data = PurchaseRequest::find($id);
-        // if (!$data) {
-        //     return response()->json([
-        //         "result" => false,
-        //         "message" => "Data tidak ditemukan",
-        //     ]);
-        // }
+    // $data = PurchaseRequest::find($id);
+    // if (!$data) {
+    //     return response()->json([
+    //         "result" => false,
+    //         "message" => "Data tidak ditemukan",
+    //     ]);
+    // }
 
-        // try {
-        //     DB::beginTransaction();
-        //     $data->void = 1;
-        //     $data->void_user_id = session()->get('user')['id_pengguna'];
-        //     $data->save();
+    // try {
+    //     DB::beginTransaction();
+    //     $data->void = 1;
+    //     $data->void_user_id = session()->get('user')['id_pengguna'];
+    //     $data->save();
 
-        //     DB::commit();
-        //     return response()->json([
-        //         "result" => true,
-        //         "message" => "Data berhasil dibatalkan",
-        //         "redirect" => route('purchase-request'),
-        //     ]);
-        // } catch (\Exception $e) {
-        //     DB::rollback();
-        //     Log::error("Error when void purchase request");
-        //     Log::error($e);
-        //     return response()->json([
-        //         "result" => false,
-        //         "message" => "Data gagal dibatalkan",
-        //     ]);
-        // }
-    }
+    //     DB::commit();
+    //     return response()->json([
+    //         "result" => true,
+    //         "message" => "Data berhasil dibatalkan",
+    //         "redirect" => route('purchase-request'),
+    //     ]);
+    // } catch (\Exception $e) {
+    //     DB::rollback();
+    //     Log::error("Error when void purchase request");
+    //     Log::error($e);
+    //     return response()->json([
+    //         "result" => false,
+    //         "message" => "Data gagal dibatalkan",
+    //     ]);
+    // }
+    // }
 
     public function autoCode(Request $request)
     {
         $idCabang = $request->cabang;
         $data = MoveBranch::select(
             'kode_pindah_barang as text',
-            'kode_pindah_barang as id',
-            'id_pindah_barang',
+            'id_pindah_barang as id',
             'transporter',
             'nomor_polisi',
             'nama_cabang',
@@ -190,8 +190,9 @@ class ReceivedFromBranchController extends Controller
             'pindah_barang.id_cabang'
         )
             ->leftJoin('cabang', 'pindah_barang.id_cabang', '=', 'cabang.id_cabang')
-            ->where('id_cabang_tujuan', $idCabang)
+            ->where('id_cabang2', $idCabang)
             ->where('status_pindah_barang', 0)
+            ->where('id_jenis_transaksi', 21)
             ->where('void', 0)
             ->get();
 
@@ -204,16 +205,64 @@ class ReceivedFromBranchController extends Controller
 
     public function getDetailItem(Request $request)
     {
-        $data = MoveBranch::find($request->id);
-        $datas = [];
-        if ($data) {
-            $datas = $data->formatdetail;
+        $idPindahBarang = $request->id_pindah_barang;
+        $qrcode = $request->qrcode;
+
+        if ($idPindahBarang == '' || $qrcode == '') {
+            return response()->json([
+                'message' => 'Pastikan referensi kode pindah cabang dan qrcode sudah benar',
+            ], 500);
+        }
+
+        $data = DB::table('pindah_barang_detail')
+            ->select(
+                'be', 'bentuk',
+                'pindah_barang_detail.id_barang',
+                'pindah_barang_detail.id_satuan_barang',
+                'qty',
+                'keterangan',
+                'qr_code',
+                'nama_barang',
+                'nama_satuan_barang',
+                'ph',
+                'sg',
+                'warna',
+                'status_diterima',
+                'batch',
+                'tanggal_kadaluarsa',
+                'zak',
+                'weight_zak',
+                'id_wrapper_zak',
+                'status_diterima'
+            )
+            ->leftJoin('barang', 'pindah_barang_detail.id_barang', '=', 'barang.id_barang')
+            ->leftJoin('satuan_barang', 'pindah_barang_detail.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
+            ->where('id_pindah_barang', $idPindahBarang)->where('qr_code', $qrcode)->first();
+        if (!$data) {
+            return response()->json([
+                'message' => 'Data tidak ditemukan',
+            ], 500);
         }
 
         return response()->json([
-            'status' => 200,
-            'data' => $datas,
-            'message' => '',
+            'data' => $data,
         ], 200);
+    }
+
+    public function printData($id)
+    {
+        if (checkAccessMenu('terima_dari_cabang', 'print') == false) {
+            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+        }
+
+        $data = MoveBranch::find($id);
+        if (!$data) {
+            return 'data tidak ditemukan';
+        }
+
+        return view('ops.receivedFromBranch.print', [
+            'data' => $data,
+            "pageTitle" => "SCA OPS | Terima Dari Cabang | Cetak",
+        ]);
     }
 }

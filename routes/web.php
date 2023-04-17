@@ -82,24 +82,47 @@ Route::prefix('qc_penerimaan_barang')->group(function () {
     Route::get('/print/{id}', 'QcReceiptController@printData')->name('qc_receipt-print-data');
 });
 
-Route::prefix('send_to_branch')->group(function () {
+Route::prefix('kirim_ke_cabang')->group(function () {
     Route::get('/index/{user_id?}', 'SendToBranchController@index')->name('send_to_branch');
     Route::get('/entry/{id?}', 'SendToBranchController@entry')->name('send_to_branch-entry');
     Route::post('/save_entry/{id}', 'SendToBranchController@saveEntry')->name('send_to_branch-save-entry');
     Route::get('/view/{id}', 'SendToBranchController@viewData')->name('send_to_branch-view');
     Route::get('/delete/{id}', 'SendToBranchController@destroy')->name('send_to_branch-delete');
     Route::get('/auto-qrcode', 'SendToBranchController@autoQRCode')->name('send_to_branch-qrcode');
+    Route::get('/print/{id}', 'SendToBranchController@printData')->name('send_to_branch-print-data');
 });
 
-Route::prefix('received_from_branch')->group(function () {
+Route::prefix('terima_dari_cabang')->group(function () {
     Route::get('/index/{user_id?}', 'ReceivedFromBranchController@index')->name('received_from_branch');
     Route::get('/entry/{id?}', 'ReceivedFromBranchController@entry')->name('received_from_branch-entry');
     Route::post('/save_entry/{id}', 'ReceivedFromBranchController@saveEntry')->name('received_from_branch-save-entry');
     Route::get('/view/{id}', 'ReceivedFromBranchController@viewData')->name('received_from_branch-view');
-    Route::get('/delete/{id}', 'ReceivedFromBranchController@destroy')->name('received_from_branch-delete');
+    // Route::get('/delete/{id}', 'ReceivedFromBranchController@destroy')->name('received_from_branch-delete');
     Route::get('/auto-code', 'ReceivedFromBranchController@autoCode')->name('received_from_branch-code');
     Route::get('/auto-detail-item', 'ReceivedFromBranchController@getDetailItem')->name('received_from_branch-detail-item');
+    Route::get('/print/{id}', 'ReceivedFromBranchController@printData')->name('received_from_branch-print-data');
 });
+
+Route::prefix('terima_dari_gudang')->group(function () {
+    Route::get('/index/{user_id?}', 'ReceivedFromWarehouseController@index')->name('received_from_warehouse');
+    Route::get('/entry/{id?}', 'ReceivedFromWarehouseController@entry')->name('received_from_warehouse-entry');
+    Route::post('/save_entry/{id}', 'ReceivedFromWarehouseController@saveEntry')->name('received_from_warehouse-save-entry');
+    Route::get('/view/{id}', 'ReceivedFromWarehouseController@viewData')->name('received_from_warehouse-view');
+    // Route::get('/delete/{id}', 'ReceivedFromWarehouseController@destroy')->name('received_from_warehouse-delete');
+    Route::get('/auto-qrcode', 'ReceivedFromWarehouseController@autoQRCode')->name('received_from_warehouse-qrcode');
+});
+
+Route::prefix('pemakaian')->group(function () {
+    Route::get('/index/{user_id?}', 'MaterialUsageController@index')->name('material_usage');
+    Route::get('/entry/{id?}', 'MaterialUsageController@entry')->name('material_usage-entry');
+    Route::post('/save_entry/{id}', 'MaterialUsageController@saveEntry')->name('material_usage-save-entry');
+    Route::get('/view/{id}', 'MaterialUsageController@viewData')->name('material_usage-view');
+    // Route::get('/delete/{id}', 'ReceivedFromWarehouseController@destroy')->name('received_from_warehouse-delete');
+    Route::get('/auto-qrcode', 'MaterialUsageController@autoQRCode')->name('material_usage-qrcode');
+    Route::get('/reload-timbangan', 'MaterialUsageController@reloadWeight')->name('material_usage-reload-weight');
+});
+
+Route::get('kirim_ke_gudang/print/{id}', 'SendToWarehouseController@print')->name('send_to_warehouse-print');
 
 // Master
 Route::get('/master/slip/index/{user_id?}', 'MasterSlipController@index')->name('master-slip');
@@ -160,5 +183,6 @@ Route::prefix('transaction')->group(function () {
         Route::get('/print/{id?}', 'AdjustmentLedgerController@printSlip')->name('transaction-adjustment-ledger-print');
         Route::get('/void/{id?}', 'AdjustmentLedgerController@void')->name('transaction-adjustment-ledger-void');
         Route::get('/active/{id?}', 'AdjustmentLedgerController@active')->name('transaction-adjustment-ledger-active');
+        Route::get('/getGiroReject/{id?}', 'AdjustmentLedgerController@getGiroReject')->name('transaction-adjustment-ledger-get-giro-reject');
     });
 });

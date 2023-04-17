@@ -91,11 +91,6 @@
                                 <select name="id_cabang" class="form-control select2" data-validation="[NOTEMPTY]"
                                     data-validation-message="Cabang tidak boleh kosong">
                                     <option value="">Pilih Cabang</option>
-                                    @foreach ($cabang as $branch)
-                                        <option value="{{ $branch->id_cabang }}"
-                                            {{ old('id_cabang', $data ? $data->id_cabang : '') == $branch->id_cabang ? 'selected' : '' }}>
-                                            {{ $branch->nama_cabang }}</option>
-                                    @endforeach
                                 </select>
                             </div>
                         </div>
@@ -149,8 +144,8 @@
                             <thead>
                                 <tr>
                                     <th>Nama Barang</th>
-                                    <th>Satuan</th>
                                     <th>Jumlah</th>
+                                    <th>Satuan</th>
                                     <th>Tanggal QC</th>
                                     <th>Status</th>
                                     <th>Alasan</th>
@@ -277,6 +272,7 @@
 
 @section('externalScripts')
     <script>
+        let branch = {!! json_encode($cabang) !!}
         let arrayStatus = {!! json_encode($arrayStatus) !!};
         let details = [];
         let detailSelect = []
@@ -291,89 +287,86 @@
             data: details,
             ordering: false,
             columns: [{
-                    data: 'nama_barang',
-                    name: 'nama_barang'
+                data: 'nama_barang',
+                name: 'nama_barang'
+            }, {
+                data: 'jumlah_pembelian_detail',
+                name: 'jumlah_pembelian_detail',
+                render: function(data) {
+                    return data ? formatNumber(data, 4) : 0
                 },
-                {
-                    data: 'nama_satuan_barang',
-                    name: 'nama_satuan_barang'
+                className: 'text-right'
+            }, {
+                data: 'nama_satuan_barang',
+                name: 'nama_satuan_barang'
+            }, {
+                data: 'tanggal_qc',
+                name: 'tanggal_qc',
+            }, {
+                data: 'status_qc',
+                name: 'status_qc',
+                render: function(data, type, row) {
+                    return '<label class="' + arrayStatus[data]['class'] + '">' + arrayStatus[data][
+                        'text'
+                    ] + '</label>';
                 },
-                {
-                    data: 'jumlah_pembelian_detail',
-                    name: 'jumlah_pembelian_detail',
-                    render: $.fn.dataTable.render.number('.', ',', 4),
-                    className: 'text-right'
+                className: 'text-center'
+            }, {
+                data: 'reason',
+                name: 'reason',
+            }, {
+                data: 'sg_pembelian_detail',
+                name: 'sg_pembelian_detail',
+                render: function(data) {
+                    return data ? formatNumber(data, 4) : 0
                 },
-                {
-                    data: 'tanggal_qc',
-                    name: 'tanggal_qc',
+                className: 'text-right'
+            }, {
+                data: 'be_pembelian_detail',
+                name: 'be_pembelian_detail',
+                render: function(data) {
+                    return data ? formatNumber(data, 4) : 0
                 },
-                {
-                    data: 'status_qc',
-                    name: 'status_qc',
-                    render: function(data, type, row) {
-                        return '<label class="' + arrayStatus[data]['class'] + '">' + arrayStatus[data][
-                            'text'
-                        ] + '</label>';
-                    },
-                    className: 'text-center'
+                className: 'text-right'
+            }, {
+                data: 'ph_pembelian_detail',
+                name: 'ph_pembelian_detail',
+                render: function(data) {
+                    return data ? formatNumber(data, 4) : 0
                 },
-                {
-                    data: 'reason',
-                    name: 'reason',
-                },
-                {
-                    data: 'sg_pembelian_detail',
-                    name: 'sg_pembelian_detail',
-                    render: $.fn.dataTable.render.number('.', ',', 4),
-                    className: 'text-right'
-                },
-                {
-                    data: 'be_pembelian_detail',
-                    name: 'be_pembelian_detail',
-                    render: $.fn.dataTable.render.number('.', ',', 4),
-                    className: 'text-right'
-                },
-                {
-                    data: 'ph_pembelian_detail',
-                    name: 'ph_pembelian_detail',
-                    render: $.fn.dataTable.render.number('.', ',', 4),
-                    className: 'text-right'
-                },
-                {
-                    data: 'warna_pembelian_detail',
-                    name: 'warna_pembelian_detail',
-                },
-                {
-                    data: 'bentuk_pembelian_detail',
-                    name: 'bentuk_pembelian_detail',
-                },
-                {
-                    data: 'keterangan_pembelian_detail',
-                    name: 'keterangan_pembelian_detail',
-                },
-                {
-                    data: 'id_barang',
-                    className: 'text-center',
-                    name: 'id_barang',
-                    searchable: false,
-                    render: function(data, type, row, meta) {
-                        let btn = '';
-                        if (row.status_qc == 3) {
-                            btn = '<ul class="horizontal-list">';
-                            btn +=
-                                '<li><a href="javascript:void(0)" data-id="' + data +
-                                '" class="btn btn-warning btn-xs mr-1 mb-1 edit-entry"><i class="glyphicon glyphicon-pencil"></i></a></li>';
-                            btn += '</ul>';
-                        }
-
-                        return btn;
+                className: 'text-right'
+            }, {
+                data: 'warna_pembelian_detail',
+                name: 'warna_pembelian_detail',
+            }, {
+                data: 'bentuk_pembelian_detail',
+                name: 'bentuk_pembelian_detail',
+            }, {
+                data: 'keterangan_pembelian_detail',
+                name: 'keterangan_pembelian_detail',
+            }, {
+                data: 'id_barang',
+                className: 'text-center',
+                name: 'id_barang',
+                searchable: false,
+                render: function(data, type, row, meta) {
+                    let btn = '';
+                    if (row.status_qc == 3) {
+                        btn = '<ul class="horizontal-list">';
+                        btn +=
+                            '<li><a href="javascript:void(0)" data-id="' + data +
+                            '" class="btn btn-warning btn-xs mr-1 mb-1 edit-entry"><i class="glyphicon glyphicon-pencil"></i></a></li>';
+                        btn += '</ul>';
                     }
-                },
-            ]
+
+                    return btn;
+                }
+            }]
         });
 
-        $('[name="id_cabang"]').select2().on('select2:select', function(e) {
+        $('[name="id_cabang"]').select2({
+            data: branch
+        }).on('select2:select', function(e) {
             let dataselect = e.params.data
             getPurchasingNumber()
         });

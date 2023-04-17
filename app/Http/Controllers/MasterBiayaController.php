@@ -49,8 +49,7 @@ class MasterBiayaController extends Controller
                 ->make(true);
         }
 
-        $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
-
+        $cabang = session()->get('access_cabang');
         return view('ops.master.biaya.index', [
             'cabang' => $cabang,
             "pageTitle" => "SCA OPS | Master Biaya | List",
@@ -65,8 +64,7 @@ class MasterBiayaController extends Controller
 
         $data = MasterBiaya::find($id);
         $akunBiaya = DB::table('master_akun')->where('isshown', 1)->get();
-        $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
-
+        $cabang = session()->get('access_cabang');
         return view('ops.master.biaya.form', [
             'data' => $data,
             'akunBiaya' => $akunBiaya,

@@ -20,7 +20,8 @@ class SendToBranchController extends Controller
             $data = DB::table('pindah_barang')
                 ->select('id_pindah_barang', 'type', 'nama_gudang', 'tanggal_pindah_barang', 'kode_pindah_barang', 'nama_cabang', 'status_pindah_barang', 'keterangan_pindah_barang', 'transporter', 'void')
                 ->leftJoin('gudang', 'pindah_barang.id_gudang', '=', 'gudang.id_gudang')
-                ->leftJoin('cabang', 'pindah_barang.id_cabang_tujuan', '=', 'cabang.id_cabang')
+                ->leftJoin('cabang', 'pindah_barang.id_cabang2', '=', 'cabang.id_cabang')
+                ->where('id_jenis_transaksi', 21)
                 ->where('type', 0);
             if (isset($request->c)) {
                 $data = $data->where('pindah_barang.id_cabang', $request->c);
@@ -61,7 +62,7 @@ class SendToBranchController extends Controller
                 ->make(true);
         }
 
-        $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
+        $cabang = session()->get('access_cabang');
         return view('ops.sendToBranch.index', [
             'cabang' => $cabang,
             "pageTitle" => "SCA OPS | Kirim Ke Cabang | List",
@@ -75,10 +76,12 @@ class SendToBranchController extends Controller
         }
 
         $data = MoveBranch::find($id);
-        $cabang = DB::table('cabang')->select('nama_cabang as text', 'id_cabang as id')->where('status_cabang', 1)->get();
+        $cabang = session()->get('access_cabang');
+        $allCabang = DB::table('cabang')->select('id_cabang as id', 'nama_cabang as text')->where('status_cabang', 1)->get();
         return view('ops.sendToBranch.form', [
             'data' => $data,
             'cabang' => $cabang,
+            'allCabang' => $allCabang,
             "pageTitle" => "SCA OPS | Kirim Ke Cabang | " . ($id == 0 ? 'Create' : 'Edit'),
         ]);
     }
@@ -94,7 +97,7 @@ class SendToBranchController extends Controller
             DB::beginTransaction();
             $data->fill($request->all());
             if ($id == 0) {
-                $data->kode_pindah_barang = MoveBranch::createcode($request->id_cabang);
+                $data->kode_pindah_barang = MoveBranch::createcodeCabang($request->id_cabang);
                 $data->status_pindah_barang = 0;
                 $data->type = 0;
                 $data->user_created = session()->get('user')['id_pengguna'];
@@ -130,7 +133,7 @@ class SendToBranchController extends Controller
         $data = MoveBranch::where('type', 0)->where('id_pindah_barang', $id)->first();
         return view('ops.sendToBranch.detail', [
             'data' => $data,
-            "pageTitle" => "SCA OPS | kirim Ke Cabang | Lihat",
+            "pageTitle" => "SCA OPS | Kirim Ke Cabang | Lihat",
         ]);
     }
 
@@ -197,7 +200,10 @@ class SendToBranchController extends Controller
                 'id_rak',
                 'sisa_master_qr_code',
                 'tanggal_expired_master_qr_code as tanggal_kadaluarsa',
-                'batch_master_qr_code as batch'
+                'batch_master_qr_code as batch',
+                'zak',
+                'id_wrapper_zak',
+                'weight_zak'
             )
             ->leftJoin('barang', 'mqc.id_barang', '=', 'barang.id_barang')
             ->leftJoin('satuan_barang', 'mqc.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
@@ -224,5 +230,22 @@ class SendToBranchController extends Controller
             'data' => $data,
             'message' => $message,
         ], $status);
+    }
+
+    public function printData($id)
+    {
+        if (checkAccessMenu('kirim_ke_cabang', 'print') == false) {
+            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+        }
+
+        $data = MoveBranch::where('id_jenis_transaksi', 21)->where('id_pindah_barang', $id)->first();
+        if (!$data) {
+            return 'data tidak ditemukan';
+        }
+
+        return view('ops.sendToBranch.print', [
+            'data' => $data,
+            "pageTitle" => "SCA OPS | Kirim Ke Cabang | Cetak",
+        ]);
     }
 }

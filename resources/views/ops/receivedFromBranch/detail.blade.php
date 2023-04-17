@@ -29,6 +29,10 @@
         <div class="box box-primary">
             <div class="box-header">
                 <h3 class="box-title">Detail Terima Dari Cabang <span class="text-muted"></span></h3>
+                <a href="{{ route('received_from_branch-print-data', $data->id_pindah_barang) }}" target="_blank"
+                    class="btn btn-sm btn-default btn-flat pull-right">
+                    <span class="glyphicon glyphicon-print mr-1"></span> Cetak
+                </a>
                 <a href="{{ route('received_from_branch') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right"
                     style="margin-right:10px;">
                     <span class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali
@@ -50,7 +54,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <label class="col-md-4">Kode Pindah Barang</label>
+                            <label class="col-md-4">Kode Pindah Cabang</label>
                             <div class="col-md-8">
                                 : {{ $data->kode_pindah_barang }}
                             </div>
@@ -66,7 +70,7 @@
                         <div class="row">
                             <label class="col-md-4">Cabang Asal</label>
                             <div class="col-md-8">
-                                : {{ $data->originBranch->nama_cabang }}
+                                : {{ $data->cabang2->nama_cabang }}
                             </div>
                         </div>
                         <div class="row">
@@ -101,8 +105,8 @@
                             <tr>
                                 <th>QR Code</th>
                                 <th>Nama Barang</th>
-                                <th>Satuan</th>
                                 <th>Jumlah</th>
+                                <th>Satuan</th>
                                 <th>Batch</th>
                                 <th>Kadaluarsa</th>
                                 <th>SG</th>
@@ -140,13 +144,15 @@
                     data: 'nama_barang',
                     name: 'nama_barang'
                 }, {
-                    data: 'nama_satuan_barang',
-                    name: 'nama_satuan_barang'
-                }, {
                     data: 'qty',
                     name: 'qty',
-                    render: $.fn.dataTable.render.number('.', ',', 4),
+                    render: function(data) {
+                        return data ? formatNumber(data, 4) : 0
+                    },
                     className: 'text-right'
+                }, {
+                    data: 'nama_satuan_barang',
+                    name: 'nama_satuan_barang'
                 }, {
                     data: 'batch',
                     name: 'batch',
@@ -157,17 +163,23 @@
                 }, {
                     data: 'sg',
                     name: 'sg',
-                    render: $.fn.dataTable.render.number('.', ',', 4),
+                    render: function(data) {
+                        return data ? formatNumber(data, 4) : 0
+                    },
                     className: 'text-right'
                 }, {
                     data: 'be',
                     name: 'be',
-                    render: $.fn.dataTable.render.number('.', ',', 4),
+                    render: function(data) {
+                        return data ? formatNumber(data, 4) : 0
+                    },
                     className: 'text-right'
                 }, {
                     data: 'ph',
                     name: 'ph',
-                    render: $.fn.dataTable.render.number('.', ',', 4),
+                    render: function(data) {
+                        return data ? formatNumber(data, 4) : 0
+                    },
                     className: 'text-right'
                 }, {
                     data: 'bentuk',

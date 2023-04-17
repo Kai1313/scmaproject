@@ -504,7 +504,6 @@
             },
             callback: {
                 onSubmit: function(node, formData) {
-                    console.log('hello detail')
                     submit_detail()
                 }
             }
@@ -523,8 +522,12 @@
     $(function() {
         $.validate(validateLedger)
         $.validate(validateDetail)
+        
+        for (let i = 0; i < details.length; i++) {
+            details[i].debet = formatNumberAsFloatFromDB(details[i].debet);
+            details[i].kredit = formatNumberAsFloatFromDB(details[i].kredit);
+        }
 
-        console.log(details)
         populate_detail(details)
 
         getCoa()
@@ -594,11 +597,13 @@
             detail = details.filter(function(item) {
                 return item['guid'] == guid
             })
+            let notes = detail[0]["notes"].replace('<br/>', '\n')
+
             // Set data on form
             $("#akun_detail").val(detail[0]["akun"]).trigger("change.select2")
-            $("#notes_detail").val(detail[0]["notes"])
-            $("#debet").val(detail[0]["debet"])
-            $("#kredit").val(detail[0]["kredit"])
+            $("#notes_detail").val(notes)
+            $("#debet").val(formatCurr(detail[0]["debet"]))
+            $("#kredit").val(formatCurr(detail[0]["kredit"]))
             $("#edit_id").val(detail[0]["guid"])
         })
 
@@ -623,8 +628,11 @@
                     return item['guid'] != "gen"
                 })
                 details.forEach(detail => {
-                    total_debet = parseFloat(total_debet) + parseFloat(detail.debet)
-                    total_kredit = parseFloat(total_kredit) + parseFloat(detail.kredit)
+                    detail.debet = String(detail.debet);
+                    detail.kredit = String(detail.kredit);
+
+                    total_debet = parseFloat(total_debet) + parseFloat(detail.debet.replace(',', '.'))
+                    total_kredit = parseFloat(total_kredit) + parseFloat(detail.kredit.replace(',', '.'))
                 })
                 if (jenis == "BM" || jenis == "KM" || jenis == "PG") {
                     if (total_kredit > total_debet) {
@@ -636,8 +644,8 @@
                             kode_akun: kode_akun_slip,
                             notes: jenis + " [" + notes + "]",
                             trx: null,
-                            debet: debet,
-                            kredit: kredit
+                            debet: formatNumberAsFloatFromDB(debet),
+                            kredit: formatNumberAsFloatFromDB(kredit)
                         })
                         populate_detail(details)
                     } else {
@@ -653,8 +661,8 @@
                             kode_akun: kode_akun_slip,
                             notes: jenis + " [" + notes + "]",
                             trx: null,
-                            debet: debet,
-                            kredit: kredit
+                            debet: formatNumberAsFloatFromDB(debet),
+                            kredit: formatNumberAsFloatFromDB(kredit)
                         })
                         populate_detail(details)
                     } else {
@@ -812,7 +820,7 @@
                             notes: 'Jurnal Otomatis Pelunasan - ' + no_jual + ' - ' + pelanggan,
                             trx: no_jual,
                             debet: 0,
-                            kredit: kredit.replace(/,/g, '')
+                            kredit: formatNumberAsLocalFloat(kredit)
                         })
                     }).get()
                     populate_detail(details)
@@ -837,7 +845,7 @@
                             kode_akun: piutang_dagang.kode_akun,
                             notes: 'Jurnal Otomatis Pelunasan - ' + no_jual + ' - ' + pelanggan,
                             trx: no_jual,
-                            debet: debet.replace(/,/g, ''),
+                            debet: formatNumberAsLocalFloat(debet),
                             kredit: 0
                         })
                     }).get()
@@ -863,7 +871,7 @@
                             kode_akun: hutang_dagang.kode_akun,
                             notes: 'Jurnal Otomatis Pelunasan - ' + no_beli + ' - ' + pemasok,
                             trx: no_beli,
-                            debet: debet.replace(/,/g, ''),
+                            debet: formatNumberAsLocalFloat(debet),
                             kredit: 0
                         })
                     }).get()
@@ -890,7 +898,7 @@
                             notes: 'Jurnal Otomatis Pelunasan - ' + no_beli + ' - ' + pemasok,
                             trx: no_beli,
                             debet: 0,
-                            kredit: kredit.replace(/,/g, '')
+                            kredit: formatNumberAsLocalFloat(kredit)
                         })
                     }).get()
                     populate_detail(details)
@@ -919,7 +927,7 @@
                             notes: 'Jurnal Otomatis Pelunasan - ' + no_giro,
                             trx: no_trx,
                             debet: 0,
-                            kredit: kredit.replace(/,/g, '')
+                            kredit: formatNumberAsLocalFloat(kredit)
                         })
                     }).get()
                     populate_detail(details)
@@ -947,7 +955,7 @@
                             kode_akun: kode_akun,
                             notes: 'Jurnal Otomatis Pelunasan - ' + no_giro,
                             trx: no_trx,
-                            debet: debet.replace(/,/g, ''),
+                            debet: formatNumberAsLocalFloat(debet),
                             kredit: 0
                         })
                     }).get()
@@ -1084,15 +1092,12 @@
                 if (data.result) {
                     piutang_dagang = data.piutang_dagang
                     hutang_dagang = data.hutang_dagang
-                    // console.log(piutang_dagang)
-                    // console.log(hutang_dagang)
                 }
             }
         })
     }
 
     function submit_detail() {
-        console.log("submit detail clicked" + guid)
         let detailguid = $("#edit_id").val()
         let akun = $("#akun_detail").val()
         let nama_akun = $("#akun_detail").find(":selected").data("nama")
@@ -1113,8 +1118,8 @@
             kode_akun: kode_akun,
             notes: notes,
             trx: null,
-            debet: debet.replace(/,/g, ''),
-            kredit: kredit.replace(/,/g, '')
+            debet: formatNumberAsLocalFloat(debet),
+            kredit: formatNumberAsLocalFloat(kredit)
         })
         guid++
         detail_clear()
@@ -1188,17 +1193,23 @@
         let total_debet = parseFloat(0)
         let total_kredit = parseFloat(0)
         details.forEach(detail => {
-            total_debet = parseFloat(total_debet) + parseFloat(detail.debet)
-            total_kredit = parseFloat(total_kredit) + parseFloat(detail.kredit)
+            detail.debet = String(detail.debet);
+            detail.kredit = String(detail.kredit);
+            
+            total_debet = parseFloat(total_debet) + parseFloat(detail.debet.replace(',', '.'))
+            total_kredit = parseFloat(total_kredit) + parseFloat(detail.kredit.replace(',', '.'))
         })
+        total_debet = parseFloat(total_debet).toFixed(2);
+        total_kredit = parseFloat(total_kredit).toFixed(2);
+
+        total_debet = String(total_debet);
+        total_kredit = String(total_kredit);
+
+        total_debet = total_debet.replace('.', ',');
+        total_kredit = total_kredit.replace('.', ',');
+
         $("#total_debet").val(formatCurr(total_debet))
         $("#total_kredit").val(formatCurr(total_kredit))
-    }
-
-    function formatCurr(num) {
-        num = String(num);
-        num = num.replace(/[^0-9.]/g, '');
-        return numeral(num).format('0,0.00');
     }
 
     function populate_transaction(type) {
@@ -1257,7 +1268,7 @@
                             width: '10%',
                             className: 'text-right',
                             render: function(data, type, row) {
-                                return numberWithCommas(data);
+                                return formatCurr(formatNumberAsFloatFromDB(data));
                             },
                         },
                         {
@@ -1266,7 +1277,7 @@
                             width: '10%',
                             className: 'text-right',
                             render: function(data, type, row) {
-                                return numberWithCommas(data);
+                                return formatCurr(formatNumberAsFloatFromDB(data));
                             },
                         },
                         {
@@ -1275,7 +1286,7 @@
                             width: '10%',
                             className: 'text-right',
                             render: function(data, type, row) {
-                                return numberWithCommas(data);
+                                return formatCurr(formatNumberAsFloatFromDB(data));
                             },
                         },
                         {
@@ -1284,7 +1295,7 @@
                             width: '10%',
                             className: 'text-right',
                             render: function(data, type, row) {
-                                return numberWithCommas(data);
+                                return formatCurr(formatNumberAsFloatFromDB(data));
                             },
                         },
                         {
@@ -1293,14 +1304,14 @@
                             width: '10%',
                             className: 'text-right',
                             render: function(data, type, row) {
-                                return numberWithCommas(data);
+                                return formatCurr(formatNumberAsFloatFromDB(data));
                             },
                         },
                         {
                             data: 'sisa',
                             width: '10%',
                             render: function(data, type, row) {
-                                return '<input type="text" class="form-control transaction-bayar" value="'+formatCurr(data)+'" onblur="this.value=formatCurr(this.value)"><input type="hidden" class="form-control transaction-id" value="'+row["id"]+'">';
+                                return '<input type="text" class="form-control transaction-bayar" value="'+formatCurr(formatNumberAsFloatFromDB(data))+'" onblur="this.value=formatCurr(this.value)"><input type="hidden" class="form-control transaction-id" value="'+row["id"]+'">';
                             },
                             orderable: false
                         }
@@ -1373,7 +1384,7 @@
                             width: '10%',
                             className: 'text-right',
                             render: function(data, type, row) {
-                                return numberWithCommas(data);
+                                return formatCurr(formatNumberAsFloatFromDB(data));
                             },
                         },
                         {
@@ -1382,7 +1393,7 @@
                             width: '10%',
                             className: 'text-right',
                             render: function(data, type, row) {
-                                return numberWithCommas(data);
+                                return formatCurr(formatNumberAsFloatFromDB(data));
                             },
                         },
                         {
@@ -1391,7 +1402,7 @@
                             width: '10%',
                             className: 'text-right',
                             render: function(data, type, row) {
-                                return numberWithCommas(data);
+                                return formatCurr(formatNumberAsFloatFromDB(data));
                             },
                         },
                         {
@@ -1400,7 +1411,7 @@
                             width: '10%',
                             className: 'text-right',
                             render: function(data, type, row) {
-                                return numberWithCommas(data);
+                                return formatCurr(formatNumberAsFloatFromDB(data));
                             },
                         },
                         {
@@ -1409,14 +1420,14 @@
                             width: '10%',
                             className: 'text-right',
                             render: function(data, type, row) {
-                                return numberWithCommas(data);
+                                return formatCurr(formatNumberAsFloatFromDB(data));
                             },
                         },
                         {
                             data: 'sisa',
                             width: '10%',
                             render: function(data, type, row) {
-                                return '<input type="text" class="form-control transaction-bayar" value="'+formatCurr(data)+'" onblur="this.value=formatCurr(this.value)"><input type="hidden" class="form-control transaction-id" value="'+row["id"]+'">';
+                                return '<input type="text" class="form-control transaction-bayar" value="'+formatCurr(formatNumberAsFloatFromDB(data))+'" onblur="this.value=formatCurr(this.value)"><input type="hidden" class="form-control transaction-id" value="'+row["id"]+'">';
                             },
                             orderable: false
                         }
@@ -1489,7 +1500,7 @@
                             width: '10%',
                             className: 'text-right',
                             render: function(data, type, row) {
-                                return numberWithCommas(data);
+                                return formatCurr(formatNumberAsFloatFromDB(data));
                             },
                         },
                         {
@@ -1498,7 +1509,7 @@
                             width: '10%',
                             className: 'text-right',
                             render: function(data, type, row) {
-                                return numberWithCommas(data);
+                                return formatCurr(formatNumberAsFloatFromDB(data));
                             },
                         },
                         {
@@ -1507,7 +1518,7 @@
                             width: '10%',
                             className: 'text-right',
                             render: function(data, type, row) {
-                                return numberWithCommas(data);
+                                return formatCurr(formatNumberAsFloatFromDB(data));
                             },
                         },
                         {
@@ -1516,7 +1527,7 @@
                             width: '10%',
                             className: 'text-right',
                             render: function(data, type, row) {
-                                return numberWithCommas(data);
+                                return formatCurr(formatNumberAsFloatFromDB(data));
                             },
                         },
                         {
@@ -1525,14 +1536,14 @@
                             width: '10%',
                             className: 'text-right',
                             render: function(data, type, row) {
-                                return numberWithCommas(data);
+                                return formatCurr(formatNumberAsFloatFromDB(data));
                             },
                         },
                         {
                             data: 'sisa',
                             width: '10%',
                             render: function(data, type, row) {
-                                return '<input type="text" class="form-control transaction-bayar" value="'+formatCurr(data)+'" onblur="this.value=formatCurr(this.value)"><input type="hidden" class="form-control transaction-id" value="'+row["id"]+'">';
+                                return '<input type="text" class="form-control transaction-bayar" value="'+formatCurr(formatNumberAsFloatFromDB(data))+'" onblur="this.value=formatCurr(this.value)"><input type="hidden" class="form-control transaction-id" value="'+row["id"]+'">';
                             },
                             orderable: false
                         }
@@ -1605,7 +1616,7 @@
                             width: '10%',
                             className: 'text-right',
                             render: function(data, type, row) {
-                                return numberWithCommas(data);
+                                return formatCurr(formatNumberAsFloatFromDB(data));
                             },
                         },
                         {
@@ -1614,7 +1625,7 @@
                             width: '10%',
                             className: 'text-right',
                             render: function(data, type, row) {
-                                return numberWithCommas(data);
+                                return formatCurr(formatNumberAsFloatFromDB(data));
                             },
                         },
                         {
@@ -1623,7 +1634,7 @@
                             width: '10%',
                             className: 'text-right',
                             render: function(data, type, row) {
-                                return numberWithCommas(data);
+                                return formatCurr(formatNumberAsFloatFromDB(data));
                             },
                         },
                         {
@@ -1632,7 +1643,7 @@
                             width: '10%',
                             className: 'text-right',
                             render: function(data, type, row) {
-                                return numberWithCommas(data);
+                                return formatCurr(formatNumberAsFloatFromDB(data));
                             },
                         },
                         {
@@ -1641,14 +1652,14 @@
                             width: '10%',
                             className: 'text-right',
                             render: function(data, type, row) {
-                                return numberWithCommas(data);
+                                return formatCurr(formatNumberAsFloatFromDB(data));
                             },
                         },
                         {
                             data: 'sisa',
                             width: '10%',
                             render: function(data, type, row) {
-                                return '<input type="text" class="form-control transaction-bayar" value="'+formatCurr(data)+'" onblur="this.value=formatCurr(this.value)"><input type="hidden" class="form-control transaction-id" value="'+row["id"]+'">';
+                                return '<input type="text" class="form-control transaction-bayar" value="'+formatCurr(formatNumberAsFloatFromDB(data))+'" onblur="this.value=formatCurr(this.value)"><input type="hidden" class="form-control transaction-id" value="'+row["id"]+'">';
                             },
                             orderable: false
                         }
@@ -1716,14 +1727,14 @@
                             width: '10%',
                             className: 'text-right',
                             render: function(data, type, row) {
-                                return numberWithCommas(data);
+                                return formatCurr(formatNumberAsFloatFromDB(data));
                             },
                         },
                         {
                             data: 'sisa',
                             width: '10%',
                             render: function(data, type, row) {
-                                return '<input type="text" class="form-control transaction-bayar" value="'+formatCurr(data)+'" onblur="this.value=formatCurr(this.value)" readonly><input type="hidden" class="form-control transaction-id" value="'+row["id"]+'"><input type="hidden" class="form-control akun-id" value="'+row["id_akun"]+'"><input type="hidden" class="form-control akun-nama" value="'+row["nama_akun"]+'"><input type="hidden" class="form-control akun-kode" value="'+row["kode_akun"]+'"><input type="hidden" class="form-control transaction-no" value="'+row["id_transaksi"]+'">';
+                                return '<input type="text" class="form-control transaction-bayar" value="'+formatCurr(formatNumberAsFloatFromDB(data))+'" onblur="this.value=formatCurr(this.value)" readonly><input type="hidden" class="form-control transaction-id" value="'+row["id"]+'"><input type="hidden" class="form-control akun-id" value="'+row["id_akun"]+'"><input type="hidden" class="form-control akun-nama" value="'+row["nama_akun"]+'"><input type="hidden" class="form-control akun-kode" value="'+row["kode_akun"]+'"><input type="hidden" class="form-control transaction-no" value="'+row["id_transaksi"]+'">';
                             },
                             orderable: false
                         }
@@ -1791,14 +1802,14 @@
                             width: '10%',
                             className: 'text-right',
                             render: function(data, type, row) {
-                                return numberWithCommas(data);
+                                return formatCurr(formatNumberAsFloatFromDB(data));
                             },
                         },
                         {
                             data: 'sisa',
                             width: '10%',
                             render: function(data, type, row) {
-                                return '<input type="text" class="form-control transaction-bayar" value="'+formatCurr(data)+'" onblur="this.value=formatCurr(this.value)" readonly><input type="hidden" class="form-control transaction-id" value="'+row["id"]+'"><input type="hidden" class="form-control akun-id" value="'+row["id_akun"]+'"><input type="hidden" class="form-control akun-nama" value="'+row["nama_akun"]+'"><input type="hidden" class="form-control akun-kode" value="'+row["kode_akun"]+'"><input type="hidden" class="form-control transaction-no" value="'+row["id_transaksi"]+'">';
+                                return '<input type="text" class="form-control transaction-bayar" value="'+formatCurr(formatNumberAsFloatFromDB(data))+'" onblur="this.value=formatCurr(this.value)" readonly><input type="hidden" class="form-control transaction-id" value="'+row["id"]+'"><input type="hidden" class="form-control akun-id" value="'+row["id_akun"]+'"><input type="hidden" class="form-control akun-nama" value="'+row["nama_akun"]+'"><input type="hidden" class="form-control akun-kode" value="'+row["kode_akun"]+'"><input type="hidden" class="form-control transaction-no" value="'+row["id_transaksi"]+'">';
                             },
                             orderable: false
                         }
@@ -1824,8 +1835,44 @@
         }
     }
 
-    function numberWithCommas(x) {
-        return x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+    function formatCurr(num) {
+        num = String(num);
+        
+        num = num.split('.').join("");;
+        num = num.replace(/,/g, '.');
+        num = num.toString().replace(/\,/gi, "");
+
+        num += '';
+        x = num.split('.');
+        x1 = x[0];
+        x2 = x.length > 1 ? ',' + x[1] : ',00';
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + '.' + '$2');
+        }
+        return x1 + x2;
+    }
+
+    function formatNumberAsFloat(num) {
+        num = String(num);
+        num = num.replace(',', '.');
+        
+        return num;
+    }
+
+    function formatNumberAsLocalFloat(num) {
+        num = String(num);
+        num = num.split('.').join("");
+        
+        return num;
+    }
+
+    function formatNumberAsFloatFromDB(num) {
+        num = String(num);
+		num = parseFloat(num).toFixed(2);
+        num = num.replace('.', ',');
+        
+        return num;
     }
 </script>
 @endsection

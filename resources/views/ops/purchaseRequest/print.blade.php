@@ -116,7 +116,6 @@
         }
     }
 </style>
-{{-- <button type="button" class="no-print" onclick="window.print()">Print</button><br /> --}}
 <div class="atas">
     <table style="width:100%;">
         <tr>
