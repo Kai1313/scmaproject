@@ -12,7 +12,7 @@ class MasterWrapper extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'id_cabang', 'nama_wrapper', 'weight', 'path', 'path2', 'catatan', 'user_created', 'dt_created', 'user_modified', 'dt_modified',
+        'id_cabang', 'nama_wrapper', 'weight', 'path', 'path2', 'catatan', 'user_created', 'dt_created', 'user_modified', 'dt_modified', 'id_kategori_wrapper',
     ];
 
     public function cabang()
