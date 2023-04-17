@@ -250,6 +250,10 @@ class MoveBranch extends Model
                 $master->sisa_master_qr_code = $master->jumlah_master_qr_code;
                 $master->save();
             }
+
+            DB::table('kartu_stok')->where('kode_kartu_stok', $this->kode_pindah_barang)
+                ->where('kode_batang_kartu_stok', $detail->qr_code)
+                ->where('id_jenis_transaksi', $this->id_jenis_transaksi)->delete();
         }
 
         return ['status' => 'success'];
