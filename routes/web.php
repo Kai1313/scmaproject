@@ -124,6 +124,43 @@ Route::prefix('pemakaian')->group(function () {
 
 Route::get('kirim_ke_gudang/print/{id}', 'SendToWarehouseController@print')->name('send_to_warehouse-print');
 
+Route::prefix('laporan')->namespace('Report')->group(function () {
+    Route::prefix('qc_penerimaan')->group(function () {
+        Route::get('index', 'QcReceivedController@index')->name('report_qc-index');
+        Route::get('print', 'QcReceivedController@print')->name('report_qc-print');
+    });
+
+    Route::prefix('pemakaian')->group(function () {
+        Route::get('index', 'MaterialUsageController@index')->name('report_material_usage-index');
+        Route::get('print', 'MaterialUsageController@print')->name('report_material_usage-print');
+    });
+
+    Route::prefix('terima_dari_cabang')->group(function () {
+        Route::get('index', 'ReceivedFromBranchController@index')->name('report_received_from_branch-index');
+        Route::get('print', 'ReceivedFromBranchController@print')->name('report_received_from_branch-print');
+    });
+
+    Route::prefix('terima_dari_cabang')->group(function () {
+        Route::get('index', 'ReceivedFromBranchController@index')->name('report_received_from_branch-index');
+        Route::get('print', 'ReceivedFromBranchController@print')->name('report_received_from_branch-print');
+    });
+
+    Route::prefix('terima_dari_gudang')->group(function () {
+        Route::get('index', 'ReceivedFromWarehouseController@index')->name('report_received_from_warehouse-index');
+        Route::get('print', 'ReceivedFromWarehouseController@print')->name('report_received_from_warehouse-print');
+    });
+
+    Route::prefix('kirim_ke_cabang')->group(function () {
+        Route::get('index', 'SendToBranchController@index')->name('report_send_to_branch-index');
+        Route::get('print', 'SendToBranchController@print')->name('report_send_to_branch-print');
+    });
+
+    Route::prefix('kirim_ke_gudang')->group(function () {
+        Route::get('index', 'SendToWarehouseController@index')->name('report_send_to_warehouse-index');
+        Route::get('print', 'SendToWarehouseController@print')->name('report_send_to_warehouse-print');
+    });
+});
+
 // Master
 Route::get('/master/slip/index/{user_id?}', 'MasterSlipController@index')->name('master-slip');
 Route::get('/master/slip/form/create', 'MasterSlipController@create')->name('master-slip-create');

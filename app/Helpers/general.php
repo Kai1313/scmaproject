@@ -119,3 +119,18 @@ function replaceMessage($array, $message)
 
     return $message;
 }
+
+function getCabangForReport()
+{
+    $array = [];
+    $cabang = session()->get('access_cabang');
+    if (count($cabang) > 1) {
+        $array[] = ['id' => implode(array_column($cabang, 'id'), ','), 'text' => 'Semua Cabang'];
+    }
+
+    foreach ($cabang as $c) {
+        $array[] = ['id' => $c['id'], 'text' => $c['text']];
+    }
+
+    return $array;
+}

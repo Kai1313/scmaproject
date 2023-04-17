@@ -783,6 +783,13 @@
                                             </a>
                                         </li>
                                     @endif
+                                    {{-- @if (checkAccessMenu('laporan_persediaan')) --}}
+                                    <li data-alias="">
+                                        <a href="{{ route('report_qc-index') }}">
+                                            <i class="glyphicon glyphicon-option-vertical"></i>QC Penerimaan Barang
+                                        </a>
+                                    </li>
+                                    {{-- @endif --}}
                                 </ul>
                             </li>
                         @endif
