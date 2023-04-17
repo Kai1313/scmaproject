@@ -83,7 +83,7 @@
                 <div class="box-body">
                     <div class="row">
                         <div class="col-md-4">
-                            <center>
+                            <center style="{{ $data ? 'display:none;' : 'display:block;' }}">
                                 <div id="reader"></div>
                             </center>
                         </div>
@@ -95,7 +95,7 @@
                                 <div class="form-group">
                                     <div class="input-group">
                                         <input type="text" name="search-qrcode" class="form-control"
-                                            placeholder="Scan QRCode">
+                                            placeholder="Scan QRCode" autocomplete="off">
                                         <div class="input-group-btn">
                                             <button class="btn btn-info btn-search btn-flat" type="button">
                                                 <i class="fa fa-search"></i>
@@ -128,6 +128,16 @@
                                     value="{{ old('id_jenis_transaksi', $data ? $data->id_jenis_transaksi : '24') }}">
                             </div>
                         </div>
+                        @if ($data)
+                            <div class="col-md-4">
+                                <label>Kode Referensi <span>*</span></label>
+                                <div class="form-group">
+                                    <input type="text" name="kode_pindah_barang2"
+                                        value="{{ old('kode_pindah_barang2', $data ? $data->parent->kode_pindah_barang : '') }}"
+                                        class="form-control" readonly>
+                                </div>
+                            </div>
+                        @endif
                         <div class="col-md-4">
                             <label>Cabang</label>
                             <div class="form-group">
@@ -213,28 +223,20 @@
 
 @section('externalScripts')
     <script>
-        let oldDetails = {!! $data && $data->parent ? $data->parent->formatdetail : '[]' !!};
+        let idData = {{ $data ? $data->id_pindah_barang : 0 }}
+        console.log(idData)
         let arrayQRCode = {!! $data ? $data->getDetailQRCode->pluck('qr_code') : '[]' !!};
-        let details = []
+        let details = {!! $data ? $data->formatdetail : '[]' !!}
         let html5QrcodeScanner = new Html5QrcodeScanner("reader", {
             fps: 10,
             qrbox: 250
         });
 
-        html5QrcodeScanner.render(onScanSuccess, onScanError);
-
-        for (let i = 0; i < oldDetails.length; i++) {
-            details.push(oldDetails[i])
-            if (arrayQRCode.includes(oldDetails[i]['qr_code'])) {
-                details[i]['status_diterima'] = 1
-            } else {
-                details[i]['id_pindah_barang_detail'] = 0
-                details[i]['status_diterima'] = 0
-            }
+        if (idData == 0) {
+            html5QrcodeScanner.render(onScanSuccess, onScanError);
         }
 
         $('[name="details"]').val(JSON.stringify(details))
-
         var resDataTable = $('#table-detail').DataTable({
             data: details,
             ordering: false,
@@ -294,21 +296,19 @@
                     qrcode: string
                 },
                 success: function(res) {
-                    details = []
-                    oldDetails = res.details
-                    for (let i = 0; i < oldDetails.length; i++) {
-                        details.push(oldDetails[i])
-                        if (arrayQRCode.includes(oldDetails[i]['qr_code'])) {
+                    let newDetail = res.details
+                    for (let i = 0; i < newDetail.length; i++) {
+                        details.push(newDetail[i])
+                        if (arrayQRCode.includes(newDetail[i]['qr_code'])) {
                             details[i]['status_diterima'] = 1
                         } else {
-                            details[i]['id_pindah_barang_detail'] = 0
-                            details[i]['status_diterima'] = 0
+                            details[i]['id_pindah_barang_detail'] = ''
+                            details[i]['status_diterima'] = 1
                         }
                     }
 
                     resDataTable.clear().rows.add(details).draw()
                     $('[name="details"]').val(JSON.stringify(details))
-                    $('[name="search-qrcode"]').val('')
                     $('[name="id_cabang"]').val(res.data.id_cabang2)
                     $('[name="id_cabang2"]').val(res.data.id_cabang)
                     $('[name="nama_cabang"]').val(res.data.cabang2.nama_cabang)
