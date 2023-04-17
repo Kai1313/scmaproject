@@ -269,7 +269,7 @@ class PurchaseRequestController extends Controller
                 ->leftJoin('barang', 'kartu_stok.id_barang', '=', 'barang.id_barang')
                 ->leftJoin('isi_satuan_barang', 'kartu_stok.id_barang', '=', 'isi_satuan_barang.id_barang')
                 ->leftJoin('satuan_barang', 'isi_satuan_barang.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
-                ->where('satuan_jual_isi_satuan_barang', 1)
+            // ->where('satuan_jual_isi_satuan_barang', 1)
                 ->where('kartu_stok.id_barang', $item)
                 ->whereIn('id_gudang', $arrayCabang[$cabang])->groupBy('kartu_stok.id_barang')->first();
             if ($stok) {

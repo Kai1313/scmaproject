@@ -508,6 +508,13 @@
                                             </a>
                                         </li>
                                     @endif
+                                    @if (checkAccessMenu('cc_pisah_barang'))
+                                        <li data-alias="cc_pisah_barang">
+                                            <a href="{{ env('OLD_URL_ROOT') }}#cc_pisah_barang">
+                                                <i class="glyphicon glyphicon-option-vertical"></i>CC Pisah Barang
+                                            </a>
+                                        </li>
+                                    @endif
                                     @if (checkAccessMenu('koreksi_stok'))
                                         <li data-alias="koreksi_stok">
                                             <a href="{{ env('OLD_URL_ROOT') }}#koreksi_stok">
