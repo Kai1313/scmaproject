@@ -80,7 +80,7 @@ function checkUserSession($request, $alias_menu, $type)
         }
 
         $arrayCabang = array_values($arrayCabang);
-        // session()->flush();
+        session()->flush();
         if ($token && session()->has('token') == false) {
             session()->put('token', $token->nama_token_pengguna);
             session()->put('user', $user);
@@ -129,8 +129,21 @@ function getCabangForReport()
     }
 
     foreach ($cabang as $c) {
-        $array[] = ['id' => $c['id'], 'text' => $c['text']];
+        $array[] = $c;
     }
 
     return $array;
+}
+
+function formatNumber($number)
+{
+    $number = number_format($number, 4, ',', '.');
+    $explode = explode(',', $number);
+    $koma = '';
+    if (count($explode) > 1) {
+        $reverse = (int) strrev($explode[1]);
+        $koma = (string) $reverse > 0 ? ',' . strrev($reverse) : '';
+    }
+
+    return $explode[0] . $koma;
 }

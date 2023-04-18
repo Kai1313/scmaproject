@@ -27,9 +27,9 @@
         <div class="box">
             <div class="box-header">
                 <div class="row">
-                    <div class="col-md-8">
+                    <div class="col-md-10">
                         <div class="row">
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label>Cabang</label>
                                 <div class="form-group">
                                     <select name="id_cabang" class="form-control select2 trigger-change">
@@ -39,15 +39,38 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label>Tanggal</label>
                                 <div class="form-group">
                                     <input type="text" name="date" class="form-control trigger-change">
                                 </div>
                             </div>
+                            <div class="col-md-3">
+                                <label>Status</label>
+                                <div class="form-group">
+                                    <select name="status_qc" class="form-control select2 trigger-change">
+                                        <option value="all">Semua Status</option>
+                                        @foreach ($arrayStatus as $key => $val)
+                                            <option value="{{ $key }}">{{ $val }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label>Kode Pembelian</label>
+                                <div class="form-group">
+                                    <input type="text" class="form-control trigger-change" name="kode_pembelian">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label>Nama Barang</label>
+                                <div class="form-group">
+                                    <input type="text" class="form-control trigger-change" name="nama_barang">
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-2">
                         <a href="{{ route('report_qc-print') }}"
                             class="btn btn-primary btn-sm btn-flat pull-right btn-action" style="margin-top:26px;"
                             target="_blank">
@@ -62,6 +85,7 @@
                     <table class="table table-bordered data-table display responsive nowrap" width="100%">
                         <thead>
                             <tr>
+                                <th>No</th>
                                 <th>Kode Pembelian</th>
                                 <th>Nama Barang</th>
                                 <th>Jumlah</th>
@@ -101,7 +125,6 @@
         let defaultUrlIndex = '{{ route('report_qc-index') }}'
         let defaultUrlPrint = $('.btn-action').prop('href')
         let countDown = '{{ $countDown }}'
-        console.log(countDown)
         let param = ''
 
         $('.select2').select2()
@@ -110,28 +133,40 @@
             startDate: moment().subtract(countDown, 'days'),
             endDate: moment(),
             locale: {
-                format: 'YYYY/M/DD'
+                format: 'YYYY-MM-DD'
             }
         });
+
         $('.btn-action').prop('href', defaultUrlPrint + param)
         $(document).ready(function() {
             getData()
         })
 
         function getParam() {
-            param = '?id_cabang=' + $('[name="id_cabang"]').val() + '&date=' + $('[name="date"]').val()
+            param = ''
+            $('.trigger-change').each(function(i, v) {
+                param += (i == 0) ? '?' : '&'
+                param += $(v).prop('name') + '=' + $(v).val()
+            })
+
+            $('.btn-action').prop('href', defaultUrlPrint + param)
         }
 
         function getData() {
             getParam()
 
+            $('#cover-spin').show()
             $.ajax({
                 url: defaultUrlIndex + param,
                 success: function(res) {
-                    console.log(res)
+                    $('tbody').html(res.html)
+                    $('#cover-spin').hide()
                 },
                 error: function(error) {
-                    console.log(error)
+                    let textError = error.hasOwnProperty('responseJSON') ? error.responseJSON.message : error
+                        .statusText
+                    Swal.fire("Gagal Mengambil Data. ", textError, 'error')
+                    $('#cover-spin').hide()
                 }
             })
         }

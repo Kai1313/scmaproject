@@ -32,4 +32,19 @@ class MoveBranchDetail extends Model
         'id_wrapper_zak',
         'weight_zak',
     ];
+
+    public function barang()
+    {
+        return $this->belongsTo(Barang::class, 'id_barang');
+    }
+
+    public function satuan()
+    {
+        return $this->belongsTo(SatuanBarang::class, 'id_satuan_barang');
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(MoveBranch::class, 'id_pindah_barang');
+    }
 }

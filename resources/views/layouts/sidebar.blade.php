@@ -902,12 +902,19 @@
                                             </a>
                                         </li>
                                     @endif
+                                    {{-- @if (checkAccessMenu('laporan_persediaan')) --}}
+                                    <li data-alias="">
+                                        <a href="{{ route('report_send_to_branch-index') }}">
+                                            <i class="glyphicon glyphicon-option-vertical"></i>Kirim Ke Cabang
+                                        </a>
+                                    </li>
+                                    {{-- @endif --}}
                                 </ul>
                             </li>
                         @endif
                         @if (checkAccessMenu('laporan_produksi_kepala'))
                             <li class="treeview" data-alias="laporan_produksi_kepala">
-                                <a href="#"><i class="glyphicon glyphicon-arrow-right"></i>>
+                                <a href="#"><i class="glyphicon glyphicon-arrow-right"></i>
                                     <span>Produksi</span>
                                     <span class="pull-right-container">
                                         <i class="fa fa-angle-left pull-right"></i>
