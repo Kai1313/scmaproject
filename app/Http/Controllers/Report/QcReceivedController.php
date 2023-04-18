@@ -17,7 +17,7 @@ class QcReceivedController extends Controller
         if ($request->ajax()) {
             $startDate = $request->start_date;
             $endDate = $request->end_date;
-            $idCabang = explode($request->id_cabang, ',');
+            $idCabang = explode(',', $request->id_cabang);
 
             $data = DB::table('pembelian_detail')
                 ->select(
@@ -53,8 +53,12 @@ class QcReceivedController extends Controller
             ]);
         }
 
+        $duration = DB::table('setting')->where('code', 'QC Duration')->first();
+        $countdown = $duration->value2;
+
         return view('report_ops.qualityControl.index', [
             "pageTitle" => "SCA OPS | Laporan QC Penerimaan Barang | List",
+            'countDown' => $countdown,
         ]);
     }
 

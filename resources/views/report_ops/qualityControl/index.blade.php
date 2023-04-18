@@ -1,6 +1,7 @@
 @extends('layouts.main')
 @section('addedStyles')
     <link rel="stylesheet" href="{{ asset('assets/bower_components/select2/dist/css/select2.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/bower_components/bootstrap-daterangepicker/daterangepicker.css') }}" />
     <style>
         th {
             text-align: center;
@@ -39,17 +40,9 @@
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <label>Tanggal Awal</label>
+                                <label>Tanggal</label>
                                 <div class="form-group">
-                                    <input type="date" name="start_date" class="form-control trigger-change"
-                                        value="{{ date('Y-m-d') }}">
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <label>Tanggal Akhir</label>
-                                <div class="form-group">
-                                    <input type="date" name="end_date" class="form-control trigger-change"
-                                        value="{{ date('Y-m-d') }}">
+                                    <input type="text" name="date" class="form-control trigger-change">
                                 </div>
                             </div>
                         </div>
@@ -69,14 +62,19 @@
                     <table class="table table-bordered data-table display responsive nowrap" width="100%">
                         <thead>
                             <tr>
-                                <th>Tanggal</th>
-                                <th>Kode Pindah Gudang</th>
-                                <th>Gudang</th>
-                                <th>Cabang Tujuan</th>
-                                <th>Keterangan</th>
-                                <th>Jasa Pengiriman</th>
+                                <th>Kode Pembelian</th>
+                                <th>Nama Barang</th>
+                                <th>Jumlah</th>
+                                <th>Satuan</th>
                                 <th>Status</th>
-                                <th>Action</th>
+                                <th>Alasan</th>
+                                <th>Tanggal QC</th>
+                                <th>SG</th>
+                                <th>BE</th>
+                                <th>PH</th>
+                                <th>Warna</th>
+                                <th>Bentuk</th>
+                                <th>Keterangan</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -90,27 +88,43 @@
 
 @section('addedScripts')
     <script src="{{ asset('assets/bower_components/select2/dist/js/select2.min.js') }}"></script>
+    {{-- <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script> --}}
+    <script type="text/javascript" src="{{ asset('assets/bower_components/moment/moment.js') }}"></script>
+    <script type="text/javascript"
+        src="{{ asset('assets/bower_components/bootstrap-daterangepicker/daterangepicker.js') }}"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/custom.js') }}"></script>
 @endsection
 
 @section('externalScripts')
     <script>
-        let filterBranch = $('[name="id_cabang"]').val()
-        let filterStartDate = $('[name="start_date"]').val()
-        let filterEndDate = $('[name="end_date"]').val()
         let defaultUrlIndex = '{{ route('report_qc-index') }}'
         let defaultUrlPrint = $('.btn-action').prop('href')
-
-        let param = '?id_cabang=' + filterBranch + '&start_date=' + filterStartDate + '&end_date=' + filterEndDate
+        let countDown = '{{ $countDown }}'
+        console.log(countDown)
+        let param = ''
 
         $('.select2').select2()
+        $('[name="date"]').daterangepicker({
+            timePicker: true,
+            startDate: moment().subtract(countDown, 'days'),
+            endDate: moment(),
+            locale: {
+                format: 'YYYY/M/DD'
+            }
+        });
         $('.btn-action').prop('href', defaultUrlPrint + param)
         $(document).ready(function() {
             getData()
         })
 
+        function getParam() {
+            param = '?id_cabang=' + $('[name="id_cabang"]').val() + '&date=' + $('[name="date"]').val()
+        }
+
         function getData() {
+            getParam()
+
             $.ajax({
                 url: defaultUrlIndex + param,
                 success: function(res) {

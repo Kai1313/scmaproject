@@ -80,7 +80,7 @@ function checkUserSession($request, $alias_menu, $type)
         }
 
         $arrayCabang = array_values($arrayCabang);
-        session()->flush();
+        // session()->flush();
         if ($token && session()->has('token') == false) {
             session()->put('token', $token->nama_token_pengguna);
             session()->put('user', $user);
