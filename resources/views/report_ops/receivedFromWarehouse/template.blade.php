@@ -5,12 +5,11 @@
                 <tr>
                     <th>No</th>
                     <th>Tanggal</th>
-                    <th>Kode Pindah Cabang</th>
+                    <th>Kode Pindah Gudang</th>
                     <th>Cabang</th>
                     <th>Gudang</th>
-                    <th>Cabang Tujuan</th>
+                    <th>Gudang Asal</th>
                     <th>keterangan</th>
-                    <th>Jasa Pengiriman</th>
                     <th>Status</th>
                 </tr>
             </thead>
@@ -22,10 +21,8 @@
                         <td>{{ $data->kode_pindah_barang }}</td>
                         <td>{{ $data->cabang->nama_cabang }}</td>
                         <td>{{ $data->gudang->nama_gudang }}</td>
-                        <td>{{ $data->cabang2->nama_cabang }}</td>
+                        <td>{{ $data->gudang2->nama_gudang }}</td>
                         <td>{{ $data->keterangan_pindah_barang }}</td>
-                        <td>{{ $data->transporter }} {{ $data->nomor_polisi ? '(' . $data->nomor_polisi . ')' : '' }}
-                        </td>
                         <td>{{ $arrayStatus[$data->status_pindah_barang] }}</td>
                     </tr>
                 @endforeach
@@ -64,16 +61,9 @@
                 <div>
                     <table>
                         <tr>
-                            <td style="width:120px;">Cabang Tujuan</td>
+                            <td style="width:120px;">Gudang Asal</td>
                             <td style="width:30px;">:</td>
-                            <td style="width:200px;">{{ $data->cabang2->nama_cabang }}</td>
-                        </tr>
-                        <tr>
-                            <td>Jasa Pengiriman</td>
-                            <td>:</td>
-                            <td>{{ $data->transporter }}
-                                {{ $data->nomor_polisi ? '(' . $data->nomor_polisi . ')' : '' }}
-                            </td>
+                            <td style="width:200px;">{{ $data->gudang2->nama_gudang }}</td>
                         </tr>
                         <tr>
                             <td>Keterangan</td>
@@ -136,13 +126,12 @@
         <table class="table table-bordered data-table display responsive nowrap" width="100%">
             <thead>
                 <tr>
-
                     <th>No</th>
                     <th>Tanggal</th>
-                    <th>Kode Pindah Cabang</th>
+                    <th>Kode Pindah Gudang</th>
                     <th>Cabang</th>
                     <th>Gudang</th>
-                    <th>Cabang Tujuan</th>
+                    <th>Gudang Asal</th>
                     <th>QR Code</th>
                     <th>Nama Barang</th>
                     <th>Jumlah</th>
@@ -157,7 +146,7 @@
                         <td>{{ $data->parent->kode_pindah_barang }}</td>
                         <td>{{ $data->parent->cabang->nama_cabang }}</td>
                         <td>{{ $data->parent->gudang->nama_gudang }}</td>
-                        <td>{{ $data->parent->cabang2->nama_cabang }}</td>
+                        <td>{{ $data->parent->gudang2->nama_gudang }}</td>
                         <td>{{ $data->qr_code }}</td>
                         <td>{{ $data->barang->nama_barang }}</td>
                         <td style="text-align:right;">{{ formatNumber($data->qty) }}

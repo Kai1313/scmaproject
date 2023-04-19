@@ -8,7 +8,7 @@
                     <th>Kode Pindah Cabang</th>
                     <th>Cabang</th>
                     <th>Gudang</th>
-                    <th>Cabang Tujuan</th>
+                    <th>Cabang Asal</th>
                     <th>keterangan</th>
                     <th>Jasa Pengiriman</th>
                     <th>Status</th>
@@ -142,7 +142,7 @@
                     <th>Kode Pindah Cabang</th>
                     <th>Cabang</th>
                     <th>Gudang</th>
-                    <th>Cabang Tujuan</th>
+                    <th>Cabang Asal</th>
                     <th>QR Code</th>
                     <th>Nama Barang</th>
                     <th>Jumlah</th>

@@ -909,6 +909,27 @@
                                         </a>
                                     </li>
                                     {{-- @endif --}}
+                                    {{-- @if (checkAccessMenu('laporan_persediaan')) --}}
+                                    <li data-alias="">
+                                        <a href="{{ route('report_received_from_branch-index') }}">
+                                            <i class="glyphicon glyphicon-option-vertical"></i>Terima Dari Cabang
+                                        </a>
+                                    </li>
+                                    {{-- @endif --}}
+                                    {{-- @if (checkAccessMenu('laporan_persediaan')) --}}
+                                    <li data-alias="">
+                                        <a href="{{ route('report_send_to_warehouse-index') }}">
+                                            <i class="glyphicon glyphicon-option-vertical"></i>Kirim Ke Gudang
+                                        </a>
+                                    </li>
+                                    {{-- @endif --}}
+                                    {{-- @if (checkAccessMenu('laporan_persediaan')) --}}
+                                    <li data-alias="">
+                                        <a href="{{ route('report_received_from_warehouse-index') }}">
+                                            <i class="glyphicon glyphicon-option-vertical"></i>Terima Dari Gudang
+                                        </a>
+                                    </li>
+                                    {{-- @endif --}}
                                 </ul>
                             </li>
                         @endif
