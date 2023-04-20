@@ -60,6 +60,7 @@ class ReceivedFromWarehouseController extends Controller
             'arrayStatus' => $this->arrayStatus,
             'cabang' => implode(', ', $sCabang),
             'date' => $request->date,
+            'type' => $request->type,
         ]);
     }
 

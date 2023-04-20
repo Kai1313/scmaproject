@@ -61,7 +61,7 @@ function checkUserSession($request, $alias_menu, $type)
             ->join('gudang', 'akses_gudang.id_gudang', '=', 'gudang.id_gudang')
             ->join('cabang', 'gudang.id_cabang', '=', 'cabang.id_cabang')
             ->where('status_akses_gudang', 1)->where('status_cabang', 1)->where('status_gudang', 1)
-            ->where('id_pengguna', session()->get('user')['id_pengguna'])
+            ->where('id_pengguna', $user_id)
             ->get();
 
         $arrayCabang = [];
@@ -80,7 +80,6 @@ function checkUserSession($request, $alias_menu, $type)
         }
 
         $arrayCabang = array_values($arrayCabang);
-        // session()->flush();
         if ($token && session()->has('token') == false) {
             session()->put('token', $token->nama_token_pengguna);
             session()->put('user', $user);
@@ -124,6 +123,7 @@ function getCabangForReport()
 {
     $array = [];
     $cabang = session()->get('access_cabang');
+    return $cabang;
     if (count($cabang) > 1) {
         $array[] = ['id' => implode(array_column($cabang, 'id'), ','), 'text' => 'Semua Cabang'];
     }
