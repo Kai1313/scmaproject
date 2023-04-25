@@ -188,6 +188,7 @@ Route::get('/master/slip/populate', 'MasterSlipController@populate')->name('mast
 Route::get('/master/slip/export/excel', 'MasterSlipController@export_excel')->name('master-slip-export-excel');
 Route::post('/master/slip/copy/data', 'MasterSlipController@copy_data')->name('master-slip-copy-data');
 Route::get('/master/slip/get_by_cabang/{id_cabang?}/{id_slip?}', 'MasterSlipController@getSlipByCabang')->name('master-slip-get-by-cabang');
+Route::get('/master/slip/get_giro_by_cabang/{id_cabang?}/{jenis?}', 'MasterSlipController@getSlipGiroByCabang')->name('master-slip-get-giro-by-cabang');
 
 Route::get('/master/coa/index/{user_id?}', 'MasterCoaController@index')->name('master-coa');
 Route::get('/master/coa/populate/{cabang?}', 'MasterCoaController@populate')->name('master-coa-populate');
@@ -236,5 +237,9 @@ Route::prefix('transaction')->group(function () {
         Route::get('/void/{id?}', 'AdjustmentLedgerController@void')->name('transaction-adjustment-ledger-void');
         Route::get('/active/{id?}', 'AdjustmentLedgerController@active')->name('transaction-adjustment-ledger-active');
         Route::get('/getGiroReject/{id?}', 'AdjustmentLedgerController@getGiroReject')->name('transaction-adjustment-ledger-get-giro-reject');
+    });
+    Route::prefix('closing_journal')->group(function () {
+        Route::get('/index/{user_id?}', 'ClosingJournalController@index')->name('transaction-closing-journal');
+        Route::get('/form/create', 'ClosingJournalController@create')->name('transaction-closing-journal-create');
     });
 });
