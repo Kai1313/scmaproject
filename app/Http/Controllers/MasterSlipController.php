@@ -469,4 +469,33 @@ class MasterSlipController extends Controller
             ]);
         }
     }
+
+    public function getSlipGiroByCabang($id_cabang, $jenis)
+    {
+        try {
+            $jenis = explode(",", $jenis);
+            $data_slip = Slip::where("master_slip.id_cabang", $id_cabang)->whereIn("master_slip.jenis_slip", $jenis)->join("master_akun", "master_akun.id_akun", "master_slip.id_akun")->get();
+            // Log::info(count($data_slip));
+            if (empty($data_slip)) {
+                return response()->json([
+                    "result"=>FALSE,
+                    "message"=>"Data slip not found!!!"
+                ]);
+            }
+            return response()->json([
+                "result"=>TRUE,
+                "message"=>"Successfully get slip giro by cabang",
+                "data"=>$data_slip
+            ]);
+        }
+        catch (\Exception $e) {
+            $message = "Error when get slip giro by cabang";
+            Log::error($message);
+            Log::error($e);
+            return response()->json([
+                "result"=>FALSE,
+                "message"=>$message
+            ]);
+        }
+    }
 }

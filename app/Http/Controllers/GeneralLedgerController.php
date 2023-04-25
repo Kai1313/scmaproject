@@ -157,6 +157,7 @@ class GeneralLedgerController extends Controller
                 $trx_saldo->bayar = 0;
                 $trx_saldo->sisa = $sum;
                 $trx_saldo->id_jurnal = $header->id_jurnal;
+                $trx_saldo->id_slip2 = $slipGiroID;
                 $trx_saldo->no_giro = $header->no_giro;
                 $trx_saldo->tanggal_giro = $header->tanggal_giro;
                 $trx_saldo->tanggal_giro_jt = $header->tanggal_giro_jt;
@@ -489,6 +490,7 @@ class GeneralLedgerController extends Controller
                 $trx_saldo->bayar = 0;
                 $trx_saldo->sisa = $sum;
                 $trx_saldo->id_jurnal = $header->id_jurnal;
+                $trx_saldo->id_slip2 = $slipGiroID;
                 $trx_saldo->no_giro = $header->no_giro;
                 $trx_saldo->tanggal_giro = $header->tanggal_giro;
                 $trx_saldo->tanggal_giro_jt = $header->tanggal_giro_jt;
@@ -854,8 +856,13 @@ class GeneralLedgerController extends Controller
                 $data_saldo = $data_saldo->where("saldo_transaksi.id_pemasok", $supplier);
             }
             if ($type == "piutang giro" || $type == "hutang giro") {
+                $slip = $request->slip;
+                if ($slip != "") {
+                    $data_saldo = $data_saldo->where("id_slip2", $slip);
+                }
                 $data_saldo = $data_saldo->where("saldo_transaksi.tanggal_giro_jt", "<=", date("Y-m-d"))->join("jurnal_header", "jurnal_header.id_jurnal", "saldo_transaksi.id_jurnal")->join("master_slip", "master_slip.id_slip", "jurnal_header.id_slip")->join("master_akun", "master_akun.id_akun", "master_slip.id_akun")->select("saldo_transaksi.*", "pelanggan.nama_pelanggan as nama_pelanggan", "pemasok.nama_pemasok as nama_pemasok", "master_akun.nama_akun as nama_akun", "master_akun.kode_akun as kode_akun", "master_akun.id_akun as id_akun");
-            } else {
+            } 
+            else {
                 $data_saldo = $data_saldo->select("saldo_transaksi.*", "pelanggan.nama_pelanggan as nama_pelanggan", "pemasok.nama_pemasok as nama_pemasok");
             }
             if (isset($keyword)) {

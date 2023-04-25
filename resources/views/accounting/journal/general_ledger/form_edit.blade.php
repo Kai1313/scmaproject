@@ -1720,7 +1720,7 @@
             case "piutang_giro":
                 $("#table_piutang_giro").DataTable().destroy()
                 let get_piutang_giro_url = "{{ route('transaction-general-ledger-populate-transaction') }}"
-                get_piutang_giro_url += '?transaction_type=' + $("#transaction_type").val() + '&supplier=' + $("#supplier_transaction").val()
+                get_piutang_giro_url += '?transaction_type=' + $("#transaction_type").val() + '&supplier=' + $("#supplier_transaction").val() + '&slip=' + $("#slip_giro").val()
                 $('#table_piutang_giro').DataTable({
                     processing: true,
                     serverSide: true,
@@ -1795,7 +1795,7 @@
             case "hutang_giro":
                 $("#table_hutang_giro").DataTable().destroy()
                 let get_hutang_giro_url = "{{ route('transaction-general-ledger-populate-transaction') }}"
-                get_hutang_giro_url += '?transaction_type=' + $("#transaction_type").val() + '&supplier=' + $("#supplier_transaction").val()
+                get_hutang_giro_url += '?transaction_type=' + $("#transaction_type").val() + '&supplier=' + $("#supplier_transaction").val() + '&slip=' + $("#slip_giro").val()
                 $('#table_hutang_giro').DataTable({
                     processing: true,
                     serverSide: true,
