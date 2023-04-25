@@ -158,7 +158,7 @@
                             <tr>
                                 <td>Keterangan</td>
                                 <td>:</td>
-                                <td>{{ $data->transporter }}</td>
+                                <td>{{ $data->keterangan_pindah_barang }}</td>
                             </tr>
                             <tr>
                                 <td>Status</td>
@@ -250,5 +250,11 @@
         </table>
     @endif
 </body>
+<script>
+    window.print()
+    window.addEventListener('afterprint', (e) => {
+        window.close()
+    })
+</script>
 
 </html>

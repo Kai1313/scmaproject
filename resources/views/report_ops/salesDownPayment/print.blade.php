@@ -99,5 +99,11 @@
         </tbody>
     </table>
 </body>
+<script>
+    window.print()
+    window.addEventListener('afterprint', (e) => {
+        window.close()
+    })
+</script>
 
 </html>

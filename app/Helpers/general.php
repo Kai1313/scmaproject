@@ -123,7 +123,6 @@ function getCabangForReport()
 {
     $array = [];
     $cabang = session()->get('access_cabang');
-    return $cabang;
     if (count($cabang) > 1) {
         $array[] = ['id' => implode(array_column($cabang, 'id'), ','), 'text' => 'Semua Cabang'];
     }
