@@ -159,6 +159,21 @@ Route::prefix('laporan')->namespace('Report')->group(function () {
         Route::get('index/{user_id?}', 'SendToWarehouseController@index')->name('report_send_to_warehouse-index');
         Route::get('print', 'SendToWarehouseController@print')->name('report_send_to_warehouse-print');
     });
+
+    Route::prefix('kirim_ke_cabang')->group(function () {
+        Route::get('index/{user_id?}', 'SendToBranchController@index')->name('report_send_to_branch-index');
+        Route::get('print', 'SendToBranchController@print')->name('report_send_to_branch-print');
+    });
+
+    Route::prefix('uang_muka_pembelian')->group(function () {
+        Route::get('index/{user_id?}', 'PurchaseDownPaymentController@index')->name('report_purchase_down_payment-index');
+        Route::get('print', 'PurchaseDownPaymentController@print')->name('report_purchase_down_payment-print');
+    });
+
+    Route::prefix('uang_muka_penjualan')->group(function () {
+        Route::get('index/{user_id?}', 'SalesDownPaymentController@index')->name('report_sales_down_payment-index');
+        Route::get('print', 'SalesDownPaymentController@print')->name('report_sales_down_payment-print');
+    });
 });
 
 // Master

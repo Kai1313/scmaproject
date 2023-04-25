@@ -930,6 +930,13 @@
                                         </a>
                                     </li>
                                     {{-- @endif --}}
+                                    {{-- @if (checkAccessMenu('laporan_persediaan')) --}}
+                                    <li data-alias="">
+                                        <a href="{{ route('report_material_usage-index') }}">
+                                            <i class="glyphicon glyphicon-option-vertical"></i>Pemakaian
+                                        </a>
+                                    </li>
+                                    {{-- @endif --}}
                                 </ul>
                             </li>
                         @endif

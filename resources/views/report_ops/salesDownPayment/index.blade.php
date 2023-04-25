@@ -12,12 +12,12 @@
 @section('header')
     <section class="content-header">
         <h1>
-            Laporan Pemakaian
+            Laporan Uang Muka Penjualan
             <small></small>
         </h1>
         <ol class="breadcrumb">
             <li><a href="#"><i class="fa fa-dashboard"></i> Dashboard</a></li>
-            <li class="active">Laporan Pemakaian</li>
+            <li class="active">Laporan Uang Muka Penjualan</li>
         </ol>
     </section>
 @endsection
@@ -40,45 +40,15 @@
                                 </div>
                             </div>
                             <div class="col-md-3">
-                                <label>Gudang</label>
-                                <div class="form-group">
-                                    <select name="id_gudang" class="form-control select2 trigger-change">
-                                        <option value="all">Semua Gudang</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
                                 <label>Tanggal</label>
                                 <div class="form-group">
                                     <input type="text" name="date" class="form-control trigger-change">
                                 </div>
                             </div>
-                            <div class="col-md-3">
-                                <label>Jenis Laporan</label>
-                                <div class="form-group">
-                                    <select name="type" class="form-control select2 trigger-change">
-                                        @foreach ($typeReport as $type)
-                                            <option value="{{ $type }}">{{ $type }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            {{-- <div class="col-md-3">
-                                <label>Kode Pembelian</label>
-                                <div class="form-group">
-                                    <input type="text" class="form-control trigger-change" name="kode_pembelian">
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <label>Nama Barang</label>
-                                <div class="form-group">
-                                    <input type="text" class="form-control trigger-change" name="nama_barang">
-                                </div>
-                            </div> --}}
                         </div>
                     </div>
                     <div class="col-md-2">
-                        <a href="{{ route('report_material_usage-print') }}"
+                        <a href="{{ route('report_sales_down_payment-print') }}"
                             class="btn btn-primary btn-sm btn-flat pull-right btn-action" style="margin-top:26px;"
                             target="_blank">
                             <i class="glyphicon glyphicon-print"></i> Print
@@ -87,6 +57,8 @@
                 </div>
 
             </div>
+        </div>
+        <div class="box">
             <div class="box-body" id="target-html">
 
             </div>
@@ -106,16 +78,15 @@
 
 @section('externalScripts')
     <script>
-        let defaultUrlIndex = '{{ route('report_material_usage-index') }}'
+        let defaultUrlIndex = '{{ route('report_sales_down_payment-index') }}'
         let defaultUrlPrint = $('.btn-action').prop('href')
         let param = ''
-        let branch = {!! json_encode(session()->get('access_cabang')) !!}
         let gArray = [];
 
         $('.select2').select2()
         $('[name="date"]').daterangepicker({
             timePicker: true,
-            startDate: moment().subtract(30, 'days'),
+            startDate: moment().subtract(60, 'days'),
             endDate: moment(),
             locale: {
                 format: 'YYYY-MM-DD'
@@ -155,54 +126,11 @@
                         $('#cover-spin').hide()
                     }
                 })
-            }, 500)
+            }, 100);
         }
 
         $('.trigger-change').change(function() {
             getData()
         })
-
-        $('[name="id_cabang"]').select2().on('select2:select', function(e) {
-            let dataselect = e.params.data
-            clearWarehouse()
-            for (let i = 0; i < branch.length; i++) {
-                if (branch[i].id == dataselect.id) {
-                    getWarehouse(branch[i].gudang)
-                    break
-                }
-            }
-        });
-
-        function getWarehouse(arrayGudang) {
-            gArray = []
-            if (arrayGudang.length > 0) {
-                gArray.push({
-                    'id': arrayGudang.map(s => s.id).join(','),
-                    'text': 'Semua Gudang'
-                })
-            }
-
-            for (let a = 0; a < arrayGudang.length; a++) {
-                gArray.push({
-                    'id': arrayGudang[a].id,
-                    'text': arrayGudang[a].text
-                })
-            }
-
-            $('[name="id_gudang"]').empty()
-            $('[name="id_gudang"]').select2({
-                data: gArray
-            })
-        }
-
-        function clearWarehouse() {
-            $('[name="id_gudang"]').empty()
-            $('[name="id_gudang"]').select2({
-                data: [{
-                    'id': 'all',
-                    'text': 'Semua Gudang'
-                }]
-            })
-        }
     </script>
 @endsection
