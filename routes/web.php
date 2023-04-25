@@ -124,53 +124,53 @@ Route::prefix('pemakaian')->group(function () {
 
 Route::get('kirim_ke_gudang/print/{id}', 'SendToWarehouseController@print')->name('send_to_warehouse-print');
 
-Route::prefix('laporan')->namespace('Report')->group(function () {
-    Route::prefix('qc_penerimaan')->group(function () {
+Route::namespace ('Report')->group(function () {
+    Route::prefix('laporan_qc_penerimaan')->group(function () {
         Route::get('index/{user_id?}', 'QcReceivedController@index')->name('report_qc-index');
         Route::get('print', 'QcReceivedController@print')->name('report_qc-print');
     });
 
-    Route::prefix('pemakaian')->group(function () {
+    Route::prefix('laporan_pemakaian')->group(function () {
         Route::get('index/{user_id?}', 'MaterialUsageController@index')->name('report_material_usage-index');
         Route::get('print', 'MaterialUsageController@print')->name('report_material_usage-print');
     });
 
-    Route::prefix('terima_dari_cabang')->group(function () {
+    Route::prefix('laporan_terima_dari_cabang')->group(function () {
         Route::get('index/{user_id?}', 'ReceivedFromBranchController@index')->name('report_received_from_branch-index');
         Route::get('print', 'ReceivedFromBranchController@print')->name('report_received_from_branch-print');
     });
 
-    Route::prefix('terima_dari_cabang')->group(function () {
+    Route::prefix('laporan_terima_dari_cabang')->group(function () {
         Route::get('index/{user_id?}', 'ReceivedFromBranchController@index')->name('report_received_from_branch-index');
         Route::get('print', 'ReceivedFromBranchController@print')->name('report_received_from_branch-print');
     });
 
-    Route::prefix('terima_dari_gudang')->group(function () {
+    Route::prefix('laporan_terima_dari_gudang')->group(function () {
         Route::get('index/{user_id?}', 'ReceivedFromWarehouseController@index')->name('report_received_from_warehouse-index');
         Route::get('print', 'ReceivedFromWarehouseController@print')->name('report_received_from_warehouse-print');
     });
 
-    Route::prefix('kirim_ke_cabang')->group(function () {
+    Route::prefix('laporan_kirim_ke_cabang')->group(function () {
         Route::get('index/{user_id?}', 'SendToBranchController@index')->name('report_send_to_branch-index');
         Route::get('print', 'SendToBranchController@print')->name('report_send_to_branch-print');
     });
 
-    Route::prefix('kirim_ke_gudang')->group(function () {
+    Route::prefix('laporan_kirim_ke_gudang')->group(function () {
         Route::get('index/{user_id?}', 'SendToWarehouseController@index')->name('report_send_to_warehouse-index');
         Route::get('print', 'SendToWarehouseController@print')->name('report_send_to_warehouse-print');
     });
 
-    Route::prefix('kirim_ke_cabang')->group(function () {
+    Route::prefix('laporan_kirim_ke_cabang')->group(function () {
         Route::get('index/{user_id?}', 'SendToBranchController@index')->name('report_send_to_branch-index');
         Route::get('print', 'SendToBranchController@print')->name('report_send_to_branch-print');
     });
 
-    Route::prefix('uang_muka_pembelian')->group(function () {
+    Route::prefix('laporan_uang_muka_pembelian')->group(function () {
         Route::get('index/{user_id?}', 'PurchaseDownPaymentController@index')->name('report_purchase_down_payment-index');
         Route::get('print', 'PurchaseDownPaymentController@print')->name('report_purchase_down_payment-print');
     });
 
-    Route::prefix('uang_muka_penjualan')->group(function () {
+    Route::prefix('laporan_uang_muka_penjualan')->group(function () {
         Route::get('index/{user_id?}', 'SalesDownPaymentController@index')->name('report_sales_down_payment-index');
         Route::get('print', 'SalesDownPaymentController@print')->name('report_sales_down_payment-print');
     });
