@@ -91,7 +91,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label>Tanggal Jurnal</label>
-                                        <input type="date" class="form-control" id="tanggal" name="tanggal" placeholder="Masukkan tanggal jurnal umum" value="{{ isset($jurnal_header->tanggal_jurnal)?$jurnal_header->tanggal_jurnal:'' }}" data-validation="[NOTEMPTY]" data-validation-message="Tanggal Jurnal tidak boleh kosong">
+                                        <input type="text" class="form-control datepicker" id="tanggal" name="tanggal" placeholder="Masukkan tanggal jurnal umum" value="{{ isset($jurnal_header->tanggal_jurnal)?$jurnal_header->tanggal_jurnal:'' }}" data-validation="[NOTEMPTY]" data-validation-message="Tanggal Jurnal tidak boleh kosong">
                                     </div>
                                     <div class="form-group">
                                         <label>Jenis Jurnal</label>
@@ -108,6 +108,12 @@
                                     <textarea name="notes" id="notes" class="form-control" rows="4" placeholder="Notes ...">{{ isset($jurnal_header->catatan)?$jurnal_header->catatan:'' }}</textarea>
                                 </div>
                                 <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Slip</label>
+                                        <select name="slip_giro" id="slip_giro" class="form-control select2 comp-giro" data-validation="[NOTEMPTY]" data-validation-message="Slip giro tidak boleh kosong" disabled>
+                                            <option value="">Pilih Slip</option>
+                                        </select>
+                                    </div>
                                     <div class="form-group">
                                         <label>Nomor Giro</label>
                                         <input type="text" name="nomor_giro" id="nomor_giro" class="form-control comp-giro" data-validation="[NOTEMPTY]" data-validation-message="Nomor giro tidak boleh kosong" {{ ($jurnal_header->jenis_jurnal == "PG" || $jurnal_header->jenis_jurnal == "HG")? 'value='.$jurnal_header->no_giro.'':'disabled' }}>
@@ -434,6 +440,7 @@
     let data_route = "{{ route('transaction-general-ledger') }}"
     let coa_by_cabang_route = "{{ route('master-coa-get-by-cabang', ':id') }}"
     let slip_by_cabang_route = "{{ route('master-slip-get-by-cabang', [':id', ':slip']) }}"
+    let slip_giro_by_cabang_route = "{{ route('master-slip-get-giro-by-cabang', [':id', ':slip']) }}"
     let coa_data_route = "{{ route('master-coa-get-data', ':id') }}"
     let setting_data_route = "{{ route('master-setting-get-pelunasan', ':id') }}"
     let piutang_dagang 
@@ -518,6 +525,7 @@
     var details = JSON.parse('<?php echo $jurnal_detail ?>')
     var guid = '<?php echo $jurnal_detail_count ?>'
     var current_slip = '<?php echo $jurnal_header->id_slip ?>'
+    var current_slip_giro = '<?php echo $jurnal_header->id_slip2 ?>'
 
     $(function() {
         $.validate(validateLedger)
@@ -532,10 +540,15 @@
 
         getCoa()
         getSlip(current_slip)
+        getSlipGiro(current_slip_giro)
         getSetting($("#cabang_input").val())
 
         $('.select2').select2({
             width: '100%'
+        })
+
+        $(".datepicker").datepicker({
+            format: "yyyy-mm-dd"
         })
 
         $("#btn-save").on("click", function() {
@@ -569,7 +582,9 @@
             let jenis = $(this).val()
             if (jenis == "PG" || jenis == "HG") {
                 $(".comp-giro").attr("disabled", false)
-            } else {
+                getSlipGiro()
+            } 
+            else {
                 $(".comp-giro").attr("disabled", true).val("")
             }
         })
@@ -1060,6 +1075,30 @@
                 });
 
                 $('#slip').append(option_slip);
+            }
+        })
+    }
+
+    function getSlipGiro() {
+        let id_cabang = $("#cabang_input").val()
+        let current_slip_giro_route = slip_giro_by_cabang_route.replace(':id', id_cabang);
+        current_slip_giro_route = current_slip_giro_route.replace(':slip', '0,1');
+        $.getJSON(current_slip_giro_route, function(data) {
+            console.log("ini");
+            if (data.result) {
+                console.log("ini 2");
+                $('#slip_giro').html('');
+
+                let data_slip = data.data;
+                let option_slip = '';
+
+                option_slip += `<option value="">Pilih Slip</option>`;
+                data_slip.forEach(slip => {
+                    option_slip +=
+                        `<option value="${slip.id_slip}" data-nama="${slip.nama_slip}" data-akun="${slip.id_akun}" data-namaakun="${slip.nama_akun}" data-kode="${slip.kode_akun}">${slip.kode_slip} - ${slip.nama_slip}</option>`;
+                });
+
+                $('#slip_giro').append(option_slip);
             }
         })
     }

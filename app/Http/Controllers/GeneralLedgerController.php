@@ -100,6 +100,7 @@ class GeneralLedgerController extends Controller
             $giroDate = ($request->header[0]["tanggal_giro"]) ? date('Y-m-d', strtotime($request->header[0]["tanggal_giro"])) : null;
             $giroDueDate = ($request->header[0]["tanggal_jt_giro"]) ? date('Y-m-d', strtotime($request->header[0]["tanggal_jt_giro"])) : null;
             $slipID = $request->header[0]["slip"];
+            $slipGiroID = ($request->header[0]["slip_giro"])?$request->header[0]["slip_giro"] : null;
             $journalType = $request->header[0]["jenis"];
             $cabangID = $request->header[0]["cabang"];
             $noteHeader = $request->header[0]["notes"];
@@ -116,6 +117,7 @@ class GeneralLedgerController extends Controller
             $header->id_cabang = $cabangID;
             $header->jenis_jurnal = $journalType;
             $header->id_slip = $slipID;
+            $header->id_slip2 = $slipGiroID;
             $header->catatan = $noteHeader;
             $header->no_giro = $giroNo;
             $header->tanggal_giro = $giroDate;
@@ -414,6 +416,7 @@ class GeneralLedgerController extends Controller
             $giroDueDate = ($request->header[0]["tanggal_jt_giro"]) ? date('Y-m-d', strtotime($request->header[0]["tanggal_jt_giro"])) : null;
             $journalID = $request->header[0]["id_jurnal"];
             $slipID = $request->header[0]["slip"];
+            $slipGiroID = ($request->header[0]["slip_giro"])?$request->header[0]["slip_giro"] : null;
             $journalType = $request->header[0]["jenis"];
             $cabangID = $request->header[0]["cabang"];
             $noteHeader = $request->header[0]["notes"];
@@ -450,6 +453,7 @@ class GeneralLedgerController extends Controller
             $header->tanggal_jurnal = $journalDate;
             $header->jenis_jurnal = $journalType;
             $header->id_slip = $slipID;
+            $header->id_slip2 = $slipGiroID;
             $header->catatan = $noteHeader;
             $header->no_giro = $giroNo;
             $header->tanggal_giro = $giroDate;

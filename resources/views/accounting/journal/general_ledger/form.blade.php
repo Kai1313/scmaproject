@@ -8,6 +8,8 @@
 <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css') }}">
 <link rel="stylesheet" href="{{ asset('assets/plugins/jquery-datatables-checkboxes-1.2.12/css/dataTables.checkboxes.css') }}">
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- bootstrap datepicker -->
+<link rel="stylesheet" href="{{ asset('assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css') }}">
 
 <style>
     .mt-1 {
@@ -87,7 +89,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label>Tanggal Jurnal</label>
-                                        <input type="date" class="form-control" id="tanggal" name="tanggal" placeholder="Masukkan tanggal jurnal umum" value="{{ date('Y-m-d') }}" data-validation="[NOTEMPTY]" data-validation-message="Tanggal Jurnal tidak boleh kosong">
+                                        <input type="text" class="form-control datepicker" id="tanggal" name="tanggal" placeholder="Masukkan tanggal jurnal umum" value="{{ date('Y-m-d') }}" data-validation="[NOTEMPTY]" data-validation-message="Tanggal Jurnal tidak boleh kosong">
                                     </div>
                                     <div class="form-group">
                                         <label>Jenis Jurnal</label>
@@ -116,16 +118,22 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
+                                        <label>Slip</label>
+                                        <select name="slip_giro" id="slip_giro" class="form-control select2 comp-giro" data-validation="[NOTEMPTY]" data-validation-message="Slip giro tidak boleh kosong" disabled>
+                                            <option value="">Pilih Slip</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
                                         <label>Nomor Giro</label>
                                         <input type="text" name="nomor_giro" id="nomor_giro" class="form-control comp-giro" data-validation="[NOTEMPTY]" data-validation-message="Nomor giro tidak boleh kosong" disabled>
                                     </div>
                                     <div class="form-group">
                                         <label>Tanggal Giro</label>
-                                        <input type="date" class="form-control comp-giro" id="tanggal_giro" name="tanggal_giro" placeholder="Masukkan tanggal giro" value="{{ date('Y-m-d') }}" data-validation="[NOTEMPTY]" data-validation-message="Tanggal Giro tidak boleh kosong" disabled>
+                                        <input type="text" class="form-control comp-giro datepicker" id="tanggal_giro" name="tanggal_giro" placeholder="Masukkan tanggal giro" value="{{ date('Y-m-d') }}" data-validation="[NOTEMPTY]" data-validation-message="Tanggal Giro tidak boleh kosong" disabled>
                                     </div>
                                     <div class="form-group">
                                         <label>Tanggal JT Giro</label>
-                                        <input type="date" class="form-control comp-giro" id="tanggal_jt_giro" name="tanggal_jt_giro" placeholder="Masukkan tanggal jatuh tempo giro" value="{{ date('Y-m-d') }}" data-validation="[NOTEMPTY]" data-validation-message="Tanggal JT Giro tidak boleh kosong" disabled>
+                                        <input type="text" class="form-control comp-giro datepicker" id="tanggal_jt_giro" name="tanggal_jt_giro" placeholder="Masukkan tanggal jatuh tempo giro" value="{{ date('Y-m-d') }}" data-validation="[NOTEMPTY]" data-validation-message="Tanggal JT Giro tidak boleh kosong" disabled>
                                     </div>
                                     <button id="hidden-btn" style="display:none;" type="submit">HIDDEN</button>
                                 </div>
@@ -423,6 +431,8 @@
 <script src="{{ asset('assets/bower_components/datatables.net/js/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js') }}"></script>
 <script src="{{ asset('assets/plugins/jquery-datatables-checkboxes-1.2.12/js/dataTables.checkboxes.min.js') }}"></script>
+<!-- bootstrap datepicker -->
+<script src="{{ asset('assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js') }}"></script>
 <!-- SlimScroll -->
 <script src="{{ asset('assets/bower_components/jquery-slimscroll/jquery.slimscroll.min.js') }}"></script>
 <!-- FastClick -->
@@ -438,6 +448,7 @@
     let data_route = "{{ route('transaction-general-ledger') }}"
     let coa_by_cabang_route = "{{ route('master-coa-get-by-cabang', ':id') }}"
     let slip_by_cabang_route = "{{ route('master-slip-get-by-cabang', [':id', ':slip']) }}"
+    let slip_giro_by_cabang_route = "{{ route('master-slip-get-giro-by-cabang', [':id', ':slip']) }}"
     let coa_data_route = "{{ route('master-coa-get-data', ':id') }}"
     let setting_data_route = "{{ route('master-setting-get-pelunasan', ':id') }}"
     let piutang_dagang 
@@ -535,6 +546,10 @@
             width: '100%'
         })
 
+        $(".datepicker").datepicker({
+            format: "yyyy-mm-dd"
+        })
+
         $("#btn-save").on("click", function() {
             $("#hidden-btn").click()
         })
@@ -566,7 +581,9 @@
             let jenis = $(this).val()
             if (jenis == "PG" || jenis == "HG") {
                 $(".comp-giro").attr("disabled", false)
-            } else {
+                getSlipGiro()
+            } 
+            else {
                 $(".comp-giro").attr("disabled", true).val("")
             }
             getSlip()
@@ -1065,6 +1082,30 @@
                 });
 
                 $('#slip').append(option_slip);
+            }
+        })
+    }
+
+    function getSlipGiro() {
+        let id_cabang = $("#cabang_input").val()
+        let current_slip_giro_route = slip_giro_by_cabang_route.replace(':id', id_cabang);
+        current_slip_giro_route = current_slip_giro_route.replace(':slip', '0,1');
+        $.getJSON(current_slip_giro_route, function(data) {
+            console.log("ini");
+            if (data.result) {
+                console.log("ini 2");
+                $('#slip_giro').html('');
+
+                let data_slip = data.data;
+                let option_slip = '';
+
+                option_slip += `<option value="">Pilih Slip</option>`;
+                data_slip.forEach(slip => {
+                    option_slip +=
+                        `<option value="${slip.id_slip}" data-nama="${slip.nama_slip}" data-akun="${slip.id_akun}" data-namaakun="${slip.nama_akun}" data-kode="${slip.kode_akun}">${slip.kode_slip} - ${slip.nama_slip}</option>`;
+                });
+
+                $('#slip_giro').append(option_slip);
             }
         })
     }
