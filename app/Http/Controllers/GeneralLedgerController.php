@@ -245,9 +245,10 @@ class GeneralLedgerController extends Controller
         }
 
         $data_jurnal_header = JurnalHeader::join('master_slip', 'master_slip.id_slip', 'jurnal_header.id_slip')
+            ->join('master_slip as ms2', 'ms2.id_slip', 'jurnal_header.id_slip2')
             ->join('cabang', 'cabang.id_cabang', 'jurnal_header.id_cabang')
             ->where('id_jurnal', $id)
-            ->select('jurnal_header.*', 'cabang.kode_cabang', 'cabang.nama_cabang', 'master_slip.kode_slip', 'master_slip.nama_slip', DB::raw(
+            ->select('jurnal_header.*', 'cabang.kode_cabang', 'cabang.nama_cabang', 'master_slip.kode_slip', 'master_slip.nama_slip', 'ms2.nama_slip as nama_slip2', 'ms2.kode_slip as kode_slip2', DB::raw(
                 '(CASE
                     WHEN jenis_jurnal = "KK" THEN "Kas Keluar"
                     WHEN jenis_jurnal = "KM" THEN "Kas Masuk"
