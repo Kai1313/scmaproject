@@ -8,6 +8,8 @@
 <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css') }}">
 <link rel="stylesheet" href="{{ asset('assets/plugins/jquery-datatables-checkboxes-1.2.12/css/dataTables.checkboxes.css') }}">
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- bootstrap datepicker -->
+<link rel="stylesheet" href="{{ asset('assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css') }}">
 
 <style>
     .mt-1 {
@@ -120,14 +122,12 @@
                                     </div>
                                     <div class="form-group">
                                         <label>Tanggal Giro</label>
-                                        <input type="date" class="form-control comp-giro" id="tanggal_giro" name="tanggal_giro" placeholder="Masukkan tanggal giro" data-validation="[NOTEMPTY]" data-validation-message="Tanggal Giro tidak boleh kosong" {{ ($jurnal_header->jenis_jurnal == "PG" || $jurnal_header->jenis_jurnal == "HG")? 'value='.$jurnal_header->tanggal_giro.'':'disabled' }}>
+                                        <input type="text" class="form-control comp-giro datepicker" id="tanggal_giro" name="tanggal_giro" placeholder="Masukkan tanggal giro" data-validation="[NOTEMPTY]" data-validation-message="Tanggal Giro tidak boleh kosong" {{ ($jurnal_header->jenis_jurnal == "PG" || $jurnal_header->jenis_jurnal == "HG")? 'value='.$jurnal_header->tanggal_giro.'':'disabled' }}>
                                     </div>
-                                    <div class="form-group">
-                                        <label>Notes</label>
                                     <div class="form-group">
                                         </div>
                                         <label>Tanggal JT Giro</label>
-                                        <input type="date" class="form-control comp-giro" id="tanggal_jt_giro" name="tanggal_jt_giro" placeholder="Masukkan tanggal jatuh tempo giro" data-validation="[NOTEMPTY]" data-validation-message="Tanggal JT Giro tidak boleh kosong" {{ ($jurnal_header->jenis_jurnal == "PG" || $jurnal_header->jenis_jurnal == "HG")? 'value='.$jurnal_header->tanggal_giro_jt.'':'disabled' }}>
+                                        <input type="text" class="form-control comp-giro datepicker" id="tanggal_jt_giro" name="tanggal_jt_giro" placeholder="Masukkan tanggal jatuh tempo giro" data-validation="[NOTEMPTY]" data-validation-message="Tanggal JT Giro tidak boleh kosong" {{ ($jurnal_header->jenis_jurnal == "PG" || $jurnal_header->jenis_jurnal == "HG")? 'value='.$jurnal_header->tanggal_giro_jt.'':'disabled' }}>
                                     </div>
                                     <button id="hidden-btn" style="display:none;" type="submit">HIDDEN</button>
                                 </div>
@@ -426,6 +426,8 @@
 <script src="{{ asset('assets/bower_components/datatables.net/js/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js') }}"></script>
 <script src="{{ asset('assets/plugins/jquery-datatables-checkboxes-1.2.12/js/dataTables.checkboxes.min.js') }}"></script>
+<!-- bootstrap datepicker -->
+<script src="{{ asset('assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js') }}"></script>
 <!-- SlimScroll -->
 <script src="{{ asset('assets/bower_components/jquery-slimscroll/jquery.slimscroll.min.js') }}"></script>
 <!-- FastClick -->
