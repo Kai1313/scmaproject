@@ -110,7 +110,7 @@
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label>Slip</label>
-                                        <select name="slip_giro" id="slip_giro" class="form-control select2 comp-giro" data-validation="[NOTEMPTY]" data-validation-message="Slip giro tidak boleh kosong" disabled>
+                                        <select name="slip_giro" id="slip_giro" class="form-control select2 comp-giro" data-validation="[NOTEMPTY]" data-validation-message="Slip giro tidak boleh kosong" {{ ($jurnal_header->jenis_jurnal == "PG" || $jurnal_header->jenis_jurnal == "HG")? 'value='.$jurnal_header->no_giro.'':'disabled' }}>
                                             <option value="">Pilih Slip</option>
                                         </select>
                                     </div>
@@ -1082,10 +1082,10 @@
         })
     }
 
-    function getSlipGiro() {
+    function getSlipGiro(current = null) {
         let id_cabang = $("#cabang_input").val()
         let current_slip_giro_route = slip_giro_by_cabang_route.replace(':id', id_cabang);
-        current_slip_giro_route = current_slip_giro_route.replace(':slip', '0,1');
+        current_slip_giro_route = current_slip_giro_route.replace(':slip', '1');
         $.getJSON(current_slip_giro_route, function(data) {
             console.log("ini");
             if (data.result) {
@@ -1097,8 +1097,9 @@
 
                 option_slip += `<option value="">Pilih Slip</option>`;
                 data_slip.forEach(slip => {
+                    let selected = (current == slip.id_slip) ? 'selected' : ''
                     option_slip +=
-                        `<option value="${slip.id_slip}" data-nama="${slip.nama_slip}" data-akun="${slip.id_akun}" data-namaakun="${slip.nama_akun}" data-kode="${slip.kode_akun}">${slip.kode_slip} - ${slip.nama_slip}</option>`;
+                        `<option value="${slip.id_slip}" data-nama="${slip.nama_slip}" data-akun="${slip.id_akun}" data-namaakun="${slip.nama_akun}" data-kode="${slip.kode_akun}" ${selected}>${slip.kode_slip} - ${slip.nama_slip}</option>`;
                 });
 
                 $('#slip_giro').append(option_slip);
@@ -1721,7 +1722,7 @@
             case "piutang_giro":
                 $("#table_piutang_giro").DataTable().destroy()
                 let get_piutang_giro_url = "{{ route('transaction-general-ledger-populate-transaction') }}"
-                get_piutang_giro_url += '?transaction_type=' + $("#transaction_type").val() + '&supplier=' + $("#supplier_transaction").val() + '&slip=' + $("#slip_giro").val()
+                get_piutang_giro_url += '?transaction_type=' + $("#transaction_type").val() + '&supplier=' + $("#supplier_transaction").val() + '&slip=' + $("#slip").val()
                 $('#table_piutang_giro').DataTable({
                     processing: true,
                     serverSide: true,
@@ -1796,7 +1797,7 @@
             case "hutang_giro":
                 $("#table_hutang_giro").DataTable().destroy()
                 let get_hutang_giro_url = "{{ route('transaction-general-ledger-populate-transaction') }}"
-                get_hutang_giro_url += '?transaction_type=' + $("#transaction_type").val() + '&supplier=' + $("#supplier_transaction").val() + '&slip=' + $("#slip_giro").val()
+                get_hutang_giro_url += '?transaction_type=' + $("#transaction_type").val() + '&supplier=' + $("#supplier_transaction").val() + '&slip=' + $("#slip").val()
                 $('#table_hutang_giro').DataTable({
                     processing: true,
                     serverSide: true,
