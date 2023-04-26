@@ -993,6 +993,7 @@
             tanggal: $("#tanggal").val(),
             jenis: $("#jenis").val(),
             slip: $("#slip").val(),
+            slip_giro: $("#slip_giro").val(),
             nomor_giro: $("#nomor_giro").val(),
             tanggal_giro: $("#tanggal_giro").val(),
             tanggal_jt_giro: $("#tanggal_jt_giro").val(),
