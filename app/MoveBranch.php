@@ -56,7 +56,7 @@ class MoveBranch extends Model
 
     public function cabang2()
     {
-        return $this->belongsTo(Cabang::class, 'id_cabang');
+        return $this->belongsTo(Cabang::class, 'id_cabang2');
     }
 
     public function gudang2()
