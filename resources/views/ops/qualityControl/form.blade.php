@@ -190,8 +190,7 @@
                             <label>Total <span>*</span></label>
                             <div class="form-group">
                                 <div class="input-group" id="qty">
-                                    <input type="text" name="jumlah_pembelian_detail"
-                                        class="form-control handle-number-4" readonly>
+                                    <input type="text" name="jumlah_pembelian_detail" class="form-control" readonly>
                                     <span class="input-group-addon">KG</span>
                                 </div>
                                 <input type="hidden" name="nama_satuan_barang" class="validate">
