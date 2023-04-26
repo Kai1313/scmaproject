@@ -31,7 +31,7 @@ class QcReceiptController extends Controller
                     'tanggal_qc',
                     'nama_pembelian',
                     'nama_barang',
-                    DB::raw('sum(pembelian_detail.jumlah_purchase) as jumlah_pembelian_detail'),
+                    DB::raw('sum(pembelian_detail.nett) as jumlah_pembelian_detail'),
                     'status_qc',
                     'nama_satuan_barang',
                     'reason',
@@ -111,7 +111,7 @@ class QcReceiptController extends Controller
                     $data->id_pembelian = $request->id_pembelian;
                     $data->id_barang = $value->id_barang;
                     $data->id_satuan_barang = $value->id_satuan_barang;
-                    $data->jumlah_pembelian_detail = $value->jumlah_purchase;
+                    $data->jumlah_pembelian_detail = $value->jumlah_pembelian_detail;
                 }
 
                 $data->status_qc = $value->status_qc;
