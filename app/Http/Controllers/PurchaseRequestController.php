@@ -255,23 +255,15 @@ class PurchaseRequestController extends Controller
         $messageStock = '0';
         $messageSatuanStok = '';
         if ($cabang) {
-            // $arrayCabang = [
-            //     '1' => [1, 2, 3, 4],
-            //     '2' => [5, 7, 8],
-            // ];
             $arrayCabang = [
                 '1' => [1],
                 '2' => [5],
             ];
 
-            $gudang = $arrayCabang[$cabang];
-            $stok = DB::table('kartu_stok')->select(DB::raw('sum(debit_kartu_stok) - sum(kredit_kartu_stok) as stok'), 'satuan_barang.nama_satuan_barang')
-                ->leftJoin('barang', 'kartu_stok.id_barang', '=', 'barang.id_barang')
-                ->leftJoin('isi_satuan_barang', 'kartu_stok.id_barang', '=', 'isi_satuan_barang.id_barang')
-                ->leftJoin('satuan_barang', 'isi_satuan_barang.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
-            // ->where('satuan_jual_isi_satuan_barang', 1)
-                ->where('kartu_stok.id_barang', $item)
-                ->whereIn('id_gudang', $arrayCabang[$cabang])->groupBy('kartu_stok.id_barang')->first();
+            $stok = DB::table('master_qr_code')->select(DB::raw('sum(sisa_master_qr_code) as stok'), 'nama_satuan_barang')
+                ->join('satuan_barang', 'master_qr_code.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
+                ->where('id_barang', $item)->whereIn('id_gudang', $arrayCabang[$cabang])
+                ->groupBy('id_barang')->first();
             if ($stok) {
                 $messageStock = $stok->stok;
                 $messageSatuanStok = $stok->nama_satuan_barang;

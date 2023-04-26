@@ -40,26 +40,20 @@ class PurchaseRequest extends Model
 
     public function formatdetail()
     {
-        // $arrayCabang = [
-        //     '1' => [1, 2, 3, 4],
-        //     '2' => [5, 7, 8],
-        // ];
-
         $arrayCabang = [
             '1' => [1],
             '2' => [5],
         ];
 
         $gudang = $arrayCabang[$this->id_cabang];
-
         return $this->hasMany(PurchaseRequestDetail::class, 'purchase_request_id')
             ->select('index', 'purchase_request_detail.id_barang', 'nama_barang', 'kode_barang', 'purchase_request_detail.id_satuan_barang', 'nama_satuan_barang', 'qty', 'notes',
-                DB::raw('(case when sum(debit_kartu_stok) - sum(kredit_kartu_stok) > 0 then sum(debit_kartu_stok) - sum(kredit_kartu_stok) else 0 end) as stok'))
+                DB::raw('(case when sum(sisa_master_qr_code) > 0 then sum(sisa_master_qr_code) else 0 end) as stok'))
             ->leftJoin('barang', 'purchase_request_detail.id_barang', '=', 'barang.id_barang')
             ->leftJoin('satuan_barang', 'purchase_request_detail.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
-            ->leftJoin('kartu_stok', function ($kartuStok) use ($gudang) {
-                $kartuStok->on('purchase_request_detail.id_barang', '=', 'kartu_stok.id_barang')
-                    ->whereIn('kartu_stok.id_gudang', $gudang);
+            ->leftJoin('master_qr_code', function ($kartuStok) use ($gudang) {
+                $kartuStok->on('purchase_request_detail.id_barang', '=', 'master_qr_code.id_barang')
+                    ->whereIn('master_qr_code.id_gudang', $gudang);
             })->groupBy('id_barang');
     }
 
