@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Accounting\InventoryTransferHeader;
 use App\Models\Accounting\InventoryTransferDetail;
+use App\Models\Accounting\StockCorrectionHeader;
+use App\Models\Accounting\StockCorrectionDetail;
 use App\Models\Accounting\JurnalDetail;
 use App\Models\Accounting\JurnalHeader;
 use App\Models\Accounting\TrxSaldo;
@@ -380,6 +382,54 @@ class ClosingJournalController extends Controller
         }
         catch (\Exception $e) {
             $message = "Error when inventory transfer";
+            Log::error($message);
+            Log::error($e);
+            return response()->json([
+                "result" => FALSE,
+                "message" => $message
+            ]);
+        }
+    }
+
+    public function stockCorrection(Request $request)
+    {
+        try {
+            // Init data
+            $id_cabang = $request->id_cabang;
+            $journal_type = "ME";
+            $month = $request->month;
+            $year = $request->year;
+            $start_date = date("Y-m-d", strtotime("$year-$month-1"));
+            $end_date = date("Y-m-t", strtotime("$year-$month-1"));
+            $status = 1;
+            $hpp_account = Setting::where("id_cabang", $id_cabang)->where("code", "Koreksi Stok")->first();
+            // dd($hpp_account);
+            // if (!$hpp_account) {
+            //     return response()->json([
+            //         "result" => FALSE,
+            //         "message" => "Akun Koreksi Stok tidak ditemukan"
+            //     ]);
+            // }
+
+            // Get data koreksi stok
+            $data_header = StockCorrectionHeader::where("status_koreksi_stok", $status)->whereBetween("tanggal_koreksi_stok", [$start_date, $end_date])->get();
+            // dd(json_encode($data_header));
+            foreach ($data_header as $key => $header) {
+                // get koreksi stok detail
+                // $data_detail = StockCorrectionDetail::select("id_koreksi_stok_detail", "id_barang", DB::raw("SUM(debit_koreksi_stok_detail) as debet"), DB::raw("SUM(kredit_koreksi_stok_detail) as kredit"))->where("id_koreksi_stok", $header->id_koreksi_stok)->groupBy("id_barang")->get();
+                $data_detail = StockCorrectionDetail::select("id_koreksi_stok_detail", "id_barang", DB::raw("debit_koreksi_stok_detail as debet"), DB::raw("kredit_koreksi_stok_detail as kredit"))->leftJoin("")->where("id_koreksi_stok", $header->id_koreksi_stok)->get();
+                // dd(json_encode($data_detail));
+                $i = 0;
+                foreach ($data_detail as $key => $detail) {
+                    // Get master qr code
+                    $debet_qr = 
+                    $detail["value"] = "aa".$i++;
+                }
+                dd(json_encode($data_detail));
+            }
+        } 
+        catch (\Exception $e) {
+            $message = "Error when stock correction";
             Log::error($message);
             Log::error($e);
             return response()->json([
