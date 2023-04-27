@@ -116,6 +116,14 @@
                             ($data_jurnal_header->no_giro != null && $data_jurnal_header->jenis_jurnal == 'HG'))
                             <div class="row">
                                 <div class="col-md-4">
+                                    <label>Slip Giro</label>
+                                </div>
+                                <div class="col-md-8">
+                                    <p class="nomarg">{{ $data_jurnal_header->kode_slip2.' - '.$data_jurnal_header->nama_slip2 }}</p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
                                     <label>Nomor Giro</label>
                                 </div>
                                 <div class="col-md-8">
