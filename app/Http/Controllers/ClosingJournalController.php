@@ -15,6 +15,8 @@ use App\Models\Master\Cabang;
 use App\Models\Master\Pelanggan;
 use App\Models\Master\Pemasok;
 use App\Models\Master\Setting;
+use App\Models\Transaction\SalesDetail;
+use App\Models\Transaction\SalesHeader;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -173,7 +175,7 @@ class ClosingJournalController extends Controller
                         $sum = $out['sum'];
                         if (isset($result[$product])) {
                             $result[$product] += $sum;
-                        } 
+                        }
                         else {
                             $result[$product] = $sum;
                         }
@@ -284,7 +286,7 @@ class ClosingJournalController extends Controller
                         $sum = $in['sum'];
                         if (isset($result[$product])) {
                             $result[$product] += $sum;
-                        } 
+                        }
                         else {
                             $result[$product] = $sum;
                         }
