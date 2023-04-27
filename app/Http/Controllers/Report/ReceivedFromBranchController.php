@@ -12,7 +12,7 @@ class ReceivedFromBranchController extends Controller
     public $arrayStatus = ['0' => 'Belum Diterima', '1' => 'Diterima'];
     public function index(Request $request)
     {
-        if (checkUserSession($request, 'master_wrapper', 'show') == false) {
+        if (checkUserSession($request, 'laporan_terima_dari_cabang', 'show') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
@@ -38,9 +38,9 @@ class ReceivedFromBranchController extends Controller
     }
 
     function print(Request $request) {
-        // if (checkUserSession($request, 'master_wrapper', 'print') == false) {
-        //     return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
-        // }
+        if (checkAccessMenu($request, 'laporan_terima_dari_cabang', 'print') == false) {
+            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+        }
 
         $data = $this->getData($request);
         $arrayCabang = [];

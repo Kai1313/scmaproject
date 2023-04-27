@@ -11,7 +11,7 @@ class QcReceivedController extends Controller
     public $arrayStatus = ['' => 'Pending', '1' => 'Passed', '2' => 'Reject'];
     public function index(Request $request)
     {
-        if (checkUserSession($request, 'master_wrapper', 'show') == false) {
+        if (checkUserSession($request, 'laporan_qc_penerimaan', 'show') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
@@ -36,9 +36,9 @@ class QcReceivedController extends Controller
     }
 
     function print(Request $request) {
-        // if (checkUserSession($request, 'master_wrapper', 'print') == false) {
-        //     return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
-        // }
+        if (checkAccessMenu($request, 'laporan_qc_penerimaan', 'print') == false) {
+            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+        }
 
         $data = $this->getData($request);
         $arrayCabang = [];

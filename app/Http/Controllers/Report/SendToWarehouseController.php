@@ -12,7 +12,7 @@ class SendToWarehouseController extends Controller
     public $arrayStatus = ['0' => 'Belum Diterima', '1' => 'Diterima'];
     public function index(Request $request)
     {
-        if (checkUserSession($request, 'master_wrapper', 'show') == false) {
+        if (checkUserSession($request, 'laporan_kirim_ke_gudang', 'show') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
@@ -38,9 +38,9 @@ class SendToWarehouseController extends Controller
     }
 
     function print(Request $request) {
-        // if (checkUserSession($request, 'master_wrapper', 'print') == false) {
-        //     return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
-        // }
+        if (checkAccessMenu($request, 'laporan_kirim_ke_gudang', 'print') == false) {
+            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+        }
 
         $data = $this->getData($request);
         $arrayCabang = [];

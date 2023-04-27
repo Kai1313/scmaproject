@@ -10,7 +10,7 @@ class PurchaseDownPaymentController extends Controller
 {
     public function index(Request $request)
     {
-        if (checkUserSession($request, 'master_wrapper', 'show') == false) {
+        if (checkUserSession($request, 'laporan_uang_muka_pembelian', 'show') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
@@ -33,9 +33,9 @@ class PurchaseDownPaymentController extends Controller
     }
 
     function print(Request $request) {
-        // if (checkUserSession($request, 'master_wrapper', 'print') == false) {
-        //     return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
-        // }
+        if (checkAccessMenu($request, 'laporan_uang_muka_pembelian', 'print') == false) {
+            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+        }
 
         $data = $this->getData($request);
         $arrayCabang = [];
