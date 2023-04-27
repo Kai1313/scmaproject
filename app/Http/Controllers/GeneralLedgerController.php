@@ -100,7 +100,7 @@ class GeneralLedgerController extends Controller
             $giroDate = ($request->header[0]["tanggal_giro"]) ? date('Y-m-d', strtotime($request->header[0]["tanggal_giro"])) : null;
             $giroDueDate = ($request->header[0]["tanggal_jt_giro"]) ? date('Y-m-d', strtotime($request->header[0]["tanggal_jt_giro"])) : null;
             $slipID = $request->header[0]["slip"];
-            $slipGiroID = ($request->header[0]["slip_giro"])?$request->header[0]["slip_giro"] : null;
+            $slipGiroID = ($request->header[0]["slip_giro"]) ? $request->header[0]["slip_giro"] : null;
             $journalType = $request->header[0]["jenis"];
             $cabangID = $request->header[0]["cabang"];
             $noteHeader = $request->header[0]["notes"];
@@ -245,7 +245,7 @@ class GeneralLedgerController extends Controller
         }
 
         $data_jurnal_header = JurnalHeader::join('master_slip', 'master_slip.id_slip', 'jurnal_header.id_slip')
-            ->join('master_slip as ms2', 'ms2.id_slip', 'jurnal_header.id_slip2')
+            ->leftJoin('master_slip as ms2', 'ms2.id_slip', 'jurnal_header.id_slip2')
             ->join('cabang', 'cabang.id_cabang', 'jurnal_header.id_cabang')
             ->where('id_jurnal', $id)
             ->select('jurnal_header.*', 'cabang.kode_cabang', 'cabang.nama_cabang', 'master_slip.kode_slip', 'master_slip.nama_slip', 'ms2.nama_slip as nama_slip2', 'ms2.kode_slip as kode_slip2', DB::raw(
@@ -418,7 +418,7 @@ class GeneralLedgerController extends Controller
             $giroDueDate = ($request->header[0]["tanggal_jt_giro"]) ? date('Y-m-d', strtotime($request->header[0]["tanggal_jt_giro"])) : null;
             $journalID = $request->header[0]["id_jurnal"];
             $slipID = $request->header[0]["slip"];
-            $slipGiroID = ($request->header[0]["slip_giro"])?$request->header[0]["slip_giro"] : null;
+            $slipGiroID = ($request->header[0]["slip_giro"]) ? $request->header[0]["slip_giro"] : null;
             $journalType = $request->header[0]["jenis"];
             $cabangID = $request->header[0]["cabang"];
             $noteHeader = $request->header[0]["notes"];
@@ -478,7 +478,7 @@ class GeneralLedgerController extends Controller
                 foreach ($detailData as $key => $item) {
                     $debet = str_replace('.', '', $item['debet']);
                     $debet = str_replace(',', '.', $debet);
-    
+
                     $kredit = str_replace('.', '', $item['kredit']);
                     $kredit = str_replace(',', '.', $kredit);
                     $sum += ($journalType == "PG") ? $debet : $kredit;
@@ -745,8 +745,7 @@ class GeneralLedgerController extends Controller
                 "result" => true,
                 "message" => "Successfully void Jurnal data",
             ]);
-        } 
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
             Log::info("Error when void Jurnal data");
             Log::info($e);
@@ -897,8 +896,7 @@ class GeneralLedgerController extends Controller
                     $data_saldo = $data_saldo->where("saldo_transaksi.id_slip2", $slip);
                 }
                 $data_saldo = $data_saldo->where("saldo_transaksi.tanggal_giro_jt", "<=", date("Y-m-d"))->join("jurnal_header", "jurnal_header.id_jurnal", "saldo_transaksi.id_jurnal")->join("master_slip", "master_slip.id_slip", "jurnal_header.id_slip")->join("master_akun", "master_akun.id_akun", "master_slip.id_akun")->select("saldo_transaksi.*", "pelanggan.nama_pelanggan as nama_pelanggan", "pemasok.nama_pemasok as nama_pemasok", "master_akun.nama_akun as nama_akun", "master_akun.kode_akun as kode_akun", "master_akun.id_akun as id_akun");
-            } 
-            else {
+            } else {
                 $data_saldo = $data_saldo->select("saldo_transaksi.*", "pelanggan.nama_pelanggan as nama_pelanggan", "pemasok.nama_pemasok as nama_pemasok");
             }
             if (isset($keyword)) {
