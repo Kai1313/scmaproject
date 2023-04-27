@@ -711,6 +711,24 @@ class GeneralLedgerController extends Controller
                 ]);
             }
 
+            // Update saldo transaksi before delete
+            $old_details = JurnalDetail::where("id_jurnal", $id)->get();
+            foreach ($old_details as $key => $detail) {
+                $debet = $detail->debet;
+                $kredit = $detail->credit;
+                $trx_saldo = TrxSaldo::where("id_transaksi", $detail->id_transaksi)->first();
+                if ($trx_saldo) {
+                    $update_trx_saldo = $this->revertTrxSaldo($trx_saldo, $debet, $kredit);
+                    if (!$update_trx_saldo) {
+                        DB::rollback();
+                        return response()->json([
+                            "result" => false,
+                            "message" => "Error when store Jurnal data on revert saldo transaksi",
+                        ]);
+                    }
+                }
+            }
+
             $header->void = 1;
             $header->user_void = $userVoid;
             $header->dt_void = $dateVoid;
@@ -727,7 +745,8 @@ class GeneralLedgerController extends Controller
                 "result" => true,
                 "message" => "Successfully void Jurnal data",
             ]);
-        } catch (\Exception $e) {
+        } 
+        catch (\Exception $e) {
             DB::rollback();
             Log::info("Error when void Jurnal data");
             Log::info($e);
@@ -772,6 +791,21 @@ class GeneralLedgerController extends Controller
                     "result" => false,
                     "message" => "Error when activate Jurnal data",
                 ]);
+            }
+            $data_detail = JurnalDetail::where("id_jurnal", $id)->get();
+            foreach ($data_detail as $key => $detail) {
+                //  Update Saldo Transaksi
+                $trx_saldo = TrxSaldo::where("id_transaksi", $detail->id_transaksi)->first();
+                if ($trx_saldo) {
+                    $update_trx_saldo = $this->updateTrxSaldo($trx_saldo, $detail->debet, $detail->credit);
+                    if (!$update_trx_saldo) {
+                        DB::rollback();
+                        return response()->json([
+                            "result" => false,
+                            "message" => "Error when store Jurnal data on update saldo transaksi",
+                        ]);
+                    }
+                }
             }
 
             DB::commit();
