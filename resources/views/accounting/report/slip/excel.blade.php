@@ -18,11 +18,11 @@
             <th style="border: #000000 solid thin; font-size: 14; text-align: left; width: 160px; font-weight: bold; background-color: #CCCCCC">Cabang : </th>
             <th style="border: #000000 solid thin; font-size: 14; text-align: right; width: 160px; font-weight: bold; background-color: #CCCCCC">{{ $cabang->nama_cabang }}</th>
             <th style="border: #000000 solid thin; font-size: 14; text-align: left; width: 160px; font-weight: bold; background-color: #CCCCCC">Slip : </th>
-            <th style="border: #000000 solid thin; font-size: 14; text-align: right; width: 160px; font-weight: bold; background-color: #CCCCCC">{{ $mutasis[0]->nama_slip }}</th>
+            <th style="border: #000000 solid thin; font-size: 14; text-align: right; width: 160px; font-weight: bold; background-color: #CCCCCC">{{ $slip->nama_slip }}</th>
             <th style="border: #000000 solid thin; font-size: 14; text-align: left; width: 160px; font-weight: bold; background-color: #CCCCCC">Periode : </th>
-            <th style="border: #000000 solid thin; font-size: 14; text-align: right; width: 160px; font-weight: bold; background-color: #CCCCCC">{{ $from }}</th>
-            <th style="border: #000000 solid thin; font-size: 14; text-align: center; width: 160px; font-weight: bold; background-color: #CCCCCC">s.d </th>
-            <th style="border: #000000 solid thin; font-size: 14; text-align: right; width: 160px; font-weight: bold; background-color: #CCCCCC">{{ $to }}</th>
+            <th style="border: #000000 solid thin; font-size: 14; text-align: left; width: 160px; font-weight: bold; background-color: #CCCCCC">{{ $from }}</th>
+            <th style="border: #000000 solid thin; font-size: 14; text-align: left; width: 160px; font-weight: bold; background-color: #CCCCCC">s.d </th>
+            <th style="border: #000000 solid thin; font-size: 14; text-align: left; width: 160px; font-weight: bold; background-color: #CCCCCC">{{ $to }}</th>
             <th style="border: #000000 solid thin; font-size: 14; text-align: right; width: 160px; font-weight: bold; background-color: #CCCCCC"></th>
         </tr>
         <tr></tr>
@@ -56,11 +56,11 @@
 
         <tr>
             <td style="border: #000000 solid thin; font-size: 12; text-align: center;">{{ $from }}</td>
-            <td style="border: #000000 solid thin; font-size: 12; text-align: center;">{{ $data->kode_jurnal }}</td>
-            <td style="border: #000000 solid thin; font-size: 12; text-align: center;">{{ $data->nama_slip }}</td>
-            <td style="border: #000000 solid thin; font-size: 12; text-align: center;">{{ $data->nama_akun }}</td>
-            <td style="border: #000000 solid thin; font-size: 12; text-align: center;">{{ $data->keterangan }}</td>
-            <td style="border: #000000 solid thin; font-size: 12; text-align: center;">{{ $data->id_transaksi }}</td>
+            <td style="border: #000000 solid thin; font-size: 12; text-align: left;">{{ $data->kode_jurnal }}</td>
+            <td style="border: #000000 solid thin; font-size: 12; text-align: left;">{{ $data->nama_slip }}</td>
+            <td style="border: #000000 solid thin; font-size: 12; text-align: left;">{{ $data->nama_akun }}</td>
+            <td style="border: #000000 solid thin; font-size: 12; text-align: left;">{!! $data->keterangan !!}</td>
+            <td style="border: #000000 solid thin; font-size: 12; text-align: left;">{{ $data->id_transaksi }}</td>
             <td style="border: #000000 solid thin; font-size: 12; text-align: right;">{{ number_format($data->debet, 2,",",".") }}</td>
             <td style="border: #000000 solid thin; font-size: 12; text-align: right;">{{ number_format($data->credit, 2,",",".") }}</td>
             <td style="border: #000000 solid thin; font-size: 12; text-align: right;">{{ number_format($balance, 2,",",".") }}</td>
@@ -80,11 +80,11 @@
         
         <tr>
             <td style="border: #000000 solid thin; font-size: 12; text-align: center;">{{ $data->tanggal_jurnal }}</td>
-            <td style="border: #000000 solid thin; font-size: 12; text-align: center;">{{ $data->kode_jurnal }}</td>
-            <td style="border: #000000 solid thin; font-size: 12; text-align: center;">{{ $data->nama_slip }}</td>
-            <td style="border: #000000 solid thin; font-size: 12; text-align: center;">{{ $data->nama_akun }}</td>
-            <td style="border: #000000 solid thin; font-size: 12; text-align: center;">{{ $data->keterangan }}</td>
-            <td style="border: #000000 solid thin; font-size: 12; text-align: center;">{{ $data->id_transaksi }}</td>
+            <td style="border: #000000 solid thin; font-size: 12; text-align: left;">{{ $data->kode_jurnal }}</td>
+            <td style="border: #000000 solid thin; font-size: 12; text-align: left;">{{ $data->nama_slip }}</td>
+            <td style="border: #000000 solid thin; font-size: 12; text-align: left;">{{ $data->nama_akun }}</td>
+            <td style="border: #000000 solid thin; font-size: 12; text-align: left;">{!! $data->keterangan !!}</td>
+            <td style="border: #000000 solid thin; font-size: 12; text-align: left;">{{ $data->id_transaksi }}</td>
             <td style="border: #000000 solid thin; font-size: 12; text-align: right;">{{ number_format($data->debet, 2,",",".") }}</td>
             <td style="border: #000000 solid thin; font-size: 12; text-align: right;">{{ number_format($data->credit, 2,",",".") }}</td>
             <td style="border: #000000 solid thin; font-size: 12; text-align: right;">{{ number_format($balance, 2,",",".") }}</td>
