@@ -1175,7 +1175,7 @@ class ClosingJournalController extends Controller
                             ->where('master_qr_code_detail.bulan', $month)
                             ->where('master_qr_code_detail.tahun', $year)
                             ->groupBy('barang.id_barang')
-                            ->select('SUM(master_qr_code_detail.value) as susut, barang.id_barang', 'barang.nama_barang', 'barang.id_akun', 'barang.id_akun2', 'barang.id_biaya', 'barang.id_biaya2')
+                            ->select('SUM(master_qr_code_detail.value) as susut, barang.id_barang', 'barang.nama_barang', 'barang.id_akun', 'barang.id_akun2', 'barang.id_akun_biaya', 'barang.id_akun_biaya2')
                             ->get();
 
             DB::beginTransaction();
@@ -1236,9 +1236,9 @@ class ClosingJournalController extends Controller
                 $detail->id_jurnal = $header->id_jurnal;
                 $detail->index = 2;
                 if(strtoupper($cabang->nama_cabang) == 'GEDANGAN'){
-                    $detail->id_akun = $asset->id_biaya;
+                    $detail->id_akun = $asset->id_akun_biaya;
                 }else if(strtoupper($cabang->nama_cabang) == 'JAKARTA'){
-                    $detail->id_akun = $asset->id_biaya2;
+                    $detail->id_akun = $asset->id_akun_biaya2;
                 }
                 $detail->keterangan = "Penyusutan ". $asset->nama_barang;
                 // $detail->id_transaksi = $id_transaksi;
