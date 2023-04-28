@@ -64,19 +64,12 @@ class MaterialUsageController extends Controller
     {
         $date = explode(' - ', $request->date);
         $idCabang = explode(',', $request->id_cabang);
-        $idGudang = $request->id_gudang == 'all' ? '' : explode(',', $request->id_gudang);
-        // $kodePembelian = $request->kode_pembelian;
+        $idGudang = explode(',', $request->id_gudang);
         $statusQc = $request->status_qc;
-        // $namaBarang = $request->nama_barang;
 
         $data = MaterialUsage::whereBetween('tanggal', $date)
-            ->whereIn('id_cabang', $idCabang);
-
-        if ($idGudang) {
-            $data = $data->whereIn('id_gudang', $idGudang);
-        }
-
-        $data = $data->orderBy('tanggal', 'desc')->get();
+            ->whereIn('id_cabang', $idCabang)->whereIn('id_gudang', $idGudang)
+            ->orderBy('tanggal', 'desc')->get();
         return $data;
     }
 }

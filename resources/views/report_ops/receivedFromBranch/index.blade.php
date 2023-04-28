@@ -127,7 +127,7 @@
 
         $('.select2').select2()
         $('[name="date"]').daterangepicker({
-            timePicker: true,
+            timePicker: false,
             startDate: moment().subtract(30, 'days'),
             endDate: moment(),
             locale: {
@@ -186,6 +186,13 @@
             }
         });
 
+        clearWarehouse()
+        if (branch.length == 1) {
+            if (branch[0].gudang.length > 0) {
+                getWarehouse(branch[0].gudang)
+            }
+        }
+
         function getWarehouse(arrayGudang) {
             gArray = []
             if (arrayGudang.length > 0) {
@@ -209,11 +216,17 @@
         }
 
         function clearWarehouse() {
-            console.log('asd')
+            let tempId = []
+            for (let i = 0; i < branch.length; i++) {
+                for (let a = 0; a < branch[i].gudang.length; a++) {
+                    tempId.push(branch[i].gudang[a].id)
+                }
+            }
+
             $('[name="id_gudang"]').empty()
             $('[name="id_gudang"]').select2({
                 data: [{
-                    'id': 'all',
+                    'id': tempId.join(','),
                     'text': 'Semua Gudang'
                 }]
             })

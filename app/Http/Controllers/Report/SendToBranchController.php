@@ -68,7 +68,7 @@ class SendToBranchController extends Controller
     {
         $date = explode(' - ', $request->date);
         $idCabang = explode(',', $request->id_cabang);
-        $idGudang = $request->id_gudang == 'all' ? '' : explode(',', $request->id_gudang);
+        $idGudang = explode(',', $request->id_gudang);
         $status = $request->status;
         $type = $request->type;
 
@@ -76,10 +76,8 @@ class SendToBranchController extends Controller
             case 'Rekap':
             case 'Detail':
                 $data = MoveBranch::where('id_jenis_transaksi', '21')->whereBetween('tanggal_pindah_barang', $date)
-                    ->whereIn('id_cabang', $idCabang)->where('void', 0);
-                if ($idGudang) {
-                    $data = $data->whereIn('id_gudang', $idGudang);
-                }
+                    ->whereIn('id_cabang', $idCabang)->where('void', 0)
+                    ->whereIn('id_gudang', $idGudang);
 
                 if ($status != 'all') {
                     $data = $data->where('status_pindah_barang', $status);
@@ -92,10 +90,8 @@ class SendToBranchController extends Controller
                     $query = $query->whereBetween('tanggal_pindah_barang', $date)
                         ->where('id_jenis_transaksi', 21)
                         ->whereIn('id_cabang', $idCabang)
-                        ->where('void', 0);
-                    if ($idGudang) {
-                        $query = $query->whereIn('id_gudang', $idGudang);
-                    }
+                        ->where('void', 0)
+                        ->whereIn('id_gudang', $idGudang);
 
                     if ($status != 'all') {
                         $query = $query->where('status_pindah_barang', $status);

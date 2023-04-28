@@ -129,7 +129,7 @@
 
         $('.select2').select2()
         $('[name="date"]').daterangepicker({
-            timePicker: true,
+            timePicker: false,
             startDate: moment().subtract(countDown, 'days'),
             endDate: moment(),
             locale: {

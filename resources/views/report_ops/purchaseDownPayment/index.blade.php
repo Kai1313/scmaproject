@@ -85,7 +85,7 @@
 
         $('.select2').select2()
         $('[name="date"]').daterangepicker({
-            timePicker: true,
+            timePicker: false,
             startDate: moment().subtract(60, 'days'),
             endDate: moment(),
             locale: {

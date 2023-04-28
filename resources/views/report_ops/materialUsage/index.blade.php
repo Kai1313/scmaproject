@@ -173,6 +173,13 @@
             }
         });
 
+        clearWarehouse()
+        if (branch.length == 1) {
+            if (branch[0].gudang.length > 0) {
+                getWarehouse(branch[0].gudang)
+            }
+        }
+
         function getWarehouse(arrayGudang) {
             gArray = []
             if (arrayGudang.length > 0) {
@@ -196,10 +203,17 @@
         }
 
         function clearWarehouse() {
+            let tempId = []
+            for (let i = 0; i < branch.length; i++) {
+                for (let a = 0; a < branch[i].gudang.length; a++) {
+                    tempId.push(branch[i].gudang[a].id)
+                }
+            }
+
             $('[name="id_gudang"]').empty()
             $('[name="id_gudang"]').select2({
                 data: [{
-                    'id': 'all',
+                    'id': tempId.join(','),
                     'text': 'Semua Gudang'
                 }]
             })
