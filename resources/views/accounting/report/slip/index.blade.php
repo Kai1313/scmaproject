@@ -5,6 +5,8 @@
 <!-- DataTables -->
 <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css') }}">
 <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables-responsive/css/responsive.dataTables.css') }}">
+<!-- bootstrap datepicker -->
+<link rel="stylesheet" href="{{ asset('assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css') }}">
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <style>
     .dataTables_scrollHeadInner {
@@ -88,13 +90,13 @@
                             <div class="col-md-6">
                                 <div class="form-group" id="start-group">
                                     <label>Awal Period</label>
-                                    <input type="date" name="start_date" id="start_date" class="form-control" style="width: 100%;" data-validation="[NOTEMPTY]" data-validation-message="Awal Period tidak boleh kosong" value="{{date('Y-m-d')}}">
+                                    <input type="text" name="start_date" id="start_date" class="form-control datepicker" style="width: 100%;" data-validation="[NOTEMPTY]" data-validation-message="Awal Period tidak boleh kosong" value="{{date('Y-m-d')}}">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group" id="end-group">
                                     <label>Akhir Period</label>
-                                    <input type="date" name="end_date" id="end_date" class="form-control" style="width: 100%;" data-validation="[NOTEMPTY]" data-validation-message="Akhir Period tidak boleh kosong" value="{{date('Y-m-d')}}">
+                                    <input type="text" name="end_date" id="end_date" class="form-control datepicker" style="width: 100%;" data-validation="[NOTEMPTY]" data-validation-message="Akhir Period tidak boleh kosong" value="{{date('Y-m-d')}}">
                                 </div>
                             </div>
                         </div>
@@ -162,6 +164,8 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.all.min.js"></script>
 <!-- Validator -->
 <script src="{{ asset('assets/plugins/jquery-form-validation-1.5.3/dist/jquery.validation.min.js') }}"></script>
+<!-- bootstrap datepicker -->
+<script src="{{ asset('assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js') }}"></script>
 @endsection
 
 @section('externalScripts')
@@ -170,6 +174,10 @@
 
     $(function() {
         $('.select2').select2();
+
+        $(".datepicker").datepicker({
+            format: "yyyy-mm-dd"
+        })
 
         $('#btn-view-report').on('click', function() {
             console.log('view');
