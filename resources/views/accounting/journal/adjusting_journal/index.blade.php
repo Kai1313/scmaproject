@@ -224,8 +224,9 @@
                         width: '20%',
                         render: function(data, type, row) {
                             let width = $(window).width();
+                            let notes = data == null ? '' : data.replace(/\n/g, '<br>')
                             width = width > 500 ? width - 330 : width - 100;
-                            return "<div style='white-space:normal;width:" + width + "px;'>" + data + "</div>";
+                            return "<div style='white-space:normal;width:" + width + "px;'>" + notes + "</div>";
                         },
                     },
                     {

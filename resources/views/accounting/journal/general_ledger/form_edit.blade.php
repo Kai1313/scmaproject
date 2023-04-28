@@ -614,7 +614,8 @@
             detail = details.filter(function(item) {
                 return item['guid'] == guid
             })
-            let notes = detail[0]["notes"].replace('<br/>', '\n')
+            console.log(detail);
+            let notes = detail[0]["notes"].replace(/<br>/g, '\n')
 
             // Set data on form
             $("#akun_detail").val(detail[0]["akun"]).trigger("change.select2")

@@ -88,13 +88,13 @@
                             <div class="col-md-6">
                                 <div class="form-group" id="start-group">
                                     <label>Awal Period</label>
-                                    <input type="date" name="start_date" id="start_date" class="form-control" style="width: 100%;" data-validation="[NOTEMPTY]" data-validation-message="Awal Period tidak boleh kosong">
+                                    <input type="date" name="start_date" id="start_date" class="form-control" style="width: 100%;" data-validation="[NOTEMPTY]" data-validation-message="Awal Period tidak boleh kosong" value="{{date('Y-m-d')}}">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group" id="end-group">
                                     <label>Akhir Period</label>
-                                    <input type="date" name="end_date" id="end_date" class="form-control" style="width: 100%;" data-validation="[NOTEMPTY]" data-validation-message="Akhir Period tidak boleh kosong">
+                                    <input type="date" name="end_date" id="end_date" class="form-control" style="width: 100%;" data-validation="[NOTEMPTY]" data-validation-message="Akhir Period tidak boleh kosong" value="{{date('Y-m-d')}}">
                                 </div>
                             </div>
                         </div>
@@ -128,10 +128,10 @@
                         <thead width="100%">
                             <tr>
                                 <th class="text-center" width="7%" data-priority="1">Tanggal Jurnal</th>
-                                <th class="text-center" width="13%" data-priority="2">No Jurnal</th>
-                                <th class="text-center" width="10%">Slip</th>
+                                <th class="text-center" width="10%" data-priority="2">No Jurnal</th>
+                                <th class="text-center" width="11%">Slip</th>
                                 <th class="text-center" width="10%">Akun</th>
-                                <th class="text-center" width="13%">Keterangan</th>
+                                <th class="text-center" width="15%">Keterangan</th>
                                 <th class="text-center" width="10%">ID Transaksi</th>
                                 <th class="text-center" width="9%">Debet</th>
                                 <th class="text-center" width="9%">Credit</th>
@@ -289,13 +289,17 @@
                     data.saldo_awal.forEach(data => {
                         balance = parseFloat(balance) + parseFloat(data.debet)
                         balance = parseFloat(balance) - parseFloat(data.credit)
-                        rows += "<tr class='data-report'><td align='center'>" + data.tanggal_jurnal + "</td><td align='center'>" + data.kode_jurnal + "</td><td>" + data.nama_slip + "</td><td>" + data.nama_akun + "</td><td>" + data.keterangan + "</td><td>" + data.id_transaksi + "</td><td align='right'>" + formatCurr(formatNumberAsFloatFromDB(data.debet)) + "</td><td align='right'>" + formatCurr(formatNumberAsFloatFromDB(data.credit)) + "</td><td align='right'>" + formatCurr(balance) + "</td></tr>"
+                        let id_transaksi = data.id_transaksi == null ? '' : data.id_transaksi
+                        let notes = data.keterangan.replace(/\n/g, '<br>')
+                        rows += "<tr class='data-report'><td align='center'>" + data.tanggal_jurnal + "</td><td align='left'>" + data.kode_jurnal + "</td><td>" + data.nama_slip + "</td><td>" + data.nama_akun + "</td><td>" + notes + "</td><td>" + id_transaksi + "</td><td align='right'>" + formatCurr(formatNumberAsFloatFromDB(data.debet)) + "</td><td align='right'>" + formatCurr(formatNumberAsFloatFromDB(data.credit)) + "</td><td align='right'>" + formatCurr(balance) + "</td></tr>"
                     });
 
                     data.mutasis.forEach(data => {
                         balance = parseFloat(balance) + parseFloat(data.debet)
                         balance = parseFloat(balance) - parseFloat(data.credit)
-                        rows += "<tr class='data-report'><td align='center'>" + data.tanggal_jurnal + "</td><td align='center'>" + data.kode_jurnal + "</td><td>" + data.nama_slip + "</td><td>" + data.nama_akun + "</td><td>" + data.keterangan + "</td><td>" + data.id_transaksi + "</td><td align='right'>" + formatCurr(formatNumberAsFloatFromDB(data.debet)) + "</td><td align='right'>" + formatCurr(formatNumberAsFloatFromDB(data.credit)) + "</td><td align='right'>" + formatCurr(balance) + "</td></tr>"
+                        let id_transaksi = data.id_transaksi == null ? '' : data.id_transaksi
+                        let notes = data.keterangan.replace(/\n/g, '<br>')
+                        rows += "<tr class='data-report'><td align='center'>" + data.tanggal_jurnal + "</td><td align='left'>" + data.kode_jurnal + "</td><td>" + data.nama_slip + "</td><td>" + data.nama_akun + "</td><td>" + notes + "</td><td>" + id_transaksi + "</td><td align='right'>" + formatCurr(formatNumberAsFloatFromDB(data.debet)) + "</td><td align='right'>" + formatCurr(formatNumberAsFloatFromDB(data.credit)) + "</td><td align='right'>" + formatCurr(balance) + "</td></tr>"
                     });
                 } else {
                     rows += '<tr class="data-report"><td colspan="8" align="center">No data<td></tr>'

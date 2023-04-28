@@ -20,7 +20,8 @@ class ReportSlipExport implements FromView
     private $fromOrg;
     private $toOrg;
 
-    public function __construct($cabang, $slip, $from, $to){
+    public function __construct($cabang, $slip, $from, $to)
+    {
         $this->cabang = $cabang;
         $this->slip = $slip;
         $this->from = "'" . $from . "'";
@@ -32,12 +33,12 @@ class ReportSlipExport implements FromView
     public function view(): View
     {
         $slip = Slip::find($this->slip);
-        
+
         $saldo_awal = DB::table("jurnal_header as head")
-        ->join('jurnal_detail as det', 'head.id_jurnal', 'det.id_jurnal')
-        ->join('master_akun as akun', 'akun.id_akun', 'det.id_akun')
-        ->join('master_slip as slip', 'slip.id_slip', 'head.id_slip')
-        ->selectRaw('head.tanggal_jurnal,
+            ->join('jurnal_detail as det', 'head.id_jurnal', 'det.id_jurnal')
+            ->join('master_akun as akun', 'akun.id_akun', 'det.id_akun')
+            ->join('master_slip as slip', 'slip.id_slip', 'head.id_slip')
+            ->selectRaw('head.tanggal_jurnal,
         "" as kode_jurnal,
         "" as nama_slip,
         akun.nama_akun,
@@ -45,14 +46,14 @@ class ReportSlipExport implements FromView
         "" as id_transaksi,
         det.debet,
         det.credit')
-        ->where('head.void', 0)
-        ->where('head.id_cabang', $this->cabang)
-        ->where('head.id_slip', $this->slip)
-        ->where('det.id_akun', $slip->id_akun)
-        ->whereRaw("head.tanggal_jurnal BETWEEN $this->from AND $this->to")
-        ->groupBy('det.id_akun')
-        ->orderBy('head.tanggal_jurnal', 'ASC')
-        ->get();
+            ->where('head.void', 0)
+            ->where('head.id_cabang', $this->cabang)
+            ->where('head.id_slip', $this->slip)
+            ->where('det.id_akun', $slip->id_akun)
+            ->whereRaw("head.tanggal_jurnal BETWEEN $this->from AND $this->to")
+            ->groupBy('det.id_akun')
+            ->orderBy('head.tanggal_jurnal', 'ASC')
+            ->get();
 
         $mutasis = DB::table("jurnal_header as head")
             ->join('jurnal_detail as det', 'head.id_jurnal', 'det.id_jurnal')
@@ -75,11 +76,23 @@ class ReportSlipExport implements FromView
             ->get();
 
         $cabang = Cabang::find($this->cabang);
+        $slip = Slip::find($this->slip);
+
+        foreach ($saldo_awal as $key => $value) {
+            $notes = str_replace("\n", '<br>', $value->keterangan);
+            $value->keterangan = $notes;
+        }
+
+        foreach ($mutasis as $key => $value) {
+            $notes = str_replace("\n", '<br>', $value->keterangan);
+            $value->keterangan = $notes;
+        }
 
         return view('accounting.report.slip.excel', [
             'saldo_awal' => $saldo_awal,
             'mutasis' => $mutasis,
             'cabang' => $cabang,
+            'slip' => $slip,
             'from' => $this->fromOrg,
             'to' => $this->toOrg
         ]);

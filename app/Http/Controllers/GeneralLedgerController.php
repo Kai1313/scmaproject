@@ -266,10 +266,10 @@ class GeneralLedgerController extends Controller
             ->select('jurnal_detail.*', 'master_akun.kode_akun', 'master_akun.nama_akun')
             ->get();
 
-        $data_jurnal_header->catatan = str_replace("\n", '<br/>', $data_jurnal_header->catatan);
+        $data_jurnal_header->catatan = str_replace("\n", '<br>', $data_jurnal_header->catatan);
 
         foreach ($data_jurnal_detail as $key => $value) {
-            $notes = str_replace("\n", '<br/>', $value->keterangan);
+            $notes = str_replace("\n", '<br>', $value->keterangan);
             $value->keterangan = $notes;
         }
 
@@ -320,10 +320,10 @@ class GeneralLedgerController extends Controller
             ->select('jurnal_detail.*', 'master_akun.kode_akun', 'master_akun.nama_akun')
             ->get();
 
-        $data_jurnal_header->catatan = str_replace("\n", '<br/>', $data_jurnal_header->catatan);
+        $data_jurnal_header->catatan = str_replace("\n", '<br>', $data_jurnal_header->catatan);
 
         foreach ($data_jurnal_detail as $key => $value) {
-            $notes = str_replace("\n", '<br/>', $value->keterangan);
+            $notes = str_replace("\n", '<br>', $value->keterangan);
             $value->keterangan = $notes;
         }
 
@@ -361,7 +361,7 @@ class GeneralLedgerController extends Controller
         foreach ($jurnal_detail as $key => $jurnal) {
             $akun = Akun::find($jurnal->id_akun);
             $trx_id = TrxSaldo::where("id_transaksi", $jurnal->id_transaksi)->first();
-            $notes = str_replace("\n", '<br/>', $jurnal->keterangan);
+            $notes = str_replace("\n", '<br>', $jurnal->keterangan);
             $details[] = [
                 "guid" => (++$i == count($jurnal_detail)) ? "gen" : (($trx_id) ? "trx-" . $trx_id->id : $jurnal->index),
                 "akun" => $akun->id_akun,
