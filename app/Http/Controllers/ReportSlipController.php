@@ -33,6 +33,13 @@ class ReportSlipController extends Controller
 
     public function populate(Request $request)
     {
+        // if (checkAccessMenu('report_slip', 'view') == false) {
+        //     return response()->json([
+        //         "result" => false,
+        //         "message" => "Error, anda tidak punya akses!",
+        //     ]);
+        // }
+
         $cabang = $request->cabang;
         $slip = $request->slip;
         $start_date = $request->start_date;
@@ -120,6 +127,13 @@ class ReportSlipController extends Controller
 
     public function exportPdf(Request $request)
     {
+        // if (checkAccessMenu('report_slip', 'print') == false) {
+        //     return response()->json([
+        //         "result" => false,
+        //         "message" => "Error, anda tidak punya akses!",
+        //     ]);
+        // }
+
         $cabang = $request->cabang;
         $slip = $request->slip;
         $start_date = $request->start_date;
@@ -173,18 +187,40 @@ class ReportSlipController extends Controller
             ->orderBy('head.tanggal_jurnal', 'ASC')
             ->get();
 
+        $cabang = Cabang::find($cabang);
+        $slip = Slip::find($slip);
+
+        foreach ($saldo_awal as $key => $value) {
+            $notes = str_replace("\n", '<br>', $value->keterangan);
+            $value->keterangan = $notes;
+        }
+
+        foreach ($mutasis as $key => $value) {
+            $notes = str_replace("\n", '<br>', $value->keterangan);
+            $value->keterangan = $notes;
+        }
+
         $data = [
             'saldo_awal' => $saldo_awal,
             'mutasis' => $mutasis,
             'cabang' => $cabang,
+            'slip' => $slip,
             'from' => $start_date,
             'to' => $end_date
         ];
 
         // return view('accounting.report.slip.print', $data);
 
-        $pdf = PDF::loadView('accounting.report.slip.print', $data);
-        $pdf->setPaper('a4', 'landscape');
-        return $pdf->stream('ReportSlips.pdf');
+        if(count($saldo_awal) > 0 && count($mutasis) > 0){
+            $pdf = PDF::loadView('accounting.report.slip.print', $data);
+            $pdf->setPaper('a4', 'landscape');
+            return $pdf->stream('ReportSlips.pdf');
+        }else{
+            return response()->json([
+                'status' => false,
+                'message' => 'No data found'
+            ]);
+        }
+
     }
 }

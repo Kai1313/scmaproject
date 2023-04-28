@@ -45,14 +45,14 @@
                             <td width="20%">Cabang</td>
                             <td width="2%">:</td>
                             <td width="78%">
-                                {{ $cabang }}
+                                {{ $cabang->nama_cabang }}
                             </td>
                         </tr>
                         <tr>
                             <td width="20%">Slip</td>
                             <td width="2%">:</td>
                             <td width="78%">
-                                {{ $mutasis[0]->nama_slip }}
+                                {{ $slip->nama_slip }}
                             </td>
                         </tr>
                         <tr>
@@ -75,11 +75,11 @@
     <table width="100%" class="table-bordered" style="margin-top: 20px">
         <thead>
             <tr style="font-size: 14px;">
-                <th width="9%">Tanggal</th>
+                <th width="7%">Tanggal</th>
                 <th width="14%">No Jurnal</th>
                 <th width="11%">Slip</th>
                 <th width="11%">Akun</th>
-                <th width="15%">Keterangan</th>
+                <th width="17%">Keterangan</th>
                 <th width="14%">ID Transaksi</th>
                 <th width="10%">Debet</th>
                 <th width="10%">Credit</th>
@@ -104,11 +104,11 @@
             @endphp
             <tr style="font-size: 10px;">
                 <td align="center">{{ $from }}</td>
-                <td align="center">{{ $data->kode_jurnal }}</td>
-                <td align="center">{{ $data->nama_slip }}</td>
-                <td align="center">{{ $data->nama_akun }}</td>
-                <td align="center">{{ $data->keterangan }}</td>
-                <td align="center">{{ $data->id_transaksi }}</td>
+                <td align="left">{{ $data->kode_jurnal }}</td>
+                <td align="left">{{ $data->nama_slip }}</td>
+                <td align="left">{{ $data->nama_akun }}</td>
+                <td align="left">{!! str_replace('\n', '<br>', $data->keterangan) !!}</td>
+                <td align="left">{{ $data->id_transaksi }}</td>
                 <td align="right">{{ number_format($data->debet, 2,",",".") }}</td>
                 <td align="right">{{ number_format($data->credit, 2,",",".") }}</td>
                 <td align="right">{{ number_format($balance, 2,",",".") }}</td>
@@ -127,11 +127,11 @@
             @endphp
             <tr style="font-size: 10px;">
                 <td align="center">{{ $data->tanggal_jurnal }}</td>
-                <td align="center">{{ $data->kode_jurnal }}</td>
-                <td align="center">{{ $data->nama_slip }}</td>
-                <td align="center">{{ $data->nama_akun }}</td>
-                <td align="center">{{ $data->keterangan }}</td>
-                <td align="center">{{ $data->id_transaksi }}</td>
+                <td align="left">{{ $data->kode_jurnal }}</td>
+                <td align="left">{{ $data->nama_slip }}</td>
+                <td align="left">{{ $data->nama_akun }}</td>
+                <td align="left">{!! $data->keterangan !!}</td>
+                <td align="left">{{ $data->id_transaksi }}</td>
                 <td align="right">{{ number_format($data->debet, 2,",",".") }}</td>
                 <td align="right">{{ number_format($data->credit, 2,",",".") }}</td>
                 <td align="right">{{ number_format($balance, 2,",",".") }}</td>
