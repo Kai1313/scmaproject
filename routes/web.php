@@ -224,8 +224,8 @@ Route::prefix('transaction')->group(function () {
         Route::get('/void/{id?}', 'GeneralLedgerController@void')->name('transaction-general-ledger-void');
         Route::get('/active/{id?}', 'GeneralLedgerController@active')->name('transaction-general-ledger-active');
     });
+    // Jurnal Penyesuaian
     Route::prefix('adjustment_ledger')->group(function () {
-        // Jurnal Penyesuaian
         Route::get('/index/{user_id?}', 'AdjustmentLedgerController@index')->name('transaction-adjustment-ledger');
         Route::get('/form/create', 'AdjustmentLedgerController@create')->name('transaction-adjustment-ledger-create');
         Route::get('/form/edit/{id?}', 'AdjustmentLedgerController@edit')->name('transaction-adjustment-ledger-edit');
@@ -242,5 +242,17 @@ Route::prefix('transaction')->group(function () {
         Route::get('/index/{user_id?}', 'ClosingJournalController@index')->name('transaction-closing-journal');
         Route::get('/form/create', 'ClosingJournalController@create')->name('transaction-closing-journal-create');
         Route::get('/inventory_transfer', 'ClosingJournalController@inventoryTransfer')->name('transaction-closing-journal-inventory-transfer');
+        Route::get('/stock_correction', 'ClosingJournalController@stockCorrection')->name('transaction-closing-journa-stock-correction');
+    });
+});
+
+// Report
+Route::prefix('report')->group(function(){
+    // Slip
+    Route::prefix('slip')->group(function(){
+        Route::get('/index/{user_id?}', 'ReportSlipController@index')->name('report-slip');
+        Route::get('/populate', 'ReportSlipController@populate')->name('report-slip-populate');
+        Route::get('/excel', 'ReportSlipController@exportExcel')->name('report-slip-excel');
+        Route::get('/pdf', 'ReportSlipController@exportPdf')->name('report-slip-pdf');
     });
 });

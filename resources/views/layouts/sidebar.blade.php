@@ -1213,17 +1213,21 @@
                     <li class="{{ request()->segment(2) == 'adjustment_ledger' ? 'active' : null }}">
                         <a href="{{ route('transaction-adjustment-ledger') }}">Jurnal Penyesuaian</a>
                     </li>
+                    <li class="{{ request()->segment(2) == 'cloing_journal' ? 'active' : null }}">
+                        <a href="{{ route('transaction-closing-journal', 1) }}">Jurnal Closing</a>
+                    </li>
                 </ul>
             </li>
-            <li class="treeview ">
+            <li class="treeview {{ request()->segment(1) == 'report' ? 'active' : null }}">
                 <a href="#"><i class="fa fa-link"></i> <span>Report</span>
                     <span class="pull-right-container">
                         <i class="fa fa-angle-left pull-right"></i>
                     </span>
                 </a>
                 <ul class="treeview-menu">
-                    <li class=""><a href="#">Link in level 2</a></li>
-                    <li><a href="#">Link in level 2</a></li>
+                    <li class="{{ request()->segment(1) == 'report' && request()->segment(2) == 'slip' ? 'active' : null }}">
+                        <a href="{{ route('report-slip', 1) }}">Slip</a>
+                    </li>
                 </ul>
             </li>
         </ul>
