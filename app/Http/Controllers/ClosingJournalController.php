@@ -145,7 +145,8 @@ class ClosingJournalController extends Controller
             $data_header = InventoryTransferHeader::where("id_cabang2", "<>", $id_cabang)->whereBetween("tanggal_pindah_barang", [$start_date, $end_date])->where("void", 0)->where("status_pindah_barang", 1)->get();
             $details_out = [];
             $details_in = [];
-            // dd($data_header);
+            Log::info("jumlah data header");
+            Log::info(count($data_header));
             DB::beginTransaction();
             foreach ($data_header as $key => $header) {
                 // Log::info($header->kode_pindah_barang);
@@ -587,5 +588,14 @@ class ClosingJournalController extends Controller
         } catch (\Exception $e) {
             Log::error("Error when generate journal code");
         }
+    }
+
+    public function dummyAjax(Request $request)
+    {
+        sleep(5);
+        return response()->json([
+            "result"=>TRUE,
+            "message"=>"Ajax function succeed"
+        ]);
     }
 }
