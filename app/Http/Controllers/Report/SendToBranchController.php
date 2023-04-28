@@ -38,7 +38,7 @@ class SendToBranchController extends Controller
     }
 
     function print(Request $request) {
-        if (checkAccessMenu($request, 'laporan_kirim_ke_cabang', 'print') == false) {
+        if (checkAccessMenu('laporan_kirim_ke_cabang', 'print') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 

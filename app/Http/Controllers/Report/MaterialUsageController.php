@@ -35,7 +35,7 @@ class MaterialUsageController extends Controller
     }
 
     function print(Request $request) {
-        if (checkAccessMenu($request, 'laporan_pemakaian', 'print') == false) {
+        if (checkAccessMenu('laporan_pemakaian', 'print') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 

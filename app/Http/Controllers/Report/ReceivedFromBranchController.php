@@ -38,7 +38,7 @@ class ReceivedFromBranchController extends Controller
     }
 
     function print(Request $request) {
-        if (checkAccessMenu($request, 'laporan_terima_dari_cabang', 'print') == false) {
+        if (checkAccessMenu('laporan_terima_dari_cabang', 'print') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 

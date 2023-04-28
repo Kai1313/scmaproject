@@ -36,7 +36,7 @@ class QcReceivedController extends Controller
     }
 
     function print(Request $request) {
-        if (checkAccessMenu($request, 'laporan_qc_penerimaan', 'print') == false) {
+        if (checkAccessMenu('laporan_qc_penerimaan', 'print') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 

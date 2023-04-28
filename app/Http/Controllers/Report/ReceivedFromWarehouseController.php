@@ -38,7 +38,7 @@ class ReceivedFromWarehouseController extends Controller
     }
 
     function print(Request $request) {
-        if (checkAccessMenu($request, 'laporan_terima_dari_gudang', 'print') == false) {
+        if (checkAccessMenu('laporan_terima_dari_gudang', 'print') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 

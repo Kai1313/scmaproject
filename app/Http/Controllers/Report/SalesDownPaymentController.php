@@ -33,7 +33,7 @@ class SalesDownPaymentController extends Controller
     }
 
     function print(Request $request) {
-        if (checkAccessMenu($request, 'laporan_uang_muka_penjualan', 'print') == false) {
+        if (checkAccessMenu('laporan_uang_muka_penjualan', 'print') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
