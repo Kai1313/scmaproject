@@ -27,66 +27,53 @@
         <div class="box">
             <div class="box-header">
                 <div class="row">
-                    <div class="col-md-10">
-                        <div class="row">
-                            <div class="col-md-3">
-                                <label>Cabang</label>
-                                <div class="form-group">
-                                    <select name="id_cabang" class="form-control select2 trigger-change">
-                                        @foreach (getCabangForReport() as $branch)
-                                            <option value="{{ $branch['id'] }}">{{ $branch['text'] }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <label>Gudang</label>
-                                <div class="form-group">
-                                    <select name="id_gudang" class="form-control select2 trigger-change">
-                                        <option value="all">Semua Gudang</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <label>Tanggal</label>
-                                <div class="form-group">
-                                    <input type="text" name="date" class="form-control trigger-change">
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <label>Jenis Laporan</label>
-                                <div class="form-group">
-                                    <select name="type" class="form-control select2 trigger-change">
-                                        @foreach ($typeReport as $type)
-                                            <option value="{{ $type }}">{{ $type }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            {{-- <div class="col-md-3">
-                                <label>Kode Pembelian</label>
-                                <div class="form-group">
-                                    <input type="text" class="form-control trigger-change" name="kode_pembelian">
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <label>Nama Barang</label>
-                                <div class="form-group">
-                                    <input type="text" class="form-control trigger-change" name="nama_barang">
-                                </div>
-                            </div> --}}
+                    <div class="col-md-3">
+                        <label>Cabang</label>
+                        <div class="form-group">
+                            <select name="id_cabang" class="form-control select2 trigger-change">
+                                @foreach (getCabangForReport() as $branch)
+                                    <option value="{{ $branch['id'] }}">{{ $branch['text'] }}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
-                    <div class="col-md-2">
-                        <a href="{{ route('report_material_usage-print') }}"
-                            class="btn btn-primary btn-sm btn-flat pull-right btn-action" style="margin-top:26px;"
-                            target="_blank">
-                            <i class="glyphicon glyphicon-print"></i> Print
-                        </a>
+                    <div class="col-md-3">
+                        <label>Gudang</label>
+                        <div class="form-group">
+                            <select name="id_gudang" class="form-control select2 trigger-change">
+                                <option value="all">Semua Gudang</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <label>Tanggal</label>
+                        <div class="form-group">
+                            <input type="text" name="date" class="form-control trigger-change">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <label>Jenis Laporan</label>
+                        <div class="form-group">
+                            <select name="type" class="form-control select2 trigger-change">
+                                @foreach ($typeReport as $type)
+                                    <option value="{{ $type }}">{{ $type }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
                 </div>
-
+                <div class="pull-right">
+                    <a href="{{ route('report_material_usage-print') }}" class="btn btn-danger btn-sm btn-flat btn-action"
+                        target="_blank">
+                        <i class="glyphicon glyphicon-print"></i> Print
+                    </a>
+                    <a href="javascript:void(0)" class="btn btn-warning btn-sm btn-flat btn-view-action">
+                        <i class="glyphicon glyphicon-eye-open"></i> View
+                    </a>
+                </div>
             </div>
+        </div>
+        <div class="box">
             <div class="box-body" id="target-html">
 
             </div>
@@ -123,7 +110,7 @@
         });
 
         $('.btn-action').prop('href', defaultUrlPrint + param)
-        $(document).ready(function() {
+        $('.btn-view-action').click(function() {
             getData()
         })
 
@@ -157,10 +144,6 @@
                 })
             }, 500)
         }
-
-        $('.trigger-change').change(function() {
-            getData()
-        })
 
         $('[name="id_cabang"]').select2().on('select2:select', function(e) {
             let dataselect = e.params.data

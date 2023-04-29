@@ -72,18 +72,6 @@
                             </select>
                         </div>
                     </div>
-                    {{-- <div class="col-md-3">
-                                <label>Kode Transaksi</label>
-                                <div class="form-group">
-                                    <input type="text" class="form-control trigger-change" name="kode_pindah_barang">
-                                </div>
-                            </div> --}}
-                    {{-- <div class="col-md-3">
-                                <label>Nama Barang</label>
-                                <div class="form-group">
-                                    <input type="text" class="form-control trigger-change" name="nama_barang">
-                                </div>
-                            </div> --}}
                 </div>
                 <div class="pull-right">
                     <a href="{{ route('report_send_to_warehouse-print') }}"
