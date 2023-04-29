@@ -130,6 +130,7 @@
                                     <div id="response3"></div><br>
                                     <div id="response4"></div><br>
                                     <div id="response5"></div><br>
+                                    <div id="response6"></div><br>
                                 </div>
                             </div>
                         </form>
@@ -175,6 +176,7 @@
     let routeClosingStore = "{{ Route('transaction-closing-journal-store') }}"
     let routeInventoryTransfer = "{{ Route('transaction-closing-journal-inventory-transfer') }}"
     let routeStockCorrection = "{{ Route('transaction-closing-journal-stock-correction') }}"
+    let routeProduction = "{{ Route('transaction-closing-journal-production') }}"
     let routeSales = "{{ Route('transaction-closing-journal-sales') }}"
     let routeDepreciation = "{{ Route('transaction-closing-journal-depreciation') }}"
     let piutang_dagang
@@ -251,6 +253,7 @@
             $("#response3").empty()
             $("#response4").empty()
             $("#response5").empty()
+            $("#response6").empty()
 
             // Start ajax chain
             save_data(routeClosingStore, param, "1")
@@ -338,18 +341,40 @@
     }
 
     function steps(step, param) {
+        // switch (step) {
+        //     case "1":
+        //         save_data(routeInventoryTransfer, param, "2")
+        //         break;
+        //     case "2":
+        //         save_data(routeStockCorrection, param, "3")
+        //         break;
+        //     case "3":
+        //         save_data(routeSales, param, "4")
+        //         break;
+        //     case "4":
+        //         save_data(routeDepreciation, param, "5")
+        //         break;
+
+        //     default:
+        //         myButton.disabled = false
+        //         myButton.innerHTML = "Submit"
+        //         break;
+        // }
         switch (step) {
             case "1":
-                save_data(routeInventoryTransfer, param, "2")
+                save_data(routeProduction, param, "2")
                 break;
             case "2":
-                save_data(routeStockCorrection, param, "3")
+                save_data(routeInventoryTransfer, param, "3")
                 break;
             case "3":
-                save_data(routeSales, param, "4")
+                save_data(routeStockCorrection, param, "4")
                 break;
             case "4":
-                save_data(routeDepreciation, param, "5")
+                save_data(routeSales, param, "5")
+                break;
+            case "5":
+                save_data(routeDepreciation, param, "6")
                 break;
 
             default:
