@@ -46,7 +46,7 @@
                 </div>
                 <div class="pull-right">
                     <a href="{{ route('report_sales_down_payment-print') }}"
-                        class="btn btn-danger btn-sm btn-flat pull-right btn-action" target="_blank">
+                        class="btn btn-danger btn-sm btn-flat btn-action" target="_blank">
                         <i class="glyphicon glyphicon-print"></i> Print
                     </a>
                     <a href="javascript:void(0)" class="btn btn-warning btn-sm btn-flat btn-view-action">
@@ -91,7 +91,7 @@
         });
 
         $('.btn-action').prop('href', defaultUrlPrint + param)
-        $(document).ready(function() {
+        $('.btn-view-action').click(function() {
             getData()
         })
 
@@ -125,9 +125,5 @@
                 })
             }, 100);
         }
-
-        $('.trigger-change').change(function() {
-            getData()
-        })
     </script>
 @endsection
