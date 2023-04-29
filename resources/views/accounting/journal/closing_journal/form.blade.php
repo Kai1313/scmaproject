@@ -140,7 +140,7 @@
 @endsection
 
 @section('modal-section')
-    
+
 @endsection
 
 @section('addedScripts')
@@ -173,7 +173,9 @@
     let routeClosingStore = "{{ Route('transaction-closing-journal-store') }}"
     let routeInventoryTransfer = "{{ Route('transaction-closing-journal-inventory-transfer') }}"
     let routeStockCorrection = "{{ Route('transaction-closing-journal-stock-correction') }}"
-    let piutang_dagang 
+    let routeSales = "{{ Route('transaction-closing-journal-sales') }}"
+    let routeDepreciation = "{{ Route('transaction-closing-journal-depreciation') }}"
+    let piutang_dagang
     let hutang_dagang
     var myButton = document.getElementById("btn-process")
 
@@ -201,7 +203,7 @@
                     })
                     if (total_debet == total_kredit) {
                         save_data()
-                    } 
+                    }
                     else {
                         Swal.fire("Sorry, Can't save data. ", "Jumlah total debet harus sama dengan dari total kredit", 'error')
                     }
@@ -339,7 +341,7 @@
             case "2":
                 save_data(routeStockCorrection, param, "3")
                 break;
-        
+
             default:
                 myButton.disabled = false
                 myButton.innerHTML = "Submit"
@@ -349,7 +351,7 @@
 
     function formatCurr(num) {
         num = String(num);
-        
+
         num = num.split('.').join("");;
         num = num.replace(/,/g, '.');
         num = num.toString().replace(/\,/gi, "");
@@ -367,14 +369,14 @@
     function formatNumberAsFloat(num) {
         num = String(num);
         num = num.replace(',', '.');
-        
+
         return num;
     }
 
     function formatNumberAsLocalFloat(num) {
         num = String(num);
         num = num.split('.').join("");
-        
+
         return num;
     }
 
@@ -382,7 +384,7 @@
         num = String(num);
         num = parseFloat(num).toFixed(2);
         num = num.replace('.', ',');
-        
+
         return num;
     }
 </script>
