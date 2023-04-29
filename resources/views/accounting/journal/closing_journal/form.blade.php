@@ -126,7 +126,8 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div id="response1"></div><br>
-                                    <div id="response2"></div>
+                                    <div id="response2"></div><br>
+                                    <div id="response3"></div>
                                 </div>
                             </div>
                         </form>
@@ -169,8 +170,12 @@
     let coa_data_route = "{{ route('master-coa-get-data', ':id') }}"
     let setting_data_route = "{{ route('master-setting-get-pelunasan', ':id') }}"
     let giro_reject_data_route = "{{ route('transaction-adjustment-ledger-get-giro-reject', ':id') }}"
+    let routeClosingStore = "{{ Route('transaction-closing-journal-store') }}"
+    let routeInventoryTransfer = "{{ Route('transaction-closing-journal-inventory-transfer') }}"
+    let routeStockCorrection = "{{ Route('transaction-closing-journal-stock-correction') }}"
     let piutang_dagang 
     let hutang_dagang
+    var myButton = document.getElementById("btn-process")
 
     var validateLedger = {
         submit: {
@@ -222,14 +227,13 @@
         $("#btn-process").on("click", function() {
             // console.log("Clicked")
             // Init data
-            var myButton = document.getElementById("btn-process")
             let cabang = $("#cabang_input").val()
             let month = $("#month").val()
             let year = $("#year").val()
             let param = "?id_cabang="+cabang+"&month="+month+"&year="+year
             let route = "{{ Route('dummy-ajax') }}"
-            let routeInventoryTransfer = "{{ Route('transaction-closing-journal-inventory-transfer') }}"
-            let routeStockCorrection = "{{ Route('transaction-closing-journal-stock-correction') }}"
+            // let routeInventoryTransfer = "{{ Route('transaction-closing-journal-inventory-transfer') }}"
+            // let routeStockCorrection = "{{ Route('transaction-closing-journal-stock-correction') }}"
             route = route + param
             // console.log(route)
 
@@ -240,55 +244,52 @@
             // Cleanse response div
             $("#response1").empty()
             $("#response2").empty()
+            $("#response3").empty()
 
             // Start ajax chain
+            save_data(routeClosingStore, param, "1")
             // Ajax 1
-            $.ajax({
-                type: "GET",
-                url: routeInventoryTransfer+param,
-            }).done(function(data) {
-                // console.log("response")
-                // console.log(data)
-                let res1 = '<span><i class="fa fa-check-circle" style="color: green;"></i> '+data.message+'</span>'
-                let fail1 = '<span><i class="fa fa-times-circle" style="color: red;"></i> Proses jurnal closing Inventory Transfer gagal. '+data.message+'</span>'
-                if (data.result) {
-                    // console.log("another ajax")
-                    $("#response1").append(res1)
-                    // Ajax 2
-                    $.ajax({
-                        type: "GET",
-                        url: routeStockCorrection+param,
-                    }).done(function(data) {
-                        console.log("2nd ajax response")
-                        console.log(data)
-                        let res2 = '<span><i class="fa fa-check-circle" style="color: green;"></i>'+data.message+'</span>'
-                        let fail2 = '<span><i class="fa fa-times-circle" style="color: red;"></i> Proses jurnal closing Koreksi Stok gagal. '+data.message+'</span>'
-                        if (data.result) {
-                            console.log("2nd succeed")
-                            $("#response2").append(res2)
-                            myButton.disabled = false
-                            myButton.innerHTML = "Submit"
-                        }
-                        else {
-                            console.log("2nd ajax response false")
-                            $("#response2").append(fail2)
-                            myButton.disabled = false
-                            myButton.innerHTML = "Submit"
-                        }
-                    })
-                }
-                else {
-                    console.log("ajax response false")
-                    $("#response1").append(fail1)
-                    myButton.disabled = false
-                    myButton.innerHTML = "Submit"
-                }
-            })
-            
-            // setTimeout(function() {
-            //   myButton.disabled = false
-            //   myButton.innerHTML = "Submit"
-            // }, 3000)
+            // $.ajax({
+            //     type: "GET",
+            //     url: routeInventoryTransfer+param,
+            // }).done(function(data) {
+            //     // console.log("response")
+            //     // console.log(data)
+            //     let res1 = '<span><i class="fa fa-check-circle" style="color: green;"></i> '+data.message+'</span>'
+            //     let fail1 = '<span><i class="fa fa-times-circle" style="color: red;"></i> Proses jurnal closing Inventory Transfer gagal. '+data.message+'</span>'
+            //     if (data.result) {
+            //         // console.log("another ajax")
+            //         $("#response1").append(res1)
+            //         // Ajax 2
+            //         $.ajax({
+            //             type: "GET",
+            //             url: routeStockCorrection+param,
+            //         }).done(function(data) {
+            //             console.log("2nd ajax response")
+            //             console.log(data)
+            //             let res2 = '<span><i class="fa fa-check-circle" style="color: green;"></i>'+data.message+'</span>'
+            //             let fail2 = '<span><i class="fa fa-times-circle" style="color: red;"></i> Proses jurnal closing Koreksi Stok gagal. '+data.message+'</span>'
+            //             if (data.result) {
+            //                 console.log("2nd succeed")
+            //                 $("#response2").append(res2)
+            //                 myButton.disabled = false
+            //                 myButton.innerHTML = "Submit"
+            //             }
+            //             else {
+            //                 console.log("2nd ajax response false")
+            //                 $("#response2").append(fail2)
+            //                 myButton.disabled = false
+            //                 myButton.innerHTML = "Submit"
+            //             }
+            //         })
+            //     }
+            //     else {
+            //         console.log("ajax response false")
+            //         $("#response1").append(fail1)
+            //         myButton.disabled = false
+            //         myButton.innerHTML = "Submit"
+            //     }
+            // })
         })
 
         $(document).on('select2:open', () => {
@@ -307,42 +308,43 @@
 
     })
 
-    function save_data() {
-        let header = []
-        header.push({
-            cabang: $("#cabang_input").val(),
-            tanggal: $("#tanggal").val(),
-            jenis: $("#jenis").val(),
-            slip: $("#slip").val(),
-            nomor_giro: $("#nomor_giro").val(),
-            tanggal_giro: $("#tanggal_giro").val(),
-            tanggal_jt_giro: $("#tanggal_jt_giro").val(),
-            notes: $("#notes").val(),
-        })
+    function save_data(route, param, step) {
         $.ajax({
-            type: "POST",
-            url: save_route,
-            data: {
-                "_token": "{{ csrf_token() }}",
-                "header": header,
-                "detail": details
-            },
-            success: function(data) {
-                if (data.result) {
-                    Swal.fire('Saved!', data.message, 'success').then((result) => {
-                        if (result.isConfirmed) {
-                            window.location.href = data_route;
-                        }
-                    })
-                } else {
-                    Swal.fire("Sorry, Can't save data. ", data.message, 'error')
-                }
-
-            },
-            error: function(data) {
-                Swal.fire("Sorry, Can't save data. ", data.responseJSON.message, 'error')
+            type: "GET",
+            url: route+param,
+        }).done(function(data) {
+            console.log("ajax response "+step)
+            console.log(data)
+            let res = '<span><i class="fa fa-check-circle" style="color: green;"></i>'+data.message+'</span>'
+            let fail = '<span><i class="fa fa-times-circle" style="color: red;"></i> Proses jurnal closing Koreksi Stok gagal. '+data.message+'</span>'
+            if (data.result) {
+                console.log("succeed")
+                $("#response"+step).append(res)
+                steps(step, param)
+            }
+            else {
+                console.log("ajax response false "+step)
+                $("#response"+step).append(fail)
+                myButton.disabled = false
+                myButton.innerHTML = "Submit"
             }
         })
+    }
+
+    function steps(step, param) {
+        switch (step) {
+            case "1":
+                save_data(routeInventoryTransfer, param, "2")
+                break;
+            case "2":
+                save_data(routeStockCorrection, param, "3")
+                break;
+        
+            default:
+                myButton.disabled = false
+                myButton.innerHTML = "Submit"
+                break;
+        }
     }
 
     function formatCurr(num) {

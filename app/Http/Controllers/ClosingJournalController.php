@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Accounting\Closing;
 use App\Models\Accounting\InventoryTransferHeader;
 use App\Models\Accounting\InventoryTransferDetail;
 use App\Models\Accounting\StockCorrectionHeader;
@@ -75,7 +76,47 @@ class ClosingJournalController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            // Init data
+            $id_cabang = $request->id_cabang;
+            $month = $request->month;
+            $year = $request->year;
+
+            // Store to closing table
+            DB::beginTransaction();
+            $check = Closing::where("month", $month)->where("year", $year)->first();
+            if ($check) {
+                return response()->json([
+                    "result" => FALSE,
+                    "message" => "Closing sudah pernah dilakukan"
+                ]);
+            }
+            $closing = new Closing;
+            $closing->month = $month;
+            $closing->year = $year;
+            if (!$closing->save()) {
+                DB::rollback();
+                return response()->json([
+                    "result" => false,
+                    "message" => "Error when store data on table closing",
+                ]);
+            }
+            DB::commit();
+            return response()->json([
+                "result"=>TRUE,
+                "message"=>"Successfully proceed closing journal data"
+            ]);
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            $message = "Error when store closing";
+            Log::error($message);
+            Log::error($e);
+            return response()->json([
+                "result" => FALSE,
+                "message" => $message
+            ]);
+        }
     }
 
     /**
