@@ -653,7 +653,7 @@ class GeneralLedgerController extends Controller
                 }
             }
         } else {
-            $data_general_ledger_table->orderBy('jurnal_header.dt_modified', 'DESC');
+            $data_general_ledger_table->orderBy('jurnal_header.id_jurnal', 'DESC');
         }
 
         // pagination
