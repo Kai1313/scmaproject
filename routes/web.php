@@ -183,6 +183,13 @@ Route::prefix('report')->group(function(){
         Route::get('/excel', 'ReportSlipController@exportExcel')->name('report-slip-excel');
         Route::get('/pdf', 'ReportSlipController@exportPdf')->name('report-slip-pdf');
     });
+    // Ledger
+    Route::prefix('general_ledger')->group(function(){
+        Route::get('/index/{user_id?}', 'ReportGeneralLedgerController@index')->name('report-general-ledger');
+        Route::get('/populate', 'ReportGeneralLedgerController@populate')->name('report-general-ledger-populate');
+        Route::get('/excel', 'ReportGeneralLedgerController@exportExcel')->name('report-general-ledger-excel');
+        Route::get('/pdf', 'ReportGeneralLedgerController@exportPdf')->name('report-general-ledger-pdf');
+    });
 });
 
 Route::get('/dummyAjax', 'ClosingJournalController@dummyAjax')->name('dummy-ajax');
