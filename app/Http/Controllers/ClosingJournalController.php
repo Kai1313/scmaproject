@@ -165,7 +165,7 @@ class ClosingJournalController extends Controller
     }
 
     // Start Step 1
-    public function getBiayaProduksi($date, $id_cabang){
+    public function getProductionCost($date, $id_cabang){
         $param_bulan = date('m', strtotime($date));
         $param_tahun = date('Y', strtotime($date));
 
@@ -209,7 +209,7 @@ class ClosingJournalController extends Controller
         return $data;
     }
 
-    public function updateKreditProduksi($id_produksi, $data_biaya){
+    public function updateProductionCredit($id_produksi, $data_biaya){
         $beban_produksi = ProductionCost::where('id_produksi', $id_produksi)->first();
 
         $tenaga = ($beban_produksi->tenaga_kerja_beban_produksi * $beban_produksi->listrik_beban_produksi) * $data_biaya['gaji'];
@@ -277,7 +277,7 @@ class ClosingJournalController extends Controller
         return $data;
     }
 
-    public function hppProduksi(Request $request){
+    public function production(Request $request){
         try {
             // Init data
             $id_cabang = $request->id_cabang;
@@ -289,13 +289,13 @@ class ClosingJournalController extends Controller
             $void = 0;
             $status = 1;
 
-            $biaya_produksi = $this->getBiayaProduksi($end_date, $id_cabang);
+            $biaya_produksi = $this->getProductionCost($end_date, $id_cabang);
 
             $data_produksi = Production::whereRaw("MONTH(tanggal_produksi)", $month)->whereRaw('YEAR(tanggal_produksi)', $year)->where('id_jenis_transaksi', 17)->get();
 
             DB::beginTransaction();
             foreach($data_produksi as $produksi){
-                $data_hpp = $this->updateKreditProduksi($produksi->id_produksi, $biaya_produksi);
+                $data_hpp = $this->updateProductionCredit($produksi->id_produksi, $biaya_produksi);
                 $data_hpp_biaya = $data_hpp['biaya'];
                 $data_hpp_kredit_hasil = $data_hpp['kredit_produksi'];
 
@@ -441,8 +441,8 @@ class ClosingJournalController extends Controller
                                             ->selectRaw('ROUND(SUM(credit-debet), 2) as value')
                                             ->first();
 
-            $selisih_listrik = $sum_biaya_listrik_otomatis - $sum_biaya_listrik_manual;
-            $selisih_tenaga = $sum_biaya_operator_otomatis - $sum_biaya_operator_manual;
+            $selisih_listrik = $sum_biaya_listrik_otomatis->value - $sum_biaya_listrik_manual->value;
+            $selisih_tenaga = $sum_biaya_operator_otomatis->value - $sum_biaya_operator_manual->value;
 
             if($selisih_listrik != 0 || $selisih_tenaga != 0){
                 // Create journal memorial
@@ -561,12 +561,12 @@ class ClosingJournalController extends Controller
             DB::commit();
             return response()->json([
                 "result"=>TRUE,
-                "message"=>"Successfully proceed closing journal inventory transfer"
+                "message"=>"Successfully proceed closing journal Hpp Production"
             ]);
         }
         catch (\Exception $e) {
             DB::rollback();
-            $message = "Error when inventory transfer";
+            $message = "Error when closing journal Hpp Production";
             Log::error($message);
             Log::error($e);
             return response()->json([
@@ -1104,7 +1104,7 @@ class ClosingJournalController extends Controller
     }
 
     // step 6
-    public function penjualan(Request $request){
+    public function sales(Request $request){
         try {
             // Init data
             $id_cabang = $request->id_cabang;
@@ -1141,21 +1141,25 @@ class ClosingJournalController extends Controller
 
 
                 // Get header out detail
-                $data_detail = SalesDetail::select("penjualan_detail.id_barang", "penjualan_detail.kode_batang_lama_penjualan_detail", "master_qr_code.beli_master_qr_code", "master_qr_code.biaya_beli_master_qr_code", "master_qr_code.jumlah_master_qr_code", "master_qr_code.produksi_master_qr_code", "master_qr_code.listrik_master_qr_code", "master_qr_code.pegawai_master_qr_code")->join("master_qr_code", "kode_batang_master_qr_code", "pindah_barang_detail.kode_batang_lama_penjualan_detail")->where("id_penjualan", $header->id_penjualan)->get();
+                $data_detail = SalesDetail::select("penjualan_detail.id_barang", "penjualan_detail.kode_batang_lama_penjualan_detail", "master_qr_code.beli_master_qr_code", "master_qr_code.biaya_beli_master_qr_code", "master_qr_code.jumlah_master_qr_code", "master_qr_code.produksi_master_qr_code", "master_qr_code.listrik_master_qr_code", "master_qr_code.pegawai_master_qr_code")
+                            ->join("master_qr_code", "kode_batang_master_qr_code", "penjualan_detail.kode_batang_lama_penjualan_detail")
+                            ->where("id_penjualan", $header->id_penjualan)
+                            ->get();
 
+                $details = [];
                 foreach ($data_detail as $key => $detail) {
                     $qty = $detail->jumlah_master_qr_code;
                     $sum = ($qty*$detail->beli_master_qr_code)+($qty*$detail->biaya_beli_master_qr_code)+($qty*$detail->produksi_master_qr_code)+($qty*$detail->listrik_master_qr_code)+($qty*$detail->pegawai_master_qr_code);
-                    $details_out[] = [
+                    $details[] = [
                         "qr_code"=>$detail->kode_batang_lama_penjualan_detail,
                         "barang"=>$detail->id_barang,
                         "qty"=>$qty,
                         "sum"=>$sum
                     ];
                 }
-                // Log::info(json_encode($details_out));
+                // Log::info(json_encode($details));
                 // Grouping and sum the same barang
-                $grouped_out = array_reduce($details_out, function($result, $out) {
+                $grouped_out = array_reduce($details, function($result, $out) {
                     $product = $out['barang'];
                     $sum = $out['sum'];
                     if (isset($result[$product])) {
@@ -1271,7 +1275,7 @@ class ClosingJournalController extends Controller
     }
 
     // Step 7
-    public function penyusutan(Request $request){
+    public function depreciation(Request $request){
         try {
             // Init data
             $id_cabang = $request->id_cabang;
