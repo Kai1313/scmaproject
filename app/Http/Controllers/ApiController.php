@@ -2302,6 +2302,10 @@ class ApiController extends Controller
                                     ->orderBy('produksi_detail.id_barang', 'ASC')
                                     ->get();
 
+        if(count($data_production_supplies) < 1){
+            return false;
+        }
+
         // init array kosong untuk memasukkan data persediaan dan total persediaan
         $data_supplies = [];
         $total_supplies = 0;
@@ -2332,6 +2336,10 @@ class ApiController extends Controller
         $data_production_cost = DB::table("beban_produksi")
                                 ->where('beban_produksi.id_produksi', $production_id)
                                 ->first();
+
+        if(empty($data_production_cost)){
+            return false;
+        }
 
         // init beban listrik dan pegawai
         $beban_listrik = round($data_production_cost->kwh_beban_produksi, 2);
@@ -2450,13 +2458,41 @@ class ApiController extends Controller
         $void = $request->void;
 
         $data_produksi = DB::table('produksi')->where('nama_produksi', $no_transaksi)->first();
+
+        if(empty($data_produksi)){
+            DB::rollBack();
+            return response()->json([
+                "result" => false,
+                "code" => 400,
+                "message" => "Error when store Jurnal Hpp data. Please re-check no_transaksi, Produksi " . $no_transaksi . " not found ",
+            ], 400);
+        }
+
         $id_produksi = $data_produksi->id_produksi;
 
         // tahap 1
         $data_production_supplies = $this->productionSupplies($id_produksi);
 
+        if($data_production_supplies == false){
+            DB::rollBack();
+            return response()->json([
+                "result" => false,
+                "code" => 400,
+                "message" => "Error when store Jurnal Hpp data. Data Produksi " . $no_transaksi . " not found ",
+            ], 400);
+        }
+
         // tahap 2 dan 3
         $data_production_cost = $this->productionCost($id_produksi, $id_cabang);
+
+        if($data_production_cost == false){
+            DB::rollBack();
+            return response()->json([
+                "result" => false,
+                "code" => 400,
+                "message" => "Error when store Jurnal Hpp data. Data Beban Produksi " . $no_transaksi . " not found ",
+            ], 400);
+        }
 
         $total_supplies = $data_production_supplies['total_supplies'];
         $biaya_listrik = $data_production_cost['biaya_listrik'];
@@ -2472,6 +2508,15 @@ class ApiController extends Controller
         $data_pemakaian = $data_production_supplies['data_supplies'];
         $data_hasil = $data_production_results['data_results'];
         $user_data = Auth::guard('api')->user();
+
+        if(count($data_hasil) < 1){
+            DB::rollBack();
+            return response()->json([
+                "result" => false,
+                "code" => 400,
+                "message" => "Error when store Jurnal Hpp data. Data Hasil Produksi empty",
+            ], 400);
+        }
 
         $data = [
             'id_transaksi' => $id_transaksi,
@@ -2633,7 +2678,7 @@ class ApiController extends Controller
                     return FALSE;
                 }
                 Log::debug($detail);
-                
+
                 $total_debet += $detail->debet;
                 $total_credit += $detail->credit;
                 $list_transaksi .= $value['nama_transaksi'] . ';';
@@ -2682,7 +2727,7 @@ class ApiController extends Controller
                 }
                 Log::debug($detail);
             }
-            
+
             DB::commit();
             return TRUE;
         } catch (\Exception $e) {
@@ -2825,7 +2870,7 @@ class ApiController extends Controller
                     return FALSE;
                 }
                 Log::debug($detail);
-                
+
                 $total_debet += $detail->debet;
                 $total_credit += $detail->credit;
                 $list_transaksi .= $value['nama_transaksi'] . ';';
@@ -2874,7 +2919,7 @@ class ApiController extends Controller
                 }
                 Log::debug($detail);
             }
-            
+
             DB::commit();
             return TRUE;
         } catch (\Exception $e) {
