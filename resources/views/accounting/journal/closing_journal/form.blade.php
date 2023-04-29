@@ -127,7 +127,9 @@
                                 <div class="col-md-6">
                                     <div id="response1"></div><br>
                                     <div id="response2"></div><br>
-                                    <div id="response3"></div>
+                                    <div id="response3"></div><br>
+                                    <div id="response4"></div><br>
+                                    <div id="response5"></div><br>
                                 </div>
                             </div>
                         </form>
@@ -247,6 +249,8 @@
             $("#response1").empty()
             $("#response2").empty()
             $("#response3").empty()
+            $("#response4").empty()
+            $("#response5").empty()
 
             // Start ajax chain
             save_data(routeClosingStore, param, "1")
@@ -340,6 +344,12 @@
                 break;
             case "2":
                 save_data(routeStockCorrection, param, "3")
+                break;
+            case "3":
+                save_data(routeSales, param, "4")
+                break;
+            case "4":
+                save_data(routeDepreciation, param, "5")
                 break;
 
             default:
