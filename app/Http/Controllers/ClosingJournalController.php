@@ -308,6 +308,11 @@ class ClosingJournalController extends Controller
                 $jurnal_biaya_listrik->credit = $data_hpp_biaya['listrik'];
                 if (!$jurnal_biaya_listrik->save()) {
                     DB::rollback();
+                     // Revert post closing
+                    $check = Closing::where("month", $month)->where("year", $year)->first();
+                    if ($check) {
+                        $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                    }
                     Log::error("Error when updating journal detail on update jurnal biaya listrik hpp produksi");
                     return FALSE;
                 }
@@ -316,6 +321,10 @@ class ClosingJournalController extends Controller
                 $jurnal_biaya_operator->credit = $data_hpp_biaya['tenaga'];
                 if (!$jurnal_biaya_operator->save()) {
                     DB::rollback();
+                    $check = Closing::where("month", $month)->where("year", $year)->first();
+                    if ($check) {
+                        $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                    }
                     Log::error("Error when updating journal detail on update jurnal biaya operator hpp produksi");
                     return FALSE;
                 }
@@ -326,6 +335,10 @@ class ClosingJournalController extends Controller
                     $jurnal_hasil_produksi->debet = $kredit_hasil->value;
                     if (!$jurnal_hasil_produksi->save()) {
                         DB::rollback();
+                        $check = Closing::where("month", $month)->where("year", $year)->first();
+                        if ($check) {
+                            $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                        }
                         Log::error("Error when updating journal detail on update jurnal hasil produksi " . $sumber_produksi->nama_produksi . " barang " . $kredit_hasil->id_barang . " hpp produksi");
                         return FALSE;
                     }
@@ -371,6 +384,10 @@ class ClosingJournalController extends Controller
 
                         if (!$detail->save()) {
                             DB::rollback();
+                            $check = Closing::where("month", $month)->where("year", $year)->first();
+                            if ($check) {
+                                $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                            }
                             Log::error("Error when storing journal detail on store jurnal pembulatan hpp produksi");
                             return FALSE;
                         }
@@ -385,6 +402,10 @@ class ClosingJournalController extends Controller
 
                         if (!$jurnal_pembulatan->save()) {
                             DB::rollback();
+                            $check = Closing::where("month", $month)->where("year", $year)->first();
+                            if ($check) {
+                                $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                            }
                             Log::error("Error when update journal detail on update jurnal pembulatan hpp produksi");
                             return FALSE;
                         }
@@ -461,6 +482,10 @@ class ClosingJournalController extends Controller
                 // dd($header);
                 if (!$header->save()) {
                     DB::rollback();
+                    $check = Closing::where("month", $month)->where("year", $year)->first();
+                    if ($check) {
+                        $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                    }
                     return response()->json([
                         "result" => false,
                         "message" => "Error when store Jurnal data on table header",
@@ -492,6 +517,10 @@ class ClosingJournalController extends Controller
                     // Log::info(json_encode($detail));
                     if (!$detail->save()) {
                         DB::rollback();
+                        $check = Closing::where("month", $month)->where("year", $year)->first();
+                        if ($check) {
+                            $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                        }
                         return response()->json([
                             "result" => false,
                             "message" => "Error when store Jurnal data on table detail",
@@ -522,6 +551,10 @@ class ClosingJournalController extends Controller
                     // Log::info(json_encode($detail));
                     if (!$detail->save()) {
                         DB::rollback();
+                        $check = Closing::where("month", $month)->where("year", $year)->first();
+                        if ($check) {
+                            $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                        }
                         return response()->json([
                             "result" => false,
                             "message" => "Error when store Jurnal data on table detail",
@@ -552,6 +585,10 @@ class ClosingJournalController extends Controller
 
                     if (!$detail->save()) {
                         DB::rollback();
+                        $check = Closing::where("month", $month)->where("year", $year)->first();
+                        if ($check) {
+                            $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                        }
                         Log::error("Error when storing journal detail on table detail");
                         return FALSE;
                     }
@@ -566,6 +603,10 @@ class ClosingJournalController extends Controller
         }
         catch (\Exception $e) {
             DB::rollback();
+            $check = Closing::where("month", $month)->where("year", $year)->first();
+            if ($check) {
+                $delete = Closing::where("month", $month)->where("year", $year)->delete();
+            }
             $message = "Error when closing journal Hpp Production";
             Log::error($message);
             Log::error($e);
@@ -1188,6 +1229,10 @@ class ClosingJournalController extends Controller
                 // dd($header);
                 if (!$header->save()) {
                     DB::rollback();
+                    $check = Closing::where("month", $month)->where("year", $year)->first();
+                    if ($check) {
+                        $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                    }
                     return response()->json([
                         "result" => false,
                         "message" => "Error when store Jurnal data on table header",
@@ -1204,6 +1249,10 @@ class ClosingJournalController extends Controller
                     $barang = Barang::find($key);
                     if (!$barang) {
                         DB::rollback();
+                        $check = Closing::where("month", $month)->where("year", $year)->first();
+                        if ($check) {
+                            $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                        }
                         return response()->json([
                             "result" => false,
                             "message" => "Error when store Jurnal data on table detail, barang not found",
@@ -1225,6 +1274,10 @@ class ClosingJournalController extends Controller
                     // Log::info(json_encode($detail));
                     if (!$detail->save()) {
                         DB::rollback();
+                        $check = Closing::where("month", $month)->where("year", $year)->first();
+                        if ($check) {
+                            $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                        }
                         return response()->json([
                             "result" => false,
                             "message" => "Error when store Jurnal data on table detail",
@@ -1248,6 +1301,10 @@ class ClosingJournalController extends Controller
                 // dd(json_encode($detail));
                 if (!$detail->save()) {
                     DB::rollback();
+                    $check = Closing::where("month", $month)->where("year", $year)->first();
+                    if ($check) {
+                        $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                    }
                     return response()->json([
                         "result" => false,
                         "message" => "Error when store Jurnal data on table detail",
@@ -1335,6 +1392,10 @@ class ClosingJournalController extends Controller
                 // dd($header);
                 if (!$header->save()) {
                     DB::rollback();
+                    $check = Closing::where("month", $month)->where("year", $year)->first();
+                    if ($check) {
+                        $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                    }
                     return response()->json([
                         "result" => false,
                         "message" => "Error when store Jurnal data on table header",
@@ -1359,6 +1420,10 @@ class ClosingJournalController extends Controller
                     // Log::info(json_encode($detail));
                     if (!$detail->save()) {
                         DB::rollback();
+                        $check = Closing::where("month", $month)->where("year", $year)->first();
+                        if ($check) {
+                            $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                        }
                         return response()->json([
                             "result" => false,
                             "message" => "Error when store Jurnal data on table detail",
@@ -1382,6 +1447,10 @@ class ClosingJournalController extends Controller
                     // dd(json_encode($detail));
                     if (!$detail->save()) {
                         DB::rollback();
+                        $check = Closing::where("month", $month)->where("year", $year)->first();
+                        if ($check) {
+                            $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                        }
                         return response()->json([
                             "result" => false,
                             "message" => "Error when store Jurnal data on table detail",

@@ -116,11 +116,11 @@ class ReportSlipController extends Controller
         try {
             return Excel::download(new ReportSlipExport($request->cabang, $request->slip, $request->start_date, $request->end_date), 'ReportSlips.xlsx');
         } catch (\Exception $e) {
-            Log::error("Error when export excel master slip");
+            Log::error("Error when export excel report slip");
             Log::error($e);
             return response()->json([
                 "result" => false,
-                "message" => "Error when export excel master slip",
+                "message" => "Error when export excel report slip",
             ]);
         }
     }

@@ -1108,6 +1108,9 @@
                     <li class="{{ request()->segment(1) == 'report' && request()->segment(2) == 'general_ledger' ? 'active' : null }}">
                         <a href="{{ route('report-general-ledger', 1) }}">Buku Besar</a>
                     </li>
+                    <li class="{{ request()->segment(1) == 'report' && request()->segment(2) == 'giro' ? 'active' : null }}">
+                        <a href="{{ route('report-giro', 1) }}">Giro</a>
+                    </li>
                 </ul>
             </li>
         </ul>
