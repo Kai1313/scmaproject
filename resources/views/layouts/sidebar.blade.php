@@ -1105,6 +1105,9 @@
                     <li class="{{ request()->segment(1) == 'report' && request()->segment(2) == 'slip' ? 'active' : null }}">
                         <a href="{{ route('report-slip', 1) }}">Slip</a>
                     </li>
+                    <li class="{{ request()->segment(1) == 'report' && request()->segment(2) == 'giro' ? 'active' : null }}">
+                        <a href="{{ route('report-giro', 1) }}">Giro</a>
+                    </li>
                 </ul>
             </li>
         </ul>

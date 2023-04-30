@@ -1,0 +1,290 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Exports\ReportGiroExport;
+use App\Models\Master\Cabang;
+use App\Models\Master\Slip;
+use Illuminate\Http\Request;
+use Excel;
+use PDF;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
+class ReportGiroController extends Controller
+{
+    public function index(Request $request)
+    {
+        if (checkUserSession($request, 'general_ledger', 'show') == false) {
+            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+        }
+
+        $data_cabang = Cabang::all();
+        $data_slip = Slip::all();
+        $data_status = array(
+            array(
+                'value' => 'All',
+                'title' => 'All'
+            ),
+            array(
+                'value' => '0',
+                'title' => 'Belum Cair'
+            ),
+            array(
+                'value' => '1',
+                'title' => 'Cair'
+            ),
+            array(
+                'value' => '2',
+                'title' => 'Tolak'
+            )
+        );
+
+        //    dd($data_status);
+
+        $data = [
+            "pageTitle" => "SCA Accounting | Report Giro",
+            "data_slip" => $data_slip,
+            "data_cabang" => $data_cabang,
+            "data_status" => $data_status
+        ];
+
+        return view('accounting.report.giro.index', $data);
+    }
+
+    public function populate(Request $request)
+    {
+        // if (checkAccessMenu('report_slip', 'view') == false) {
+        //     return response()->json([
+        //         "result" => false,
+        //         "message" => "Error, anda tidak punya akses!",
+        //     ]);
+        // }
+
+        $cabang = $request->cabang;
+        $slip = $request->slip;
+        $tipe = $request->tipe;
+        $tanggal = $request->tanggal;
+        $status = $request->status;
+
+        Log::debug($request->all());
+
+        $giro = DB::table("jurnal_header as head")
+            ->join('jurnal_detail as det', 'head.id_jurnal', 'det.id_jurnal')
+            ->join('saldo_transaksi as saldo', 'saldo.id_jurnal', 'head.id_jurnal')
+            ->selectRaw('head.id_jurnal,
+                head.tanggal_jurnal,
+                head.kode_jurnal,
+                head.no_giro,
+                head.tanggal_giro,
+                head.tanggal_giro_jt,
+                saldo.total')
+            ->where('head.void', 0)
+            ->where('head.id_cabang', $cabang)
+            ->where('head.jenis_jurnal', $tipe)
+            ->where('head.tanggal_giro_jt', $tanggal);
+
+        if ($slip != 'All') {
+            $giro = $giro->where('head.id_slip', $slip);
+        }
+
+        if ($status != 'All') {
+            if ($status == 0) {
+                $giro = $giro->where('saldo.sisa', '>', 0);
+                $giro = $giro->where('saldo.status_giro', $status);
+            } else {
+                $giro = $giro->where('saldo.sisa', 0);
+                $giro = $giro->where('saldo.status_giro', $status);
+            }
+        }
+
+        $giro = $giro->groupBy('det.id_jurnal')
+            ->orderBy('head.tanggal_jurnal', 'ASC');
+
+        $data = $giro->get();
+
+        Log::debug($data);
+        foreach ($data as $key => $value) {
+            $cair = DB::table('jurnal_header as head')
+                ->join('saldo_transaksi as saldo', 'saldo.id_jurnal', 'head.id_jurnal')
+                ->join('master_slip as slip', 'slip.id_slip', 'head.id_slip')
+                ->selectRaw('head.kode_jurnal,
+                    head.tanggal_giro_jt,
+                    slip.nama_slip')
+                ->where('head.id_jurnal', $value->id_jurnal)
+                ->where('saldo.sisa', '=', 0)
+                ->where('saldo.status_giro', '=', 1)
+                ->first();
+            Log::debug(json_encode($cair));
+
+            $value->cair_kode_jurnal = isset($cair) ? $cair->kode_jurnal : '';
+            $value->cair_tanggal_giro = isset($cair) ? $cair->tanggal_giro_jt : '';
+            $value->cair_slip = isset($cair) ? $cair->nama_slip : '';
+
+            $tolak = DB::table('jurnal_header as head')
+                ->join('saldo_transaksi as saldo', 'saldo.id_jurnal', 'head.id_jurnal')
+                ->join('master_slip as slip', 'slip.id_slip', 'head.id_slip')
+                ->selectRaw('head.kode_jurnal,
+                    head.tanggal_giro_jt,
+                    slip.nama_slip')
+                ->where('head.id_jurnal', $value->id_jurnal)
+                ->where('saldo.sisa', '=', 0)
+                ->where('saldo.status_giro', '=', 2)
+                ->first();
+            Log::debug(json_encode($tolak));
+
+            $value->tolak_kode_jurnal = isset($tolak) ? $tolak->kode_jurnal : '';
+            $value->tolak_tanggal_giro = isset($tolak) ? $tolak->tanggal_giro_jt : '';
+        }
+
+        Log::debug($data);
+
+        return $data;
+    }
+
+    public function exportExcel(Request $request)
+    {
+        // if (checkAccessMenu('report_slip', 'print') == false) {
+        //     return response()->json([
+        //         "result" => false,
+        //         "message" => "Error, anda tidak punya akses!",
+        //     ]);
+        // }
+
+        Log::debug($request->all());
+
+        try {
+            return Excel::download(new ReportGiroExport($request->cabang, $request->slip, $request->tipe, $request->tanggal,  $request->status), 'ReportGiros.xlsx');
+        } catch (\Exception $e) {
+            Log::error("Error when export excel report giro");
+            Log::error($e);
+            return response()->json([
+                "result" => false,
+                "message" => "Error when export excel report giro",
+            ]);
+        }
+    }
+
+    public function exportPdf(Request $request)
+    {
+        // if (checkAccessMenu('report_slip', 'print') == false) {
+        //     return response()->json([
+        //         "result" => false,
+        //         "message" => "Error, anda tidak punya akses!",
+        //     ]);
+        // }
+
+        $cabang = $request->cabang;
+        $slip = $request->slip;
+        $tipe = $request->tipe;
+        $tanggal = $request->tanggal;
+        $status = $request->status;
+
+        Log::debug($request->all());
+
+        $giro = DB::table("jurnal_header as head")
+            ->join('jurnal_detail as det', 'head.id_jurnal', 'det.id_jurnal')
+            ->join('saldo_transaksi as saldo', 'saldo.id_jurnal', 'head.id_jurnal')
+            ->selectRaw('head.id_jurnal,
+                head.tanggal_jurnal,
+                head.kode_jurnal,
+                head.no_giro,
+                head.tanggal_giro,
+                head.tanggal_giro_jt,
+                saldo.total')
+            ->where('head.void', 0)
+            ->where('head.id_cabang', $cabang)
+            ->where('head.jenis_jurnal', $tipe)
+            ->where('head.tanggal_giro_jt', $tanggal);
+
+        if ($slip != 'All') {
+            $giro = $giro->where('head.id_slip', $slip);
+        }
+
+        if ($status != 'All') {
+            if ($status == 0) {
+                $giro = $giro->where('saldo.sisa', '>', 0);
+                $giro = $giro->where('saldo.status_giro', $status);
+            } else {
+                $giro = $giro->where('saldo.sisa', 0);
+                $giro = $giro->where('saldo.status_giro', $status);
+            }
+        }
+
+        $giro = $giro->groupBy('det.id_jurnal')
+            ->orderBy('head.tanggal_jurnal', 'ASC');
+
+        $data = $giro->get();
+
+        Log::debug($data);
+        foreach ($data as $key => $value) {
+            $cair = DB::table('jurnal_header as head')
+                ->join('saldo_transaksi as saldo', 'saldo.id_jurnal', 'head.id_jurnal')
+                ->join('master_slip as slip', 'slip.id_slip', 'head.id_slip')
+                ->selectRaw('head.kode_jurnal,
+                    head.tanggal_giro_jt,
+                    slip.nama_slip')
+                ->where('head.id_jurnal', $value->id_jurnal)
+                ->where('saldo.sisa', '=', 0)
+                ->where('saldo.status_giro', '=', 1)
+                ->first();
+            Log::debug(json_encode($cair));
+
+            $value->cair_kode_jurnal = isset($cair) ? $cair->kode_jurnal : '';
+            $value->cair_tanggal_giro = isset($cair) ? $cair->tanggal_giro_jt : '';
+            $value->cair_slip = isset($cair) ? $cair->nama_slip : '';
+
+            $tolak = DB::table('jurnal_header as head')
+                ->join('saldo_transaksi as saldo', 'saldo.id_jurnal', 'head.id_jurnal')
+                ->join('master_slip as slip', 'slip.id_slip', 'head.id_slip')
+                ->selectRaw('head.kode_jurnal,
+                    head.tanggal_giro_jt,
+                    slip.nama_slip')
+                ->where('head.id_jurnal', $value->id_jurnal)
+                ->where('saldo.sisa', '=', 0)
+                ->where('saldo.status_giro', '=', 2)
+                ->first();
+            Log::debug(json_encode($tolak));
+
+            $value->tolak_kode_jurnal = isset($tolak) ? $tolak->kode_jurnal : '';
+            $value->tolak_tanggal_giro = isset($tolak) ? $tolak->tanggal_giro_jt : '';
+        }
+
+        Log::debug($data);
+
+        $cabang = $cabang == 'All' ? 'All' : Cabang::find($cabang)->nama_cabang;
+        $slip = $slip == 'All' ? 'All' : Slip::find($slip)->nama_slip;
+        
+        if ($status == 0) {
+            $status = 'Belum Cair';
+        } else if ($status  == 1) {
+            $status = 'Cair';
+        } else if ($status == 2) {
+            $status = 'Tolak';
+        } else {
+            $status = $status;
+        }
+
+        $datas = [
+            'data' => $data,
+            'cabang' => $cabang,
+            'slip' => $slip,
+            'tanggal' => $tanggal,
+            'tipe' => $tipe,
+            'status' => $status
+        ];
+
+        // return view('accounting.report.slip.print', $data);
+
+        if (count($data) > 0) {
+            $pdf = PDF::loadView('accounting.report.giro.print', $datas);
+            $pdf->setPaper('a4', 'landscape');
+            return $pdf->stream('ReportGiro.pdf');
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'No data found'
+            ]);
+        }
+    }
+}

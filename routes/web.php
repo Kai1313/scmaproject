@@ -179,5 +179,13 @@ Route::prefix('report')->group(function(){
         Route::get('/excel', 'ReportSlipController@exportExcel')->name('report-slip-excel');
         Route::get('/pdf', 'ReportSlipController@exportPdf')->name('report-slip-pdf');
     });
+
+    // Giro
+    Route::prefix('giro')->group(function(){
+        Route::get('/index/{user_id?}', 'ReportGiroController@index')->name('report-giro');
+        Route::get('/populate', 'ReportGiroController@populate')->name('report-giro-populate');
+        Route::get('/excel', 'ReportGiroController@exportExcel')->name('report-giro-excel');
+        Route::get('/pdf', 'ReportGiroController@exportPdf')->name('report-giro-pdf');
+    });
 });
 
