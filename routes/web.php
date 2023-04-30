@@ -165,8 +165,12 @@ Route::prefix('transaction')->group(function () {
     Route::prefix('closing_journal')->group(function () {
         Route::get('/index/{user_id?}', 'ClosingJournalController@index')->name('transaction-closing-journal');
         Route::get('/form/create', 'ClosingJournalController@create')->name('transaction-closing-journal-create');
+        Route::get('/store', 'ClosingJournalController@store')->name('transaction-closing-journal-store');
         Route::get('/inventory_transfer', 'ClosingJournalController@inventoryTransfer')->name('transaction-closing-journal-inventory-transfer');
-        Route::get('/stock_correction', 'ClosingJournalController@stockCorrection')->name('transaction-closing-journa-stock-correction');
+        Route::get('/stock_correction', 'ClosingJournalController@stockCorrection')->name('transaction-closing-journal-stock-correction');
+        Route::get('/production', 'ClosingJournalController@production')->name('transaction-closing-journal-production');
+        Route::get('/sales', 'ClosingJournalController@sales')->name('transaction-closing-journal-sales');
+        Route::get('/depreciation', 'ClosingJournalController@depreciation')->name('transaction-closing-journal-depreciation');
     });
 });
 
@@ -187,5 +191,14 @@ Route::prefix('report')->group(function(){
         Route::get('/excel', 'ReportGiroController@exportExcel')->name('report-giro-excel');
         Route::get('/pdf', 'ReportGiroController@exportPdf')->name('report-giro-pdf');
     });
+    
+    // Ledger
+    Route::prefix('general_ledger')->group(function(){
+        Route::get('/index/{user_id?}', 'ReportGeneralLedgerController@index')->name('report-general-ledger');
+        Route::get('/populate', 'ReportGeneralLedgerController@populate')->name('report-general-ledger-populate');
+        Route::get('/excel', 'ReportGeneralLedgerController@exportExcel')->name('report-general-ledger-excel');
+        Route::get('/pdf', 'ReportGeneralLedgerController@exportPdf')->name('report-general-ledger-pdf');
+    });
 });
 
+Route::get('/dummyAjax', 'ClosingJournalController@dummyAjax')->name('dummy-ajax');

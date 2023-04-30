@@ -2302,6 +2302,10 @@ class ApiController extends Controller
                                     ->orderBy('produksi_detail.id_barang', 'ASC')
                                     ->get();
 
+        if(count($data_production_supplies) < 1){
+            return false;
+        }
+
         // init array kosong untuk memasukkan data persediaan dan total persediaan
         $data_supplies = [];
         $total_supplies = 0;
@@ -2328,10 +2332,21 @@ class ApiController extends Controller
     }
 
     public function productionCost($production_id, $id_cabang){
+        $hasil_produksi = DB::table('produksi')->where('nomor_referensi_produksi', $production_id)->first();
+        if(empty($hasil_produksi)){
+            return false;
+        }
+
+        $id_hasil_produksi = $hasil_produksi->id_produksi;
+
         // cari beban produksi dari produksi yang diinput
         $data_production_cost = DB::table("beban_produksi")
-                                ->where('beban_produksi.id_produksi', $production_id)
+                                ->where('beban_produksi.id_produksi', $id_hasil_produksi)
                                 ->first();
+
+        if(empty($data_production_cost)){
+            return false;
+        }
 
         // init beban listrik dan pegawai
         $beban_listrik = round($data_production_cost->kwh_beban_produksi, 2);
@@ -2361,7 +2376,7 @@ class ApiController extends Controller
         // cari data produksi detail untuk melakukan update beban biaya
         $data_production_detail = DB::table("produksi_detail")
                                     ->join('master_qr_code', 'master_qr_code.kode_batang_master_qr_code', 'produksi_detail.kode_batang_lama_produksi_detail')
-                                    ->where('produksi_detail.id_produksi', $production_id)
+                                    ->where('produksi_detail.id_produksi', $id_hasil_produksi)
                                     ->get();
 
         // data return biaya listrik dan pegawai
@@ -2379,7 +2394,7 @@ class ApiController extends Controller
         $data_production_results = DB::table("produksi_detail")
                                     ->join('produksi', 'produksi.id_produksi', 'produksi_detail.id_produksi')
                                     ->join('barang', 'barang.id_barang', 'produksi_detail.id_barang')
-                                    ->join('master_qr_code', 'master_qr_code.kode_batang_master_qr_code', 'produksi_detail.kode_batang_lama_produksi_detail')
+                                    ->join('master_qr_code', 'master_qr_code.kode_batang_master_qr_code', 'produksi_detail.kode_batang_produksi_detail')
                                     ->select('produksi_detail.*')
                                     ->where('produksi.nomor_referensi_produksi', $production_id)
                                     ->orderBy('produksi_detail.id_barang', 'ASC')
@@ -2389,7 +2404,7 @@ class ApiController extends Controller
         $total_kredit_produksi = 0;
 
         foreach($data_production_results as $production){
-            $total_kredit_produksi += $production->kredit_produksi_detail;
+            $total_kredit_produksi += $production->debit_produksi_detail;
         }
 
         // hitung harga produksi, listrik dan pegawai
@@ -2401,7 +2416,7 @@ class ApiController extends Controller
         foreach($data_production_results as $production){
             DB::table("master_qr_code")
             ->where('id_barang', $production->id_barang)
-            ->where('kode_batang_master_qr_code', $production->kode_batang_lama_produksi_detail)
+            ->where('kode_batang_master_qr_code', $production->kode_batang_produksi_detail)
             ->update([
                 'produksi_master_qr_code' => $harga_produksi,
                 'listrik_master_qr_code' => $harga_listrik,
@@ -2414,11 +2429,11 @@ class ApiController extends Controller
         $data_production_results_groupby_barang = DB::table("produksi_detail")
                                                 ->join('produksi', 'produksi.id_produksi', 'produksi_detail.id_produksi')
                                                 ->join('barang', 'barang.id_barang', 'produksi_detail.id_barang')
-                                                ->join('master_qr_code', 'master_qr_code.kode_batang_master_qr_code', 'produksi_detail.kode_batang_lama_produksi_detail')
+                                                ->join('master_qr_code', 'master_qr_code.kode_batang_master_qr_code', 'produksi_detail.kode_batang_produksi_detail')
                                                 ->selectRaw('produksi_detail.id_barang,
-                                                ROUND(SUM(kredit_produksi_detail),2) as kredit_produksi_detail,
+                                                ROUND(SUM(debit_produksi_detail),2) as debit_produksi_detail,
                                                 barang.id_akun,
-                                                ROUND(SUM(ROUND(master_qr_code.listrik_master_qr_code * produksi_detail.kredit_produksi_detail, 2) + ROUND(master_qr_code.pegawai_master_qr_code * produksi_detail.kredit_produksi_detail, 2) + ROUND(master_qr_code.produksi_master_qr_code * produksi_detail.kredit_produksi_detail, 2)), 2) as total')
+                                                ROUND(SUM(ROUND(master_qr_code.listrik_master_qr_code * produksi_detail.debit_produksi_detail, 2) + ROUND(master_qr_code.pegawai_master_qr_code * produksi_detail.debit_produksi_detail, 2) + ROUND(master_qr_code.produksi_master_qr_code * produksi_detail.debit_produksi_detail, 2)), 2) as total')
                                                 ->where('produksi.nomor_referensi_produksi', $production_id)
                                                 ->groupBy('produksi_detail.id_barang')
                                                 ->orderBy('produksi_detail.id_barang', 'ASC')
@@ -2450,13 +2465,41 @@ class ApiController extends Controller
         $void = $request->void;
 
         $data_produksi = DB::table('produksi')->where('nama_produksi', $no_transaksi)->first();
+
+        if(empty($data_produksi)){
+            DB::rollBack();
+            return response()->json([
+                "result" => false,
+                "code" => 400,
+                "message" => "Error when store Jurnal Hpp data. Please re-check no_transaksi, Produksi " . $no_transaksi . " not found ",
+            ], 400);
+        }
+
         $id_produksi = $data_produksi->id_produksi;
 
         // tahap 1
         $data_production_supplies = $this->productionSupplies($id_produksi);
 
+        if($data_production_supplies == false){
+            DB::rollBack();
+            return response()->json([
+                "result" => false,
+                "code" => 400,
+                "message" => "Error when store Jurnal Hpp data. Data Produksi " . $no_transaksi . " not found ",
+            ], 400);
+        }
+
         // tahap 2 dan 3
         $data_production_cost = $this->productionCost($id_produksi, $id_cabang);
+
+        if($data_production_cost == false){
+            DB::rollBack();
+            return response()->json([
+                "result" => false,
+                "code" => 400,
+                "message" => "Error when store Jurnal Hpp data. Data Beban Produksi " . $no_transaksi . " not found ",
+            ], 400);
+        }
 
         $total_supplies = $data_production_supplies['total_supplies'];
         $biaya_listrik = $data_production_cost['biaya_listrik'];
@@ -2472,6 +2515,15 @@ class ApiController extends Controller
         $data_pemakaian = $data_production_supplies['data_supplies'];
         $data_hasil = $data_production_results['data_results'];
         $user_data = Auth::guard('api')->user();
+
+        if(count($data_hasil) < 1){
+            DB::rollBack();
+            return response()->json([
+                "result" => false,
+                "code" => 400,
+                "message" => "Error when store Jurnal Hpp data. Data Hasil Produksi empty",
+            ], 400);
+        }
 
         $data = [
             'id_transaksi' => $id_transaksi,
@@ -2499,147 +2551,6 @@ class ApiController extends Controller
                 "code" => 400,
                 "message" => "Error when store Jurnal Hpp data",
             ], 400);
-        }
-    }
-
-    public function journalHppClosing(Request $request){
-        $date = $request->date;
-        $cabangID = $request->id_cabang;
-
-        $param_bulan = date('m', strtotime($date));
-        $param_tahun = date('Y', strtotime($date));
-
-        $get_akun_biaya_listrik = Setting::where("id_cabang", $cabangID)->where("code", "Biaya Listrik")->first();
-        $get_akun_biaya_operator = Setting::where("id_cabang", $cabangID)->where("code", "Biaya Operator")->first();
-        $get_akun_pembulatan = Setting::where("id_cabang", $cabangID)->where("code", "Pembulatan")->first();
-
-        $biaya_listrik = JurnalHeader::join('jurnal_detail', 'jurnal_detail.id_jurnal', 'jurnal_header.id_jurnal')
-                        ->whereRaw('MONTH(tanggal_jurnal) = ' . $param_bulan)
-                        ->whereRaw('YEAR(tanggal_jurnal) = ' . $param_tahun)
-                        ->where('jurnal_header.void', 0)
-                        // ->whereNull('jurnal_header.id_transaksi')
-                        ->where('jurnal_detail.id_akun', $get_akun_biaya_listrik->value2)
-                        ->select(DB::raw('SUM(jurnal_detail.debet - jurnal_detail.credit) as total_listrik'))
-                        ->first();
-
-        $biaya_operator = JurnalHeader::join('jurnal_detail', 'jurnal_detail.id_jurnal', 'jurnal_header.id_jurnal')
-                        ->whereRaw('MONTH(tanggal_jurnal) = ' . $param_bulan)
-                        ->whereRaw('YEAR(tanggal_jurnal) = ' . $param_tahun)
-                        ->where('jurnal_header.void', 0)
-                        // ->whereNull('jurnal_header.id_transaksi')
-                        ->where('jurnal_detail.id_akun', $get_akun_biaya_operator->value2)
-                        ->select(DB::raw('SUM(jurnal_detail.debet - jurnal_detail.credit) as total_gaji'))
-                        ->first();
-
-        $data_beban_produksi = DB::table('beban_produksi')->join('produksi', 'produksi.id_produksi', 'beban_produksi.id_produksi')
-                        ->whereRaw('MONTH(tanggal_produksi) = ' . $param_bulan)
-                        ->whereRaw('YEAR(tanggal_produksi) = ' . $param_tahun)
-                        ->selectRaw('SUM(beban_produksi.tenaga_kerja_beban_produksi * beban_produksi.listrik_beban_produksi) as tenaga,
-                            SUM(beban_produksi.kwh_beban_produksi) as listrik')
-                        ->first();
-
-        $avg_listrik = $biaya_listrik->total_listrik / $data_beban_produksi->listrik;
-        $avg_gaji = $biaya_operator->total_gaji / $data_beban_produksi->tenaga;
-
-        Log::debug(json_encode($biaya_listrik));
-        Log::debug(json_encode($biaya_operator));
-        Log::debug(json_encode($data_beban_produksi));
-
-        $data_produksi = DB::table('produksi')->whereRaw('MONTH(tanggal_produksi) = ' . $param_bulan)
-                        ->whereRaw('YEAR(tanggal_produksi) = ' . $param_tahun)
-                        ->where('produksi.id_jenis_transaksi', 17)
-                        ->get();
-
-        foreach($data_produksi as $produksi){
-            $beban_produksi = DB::table('beban_produksi')->where('id_produksi', $produksi->id_produksi)
-                                    ->first();
-
-            $tenaga_produksi = $beban_produksi->tenaga_kerja_beban_produksi * $beban_produksi->listrik_beban_produksi;
-            $listrik_produksi = $beban_produksi->kwh_beban_produksi;
-
-            $nominal_tenaga_produksi = $tenaga_produksi * $avg_gaji;
-            $nominal_listrik_produksi = $listrik_produksi * $avg_listrik;
-
-
-            // cari hasil produksi dari input produksi yang berlangsung
-            $data_production_results = DB::table("produksi_detail")
-                ->join('produksi', 'produksi.id_produksi', 'produksi_detail.id_produksi')
-                ->join('barang', 'barang.id_barang', 'produksi_detail.id_barang')
-                ->join('master_qr_code', 'master_qr_code.kode_batang_master_qr_code', 'produksi_detail.kode_batang_lama_produksi_detail')
-                ->select('produksi_detail.*')
-                ->where('produksi.nomor_referensi_produksi', $produksi->id_produksi)
-                ->orderBy('produksi_detail.id_barang', 'ASC')
-                ->get();
-
-            // hitung total kredit hasil produksi
-            $total_kredit_produksi = 0;
-
-            foreach($data_production_results as $production){
-                $total_kredit_produksi += $production->kredit_produksi_detail;
-            }
-
-            // hitung harga listrik dan pegawai
-            $harga_listrik = round(($nominal_listrik_produksi/$total_kredit_produksi), 2);
-            $harga_pegawai = round(($nominal_tenaga_produksi/$total_kredit_produksi), 2);
-
-            // update beban biaya dari tiap produksi detail
-            foreach($data_production_results as $production){
-                DB::table("master_qr_code")
-                ->where('id_barang', $production->id_barang)
-                ->where('kode_batang_master_qr_code', $production->kode_batang_lama_produksi_detail)
-                ->update([
-                    'listrik_master_qr_code' => $harga_listrik,
-                    'pegawai_master_qr_code' => $harga_pegawai,
-                ]);
-            }
-
-
-            // cari total hasil produksi detail
-            $data_production_results_groupby_barang = DB::table("produksi_detail")
-                                ->join('produksi', 'produksi.id_produksi', 'produksi_detail.id_produksi')
-                                ->join('barang', 'barang.id_barang', 'produksi_detail.id_barang')
-                                ->join('master_qr_code', 'master_qr_code.kode_batang_master_qr_code', 'produksi_detail.kode_batang_lama_produksi_detail')
-                                ->selectRaw('produksi_detail.id_barang,
-                                ROUND(SUM(kredit_produksi_detail),2) as kredit_produksi_detail,
-                                barang.id_akun,
-                                ROUND(SUM(ROUND(master_qr_code.listrik_master_qr_code * produksi_detail.kredit_produksi_detail, 2) + ROUND(master_qr_code.pegawai_master_qr_code * produksi_detail.kredit_produksi_detail, 2) + ROUND(master_qr_code.produksi_master_qr_code * produksi_detail.kredit_produksi_detail, 2)), 2) as total')
-                                ->where('produksi.nomor_referensi_produksi', $produksi->id_produksi)
-                                ->groupBy('produksi_detail.id_barang')
-                                ->orderBy('produksi_detail.id_barang', 'ASC')
-                                ->get();
-
-            Log::debug(json_encode($data_production_results_groupby_barang));
-
-            $data_results = [];
-
-            foreach($data_production_results_groupby_barang as $production){
-                array_push($data_results, [
-                    'akun' => $production->id_akun,
-                    'notes' => $production->id_barang,
-                    'debet' => round($production->total, 2),
-                    'kredit' => 0,
-                ]);
-            }
-
-            // tahap 1
-            $data_production_supplies = $this->productionSupplies($produksi->id_produksi);
-            $data_pemakaian = $data_production_supplies['data_supplies'];
-
-            $user_data = Auth::guard('api')->user();
-
-            $data = [
-                'id_transaksi' => $produksi->id_produksi,
-                'cabang' => $cabangID,
-                'data_pemakaian' => $data_pemakaian,
-                'biaya_listrik' => $nominal_listrik_produksi,
-                'biaya_operator' => $nominal_tenaga_produksi,
-                'data_hasil' => $data_results,
-                'user_data' => $user_data,
-                'void' => 0
-            ];
-
-            // tahap 5
-            $store_data =  $this->storeHppJournal($data);
         }
     }
 
@@ -2774,7 +2685,7 @@ class ApiController extends Controller
                     return FALSE;
                 }
                 Log::debug($detail);
-                
+
                 $total_debet += $detail->debet;
                 $total_credit += $detail->credit;
                 $list_transaksi .= $value['nama_transaksi'] . ';';
@@ -2823,7 +2734,7 @@ class ApiController extends Controller
                 }
                 Log::debug($detail);
             }
-            
+
             DB::commit();
             return TRUE;
         } catch (\Exception $e) {
@@ -2966,7 +2877,7 @@ class ApiController extends Controller
                     return FALSE;
                 }
                 Log::debug($detail);
-                
+
                 $total_debet += $detail->debet;
                 $total_credit += $detail->credit;
                 $list_transaksi .= $value['nama_transaksi'] . ';';
@@ -3015,7 +2926,7 @@ class ApiController extends Controller
                 }
                 Log::debug($detail);
             }
-            
+
             DB::commit();
             return TRUE;
         } catch (\Exception $e) {
