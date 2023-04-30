@@ -1090,7 +1090,7 @@
                     <li class="{{ request()->segment(2) == 'adjustment_ledger' ? 'active' : null }}">
                         <a href="{{ route('transaction-adjustment-ledger', 1) }}">Jurnal Penyesuaian</a>
                     </li>
-                    <li class="{{ request()->segment(2) == 'cloing_journal' ? 'active' : null }}">
+                    <li class="{{ request()->segment(2) == 'closing_journal' ? 'active' : null }}">
                         <a href="{{ route('transaction-closing-journal', 1) }}">Jurnal Closing</a>
                     </li>
                 </ul>
@@ -1104,6 +1104,9 @@
                 <ul class="treeview-menu">
                     <li class="{{ request()->segment(1) == 'report' && request()->segment(2) == 'slip' ? 'active' : null }}">
                         <a href="{{ route('report-slip', 1) }}">Slip</a>
+                    </li>
+                    <li class="{{ request()->segment(1) == 'report' && request()->segment(2) == 'general_ledger' ? 'active' : null }}">
+                        <a href="{{ route('report-general-ledger', 1) }}">Buku Besar</a>
                     </li>
                 </ul>
             </li>
