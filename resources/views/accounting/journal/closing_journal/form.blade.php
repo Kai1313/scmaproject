@@ -257,48 +257,6 @@
 
             // Start ajax chain
             save_data(routeClosingStore, param, "1")
-            // Ajax 1
-            // $.ajax({
-            //     type: "GET",
-            //     url: routeInventoryTransfer+param,
-            // }).done(function(data) {
-            //     // console.log("response")
-            //     // console.log(data)
-            //     let res1 = '<span><i class="fa fa-check-circle" style="color: green;"></i> '+data.message+'</span>'
-            //     let fail1 = '<span><i class="fa fa-times-circle" style="color: red;"></i> Proses jurnal closing Inventory Transfer gagal. '+data.message+'</span>'
-            //     if (data.result) {
-            //         // console.log("another ajax")
-            //         $("#response1").append(res1)
-            //         // Ajax 2
-            //         $.ajax({
-            //             type: "GET",
-            //             url: routeStockCorrection+param,
-            //         }).done(function(data) {
-            //             console.log("2nd ajax response")
-            //             console.log(data)
-            //             let res2 = '<span><i class="fa fa-check-circle" style="color: green;"></i>'+data.message+'</span>'
-            //             let fail2 = '<span><i class="fa fa-times-circle" style="color: red;"></i> Proses jurnal closing Koreksi Stok gagal. '+data.message+'</span>'
-            //             if (data.result) {
-            //                 console.log("2nd succeed")
-            //                 $("#response2").append(res2)
-            //                 myButton.disabled = false
-            //                 myButton.innerHTML = "Submit"
-            //             }
-            //             else {
-            //                 console.log("2nd ajax response false")
-            //                 $("#response2").append(fail2)
-            //                 myButton.disabled = false
-            //                 myButton.innerHTML = "Submit"
-            //             }
-            //         })
-            //     }
-            //     else {
-            //         console.log("ajax response false")
-            //         $("#response1").append(fail1)
-            //         myButton.disabled = false
-            //         myButton.innerHTML = "Submit"
-            //     }
-            // })
         })
 
         $(document).on('select2:open', () => {
@@ -335,31 +293,12 @@
                 console.log("ajax response false "+step)
                 $("#response"+step).append(fail)
                 myButton.disabled = false
-                myButton.innerHTML = "Submit"
+                myButton.innerHTML = "Proses"
             }
         })
     }
 
     function steps(step, param) {
-        // switch (step) {
-        //     case "1":
-        //         save_data(routeInventoryTransfer, param, "2")
-        //         break;
-        //     case "2":
-        //         save_data(routeStockCorrection, param, "3")
-        //         break;
-        //     case "3":
-        //         save_data(routeSales, param, "4")
-        //         break;
-        //     case "4":
-        //         save_data(routeDepreciation, param, "5")
-        //         break;
-
-        //     default:
-        //         myButton.disabled = false
-        //         myButton.innerHTML = "Submit"
-        //         break;
-        // }
         switch (step) {
             case "1":
                 save_data(routeProduction, param, "2")
@@ -379,7 +318,7 @@
 
             default:
                 myButton.disabled = false
-                myButton.innerHTML = "Submit"
+                myButton.innerHTML = "Proses"
                 break;
         }
     }
