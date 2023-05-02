@@ -44,8 +44,8 @@
 @section('header')
 <section class="content-header">
     <h1>
-        Report Giro
-        <small></small>
+        Report
+        <small> | Giro</small>
     </h1>
     <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> Dashboard</a></li>
@@ -57,11 +57,18 @@
 <div class="content container-fluid">
     <div class="row">
         <div class="col-xs-12">
-            <div class="box">
+            <div class="box box-primary">
                 <form id="form_report" action="" method="post">
                     <div class="box-header">
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-xs-12">
+                                <h3 class="box-title">Report Giro</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-md-2">
                                 <div class="form-group" id="cabang-group">
                                     <label>Cabang</label>
                                     <select name="cabang" id="cabang" class="form-control select2" style="width: 100%;" data-validation="[NOTEMPTY]" data-validation-message="Cabang tidak boleh kosong">
@@ -73,7 +80,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-2">
                                 <div class="form-group" id="slip-group">
                                     <label>Slip</label>
                                     <select name="slip" id="slip" class="form-control select2" style="width: 100%;" data-validation="[NOTEMPTY]" data-validation-message="Slip tidak boleh kosong">
@@ -86,9 +93,7 @@
                                     </select>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-2">
                                 <div class="form-group" id="status-group">
                                     <label>Tipe</label>
                                     <select name="tipe" id="tipe" class="form-control select2" style="width: 100%;" data-validation="[NOTEMPTY]" data-validation-message="Tipe tidak boleh kosong">
@@ -97,15 +102,13 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-2">
                                 <div class="form-group" id="date-group">
                                     <label>Tanggal</label>
                                     <input type="text" name="giro_date" id="giro_date" class="form-control datepicker" style="width: 100%;" data-validation="[NOTEMPTY]" data-validation-message="Tanggal Giro tidak boleh kosong" value="{{date('Y-m-d')}}">
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-2">
                                 <div class="form-group" id="status-group">
                                     <label>Status</label>
                                     <select name="status" id="status" class="form-control select2" style="width: 100%;" data-validation="[NOTEMPTY]" data-validation-message="Status tidak boleh kosong">
@@ -121,9 +124,9 @@
                         </div>
                         <div class="row">
                             <div class="col-md-12">
-                                <button type="button" name="view" value="View" id="btn-view-report" class="btn btn-sm btn-warning btn-flat pull-right mr-1"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> View</button>
-                                <button type="button" name="excel" value="Excel" id="btn-excel-report" class="btn btn-sm btn-success btn-flat pull-right mr-1"><span class="glyphicon glyphicon-save-file" aria-hidden="true"></span> Excel</button>
-                                <button type="button" name="pdf" value="Pdf" id="btn-pdf-report" class="btn btn-sm btn-danger btn-flat pull-right mr-1"><span class="glyphicon glyphicon-save-file" aria-hidden="true"></span> PDF</button>
+                                <button type="button" name="view" value="View" id="btn-view-report" class="btn btn-sm btn-default pull-right mr-1"><i class="fa fa-eye"></i> View</button>
+                                <button type="button" name="excel" value="Excel" id="btn-excel-report" class="btn btn-sm btn-success pull-right mr-1"><i class="fa fa-file-excel-o"></i> Excel</button>
+                                <button type="button" name="pdf" value="Pdf" id="btn-pdf-report" class="btn btn-sm btn-danger pull-right mr-1"><i class="fa fa-print"></i> Print</button>
                             </div>
                         </div>
                     </div>

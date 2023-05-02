@@ -83,12 +83,12 @@
     </table>
     <table width="100%" class="table-bordered" style="margin-top: 20px">
         <thead style="font-size: 14px;">
-            <tr>
+            <tr style="font-size: 12px;">
                 <th colspan="6">Giro</th>
                 <th colspan="3">Cair</th>
                 <th colspan="2">Tolak</th>
             </tr>
-            <tr style="font-size: 14px;">
+            <tr style="font-size: 12px;">
                 <th width="10%">No Jurnal</th>
                 <th width="7%">Tanggal Jurnal</th>
                 <th width="11%">No Giro</th>

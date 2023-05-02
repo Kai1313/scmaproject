@@ -44,8 +44,8 @@
 @section('header')
 <section class="content-header">
     <h1>
-        Report Slip
-        <small></small>
+        Report
+        <small> | Slip</small>
     </h1>
     <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> Dashboard</a></li>
@@ -57,11 +57,18 @@
 <div class="content container-fluid">
     <div class="row">
         <div class="col-xs-12">
-            <div class="box">
+            <div class="box box-primary">
                 <form id="form_report" action="" method="post">
                     <div class="box-header">
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-xs-12">
+                                <h3 class="box-title">Report Slip</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-md-3">
                                 <div class="form-group" id="cabang-group">
                                     <label>Cabang</label>
                                     <select name="cabang" id="cabang" class="form-control select2" style="width: 100%;" data-validation="[NOTEMPTY]" data-validation-message="Cabang tidak boleh kosong">
@@ -73,7 +80,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-3">
                                 <div class="form-group" id="slip-group">
                                     <label>Slip</label>
                                     <select name="slip" id="slip" class="form-control select2" style="width: 100%;" data-validation="[NOTEMPTY]" data-validation-message="Slip tidak boleh kosong">
@@ -85,15 +92,13 @@
                                     </select>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-3">
                                 <div class="form-group" id="start-group">
                                     <label>Awal Period</label>
                                     <input type="text" name="start_date" id="start_date" class="form-control datepicker" style="width: 100%;" data-validation="[NOTEMPTY]" data-validation-message="Awal Period tidak boleh kosong" value="{{date('Y-m-d')}}">
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-3">
                                 <div class="form-group" id="end-group">
                                     <label>Akhir Period</label>
                                     <input type="text" name="end_date" id="end_date" class="form-control datepicker" style="width: 100%;" data-validation="[NOTEMPTY]" data-validation-message="Akhir Period tidak boleh kosong" value="{{date('Y-m-d')}}">
@@ -102,9 +107,9 @@
                         </div>
                         <div class="row">
                             <div class="col-md-12">
-                                <button type="button" name="view" value="View" id="btn-view-report" class="btn btn-sm btn-warning btn-flat pull-right mr-1"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> View</button>
-                                <button type="button" name="excel" value="Excel" id="btn-excel-report" class="btn btn-sm btn-success btn-flat pull-right mr-1"><span class="glyphicon glyphicon-save-file" aria-hidden="true"></span> Excel</button>
-                                <button type="button" name="pdf" value="Pdf" id="btn-pdf-report" class="btn btn-sm btn-danger btn-flat pull-right mr-1"><span class="glyphicon glyphicon-save-file" aria-hidden="true"></span> PDF</button>
+                                <button type="button" name="view" value="View" id="btn-view-report" class="btn btn-sm btn-default pull-right mr-1"><i class="fa fa-eye"></i> View</button>
+                                <button type="button" name="excel" value="Excel" id="btn-excel-report" class="btn btn-sm btn-success pull-right mr-1"><i class="fa fa-file-excel-o"></i> Excel</button>
+                                <button type="button" name="pdf" value="Pdf" id="btn-pdf-report" class="btn btn-sm btn-danger pull-right mr-1"><i class="fa fa-print"></i> Print</button>
                             </div>
                         </div>
                     </div>
@@ -185,7 +190,6 @@
 
             if (form.status) {
                 populate_table(form.data)
-                $('#table_report').css('display', '')
             }
         });
 
@@ -207,7 +211,29 @@
             if (form.status) {
                 let base_url = "{{ url('') }}";
 
-                window.open(base_url + '/report/slip/pdf?cabang=' + form.data.cabang + '&slip=' + form.data.slip + '&start_date=' + form.data.start_date + '&end_date=' + form.data.end_date);
+                let route = base_url + '/report/slip/pdf?cabang=' + form.data.cabang + '&slip=' + form.data.slip + '&start_date=' + form.data.start_date + '&end_date=' + form.data.end_date;
+
+                $.ajax({
+                    type: "GET",
+                    url: route
+                }).done(function(data) {
+                    console.log(data)
+                    if (data.result) {
+                        // Create a new anchor element
+                        var link = document.createElement('a');
+                        // Set the PDF data as href attribute
+                        link.href = 'data:application/pdf;base64,' + data.pdfData;
+                        // Set the PDF headers as download attribute
+                        link.setAttribute('download', 'ReportSlips.pdf');
+                        link.setAttribute('target', '_blank');
+                        // Append the anchor element to the document
+                        document.body.appendChild(link);
+                        // Trigger a click on the anchor element to download the PDF
+                        link.click();
+                        // Remove the anchor element from the document
+                        document.body.removeChild(link);
+                    }
+                })
             }
         });
     })
@@ -285,39 +311,96 @@
         let get_data_url = "{{ route('report-slip-populate') }}"
         get_data_url += '?cabang=' + data.cabang + '&slip=' + data.slip + '&start_date=' + data.start_date + '&end_date=' + data.end_date
 
-        $.ajax({
-            type: "GET",
-            url: get_data_url,
-            success: function(data) {
-                $('.data-report').remove();
-                let rows = '';
-                let balance = 0;
+        $('#table_report').css('display', '')
 
-                if (data.mutasis.length > 0) {
-                    data.saldo_awal.forEach(data => {
-                        balance = parseFloat(balance) + parseFloat(data.debet)
-                        balance = parseFloat(balance) - parseFloat(data.credit)
-                        let id_transaksi = data.id_transaksi == null ? '' : data.id_transaksi
-                        let notes = data.keterangan.replace(/\n/g, '<br>')
-                        rows += "<tr class='data-report'><td align='center'>" + data.tanggal_jurnal + "</td><td align='left'>" + data.kode_jurnal + "</td><td>" + data.nama_slip + "</td><td>" + data.nama_akun + "</td><td>" + notes + "</td><td>" + id_transaksi + "</td><td align='right'>" + formatCurr(formatNumberAsFloatFromDB(data.debet)) + "</td><td align='right'>" + formatCurr(formatNumberAsFloatFromDB(data.credit)) + "</td><td align='right'>" + formatCurr(balance) + "</td></tr>"
-                    });
-
-                    data.mutasis.forEach(data => {
-                        balance = parseFloat(balance) + parseFloat(data.debet)
-                        balance = parseFloat(balance) - parseFloat(data.credit)
-                        let id_transaksi = data.id_transaksi == null ? '' : data.id_transaksi
-                        let notes = data.keterangan.replace(/\n/g, '<br>')
-                        rows += "<tr class='data-report'><td align='center'>" + data.tanggal_jurnal + "</td><td align='left'>" + data.kode_jurnal + "</td><td>" + data.nama_slip + "</td><td>" + data.nama_akun + "</td><td>" + notes + "</td><td>" + id_transaksi + "</td><td align='right'>" + formatCurr(formatNumberAsFloatFromDB(data.debet)) + "</td><td align='right'>" + formatCurr(formatNumberAsFloatFromDB(data.credit)) + "</td><td align='right'>" + formatCurr(balance) + "</td></tr>"
-                    });
-                } else {
-                    rows += '<tr class="data-report"><td colspan="8" align="center">No data<td></tr>'
+        $('#table_report').DataTable().destroy();
+        $('#table_report').DataTable({
+            processing: true,
+            serverSide: true,
+            "scrollX": true,
+            "bDestroy": true,
+            responsive: true,
+            ajax: {
+                "url": get_data_url,
+                "type": "GET",
+                "dataType": "JSON",
+                "error": function(xhr, textStatus, ThrownException) {
+                    alert("Error loading data. Exception: " + ThrownException + '\n' + textStatus)
                 }
-
-                $('#table_report').append(rows);
             },
-            error: function(data) {
-                Swal.fire("Sorry, Can't get data. ", data.responseJSON.message, 'error')
-            }
+            columns: [{
+                    data: 'tanggal_jurnal',
+                    name: 'tanggal_jurnal',
+                    className: 'text-center',
+                    width: '7%'
+                },
+                {
+                    data: 'kode_jurnal',
+                    name: 'kode_jurnal',
+                    className: 'text-left',
+                    width: '10%'
+                },
+                {
+                    data: 'nama_slip',
+                    name: 'nama_slip',
+                    className: 'text-left',
+                    width: '11%'
+                },
+                {
+                    data: 'nama_akun',
+                    name: 'nama_akun',
+                    className: 'text-left',
+                    width: '10%'
+                },
+                {
+                    data: 'keterangan',
+                    name: 'keterangan',
+                    className: 'text-left',
+                    width: '15%',
+                    render: function(data, type, row) {
+                        return data.replace(/\n/g, '<br>')
+                    }
+                },
+                {
+                    data: 'id_transaksi',
+                    name: 'id_transaksi',
+                    className: 'text-left',
+                    width: '10%'
+                },
+                {
+                    data: 'debet',
+                    name: 'debet',
+                    width: '9%',
+                    searchable: false,
+                    orderable: false,
+                    className: 'text-right',
+                    render: function(data, type, row) {
+                        return formatCurr(formatNumberAsFloatFromDB(data))
+                    }
+                },
+                {
+                    data: 'credit',
+                    name: 'credit',
+                    width: '9%',
+                    searchable: false,
+                    orderable: false,
+                    className: 'text-right',
+                    render: function(data, type, row) {
+                        return formatCurr(formatNumberAsFloatFromDB(data))
+                    }
+                },
+                {
+                    data: 'balance',
+                    name: 'balance',
+                    width: '9%',
+                    searchable: false,
+                    orderable: false,
+                    className: 'text-right',
+                    render: function(data, type, row) {
+                        return formatCurr(formatNumberAsFloatFromDB(data))
+                    }
+                }
+            ],
         })
     }
 

@@ -20,7 +20,7 @@ class ReportGiroController extends Controller
         }
 
         $data_cabang = Cabang::all();
-        $data_slip = Slip::all();
+        $data_slip = Slip::where('jenis_slip', 2)->orWhere('jenis_slip', 3)->get();
         $data_status = array(
             array(
                 'value' => 'All',
@@ -82,7 +82,7 @@ class ReportGiroController extends Controller
             ->where('head.void', 0)
             ->where('head.id_cabang', $cabang)
             ->where('head.jenis_jurnal', $tipe)
-            ->where('head.tanggal_giro_jt', $tanggal);
+            ->where('head.tanggal_giro_jt', '<=',  $tanggal);
 
         if ($slip != 'All') {
             $giro = $giro->where('head.id_slip', $slip);
@@ -195,7 +195,7 @@ class ReportGiroController extends Controller
             ->where('head.void', 0)
             ->where('head.id_cabang', $cabang)
             ->where('head.jenis_jurnal', $tipe)
-            ->where('head.tanggal_giro_jt', $tanggal);
+            ->where('head.tanggal_giro_jt', '<=', $tanggal);
 
         if ($slip != 'All') {
             $giro = $giro->where('head.id_slip', $slip);
@@ -216,7 +216,6 @@ class ReportGiroController extends Controller
 
         $data = $giro->get();
 
-        Log::debug($data);
         foreach ($data as $key => $value) {
             $cair = DB::table('jurnal_header as head')
                 ->join('saldo_transaksi as saldo', 'saldo.id_jurnal', 'head.id_jurnal')
@@ -228,7 +227,6 @@ class ReportGiroController extends Controller
                 ->where('saldo.sisa', '=', 0)
                 ->where('saldo.status_giro', '=', 1)
                 ->first();
-            Log::debug(json_encode($cair));
 
             $value->cair_kode_jurnal = isset($cair) ? $cair->kode_jurnal : '';
             $value->cair_tanggal_giro = isset($cair) ? $cair->tanggal_giro_jt : '';
@@ -244,25 +242,23 @@ class ReportGiroController extends Controller
                 ->where('saldo.sisa', '=', 0)
                 ->where('saldo.status_giro', '=', 2)
                 ->first();
-            Log::debug(json_encode($tolak));
 
             $value->tolak_kode_jurnal = isset($tolak) ? $tolak->kode_jurnal : '';
             $value->tolak_tanggal_giro = isset($tolak) ? $tolak->tanggal_giro_jt : '';
         }
 
-        Log::debug($data);
-
         $cabang = $cabang == 'All' ? 'All' : Cabang::find($cabang)->nama_cabang;
         $slip = $slip == 'All' ? 'All' : Slip::find($slip)->nama_slip;
-        
-        if ($status == 0) {
+        $tipe = $tipe == 'PG' ? 'Piutang Giro' : 'Hutang Giro';
+
+        if ($status == '0') {
             $status = 'Belum Cair';
-        } else if ($status  == 1) {
+        } else if ($status == '1') {
             $status = 'Cair';
-        } else if ($status == 2) {
+        } else if ($status == '2') {
             $status = 'Tolak';
         } else {
-            $status = $status;
+            $status = 'All';
         }
 
         $datas = [

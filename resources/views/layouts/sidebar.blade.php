@@ -1072,7 +1072,7 @@
                     <li class="{{ request()->segment(2) == 'coa' ? 'active' : null }}">
                         <a href="{{ route('master-coa', 1) }}">Master CoA</a>
                     </li>
-                    <li class="{{ request()->segment(2) == 'slip' ? 'active' : null }}">
+                    <li class="{{ request()->segment(1) == 'master' && request()->segment(2) == 'slip' ? 'active' : null }}">
                         <a href="{{ route('master-slip', 1) }}">Master Slip</a>
                     </li>
                 </ul>
@@ -1084,7 +1084,7 @@
                     </span>
                 </a>
                 <ul class="treeview-menu">
-                    <li class="{{ request()->segment(2) == 'general_ledger' ? 'active' : null }}">
+                    <li class="{{ request()->segment(1) == 'transaction' && request()->segment(2) == 'slip' ? 'active' : null }}">
                         <a href="{{ route('transaction-general-ledger', 1) }}">Jurnal Umum</a>
                     </li>
                     <li class="{{ request()->segment(2) == 'adjustment_ledger' ? 'active' : null }}">
@@ -1105,11 +1105,11 @@
                     <li class="{{ request()->segment(1) == 'report' && request()->segment(2) == 'slip' ? 'active' : null }}">
                         <a href="{{ route('report-slip', 1) }}">Slip</a>
                     </li>
-                    <li class="{{ request()->segment(1) == 'report' && request()->segment(2) == 'general_ledger' ? 'active' : null }}">
-                        <a href="{{ route('report-general-ledger', 1) }}">Buku Besar</a>
-                    </li>
                     <li class="{{ request()->segment(1) == 'report' && request()->segment(2) == 'giro' ? 'active' : null }}">
                         <a href="{{ route('report-giro', 1) }}">Giro</a>
+                    </li>
+                    <li class="{{ request()->segment(1) == 'report' && request()->segment(2) == 'general_ledger' ? 'active' : null }}">
+                        <a href="{{ route('report-general-ledger', 1) }}">Buku Besar</a>
                     </li>
                 </ul>
             </li>

@@ -43,7 +43,7 @@ class ReportGiroExport implements FromView
             ->where('head.void', 0)
             ->where('head.id_cabang', $this->cabang)
             ->where('head.jenis_jurnal', $this->tipe)
-            ->where('head.tanggal_giro_jt', $this->tanggal);
+            ->where('head.tanggal_giro_jt', '<=', $this->tanggal);
 
         if ($this->slip != 'All') {
             $giro = $giro->where('head.id_slip', $this->slip);
@@ -100,16 +100,17 @@ class ReportGiroExport implements FromView
         Log::debug($data);
 
         $cabang = $this->cabang == 'All' ? 'All' : Cabang::find($this->cabang)->nama_cabang;
-        $slip = $this->slip == 'All' ? 'All' : Slip::find($this->slip)->nama_slip;
+        $slip = $this->slip == 'All' ? 'All' : Slip::find($this->slip)->nama_slip; 
+        $tipe = $this->tipe == 'PG' ? 'Piutang Giro' : 'Hutang Giro';
         
-        if ($this->status == 0) {
+        if ($this->status == '0') {
             $status = 'Belum Cair';
-        } else if ($this->status  == 1) {
+        } else if ($this->status == '1') {
             $status = 'Cair';
-        } else if ($this->status == 2) {
+        } else if ($this->status == '2') {
             $status = 'Tolak';
         } else {
-            $status = $this->status;
+            $status = 'All';
         }
 
         return view('accounting.report.giro.excel', [
@@ -117,7 +118,7 @@ class ReportGiroExport implements FromView
             'cabang' => $cabang,
             'slip' => $slip,
             'tanggal' => $this->tanggal,
-            'tipe' => $this->tipe,
+            'tipe' => $tipe,
             'status' => $status
         ]);
     }

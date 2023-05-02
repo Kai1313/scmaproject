@@ -120,10 +120,10 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-3">
-                                    <button id="btn-view" type="button" class="btn btn-flat btn-default mr-1 mb-1 pull-left"><i class="fa fa-eye"></i> View</button>
-                                    <button id="btn-excel" type="button" class="btn btn-flat btn-success mr-1 mb-1 pull-left"><i class="fa fa-file-excel-o"></i> Excel</button>
-                                    <button id="btn-print" type="button" class="btn btn-flat btn-primary mr-1 mb-1 pull-left"><i class="fa fa-print"></i> Print</button>
+                                <div class="col-md-12">
+                                    <button id="btn-view" type="button" class="btn btn-sm btn-default pull-right mr-1"><i class="fa fa-eye"></i> View</button>
+                                    <button id="btn-excel" type="button" class="btn btn-sm btn-success pull-right mr-1"><i class="fa fa-file-excel-o"></i> Excel</button>
+                                    <button id="btn-print" type="button" class="btn btn-sm btn-danger pull-right mr-1"><i class="fa fa-print"></i> Print</button>
                                     <button id="hidden-btn" style="display:none;" type="submit">HIDDEN</button>
                                 </div>
                             </div>
@@ -231,7 +231,7 @@
                     let end = $("#end_date").val()
                     let type = $("#type").val()
                     let coa = $("#coa").val()
-                    let param = "?id_cabang="+cabang+"&start_date="+start+"&end_date="+end+"&type="+type+"&coa="+coa
+                    let param = "?id_cabang=" + cabang + "&start_date=" + start + "&end_date=" + end + "&type=" + type + "&coa=" + coa
                     let route = "{{ Route('dummy-ajax') }}"
                     route = route + param
                     console.log(route)
@@ -255,7 +255,7 @@
                             printButton.innerHTML = '<i class="fa fa-spinner fa-spin"></i>'
                             print(param)
                             break;
-                    
+
                         default:
                             break;
                     }
@@ -324,20 +324,19 @@
     function save_data(route, param, step) {
         $.ajax({
             type: "GET",
-            url: route+param,
+            url: route + param,
         }).done(function(data) {
-            console.log("ajax response "+step)
+            console.log("ajax response " + step)
             console.log(data)
-            let res = '<span><i class="fa fa-check-circle" style="color: green;"></i>'+data.message+'</span>'
-            let fail = '<span><i class="fa fa-times-circle" style="color: red;"></i> Proses jurnal closing Koreksi Stok gagal. '+data.message+'</span>'
+            let res = '<span><i class="fa fa-check-circle" style="color: green;"></i>' + data.message + '</span>'
+            let fail = '<span><i class="fa fa-times-circle" style="color: red;"></i> Proses jurnal closing Koreksi Stok gagal. ' + data.message + '</span>'
             if (data.result) {
                 console.log("succeed")
-                $("#response"+step).append(res)
+                $("#response" + step).append(res)
                 steps(step, param)
-            }
-            else {
-                console.log("ajax response false "+step)
-                $("#response"+step).append(fail)
+            } else {
+                console.log("ajax response false " + step)
+                $("#response" + step).append(fail)
                 myButton.disabled = false
                 myButton.innerHTML = "Submit"
             }
@@ -357,30 +356,32 @@
                 "bDestroy": true,
                 responsive: true,
                 ajax: {
-                    "url": route+param,
+                    "url": route + param,
                     "type": "GET",
                     "dataType": "JSON",
                     "error": function(xhr, textStatus, ThrownException) {
                         alert("Error loading data. Exception: " + ThrownException + '\n' + textStatus)
                     }
                 },
-                columns: [
-                    {
+                columns: [{
                         data: 'kode_akun',
                         name: 'kode_akun',
                         width: '10%',
+                        className: 'text-left',
                         responsivePriority: 1
                     },
                     {
                         data: 'nama_akun',
                         name: 'nama_akun',
                         width: '12%',
+                        className: 'text-left',
                         responsivePriority: 2
                     },
                     {
                         data: 'saldo_awal',
                         name: 'saldo_awal',
                         width: '10%',
+                        className: 'text-right',
                         searchable: false,
                         orderable: false,
                         render: function(data, type, row) {
@@ -391,6 +392,7 @@
                         data: 'debet',
                         name: 'debet',
                         width: '10%',
+                        className: 'text-right',
                         searchable: false,
                         orderable: false,
                         render: function(data, type, row) {
@@ -401,6 +403,7 @@
                         data: 'kredit',
                         name: 'kredit',
                         width: '10%',
+                        className: 'text-right',
                         searchable: false,
                         orderable: false,
                         render: function(data, type, row) {
@@ -411,6 +414,7 @@
                         data: 'saldo_akhir',
                         name: 'saldo_akhir',
                         width: '10%',
+                        className: 'text-right',
                         searchable: false,
                         orderable: false,
                         render: function(data, type, row) {
@@ -419,8 +423,7 @@
                     },
                 ],
             })
-        }
-        else {
+        } else {
             $("#table_recap_div").hide()
             $("#table_detail_div").show()
             $('#table_detail').DataTable().destroy();
@@ -431,15 +434,14 @@
                 "bDestroy": true,
                 responsive: true,
                 ajax: {
-                    "url": route+param,
+                    "url": route + param,
                     "type": "GET",
                     "dataType": "JSON",
                     "error": function(xhr, textStatus, ThrownException) {
                         alert("Error loading data. Exception: " + ThrownException + '\n' + textStatus)
                     }
                 },
-                columns: [
-                    {
+                columns: [{
                         data: 'tanggal_jurnal',
                         name: 'tanggal_jurnal',
                         width: '10%',
@@ -518,7 +520,7 @@
     function excel(param) {
         let route = "{{ Route('report-general-ledger-excel') }}"
         let base_url = "{{ url('') }}";
-        window.open(route+param)
+        window.open(route + param)
         excelButton.disabled = false
         excelButton.innerHTML = '<i class="fa fa-file-excel-o"></i> Excel'
     }
@@ -527,7 +529,7 @@
         let route = "{{ Route('report-general-ledger-pdf') }}"
         $.ajax({
             type: "GET",
-            url: route+param
+            url: route + param
         }).done(function(data) {
             console.log(data)
             if (data.result) {
@@ -601,7 +603,7 @@
         num = num.split('.').join("");
         num = num.replace(/,/g, '.');
         num = num.toString().replace(/\,/gi, "");
-    
+
         num += '';
         x = num.split('.');
         x1 = x[0];
