@@ -488,6 +488,7 @@
             let modal = $('#modalEntry')
             let valid = validatorModal($('#qr_code').text())
             if (!valid.status) {
+                html5QrcodeScanner.render(onScanSuccess, onScanError);
                 Swal.fire("Gagal proses data. ", valid.message, 'error')
                 return false
             }

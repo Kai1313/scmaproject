@@ -220,22 +220,30 @@
                             <input type="text" name="nama_satuan_barang" class="validate form-control" readonly>
                             <input type="hidden" name="id_satuan_barang" class="validate">
                         </div>
-                        <label>Jumlah Zak <span>*</span></label>
+                        <label id="label-jumlah-zak">Jumlah Zak</label>
                         <div class="form-group">
-                            <input type="text" name="jumlah_zak" class="form-control validate handle-number-4"
-                                autocomplete="off">
+                            <div class="input-group">
+                                <input type="text" name="jumlah_zak" class="form-control validate handle-number-4"
+                                    autocomplete="off">
+                                <span class="input-group-addon" id="max-jumlah-zak"></span>
+                            </div>
+
                             <input type="hidden" name="weight_zak" class="validate">
                             <input type="hidden" name="wrapper_weight" class="validate">
                         </div>
                         <label id="label-timbangan">Timbangan</label>
                         <div class="form-group">
                             <select name="id_timbangan" class="form-control select2">
+                                <option value="">Pilih Timbangan</option>
                             </select>
                         </div>
                         <label id="label-berat">Berat Barang</label>
                         <div class="form-group">
-                            <input type="text" name="jumlah" class="form-control handle-number-4"
-                                autocomplete="off">
+                            <div class="input-group">
+                                <input type="text" name="jumlah" class="form-control handle-number-4"
+                                    autocomplete="off">
+                                <span class="input-group-addon" id="max-jumlah"></span>
+                            </div>
                             <input type="hidden" name="max_weight" class="validate">
                             <label id="alertWeight" style="display:none;color:red;"></label>
                         </div>
@@ -267,7 +275,6 @@
         let branch = {!! json_encode($cabang) !!}
         let timbangan = {!! $timbangan !!}
         let details = {!! $data ? $data->formatdetail : '[]' !!};
-        console.log(details)
         let detailSelect = []
         let count = details.length
         let statusModal = 'create'
@@ -395,17 +402,20 @@
         $('[name="id_timbangan"]').select2({
             data: timbangan
         }).on('select2:select', function(e) {
+            stopInterval()
             let dataselect = e.params.data
-            let beratTimbangan = dataselect.value
-            let beratMax = $('[name="max_weight"]').val()
-            if (parseFloat(beratTimbangan) > parseFloat(beratMax)) {
-                $('#alertWeight').text('Berat melebihi stok').show()
-            } else {
-                $('#alertWeight').text('').hide()
-            }
+            if (dataselect.id != '') {
+                let beratTimbangan = dataselect.value
+                let beratMax = $('[name="max_weight"]').val()
+                if (parseFloat(beratTimbangan) > parseFloat(beratMax)) {
+                    $('#alertWeight').text('Berat melebihi stok').show()
+                } else {
+                    $('#alertWeight').text('').hide()
+                }
 
-            intervalReloadTimbangan = setInterval(reloadTimbangan, 2000)
-            $('#modalEntry').find('[name="jumlah"]').val(formatNumber(dataselect.value, 4))
+                intervalReloadTimbangan = setInterval(reloadTimbangan, 2000)
+                $('#modalEntry').find('[name="jumlah"]').val(formatNumber(dataselect.value, 4))
+            }
         })
 
         function reloadTimbangan() {
@@ -415,6 +425,13 @@
                     id: $('[name="id_timbangan"]').val()
                 },
                 success: function(res) {
+                    let beratTimbangan = res.data
+                    let beratMax = $('[name="max_weight"]').val()
+                    if (parseFloat(beratTimbangan) > parseFloat(beratMax)) {
+                        $('#alertWeight').text('Berat melebihi stok').show()
+                    } else {
+                        $('#alertWeight').text('').hide()
+                    }
                     $('#modalEntry').find('[name="jumlah"]').val(formatNumber(res.data, 4))
                 },
                 error: function(error) {
@@ -442,6 +459,7 @@
             $('#message-stok').text('')
             $('#label-timbangan').html('Timbangan')
             $('#label-berat').html('Berat Barang')
+            $('#label-jumlah-zak').html('Jumlah Zak')
             $('[name="jumlah_zak"]').val(0)
             $('[name="weight_zak"]').val(0)
             html5QrcodeScanner.render(onScanSuccess, onScanError);
@@ -449,11 +467,22 @@
 
         $('#modalEntry').on('input', '[name="jumlah_zak"]', function() {
             let weightWrapper = $('[name="wrapper_weight"]').val()
-            let jumlah = $(this).val()
-            $('[name="weight_zak"]').val(jumlah * weightWrapper)
+            let jumlahZak = normalizeNumber($(this).val() ? $(this).val() : '0')
+            let totalZak = 0
+            let weightZak = 0
+            if (jumlahZak <= detailSelect.jumlah_zak) {
+                weightZak = jumlahZak * weightWrapper
+            } else {
+                weightZak = detailSelect.jumlah_zak * weightWrapper
+                jumlahZak = detailSelect.jumlah_zak
+            }
+
+            $('[name="jumlah_zak"]').val(jumlahZak)
+            $('[name="weight_zak"]').val(weightZak)
         })
 
         $('.save-entry').click(function() {
+            detailSelect = []
             let modal = $('#modalEntry')
             let valid = validatorModal(modal.find('[name="kode_batang"]').val())
             if (!valid.status) {
@@ -488,7 +517,6 @@
 
             resDataTable.clear().rows.add(details).draw()
             stopInterval()
-            console.log('lalala')
             $('#modalEntry').modal('hide')
         })
 
@@ -583,13 +611,28 @@
                     id_gudang: $('[name="id_gudang"]').val()
                 },
                 success: function(res) {
+                    detailSelect = res.data
                     let modal = $('#modalEntry')
                     let data = res.data
                     for (let key in data) {
                         modal.find('[name="' + key + '"]').val(data[key])
+
+                        if (['weight_zak', 'wrapper_weight'].includes(key) && data[key] == null) {
+                            modal.find('[name="' + key + '"]').val(0)
+                        }
                     }
 
+                    $('#max-jumlah').text('Max ' + formatNumber(data.sisa_master_qr_code))
+
                     modal.find('[name="max_weight"]').val(data.sisa_master_qr_code)
+                    if (data.jumlah_zak == null) {
+                        modal.find('[name="jumlah_zak"]').prop('readonly', true).removeClass('validate')
+                    } else {
+                        $('#label-jumlah-zak').html('Jumlah Zak <span>*</span>')
+                        $('#max-jumlah-zak').text('Max ' + formatNumber(data.jumlah_zak, 4))
+                        modal.find('[name="jumlah_zak"]').prop('readonly', false).addClass('validate')
+                    }
+
                     if (data.isweighed == 1) {
                         modal.find('[name="jumlah"]').prop('readonly', true).removeClass('validate')
                         modal.find('[name="id_timbangan"]').prop('disabled', false).addClass('validate')

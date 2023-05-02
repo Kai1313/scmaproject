@@ -176,14 +176,17 @@ class MaterialUsageController extends Controller
                 'sisa_master_qr_code',
                 'isweighed',
                 'master_wrapper.weight as wrapper_weight',
-                'id_wrapper_zak'
+                'id_wrapper_zak',
+                'weight_zak',
+                'zak as jumlah_zak'
             )
             ->leftJoin('barang', 'mqc.id_barang', '=', 'barang.id_barang')
             ->leftJoin('satuan_barang as sb', 'mqc.id_satuan_barang', '=', 'sb.id_satuan_barang')
             ->leftJoin('master_wrapper', 'mqc.id_wrapper_zak', '=', 'master_wrapper.id_wrapper')
             ->where('mqc.id_cabang', $idCabang)
             ->where('mqc.id_gudang', $idGudang)
-            ->where('kode_batang_master_qr_code', $qrcode)->first();
+            ->where('kode_batang_master_qr_code', $qrcode)
+            ->where('sisa_master_qr_code', '>', 0)->first();
         if (!$data) {
             return response()->json([
                 'message' => 'Barang tidak ditemukan',

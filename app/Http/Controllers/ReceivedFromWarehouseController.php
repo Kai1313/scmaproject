@@ -33,7 +33,7 @@ class ReceivedFromWarehouseController extends Controller
                 ->addColumn('action', function ($row) {
                     $btn = '<ul class="horizontal-list">';
                     $btn .= '<li><a href="' . route('received_from_warehouse-view', $row->id_pindah_barang) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
-                    $btn .= '<li><a href="' . route('received_from_warehouse-entry', $row->id_pindah_barang) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
+                    // $btn .= '<li><a href="' . route('received_from_warehouse-entry', $row->id_pindah_barang) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
                     // $btn .= '<li><a href="' . route('received_from_branch-delete', $row->id_pindah_barang) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Void</a></li>';
                     $btn .= '</ul>';
                     return $btn;
@@ -85,7 +85,7 @@ class ReceivedFromWarehouseController extends Controller
             $data->fill($request->all());
             if ($id == 0) {
                 $data->kode_pindah_barang = MoveBranch::createcodeGudang($request->id_cabang);
-                $data->status_pindah_barang = 1;
+                $data->status_pindah_barang = 0;
                 $data->type = 1;
                 $data->user_created = session()->get('user')['id_pengguna'];
             } else {
@@ -96,9 +96,15 @@ class ReceivedFromWarehouseController extends Controller
             $data->saveDetails($request->details, 'in');
 
             $parent = MoveBranch::find($data->id_pindah_barang2);
-            $parent->status_pindah_barang = 1;
-            $parent->save();
-            $parent->saveChangeStatusFromParent();
+            $parent->saveChangeStatusFromParent($data->details->pluck('qr_code')->toArray());
+
+            if (count($data->details) == count($parent->details)) {
+                $data->status_pindah_barang = 1;
+                $data->save();
+
+                $parent->status_pindah_barang = 1;
+                $parent->save();
+            }
 
             DB::commit();
             return response()->json([
@@ -145,7 +151,14 @@ class ReceivedFromWarehouseController extends Controller
             ], 500);
         }
 
-        if ($data && $data->status_pindah_barang == 1) {
+        if ($data->id_produksi != null) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Pengiriman untuk produksi',
+            ], 500);
+        }
+
+        if ($data->status_pindah_barang == 1) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Pindah barang sudah diterima',

@@ -52,17 +52,18 @@ class PurchaseRequestController extends Controller
             }
 
             $data = $data->orderBy('prh.dt_created', 'desc');
-
+            $access = DB::table('setting')->where('id_cabang', $request->c)->where('code', 'PR Approval')->first();
+            $arrayAccess = explode(',', $access->value1);
             return Datatables::of($data)
                 ->addIndexColumn()
-                ->addColumn('action', function ($row) {
+                ->addColumn('action', function ($row) use ($arrayAccess) {
                     if ($row->void == '1') {
                         $btn = '<label class="label label-default">Batal</label>';
                     } else {
                         $btn = '<ul class="horizontal-list">';
                         $btn .= '<li><a href="' . route('purchase-request-view', $row->purchase_request_id) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
                         if ($row->approval_status == 0) {
-                            if (session()->get('user')['id_grup_pengguna'] == 13) {
+                            if (in_array(session()->get('user')['id_grup_pengguna'], $arrayAccess)) {
                                 $btn .= '<li><a href="' . route('purchase-request-change-status', [$row->purchase_request_id, 'approval']) . '" class="btn btn-success btn-xs mr-1 mb-1 btn-change-status" data-param="menyetujui"><i class="glyphicon glyphicon-check"></i> Approval</a></li>';
                                 $btn .= '<li><a href="' . route('purchase-request-change-status', [$row->purchase_request_id, 'reject']) . '" class="btn btn-default btn-xs mr-1 mb-1 btn-change-status" data-param="menolak"><i class="fa fa-times"></i> Reject</a></li>';
                             }

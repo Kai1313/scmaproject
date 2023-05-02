@@ -182,7 +182,7 @@ class MoveBranch extends Model
                     'user_created' => session()->get('user')['id_pengguna'],
                     'dt_created' => date('Y-m-d H:i:s'),
                     'batch' => $data->batch,
-                    'tanggal_kadaluarsa' => $data->tanggal_kadaluarsa,
+                    'tanggal_kadaluarsa' => $data->tanggal_kadaluarsa ? $data->tanggal_kadaluarsa : null,
                     'zak' => $data->zak,
                     'id_wrapper_zak' => $data->id_wrapper_zak,
                     'weight_zak' => $data->weight_zak,
@@ -215,9 +215,9 @@ class MoveBranch extends Model
                         'nama_kartu_stok' => $this->id_pindah_barang,
                         'nomor_kartu_stok' => $store->id_pindah_barang_detail,
                         'tanggal_kartu_stok' => date('Y-m-d'),
-                        'debit_kartu_stok' => 0,
-                        'kredit_kartu_stok' => ($type == 'in' && in_array($idJenisTransaksi, [22, 24])) ? '-' . $store->qty : $store->qty,
-                        'tanggal_kadaluarsa_kartu_stok' => $data->tanggal_kadaluarsa,
+                        'debit_kartu_stok' => $type == 'in' ? $store->qty : 0,
+                        'kredit_kartu_stok' => $type == 'out' ? $store->qty : 0,
+                        'tanggal_kadaluarsa_kartu_stok' => $data->tanggal_kadaluarsa ? $data->tanggal_kadaluarsa : null,
                         'mtotal_debit_kartu_stok' => 0,
                         'mtotal_kredit_kartu_stok' => 0,
                         'kode_batang_kartu_stok' => $data->qr_code,
@@ -261,12 +261,14 @@ class MoveBranch extends Model
         return ['status' => 'success'];
     }
 
-    public function saveChangeStatusFromParent()
+    public function saveChangeStatusFromParent($array)
     {
         $details = MoveBranchDetail::where('id_pindah_barang', $this->id_pindah_barang)->get();
         foreach ($details as $detail) {
-            $detail->status_diterima = 1;
-            $detail->save();
+            if (in_array($detail->qr_code, $array)) {
+                $detail->status_diterima = 1;
+                $detail->save();
+            }
         }
 
         return response()->json([

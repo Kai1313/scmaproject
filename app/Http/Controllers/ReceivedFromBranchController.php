@@ -86,16 +86,24 @@ class ReceivedFromBranchController extends Controller
     public function saveEntry(Request $request, $id = 0)
     {
         $data = MoveBranch::find($id);
-        try {
-            DB::beginTransaction();
-            if (!$data) {
-                $data = new MoveBranch;
+        if (!$data) {
+            $checkUsed = MoveBranch::where('id_pindah_barang2', $request->id_pindah_barang2)->first();
+            if ($checkUsed) {
+                return response()->json([
+                    "result" => false,
+                    "message" => "Kode kirim ke cabang sudah di dalam kode penerimaan " . $checkUsed->kode_pindah_barang,
+                ], 500);
             }
 
+            $data = new MoveBranch;
+        }
+
+        try {
+            DB::beginTransaction();
             $data->fill($request->all());
             if ($id == 0) {
                 $data->kode_pindah_barang = MoveBranch::createcodeCabang($request->id_cabang);
-                $data->status_pindah_barang = 1;
+                $data->status_pindah_barang = 0;
                 $data->type = 1;
                 $data->user_created = session()->get('user')['id_pengguna'];
             } else {
@@ -106,9 +114,15 @@ class ReceivedFromBranchController extends Controller
             $data->saveDetails($request->details, 'in');
 
             $parent = MoveBranch::find($data->id_pindah_barang2);
-            $parent->status_pindah_barang = 1;
-            $parent->save();
-            $parent->saveChangeStatusFromParent();
+            $parent->saveChangeStatusFromParent($data->details->pluck('qr_code')->toArray());
+
+            if (count($data->details) == count($parent->details)) {
+                $data->status_pindah_barang = 1;
+                $data->save();
+
+                $parent->status_pindah_barang = 1;
+                $parent->save();
+            }
 
             DB::commit();
             return response()->json([
@@ -241,6 +255,12 @@ class ReceivedFromBranchController extends Controller
         if (!$data) {
             return response()->json([
                 'message' => 'Data tidak ditemukan',
+            ], 500);
+        }
+
+        if ($data->status_diterima == 1) {
+            return response()->json([
+                'message' => 'Barang sudah diterima',
             ], 500);
         }
 
