@@ -169,6 +169,8 @@ Route::prefix('transaction')->group(function () {
         Route::get('/inventory_transfer', 'ClosingJournalController@inventoryTransfer')->name('transaction-closing-journal-inventory-transfer');
         Route::get('/stock_correction', 'ClosingJournalController@stockCorrection')->name('transaction-closing-journal-stock-correction');
         Route::get('/production', 'ClosingJournalController@production')->name('transaction-closing-journal-production');
+        Route::get('/selling_return', 'ClosingJournalController@sellingReturn')->name('transaction-closing-journal-selling-return');
+        Route::get('/usage', 'ClosingJournalController@usage')->name('transaction-closing-journal-usage');
         Route::get('/sales', 'ClosingJournalController@sales')->name('transaction-closing-journal-sales');
         Route::get('/depreciation', 'ClosingJournalController@depreciation')->name('transaction-closing-journal-depreciation');
     });

@@ -131,6 +131,8 @@
                                     <div id="response4"></div><br>
                                     <div id="response5"></div><br>
                                     <div id="response6"></div><br>
+                                    <div id="response7"></div><br>
+                                    <div id="response8"></div><br>
                                 </div>
                             </div>
                         </form>
@@ -177,6 +179,8 @@
     let routeInventoryTransfer = "{{ Route('transaction-closing-journal-inventory-transfer') }}"
     let routeStockCorrection = "{{ Route('transaction-closing-journal-stock-correction') }}"
     let routeProduction = "{{ Route('transaction-closing-journal-production') }}"
+    let routeSellingReturn = "{{ Route('transaction-closing-journal-selling-return') }}"
+    let routeUsage = "{{ Route('transaction-closing-journal-usage') }}"
     let routeSales = "{{ Route('transaction-closing-journal-sales') }}"
     let routeDepreciation = "{{ Route('transaction-closing-journal-depreciation') }}"
     let piutang_dagang
@@ -254,6 +258,8 @@
             $("#response4").empty()
             $("#response5").empty()
             $("#response6").empty()
+            $("#response7").empty()
+            $("#response8").empty()
 
             // Start ajax chain
             save_data(routeClosingStore, param, "1")
@@ -310,10 +316,16 @@
                 save_data(routeStockCorrection, param, "4")
                 break;
             case "4":
-                save_data(routeSales, param, "5")
+                save_data(routeSellingReturn, param, "5")
                 break;
             case "5":
-                save_data(routeDepreciation, param, "6")
+                save_data(routeUsage, param, "6")
+                break;
+            case "6":
+                save_data(routeSales, param, "7")
+                break;
+            case "7":
+                save_data(routeDepreciation, param, "8")
                 break;
 
             default:
