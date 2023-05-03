@@ -76,7 +76,7 @@
                 @foreach ($data as $item)
                     <tr style="font-size: 12px;">
                         <td align="center">{{ $item->kode_akun }}</td>
-                        <td align="center">{{ $item->nama_akun }}</td>
+                        <td align="left">{{ $item->nama_akun }}</td>
                         <td align="right">{{ number_format($item->saldo_awal, 2, ",", ".") }}</td>
                         <td align="right">{{ number_format($item->debet, 2, ",", ".") }}</td>
                         <td align="right">{{ number_format($item->kredit, 2, ",", ".") }}</td>
@@ -104,11 +104,11 @@
                 @foreach ($data as $item)
                     <tr style="font-size: 10px;">
                         <td align="center">{{ $item->tanggal_jurnal }}</td>
-                        <td align="center">{{ $item->kode_jurnal }}</td>
+                        <td align="left">{{ $item->kode_jurnal }}</td>
                         <td align="center">{{ $item->kode_akun }}</td>
-                        <td align="center">{{ $item->nama_akun }}</td>
+                        <td align="left">{{ $item->nama_akun }}</td>
                         <td align="left">{{ $item->keterangan }}</td>
-                        <td align="center">{{ $item->id_transaksi }}</td>
+                        <td align="left">{{ $item->id_transaksi }}</td>
                         <td align="right">{{ number_format($item->debet, 2, ",", ".") }}</td>
                         <td align="right">{{ number_format($item->kredit, 2, ",", ".") }}</td>
                         <td align="right">{{ number_format($item->saldo_balance, 2, ",", ".") }}</td>
