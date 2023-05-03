@@ -147,7 +147,7 @@ class MoveBranch extends Model
             $trashQrCode = MasterQrCode::where('kode_batang_master_qr_code', $trash->qr_code)->first();
             if ($trashQrCode) {
                 if ($type == 'out') {
-                    $trashQrCode->sisa_master_qr_code = $trashQrCode->jumlah_master_qr_code;
+                    $trashQrCode->sisa_master_qr_code = $trash->qty;
                 } else {
                     $trashQrCode->sisa_master_qr_code = 0;
                 }
@@ -194,7 +194,7 @@ class MoveBranch extends Model
                 $master = MasterQrCode::where('kode_batang_master_qr_code', $data->qr_code)->first();
                 if ($master) {
                     if ($type == 'in' && $data->status_diterima == 1) {
-                        $master->sisa_master_qr_code = $master->jumlah_master_qr_code;
+                        $master->sisa_master_qr_code = $data->qty;
                         $master->id_cabang = $this->id_cabang;
                         $master->id_gudang = $this->id_gudang;
                         $master->id_jenis_transaksi = $idJenisTransaksi;
@@ -249,7 +249,7 @@ class MoveBranch extends Model
         foreach ($this->details as $detail) {
             $master = MasterQrCode::where('kode_batang_master_qr_code', $detail->qr_code)->first();
             if ($master) {
-                $master->sisa_master_qr_code = $master->jumlah_master_qr_code;
+                $master->sisa_master_qr_code = $detail->qty;
                 $master->save();
             }
 
