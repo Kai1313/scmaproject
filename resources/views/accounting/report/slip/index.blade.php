@@ -209,6 +209,9 @@
             let form = validateFormValue()
 
             if (form.status) {
+                let button = document.getElementById("btn-pdf-report");
+                button.disabled = true;
+                button.innerHTML = '<i class="fa fa-spinner fa-spin"></i>'
                 let base_url = "{{ url('') }}";
 
                 let route = base_url + '/report/slip/pdf?cabang=' + form.data.cabang + '&slip=' + form.data.slip + '&start_date=' + form.data.start_date + '&end_date=' + form.data.end_date;
@@ -232,7 +235,11 @@
                         link.click();
                         // Remove the anchor element from the document
                         document.body.removeChild(link);
+                    } else {
+                        Swal.fire("Gagal membuat report. ", data.message, 'error')
                     }
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fa fa-print"></i> Print'
                 })
             }
         });
