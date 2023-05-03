@@ -15,12 +15,12 @@ class ReportSlipController extends Controller
 {
     public function index(Request $request)
     {
-        // if (checkUserSession($request, 'report_slip', 'show') == false) {
-        //     return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
-        // }
+        if (checkUserSession($request, 'general_ledger', 'show') == false) {
+            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+        }
 
         $data_cabang = Cabang::all();
-        $data_slip = Slip::all();
+        $data_slip = Slip::where('id_cabang', 1)->get();
 
         $data = [
             "pageTitle" => "SCA Accounting | Report Slip",
@@ -69,7 +69,7 @@ class ReportSlipController extends Controller
             ->where('det.id_akun', $slip_db->id_akun)
             ->whereRaw("head.tanggal_jurnal BETWEEN $from AND $to")
             ->groupBy('det.id_akun')
-            ->orderBy('head.tanggal_jurnal', 'ASC')
+            ->orderBy('head.tanggal_jurnal', 'DESC')
             ->get();
 
         Log::debug($saldo_awal);
@@ -90,7 +90,7 @@ class ReportSlipController extends Controller
             ->where('head.id_slip', $slip)
             ->where('det.id_akun', '!=', $slip_db->id_akun)
             ->whereRaw("head.tanggal_jurnal BETWEEN $from AND $to")
-            ->orderBy('head.tanggal_jurnal', 'ASC')
+            ->orderBy('head.tanggal_jurnal', 'DESC')
             ->get();
 
         return [
@@ -158,7 +158,7 @@ class ReportSlipController extends Controller
                 ->where('det.id_akun', $slip_db->id_akun)
                 ->whereRaw("head.tanggal_jurnal BETWEEN $from AND $to")
                 ->groupBy('det.id_akun')
-                ->orderBy('head.tanggal_jurnal', 'ASC');
+                ->orderBy('head.tanggal_jurnal', 'DESC');
 
             $mutasis = DB::table("jurnal_header as head")
                 ->join('jurnal_detail as det', 'head.id_jurnal', 'det.id_jurnal')
@@ -210,7 +210,7 @@ class ReportSlipController extends Controller
                     }
                 }
             } else {
-                $mutasis->orderBy("head.tanggal_jurnal", "ASC");
+                $mutasis->orderBy("head.tanggal_jurnal", "DESC");
             }
 
             // pagination
@@ -320,7 +320,7 @@ class ReportSlipController extends Controller
                 ->where('det.id_akun', $slip_db->id_akun)
                 ->whereRaw("head.tanggal_jurnal BETWEEN $from AND $to")
                 ->groupBy('det.id_akun')
-                ->orderBy('head.tanggal_jurnal', 'ASC')
+                ->orderBy('head.tanggal_jurnal', 'DESC')
                 ->get();
 
             Log::debug($saldo_awal);
@@ -341,7 +341,7 @@ class ReportSlipController extends Controller
                 ->where('head.id_slip', $slip)
                 ->where('det.id_akun', '!=', $slip_db->id_akun)
                 ->whereRaw("head.tanggal_jurnal BETWEEN $from AND $to")
-                ->orderBy('head.tanggal_jurnal', 'ASC')
+                ->orderBy('head.tanggal_jurnal', 'DESC')
                 ->get();
 
             $cabang = Cabang::find($cabang);
@@ -395,6 +395,23 @@ class ReportSlipController extends Controller
             return response()->json([
                 "result" => False,
                 "message" => $message
+            ]);
+        }
+    }
+
+    public function getSlip(Request $request)
+    {
+        try {
+            $slip = Slip::where('id_cabang', $request->cabang)->get();
+            return response()->json([
+                "result" => true,
+                "message" => 'Success get slip data',
+                "data" => $slip
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                "result" => false,
+                "message" => 'Error when get slip data'
             ]);
         }
     }

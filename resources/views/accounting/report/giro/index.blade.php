@@ -81,6 +81,15 @@
                                 </div>
                             </div>
                             <div class="col-md-2">
+                                <div class="form-group" id="status-group">
+                                    <label>Tipe</label>
+                                    <select name="tipe" id="tipe" class="form-control select2" style="width: 100%;" data-validation="[NOTEMPTY]" data-validation-message="Tipe tidak boleh kosong">
+                                        <option value="HG">Hutang Giro</option>
+                                        <option value="PG">Piutang Giro</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
                                 <div class="form-group" id="slip-group">
                                     <label>Slip</label>
                                     <select name="slip" id="slip" class="form-control select2" style="width: 100%;" data-validation="[NOTEMPTY]" data-validation-message="Slip tidak boleh kosong">
@@ -90,15 +99,6 @@
                                             {{ $slip->kode_slip . ' - ' . $slip->nama_slip }}
                                         </option>
                                         @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="form-group" id="status-group">
-                                    <label>Tipe</label>
-                                    <select name="tipe" id="tipe" class="form-control select2" style="width: 100%;" data-validation="[NOTEMPTY]" data-validation-message="Tipe tidak boleh kosong">
-                                        <option value="HG">Hutang Giro</option>
-                                        <option value="PG">Piutang Giro</option>
                                     </select>
                                 </div>
                             </div>
@@ -231,7 +231,7 @@
             console.log('pdf');
             let form = validateFormValue()
 
-            
+
             if (form.status) {
                 let button = document.getElementById("btn-pdf-report");
                 button.disabled = true;
@@ -265,6 +265,56 @@
                     button.innerHTML = '<i class="fa fa-print"></i> Print'
                 })
             }
+        });
+
+        $('#cabang').on('change', function() {
+            let tipe = $('#tipe').val();
+
+            let base_url = "{{ url('') }}";
+            let route = base_url + '/report/giro/getSlip?cabang=' + this.value + '&tipe=' + tipe;
+
+            $.ajax({
+                type: "GET",
+                url: route
+            }).done(function(data) {
+                if (data.result) {
+                    $('#slip').empty();
+
+                    let option = '<option value="All">All</option>'
+                    data.data.forEach(value => {
+                        option += '<option value="' + value.id_slip + '">' + value.kode_slip + ' - ' + value.nama_slip + '</option>'
+                    });
+
+                    $('#slip').append(option);
+                } else {
+                    Swal.fire("Gagal get data slip. ", data.message, 'error')
+                }
+            })
+        });
+
+        $('#tipe').on('change', function() {
+            let cabang = $('#cabang').val();
+
+            let base_url = "{{ url('') }}";
+            let route = base_url + '/report/giro/getSlip?tipe=' + this.value + '&cabang=' + cabang;
+
+            $.ajax({
+                type: "GET",
+                url: route
+            }).done(function(data) {
+                if (data.result) {
+                    $('#slip').empty();
+
+                    let option = '<option value="All">All</option>'
+                    data.data.forEach(value => {
+                        option += '<option value="' + value.id_slip + '">' + value.kode_slip + ' - ' + value.nama_slip + '</option>'
+                    });
+
+                    $('#slip').append(option);
+                } else {
+                    Swal.fire("Gagal get data slip. ", data.message, 'error')
+                }
+            })
         });
     })
 

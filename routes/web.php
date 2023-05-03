@@ -184,6 +184,7 @@ Route::prefix('report')->group(function(){
         Route::get('/populate', 'ReportSlipController@populate')->name('report-slip-populate');
         Route::get('/excel', 'ReportSlipController@exportExcel')->name('report-slip-excel');
         Route::get('/pdf', 'ReportSlipController@exportPdf')->name('report-slip-pdf');
+        Route::get('/getSlip', 'ReportSlipController@getSlip')->name('report-slip-get-slip');
     });
 
     // Giro
@@ -192,6 +193,7 @@ Route::prefix('report')->group(function(){
         Route::get('/populate', 'ReportGiroController@populate')->name('report-giro-populate');
         Route::get('/excel', 'ReportGiroController@exportExcel')->name('report-giro-excel');
         Route::get('/pdf', 'ReportGiroController@exportPdf')->name('report-giro-pdf');
+        Route::get('/getSlip', 'ReportGiroController@getSlip')->name('report-giro-get-slip');
     });
     
     // Ledger

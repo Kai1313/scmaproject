@@ -243,6 +243,30 @@
                 })
             }
         });
+
+        $('#cabang').on('change', function() {
+            let base_url = "{{ url('') }}";
+
+            let route = base_url + '/report/slip/getSlip?cabang=' + this.value;
+
+            $.ajax({
+                type: "GET",
+                url: route
+            }).done(function(data) {
+                if (data.result) {
+                    $('#slip').empty();
+
+                    let option = ''
+                    data.data.forEach(value => {
+                        option += '<option value="' + value.id_slip + '">' + value.kode_slip + ' - ' + value.nama_slip + '</option>'
+                    });
+
+                    $('#slip').append(option);
+                } else {
+                    Swal.fire("Gagal get data slip. ", data.message, 'error')
+                }
+            })
+        });
     })
 
     function validateFormValue() {

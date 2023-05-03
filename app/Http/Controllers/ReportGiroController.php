@@ -20,7 +20,7 @@ class ReportGiroController extends Controller
         }
 
         $data_cabang = Cabang::all();
-        $data_slip = Slip::where('jenis_slip', 2)->orWhere('jenis_slip', 3)->get();
+        $data_slip = Slip::where('jenis_slip', 3)->where('id_cabang', 1)->get();
         $data_status = array(
             array(
                 'value' => 'All',
@@ -99,7 +99,7 @@ class ReportGiroController extends Controller
         }
 
         $giro = $giro->groupBy('det.id_jurnal')
-            ->orderBy('head.tanggal_jurnal', 'ASC');
+            ->orderBy('head.tanggal_jurnal', 'DESC');
 
         $data = $giro->get();
 
@@ -227,7 +227,7 @@ class ReportGiroController extends Controller
                     }
                 }
             } else {
-                $giro->orderBy('head.tanggal_jurnal', 'ASC');
+                $giro->orderBy('head.tanggal_jurnal', 'DESC');
             }
 
             // pagination
@@ -366,7 +366,7 @@ class ReportGiroController extends Controller
             }
     
             $giro = $giro->groupBy('det.id_jurnal')
-                ->orderBy('head.tanggal_jurnal', 'ASC');
+                ->orderBy('head.tanggal_jurnal', 'DESC');
     
             $data = $giro->get();
     
@@ -451,6 +451,34 @@ class ReportGiroController extends Controller
             return response()->json([
                 "result" => False,
                 "message" => $message
+            ]);
+        }
+    }
+
+    public function getSlip(Request $request)
+    {
+        try {
+            $slip = Slip::where('id_cabang', $request->cabang);
+
+            if($request->tipe == 'PG'){
+                $slip = $slip->where('jenis_slip', 2);
+            }
+
+            if($request->tipe == 'HG'){
+                $slip = $slip->where('jenis_slip', 3);
+            }
+
+            $slip = $slip->get();
+
+            return response()->json([
+                "result" => true,
+                "message" => 'Success get slip data',
+                "data" => $slip
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                "result" => false,
+                "message" => 'Error when get slip data'
             ]);
         }
     }

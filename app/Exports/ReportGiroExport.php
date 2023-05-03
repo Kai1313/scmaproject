@@ -60,7 +60,7 @@ class ReportGiroExport implements FromView
         }
 
         $giro = $giro->groupBy('det.id_jurnal')
-            ->orderBy('head.tanggal_jurnal', 'ASC');
+            ->orderBy('head.tanggal_jurnal', 'DESC');
 
         $data = $giro->get();
 
