@@ -45,11 +45,11 @@
 <section class="content-header">
     <h1>
         Report
-        <small> | Slip</small>
+        <small> | Giro</small>
     </h1>
     <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> Dashboard</a></li>
-        <li class="active">Report Slip</li>
+        <li class="active">Report Giro</li>
     </ol>
 </section>
 @endsection
@@ -62,13 +62,13 @@
                     <div class="box-header">
                         <div class="row">
                             <div class="col-xs-12">
-                                <h3 class="box-title">Report Slip</h3>
+                                <h3 class="box-title">Report Giro</h3>
                             </div>
                         </div>
                     </div>
                     <div class="box-body">
                         <div class="row">
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <div class="form-group" id="cabang-group">
                                     <label>Cabang</label>
                                     <select name="cabang" id="cabang" class="form-control select2" style="width: 100%;" data-validation="[NOTEMPTY]" data-validation-message="Cabang tidak boleh kosong">
@@ -80,10 +80,11 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <div class="form-group" id="slip-group">
                                     <label>Slip</label>
                                     <select name="slip" id="slip" class="form-control select2" style="width: 100%;" data-validation="[NOTEMPTY]" data-validation-message="Slip tidak boleh kosong">
+                                        <option value="All">All</option>
                                         @foreach ($data_slip as $slip)
                                         <option value="{{ $slip->id_slip }}">
                                             {{ $slip->kode_slip . ' - ' . $slip->nama_slip }}
@@ -92,16 +93,32 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-3">
-                                <div class="form-group" id="start-group">
-                                    <label>Awal Period</label>
-                                    <input type="text" name="start_date" id="start_date" class="form-control datepicker" style="width: 100%;" data-validation="[NOTEMPTY]" data-validation-message="Awal Period tidak boleh kosong" value="{{date('Y-m-d')}}">
+                            <div class="col-md-2">
+                                <div class="form-group" id="status-group">
+                                    <label>Tipe</label>
+                                    <select name="tipe" id="tipe" class="form-control select2" style="width: 100%;" data-validation="[NOTEMPTY]" data-validation-message="Tipe tidak boleh kosong">
+                                        <option value="HG">Hutang Giro</option>
+                                        <option value="PG">Piutang Giro</option>
+                                    </select>
                                 </div>
                             </div>
-                            <div class="col-md-3">
-                                <div class="form-group" id="end-group">
-                                    <label>Akhir Period</label>
-                                    <input type="text" name="end_date" id="end_date" class="form-control datepicker" style="width: 100%;" data-validation="[NOTEMPTY]" data-validation-message="Akhir Period tidak boleh kosong" value="{{date('Y-m-d')}}">
+                            <div class="col-md-2">
+                                <div class="form-group" id="date-group">
+                                    <label>Tanggal</label>
+                                    <input type="text" name="giro_date" id="giro_date" class="form-control datepicker" style="width: 100%;" data-validation="[NOTEMPTY]" data-validation-message="Tanggal Giro tidak boleh kosong" value="{{date('Y-m-d')}}">
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group" id="status-group">
+                                    <label>Status</label>
+                                    <select name="status" id="status" class="form-control select2" style="width: 100%;" data-validation="[NOTEMPTY]" data-validation-message="Status tidak boleh kosong">
+                                        @foreach ($data_status as $status)
+                                        <option value="{{ $status['value'] }}">
+                                            {{ $status['title'] }}
+                                        </option>
+                                        @endforeach
+                                    </select>
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -134,15 +151,22 @@
                     <table id="table_report" style="display:none" class="table table-bordered table-striped display responsive nowrap" width="100%">
                         <thead width="100%">
                             <tr>
-                                <th class="text-center" width="7%" data-priority="1">Tanggal Jurnal</th>
+                                <th class="text-center" colspan="6">Giro</th>
+                                <th class="text-center" colspan="3">Cair</th>
+                                <th class="text-center" colspan="2">Tolak</th>
+                            </tr>
+                            <tr>
                                 <th class="text-center" width="10%" data-priority="2">No Jurnal</th>
+                                <th class="text-center" width="7%" data-priority="1">Tanggal Jurnal</th>
+                                <th class="text-center" width="11%">Giro No</th>
+                                <th class="text-center" width="7%">Giro Date</th>
+                                <th class="text-center" width="7%">Giro Due Date</th>
+                                <th class="text-center" width="11%">Total</th>
+                                <th class="text-center" width="11%">No Jurnal</th>
+                                <th class="text-center" width="7%">Tanggal</th>
                                 <th class="text-center" width="11%">Slip</th>
-                                <th class="text-center" width="10%">Akun</th>
-                                <th class="text-center" width="15%">Keterangan</th>
-                                <th class="text-center" width="10%">ID Transaksi</th>
-                                <th class="text-center" width="9%">Debet</th>
-                                <th class="text-center" width="9%">Credit</th>
-                                <th class="text-center" width="9%">Balance</th>
+                                <th class="text-center" width="11%">No Jurnal</th>
+                                <th class="text-center" width="7%">Tanggal</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -175,8 +199,6 @@
 
 @section('externalScripts')
 <script>
-    let excel_route = "{{ route('report-slip-excel') }}"
-
     $(function() {
         $('.select2').select2();
 
@@ -190,6 +212,7 @@
 
             if (form.status) {
                 populate_table(form.data)
+                $('#table_report').css('display', '')
             }
         });
 
@@ -200,7 +223,7 @@
             if (form.status) {
                 let base_url = "{{ url('') }}";
 
-                window.open(base_url + '/report/slip/excel?cabang=' + form.data.cabang + '&slip=' + form.data.slip + '&start_date=' + form.data.start_date + '&end_date=' + form.data.end_date);
+                window.open(base_url + '/report/giro/excel?cabang=' + form.data.cabang + '&slip=' + form.data.slip + '&tanggal=' + form.data.giro_date + '&tipe=' + form.data.tipe + '&status=' + form.data.status);
             }
         });
 
@@ -211,29 +234,7 @@
             if (form.status) {
                 let base_url = "{{ url('') }}";
 
-                let route = base_url + '/report/slip/pdf?cabang=' + form.data.cabang + '&slip=' + form.data.slip + '&start_date=' + form.data.start_date + '&end_date=' + form.data.end_date;
-
-                $.ajax({
-                    type: "GET",
-                    url: route
-                }).done(function(data) {
-                    console.log(data)
-                    if (data.result) {
-                        // Create a new anchor element
-                        var link = document.createElement('a');
-                        // Set the PDF data as href attribute
-                        link.href = 'data:application/pdf;base64,' + data.pdfData;
-                        // Set the PDF headers as download attribute
-                        link.setAttribute('download', 'ReportSlips.pdf');
-                        link.setAttribute('target', '_blank');
-                        // Append the anchor element to the document
-                        document.body.appendChild(link);
-                        // Trigger a click on the anchor element to download the PDF
-                        link.click();
-                        // Remove the anchor element from the document
-                        document.body.removeChild(link);
-                    }
-                })
+                window.open(base_url + '/report/giro/pdf?cabang=' + form.data.cabang + '&slip=' + form.data.slip + '&tanggal=' + form.data.giro_date + '&tipe=' + form.data.tipe + '&status=' + form.data.status);
             }
         });
     })
@@ -241,16 +242,18 @@
     function validateFormValue() {
         let cabang = $('#cabang').val();
         let slip = $('#slip').val();
-        let start_date = $('#start_date').val();
-        let end_date = $('#end_date').val();
+        let giro_date = $('#giro_date').val();
+        let tipe = $('#tipe').val();
+        let status = $('#status').val();
 
         let error = 0;
 
         let data = {
             cabang: cabang,
             slip: slip,
-            start_date: start_date,
-            end_date: end_date
+            giro_date: giro_date,
+            tipe: tipe,
+            status: status
         }
 
         let alert = '<div class="form-control-error" id="replace-id" data-error-list><ul><li>ReplaceHere tidak boleh kosong</li></ul></div>'
@@ -271,18 +274,26 @@
             error += 1;
         }
 
-        if (start_date == '') {
-            $('#start-group').addClass('has-error');
-            let alertfix = alert.replace('ReplaceHere', 'Start Date')
-            $('#start_date').after(alertfix);
+        if (giro_date == '') {
+            $('#giro_date-group').addClass('has-error');
+            let alertfix = alert.replace('ReplaceHere', 'Tanggal giro')
+            $('#giro_date').after(alertfix);
 
             error += 1;
         }
 
-        if (end_date == '') {
-            $('#end-group').addClass('has-error');
-            let alertfix = alert.replace('ReplaceHere', 'End Date')
-            $('#end_date').after(alertfix);
+        if (tipe == '') {
+            $('#tipe-group').addClass('has-error');
+            let alertfix = alert.replace('ReplaceHere', 'Tipe')
+            $('#tipe').after(alertfix);
+
+            error += 1;
+        }
+
+        if (status == '') {
+            $('#status-group').addClass('has-error');
+            let alertfix = alert.replace('ReplaceHere', 'Status')
+            $('#status').after(alertfix);
 
             error += 1;
         }
@@ -295,8 +306,9 @@
         } else {
             $('#cabang-group').removeClass('has-error');
             $('#slip-group').removeClass('has-error');
-            $('#start-group').removeClass('has-error');
-            $('#end-group').removeClass('has-error');
+            $('#giro_date-group').removeClass('has-error');
+            $('#tipe-group').removeClass('has-error');
+            $('#status-group').removeClass('has-error');
             $('.form-control-error').remove();
 
             return {
@@ -308,99 +320,30 @@
     }
 
     function populate_table(data) {
-        let get_data_url = "{{ route('report-slip-populate') }}"
-        get_data_url += '?cabang=' + data.cabang + '&slip=' + data.slip + '&start_date=' + data.start_date + '&end_date=' + data.end_date
+        let get_data_url = "{{ route('report-giro-populate') }}"
+        get_data_url += '?cabang=' + data.cabang + '&slip=' + data.slip + '&tanggal=' + data.giro_date + '&tipe=' + data.tipe + '&status=' + data.status
 
-        $('#table_report').css('display', '')
+        $.ajax({
+            type: "GET",
+            url: get_data_url,
+            success: function(data) {
+                $('.data-report').remove();
+                let rows = '';
+                let balance = 0;
 
-        $('#table_report').DataTable().destroy();
-        $('#table_report').DataTable({
-            processing: true,
-            serverSide: true,
-            "scrollX": true,
-            "bDestroy": true,
-            responsive: true,
-            ajax: {
-                "url": get_data_url,
-                "type": "GET",
-                "dataType": "JSON",
-                "error": function(xhr, textStatus, ThrownException) {
-                    alert("Error loading data. Exception: " + ThrownException + '\n' + textStatus)
+                if (data.length > 0) {
+                    data.forEach(val => {
+                        rows += "<tr class='data-report'><td align='left'>" + val.kode_jurnal + "</td><td align='center'>" + val.tanggal_jurnal + "</td><td align='left'>" + val.no_giro + "</td><td align='center'>" + val.tanggal_giro + "</td><td align='left'>" + val.tanggal_giro_jt + "</td><td align='right'>" + formatCurr(formatNumberAsFloatFromDB(val.total)) + "</td><td align='left'>" + val.cair_kode_jurnal + "</td><td align='center'>" + val.cair_tanggal_giro + "</td><td align='left'>" + val.cair_slip + "</td><td align='center'>" + val.tolak_kode_jurnal + "</td><td align='center'>" + val.tolak_tanggal_giro + "</td>"
+                    });
+                } else {
+                    rows += '<tr class="data-report"><td colspan="10" align="center">No data<td></tr>'
                 }
+
+                $('#table_report').append(rows);
             },
-            columns: [{
-                    data: 'tanggal_jurnal',
-                    name: 'tanggal_jurnal',
-                    className: 'text-center',
-                    width: '7%'
-                },
-                {
-                    data: 'kode_jurnal',
-                    name: 'kode_jurnal',
-                    className: 'text-left',
-                    width: '10%'
-                },
-                {
-                    data: 'nama_slip',
-                    name: 'nama_slip',
-                    className: 'text-left',
-                    width: '11%'
-                },
-                {
-                    data: 'nama_akun',
-                    name: 'nama_akun',
-                    className: 'text-left',
-                    width: '10%'
-                },
-                {
-                    data: 'keterangan',
-                    name: 'keterangan',
-                    className: 'text-left',
-                    width: '15%',
-                    render: function(data, type, row) {
-                        return data.replace(/\n/g, '<br>')
-                    }
-                },
-                {
-                    data: 'id_transaksi',
-                    name: 'id_transaksi',
-                    className: 'text-left',
-                    width: '10%'
-                },
-                {
-                    data: 'debet',
-                    name: 'debet',
-                    width: '9%',
-                    searchable: false,
-                    orderable: false,
-                    className: 'text-right',
-                    render: function(data, type, row) {
-                        return formatCurr(formatNumberAsFloatFromDB(data))
-                    }
-                },
-                {
-                    data: 'credit',
-                    name: 'credit',
-                    width: '9%',
-                    searchable: false,
-                    orderable: false,
-                    className: 'text-right',
-                    render: function(data, type, row) {
-                        return formatCurr(formatNumberAsFloatFromDB(data))
-                    }
-                },
-                {
-                    data: 'balance',
-                    name: 'balance',
-                    width: '9%',
-                    searchable: false,
-                    orderable: false,
-                    className: 'text-right',
-                    render: function(data, type, row) {
-                        return formatCurr(formatNumberAsFloatFromDB(data))
-                    }
-                }
-            ],
+            error: function(data) {
+                Swal.fire("Sorry, Can't get data. ", data.responseJSON.message, 'error')
+            }
         })
     }
 

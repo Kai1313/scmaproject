@@ -42,12 +42,12 @@
 @section('header')
     <section class="content-header">
         <h1>
-            Transaksi Jurnal Penyesuaian
+            Transaksi Jurnal Closing
             <small></small>
         </h1>
         <ol class="breadcrumb">
             <li><a href="#"><i class="fa fa-dashboard"></i> Dashboard</a></li>
-            <li class="active">Transaksi Jurnal Penyesuaian</li>
+            <li class="active">Transaksi Jurnal Closing</li>
         </ol>
     </section>
 @endsection
@@ -80,10 +80,10 @@
                                         Void
                                     </label>
                                 </span>
-                                <a href="{{ route('transaction-adjustment-ledger-create') }}"
+                                <a href="{{ route('transaction-closing-journal-create') }}"
                                     class="btn btn-sm btn-success btn-flat pull-right mr-1"><span
                                         class="glyphicon glyphicon-plus" aria-hidden="true"></span> Tambah Jurnal
-                                    Penyesuaian</a>
+                                    Closing</a>
                             </div>
                         </div>
                     </div>
@@ -104,22 +104,21 @@
                         </div>
                     @endif
                     <div class="box-body">
-                        <table id="table_general_ledger"
-                            class="table table-bordered table-striped display responsive nowrap" width="100%">
-                            <thead width="100%">
-                                <tr>
-                                    <th class="text-center" width="2%"></th>
-                                    <th class="text-center" width="10%" data-priority="1">Kode Jurnal</th>
-                                    <th class="text-center" width="13%" data-priority="2">Tanggal Jurnal</th>
-                                    <th class="text-center" width="10%">Jenis Jurnal</th>
-                                    <th class="text-center" width="10%">ID Transaksi</th>
-                                    <th class="text-center" width="20%">Catatan</th>
-                                    <th class="text-center" width="10%">Total</th>
-                                    <th class="text-center" width="10%">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <table id="table_general_ledger"
+                                    class="table table-bordered table-striped display responsive nowrap" width="100%">
+                                    <thead >
+                                        <tr>
+                                            <th class="text-center">Bulan</th>
+                                            <th class="text-center">Tahun</th>
+                                            <th class="text-center">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -144,10 +143,10 @@
     <script>
         $(function() {
             $('.select2').select2();
-            populate_table(0)
+            // populate_table(0)
 
             $("#cabang_table").on("change", function() {
-                populate_table(0)
+                // populate_table(0)
             })
 
             $('#void').change(function() {
@@ -224,9 +223,8 @@
                         width: '20%',
                         render: function(data, type, row) {
                             let width = $(window).width();
-                            let notes = data == null ? '' : data.replace(/\n/g, '<br>')
                             width = width > 500 ? width - 330 : width - 100;
-                            return "<div style='white-space:normal;width:" + width + "px;'>" + notes + "</div>";
+                            return "<div style='white-space:normal;width:" + width + "px;'>" + data + "</div>";
                         },
                     },
                     {
@@ -265,20 +263,16 @@
             var action_btn = '<ul id="horizontal-list">';
             action_btn += '<li><a href="' + base_url + '/transaction/adjustment_ledger/show/' + data +
                 '" class="btn btn-xs mr-1 mb-1 btn-default"><span class="glyphicon glyphicon-search" aria-hidden="true"></span> Detail</a></li>';
-            action_btn += (row["id_transaksi"] == null)?'<li><a href="' + base_url + '/transaction/adjustment_ledger/form/edit/' + data +
-                '" class="btn btn-xs mr-1 mb-1 btn-warning"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Ubah</a></li>':'';
-
-            if (row["id_transaksi"] == null) {
-                if (row['void'] == 0) {
-                    action_btn += '<li><button type="button" id="void-btn" data-ids="' + data + '" onclick="void_jurnal(' +
-                    data +
-                    ')" class="btn btn-xs mr-1 mb-1 btn-danger delete-btn"><span class="glyphicon glyphicon-remove-sign" aria-hidden="true"></span> Void</button></li>';
-                }    
-                else {
-                    action_btn += '<li><button type="button" id="void-btn" data-ids="' + data +
-                        '" onclick="active_jurnal(' + data +
-                        ')" class="btn btn-xs mr-1 mb-1 btn-success delete-btn"><span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span> Active</button></li>';
-                }
+            action_btn += '<li><a href="' + base_url + '/transaction/adjustment_ledger/form/edit/' + data +
+                '" class="btn btn-xs mr-1 mb-1 btn-warning"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Ubah</a></li>';
+            if (row['void'] == 0)
+                action_btn += '<li><button type="button" id="void-btn" data-ids="' + data + '" onclick="void_jurnal(' +
+                data +
+                ')" class="btn btn-xs mr-1 mb-1 btn-danger delete-btn"><span class="glyphicon glyphicon-remove-sign" aria-hidden="true"></span> Void</button></li>';
+            else {
+                action_btn += '<li><button type="button" id="void-btn" data-ids="' + data +
+                    '" onclick="active_jurnal(' + data +
+                    ')" class="btn btn-xs mr-1 mb-1 btn-success delete-btn"><span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span> Active</button></li>';
             }
             action_btn += '<li><a target="_blank" href="' + base_url + '/transaction/adjustment_ledger/print/' + data +
                 '" class="btn btn-xs mr-1 mb-1 btn-default"><span class="glyphicon glyphicon-print" aria-hidden="true"></span> Print</a></li>';
