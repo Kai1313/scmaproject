@@ -114,22 +114,22 @@
             ajax: "{{ route('received_from_warehouse') }}?c=" + $('[name="id_cabang"]').val(),
             columns: [{
                 data: 'tanggal_pindah_barang',
-                name: 'tanggal_pindah_barang'
+                name: 'pindah_barang.tanggal_pindah_barang'
             }, {
                 data: 'kode_pindah_barang',
-                name: 'kode_pindah_barang'
+                name: 'pindah_barang.kode_pindah_barang'
             }, {
                 data: 'g_nama_gudang',
-                name: 'g_nama_gudang'
+                name: 'g.nama_gudang'
             }, {
                 data: 'g2_nama_gudang',
-                name: 'g2_nama_gudang',
+                name: 'g2.nama_gudang',
             }, {
                 data: 'keterangan_pindah_barang',
-                name: 'keterangan_pindah_barang',
+                name: 'pindah_barang.keterangan_pindah_barang',
             }, {
                 data: 'status_pindah_barang',
-                name: 'status_pindah_barang',
+                name: 'pindah_barang.status_pindah_barang',
             }, {
                 data: 'action',
                 name: 'action',

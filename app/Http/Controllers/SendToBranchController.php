@@ -18,7 +18,18 @@ class SendToBranchController extends Controller
 
         if ($request->ajax()) {
             $data = DB::table('pindah_barang')
-                ->select('id_pindah_barang', 'type', 'nama_gudang', 'tanggal_pindah_barang', 'kode_pindah_barang', 'nama_cabang', 'status_pindah_barang', 'keterangan_pindah_barang', 'transporter', 'void')
+                ->select(
+                    'id_pindah_barang',
+                    'type',
+                    'nama_gudang',
+                    'tanggal_pindah_barang',
+                    'kode_pindah_barang',
+                    'nama_cabang',
+                    'status_pindah_barang',
+                    'keterangan_pindah_barang',
+                    'transporter',
+                    'void'
+                )
                 ->leftJoin('gudang', 'pindah_barang.id_gudang', '=', 'gudang.id_gudang')
                 ->leftJoin('cabang', 'pindah_barang.id_cabang2', '=', 'cabang.id_cabang')
                 ->where('id_jenis_transaksi', 21)

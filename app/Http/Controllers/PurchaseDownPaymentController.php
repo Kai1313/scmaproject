@@ -17,7 +17,20 @@ class PurchaseDownPaymentController extends Controller
         }
 
         if ($request->ajax()) {
-            $data = DB::table('uang_muka_pembelian as ump')->select('id_uang_muka_pembelian', 'kode_uang_muka_pembelian', 'tanggal', 'pp.nama_permintaan_pembelian', DB::raw("concat(mu.kode_mata_uang,' - ',mu.nama_mata_uang) as nama_mata_uang"), 'nama_pemasok', 'rate', 'nominal', 'total', 'catatan', 'void')
+            $data = DB::table('uang_muka_pembelian as ump')
+                ->select(
+                    'id_uang_muka_pembelian',
+                    'kode_uang_muka_pembelian',
+                    'tanggal',
+                    'pp.nama_permintaan_pembelian',
+                    DB::raw("concat(mu.kode_mata_uang,' - ',mu.nama_mata_uang) as nama_mata_uang"),
+                    'nama_pemasok',
+                    'rate',
+                    'nominal',
+                    'total',
+                    'catatan',
+                    'void'
+                )
                 ->leftJoin('permintaan_pembelian as pp', 'ump.id_permintaan_pembelian', '=', 'pp.id_permintaan_pembelian')
                 ->leftJoin('pemasok as p', 'pp.id_pemasok', '=', 'p.id_pemasok')
                 ->leftJoin('mata_uang as mu', 'ump.id_mata_uang', '=', 'mu.id_mata_uang');

@@ -18,7 +18,16 @@ class ReceivedFromWarehouseController extends Controller
 
         if ($request->ajax()) {
             $data = DB::table('pindah_barang')
-                ->select('id_pindah_barang', 'type', 'g.nama_gudang as g_nama_gudang', 'tanggal_pindah_barang', 'kode_pindah_barang', 'g2.nama_gudang as g2_nama_gudang', 'status_pindah_barang', 'keterangan_pindah_barang')
+                ->select(
+                    'id_pindah_barang',
+                    'type',
+                    'g.nama_gudang as g_nama_gudang',
+                    'tanggal_pindah_barang',
+                    'kode_pindah_barang',
+                    'g2.nama_gudang as g2_nama_gudang',
+                    'status_pindah_barang',
+                    'keterangan_pindah_barang'
+                )
                 ->leftJoin('gudang as g', 'pindah_barang.id_gudang', '=', 'g.id_gudang')
                 ->leftJoin('gudang as g2', 'pindah_barang.id_gudang2', '=', 'g2.id_gudang')
                 ->where('id_jenis_transaksi', 24)

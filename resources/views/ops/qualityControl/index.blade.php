@@ -141,10 +141,10 @@
                 '[name="start_date"]').val() + '&end_date=' + $('[name="end_date"]').val(),
             columns: [{
                 data: 'nama_pembelian',
-                name: 'nama_pembelian'
+                name: 'pembelian.nama_pembelian'
             }, {
                 data: 'nama_barang',
-                name: 'nama_barang',
+                name: 'barang.nama_barang',
             }, {
                 data: 'jumlah_pembelian_detail',
                 name: 'jumlah_pembelian_detail',
@@ -154,47 +154,47 @@
                 className: 'text-right'
             }, {
                 data: 'nama_satuan_barang',
-                name: 'nama_satuan_barang',
+                name: 'satuan_barang.nama_satuan_barang',
             }, {
                 data: 'status_qc',
-                name: 'status_qc',
+                name: 'qc.status_qc',
                 className: 'text-center'
             }, {
                 data: 'reason',
-                name: 'reason',
+                name: 'qc.reason',
             }, {
                 data: 'tanggal_qc',
-                name: 'tanggal_qc'
+                name: 'qc.tanggal_qc'
             }, {
                 data: 'sg_pembelian_detail',
-                name: 'sg_pembelian_detail',
+                name: 'pembelian_detail.sg_pembelian_detail',
                 render: function(data) {
                     return data ? formatNumber(data, 4) : 0
                 },
                 className: 'text-right'
             }, {
                 data: 'be_pembelian_detail',
-                name: 'be_pembelian_detail',
+                name: 'pembelian_detail.be_pembelian_detail',
                 render: function(data) {
                     return data ? formatNumber(data, 4) : 0
                 },
                 className: 'text-right'
             }, {
                 data: 'ph_pembelian_detail',
-                name: 'ph_pembelian_detail',
+                name: 'pembelian_detail.ph_pembelian_detail',
                 render: function(data) {
                     return data ? formatNumber(data, 4) : 0
                 },
                 className: 'text-right'
             }, {
                 data: 'warna_pembelian_detail',
-                name: 'warna_pembelian_detail',
+                name: 'pembelian_detail.warna_pembelian_detail',
             }, {
                 data: 'bentuk_pembelian_detail',
-                name: 'bentuk_pembelian_detail',
+                name: 'pembelian_detail.bentuk_pembelian_detail',
             }, {
                 data: 'keterangan_pembelian_detail',
-                name: 'keterangan_pembelian_detail',
+                name: 'pembelian_detail.keterangan_pembelian_detail',
             }]
         });
 
