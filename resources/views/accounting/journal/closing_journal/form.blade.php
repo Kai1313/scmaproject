@@ -283,7 +283,7 @@
             console.log("ajax response "+step)
             console.log(data)
             let res = '<span><i class="fa fa-check-circle" style="color: green;"></i>'+data.message+'</span>'
-            let fail = '<span><i class="fa fa-times-circle" style="color: red;"></i> Proses jurnal closing Koreksi Stok gagal. '+data.message+'</span>'
+            let fail = '<span><i class="fa fa-times-circle" style="color: red;"></i> '+data.message+'</span>'
             if (data.result) {
                 console.log("succeed")
                 $("#response"+step).append(res)

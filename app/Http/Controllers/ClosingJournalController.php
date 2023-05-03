@@ -198,8 +198,8 @@ class ClosingJournalController extends Controller
                 SUM(beban_produksi.kwh_beban_produksi) as listrik')
             ->first();
 
-        $avg_listrik = $biaya_listrik->total_listrik / $data_beban_produksi->listrik;
-        $avg_gaji = $biaya_operator->total_gaji / $data_beban_produksi->tenaga;
+        $avg_listrik = ($biaya_listrik->total_listrik && $data_beban_produksi->listrik)?$biaya_listrik->total_listrik / $data_beban_produksi->listrik:0;
+        $avg_gaji = ($biaya_operator->total_gaji && $data_beban_produksi->tenaga)?$biaya_operator->total_gaji / $data_beban_produksi->tenaga:0;
 
         $data = [
           'listrik' => $avg_listrik,
@@ -640,7 +640,7 @@ class ClosingJournalController extends Controller
                 }
                 return response()->json([
                     "result" => FALSE,
-                    "message" => "Akun HPP Transfer Cabang tidak ditemukan"
+                    "message" => "Jurnal Closing Transfer Cabang Gagal. Akun HPP Transfer Cabang tidak ditemukan"
                 ]);
             }
 
@@ -709,7 +709,7 @@ class ClosingJournalController extends Controller
                         }
                         return response()->json([
                             "result" => false,
-                            "message" => "Error when store Jurnal data on table header",
+                            "message" => "Jurnal Closing Transfer Cabang Gagal. Error when store Jurnal data on table header",
                         ]);
                     }
 
@@ -730,7 +730,7 @@ class ClosingJournalController extends Controller
                             }
                             return response()->json([
                                 "result" => false,
-                                "message" => "Error when store Jurnal data on table detail, barang not found",
+                                "message" => "Jurnal Closing Transfer Cabang Gagal. Error when store Jurnal data on table detail, barang not found",
                             ]);
                         }
                         // Log::info(json_encode($barang->id_barang));
@@ -756,7 +756,7 @@ class ClosingJournalController extends Controller
                             }
                             return response()->json([
                                 "result" => false,
-                                "message" => "Error when store Jurnal data on table detail",
+                                "message" => "Jurnal Closing Transfer Cabang Gagal. Error when store Jurnal data on table detail",
                             ]);
                         }
                         $sum_debet += $out;
@@ -784,7 +784,7 @@ class ClosingJournalController extends Controller
                         }
                         return response()->json([
                             "result" => false,
-                            "message" => "Error when store Jurnal data on table detail",
+                            "message" => "Jurnal Closing Transfer Cabang Gagal. Error when store Jurnal data on table detail",
                         ]);
                     }
                     // Log::info(json_encode($grouped_out));
@@ -840,7 +840,7 @@ class ClosingJournalController extends Controller
                         }
                         return response()->json([
                             "result" => false,
-                            "message" => "Error when store Jurnal data on table header",
+                            "message" => "Jurnal Closing Transfer Cabang Gagal. Error when store Jurnal data on table header",
                         ]);
                     }
 
@@ -861,7 +861,7 @@ class ClosingJournalController extends Controller
                             }
                             return response()->json([
                                 "result" => false,
-                                "message" => "Error when store Jurnal data on table detail, barang not found",
+                                "message" => "Jurnal Closing Transfer Cabang Gagal. Error when store Jurnal data on table detail, barang not found",
                             ]);
                         }
                         // Log::info(json_encode($barang->id_barang));
@@ -887,7 +887,7 @@ class ClosingJournalController extends Controller
                             }
                             return response()->json([
                                 "result" => false,
-                                "message" => "Error when store Jurnal data on table detail",
+                                "message" => "Jurnal Closing Transfer Cabang Gagal. Error when store Jurnal data on table detail",
                             ]);
                         }
                         $sum_kredit += $in;
@@ -915,7 +915,7 @@ class ClosingJournalController extends Controller
                         }
                         return response()->json([
                             "result" => false,
-                            "message" => "Error when store Jurnal data on table detail",
+                            "message" => "Jurnal Closing Transfer Cabang Gagal. Error when store Jurnal data on table detail",
                         ]);
                     }
                 }
@@ -935,7 +935,7 @@ class ClosingJournalController extends Controller
             if ($check) {
                 $delete = Closing::where("month", $month)->where("year", $year)->delete();
             }
-            $message = "Error when inventory transfer";
+            $message = "Jurnal Closing Transfer Cabang Gagal. Error when inventory transfer";
             Log::error($message);
             Log::error($e);
             return response()->json([
@@ -966,7 +966,7 @@ class ClosingJournalController extends Controller
                 }
                 return response()->json([
                     "result" => FALSE,
-                    "message" => "Akun Koreksi Stok tidak ditemukan"
+                    "message" => "Jurnal Closing Koreksi Stok Gagal. Akun Koreksi Stok tidak ditemukan"
                 ]);
             }
 
@@ -1040,7 +1040,7 @@ class ClosingJournalController extends Controller
                     }
                     return response()->json([
                         "result" => false,
-                        "message" => "Error when store Jurnal data on table header",
+                        "message" => "Jurnal Closing Koreksi Stok Gagal. Error when store Jurnal data on table header",
                     ]);
                 }
                 // Store detail
@@ -1060,7 +1060,7 @@ class ClosingJournalController extends Controller
                         }
                         return response()->json([
                             "result" => false,
-                            "message" => "Error when store Jurnal data on table detail, barang not found",
+                            "message" => "Jurnal Closing Koreksi Stok Gagal. Error when store Jurnal data on table detail, barang not found",
                         ]);
                     }
                     // Log::info(json_encode($barang->id_barang));
@@ -1086,7 +1086,7 @@ class ClosingJournalController extends Controller
                         }
                         return response()->json([
                             "result" => false,
-                            "message" => "Error when store Jurnal data on table detail",
+                            "message" => "Jurnal Closing Koreksi Stok Gagal. Error when store Jurnal data on table detail",
                         ]);
                     }
                     $sum_val += $out;
@@ -1114,7 +1114,7 @@ class ClosingJournalController extends Controller
             }
                     return response()->json([
                         "result" => false,
-                        "message" => "Error when store Jurnal data on table detail",
+                        "message" => "Jurnal Closing Koreksi Stok Gagal. Error when store Jurnal data on table detail",
                     ]);
                 }
 
@@ -1134,7 +1134,7 @@ class ClosingJournalController extends Controller
             if ($check) {
                 $delete = Closing::where("month", $month)->where("year", $year)->delete();
             }
-            $message = "Error when stock correction";
+            $message = "Jurnal Closing Koreksi Stok Gagal. Error when stock correction";
             Log::error($message);
             Log::error($e);
             return response()->json([
