@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Report;
 
 use App\Http\Controllers\Controller;
-use App\MaterialUsage;
+use DB;
 use Illuminate\Http\Request;
+use Yajra\DataTables\DataTables;
 
 class MaterialUsageController extends Controller
 {
@@ -15,22 +16,12 @@ class MaterialUsageController extends Controller
         }
 
         if ($request->ajax()) {
-            $data = $this->getData($request);
-
-            $html = '';
-            $html .= view('report_ops.materialUsage.template', ['datas' => $data, 'type' => $request->type]);
-            return response()->json([
-                'html' => $html,
-            ]);
+            return $this->getData($request, 'datatable');
         }
-
-        // $duration = DB::table('setting')->where('code', 'U Duration')->first();
-        // $countdown = $duration->value2;
 
         return view('report_ops.materialUsage.index', [
             "pageTitle" => "SCA OPS | Laporan Pemakaian | List",
             'typeReport' => ['Rekap', 'Detail'],
-            // 'countDown' => $countdown,
         ]);
     }
 
@@ -39,7 +30,7 @@ class MaterialUsageController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        $data = $this->getData($request);
+        $data = $this->getData($request, 'print');
         $arrayCabang = [];
         foreach (session()->get('access_cabang') as $c) {
             $arrayCabang[$c['id']] = $c['text'];
@@ -60,16 +51,31 @@ class MaterialUsageController extends Controller
         ]);
     }
 
-    public function getData($request)
+    public function getData($request, $type)
     {
         $date = explode(' - ', $request->date);
         $idCabang = explode(',', $request->id_cabang);
         $idGudang = explode(',', $request->id_gudang);
         $statusQc = $request->status_qc;
 
-        $data = MaterialUsage::whereBetween('tanggal', $date)
-            ->whereIn('id_cabang', $idCabang)->whereIn('id_gudang', $idGudang)
-            ->orderBy('tanggal', 'desc')->get();
+        $data = DB::table('pemakaian_header as mu')->select(
+            'tanggal',
+            'kode_pemakaian',
+            'c.nama_cabang',
+            'g.nama_gudang',
+            'catatan'
+        )
+            ->leftJoin('cabang as c', 'mu.id_cabang', 'c.id_cabang')
+            ->leftJoin('gudang as g', 'mu.id_gudang', 'g.id_gudang')
+            ->whereIn('mu.id_cabang', $idCabang)->whereIn('mu.id_gudang', $idGudang)
+            ->orderBy('tanggal', 'asc');
+
+        if ($type == 'datatable') {
+            return Datatables::of($data)
+                ->toJson();
+        }
+
+        $data = $data->get();
         return $data;
     }
 }
