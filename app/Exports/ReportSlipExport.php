@@ -38,7 +38,7 @@ class ReportSlipExport implements FromView
             ->join('jurnal_detail as det', 'head.id_jurnal', 'det.id_jurnal')
             ->join('master_akun as akun', 'akun.id_akun', 'det.id_akun')
             ->join('master_slip as slip', 'slip.id_slip', 'head.id_slip')
-            ->selectRaw('head.tanggal_jurnal,
+            ->selectRaw('"'.$this->fromOrg.'" as tanggal_jurnal,
         "" as kode_jurnal,
         "" as nama_slip,
         akun.nama_akun,

@@ -410,7 +410,7 @@
             serverSide: true,
             "scrollX": true,
             "bDestroy": true,
-            responsive: true,
+            responsive: false,
             ajax: {
                 "url": get_data_url,
                 "type": "GET",
