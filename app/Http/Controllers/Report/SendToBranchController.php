@@ -9,7 +9,7 @@ use Yajra\DataTables\DataTables;
 
 class SendToBranchController extends Controller
 {
-    public $arrayStatus = ['0' => 'Belum Diterima', '1' => 'Diterima'];
+    public $arrayStatus = ['0' => 'Dalam Perjalanan', '1' => 'Diterima'];
     public function index(Request $request)
     {
         if (checkUserSession($request, 'laporan_kirim_ke_cabang', 'show') == false) {
@@ -73,13 +73,16 @@ class SendToBranchController extends Controller
                     'pb.keterangan_pindah_barang',
                     'pb.transporter',
                     'pb.nomor_polisi',
-                    DB::raw('(CASE 
-                        WHEN status_pindah_barang = "0" 
-                    )')'pb.status_pindah_barang'
+                    DB::raw('(CASE
+                        WHEN status_pindah_barang = "0" THEN "Dalam Perjalanan"
+                        WHEN status_pindah_barang = "1" THEN "Diterima"
+                        ELSE ""
+                    END) AS status_pindah_barang')
                 )
-                    ->leftJoin('cabang as c', 'pb.id_cabang', 'c.id_cabang')
-                    ->leftJoin('gudang as g', 'pb.id_gudang', 'g.id_gudang')
-                    ->leftJoin('cabang as c2', 'pb.id_cabang2', 'c2.id_cabang')
+                    ->join('cabang as c', 'pb.id_cabang', 'c.id_cabang')
+                    ->join('gudang as g', 'pb.id_gudang', 'g.id_gudang')
+                    ->join('cabang as c2', 'pb.id_cabang2', 'c2.id_cabang')
+                    ->where('id_jenis_transaksi', '21')->where('void', 0)
                     ->whereBetween('pb.tanggal_pindah_barang', $date)
                     ->whereIn('pb.id_cabang', $idCabang)->whereIn('pb.id_gudang', $idGudang)
                     ->orderBy('pb.tanggal_pindah_barang', 'asc');
@@ -91,56 +94,71 @@ class SendToBranchController extends Controller
                 $data = $data->orderBy('pb.tanggal_pindah_barang', 'asc');
                 break;
             case 'Detail':
-                //belum
-                $data = DB::table('pindah_barang as pb')->select(
-                    'tanggal_pindah_barang',
-                    'kode_pindah_barang',
+                $data = DB::table('pindah_barang_detail as pbd')->select(
+                    'pb.tanggal_pindah_barang',
+                    'pb.kode_pindah_barang',
                     'c.nama_cabang',
                     'g.nama_gudang',
-                    'c2.nama_cabang',
-                    'keterangan_pindah_barang',
-                    'transporter',
-                    'nomor_polisi',
-                    'status_pindah_barang'
+                    'c2.nama_cabang as nama_cabang2',
+                    'pbd.qr_code',
+                    'b.nama_barang',
+                    'pbd.qty',
+                    'pbd.batch',
+                    DB::raw('(CASE
+                        WHEN status_diterima = "0" THEN "Belum Diterima"
+                        WHEN status_diterima = "1" THEN "Sudah Diterima"
+                        ELSE ""
+                    END) AS status_diterima')
                 )
-                    ->leftJoin('cabang as c', 'pb.id_cabang', 'c.id_cabang')
-                    ->leftJoin('gudang as g', 'mu.id_gudang', 'g.id_gudang')
-                    ->leftJoin('cabang as c2', 'mu.id_cabang2', 'c2.id_cabang')
-                    ->whereBetween('tanggal_pindah_barang', $date)
+                    ->join('pindah_barang as pb', 'pbd.id_pindah_barang', 'pb.id_pindah_barang')
+                    ->join('barang as b', 'pbd.id_barang', 'b.id_barang')
+                    ->join('cabang as c', 'pb.id_cabang', 'c.id_cabang')
+                    ->join('gudang as g', 'pb.id_gudang', 'g.id_gudang')
+                    ->join('cabang as c2', 'pb.id_cabang2', 'c2.id_cabang')
+                    ->where('id_jenis_transaksi', '21')->where('void', 0)
+                    ->whereBetween('pb.tanggal_pindah_barang', $date)
                     ->whereIn('pb.id_cabang', $idCabang)->whereIn('pb.id_gudang', $idGudang)
-                    ->orderBy('tanggal_pindah_barang', 'asc');
+                    ->orderBy('pb.tanggal_pindah_barang', 'asc');
 
                 if ($status != 'all') {
-                    $data = $data->where('status_pindah_barang', $status);
+                    $data = $data->where('pb.status_pindah_barang', $status);
                 }
 
-                $data = $data->orderBy('tanggal_pindah_barang', 'asc');
+                $data = $data->orderBy('pb.tanggal_pindah_barang', 'asc');
                 break;
             case 'Outstanding':
-                //belum
-                $data = DB::table('pindah_barang as pb')->select(
-                    'tanggal_pindah_barang',
-                    'kode_pindah_barang',
+                $data = DB::table('pindah_barang_detail as pbd')->select(
+                    'pb.tanggal_pindah_barang',
+                    'pb.kode_pindah_barang',
                     'c.nama_cabang',
                     'g.nama_gudang',
-                    'c2.nama_cabang',
-                    'keterangan_pindah_barang',
-                    'transporter',
-                    'nomor_polisi',
-                    'status_pindah_barang'
+                    'c2.nama_cabang as nama_cabang2',
+                    'pbd.qr_code',
+                    'b.nama_barang',
+                    'pbd.qty',
+                    'pbd.batch',
+                    DB::raw('(CASE
+                        WHEN status_diterima = "0" THEN "Belum Diterima"
+                        WHEN status_diterima = "1" THEN "Sudah Diterima"
+                        ELSE ""
+                    END) AS status_diterima')
                 )
-                    ->leftJoin('cabang as c', 'pb.id_cabang', 'c.id_cabang')
-                    ->leftJoin('gudang as g', 'mu.id_gudang', 'g.id_gudang')
-                    ->leftJoin('cabang as c2', 'mu.id_cabang2', 'c2.id_cabang')
-                    ->whereBetween('tanggal_pindah_barang', $date)
+                    ->join('pindah_barang as pb', 'pbd.id_pindah_barang', 'pb.id_pindah_barang')
+                    ->join('barang as b', 'pbd.id_barang', 'b.id_barang')
+                    ->join('cabang as c', 'pb.id_cabang', 'c.id_cabang')
+                    ->join('gudang as g', 'pb.id_gudang', 'g.id_gudang')
+                    ->join('cabang as c2', 'pb.id_cabang2', 'c2.id_cabang')
+                    ->where('id_jenis_transaksi', '21')->where('void', 0)
+                    ->whereBetween('pb.tanggal_pindah_barang', $date)
                     ->whereIn('pb.id_cabang', $idCabang)->whereIn('pb.id_gudang', $idGudang)
-                    ->orderBy('tanggal_pindah_barang', 'asc');
+                    ->where('status_diterima', 0)
+                    ->orderBy('pb.tanggal_pindah_barang', 'asc');
 
                 if ($status != 'all') {
-                    $data = $data->where('status_pindah_barang', $status);
+                    $data = $data->where('pb.status_pindah_barang', $status);
                 }
 
-                $data = $data->orderBy('tanggal_pindah_barang', 'asc');
+                $data = $data->orderBy('pb.tanggal_pindah_barang', 'asc');
                 break;
             default:
                 $data = [];

@@ -115,11 +115,12 @@
                                 <th>Kode Transaksi</th>
                                 <th>Cabang</th>
                                 <th>Gudang</th>
+                                <th>Cabang Tujuan</th>
                                 <th>QR Code</th>
                                 <th>Nama Barang</th>
                                 <th>Jumlah</th>
-                                <th>Jumlah Zak</th>
-                                <th>Berat Zak</th>
+                                <th>Batch</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -136,11 +137,12 @@
                                 <th>Kode Transaksi</th>
                                 <th>Cabang</th>
                                 <th>Gudang</th>
+                                <th>Cabang Tujuan</th>
                                 <th>QR Code</th>
                                 <th>Nama Barang</th>
                                 <th>Jumlah</th>
-                                <th>Jumlah Zak</th>
-                                <th>Berat Zak</th>
+                                <th>Batch</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -175,6 +177,7 @@
             switch (reportType) {
                 case 'Rekap':
                     $('#target-table-detail').hide()
+                    $('#target-table-outstanding').hide()
                     $('.data-table-rekap').DataTable().destroy();
                     $('.data-table-rekap').find('tbody').html('')
 
@@ -186,10 +189,10 @@
                         ajax: defaultUrlIndex + param,
                         columns: [{
                             data: 'tanggal_pindah_barang',
-                            name: 'tanggal_pindah_barang'
+                            name: 'pb.tanggal_pindah_barang'
                         }, {
                             data: 'kode_pindah_barang',
-                            name: 'kode_pindah_barang'
+                            name: 'pb.kode_pindah_barang'
                         }, {
                             data: 'nama_cabang',
                             name: 'c.nama_cabang',
@@ -201,21 +204,22 @@
                             name: 'c2.nama_cabang',
                         }, {
                             data: 'keterangan_pindah_barang',
-                            name: 'keterangan_pindah_barang',
+                            name: 'pb.keterangan_pindah_barang',
                         }, {
                             data: 'transporter',
-                            name: 'transporter',
+                            name: 'pb.transporter',
                         }, {
                             data: 'nomor_polisi',
-                            name: 'nomor_polisi',
+                            name: 'pb.nomor_polisi',
                         }, {
                             data: 'status_pindah_barang',
-                            name: 'status_pindah_barang',
+                            name: 'pb.status_pindah_barang',
                         }, ]
                     });
                     break;
                 case 'Detail':
                     $('#target-table-rekap').hide()
+                    $('#target-table-outstanding').hide()
                     $('.data-table-detail').DataTable().destroy();
                     $('.data-table-detail').find('tbody').html('')
 
@@ -226,11 +230,11 @@
                         serverSide: true,
                         ajax: defaultUrlIndex + param,
                         columns: [{
-                            data: 'tanggal',
-                            name: 'tanggal'
+                            data: 'tanggal_pindah_barang',
+                            name: 'pb.tanggal_pindah_barang'
                         }, {
-                            data: 'kode_pemakaian',
-                            name: 'kode_pemakaian'
+                            data: 'kode_pindah_barang',
+                            name: 'pb.kode_pindah_barang'
                         }, {
                             data: 'nama_cabang',
                             name: 'c.nama_cabang',
@@ -238,20 +242,68 @@
                             data: 'nama_gudang',
                             name: 'g.nama_gudang',
                         }, {
-                            data: 'kode_batang',
-                            name: 'pd.kode_batang',
+                            data: 'nama_cabang2',
+                            name: 'c2.nama_cabang',
+                        }, {
+                            data: 'qr_code',
+                            name: 'pbd.qr_code',
                         }, {
                             data: 'nama_barang',
                             name: 'b.nama_barang',
                         }, {
-                            data: 'jumlah',
-                            name: 'pd.jumlah',
+                            data: 'qty',
+                            name: 'pbd.qty',
                         }, {
-                            data: 'jumlah_zak',
-                            name: 'pd.jumlah_zak',
+                            data: 'batch',
+                            name: 'pbd.batch',
                         }, {
-                            data: 'weight_zak',
-                            name: 'pd.weight_zak',
+                            data: 'status_diterima',
+                            name: 'pbd.status_diterima',
+                        }, ]
+                    });
+                    break;
+                case 'Outstanding':
+                    $('#target-table-rekap').hide()
+                    $('#target-table-detail').hide()
+                    $('.data-table-outstanding').DataTable().destroy();
+                    $('.data-table-outstanding').find('tbody').html('')
+
+                    $('#target-table-outstanding').show()
+                    table = $('.data-table-outstanding').DataTable({
+                        bDestroy: true,
+                        processing: true,
+                        serverSide: true,
+                        ajax: defaultUrlIndex + param,
+                        columns: [{
+                            data: 'tanggal_pindah_barang',
+                            name: 'pb.tanggal_pindah_barang'
+                        }, {
+                            data: 'kode_pindah_barang',
+                            name: 'pb.kode_pindah_barang'
+                        }, {
+                            data: 'nama_cabang',
+                            name: 'c.nama_cabang',
+                        }, {
+                            data: 'nama_gudang',
+                            name: 'g.nama_gudang',
+                        }, {
+                            data: 'nama_cabang2',
+                            name: 'c2.nama_cabang',
+                        }, {
+                            data: 'qr_code',
+                            name: 'pbd.qr_code',
+                        }, {
+                            data: 'nama_barang',
+                            name: 'b.nama_barang',
+                        }, {
+                            data: 'qty',
+                            name: 'pbd.qty',
+                        }, {
+                            data: 'batch',
+                            name: 'pbd.batch',
+                        }, {
+                            data: 'status_diterima',
+                            name: 'pbd.status_diterima',
                         }, ]
                     });
                     break;

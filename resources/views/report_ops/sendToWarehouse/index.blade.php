@@ -1,5 +1,7 @@
 @extends('layouts.main')
 @section('addedStyles')
+    <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables-responsive/css/responsive.dataTables.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/bower_components/select2/dist/css/select2.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/bower_components/bootstrap-daterangepicker/daterangepicker.css') }}" />
     <style>
@@ -83,18 +85,79 @@
                     </a>
                 </div>
             </div>
-        </div>
-        <div class="box">
-            <div class="box-body" id="target-html">
+            <div class="box-body">
+                <div class="table-responsive" id="target-table-rekap" style="display:none;">
+                    <table class="table table-bordered data-table-rekap display responsive nowrap" width="100%">
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Kode Transaksi</th>
+                                <th>Cabang</th>
+                                <th>Gudang</th>
+                                <th>Gudang Tujuan</th>
+                                <th>Keterangan</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
 
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="table-responsive" id="target-table-detail" style="display:none;">
+                    <table class="table table-bordered data-table-detail display responsive nowrap" width="100%">
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Kode Transaksi</th>
+                                <th>Cabang</th>
+                                <th>Gudang</th>
+                                <th>Gudang Tujuan</th>
+                                <th>QR Code</th>
+                                <th>Nama Barang</th>
+                                <th>Jumlah</th>
+                                <th>Batch</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="table-responsive" id="target-table-outstanding" style="display:none;">
+                    <table class="table table-bordered data-table-outstanding display responsive nowrap" width="100%">
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Kode Transaksi</th>
+                                <th>Cabang</th>
+                                <th>Gudang</th>
+                                <th>Gudang Tujuan</th>
+                                <th>QR Code</th>
+                                <th>Nama Barang</th>
+                                <th>Jumlah</th>
+                                <th>Batch</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 @endsection
 
 @section('addedScripts')
+    <script src="{{ asset('assets/bower_components/datatables.net/js/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js') }}"></script>
+    <script src="{{ asset('assets/bower_components/datatables-responsive/js/dataTables.responsive.js') }}"></script>
     <script src="{{ asset('assets/bower_components/select2/dist/js/select2.min.js') }}"></script>
-    {{-- <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script> --}}
     <script type="text/javascript" src="{{ asset('assets/bower_components/moment/moment.js') }}"></script>
     <script type="text/javascript"
         src="{{ asset('assets/bower_components/bootstrap-daterangepicker/daterangepicker.js') }}"></script>
@@ -105,113 +168,141 @@
 @section('externalScripts')
     <script>
         let defaultUrlIndex = '{{ route('report_send_to_warehouse-index') }}'
-        let defaultUrlPrint = $('.btn-action').prop('href')
-        let param = ''
         let branch = {!! json_encode(session()->get('access_cabang')) !!}
-        let gArray = [];
 
-        $('.select2').select2()
-        $('[name="date"]').daterangepicker({
-            timePicker: false,
-            startDate: moment().subtract(30, 'days'),
-            endDate: moment(),
-            locale: {
-                format: 'YYYY-MM-DD'
+        function loadDatatable() {
+            reportType = $('[name="type"]').val()
+            switch (reportType) {
+                case 'Rekap':
+                    $('#target-table-detail').hide()
+                    $('#target-table-outstanding').hide()
+                    $('.data-table-rekap').DataTable().destroy();
+                    $('.data-table-rekap').find('tbody').html('')
+
+                    $('#target-table-rekap').show()
+                    table = $('.data-table-rekap').DataTable({
+                        bDestroy: true,
+                        processing: true,
+                        serverSide: true,
+                        ajax: defaultUrlIndex + param,
+                        columns: [{
+                            data: 'tanggal_pindah_barang',
+                            name: 'pb.tanggal_pindah_barang'
+                        }, {
+                            data: 'kode_pindah_barang',
+                            name: 'pb.kode_pindah_barang'
+                        }, {
+                            data: 'nama_cabang',
+                            name: 'c.nama_cabang',
+                        }, {
+                            data: 'nama_gudang',
+                            name: 'g.nama_gudang',
+                        }, {
+                            data: 'nama_gudang2',
+                            name: 'g2.nama_gudang',
+                        }, {
+                            data: 'keterangan_pindah_barang',
+                            name: 'pb.keterangan_pindah_barang',
+                        }, {
+                            data: 'status_pindah_barang',
+                            name: 'pb.status_pindah_barang',
+                        }, ]
+                    });
+                    break;
+                case 'Detail':
+                    $('#target-table-rekap').hide()
+                    $('#target-table-outstanding').hide()
+                    $('.data-table-detail').DataTable().destroy();
+                    $('.data-table-detail').find('tbody').html('')
+
+                    $('#target-table-detail').show()
+                    table = $('.data-table-detail').DataTable({
+                        bDestroy: true,
+                        processing: true,
+                        serverSide: true,
+                        ajax: defaultUrlIndex + param,
+                        columns: [{
+                            data: 'tanggal_pindah_barang',
+                            name: 'pb.tanggal_pindah_barang'
+                        }, {
+                            data: 'kode_pindah_barang',
+                            name: 'pb.kode_pindah_barang'
+                        }, {
+                            data: 'nama_cabang',
+                            name: 'c.nama_cabang',
+                        }, {
+                            data: 'nama_gudang',
+                            name: 'g.nama_gudang',
+                        }, {
+                            data: 'nama_gudang2',
+                            name: 'g2.nama_gudang',
+                        }, {
+                            data: 'qr_code',
+                            name: 'pbd.qr_code',
+                        }, {
+                            data: 'nama_barang',
+                            name: 'b.nama_barang',
+                        }, {
+                            data: 'qty',
+                            name: 'pbd.qty',
+                        }, {
+                            data: 'batch',
+                            name: 'pbd.batch',
+                        }, {
+                            data: 'status_diterima',
+                            name: 'pbd.status_diterima',
+                        }, ]
+                    });
+                    break;
+                case 'Outstanding':
+                    $('#target-table-rekap').hide()
+                    $('#target-table-detail').hide()
+                    $('.data-table-outstanding').DataTable().destroy();
+                    $('.data-table-outstanding').find('tbody').html('')
+
+                    $('#target-table-outstanding').show()
+                    table = $('.data-table-outstanding').DataTable({
+                        bDestroy: true,
+                        processing: true,
+                        serverSide: true,
+                        ajax: defaultUrlIndex + param,
+                        columns: [{
+                            data: 'tanggal_pindah_barang',
+                            name: 'pb.tanggal_pindah_barang'
+                        }, {
+                            data: 'kode_pindah_barang',
+                            name: 'pb.kode_pindah_barang'
+                        }, {
+                            data: 'nama_cabang',
+                            name: 'c.nama_cabang',
+                        }, {
+                            data: 'nama_gudang',
+                            name: 'g.nama_gudang',
+                        }, {
+                            data: 'nama_gudang2',
+                            name: 'g2.nama_gudang',
+                        }, {
+                            data: 'qr_code',
+                            name: 'pbd.qr_code',
+                        }, {
+                            data: 'nama_barang',
+                            name: 'b.nama_barang',
+                        }, {
+                            data: 'qty',
+                            name: 'pbd.qty',
+                        }, {
+                            data: 'batch',
+                            name: 'pbd.batch',
+                        }, {
+                            data: 'status_diterima',
+                            name: 'pbd.status_diterima',
+                        }, ]
+                    });
+                    break;
+                default:
+                    break;
             }
-        });
-
-        $('.btn-action').prop('href', defaultUrlPrint + param)
-
-        function getParam() {
-            param = ''
-            $('.trigger-change').each(function(i, v) {
-                param += (i == 0) ? '?' : '&'
-                param += $(v).prop('name') + '=' + $(v).val()
-            })
-
-            $('.btn-action').prop('href', defaultUrlPrint + param)
-        }
-
-        function getData() {
-            $('#cover-spin').show()
-            setTimeout(() => {
-                getParam()
-                $.ajax({
-                    url: defaultUrlIndex + param,
-                    success: function(res) {
-                        $('#target-html').html(res.html)
-                        $('#cover-spin').hide()
-                    },
-                    error: function(error) {
-                        let textError = error.hasOwnProperty('responseJSON') ? error.responseJSON
-                            .message : error
-                            .statusText
-                        Swal.fire("Gagal Mengambil Data. ", textError, 'error')
-                        $('#cover-spin').hide()
-                    }
-                })
-            }, 100);
-        }
-
-        $('.btn-view-action').click(function() {
-            getData()
-        })
-
-        $('[name="id_cabang"]').select2().on('select2:select', function(e) {
-            let dataselect = e.params.data
-            clearWarehouse()
-            for (let i = 0; i < branch.length; i++) {
-                if (branch[i].id == dataselect.id) {
-                    getWarehouse(branch[i].gudang)
-                    break
-                }
-            }
-        });
-
-        clearWarehouse()
-        if (branch.length == 1) {
-            if (branch[0].gudang.length > 0) {
-                getWarehouse(branch[0].gudang)
-            }
-        }
-
-        function getWarehouse(arrayGudang) {
-            gArray = []
-            if (arrayGudang.length > 0) {
-                gArray.push({
-                    'id': arrayGudang.map(s => s.id).join(','),
-                    'text': 'Semua Gudang'
-                })
-            }
-
-            for (let a = 0; a < arrayGudang.length; a++) {
-                gArray.push({
-                    'id': arrayGudang[a].id,
-                    'text': arrayGudang[a].text
-                })
-            }
-
-            $('[name="id_gudang"]').empty()
-            $('[name="id_gudang"]').select2({
-                data: gArray
-            })
-        }
-
-        function clearWarehouse() {
-            let tempId = []
-            for (let i = 0; i < branch.length; i++) {
-                for (let a = 0; a < branch[i].gudang.length; a++) {
-                    tempId.push(branch[i].gudang[a].id)
-                }
-            }
-
-            $('[name="id_gudang"]').empty()
-            $('[name="id_gudang"]').select2({
-                data: [{
-                    'id': tempId.join(','),
-                    'text': 'Semua Gudang'
-                }]
-            })
         }
     </script>
+    <script src="{{ asset('js/for-report.js') }}"></script>
 @endsection
