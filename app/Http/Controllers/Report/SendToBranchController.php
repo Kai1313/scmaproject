@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Report;
 
 use App\Http\Controllers\Controller;
-use App\MoveBranch;
-use App\MoveBranchDetail;
+use DB;
 use Illuminate\Http\Request;
+use Yajra\DataTables\DataTables;
 
 class SendToBranchController extends Controller
 {
@@ -17,17 +17,7 @@ class SendToBranchController extends Controller
         }
 
         if ($request->ajax()) {
-            $data = $this->getData($request);
-
-            $html = '';
-            $html .= view('report_ops.sendToBranch.template', [
-                'datas' => $data,
-                'arrayStatus' => $this->arrayStatus,
-                'type' => $request->type,
-            ]);
-            return response()->json([
-                'html' => $html,
-            ]);
+            return $this->getData($request, 'datatable');
         }
 
         return view('report_ops.sendToBranch.index', [
@@ -42,7 +32,7 @@ class SendToBranchController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        $data = $this->getData($request);
+        $data = $this->getData($request, 'print');
         $arrayCabang = [];
         foreach (session()->get('access_cabang') as $c) {
             $arrayCabang[$c['id']] = $c['text'];
@@ -64,47 +54,105 @@ class SendToBranchController extends Controller
         ]);
     }
 
-    public function getData($request)
+    public function getData($request, $type)
     {
         $date = explode(' - ', $request->date);
         $idCabang = explode(',', $request->id_cabang);
         $idGudang = explode(',', $request->id_gudang);
         $status = $request->status;
-        $type = $request->type;
+        $reportType = $request->type;
 
-        switch ($type) {
+        switch ($reportType) {
             case 'Rekap':
+                $data = DB::table('pindah_barang as pb')->select(
+                    'pb.tanggal_pindah_barang',
+                    'pb.kode_pindah_barang',
+                    'c.nama_cabang',
+                    'g.nama_gudang',
+                    'c2.nama_cabang as nama_cabang2',
+                    'pb.keterangan_pindah_barang',
+                    'pb.transporter',
+                    'pb.nomor_polisi',
+                    DB::raw('(CASE 
+                        WHEN status_pindah_barang = "0" 
+                    )')'pb.status_pindah_barang'
+                )
+                    ->leftJoin('cabang as c', 'pb.id_cabang', 'c.id_cabang')
+                    ->leftJoin('gudang as g', 'pb.id_gudang', 'g.id_gudang')
+                    ->leftJoin('cabang as c2', 'pb.id_cabang2', 'c2.id_cabang')
+                    ->whereBetween('pb.tanggal_pindah_barang', $date)
+                    ->whereIn('pb.id_cabang', $idCabang)->whereIn('pb.id_gudang', $idGudang)
+                    ->orderBy('pb.tanggal_pindah_barang', 'asc');
+
+                if ($status != 'all') {
+                    $data = $data->where('pb.status_pindah_barang', $status);
+                }
+
+                $data = $data->orderBy('pb.tanggal_pindah_barang', 'asc');
+                break;
             case 'Detail':
-                $data = MoveBranch::where('id_jenis_transaksi', '21')->whereBetween('tanggal_pindah_barang', $date)
-                    ->whereIn('id_cabang', $idCabang)->where('void', 0)
-                    ->whereIn('id_gudang', $idGudang);
+                //belum
+                $data = DB::table('pindah_barang as pb')->select(
+                    'tanggal_pindah_barang',
+                    'kode_pindah_barang',
+                    'c.nama_cabang',
+                    'g.nama_gudang',
+                    'c2.nama_cabang',
+                    'keterangan_pindah_barang',
+                    'transporter',
+                    'nomor_polisi',
+                    'status_pindah_barang'
+                )
+                    ->leftJoin('cabang as c', 'pb.id_cabang', 'c.id_cabang')
+                    ->leftJoin('gudang as g', 'mu.id_gudang', 'g.id_gudang')
+                    ->leftJoin('cabang as c2', 'mu.id_cabang2', 'c2.id_cabang')
+                    ->whereBetween('tanggal_pindah_barang', $date)
+                    ->whereIn('pb.id_cabang', $idCabang)->whereIn('pb.id_gudang', $idGudang)
+                    ->orderBy('tanggal_pindah_barang', 'asc');
 
                 if ($status != 'all') {
                     $data = $data->where('status_pindah_barang', $status);
                 }
 
-                $data = $data->orderBy('tanggal_pindah_barang', 'asc')->get();
+                $data = $data->orderBy('tanggal_pindah_barang', 'asc');
                 break;
             case 'Outstanding':
-                $data = MoveBranchDetail::whereHas('parent', function ($query) use ($idCabang, $idGudang, $status, $date) {
-                    $query = $query->whereBetween('tanggal_pindah_barang', $date)
-                        ->where('id_jenis_transaksi', 21)
-                        ->whereIn('id_cabang', $idCabang)
-                        ->where('void', 0)
-                        ->whereIn('id_gudang', $idGudang);
+                //belum
+                $data = DB::table('pindah_barang as pb')->select(
+                    'tanggal_pindah_barang',
+                    'kode_pindah_barang',
+                    'c.nama_cabang',
+                    'g.nama_gudang',
+                    'c2.nama_cabang',
+                    'keterangan_pindah_barang',
+                    'transporter',
+                    'nomor_polisi',
+                    'status_pindah_barang'
+                )
+                    ->leftJoin('cabang as c', 'pb.id_cabang', 'c.id_cabang')
+                    ->leftJoin('gudang as g', 'mu.id_gudang', 'g.id_gudang')
+                    ->leftJoin('cabang as c2', 'mu.id_cabang2', 'c2.id_cabang')
+                    ->whereBetween('tanggal_pindah_barang', $date)
+                    ->whereIn('pb.id_cabang', $idCabang)->whereIn('pb.id_gudang', $idGudang)
+                    ->orderBy('tanggal_pindah_barang', 'asc');
 
-                    if ($status != 'all') {
-                        $query = $query->where('status_pindah_barang', $status);
-                    }
+                if ($status != 'all') {
+                    $data = $data->where('status_pindah_barang', $status);
+                }
 
-                    return $query;
-                })->where('status_diterima', 0)->get();
+                $data = $data->orderBy('tanggal_pindah_barang', 'asc');
                 break;
             default:
                 $data = [];
                 break;
         }
 
+        if ($type == 'datatable') {
+            return Datatables::of($data)
+                ->toJson();
+        }
+
+        $data = $data->get();
         return $data;
     }
 }

@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Report;
 
 use App\Http\Controllers\Controller;
-use App\SalesDownPayment;
+use DB;
 use Illuminate\Http\Request;
+use Yajra\DataTables\DataTables;
 
 class SalesDownPaymentController extends Controller
 {
@@ -15,15 +16,7 @@ class SalesDownPaymentController extends Controller
         }
 
         if ($request->ajax()) {
-            $data = $this->getData($request);
-
-            $html = '';
-            $html .= view('report_ops.salesDownPayment.template', [
-                'datas' => $data,
-            ]);
-            return response()->json([
-                'html' => $html,
-            ]);
+            return $this->getData($request, 'datatable');
         }
 
         return view('report_ops.salesDownPayment.index', [
@@ -37,7 +30,7 @@ class SalesDownPaymentController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        $data = $this->getData($request);
+        $data = $this->getData($request, 'print');
         $arrayCabang = [];
         foreach (session()->get('access_cabang') as $c) {
             $arrayCabang[$c['id']] = $c['text'];
@@ -57,15 +50,31 @@ class SalesDownPaymentController extends Controller
         ]);
     }
 
-    public function getData($request)
+    public function getData($request, $type)
     {
         $date = explode(' - ', $request->date);
         $idCabang = explode(',', $request->id_cabang);
 
-        $data = SalesDownPayment::whereBetween('tanggal', $date)
-            ->whereIn('id_cabang', $idCabang)->where('void', 0);
+        $data = DB::table('uang_muka_penjualan as ump')->select(
+            'ump.tanggal',
+            'c.nama_cabang',
+            'ump.kode_uang_muka_penjualan',
+            'pp.nama_permintaan_penjualan',
+            's.nama_slip',
+            'mu.nama_mata_uang',
+            'ump.nominal'
+        )
+            ->leftJoin('cabang as c', 'ump.id_cabang', 'c.id_cabang')
+            ->leftJoin('permintaan_penjualan as pp', 'ump.id_permintaan_penjualan', 'pp.id_permintaan_penjualan')
+            ->leftJoin('master_slip as s', 'ump.id_slip', 's.id_slip')
+            ->leftJoin('mata_uang as mu', 'ump.id_mata_uang', 'mu.id_mata_uang')->orderBy('tanggal', 'asc');
 
-        $data = $data->orderBy('tanggal', 'asc')->get();
+        if ($type == 'datatable') {
+            return Datatables::of($data)
+                ->toJson();
+        }
+
+        $data = $data->get();
         return $data;
     }
 }

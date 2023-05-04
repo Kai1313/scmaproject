@@ -69,14 +69,14 @@
                         target="_blank">
                         <i class="glyphicon glyphicon-print"></i> Print
                     </a>
-                    <a href="javascript:void(0)" class="btn btn-warning btn-sm btn-flat btn-view-action">
+                    <a href="javascript:void(0)" class="btn btn-default btn-sm btn-flat btn-view-action">
                         <i class="glyphicon glyphicon-eye-open"></i> View
                     </a>
                 </div>
             </div>
             <div class="box-body">
-                <div class="table-responsive" id="target-table" style="display:none;">
-                    <table class="table table-bordered data-table display responsive nowrap" width="100%">
+                <div class="table-responsive" id="target-table-rekap" style="display:none;">
+                    <table class="table table-bordered data-table-rekap display responsive nowrap" width="100%">
                         <thead>
                             <tr>
                                 <th>Tanggal</th>
@@ -84,6 +84,27 @@
                                 <th>Cabang</th>
                                 <th>Gudang</th>
                                 <th>Catatan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="table-responsive" id="target-table-detail" style="display:none;">
+                    <table class="table table-bordered data-table-detail display responsive nowrap" width="100%">
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Kode Transaksi</th>
+                                <th>Cabang</th>
+                                <th>Gudang</th>
+                                <th>QR Code</th>
+                                <th>Nama Barang</th>
+                                <th>Jumlah</th>
+                                <th>Jumlah Zak</th>
+                                <th>Berat Zak</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -114,28 +135,81 @@
         let branch = {!! json_encode(session()->get('access_cabang')) !!}
 
         function loadDatatable() {
-            $('#target-table').show()
-            table = $('.data-table').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: defaultUrlIndex + param,
-                columns: [{
-                    data: 'tanggal',
-                    name: 'tanggal'
-                }, {
-                    data: 'kode_pemakaian',
-                    name: 'kode_pemakaian'
-                }, {
-                    data: 'nama_cabang',
-                    name: 'c.nama_cabang',
-                }, {
-                    data: 'nama_gudang',
-                    name: 'g.nama_gudang',
-                }, {
-                    data: 'catatan',
-                    name: 'catatan',
-                }, ]
-            });
+            reportType = $('[name="type"]').val()
+            switch (reportType) {
+                case 'Rekap':
+                    $('#target-table-detail').hide()
+                    $('.data-table-rekap').DataTable().destroy();
+                    $('.data-table-rekap').find('tbody').html('')
+
+                    $('#target-table-rekap').show()
+                    table = $('.data-table-rekap').DataTable({
+                        bDestroy: true,
+                        processing: true,
+                        serverSide: true,
+                        ajax: defaultUrlIndex + param,
+                        columns: [{
+                            data: 'tanggal',
+                            name: 'tanggal'
+                        }, {
+                            data: 'kode_pemakaian',
+                            name: 'kode_pemakaian'
+                        }, {
+                            data: 'nama_cabang',
+                            name: 'c.nama_cabang',
+                        }, {
+                            data: 'nama_gudang',
+                            name: 'g.nama_gudang',
+                        }, {
+                            data: 'catatan',
+                            name: 'catatan',
+                        }, ]
+                    });
+                    break;
+                case 'Detail':
+                    $('#target-table-rekap').hide()
+                    $('.data-table-detail').DataTable().destroy();
+                    $('.data-table-detail').find('tbody').html('')
+
+                    $('#target-table-detail').show()
+                    table = $('.data-table-detail').DataTable({
+                        bDestroy: true,
+                        processing: true,
+                        serverSide: true,
+                        ajax: defaultUrlIndex + param,
+                        columns: [{
+                            data: 'tanggal',
+                            name: 'tanggal'
+                        }, {
+                            data: 'kode_pemakaian',
+                            name: 'kode_pemakaian'
+                        }, {
+                            data: 'nama_cabang',
+                            name: 'c.nama_cabang',
+                        }, {
+                            data: 'nama_gudang',
+                            name: 'g.nama_gudang',
+                        }, {
+                            data: 'kode_batang',
+                            name: 'pd.kode_batang',
+                        }, {
+                            data: 'nama_barang',
+                            name: 'b.nama_barang',
+                        }, {
+                            data: 'jumlah',
+                            name: 'pd.jumlah',
+                        }, {
+                            data: 'jumlah_zak',
+                            name: 'pd.jumlah_zak',
+                        }, {
+                            data: 'weight_zak',
+                            name: 'pd.weight_zak',
+                        }, ]
+                    });
+                    break;
+                default:
+                    break;
+            }
         }
     </script>
     <script src="{{ asset('js/for-report.js') }}"></script>

@@ -160,13 +160,6 @@ class ReceivedFromWarehouseController extends Controller
             ], 500);
         }
 
-        if ($data->id_produksi != null) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Pengiriman untuk produksi',
-            ], 500);
-        }
-
         if ($data->status_pindah_barang == 1) {
             return response()->json([
                 'status' => 'error',

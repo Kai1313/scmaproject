@@ -1,5 +1,7 @@
 @extends('layouts.main')
 @section('addedStyles')
+    <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables-responsive/css/responsive.dataTables.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/bower_components/select2/dist/css/select2.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/bower_components/bootstrap-daterangepicker/daterangepicker.css') }}" />
     <style>
@@ -54,18 +56,6 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <label>Kode Pembelian</label>
-                        <div class="form-group">
-                            <input type="text" class="form-control trigger-change" name="kode_pembelian">
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <label>Nama Barang</label>
-                        <div class="form-group">
-                            <input type="text" class="form-control trigger-change" name="nama_barang">
-                        </div>
-                    </div>
                 </div>
                 <div class="pull-right">
                     <a href="{{ route('report_qc-print') }}" class="btn btn-danger btn-sm btn-flat btn-action"
@@ -77,18 +67,15 @@
                     </a>
                 </div>
             </div>
-        </div>
-        <div class="box">
             <div class="box-body">
-                <div class="table-responsive">
+                <div class="table-responsive" id="target-table" style="display:none;">
                     <table class="table table-bordered data-table display responsive nowrap" width="100%">
                         <thead>
                             <tr>
-                                <th>No</th>
                                 <th>Kode Pembelian</th>
                                 <th>Nama Barang</th>
-                                <th>Jumlah</th>
                                 <th>Satuan</th>
+                                <th>Jumlah</th>
                                 <th>Status</th>
                                 <th>Alasan</th>
                                 <th>Tanggal QC</th>
@@ -110,8 +97,9 @@
 @endsection
 
 @section('addedScripts')
+    <script src="{{ asset('assets/bower_components/datatables.net/js/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js') }}"></script>
     <script src="{{ asset('assets/bower_components/select2/dist/js/select2.min.js') }}"></script>
-    {{-- <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script> --}}
     <script type="text/javascript" src="{{ asset('assets/bower_components/moment/moment.js') }}"></script>
     <script type="text/javascript"
         src="{{ asset('assets/bower_components/bootstrap-daterangepicker/daterangepicker.js') }}"></script>
@@ -122,52 +110,55 @@
 @section('externalScripts')
     <script>
         let defaultUrlIndex = '{{ route('report_qc-index') }}'
-        let defaultUrlPrint = $('.btn-action').prop('href')
-        let countDown = '{{ $countDown }}'
-        let param = ''
 
-        $('.select2').select2()
-        $('[name="date"]').daterangepicker({
-            timePicker: false,
-            startDate: moment().subtract(countDown, 'days'),
-            endDate: moment(),
-            locale: {
-                format: 'YYYY-MM-DD'
-            }
-        });
-
-        $('.btn-action').prop('href', defaultUrlPrint + param)
-        $('.btn-view-action').click(function() {
-            getData()
-        })
-
-        function getParam() {
-            param = ''
-            $('.trigger-change').each(function(i, v) {
-                param += (i == 0) ? '?' : '&'
-                param += $(v).prop('name') + '=' + $(v).val()
-            })
-
-            $('.btn-action').prop('href', defaultUrlPrint + param)
-        }
-
-        function getData() {
-            getParam()
-
-            $('#cover-spin').show()
-            $.ajax({
-                url: defaultUrlIndex + param,
-                success: function(res) {
-                    $('tbody').html(res.html)
-                    $('#cover-spin').hide()
-                },
-                error: function(error) {
-                    let textError = error.hasOwnProperty('responseJSON') ? error.responseJSON.message : error
-                        .statusText
-                    Swal.fire("Gagal Mengambil Data. ", textError, 'error')
-                    $('#cover-spin').hide()
-                }
-            })
+        function loadDatatable() {
+            $('#target-table').show()
+            table = $('.data-table').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: defaultUrlIndex + param,
+                columns: [{
+                    data: 'nama_pembelian',
+                    name: 'p.nama_pembelian'
+                }, {
+                    data: 'nama_barang',
+                    name: 'b.nama_barang'
+                }, {
+                    data: 'nama_satuan_barang',
+                    name: 'sb.nama_satuan_barang',
+                }, {
+                    data: 'jumlah_pembelian_detail',
+                    name: 'pd.jumlah_purchase',
+                }, {
+                    data: 'status_qc',
+                    name: 'qc.status_qc',
+                }, {
+                    data: 'reason',
+                    name: 'qc.reason',
+                }, {
+                    data: 'tanggal_qc',
+                    name: 'qc.tanggal_qc',
+                }, {
+                    data: 'sg_pembelian_detail',
+                    name: 'qc.sg_pembelian_detail',
+                }, {
+                    data: 'be_pembelian_detail',
+                    name: 'qc.be_pembelian_detail',
+                }, {
+                    data: 'ph_pembelian_detail',
+                    name: 'qc.ph_pembelian_detail',
+                }, {
+                    data: 'warna_pembelian_detail',
+                    name: 'qc.warna_pembelian_detail',
+                }, {
+                    data: 'bentuk_pembelian_detail',
+                    name: 'qc.bentuk_pembelian_detail',
+                }, {
+                    data: 'keterangan_pembelian_detail',
+                    name: 'qc.keterangan_pembelian_detail',
+                }, ]
+            });
         }
     </script>
+    <script src="{{ asset('js/for-report.js') }}"></script>
 @endsection

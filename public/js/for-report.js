@@ -2,6 +2,7 @@ let defaultUrlPrint = $('.btn-action').prop('href')
 let param = ''
 let gArray = [];
 let table = ''
+let reportType = 'Rekap'
 
 $('.select2').select2()
 
@@ -18,10 +19,18 @@ $('.btn-action').prop('href', defaultUrlPrint + param)
 
 $('.btn-view-action').click(function () {
     getParam()
-    if (table) {
-        table.ajax.url(param).load()
+    if ($('[name="type"]').length > 0) {
+        if (table && reportType == $('[name="type"]').val()) {
+            table.ajax.url(param).load()
+        } else {
+            loadDatatable()
+        }
     } else {
-        loadDatatable()
+        if (table) {
+            table.ajax.url(param).load()
+        } else {
+            loadDatatable()
+        }
     }
 })
 

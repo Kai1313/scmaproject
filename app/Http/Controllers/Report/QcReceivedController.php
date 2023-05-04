@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Report;
 use App\Http\Controllers\Controller;
 use DB;
 use Illuminate\Http\Request;
+use Yajra\DataTables\DataTables;
 
 class QcReceivedController extends Controller
 {
@@ -16,13 +17,7 @@ class QcReceivedController extends Controller
         }
 
         if ($request->ajax()) {
-            $data = $this->getData($request);
-
-            $html = '';
-            $html .= view('report_ops.qualityControl.template', ['datas' => $data, 'arrayStatus' => $this->arrayStatus]);
-            return response()->json([
-                'html' => $html,
-            ]);
+            return $this->getData($request, 'datatable');
         }
 
         $duration = DB::table('setting')->where('code', 'QC Duration')->first();
@@ -40,7 +35,7 @@ class QcReceivedController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        $data = $this->getData($request);
+        $data = $this->getData($request, 'print');
         $arrayCabang = [];
         foreach (session()->get('access_cabang') as $c) {
             $arrayCabang[$c['id']] = $c['text'];
@@ -61,7 +56,7 @@ class QcReceivedController extends Controller
         ]);
     }
 
-    public function getData($request)
+    public function getData($request, $type)
     {
         $date = explode(' - ', $request->date);
         $idCabang = explode(',', $request->id_cabang);
@@ -69,16 +64,21 @@ class QcReceivedController extends Controller
         $statusQc = $request->status_qc;
         $namaBarang = $request->nama_barang;
 
-        $data = DB::table('pembelian_detail')
+        $data = DB::table('pembelian_detail as pd')
             ->select(
-                'id_pembelian_detail',
-                'tanggal_qc',
-                'nama_pembelian',
-                'nama_barang',
-                DB::raw('sum(pembelian_detail.jumlah_purchase) as jumlah_pembelian_detail'),
-                'status_qc',
-                'nama_satuan_barang',
-                'reason',
+                'pd.id_pembelian_detail',
+                'qc.tanggal_qc',
+                'p.nama_pembelian',
+                'b.nama_barang',
+                DB::raw('sum(pd.jumlah_purchase) as jumlah_pembelian_detail'),
+                DB::raw('(CASE
+                    WHEN qc.status_qc = 1 THEN "Passed"
+                    WHEN qc.status_qc = 2 THEN "Reject"
+                    WHEN qc.status_qc = 3 THEN "Hold"
+                    ELSE "Belum di QC"
+                END) AS status_qc'),
+                'sb.nama_satuan_barang',
+                'qc.reason',
                 'qc.sg_pembelian_detail',
                 'qc.be_pembelian_detail',
                 'qc.ph_pembelian_detail',
@@ -87,28 +87,26 @@ class QcReceivedController extends Controller
                 'qc.bentuk_pembelian_detail'
             )
             ->leftJoin('qc', function ($qc) {
-                $qc->on('pembelian_detail.id_pembelian', '=', 'qc.id_pembelian')->on('pembelian_detail.id_barang', '=', 'qc.id_barang');
+                $qc->on('pd.id_pembelian', '=', 'qc.id_pembelian')->on('pd.id_barang', '=', 'qc.id_barang');
             })
-            ->leftJoin('pembelian', 'pembelian_detail.id_pembelian', '=', 'pembelian.id_pembelian')
-            ->leftJoin('barang', 'pembelian_detail.id_barang', '=', 'barang.id_barang')
-            ->leftJoin('satuan_barang', 'pembelian_detail.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
-            ->whereBetween('pembelian.tanggal_pembelian', [$date])
-            ->whereIn('pembelian.id_cabang', $idCabang);
+            ->leftJoin('pembelian as p', 'pd.id_pembelian', '=', 'p.id_pembelian')
+            ->leftJoin('barang as b', 'pd.id_barang', '=', 'b.id_barang')
+            ->leftJoin('satuan_barang as sb', 'pd.id_satuan_barang', '=', 'sb.id_satuan_barang')
+            ->whereBetween('p.tanggal_pembelian', [$date])
+            ->whereIn('p.id_cabang', $idCabang);
         if ($statusQc != 'all') {
-            $data = $data->where('status_qc', $statusQc);
+            $data = $data->where('qc.status_qc', $statusQc);
         }
 
-        if ($kodePembelian) {
-            $data = $data->where('nama_pembelian', 'like', '%' . $kodePembelian . '%');
+        $data = $data->groupBy('pd.id_pembelian', 'pd.id_barang')
+            ->orderBy('p.tanggal_pembelian', 'asc');
+
+        if ($type == 'datatable') {
+            return Datatables::of($data)
+                ->toJson();
         }
 
-        if ($namaBarang) {
-            $data = $data->where('nama_barang', 'like', '%' . $namaBarang . '%');
-        }
-
-        $data = $data->groupBy('pembelian_detail.id_pembelian', 'pembelian_detail.id_barang')
-            ->orderBy('pembelian.tanggal_pembelian', 'asc')->get();
-
+        $data = $data->get();
         return $data;
     }
 }

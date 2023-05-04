@@ -56,19 +56,47 @@ class MaterialUsageController extends Controller
         $date = explode(' - ', $request->date);
         $idCabang = explode(',', $request->id_cabang);
         $idGudang = explode(',', $request->id_gudang);
-        $statusQc = $request->status_qc;
+        $reportType = $request->type;
+        switch ($reportType) {
+            case 'Rekap':
+                $data = DB::table('pemakaian_header as mu')->select(
+                    'tanggal',
+                    'kode_pemakaian',
+                    'c.nama_cabang',
+                    'g.nama_gudang',
+                    'catatan'
+                )
+                    ->leftJoin('cabang as c', 'mu.id_cabang', 'c.id_cabang')
+                    ->leftJoin('gudang as g', 'mu.id_gudang', 'g.id_gudang')
+                    ->whereBetween('tanggal', $date)
+                    ->whereIn('mu.id_cabang', $idCabang)->whereIn('mu.id_gudang', $idGudang)
+                    ->orderBy('tanggal', 'asc');
+                break;
+            case 'Detail':
+                $data = DB::table('pemakaian_detail as pd')->select(
+                    'ph.tanggal',
+                    'ph.kode_pemakaian',
+                    'c.nama_cabang',
+                    'g.nama_gudang',
+                    'pd.kode_batang',
+                    'b.nama_barang',
+                    'pd.jumlah',
+                    'pd.jumlah_zak',
+                    'pd.weight_zak'
+                )
+                    ->leftJoin('pemakaian_header as ph', 'pd.id_pemakaian', 'ph.id_pemakaian')
+                    ->leftJoin('cabang as c', 'ph.id_cabang', 'c.id_cabang')
+                    ->leftJoin('gudang as g', 'ph.id_gudang', 'g.id_gudang')
+                    ->leftJoin('barang as b', 'pd.id_barang', 'b.id_barang')
+                    ->whereBetween('tanggal', $date)
+                    ->whereIn('ph.id_cabang', $idCabang)->whereIn('ph.id_gudang', $idGudang)
+                    ->orderBy('ph.tanggal', 'asc');
+                break;
 
-        $data = DB::table('pemakaian_header as mu')->select(
-            'tanggal',
-            'kode_pemakaian',
-            'c.nama_cabang',
-            'g.nama_gudang',
-            'catatan'
-        )
-            ->leftJoin('cabang as c', 'mu.id_cabang', 'c.id_cabang')
-            ->leftJoin('gudang as g', 'mu.id_gudang', 'g.id_gudang')
-            ->whereIn('mu.id_cabang', $idCabang)->whereIn('mu.id_gudang', $idGudang)
-            ->orderBy('tanggal', 'asc');
+            default:
+                $data = [];
+                break;
+        }
 
         if ($type == 'datatable') {
             return Datatables::of($data)
