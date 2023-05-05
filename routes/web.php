@@ -128,51 +128,49 @@ Route::namespace('Report')->group(function () {
     Route::prefix('laporan_qc_penerimaan')->group(function () {
         Route::get('index/{user_id?}', 'QcReceivedController@index')->name('report_qc-index');
         Route::get('print', 'QcReceivedController@print')->name('report_qc-print');
+        Route::get('excel', 'QcReceivedController@getExcel')->name('report_qc-excel');
     });
 
     Route::prefix('laporan_pemakaian')->group(function () {
         Route::get('index/{user_id?}', 'MaterialUsageController@index')->name('report_material_usage-index');
         Route::get('print', 'MaterialUsageController@print')->name('report_material_usage-print');
+        Route::get('excel', 'MaterialUsageController@getExcel')->name('report_material_usage-excel');
     });
 
     Route::prefix('laporan_terima_dari_cabang')->group(function () {
         Route::get('index/{user_id?}', 'ReceivedFromBranchController@index')->name('report_received_from_branch-index');
         Route::get('print', 'ReceivedFromBranchController@print')->name('report_received_from_branch-print');
-    });
-
-    Route::prefix('laporan_terima_dari_cabang')->group(function () {
-        Route::get('index/{user_id?}', 'ReceivedFromBranchController@index')->name('report_received_from_branch-index');
-        Route::get('print', 'ReceivedFromBranchController@print')->name('report_received_from_branch-print');
+        Route::get('excel', 'ReceivedFromBranchController@getExcel')->name('report_received_from_branch-excel');
     });
 
     Route::prefix('laporan_terima_dari_gudang')->group(function () {
         Route::get('index/{user_id?}', 'ReceivedFromWarehouseController@index')->name('report_received_from_warehouse-index');
         Route::get('print', 'ReceivedFromWarehouseController@print')->name('report_received_from_warehouse-print');
+        Route::get('excel', 'ReceivedFromWarehouseController@getExcel')->name('report_received_from_warehouse-excel');
     });
 
     Route::prefix('laporan_kirim_ke_cabang')->group(function () {
         Route::get('index/{user_id?}', 'SendToBranchController@index')->name('report_send_to_branch-index');
         Route::get('print', 'SendToBranchController@print')->name('report_send_to_branch-print');
+        Route::get('excel', 'SendToBranchController@getExcel')->name('report_send_to_branch-excel');
     });
 
     Route::prefix('laporan_kirim_ke_gudang')->group(function () {
         Route::get('index/{user_id?}', 'SendToWarehouseController@index')->name('report_send_to_warehouse-index');
         Route::get('print', 'SendToWarehouseController@print')->name('report_send_to_warehouse-print');
-    });
-
-    Route::prefix('laporan_kirim_ke_cabang')->group(function () {
-        Route::get('index/{user_id?}', 'SendToBranchController@index')->name('report_send_to_branch-index');
-        Route::get('print', 'SendToBranchController@print')->name('report_send_to_branch-print');
+        Route::get('excel', 'SendToWarehouseController@getExcel')->name('report_send_to_warehouse-excel');
     });
 
     Route::prefix('laporan_uang_muka_pembelian')->group(function () {
         Route::get('index/{user_id?}', 'PurchaseDownPaymentController@index')->name('report_purchase_down_payment-index');
         Route::get('print', 'PurchaseDownPaymentController@print')->name('report_purchase_down_payment-print');
+        Route::get('excel', 'PurchaseDownPaymentController@getExcel')->name('report_purchase_down_payment-excel');
     });
 
     Route::prefix('laporan_uang_muka_penjualan')->group(function () {
         Route::get('index/{user_id?}', 'SalesDownPaymentController@index')->name('report_sales_down_payment-index');
         Route::get('print', 'SalesDownPaymentController@print')->name('report_sales_down_payment-print');
+        Route::get('excel', 'SalesDownPaymentController@getExcel')->name('report_sales_down_payment-excel');
     });
 });
 

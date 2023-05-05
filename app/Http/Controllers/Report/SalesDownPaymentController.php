@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Report;
 
+use App\Exports\ReportSalesDownPaymentExport;
 use App\Http\Controllers\Controller;
 use DB;
+use Excel;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 
@@ -50,6 +52,33 @@ class SalesDownPaymentController extends Controller
         ]);
     }
 
+    public function getExcel(Request $request)
+    {
+        if (checkAccessMenu('laporan_uang_muka_penjualan', 'print') == false) {
+            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+        }
+
+        $data = $this->getData($request, 'print');
+        $arrayCabang = [];
+        foreach (session()->get('access_cabang') as $c) {
+            $arrayCabang[$c['id']] = $c['text'];
+        }
+
+        $eCabang = explode(',', $request->id_cabang);
+        $sCabang = [];
+        foreach ($eCabang as $e) {
+            $sCabang[] = $arrayCabang[$e];
+        }
+
+        $array = [
+            "datas" => $data,
+            'cabang' => implode(', ', $sCabang),
+            'date' => $request->date,
+            'type' => $request->type,
+        ];
+        return Excel::download(new ReportSalesDownPaymentExport('report_ops.salesDownPayment.excel', $array), 'laporan uang muka penjualan.xlsx');
+    }
+
     public function getData($request, $type)
     {
         $date = explode(' - ', $request->date);
@@ -67,7 +96,10 @@ class SalesDownPaymentController extends Controller
             ->leftJoin('cabang as c', 'ump.id_cabang', 'c.id_cabang')
             ->leftJoin('permintaan_penjualan as pp', 'ump.id_permintaan_penjualan', 'pp.id_permintaan_penjualan')
             ->leftJoin('master_slip as s', 'ump.id_slip', 's.id_slip')
-            ->leftJoin('mata_uang as mu', 'ump.id_mata_uang', 'mu.id_mata_uang')->orderBy('tanggal', 'asc');
+            ->leftJoin('mata_uang as mu', 'ump.id_mata_uang', 'mu.id_mata_uang')
+            ->whereBetween('ump.tanggal', $date)
+            ->whereIn('ump.id_cabang', $idCabang)
+            ->orderBy('tanggal', 'asc');
 
         if ($type == 'datatable') {
             return Datatables::of($data)

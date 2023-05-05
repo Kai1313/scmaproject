@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Report;
 
+use App\Exports\ReportMaterialUsageExport;
 use App\Http\Controllers\Controller;
 use DB;
+use Excel;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 
@@ -49,6 +51,44 @@ class MaterialUsageController extends Controller
             'date' => $request->date,
             'type' => $request->type,
         ]);
+    }
+
+    public function getExcel(Request $request)
+    {
+        if (checkAccessMenu('laporan_pemakaian', 'print') == false) {
+            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+        }
+
+        $data = $this->getData($request, 'print');
+        $arrayCabang = [];
+        $arrayGudang = [];
+        foreach (session()->get('access_cabang') as $c) {
+            $arrayCabang[$c['id']] = $c['text'];
+            foreach ($c['gudang'] as $g) {
+                $arrayGudang[$g['id']] = $g['text'];
+            }
+        }
+
+        $eCabang = explode(',', $request->id_cabang);
+        $eGudang = explode(',', $request->id_gudang);
+        $sCabang = [];
+        $sGudang = [];
+        foreach ($eCabang as $e) {
+            $sCabang[] = $arrayCabang[$e];
+        }
+
+        foreach ($eGudang as $eg) {
+            $sGudang[] = $arrayGudang[$eg];
+        }
+
+        $array = [
+            "datas" => $data,
+            'cabang' => implode(', ', $sCabang),
+            'gudang' => implode(', ', $sGudang),
+            'date' => $request->date,
+            'type' => $request->type,
+        ];
+        return Excel::download(new ReportMaterialUsageExport('report_ops.materialUsage.excel', $array), 'laporan pemakaian.xlsx');
     }
 
     public function getData($request, $type)

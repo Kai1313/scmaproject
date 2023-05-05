@@ -51,7 +51,11 @@
                         class="btn btn-danger btn-sm btn-flat btn-action" target="_blank">
                         <i class="glyphicon glyphicon-print"></i> Print
                     </a>
-                    <a href="javascript:void(0)" class="btn btn-warning btn-sm btn-flat btn-view-action">
+                    <a href="{{ route('report_sales_down_payment-excel') }}"
+                        class="btn btn-success btn-sm btn-flat btn-action">
+                        <i class="fa fa-file-excel-o"></i> Excel
+                    </a>
+                    <a href="javascript:void(0)" class="btn btn-default btn-sm btn-flat btn-view-action">
                         <i class="glyphicon glyphicon-eye-open"></i> View
                     </a>
                 </div>

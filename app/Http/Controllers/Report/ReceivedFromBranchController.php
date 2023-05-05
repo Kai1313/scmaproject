@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Report;
 
+use App\Exports\ReportReceivedFromBranchExport;
 use App\Http\Controllers\Controller;
 use DB;
+use Excel;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 
@@ -54,6 +56,45 @@ class ReceivedFromBranchController extends Controller
         ]);
     }
 
+    public function getExcel(Request $request)
+    {
+        if (checkAccessMenu('laporan_terima_dari_cabang', 'print') == false) {
+            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+        }
+
+        $data = $this->getData($request, 'print');
+        $arrayCabang = [];
+        $arrayGudang = [];
+        foreach (session()->get('access_cabang') as $c) {
+            $arrayCabang[$c['id']] = $c['text'];
+            foreach ($c['gudang'] as $g) {
+                $arrayGudang[$g['id']] = $g['text'];
+            }
+        }
+
+        $eCabang = explode(',', $request->id_cabang);
+        $eGudang = explode(',', $request->id_gudang);
+        $sCabang = [];
+        $sGudang = [];
+        foreach ($eCabang as $e) {
+            $sCabang[] = $arrayCabang[$e];
+        }
+
+        foreach ($eGudang as $eg) {
+            $sGudang[] = $arrayGudang[$eg];
+        }
+
+        $array = [
+            "datas" => $data,
+            'cabang' => implode(', ', $sCabang),
+            'gudang' => implode(', ', $sGudang),
+            'date' => $request->date,
+            'status' => $request->status,
+            'type' => $request->type,
+        ];
+        return Excel::download(new ReportReceivedFromBranchExport('report_ops.receivedFromBranch.excel', $array), 'laporan terima dari cabang.xlsx');
+    }
+
     public function getData($request, $type)
     {
         $date = explode(' - ', $request->date);
@@ -102,6 +143,7 @@ class ReceivedFromBranchController extends Controller
                     'c2.nama_cabang as nama_cabang2',
                     'pbd.qr_code',
                     'b.nama_barang',
+                    'sb.nama_satuan_barang',
                     'pbd.qty',
                     'pbd.batch',
                     DB::raw('(CASE
@@ -115,6 +157,7 @@ class ReceivedFromBranchController extends Controller
                     ->join('cabang as c', 'pb.id_cabang', 'c.id_cabang')
                     ->join('gudang as g', 'pb.id_gudang', 'g.id_gudang')
                     ->join('cabang as c2', 'pb.id_cabang2', 'c2.id_cabang')
+                    ->join('satuan_barang as sb', 'pbd.id_satuan_barang', 'sb.id_satuan_barang')
                     ->where('id_jenis_transaksi', '22')->where('void', 0)
                     ->whereBetween('pb.tanggal_pindah_barang', $date)
                     ->whereIn('pb.id_cabang', $idCabang)->whereIn('pb.id_gudang', $idGudang)
@@ -135,6 +178,7 @@ class ReceivedFromBranchController extends Controller
                     'c2.nama_cabang as nama_cabang2',
                     'pbd.qr_code',
                     'b.nama_barang',
+                    'sb.nama_satuan_barang',
                     'pbd.qty',
                     'pbd.batch',
                     DB::raw('(CASE
@@ -148,6 +192,7 @@ class ReceivedFromBranchController extends Controller
                     ->join('cabang as c', 'pb.id_cabang', 'c.id_cabang')
                     ->join('gudang as g', 'pb.id_gudang', 'g.id_gudang')
                     ->join('cabang as c2', 'pb.id_cabang2', 'c2.id_cabang')
+                    ->join('satuan_barang as sb', 'pbd.id_satuan_barang', 'sb.id_satuan_barang')
                     ->where('id_jenis_transaksi', '22')->where('void', 0)
                     ->whereBetween('pb.tanggal_pindah_barang', $date)
                     ->whereIn('pb.id_cabang', $idCabang)->whereIn('pb.id_gudang', $idGudang)

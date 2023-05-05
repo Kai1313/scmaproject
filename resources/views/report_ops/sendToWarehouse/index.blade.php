@@ -80,7 +80,11 @@
                         class="btn btn-danger btn-sm btn-flat btn-action" target="_blank">
                         <i class="glyphicon glyphicon-print"></i> Print
                     </a>
-                    <a href="javascript:void(0)" class="btn btn-warning btn-sm btn-flat btn-view-action">
+                    <a href="{{ route('report_send_to_warehouse-excel') }}"
+                        class="btn btn-success btn-sm btn-flat btn-action">
+                        <i class="fa fa-file-excel-o"></i> Excel
+                    </a>
+                    <a href="javascript:void(0)" class="btn btn-default btn-sm btn-flat btn-view-action">
                         <i class="glyphicon glyphicon-eye-open"></i> View
                     </a>
                 </div>
@@ -116,6 +120,7 @@
                                 <th>Gudang Tujuan</th>
                                 <th>QR Code</th>
                                 <th>Nama Barang</th>
+                                <th>Satuan</th>
                                 <th>Jumlah</th>
                                 <th>Batch</th>
                                 <th>Status</th>
@@ -138,6 +143,7 @@
                                 <th>Gudang Tujuan</th>
                                 <th>QR Code</th>
                                 <th>Nama Barang</th>
+                                <th>Satuan</th>
                                 <th>Jumlah</th>
                                 <th>Batch</th>
                                 <th>Status</th>
@@ -243,6 +249,9 @@
                             data: 'nama_barang',
                             name: 'b.nama_barang',
                         }, {
+                            data: 'nama_satuan_barang',
+                            name: 'sb.nama_satuan_barang',
+                        }, {
                             data: 'qty',
                             name: 'pbd.qty',
                         }, {
@@ -287,6 +296,9 @@
                         }, {
                             data: 'nama_barang',
                             name: 'b.nama_barang',
+                        }, {
+                            data: 'nama_satuan_barang',
+                            name: 'sb.nama_satuan_barang',
                         }, {
                             data: 'qty',
                             name: 'pbd.qty',

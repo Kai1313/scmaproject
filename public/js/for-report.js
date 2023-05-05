@@ -1,8 +1,12 @@
-let defaultUrlPrint = $('.btn-action').prop('href')
+let defaultUrlPrint = []
 let param = ''
 let gArray = [];
 let table = ''
 let reportType = 'Rekap'
+
+$('.btn-action').each(function (i, v) {
+    defaultUrlPrint.push($(v).prop('href'))
+})
 
 $('.select2').select2()
 
@@ -15,7 +19,11 @@ $('[name="date"]').daterangepicker({
     }
 });
 
-$('.btn-action').prop('href', defaultUrlPrint + param)
+getParam()
+
+$('.btn-action').each(function (i, v) {
+    $(v).prop('href', defaultUrlPrint[i] + param)
+})
 
 $('.btn-view-action').click(function () {
     getParam()
@@ -49,7 +57,6 @@ $('[name="id_cabang"]').select2().on('select2:select', function (e) {
 
 if ($('[name="id_gudang"]').length > 0) {
     clearWarehouse()
-
     if (branch.length == 1) {
         if (branch[0].gudang.length > 0) {
             getWarehouse(branch[0].gudang)
@@ -64,7 +71,9 @@ function getParam() {
         param += $(v).prop('name') + '=' + $(v).val()
     })
 
-    $('.btn-action').prop('href', defaultUrlPrint + param)
+    $('.btn-action').each(function (i, v) {
+        $(v).prop('href', defaultUrlPrint[i] + param)
+    })
 }
 
 function getWarehouse(arrayGudang) {

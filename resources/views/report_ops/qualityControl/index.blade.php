@@ -40,7 +40,7 @@
                         </div>
                     </div>
                     <div class="col-md-3">
-                        <label>Tanggal</label>
+                        <label>Tanggal QC</label>
                         <div class="form-group">
                             <input type="text" name="date" class="form-control trigger-change">
                         </div>
@@ -62,6 +62,9 @@
                         target="_blank">
                         <i class="glyphicon glyphicon-print"></i> Print
                     </a>
+                    <a href="{{ route('report_qc-excel') }}" class="btn btn-success btn-sm btn-flat btn-action">
+                        <i class="fa fa-file-excel-o"></i> Excel
+                    </a>
                     <a href="javascript:void(0)" class="btn btn-warning btn-sm btn-flat btn-view-action">
                         <i class="glyphicon glyphicon-eye-open"></i> View
                     </a>
@@ -72,13 +75,14 @@
                     <table class="table table-bordered data-table display responsive nowrap" width="100%">
                         <thead>
                             <tr>
+                                <th>Tanggal Pembelian</th>
                                 <th>Kode Pembelian</th>
                                 <th>Nama Barang</th>
                                 <th>Satuan</th>
                                 <th>Jumlah</th>
+                                <th>Tanggal QC</th>
                                 <th>Status</th>
                                 <th>Alasan</th>
-                                <th>Tanggal QC</th>
                                 <th>SG</th>
                                 <th>BE</th>
                                 <th>PH</th>
@@ -118,6 +122,9 @@
                 serverSide: true,
                 ajax: defaultUrlIndex + param,
                 columns: [{
+                    data: 'tanggal_pembelian',
+                    name: 'p.tanggal_pembelian',
+                }, {
                     data: 'nama_pembelian',
                     name: 'p.nama_pembelian'
                 }, {
@@ -127,17 +134,17 @@
                     data: 'nama_satuan_barang',
                     name: 'sb.nama_satuan_barang',
                 }, {
-                    data: 'jumlah_pembelian_detail',
+                    data: 'total_jumlah_purchase',
                     name: 'pd.jumlah_purchase',
+                }, {
+                    data: 'tanggal_qc',
+                    name: 'qc.tanggal_qc',
                 }, {
                     data: 'status_qc',
                     name: 'qc.status_qc',
                 }, {
                     data: 'reason',
                     name: 'qc.reason',
-                }, {
-                    data: 'tanggal_qc',
-                    name: 'qc.tanggal_qc',
                 }, {
                     data: 'sg_pembelian_detail',
                     name: 'qc.sg_pembelian_detail',
