@@ -16,7 +16,7 @@
         </tr>
         <tr>
             <th style="border: #000000 solid thin; font-size: 14; text-align: left; width: 160px; font-weight: bold; background-color: #CCCCCC">Cabang : </th>
-            <th style="border: #000000 solid thin; font-size: 14; text-align: right; width: 160px; font-weight: bold; background-color: #CCCCCC">{{ $data["cabang"] }}</th>
+            <th style="border: #000000 solid thin; font-size: 14; text-align: left; width: 160px; font-weight: bold; background-color: #CCCCCC">{{ $data["cabang"] }}</th>
             <th style="border: #000000 solid thin; font-size: 14; text-align: left; width: 160px; font-weight: bold; background-color: #CCCCCC">Periode : </th>
             <th style="border: #000000 solid thin; font-size: 14; text-align: left; width: 160px; font-weight: bold; background-color: #CCCCCC">{{ $data["start_date"] }}</th>
             <th style="border: #000000 solid thin; font-size: 14; text-align: left; width: 160px; font-weight: bold; background-color: #CCCCCC">s.d </th>

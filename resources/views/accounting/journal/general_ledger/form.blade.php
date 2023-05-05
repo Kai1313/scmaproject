@@ -1903,7 +1903,7 @@
 
         num += '';
         x = num.split('.');
-        x1 = x[0];
+        x1 = (x[0] <= 0)?0:x[0];
         x2 = x.length > 1 ? ',' + x[1] : ',00';
         var rgx = /(\d+)(\d{3})/;
         while (rgx.test(x1)) {

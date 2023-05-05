@@ -209,6 +209,9 @@
             let form = validateFormValue()
 
             if (form.status) {
+                let button = document.getElementById("btn-pdf-report");
+                button.disabled = true;
+                button.innerHTML = '<i class="fa fa-spinner fa-spin"></i>'
                 let base_url = "{{ url('') }}";
 
                 let route = base_url + '/report/slip/pdf?cabang=' + form.data.cabang + '&slip=' + form.data.slip + '&start_date=' + form.data.start_date + '&end_date=' + form.data.end_date;
@@ -232,9 +235,37 @@
                         link.click();
                         // Remove the anchor element from the document
                         document.body.removeChild(link);
+                    } else {
+                        Swal.fire("Gagal membuat report. ", data.message, 'error')
                     }
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fa fa-print"></i> Print'
                 })
             }
+        });
+
+        $('#cabang').on('change', function() {
+            let base_url = "{{ url('') }}";
+
+            let route = base_url + '/report/slip/getSlip?cabang=' + this.value;
+
+            $.ajax({
+                type: "GET",
+                url: route
+            }).done(function(data) {
+                if (data.result) {
+                    $('#slip').empty();
+
+                    let option = ''
+                    data.data.forEach(value => {
+                        option += '<option value="' + value.id_slip + '">' + value.kode_slip + ' - ' + value.nama_slip + '</option>'
+                    });
+
+                    $('#slip').append(option);
+                } else {
+                    Swal.fire("Gagal get data slip. ", data.message, 'error')
+                }
+            })
         });
     })
 

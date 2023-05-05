@@ -112,7 +112,7 @@
                                 <div class="col-md-2">
                                     <div class="form-group">
                                         <label>Akun</label>
-                                        <select name="coa" id="coa" class="form-control select2">
+                                        <select name="coa" id="coa" class="form-control select2" data-validation="[NOTEMPTY]" data-validation-message="Akun tidak boleh kosong" disabled>
                                             <option value="recap">Rekap</option>
                                             <option value="detail">Detail</option>
                                         </select>
@@ -283,6 +283,7 @@
         })
 
         getCoa()
+        checkType("recap")
         $("#table_recap_div").hide()
         $("#table_detail_div").hide()
 
@@ -302,6 +303,11 @@
 
         $("#cabang_input").on("change", function() {
             getCoa()
+        })
+
+        $("#type").on("change", function() {
+            let type = $(this).val()
+            checkType(type)
         })
 
         $("#btn-view").on("click", function() {
@@ -341,6 +347,17 @@
                 myButton.innerHTML = "Submit"
             }
         })
+    }
+
+    function checkType(type) {
+        if (type == "recap") {
+            getCoa()
+            $("#coa").attr("disabled", true)
+        }
+        else {
+            getCoa()
+            $("#coa").attr("disabled", false)
+        }
     }
 
     function view(param, type) {
@@ -531,14 +548,14 @@
             type: "GET",
             url: route + param
         }).done(function(data) {
-            console.log(data)
+            // console.log(data)
             if (data.result) {
                 // Create a new anchor element
                 var link = document.createElement('a');
                 // Set the PDF data as href attribute
                 link.href = 'data:application/pdf;base64,' + data.pdfData;
                 // Set the PDF headers as download attribute
-                link.setAttribute('download', 'filename.pdf');
+                link.setAttribute('download', 'reportGeneralLedger.pdf');
                 link.setAttribute('target', '_blank');
                 // Append the anchor element to the document
                 document.body.appendChild(link);

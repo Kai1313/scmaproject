@@ -669,9 +669,46 @@ class AdjustmentLedgerController extends Controller
                 ]);
             }
 
-            // $session = $request->session()->get('access');
-
-            // if (($request->session()->has('token') && array_key_exists('Transaksi Jurnal Umum', $session)) && $session['Transaksi Jurnal Umum']['delete'] == 1) {
+            // Update saldo transaksi before delete
+            $old_details = JurnalDetail::where("id_jurnal", $id)->get();
+            foreach ($old_details as $key => $detail) {
+                $tolak = (str_contains($detail->keterangan, "GIRO-TOLAK"))?TRUE:FALSE;
+                $debet = $detail->debet;
+                $kredit = $detail->credit;
+                $trx_saldo = TrxSaldo::where("id_transaksi", $detail->id_transaksi)->first();
+                if ($trx_saldo) {
+                    // Log::info(json_encode($trx_saldo));
+                    $update_trx_saldo = $this->revertTrxSaldo($trx_saldo, $debet, $kredit);
+                    if (!$update_trx_saldo) {
+                        DB::rollback();
+                        return response()->json([
+                            "result" => false,
+                            "message" => "Error when store Jurnal data on revert saldo transaksi",
+                        ]);
+                    }
+                }
+                if ($tolak) {
+                    // Cek if journal have another trx
+                    $jouDetail = JurnalDetail::where("id_jurnal", $id)->get();
+                    if ($jouDetail) {
+                        foreach ($jouDetail as $key => $detail) {
+                            if ($detail->id_transaksi != "" && !str_contains($detail->keterangan, "GIRO-TOLAK")) {
+                                $trx_saldo_detail = TrxSaldo::where("id_transaksi", $detail->id_transaksi)->first();
+                                if ($trx_saldo_detail) {
+                                    $update_trx_saldo_detail = $this->updateTrxSaldo($trx_saldo_detail, $detail->credit, $detail->debet);
+                                    if (!$update_trx_saldo_detail) {
+                                        DB::rollback();
+                                        return response()->json([
+                                            "result" => false,
+                                            "message" => "Error when update saldo trnasaksi piutang giro tolak on revert saldo transaksi",
+                                        ]);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
             // Update Header Status
             $header->void = 1;
@@ -742,6 +779,43 @@ class AdjustmentLedgerController extends Controller
                     "message" => "Error when activate Jurnal data",
                 ]);
             }
+            $data_detail = JurnalDetail::where("id_jurnal", $id)->get();
+            foreach ($data_detail as $key => $detail) {
+                //  Update Saldo Transaksi
+                $trx_saldo = TrxSaldo::where("id_transaksi", $detail->id_transaksi)->first();
+                if ($trx_saldo) {
+                    $tolak = (str_contains($detail->keterangan, "GIRO-TOLAK"))?TRUE:FALSE;
+                    $update_trx_saldo = $this->updateTrxSaldo($trx_saldo, $detail->debet, $detail->credit, $tolak);
+                    if (!$update_trx_saldo) {
+                        DB::rollback();
+                        return response()->json([
+                            "result" => false,
+                            "message" => "Error when store Jurnal data on update saldo transaksi",
+                        ]);
+                    }
+                    if ($tolak) {
+                        // Cek if journal have another trx
+                        $jouDetail = JurnalDetail::where("id_jurnal", $trx_saldo->id_jurnal)->get();
+                        if ($jouDetail) {
+                            foreach ($jouDetail as $key => $detail) {
+                                if ($detail->id_transaksi != "") {
+                                    $trx_saldo_detail = TrxSaldo::where("id_transaksi", $detail->id_transaksi)->first();
+                                    if ($trx_saldo_detail) {
+                                        $update_trx_saldo_detail = $this->revertTrxSaldo($trx_saldo_detail, $detail->debet, $detail->credit);
+                                        if (!$update_trx_saldo_detail) {
+                                            DB::rollback();
+                                            return response()->json([
+                                                "result" => false,
+                                                "message" => "Error when update saldo trnasaksi piutang giro tolak on revert saldo transaksi",
+                                            ]);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
 
             DB::commit();
             return response()->json([

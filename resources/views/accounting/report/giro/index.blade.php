@@ -81,6 +81,15 @@
                                 </div>
                             </div>
                             <div class="col-md-2">
+                                <div class="form-group" id="status-group">
+                                    <label>Tipe</label>
+                                    <select name="tipe" id="tipe" class="form-control select2" style="width: 100%;" data-validation="[NOTEMPTY]" data-validation-message="Tipe tidak boleh kosong">
+                                        <option value="HG">Hutang Giro</option>
+                                        <option value="PG">Piutang Giro</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
                                 <div class="form-group" id="slip-group">
                                     <label>Slip</label>
                                     <select name="slip" id="slip" class="form-control select2" style="width: 100%;" data-validation="[NOTEMPTY]" data-validation-message="Slip tidak boleh kosong">
@@ -90,15 +99,6 @@
                                             {{ $slip->kode_slip . ' - ' . $slip->nama_slip }}
                                         </option>
                                         @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="form-group" id="status-group">
-                                    <label>Tipe</label>
-                                    <select name="tipe" id="tipe" class="form-control select2" style="width: 100%;" data-validation="[NOTEMPTY]" data-validation-message="Tipe tidak boleh kosong">
-                                        <option value="HG">Hutang Giro</option>
-                                        <option value="PG">Piutang Giro</option>
                                     </select>
                                 </div>
                             </div>
@@ -231,11 +231,90 @@
             console.log('pdf');
             let form = validateFormValue()
 
-            if (form.status) {
-                let base_url = "{{ url('') }}";
 
-                window.open(base_url + '/report/giro/pdf?cabang=' + form.data.cabang + '&slip=' + form.data.slip + '&tanggal=' + form.data.giro_date + '&tipe=' + form.data.tipe + '&status=' + form.data.status);
+            if (form.status) {
+                let button = document.getElementById("btn-pdf-report");
+                button.disabled = true;
+                button.innerHTML = '<i class="fa fa-spinner fa-spin"></i>'
+                let base_url = "{{ url('') }}";
+                let route = base_url + '/report/giro/pdf?cabang=' + form.data.cabang + '&slip=' + form.data.slip + '&tanggal=' + form.data.giro_date + '&tipe=' + form.data.tipe + '&status=' + form.data.status;
+
+                $.ajax({
+                    type: "GET",
+                    url: route
+                }).done(function(data) {
+                    console.log(data)
+                    if (data.result) {
+                        // Create a new anchor element
+                        var link = document.createElement('a');
+                        // Set the PDF data as href attribute
+                        link.href = 'data:application/pdf;base64,' + data.pdfData;
+                        // Set the PDF headers as download attribute
+                        link.setAttribute('download', 'ReportGiros.pdf');
+                        link.setAttribute('target', '_blank');
+                        // Append the anchor element to the document
+                        document.body.appendChild(link);
+                        // Trigger a click on the anchor element to download the PDF
+                        link.click();
+                        // Remove the anchor element from the document
+                        document.body.removeChild(link);
+                    } else {
+                        Swal.fire("Gagal membuat report. ", data.message, 'error')
+                    }
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fa fa-print"></i> Print'
+                })
             }
+        });
+
+        $('#cabang').on('change', function() {
+            let tipe = $('#tipe').val();
+
+            let base_url = "{{ url('') }}";
+            let route = base_url + '/report/giro/getSlip?cabang=' + this.value + '&tipe=' + tipe;
+
+            $.ajax({
+                type: "GET",
+                url: route
+            }).done(function(data) {
+                if (data.result) {
+                    $('#slip').empty();
+
+                    let option = '<option value="All">All</option>'
+                    data.data.forEach(value => {
+                        option += '<option value="' + value.id_slip + '">' + value.kode_slip + ' - ' + value.nama_slip + '</option>'
+                    });
+
+                    $('#slip').append(option);
+                } else {
+                    Swal.fire("Gagal get data slip. ", data.message, 'error')
+                }
+            })
+        });
+
+        $('#tipe').on('change', function() {
+            let cabang = $('#cabang').val();
+
+            let base_url = "{{ url('') }}";
+            let route = base_url + '/report/giro/getSlip?tipe=' + this.value + '&cabang=' + cabang;
+
+            $.ajax({
+                type: "GET",
+                url: route
+            }).done(function(data) {
+                if (data.result) {
+                    $('#slip').empty();
+
+                    let option = '<option value="All">All</option>'
+                    data.data.forEach(value => {
+                        option += '<option value="' + value.id_slip + '">' + value.kode_slip + ' - ' + value.nama_slip + '</option>'
+                    });
+
+                    $('#slip').append(option);
+                } else {
+                    Swal.fire("Gagal get data slip. ", data.message, 'error')
+                }
+            })
         });
     })
 
@@ -323,27 +402,95 @@
         let get_data_url = "{{ route('report-giro-populate') }}"
         get_data_url += '?cabang=' + data.cabang + '&slip=' + data.slip + '&tanggal=' + data.giro_date + '&tipe=' + data.tipe + '&status=' + data.status
 
-        $.ajax({
-            type: "GET",
-            url: get_data_url,
-            success: function(data) {
-                $('.data-report').remove();
-                let rows = '';
-                let balance = 0;
+        $('#table_report').css('display', '')
 
-                if (data.length > 0) {
-                    data.forEach(val => {
-                        rows += "<tr class='data-report'><td align='left'>" + val.kode_jurnal + "</td><td align='center'>" + val.tanggal_jurnal + "</td><td align='left'>" + val.no_giro + "</td><td align='center'>" + val.tanggal_giro + "</td><td align='left'>" + val.tanggal_giro_jt + "</td><td align='right'>" + formatCurr(formatNumberAsFloatFromDB(val.total)) + "</td><td align='left'>" + val.cair_kode_jurnal + "</td><td align='center'>" + val.cair_tanggal_giro + "</td><td align='left'>" + val.cair_slip + "</td><td align='center'>" + val.tolak_kode_jurnal + "</td><td align='center'>" + val.tolak_tanggal_giro + "</td>"
-                    });
-                } else {
-                    rows += '<tr class="data-report"><td colspan="10" align="center">No data<td></tr>'
+        $('#table_report').DataTable().destroy();
+        $('#table_report').DataTable({
+            processing: true,
+            serverSide: true,
+            "scrollX": true,
+            "bDestroy": true,
+            responsive: false,
+            ajax: {
+                "url": get_data_url,
+                "type": "GET",
+                "dataType": "JSON",
+                "error": function(xhr, textStatus, ThrownException) {
+                    alert("Error loading data. Exception: " + ThrownException + '\n' + textStatus)
                 }
-
-                $('#table_report').append(rows);
             },
-            error: function(data) {
-                Swal.fire("Sorry, Can't get data. ", data.responseJSON.message, 'error')
-            }
+            columns: [{
+                    data: 'kode_jurnal',
+                    name: 'kode_jurnal',
+                    className: 'text-left',
+                    width: '10%'
+                },
+                {
+                    data: 'tanggal_jurnal',
+                    name: 'tanggal_jurnal',
+                    className: 'text-center',
+                    width: '7%'
+                },
+                {
+                    data: 'no_giro',
+                    name: 'no_giro',
+                    className: 'text-left',
+                    width: '11%'
+                },
+                {
+                    data: 'tanggal_giro',
+                    name: 'tanggal_giro',
+                    className: 'text-center',
+                    width: '7%'
+                },
+                {
+                    data: 'tanggal_giro_jt',
+                    name: 'tanggal_giro_jt',
+                    className: 'text-center',
+                    width: '7%'
+                },
+                {
+                    data: 'total',
+                    name: 'total',
+                    width: '11%',
+                    searchable: false,
+                    orderable: false,
+                    className: 'text-right',
+                    render: function(data, type, row) {
+                        return formatCurr(formatNumberAsFloatFromDB(data))
+                    }
+                },
+                {
+                    data: 'cair_kode_jurnal',
+                    name: 'cair_kode_jurnal',
+                    className: 'text-left',
+                    width: '11%'
+                },
+                {
+                    data: 'cair_tanggal_giro',
+                    name: 'cair_tanggal_giro',
+                    className: 'text-center',
+                    width: '7%'
+                },
+                {
+                    data: 'cair_slip',
+                    name: 'cair_slip',
+                    className: 'text-left',
+                    width: '11%'
+                },
+                {
+                    data: 'tolak_kode_jurnal',
+                    name: 'tolak_kode_jurnal',
+                    className: 'text-left',
+                    width: '11%'
+                },
+                {
+                    data: 'tolak_tanggal_giro',
+                    name: 'tolak_tanggal_giro',
+                    className: 'text-left',
+                    width: '7%'
+                }
+            ],
         })
     }
 

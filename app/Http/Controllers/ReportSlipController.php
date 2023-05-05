@@ -15,12 +15,12 @@ class ReportSlipController extends Controller
 {
     public function index(Request $request)
     {
-        // if (checkUserSession($request, 'report_slip', 'show') == false) {
-        //     return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
-        // }
+        if (checkUserSession($request, 'general_ledger', 'show') == false) {
+            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+        }
 
         $data_cabang = Cabang::all();
-        $data_slip = Slip::all();
+        $data_slip = Slip::where('id_cabang', 1)->get();
 
         $data = [
             "pageTitle" => "SCA Accounting | Report Slip",
@@ -69,7 +69,7 @@ class ReportSlipController extends Controller
             ->where('det.id_akun', $slip_db->id_akun)
             ->whereRaw("head.tanggal_jurnal BETWEEN $from AND $to")
             ->groupBy('det.id_akun')
-            ->orderBy('head.tanggal_jurnal', 'ASC')
+            ->orderBy('head.tanggal_jurnal', 'DESC')
             ->get();
 
         Log::debug($saldo_awal);
@@ -90,7 +90,7 @@ class ReportSlipController extends Controller
             ->where('head.id_slip', $slip)
             ->where('det.id_akun', '!=', $slip_db->id_akun)
             ->whereRaw("head.tanggal_jurnal BETWEEN $from AND $to")
-            ->orderBy('head.tanggal_jurnal', 'ASC')
+            ->orderBy('head.tanggal_jurnal', 'DESC')
             ->get();
 
         return [
@@ -144,7 +144,7 @@ class ReportSlipController extends Controller
                 ->join('jurnal_detail as det', 'head.id_jurnal', 'det.id_jurnal')
                 ->join('master_akun as akun', 'akun.id_akun', 'det.id_akun')
                 ->join('master_slip as slip', 'slip.id_slip', 'head.id_slip')
-                ->selectRaw('head.tanggal_jurnal,
+                ->selectRaw('"'.$request->start_date.'" as tanggal_jurnal,
                 "" as kode_jurnal,
                 "" as nama_slip,
                 akun.nama_akun,
@@ -158,7 +158,7 @@ class ReportSlipController extends Controller
                 ->where('det.id_akun', $slip_db->id_akun)
                 ->whereRaw("head.tanggal_jurnal BETWEEN $from AND $to")
                 ->groupBy('det.id_akun')
-                ->orderBy('head.tanggal_jurnal', 'ASC');
+                ->orderBy('head.tanggal_jurnal', 'DESC');
 
             $mutasis = DB::table("jurnal_header as head")
                 ->join('jurnal_detail as det', 'head.id_jurnal', 'det.id_jurnal')
@@ -210,7 +210,7 @@ class ReportSlipController extends Controller
                     }
                 }
             } else {
-                $mutasis->orderBy("head.tanggal_jurnal", "ASC");
+                $mutasis->orderBy("head.tanggal_jurnal", "DESC");
             }
 
             // pagination
@@ -247,7 +247,7 @@ class ReportSlipController extends Controller
             $table['data'] = $result;
             return json_encode($table);
         } catch (\Exception $e) {
-            $message = "Failed to get populate general ledger for view";
+            $message = "Failed to get populate report slip.";
             Log::error($message);
             Log::error($e);
             return response()->json([
@@ -289,101 +289,129 @@ class ReportSlipController extends Controller
         //     ]);
         // }
 
-        $cabang = $request->cabang;
-        $slip = $request->slip;
-        $start_date = $request->start_date;
-        $end_date = $request->end_date;
+        try {
 
-        $from = "'" . $start_date . "'";
-        $to = "'" . $end_date . "'";
+            $cabang = $request->cabang;
+            $slip = $request->slip;
+            $start_date = $request->start_date;
+            $end_date = $request->end_date;
 
-        $slip_db = Slip::find($slip);
-        Log::debug($slip);
+            $from = "'" . $start_date . "'";
+            $to = "'" . $end_date . "'";
 
-        $saldo_awal = DB::table("jurnal_header as head")
-            ->join('jurnal_detail as det', 'head.id_jurnal', 'det.id_jurnal')
-            ->join('master_akun as akun', 'akun.id_akun', 'det.id_akun')
-            ->join('master_slip as slip', 'slip.id_slip', 'head.id_slip')
-            ->selectRaw('head.tanggal_jurnal,
-                "" as kode_jurnal,
-                "" as nama_slip,
-                akun.nama_akun,
-                "Saldo Awal" as keterangan,
-                "" as id_transaksi,
-                det.debet,
-                det.credit')
-            ->where('head.void', 0)
-            ->where('head.id_cabang', $cabang)
-            ->where('head.id_slip', $slip)
-            ->where('det.id_akun', $slip_db->id_akun)
-            ->whereRaw("head.tanggal_jurnal BETWEEN $from AND $to")
-            ->groupBy('det.id_akun')
-            ->orderBy('head.tanggal_jurnal', 'ASC')
-            ->get();
+            $slip_db = Slip::find($slip);
+            Log::debug($slip);
 
-        Log::debug($saldo_awal);
-        $mutasis = DB::table("jurnal_header as head")
-            ->join('jurnal_detail as det', 'head.id_jurnal', 'det.id_jurnal')
-            ->join('master_akun as akun', 'akun.id_akun', 'det.id_akun')
-            ->join('master_slip as slip', 'slip.id_slip', 'head.id_slip')
-            ->selectRaw('head.tanggal_jurnal,
-                head.kode_jurnal,
-                slip.nama_slip,
-                akun.nama_akun,
-                det.keterangan,
-                det.id_transaksi,
-                det.debet,
-                det.credit')
-            ->where('head.void', 0)
-            ->where('head.id_cabang', $cabang)
-            ->where('head.id_slip', $slip)
-            ->where('det.id_akun', '!=', $slip_db->id_akun)
-            ->whereRaw("head.tanggal_jurnal BETWEEN $from AND $to")
-            ->orderBy('head.tanggal_jurnal', 'ASC')
-            ->get();
+            $saldo_awal = DB::table("jurnal_header as head")
+                ->join('jurnal_detail as det', 'head.id_jurnal', 'det.id_jurnal')
+                ->join('master_akun as akun', 'akun.id_akun', 'det.id_akun')
+                ->join('master_slip as slip', 'slip.id_slip', 'head.id_slip')
+                ->selectRaw('"'.$request->start_date.'" as tanggal_jurnal,
+                    "" as kode_jurnal,
+                    "" as nama_slip,
+                    akun.nama_akun,
+                    "Saldo Awal" as keterangan,
+                    "" as id_transaksi,
+                    det.debet,
+                    det.credit')
+                ->where('head.void', 0)
+                ->where('head.id_cabang', $cabang)
+                ->where('head.id_slip', $slip)
+                ->where('det.id_akun', $slip_db->id_akun)
+                ->whereRaw("head.tanggal_jurnal BETWEEN $from AND $to")
+                ->groupBy('det.id_akun')
+                ->orderBy('head.tanggal_jurnal', 'DESC')
+                ->get();
 
-        $cabang = Cabang::find($cabang);
-        $slip = Slip::find($slip);
+            Log::debug($saldo_awal);
+            $mutasis = DB::table("jurnal_header as head")
+                ->join('jurnal_detail as det', 'head.id_jurnal', 'det.id_jurnal')
+                ->join('master_akun as akun', 'akun.id_akun', 'det.id_akun')
+                ->join('master_slip as slip', 'slip.id_slip', 'head.id_slip')
+                ->selectRaw('head.tanggal_jurnal,
+                    head.kode_jurnal,
+                    slip.nama_slip,
+                    akun.nama_akun,
+                    det.keterangan,
+                    det.id_transaksi,
+                    det.debet,
+                    det.credit')
+                ->where('head.void', 0)
+                ->where('head.id_cabang', $cabang)
+                ->where('head.id_slip', $slip)
+                ->where('det.id_akun', '!=', $slip_db->id_akun)
+                ->whereRaw("head.tanggal_jurnal BETWEEN $from AND $to")
+                ->orderBy('head.tanggal_jurnal', 'DESC')
+                ->get();
 
-        foreach ($saldo_awal as $key => $value) {
-            $notes = str_replace("\n", '<br>', $value->keterangan);
-            $value->keterangan = $notes;
-        }
+            $cabang = Cabang::find($cabang);
+            $slip = Slip::find($slip);
 
-        foreach ($mutasis as $key => $value) {
-            $notes = str_replace("\n", '<br>', $value->keterangan);
-            $value->keterangan = $notes;
-        }
+            foreach ($saldo_awal as $key => $value) {
+                $notes = str_replace("\n", '<br>', $value->keterangan);
+                $value->keterangan = $notes;
+            }
 
-        $data = [
-            'saldo_awal' => $saldo_awal,
-            'mutasis' => $mutasis,
-            'cabang' => $cabang,
-            'slip' => $slip,
-            'from' => $start_date,
-            'to' => $end_date
-        ];
+            foreach ($mutasis as $key => $value) {
+                $notes = str_replace("\n", '<br>', $value->keterangan);
+                $value->keterangan = $notes;
+            }
 
-        // return view('accounting.report.slip.print', $data);
-
-        if (count($saldo_awal) > 0 && count($mutasis) > 0) {
-            $pdf = PDF::loadView('accounting.report.slip.print', $data);
-            $pdf->setPaper('a4', 'landscape');
-
-            $headers = [
-                'Content-Type' => 'application/pdf',
-                'Content-Disposition' => 'attachment; filename="download.pdf"',
+            $data = [
+                'saldo_awal' => $saldo_awal,
+                'mutasis' => $mutasis,
+                'cabang' => $cabang,
+                'slip' => $slip,
+                'from' => $start_date,
+                'to' => $end_date
             ];
 
+            // return view('accounting.report.slip.print', $data);
+
+            if (count($saldo_awal) > 0 && count($mutasis) > 0) {
+                $pdf = PDF::loadView('accounting.report.slip.print', $data);
+                $pdf->setPaper('a4', 'landscape');
+
+                $headers = [
+                    'Content-Type' => 'application/pdf',
+                    'Content-Disposition' => 'attachment; filename="download.pdf"',
+                ];
+
+                return response()->json([
+                    "result" => true,
+                    "pdfData" => base64_encode($pdf->output()),
+                    "pdfHeaders" => $headers,
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'No data found'
+                ]);
+            }
+        } catch (\Exception $e) {
+            $message = "Failed to print report slip";
+            Log::error($message);
+            Log::error($e);
+            return response()->json([
+                "result" => False,
+                "message" => $message
+            ]);
+        }
+    }
+
+    public function getSlip(Request $request)
+    {
+        try {
+            $slip = Slip::where('id_cabang', $request->cabang)->get();
             return response()->json([
                 "result" => true,
-                "pdfData" => base64_encode($pdf->output()),
-                "pdfHeaders" => $headers,
+                "message" => 'Success get slip data',
+                "data" => $slip
             ]);
-        } else {
+        } catch (\Exception $e) {
             return response()->json([
-                'status' => false,
-                'message' => 'No data found'
+                "result" => false,
+                "message" => 'Error when get slip data'
             ]);
         }
     }
