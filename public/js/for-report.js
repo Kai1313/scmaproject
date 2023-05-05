@@ -19,14 +19,11 @@ $('[name="date"]').daterangepicker({
     }
 });
 
-getParam()
-
 $('.btn-action').each(function (i, v) {
     $(v).prop('href', defaultUrlPrint[i] + param)
 })
 
 $('.btn-view-action').click(function () {
-    getParam()
     if ($('[name="type"]').length > 0) {
         if (table && reportType == $('[name="type"]').val()) {
             table.ajax.url(param).load()
@@ -62,7 +59,13 @@ if ($('[name="id_gudang"]').length > 0) {
             getWarehouse(branch[0].gudang)
         }
     }
+
+    getParam()
 }
+
+$('.trigger-change').change(function () {
+    getParam()
+})
 
 function getParam() {
     param = ''
