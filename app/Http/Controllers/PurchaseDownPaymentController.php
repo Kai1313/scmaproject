@@ -154,7 +154,7 @@ class PurchaseDownPaymentController extends Controller
             $resultJurnalUangMukaPembelian = (new ApiController)->journalUangMukaPembelian(new Request([
                 "no_transaksi" => $data->kode_uang_muka_pembelian,
                 "tanggal" => $data->tanggal,
-                "slip" => $data->id_slip,
+                "slip" => '',
                 "cabang" => $data->id_cabang,
                 "pemasok" => $data->purchaseOrder->id_pemasok,
                 "void" => $data->void,
