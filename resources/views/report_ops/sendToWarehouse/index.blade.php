@@ -77,7 +77,7 @@
                 </div>
                 <div class="pull-right">
                     <a href="{{ route('report_send_to_warehouse-print') }}"
-                        class="btn btn-danger btn-sm btn-flat btn-action" target="_blank">
+                        class="btn btn-danger btn-sm btn-flat btn-action">
                         <i class="glyphicon glyphicon-print"></i> Print
                     </a>
                     <a href="{{ route('report_send_to_warehouse-excel') }}"
@@ -254,6 +254,10 @@
                         }, {
                             data: 'qty',
                             name: 'pbd.qty',
+                            render: function(data) {
+                                return data ? formatNumber(data, 4) : 0
+                            },
+                            className: 'text-right'
                         }, {
                             data: 'batch',
                             name: 'pbd.batch',
@@ -302,6 +306,10 @@
                         }, {
                             data: 'qty',
                             name: 'pbd.qty',
+                            render: function(data) {
+                                return data ? formatNumber(data, 4) : 0
+                            },
+                            className: 'text-right'
                         }, {
                             data: 'batch',
                             name: 'pbd.batch',

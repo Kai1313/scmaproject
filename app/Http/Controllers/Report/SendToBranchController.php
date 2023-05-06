@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use DB;
 use Excel;
 use Illuminate\Http\Request;
+use PDF;
 use Yajra\DataTables\DataTables;
 
 class SendToBranchController extends Controller
@@ -36,24 +37,38 @@ class SendToBranchController extends Controller
 
         $data = $this->getData($request, 'print');
         $arrayCabang = [];
+        $arrayGudang = [];
         foreach (session()->get('access_cabang') as $c) {
             $arrayCabang[$c['id']] = $c['text'];
+            foreach ($c['gudang'] as $g) {
+                $arrayGudang[$g['id']] = $g['text'];
+            }
         }
 
         $eCabang = explode(',', $request->id_cabang);
+        $eGudang = explode(',', $request->id_gudang);
         $sCabang = [];
+        $sGudang = [];
         foreach ($eCabang as $e) {
             $sCabang[] = $arrayCabang[$e];
         }
 
-        return view('report_ops.sendToBranch.print', [
-            "pageTitle" => "SCA OPS | Laporan Kirim Ke Cabang | Print",
+        foreach ($eGudang as $eg) {
+            $sGudang[] = $arrayGudang[$eg];
+        }
+
+        $array = [
             "datas" => $data,
-            'arrayStatus' => $this->arrayStatus,
             'cabang' => implode(', ', $sCabang),
+            'gudang' => implode(', ', $sGudang),
             'date' => $request->date,
+            'status' => $request->status,
             'type' => $request->type,
-        ]);
+        ];
+
+        $pdf = PDF::loadView('report_ops.sendToBranch.print', $array);
+        $pdf->setPaper('a4', 'landscape');
+        return $pdf->download('laporan kirim ke cabang.pdf');
     }
 
     public function getExcel(Request $request)

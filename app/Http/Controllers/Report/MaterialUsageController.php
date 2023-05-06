@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use DB;
 use Excel;
 use Illuminate\Http\Request;
+use PDF;
 use Yajra\DataTables\DataTables;
 
 class MaterialUsageController extends Controller
@@ -34,23 +35,37 @@ class MaterialUsageController extends Controller
 
         $data = $this->getData($request, 'print');
         $arrayCabang = [];
+        $arrayGudang = [];
         foreach (session()->get('access_cabang') as $c) {
             $arrayCabang[$c['id']] = $c['text'];
+            foreach ($c['gudang'] as $g) {
+                $arrayGudang[$g['id']] = $g['text'];
+            }
         }
 
         $eCabang = explode(',', $request->id_cabang);
+        $eGudang = explode(',', $request->id_gudang);
         $sCabang = [];
+        $sGudang = [];
         foreach ($eCabang as $e) {
             $sCabang[] = $arrayCabang[$e];
         }
 
-        return view('report_ops.materialUsage.print', [
-            "pageTitle" => "SCA OPS | Laporan Pemakaian | Print",
+        foreach ($eGudang as $eg) {
+            $sGudang[] = $arrayGudang[$eg];
+        }
+
+        $array = [
             "datas" => $data,
             'cabang' => implode(', ', $sCabang),
+            'gudang' => implode(', ', $sGudang),
             'date' => $request->date,
             'type' => $request->type,
-        ]);
+        ];
+
+        $pdf = PDF::loadView('report_ops.materialUsage.print', $array);
+        $pdf->setPaper('a4', 'landscape');
+        return $pdf->download('laporan pemakaian.pdf');
     }
 
     public function getExcel(Request $request)

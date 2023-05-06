@@ -7,77 +7,39 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
     <style>
-        body {
-            width: 20cm;
-            padding-left: 10px;
-            padding-right: 10px;
-        }
-
-        @page {
-            margin: 3cm 2cm 2cm 2cm;
-        }
-
-        .table {
+        table {
             border-collapse: collapse;
         }
 
-        .table th {
-            border-top: 0.2mm solid #000;
-            border-bottom: 0.2mm solid #000;
-            text-align: center;
-            border: 1px solid #000;
-            font-size: 12px;
-        }
-
-        .table tr td {
-            padding: 3px;
-            border-bottom: 0.2mm solid #000;
-            border: 1px solid #000;
-            vertical-align: top;
-            font-size: 12px;
-        }
-
         td {
-            font-size: 12px;
+            font-size: 10px;
+            border: #000000 solid thin;
         }
 
-        h3,
-        h4 {
-            margin-top: 0px;
-            margin-bottom: 0px;
+        th {
+            font-size: 12px;
+            border: #000000 solid thin;
+            max-width: 150px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .number {
+            text-align: right;
         }
     </style>
 </head>
 
 <body>
-    <div style="display:flex;margin-bottom:10px;align-items: center;">
-        <img src="{{ asset('images/logo2.jpg') }}" style="width:60px;">
-        <div style="flex:1;text-align:center;">
-            <h3 style="">LAPORAN UANG MUKA PEMBELIAN</h3>
-        </div>
-        <div>
-            <table style="width:200px;">
-                <tr>
-                    <td style="width:60px;font-weight:bold;">Cabang</td>
-                    <td>:</td>
-                    <td>{{ $cabang }}</td>
-                </tr>
-                <tr>
-                    <td style="font-weight:bold;">Tanggal</td>
-                    <td>:</td>
-                    <td>{{ $date }}</td>
-                </tr>
-            </table>
-        </div>
-    </div>
-    <table class="table" width="100%">
+    <h3 style="text-align:center;">LAPORAN UANG MUKA PEMBELIAN</h3>
+    <table width="100%">
         <thead>
             <tr>
-                <th>No</th>
                 <th>Tanggal</th>
                 <th>Cabang</th>
                 <th>Kode Transaksi</th>
                 <th>Nomor PO</th>
+                <th>Supplier</th>
                 <th>Akun Slip</th>
                 <th>Mata Uang</th>
                 <th>Nominal</th>
@@ -86,24 +48,18 @@
         <tbody>
             @foreach ($datas as $key => $data)
                 <tr>
-                    <td style="text-align:center;">{{ $key + 1 }}</td>
                     <td>{{ $data->tanggal }}</td>
-                    <td>{{ $data->cabang->nama_cabang }}</td>
+                    <td>{{ $data->nama_cabang }}</td>
                     <td>{{ $data->kode_uang_muka_pembelian }}</td>
-                    <td>{{ $data->purchaseOrder->nama_permintaan_pembelian }}</td>
-                    <td>{{ $data->slip->nama_slip }}</td>
-                    <td>{{ $data->mataUang->nama_mata_uang }}</td>
-                    <td style="text-align:right;">{{ formatNumber($data->nominal) }}</td>
+                    <td>{{ $data->nama_permintaan_pembelian }}</td>
+                    <td>{{ $data->nama_pemasok }}</td>
+                    <td>{{ $data->nama_slip }}</td>
+                    <td>{{ $data->nama_mata_uang }}</td>
+                    <td class="number">{{ formatNumber($data->nominal, 2) }}</td>
                 </tr>
             @endforeach
         </tbody>
     </table>
 </body>
-<script>
-    window.print()
-    window.addEventListener('afterprint', (e) => {
-        window.close()
-    })
-</script>
 
 </html>

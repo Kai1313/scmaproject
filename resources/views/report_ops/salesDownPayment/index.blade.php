@@ -48,7 +48,7 @@
                 </div>
                 <div class="pull-right">
                     <a href="{{ route('report_sales_down_payment-print') }}"
-                        class="btn btn-danger btn-sm btn-flat btn-action" target="_blank">
+                        class="btn btn-danger btn-sm btn-flat btn-action">
                         <i class="glyphicon glyphicon-print"></i> Print
                     </a>
                     <a href="{{ route('report_sales_down_payment-excel') }}"
@@ -69,6 +69,7 @@
                                 <th>Cabang</th>
                                 <th>Kode Transaksi</th>
                                 <th>Nomor SO</th>
+                                <th>Pelanggan</th>
                                 <th>Akun Slip</th>
                                 <th>Mata Uang</th>
                                 <th>Nominal</th>
@@ -118,6 +119,9 @@
                     data: 'nama_permintaan_penjualan',
                     name: 'pp.nama_permintaan_penjualan',
                 }, {
+                    data: 'nama_pelanggan',
+                    name: 'p.nama_pelanggan',
+                }, {
                     data: 'nama_slip',
                     name: 's.nama_slip',
                 }, {
@@ -126,6 +130,10 @@
                 }, {
                     data: 'nominal',
                     name: 'ump.nominal',
+                    render: function(data) {
+                        return data ? formatNumber(data, 2) : 0
+                    },
+                    className: 'text-right'
                 }, ]
             });
         }

@@ -58,13 +58,13 @@
                     <td style="border: #000000 solid thin;">{{ $data->nama_pembelian }}</td>
                     <td style="border: #000000 solid thin;">{{ $data->nama_barang }}</td>
                     <td style="border: #000000 solid thin;">{{ $data->nama_satuan_barang }}</td>
-                    <td style="border: #000000 solid thin;">{{ $data->total_jumlah_purchase }}</td>
+                    <td style="border: #000000 solid thin;text-align:right;">{{ $data->total_jumlah_purchase }}</td>
                     <td style="border: #000000 solid thin;">{{ $data->tanggal_qc }}</td>
                     <td style="border: #000000 solid thin;">{{ $data->status_qc }}</td>
                     <td style="border: #000000 solid thin;">{{ $data->reason }}</td>
-                    <td style="border: #000000 solid thin;">{{ $data->sg_pembelian_detail }}</td>
-                    <td style="border: #000000 solid thin;">{{ $data->be_pembelian_detail }}</td>
-                    <td style="border: #000000 solid thin;">{{ $data->ph_pembelian_detail }}</td>
+                    <td style="border: #000000 solid thin;text-align:right;">{{ $data->sg_pembelian_detail }}</td>
+                    <td style="border: #000000 solid thin;text-align:right;">{{ $data->be_pembelian_detail }}</td>
+                    <td style="border: #000000 solid thin;text-align:right;">{{ $data->ph_pembelian_detail }}</td>
                     <td style="border: #000000 solid thin;">{{ $data->warna_pembelian_detail }}</td>
                     <td style="border: #000000 solid thin;">{{ $data->bentuk_pembelian_detail }}</td>
                     <td style="border: #000000 solid thin;">{{ $data->keterangan_pembelian_detail }}</td>

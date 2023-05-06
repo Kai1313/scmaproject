@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use DB;
 use Excel;
 use Illuminate\Http\Request;
+use PDF;
 use Yajra\DataTables\DataTables;
 
 class PurchaseDownPaymentController extends Controller
@@ -44,12 +45,16 @@ class PurchaseDownPaymentController extends Controller
             $sCabang[] = $arrayCabang[$e];
         }
 
-        return view('report_ops.purchaseDownPayment.print', [
-            "pageTitle" => "SCA OPS | Laporan Uang Muka Pembelian | Print",
+        $array = [
             "datas" => $data,
             'cabang' => implode(', ', $sCabang),
             'date' => $request->date,
-        ]);
+            'type' => $request->type,
+        ];
+
+        $pdf = PDF::loadView('report_ops.purchaseDownPayment.print', $array);
+        $pdf->setPaper('a4', 'landscape');
+        return $pdf->download('laporan uang muka pembelian.pdf');
     }
 
     public function getExcel(Request $request)
@@ -89,6 +94,7 @@ class PurchaseDownPaymentController extends Controller
             'c.nama_cabang',
             'ump.kode_uang_muka_pembelian',
             'pp.nama_permintaan_pembelian',
+            'p.nama_pemasok',
             's.nama_slip',
             'mu.nama_mata_uang',
             'ump.nominal'
@@ -97,9 +103,11 @@ class PurchaseDownPaymentController extends Controller
             ->leftJoin('permintaan_pembelian as pp', 'ump.id_permintaan_pembelian', 'pp.id_permintaan_pembelian')
             ->leftJoin('master_slip as s', 'ump.id_slip', 's.id_slip')
             ->leftJoin('mata_uang as mu', 'ump.id_mata_uang', 'mu.id_mata_uang')
+            ->leftJoin('pemasok as p', 'pp.id_pemasok', 'p.id_pemasok')
             ->whereBetween('ump.tanggal', $date)
             ->whereIn('ump.id_cabang', $idCabang)
-            ->orderBy('tanggal', 'asc');
+            ->where('void', 0)
+            ->orderBy('ump.tanggal', 'asc');
 
         if ($type == 'datatable') {
             return Datatables::of($data)

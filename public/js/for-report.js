@@ -61,6 +61,8 @@ if ($('[name="id_gudang"]').length > 0) {
     }
 
     getParam()
+} else {
+    getParam()
 }
 
 $('.trigger-change').change(function () {

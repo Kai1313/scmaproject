@@ -128,7 +128,7 @@
                         <td style="border: #000000 solid thin;">{{ $data->qr_code }}</td>
                         <td style="border: #000000 solid thin;">{{ $data->nama_barang }}</td>
                         <td style="border: #000000 solid thin;">{{ $data->nama_satuan_barang }}</td>
-                        <td style="border: #000000 solid thin;">{{ $data->qty }}</td>
+                        <td style="border: #000000 solid thin;text-align:right;">{{ $data->qty }}</td>
                         <td style="border: #000000 solid thin;">{{ $data->batch }}</td>
                         <td style="border: #000000 solid thin;">{{ $data->status_diterima }}</td>
                     </tr>
@@ -193,7 +193,7 @@
                         <td style="border: #000000 solid thin;">{{ $data->qr_code }}</td>
                         <td style="border: #000000 solid thin;">{{ $data->nama_barang }}</td>
                         <td style="border: #000000 solid thin;">{{ $data->nama_satuan_barang }}</td>
-                        <td style="border: #000000 solid thin;">{{ $data->qty }}</td>
+                        <td style="border: #000000 solid thin;text-align:right;">{{ $data->qty }}</td>
                         <td style="border: #000000 solid thin;">{{ $data->batch }}</td>
                         <td style="border: #000000 solid thin;">{{ $data->status_diterima }}</td>
                     </tr>

@@ -58,14 +58,13 @@
                     </div>
                 </div>
                 <div class="pull-right">
-                    <a href="{{ route('report_qc-print') }}" class="btn btn-danger btn-sm btn-flat btn-action"
-                        target="_blank">
+                    <a href="{{ route('report_qc-print') }}" class="btn btn-danger btn-sm btn-flat btn-action">
                         <i class="glyphicon glyphicon-print"></i> Print
                     </a>
                     <a href="{{ route('report_qc-excel') }}" class="btn btn-success btn-sm btn-flat btn-action">
                         <i class="fa fa-file-excel-o"></i> Excel
                     </a>
-                    <a href="javascript:void(0)" class="btn btn-warning btn-sm btn-flat btn-view-action">
+                    <a href="javascript:void(0)" class="btn btn-default btn-sm btn-flat btn-view-action">
                         <i class="glyphicon glyphicon-eye-open"></i> View
                     </a>
                 </div>
@@ -136,6 +135,10 @@
                 }, {
                     data: 'total_jumlah_purchase',
                     name: 'pd.jumlah_purchase',
+                    render: function(data) {
+                        return data ? formatNumber(data, 2) : 0
+                    },
+                    className: 'text-right'
                 }, {
                     data: 'tanggal_qc',
                     name: 'qc.tanggal_qc',
@@ -148,12 +151,24 @@
                 }, {
                     data: 'sg_pembelian_detail',
                     name: 'qc.sg_pembelian_detail',
+                    render: function(data) {
+                        return data ? formatNumber(data, 4) : 0
+                    },
+                    className: 'text-right'
                 }, {
                     data: 'be_pembelian_detail',
                     name: 'qc.be_pembelian_detail',
+                    render: function(data) {
+                        return data ? formatNumber(data, 4) : 0
+                    },
+                    className: 'text-right'
                 }, {
                     data: 'ph_pembelian_detail',
                     name: 'qc.ph_pembelian_detail',
+                    render: function(data) {
+                        return data ? formatNumber(data, 4) : 0
+                    },
+                    className: 'text-right'
                 }, {
                     data: 'warna_pembelian_detail',
                     name: 'qc.warna_pembelian_detail',

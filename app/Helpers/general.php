@@ -140,14 +140,30 @@ function getCabangForReport()
     return $array;
 }
 
-function formatNumber($number)
+function formatNumber($number, $prefix = 0)
 {
     $number = number_format($number, 4, ',', '.');
     $explode = explode(',', $number);
     $koma = '';
     if (count($explode) > 1) {
         $reverse = (int) strrev($explode[1]);
-        $koma = (string) $reverse > 0 ? ',' . strrev($reverse) : '';
+        $koma = (string) $reverse > 0 ? strrev($reverse) : '';
+    }
+
+    if ($prefix > 0) {
+        if (strlen($koma) < $prefix) {
+            $sisa = $prefix - strlen($koma);
+            for ($i = 0; $i < $sisa; $i++) {
+                $koma .= '0';
+            }
+        } else {
+            $newNumber = normalizeNumber($explode[0]) . '.' . $koma;
+            return number_format($newNumber, 2, ',', '.');
+        }
+    }
+
+    if ($koma != '') {
+        $koma = ',' . $koma;
     }
 
     return $explode[0] . $koma;

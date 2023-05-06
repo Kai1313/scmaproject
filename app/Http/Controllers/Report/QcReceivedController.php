@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use DB;
 use Excel;
 use Illuminate\Http\Request;
+use PDF;
 use Yajra\DataTables\DataTables;
 
 class QcReceivedController extends Controller
@@ -49,13 +50,17 @@ class QcReceivedController extends Controller
             $sCabang[] = $arrayCabang[$e];
         }
 
-        return view('report_ops.qualityControl.print', [
-            "pageTitle" => "SCA OPS | Laporan QC Penerimaan Barang | Print",
+        $array = [
             "datas" => $data,
-            'arrayStatus' => $this->arrayStatus,
             'cabang' => implode(', ', $sCabang),
             'date' => $request->date,
-        ]);
+            'type' => $request->type,
+            'status' => $request->status_qc,
+        ];
+
+        $pdf = PDF::loadView('report_ops.qualityControl.print', $array);
+        $pdf->setPaper('a4', 'landscape');
+        return $pdf->download('laporan QC penerimaan.pdf');
     }
 
     public function getExcel(Request $request)

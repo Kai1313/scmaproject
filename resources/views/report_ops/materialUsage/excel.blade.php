@@ -107,9 +107,9 @@
                         <td style="border: #000000 solid thin;">{{ $data->nama_gudang }}</td>
                         <td style="border: #000000 solid thin;">{{ $data->kode_batang }}</td>
                         <td style="border: #000000 solid thin;">{{ $data->nama_barang }}</td>
-                        <td style="border: #000000 solid thin;">{{ $data->jumlah }}</td>
-                        <td style="border: #000000 solid thin;">{{ $data->jumlah_zak }}</td>
-                        <td style="border: #000000 solid thin;">{{ $data->weight_zak }}</td>
+                        <td style="border: #000000 solid thin;text-align:right;">{{ $data->jumlah }}</td>
+                        <td style="border: #000000 solid thin;text-align:right;">{{ $data->jumlah_zak }}</td>
+                        <td style="border: #000000 solid thin;text-align:right;">{{ $data->weight_zak }}</td>
                     </tr>
                 @endforeach
             </tbody>

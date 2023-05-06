@@ -36,6 +36,7 @@
                 <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Kode Transaksi
                 </th>
                 <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Nomor SO</th>
+                <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Pelanggan</th>
                 <th style="border: #000000 solid thin;width:200px;text-align:center;font-weight:bold;">Akun Slip</th>
                 <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Mata Uang</th>
                 <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Nominal</th>
@@ -48,9 +49,10 @@
                     <td style="border: #000000 solid thin;">{{ $data->nama_cabang }}</td>
                     <td style="border: #000000 solid thin;">{{ $data->kode_uang_muka_penjualan }}</td>
                     <td style="border: #000000 solid thin;">{{ $data->nama_permintaan_penjualan }}</td>
+                    <td style="border: #000000 solid thin;">{{ $data->nama_pelanggan }}</td>
                     <td style="border: #000000 solid thin;">{{ $data->nama_slip }}</td>
                     <td style="border: #000000 solid thin;">{{ $data->nama_mata_uang }}</td>
-                    <td style="border: #000000 solid thin;">{{ $data->nominal }}</td>
+                    <td style="border: #000000 solid thin;text-align:right;">{{ number_format($data->nominal, 2) }}</td>
                 </tr>
             @endforeach
         </tbody>

@@ -65,8 +65,7 @@
                     </div>
                 </div>
                 <div class="pull-right">
-                    <a href="{{ route('report_material_usage-print') }}" class="btn btn-danger btn-sm btn-flat btn-action"
-                        target="_blank">
+                    <a href="{{ route('report_material_usage-print') }}" class="btn btn-danger btn-sm btn-flat btn-action">
                         <i class="glyphicon glyphicon-print"></i> Print
                     </a>
                     <a href="{{ route('report_material_usage-excel') }}" class="btn btn-success btn-sm btn-flat btn-action">
@@ -201,12 +200,24 @@
                         }, {
                             data: 'jumlah',
                             name: 'pd.jumlah',
+                            render: function(data) {
+                                return data ? formatNumber(data, 4) : 0
+                            },
+                            className: 'text-right'
                         }, {
                             data: 'jumlah_zak',
                             name: 'pd.jumlah_zak',
+                            render: function(data) {
+                                return data ? formatNumber(data, 4) : 0
+                            },
+                            className: 'text-right'
                         }, {
                             data: 'weight_zak',
                             name: 'pd.weight_zak',
+                            render: function(data) {
+                                return data ? formatNumber(data, 4) : 0
+                            },
+                            className: 'text-right'
                         }, ]
                     });
                     break;
