@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Accounting\JurnalDetail;
 use App\Models\Accounting\JurnalHeader;
 use App\Models\Accounting\TrxSaldo;
+use App\Models\Master\Akun;
 use App\Models\Master\Cabang;
 use App\Models\Master\Setting;
 use App\Models\Master\Slip;
@@ -276,18 +277,43 @@ class ApiController extends Controller
 
             $data_slip = Slip::find($id_slip);
 
-            if ($data_slip->jenis_slip == 0) {
-                $jurnal_type = 'KK';
-                $jurnal_type_detail = 'Kas Keluar';
-            } else if ($data_slip->jenis_slip == 1) {
-                $jurnal_type = 'BK';
-                $jurnal_type_detail = 'Bank Keluar';
-            } else {
-                return response()->json([
-                    "result" => false,
-                    "code" => 400,
-                    "message" => "Error, please use slip Kas Keluar or Bank Keluar",
-                ], 400);
+            if(empty($data_slip)){
+                $data_akun_hutang_dagang = DB::table('setting')->where('code', 'Hutang Dagang')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
+                if (empty($data_akun_hutang_dagang)) {
+                    return response()->json([
+                        "result" => false,
+                        "code" => 400,
+                        "message" => "Error, please use slip Kas Keluar, Bank Keluar, or set up Hutang Dagang setting first",
+                    ], 400);
+                }else{
+                    $data_akun = Akun::find($data_akun_hutang_dagang->value2);
+                    if(empty($data_akun)){
+                        return response()->json([
+                            "result" => false,
+                            "code" => 400,
+                            "message" => "Error, can not find id_akun in Hutang Dagang setting",
+                        ], 400);
+                    }else{
+                        $jurnal_type = 'ME';
+                        $jurnal_type_detail = 'Memorial';
+                        $akun_slip = $data_akun->id_akun;
+                    }
+                }
+            }else{
+                if ($data_slip->jenis_slip == 0) {
+                    $jurnal_type = 'KK';
+                    $jurnal_type_detail = 'Kas Keluar';
+                } else if ($data_slip->jenis_slip == 1) {
+                    $jurnal_type = 'BK';
+                    $jurnal_type_detail = 'Bank Keluar';
+                } else {
+                    return response()->json([
+                        "result" => false,
+                        "code" => 400,
+                        "message" => "Error, please use slip Kas Keluar or Bank Keluar",
+                    ], 400);
+                }
+                $akun_slip = $data_slip->id_akun;
             }
 
             // detail
@@ -309,7 +335,6 @@ class ApiController extends Controller
                 ], 404);
             }
 
-            $akun_slip = $data_slip->id_akun;
             $akun_uang_muka_pembelian = $data_akun_uang_muka_pembelian->value2;
             $akun_ppn_masukan = $data_akun_ppn_masukan->value2;
             $total = $request->total;
@@ -423,7 +448,7 @@ class ApiController extends Controller
                 return response()->json([
                     "result" => false,
                     "code" => 400,
-                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance",
+                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance. credit: " . $check_balance_credit . ", debet : " . $check_balance_debit
                 ], 400);
             }
 
