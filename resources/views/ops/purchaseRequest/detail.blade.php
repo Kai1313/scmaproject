@@ -124,6 +124,7 @@
                                 <th>Satuan</th>
                                 <th>Catatan</th>
                                 <th>Stok</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                     </table>
@@ -173,6 +174,10 @@
                     return formatNumber(data, 4)
                 },
                 className: 'text-right'
+            }, {
+                data: 'status',
+                name: 'status',
+                className: 'text-center'
             }]
         });
 

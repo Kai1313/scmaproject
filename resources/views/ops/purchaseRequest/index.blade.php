@@ -94,6 +94,7 @@
                                 <th>Status</th>
                                 <th>Otorisasi</th>
                                 <th>Tanggal Otorisasi</th>
+                                <th>Jumlah Terpakai</th>
                                 <th width="150px">Action</th>
                             </tr>
                         </thead>
@@ -151,6 +152,9 @@
             }, {
                 data: 'approval_date',
                 name: 'prh.approval_date',
+            }, {
+                data: 'closed',
+                name: 'closed'
             }, {
                 data: 'action',
                 name: 'action',
