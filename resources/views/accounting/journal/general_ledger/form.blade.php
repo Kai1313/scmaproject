@@ -473,8 +473,8 @@
                     let total_debet = parseFloat(0)
                     let total_kredit = parseFloat(0)
                     details.forEach(detail => {
-                        total_debet = parseFloat(total_debet) + parseFloat(detail.debet)
-                        total_kredit = parseFloat(total_kredit) + parseFloat(detail.kredit)
+                        total_debet = parseFloat(total_debet) + parseFloat(detail.debet.replace(',', '.'))
+                        total_kredit = parseFloat(total_kredit) + parseFloat(detail.kredit.replace(',', '.'))
                     })
                     if (jenis == "BM" || jenis == "KM" || jenis == "PG") {
                         if (total_kredit == total_debet) {
@@ -1067,6 +1067,9 @@
             slip = 2;
         }else if(jenis_jurnal == 'HG'){
             slip = 3;
+        }
+        else {
+            slip = 0
         }
 
         let current_slip_route = slip_by_cabang_route.replace(':id', id_cabang);
