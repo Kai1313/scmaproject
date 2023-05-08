@@ -472,13 +472,17 @@
                 onSubmit: function(node, formData) {
                     let total_debet = parseFloat(0)
                     let total_kredit = parseFloat(0)
+                    console.log("when submit")
+                    console.log(details)
                     details.forEach(detail => {
-                        total_debet = parseFloat(total_debet) + parseFloat(detail.debet)
-                        total_kredit = parseFloat(total_kredit) + parseFloat(detail.kredit)
+                        total_debet = parseFloat(total_debet) + parseFloat(detail.debet.replace(',', '.'))
+                        total_kredit = parseFloat(total_kredit) + parseFloat(detail.kredit.replace(',', '.'))
                     })
+                    console.log(total_debet)
+                    console.log(total_kredit)
                     if (jenis == "BM" || jenis == "KM" || jenis == "PG") {
                         if (total_kredit == total_debet) {
-                            save_data()
+                            // save_data()
                         }
                         else {
                             Swal.fire("Sorry, Can't save data. ", "Jumlah total kredit harus sama dengan dari total debet", 'error')
@@ -486,7 +490,7 @@
                     }
                     else {
                         if (total_debet == total_kredit) {
-                            save_data()
+                            // save_data()
                         }
                         else {
                             Swal.fire("Sorry, Can't save data. ", "Jumlah total debet harus sama dengan dari total kredit", 'error')
@@ -1067,6 +1071,9 @@
             slip = 2;
         }else if(jenis_jurnal == 'HG'){
             slip = 3;
+        }
+        else {
+            slip = 0
         }
 
         let current_slip_route = slip_by_cabang_route.replace(':id', id_cabang);
