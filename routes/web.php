@@ -203,6 +203,14 @@ Route::prefix('report')->group(function(){
         Route::get('/excel', 'ReportGeneralLedgerController@exportExcel')->name('report-general-ledger-excel');
         Route::get('/pdf', 'ReportGeneralLedgerController@exportPdf')->name('report-general-ledger-pdf');
     });
+
+    // Profit Loss
+    Route::prefix('profit_loss')->group(function(){
+        Route::get('/index/{user_id?}', 'ReportProfitAndLossController@index')->name('report-profit-loss');
+        Route::get('/populate', 'ReportProfitAndLossController@populate')->name('report-profit-loss-populate');
+        Route::get('/excel', 'ReportProfitAndLossController@exportExcel')->name('report-profit-loss-excel');
+        Route::get('/pdf', 'ReportProfitAndLossController@exportPdf')->name('report-profit-loss-pdf');
+    });
 });
 
 Route::get('/dummyAjax', 'ClosingJournalController@dummyAjax')->name('dummy-ajax');
