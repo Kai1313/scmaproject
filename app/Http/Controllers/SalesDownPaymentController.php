@@ -221,11 +221,18 @@ class SalesDownPaymentController extends Controller
         $duration = DB::table('setting')->where('code', 'UMJ Duration')->first();
         $startDate = date('Y-m-d', strtotime('-' . intval($duration->value2) . ' days'));
         $endDate = date('Y-m-d');
-        $datas = DB::table('permintaan_penjualan as pp')->select('pp.id_permintaan_penjualan as id', 'nama_permintaan_penjualan as text', 'mtotal_permintaan_penjualan', 'tanggal_permintaan_penjualan')
+        $datas = DB::table('permintaan_penjualan as pp')
+            ->select(
+                'pp.id_permintaan_penjualan as id',
+                DB::raw('concat(nama_permintaan_penjualan," ( ",nama_pelanggan," )") as text'),
+                'mtotal_permintaan_penjualan',
+                'tanggal_permintaan_penjualan'
+            )
             ->leftJoin('uang_muka_penjualan as ump', function ($join) {
                 $join->on('pp.id_permintaan_penjualan', '=', 'ump.id_permintaan_penjualan')
                     ->where('ump.void', 0);
             })
+            ->leftJoin('pelanggan as p', 'pp.id_pelanggan', 'p.id_pelanggan')
             ->whereBetween('tanggal_permintaan_penjualan', [$startDate, $endDate])
             ->where('pp.id_cabang', $idCabang)
             ->groupBy('pp.id_permintaan_penjualan')

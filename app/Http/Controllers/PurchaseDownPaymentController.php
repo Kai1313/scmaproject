@@ -276,11 +276,17 @@ class PurchaseDownPaymentController extends Controller
 
         $startDate = date('Y-m-d', strtotime('-' . intval($valDuration) . ' days'));
         $endDate = date('Y-m-d');
-        $datas = DB::table('permintaan_pembelian as pp')->select('pp.id_permintaan_pembelian as id', 'nama_permintaan_pembelian as text', 'mtotal_permintaan_pembelian')
+        $datas = DB::table('permintaan_pembelian as pp')
+            ->select(
+                'pp.id_permintaan_pembelian as id',
+                DB::raw('concat(nama_permintaan_pembelian," ( ",nama_pemasok," )") as text'),
+                'mtotal_permintaan_pembelian'
+            )
             ->leftJoin('uang_muka_pembelian as ump', function ($join) {
                 $join->on('pp.id_permintaan_pembelian', '=', 'ump.id_permintaan_pembelian')
                     ->where('ump.void', 0);
             })
+            ->leftJoin('pemasok as p', 'pp.id_pemasok', 'p.id_pemasok')
             ->whereBetween('tanggal_permintaan_pembelian', [$startDate, $endDate])
             ->where('pp.id_cabang', $idCabang)
             ->groupBy('pp.id_permintaan_pembelian')

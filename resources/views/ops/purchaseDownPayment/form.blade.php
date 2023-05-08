@@ -81,7 +81,8 @@
                                     <option value="">Pilih Permintaan Pembelian (PO)</option>
                                     @if ($data && $data->id_permintaan_pembelian)
                                         <option value="{{ $data->id_permintaan_pembelian }}" selected>
-                                            {{ $data->purchaseOrder->nama_permintaan_pembelian }}
+                                            {{ $data->purchaseOrder->nama_permintaan_pembelian }} (
+                                            {{ $data->purchaseOrder->supplier->nama_pemasok }} )
                                         </option>
                                     @endif
                                 </select>
