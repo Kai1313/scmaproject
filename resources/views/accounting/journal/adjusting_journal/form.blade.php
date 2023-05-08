@@ -479,8 +479,8 @@
                     let total_debet = parseFloat(0)
                     let total_kredit = parseFloat(0)
                     details.forEach(detail => {
-                        total_debet = parseFloat(total_debet) + parseFloat(detail.debet)
-                        total_kredit = parseFloat(total_kredit) + parseFloat(detail.kredit)
+                        total_debet = parseFloat(total_debet) + parseFloat(detail.debet.replace(',', '.'))
+                        total_kredit = parseFloat(total_kredit) + parseFloat(detail.kredit.replace(',', '.'))
                     })
                     if (total_debet == total_kredit) {
                         save_data()
