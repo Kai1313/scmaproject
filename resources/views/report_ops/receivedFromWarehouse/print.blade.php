@@ -7,16 +7,16 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
     <style>
-        table {
+        .table {
             border-collapse: collapse;
         }
 
-        td {
+        .table td {
             font-size: 10px;
             border: #000000 solid thin;
         }
 
-        th {
+        .table th {
             font-size: 12px;
             border: #000000 solid thin;
             max-width: 150px;
@@ -27,13 +27,32 @@
         .number {
             text-align: right;
         }
+
+        .table-header td {
+            font-size: 15px;
+            font-weight: bold;
+        }
     </style>
 </head>
 
 <body>
+    <table style="width:100%;margin-bottom:10px;" class="table-header">
+        <tr>
+            <td style="width:80px;"><img src="{{ asset('images/logo2.jpg') }}" alt="logo" style="width:70px;"></td>
+            <td style="text-align:center;">LAPORAN TERIMA DARI GUDANG</td>
+        </tr>
+    </table>
+    <table style="width:100%;margin-bottom:5px;" class="table">
+        <tr>
+            <td>Cabang : {{ $cabang }}</td>
+            <td>Gudang : {{ count(explode(', ', $cabang)) > 1 ? 'Semua Gudang' : $gudang }}</td>
+            <td>Tanggal : {{ $date }}</td>
+            <td>Status : {{ $status }}</td>
+            <td>Jenis Laporan : {{ $type }}</td>
+        </tr>
+    </table>
     @if ($type == 'Rekap')
-        <h3 style="text-align:center;">LAPORAN TERIMA DARI GUDANG</h3>
-        <table width="100%">
+        <table width="100%" class="table">
             <thead>
                 <tr>
                     <th>Tanggal</th>
@@ -60,8 +79,7 @@
             </tbody>
         </table>
     @elseif($type == 'Detail')
-        <h3 style="text-align:center;">LAPORAN TERIMA DARI GUDANG</h3>
-        <table width="100%">
+        <table width="100%" class="table">
             <thead>
                 <tr>
                     <th>Tanggal</th>
@@ -96,8 +114,7 @@
             </tbody>
         </table>
     @elseif($type == 'Outstanding')
-        <h3 style="text-align:center;">LAPORAN TERIMA DARI GUDANG</h3>
-        <table width="100%">
+        <table width="100%" class="table">
             <thead>
                 <tr>
                     <th>Tanggal</th>
