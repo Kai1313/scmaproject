@@ -1111,6 +1111,9 @@
                     <li class="{{ request()->segment(1) == 'report' && request()->segment(2) == 'general_ledger' ? 'active' : null }}">
                         <a href="{{ route('report-general-ledger', 1) }}">Buku Besar</a>
                     </li>
+                    <li class="{{ request()->segment(1) == 'report' && request()->segment(2) == 'profit_loss' ? 'active' : null }}">
+                        <a href="{{ route('report-profit-loss', 1) }}">Laba Rugi</a>
+                    </li>
                     <li class="{{ request()->segment(1) == 'report' && request()->segment(2) == 'balance' ? 'active' : null }}">
                         <a href="{{ route('report-balance', 1) }}">Neraca</a>
                     </li>
