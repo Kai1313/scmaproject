@@ -516,7 +516,16 @@
             callback: {
                 onSubmit: function(node, formData) {
                     console.log('hello detail')
-                    submit_detail()
+                    let debet = formatNumberAsLocalFloat($("#debet").val())
+                    let kredit = formatNumberAsLocalFloat($("#kredit").val())
+                    debet = parseFloat(debet.replace(',', '.')).toFixed(2)
+                    kredit = parseFloat(kredit.replace(',', '.')).toFixed(2)
+                    if (debet <= 0 && kredit <= 0) {
+                        Swal.fire("Sorry, Can't add detail. ", "Jumlah debet atau kredit tidak boleh negatif atau 0", 'error')
+                    }
+                    else {
+                        submit_detail()
+                    }
                 }
             }
         },
@@ -1978,10 +1987,11 @@
         
         num = num.split('.').join("");;
         num = num.replace(/,/g, '.');
+        num = parseFloat(num).toFixed(2)
         num = num.toString().replace(/\,/gi, "");
         num += '';
         x = num.split('.');
-        x1 = (x[0] <= 0)?0:x[0];
+        x1 = x[0];
         x2 = x.length > 1 ? ',' + x[1] : ',00';
         var rgx = /(\d+)(\d{3})/;
         while (rgx.test(x1)) {
