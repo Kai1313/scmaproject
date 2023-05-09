@@ -124,9 +124,9 @@ class ApiController extends Controller
             $akun_slip = $data_slip->id_akun;
             $akun_uang_muka_penjualan = $data_akun_uang_muka_penjualan->value2;
             $akun_ppn_keluaran = $data_akun_ppn_keluaran->value2;
-            $total = $request->total;
-            $uang_muka = $request->uang_muka;
-            $nominal_ppn = $request->ppn;
+            $total = round(floatval($request->total), 2);
+            $uang_muka = round(floatval($request->uang_muka), 2);
+            $nominal_ppn = round(floatval($request->ppn), 2);
 
             // Check balance
             $check_balance_debit = 0;
@@ -229,13 +229,15 @@ class ApiController extends Controller
                 }
             }
 
+            $check_balance_debit = round($check_balance_debit, 2);
+            $check_balance_credit = round($check_balance_credit, 2);
             // check balance
             if ($check_balance_debit != $check_balance_credit) {
                 DB::rollback();
                 return response()->json([
                     "result" => false,
                     "code" => 400,
-                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance",
+                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance. credit: " . $check_balance_credit . ", debet : " . $check_balance_debit,
                 ], 400);
             }
 
@@ -337,9 +339,9 @@ class ApiController extends Controller
 
             $akun_uang_muka_pembelian = $data_akun_uang_muka_pembelian->value2;
             $akun_ppn_masukan = $data_akun_ppn_masukan->value2;
-            $total = $request->total;
-            $uang_muka = $request->uang_muka;
-            $nominal_ppn = $request->ppn;
+            $total = round(floatval($request->total), 2);
+            $uang_muka = round(floatval($request->uang_muka), 2);
+            $nominal_ppn = round(floatval($request->ppn), 2);
 
             // Check balance
             $check_balance_debit = 0;
@@ -442,6 +444,8 @@ class ApiController extends Controller
                 }
             }
 
+            $check_balance_debit = round($check_balance_debit, 2);
+            $check_balance_credit = round($check_balance_credit, 2);
             // check balance
             if ($check_balance_debit != $check_balance_credit) {
                 DB::rollback();
@@ -543,9 +547,9 @@ class ApiController extends Controller
             $akun_uang_muka_penjualan = $data_akun_uang_muka_penjualan->value2;
             $akun_ppn_keluaran = $data_akun_ppn_keluaran->value2;
             $akun_penjualan = $data_akun_penjualan->value2;
-            $total = $request->total;
-            $uang_muka = $request->uang_muka;
-            $nominal_ppn = $request->ppn;
+            $total = round(floatval($request->total), 2);
+            $uang_muka = round(floatval($request->uang_muka), 2);
+            $nominal_ppn = round(floatval($request->ppn), 2);
 
             // Check balance
             $check_balance_debit = 0;
@@ -553,22 +557,8 @@ class ApiController extends Controller
 
             $jurnal_detail_me = [
                 [
-                    'akun' => $akun_uang_muka_penjualan,
-                    'debet' => $uang_muka,
-                    'credit' => 0,
-                    'keterangan' => 'Jurnal Otomatis Uang Muka Penjualan - ' . $id_transaksi . ' - ' . $nama_pelanggan,
-                    'id_transaksi' => null,
-                ],
-                [
                     'akun' => $akun_piutang_dagang,
-                    'debet' => 0,
-                    'credit' => $uang_muka,
-                    'keterangan' => 'Jurnal Otomatis Pelunasan - ' . $id_transaksi . ' - ' . $nama_pelanggan,
-                    'id_transaksi' => $id_transaksi,
-                ],
-                [
-                    'akun' => $akun_piutang_dagang,
-                    'debet' => ($total + $uang_muka),
+                    'debet' => round(($total + $uang_muka), 2),
                     'credit' => 0,
                     'keterangan' => 'Jurnal Otomatis Penjualan ' . $id_transaksi . ' - ' . $nama_pelanggan,
                     'id_transaksi' => null,
@@ -582,11 +572,29 @@ class ApiController extends Controller
                 ],
             ];
 
+            if(isset($uang_muka) && $uang_muka > 0){
+                array_push($jurnal_detail_me, [
+                    'akun' => $akun_uang_muka_penjualan,
+                    'debet' => $uang_muka,
+                    'credit' => 0,
+                    'keterangan' => 'Jurnal Otomatis Uang Muka Penjualan - ' . $id_transaksi . ' - ' . $nama_pelanggan,
+                    'id_transaksi' => null,
+                ]);
+
+                array_push($jurnal_detail_me,[
+                    'akun' => $akun_piutang_dagang,
+                    'debet' => 0,
+                    'credit' => $uang_muka,
+                    'keterangan' => 'Jurnal Otomatis Pelunasan - ' . $id_transaksi . ' - ' . $nama_pelanggan,
+                    'id_transaksi' => $id_transaksi,
+                ]);
+            }
+
             foreach ($detail_inventory as $d_inv) {
                 array_push($jurnal_detail_me, [
                     'akun' => $akun_penjualan,
                     'debet' => 0,
-                    'credit' => $d_inv['total'],
+                    'credit' => round(floatval($d_inv['total']), 2),
                     'keterangan' => 'Jurnal Otomatis Penjualan - ' . $id_transaksi . ' - ' . $nama_pelanggan . ' - ' . $d_inv['nama_barang'],
                     'id_transaksi' => null,
                 ]);
@@ -664,13 +672,15 @@ class ApiController extends Controller
                 }
             }
 
+            $check_balance_debit = round($check_balance_debit, 2);
+            $check_balance_credit = round($check_balance_credit, 2);
             // check balance
             if ($check_balance_debit != $check_balance_credit) {
                 DB::rollback();
                 return response()->json([
                     "result" => false,
                     "code" => 400,
-                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance",
+                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance. credit: " . $check_balance_credit . ", debet : " . $check_balance_debit
                 ], 400);
             }
 
@@ -889,9 +899,9 @@ class ApiController extends Controller
             $akun_hutang_dagang = $data_akun_hutang_dagang->value2;
             $akun_uang_muka_pembelian = $data_akun_uang_muka_pembelian->value2;
             $akun_ppn_masukkan = $data_akun_ppn_masukkan->value2;
-            $total = $request->total;
-            $uang_muka = $request->uang_muka;
-            $nominal_ppn = $request->ppn;
+            $total = round(floatval($request->total), 2);
+            $uang_muka = round(floatval($request->uang_muka), 2);
+            $nominal_ppn = round(floatval($request->ppn), 2);
 
             // Check balance
             $check_balance_debit = 0;
@@ -899,23 +909,9 @@ class ApiController extends Controller
 
             $jurnal_detail_me = [
                 [
-                    'akun' => $akun_uang_muka_pembelian,
-                    'debet' => 0,
-                    'credit' => $uang_muka,
-                    'keterangan' => 'Jurnal Otomatis Uang Muka Pembelian - ' . $id_transaksi . ' - ' . $nama_pemasok,
-                    'id_transaksi' => null,
-                ],
-                [
-                    'akun' => $akun_hutang_dagang,
-                    'debet' => $uang_muka,
-                    'credit' => 0,
-                    'keterangan' => 'Jurnal Otomatis Pelunasan - ' . $id_transaksi . ' - ' . $nama_pemasok,
-                    'id_transaksi' => $id_transaksi,
-                ],
-                [
                     'akun' => $akun_hutang_dagang,
                     'debet' => 0,
-                    'credit' => ($total + $uang_muka),
+                    'credit' => round(($total + $uang_muka), 2),
                     'keterangan' => 'Jurnal Otomatis Pembelian ' . $id_transaksi . ' - ' . $nama_pemasok,
                     'id_transaksi' => null,
                 ],
@@ -928,10 +924,28 @@ class ApiController extends Controller
                 ],
             ];
 
+            if(isset($uang_muka) && $uang_muka > 0){
+                array_push($jurnal_detail_me, [
+                    'akun' => $akun_uang_muka_pembelian,
+                    'debet' => 0,
+                    'credit' => $uang_muka,
+                    'keterangan' => 'Jurnal Otomatis Uang Muka Pembelian - ' . $id_transaksi . ' - ' . $nama_pemasok,
+                    'id_transaksi' => null,
+                ]);
+
+                array_push($jurnal_detail_me, [
+                    'akun' => $akun_hutang_dagang,
+                    'debet' => $uang_muka,
+                    'credit' => 0,
+                    'keterangan' => 'Jurnal Otomatis Pelunasan - ' . $id_transaksi . ' - ' . $nama_pemasok,
+                    'id_transaksi' => $id_transaksi,
+                ]);
+            }
+
             foreach ($detail_inventory as $d_inv) {
                 array_push($jurnal_detail_me, [
                     'akun' => $d_inv['akun_id'],
-                    'debet' => $d_inv['total'],
+                    'debet' => round(floatval($d_inv['total']), 2),
                     'credit' => 0,
                     'keterangan' => 'Jurnal Otomatis Pembelian Persediaan - ' . $id_transaksi . ' - ' . $nama_pemasok . ' - ' . $d_inv['nama_barang'],
                     'id_transaksi' => null,
@@ -1010,13 +1024,15 @@ class ApiController extends Controller
                 }
             }
 
+            $check_balance_debit = round($check_balance_debit, 2);
+            $check_balance_credit = round($check_balance_credit, 2);
             // check balance
             if ($check_balance_debit != $check_balance_credit) {
                 DB::rollback();
                 return response()->json([
                     "result" => false,
                     "code" => 400,
-                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance",
+                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance. credit: " . $check_balance_credit . ", debet : " . $check_balance_debit,
                 ], 400);
             }
 
@@ -1235,8 +1251,8 @@ class ApiController extends Controller
             $akun_piutang_dagang = $data_akun_piutang_dagang->value2;
             $akun_ppn_keluaran = $data_akun_ppn_keluaran->value2;
             $akun_penjualan = $data_akun_penjualan->value2;
-            $total = $request->total;
-            $nominal_ppn = $request->ppn;
+            $total = round(floatval($request->total), 2);
+            $nominal_ppn = round(floatval($request->ppn), 2);
 
             // Check balance
             $check_balance_debit = 0;
@@ -1262,7 +1278,7 @@ class ApiController extends Controller
             foreach ($detail_inventory as $d_inv) {
                 array_push($jurnal_detail_me, [
                     'akun' => $akun_penjualan,
-                    'debet' => $d_inv['total'],
+                    'debet' => round(floatval($d_inv['total']), 2),
                     'credit' => 0,
                     'keterangan' => 'Jurnal Otomatis Retur Penjualan - ' . $id_transaksi . ' - ' . $nama_pelanggan . ' - ' . $d_inv['nama_barang'],
                     'id_transaksi' => null,
@@ -1341,13 +1357,15 @@ class ApiController extends Controller
                 }
             }
 
+            $check_balance_debit = round($check_balance_debit, 2);
+            $check_balance_credit = round($check_balance_credit, 2);
             // check balance
             if ($check_balance_debit != $check_balance_credit) {
                 DB::rollback();
                 return response()->json([
                     "result" => false,
                     "code" => 400,
-                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance",
+                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance. credit: " . $check_balance_credit . ", debet : " . $check_balance_debit,
                 ], 400);
             }
 
@@ -1557,8 +1575,8 @@ class ApiController extends Controller
             $akun_hutang_dagang = $data_akun_hutang_dagang->value2;
             $akun_ppn_masukkan = $data_akun_ppn_masukkan->value2;
             $total = $request->total;
-            $uang_muka = $request->uang_muka;
-            $nominal_ppn = $request->ppn;
+            $uang_muka = round(floatval($request->uang_muka), 2);
+            $nominal_ppn = round(floatval($request->ppn), 2);
 
             // Check balance
             $check_balance_debit = 0;
@@ -1567,7 +1585,7 @@ class ApiController extends Controller
             $jurnal_detail_me = [
                 [
                     'akun' => $akun_hutang_dagang,
-                    'debet' => ($total + $uang_muka),
+                    'debet' => round(($total + $uang_muka), 2),
                     'credit' => 0,
                     'keterangan' => 'Jurnal Otomatis Retur Pembelian ' . $id_transaksi . ' - ' . $nama_pemasok,
                     'id_transaksi' => null,
@@ -1585,7 +1603,7 @@ class ApiController extends Controller
                 array_push($jurnal_detail_me, [
                     'akun' => $d_inv['akun_id'],
                     'debet' => 0,
-                    'credit' => $d_inv['total'],
+                    'credit' => round(floatval($d_inv['total']), 2),
                     'keterangan' => 'Jurnal Otomatis Retur Pembelian Persediaan - ' . $id_transaksi . ' - ' . $nama_pemasok . ' - ' . $d_inv['nama_barang'],
                     'id_transaksi' => null,
                 ]);
@@ -1663,13 +1681,15 @@ class ApiController extends Controller
                 }
             }
 
+            $check_balance_debit = round($check_balance_debit, 2);
+            $check_balance_credit = round($check_balance_credit, 2);
             // check balance
             if ($check_balance_debit != $check_balance_credit) {
                 DB::rollback();
                 return response()->json([
                     "result" => false,
                     "code" => 400,
-                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance",
+                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance. credit: " . $check_balance_credit . ", debet : " . $check_balance_debit,
                 ], 400);
             }
 
