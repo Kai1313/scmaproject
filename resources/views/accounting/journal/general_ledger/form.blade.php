@@ -476,6 +476,11 @@
                         total_debet = parseFloat(total_debet) + parseFloat(detail.debet.replace(',', '.'))
                         total_kredit = parseFloat(total_kredit) + parseFloat(detail.kredit.replace(',', '.'))
                     })
+                    total_debet = total_debet.toFixed(2)
+                    total_kredit = total_kredit.toFixed(2)
+                    // console.log("total here")
+                    // console.log(total_debet)
+                    // console.log(total_kredit)
                     if (jenis == "BM" || jenis == "KM" || jenis == "PG") {
                         if (total_kredit == total_debet) {
                             save_data()

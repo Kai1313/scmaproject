@@ -195,7 +195,7 @@ Route::prefix('report')->group(function(){
         Route::get('/pdf', 'ReportGiroController@exportPdf')->name('report-giro-pdf');
         Route::get('/getSlip', 'ReportGiroController@getSlip')->name('report-giro-get-slip');
     });
-    
+
     // Ledger
     Route::prefix('general_ledger')->group(function(){
         Route::get('/index/{user_id?}', 'ReportGeneralLedgerController@index')->name('report-general-ledger');
@@ -210,6 +210,14 @@ Route::prefix('report')->group(function(){
         Route::get('/populate', 'ReportProfitAndLossController@populate')->name('report-profit-loss-populate');
         Route::get('/excel', 'ReportProfitAndLossController@exportExcel')->name('report-profit-loss-excel');
         Route::get('/pdf', 'ReportProfitAndLossController@exportPdf')->name('report-profit-loss-pdf');
+    });
+
+    // Balance
+    Route::prefix('balance')->group(function(){
+        Route::get('/index/{user_id?}', 'ReportBalanceController@index')->name('report-balance');
+        Route::get('/populate', 'ReportBalanceController@populate')->name('report-balance-populate');
+        Route::get('/excel', 'ReportBalanceController@exportExcel')->name('report-balance-excel');
+        Route::get('/pdf', 'ReportBalanceController@exportPdf')->name('report-balance-pdf');
     });
 });
 
