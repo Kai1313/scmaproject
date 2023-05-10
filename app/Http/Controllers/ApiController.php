@@ -279,7 +279,7 @@ class ApiController extends Controller
 
             $data_slip = Slip::find($id_slip);
 
-            if(empty($data_slip)){
+            if (empty($data_slip)) {
                 $data_akun_hutang_dagang = DB::table('setting')->where('code', 'Hutang Dagang')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
                 if (empty($data_akun_hutang_dagang)) {
                     return response()->json([
@@ -287,21 +287,21 @@ class ApiController extends Controller
                         "code" => 400,
                         "message" => "Error, please use slip Kas Keluar, Bank Keluar, or set up Hutang Dagang setting first",
                     ], 400);
-                }else{
+                } else {
                     $data_akun = Akun::find($data_akun_hutang_dagang->value2);
-                    if(empty($data_akun)){
+                    if (empty($data_akun)) {
                         return response()->json([
                             "result" => false,
                             "code" => 400,
                             "message" => "Error, can not find id_akun in Hutang Dagang setting",
                         ], 400);
-                    }else{
+                    } else {
                         $jurnal_type = 'ME';
                         $jurnal_type_detail = 'Memorial';
                         $akun_slip = $data_akun->id_akun;
                     }
                 }
-            }else{
+            } else {
                 if ($data_slip->jenis_slip == 0) {
                     $jurnal_type = 'KK';
                     $jurnal_type_detail = 'Kas Keluar';
@@ -452,7 +452,7 @@ class ApiController extends Controller
                 return response()->json([
                     "result" => false,
                     "code" => 400,
-                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance. credit: " . $check_balance_credit . ", debet : " . $check_balance_debit
+                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance. credit: " . $check_balance_credit . ", debet : " . $check_balance_debit,
                 ], 400);
             }
 
@@ -572,7 +572,7 @@ class ApiController extends Controller
                 ],
             ];
 
-            if(isset($uang_muka) && $uang_muka > 0){
+            if (isset($uang_muka) && $uang_muka > 0) {
                 array_push($jurnal_detail_me, [
                     'akun' => $akun_uang_muka_penjualan,
                     'debet' => $uang_muka,
@@ -581,7 +581,7 @@ class ApiController extends Controller
                     'id_transaksi' => null,
                 ]);
 
-                array_push($jurnal_detail_me,[
+                array_push($jurnal_detail_me, [
                     'akun' => $akun_piutang_dagang,
                     'debet' => 0,
                     'credit' => $uang_muka,
@@ -680,7 +680,7 @@ class ApiController extends Controller
                 return response()->json([
                     "result" => false,
                     "code" => 400,
-                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance. credit: " . $check_balance_credit . ", debet : " . $check_balance_debit
+                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance. credit: " . $check_balance_credit . ", debet : " . $check_balance_debit,
                 ], 400);
             }
 
@@ -924,7 +924,7 @@ class ApiController extends Controller
                 ],
             ];
 
-            if(isset($uang_muka) && $uang_muka > 0){
+            if (isset($uang_muka) && $uang_muka > 0) {
                 array_push($jurnal_detail_me, [
                     'akun' => $akun_uang_muka_pembelian,
                     'debet' => 0,
@@ -2085,7 +2085,7 @@ class ApiController extends Controller
             $newTipePembayaran = $req->tipe_pembayaran;
             if (!$data) {
                 $data = new transactionBalance;
-                $payment = $newTipePembayaran == '1' ? $total : 0;
+                $payment = 0;
                 $remaining = $newTipePembayaran == '1' ? 0 : ($total - $payment);
 
                 $array['tipe_transaksi'] = $req->tipe_transaksi;
@@ -2093,18 +2093,9 @@ class ApiController extends Controller
                 $array['bayar'] = $payment;
                 $array['sisa'] = $remaining;
             } else {
-                $oldTipePembayaran = $data->tipe_pembayaran;
-                $payment = $newTipePembayaran == '1' ? $total : ($oldTipePembayaran == $newTipePembayaran ? $data->bayar : 0);
+                $payment = $data->bayar;
                 $remaining = $newTipePembayaran == '1' ? 0 : ($total - $payment);
-                if ($oldTipePembayaran == $newTipePembayaran) {
-                    $array['sisa'] = $remaining;
-                    if ($newTipePembayaran == '1') {
-                        $array['bayar'] = $payment;
-                    }
-                } else {
-                    $array['bayar'] = $payment;
-                    $array['sisa'] = $remaining;
-                }
+                $array['sisa'] = $remaining;
             }
 
             $data->fill($array);
