@@ -252,6 +252,7 @@
                                         <option value="">Pilih Jenis Transaksi</option>
                                         <option value="penjualan">Penjualan</option>
                                         <option value="pembelian">Pembelian</option>
+                                        <option value="uang_muka_pembelian">Uang Muka Pembelian</option>
                                         <option value="retur_penjualan">Retur Penjualan</option>
                                         <option value="retur_pembelian">Retur Pembelian</option>
                                         <option value="piutang_giro">Piutang Giro</option>
@@ -340,6 +341,26 @@
                                             <th class="text-center">Note</th>
                                             <th class="text-center">DPP</th>
                                             <th class="text-center">PPn</th>
+                                            <th class="text-center">Total</th>
+                                            <th class="text-center">Terbayar</th>
+                                            <th class="text-center">Sisa</th>
+                                            <th class="text-center">Bayar</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="row box-transaction" id="box-uang-muka-beli">
+                            <div class="col-md-12">
+                                <table id="table_uang_muka_beli" class="table table-bordered table-striped table-transaction" style="width:100%">
+                                    <thead width="100%">
+                                        <tr>
+                                            <th class="text-center"></th>
+                                            <th class="text-center">Tanggal</th>
+                                            <th class="text-center">Nomor UM Beli</th>
+                                            <th class="text-center">Nomor PO</th>
+                                            <th class="text-center">Supplier</th>
+                                            <th class="text-center">Note</th>
                                             <th class="text-center">Total</th>
                                             <th class="text-center">Terbayar</th>
                                             <th class="text-center">Sisa</th>
@@ -515,7 +536,16 @@
             },
             callback: {
                 onSubmit: function(node, formData) {
-                    submit_detail()
+                    let debet = formatNumberAsLocalFloat($("#debet").val())
+                    let kredit = formatNumberAsLocalFloat($("#kredit").val())
+                    debet = parseFloat(debet.replace(',', '.')).toFixed(2)
+                    kredit = parseFloat(kredit.replace(',', '.')).toFixed(2)
+                    if (debet <= 0 && kredit <= 0) {
+                        Swal.fire("Sorry, Can't add detail. ", "Jumlah debet atau kredit tidak boleh negatif atau 0", 'error')
+                    }
+                    else {
+                        submit_detail()
+                    }
                 }
             }
         },
@@ -727,6 +757,13 @@
                     $("#box-beli").show()
                     $("#supplier_transaction_select").show()
                     break;
+                case "uang_muka_pembelian":
+                    $(".box-transaction").hide()
+                    $(".transaction-filter").hide()
+                    populate_transaction(type)
+                    $("#box-uang-muka-beli").show()
+                    $("#supplier_transaction_select").show()
+                    break;
                 case "retur_pembelian":
                     $(".box-transaction").hide()
                     $(".transaction-filter").hide()
@@ -767,6 +804,9 @@
                 case "pembelian":
                     populate_transaction(trx_type)
                     break;
+                case "uang_muka_pembelian":
+                    populate_transaction(trx_type)
+                    break;
                 case "retur_pembelian":
                     populate_transaction(trx_type)
                     break;
@@ -795,6 +835,9 @@
                     populate_transaction(trx_type)
                     break;
                 case "pembelian":
+                    populate_transaction(trx_type)
+                    break;
+                case "uang_muka_pembelian":
                     populate_transaction(trx_type)
                     break;
                 case "retur_pembelian":
@@ -880,6 +923,32 @@
                         let pemasok = $(this).closest('tr').find('td:eq(4)').text()
                         let debet = $(this).closest('tr').find('.transaction-bayar').val()
 
+                        // Remove data from details
+                        details = details.filter(function(item) {
+                            return item['guid'] != "trx-" + trx_id
+                        })
+                        details.push({
+                            guid: "trx-" + trx_id,
+                            akun: hutang_dagang.id_akun,
+                            nama_akun: hutang_dagang.nama_akun,
+                            kode_akun: hutang_dagang.kode_akun,
+                            notes: 'Jurnal Otomatis Pelunasan - ' + no_beli + ' - ' + pemasok,
+                            trx: no_beli,
+                            debet: formatNumberAsLocalFloat(debet),
+                            kredit: 0
+                        })
+                    }).get()
+                    populate_detail(details)
+                    break;
+                case "uang_muka_pembelian":
+                    let table_uang_muka_beli = $('#table_uang_muka_beli')
+                    $('.dt-checkboxes:checked', table_uang_muka_beli).each(function() {
+                        // Init data from row
+                        let trx_id = $(this).closest('tr').find('.transaction-id').val()
+                        let no_beli = $(this).closest('tr').find('td:eq(2)').text()
+                        let pemasok = $(this).closest('tr').find('td:eq(4)').text()
+                        let debet = $(this).closest('tr').find('.transaction-bayar').val()
+                        
                         // Remove data from details
                         details = details.filter(function(item) {
                             return item['guid'] != "trx-" + trx_id
@@ -1608,6 +1677,104 @@
                      'order': [[1, 'asc']]
                 })
                 break;
+            case "uang_muka_pembelian":
+                $("#table_uang_muka_beli").DataTable().destroy()
+                let get_uang_muka_pembelian_url = "{{ route('transaction-general-ledger-populate-transaction') }}"
+                get_uang_muka_pembelian_url += '?transaction_type=' + $("#transaction_type").val() + '&supplier=' + $("#supplier_transaction").val()
+                $('#table_uang_muka_beli').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    "scrollX": true,
+                    "bDestroy": true,
+                    responsive: true,
+                    ajax: {
+                        'url': get_uang_muka_pembelian_url,
+                        'type': 'GET',
+                        'dataType': 'JSON',
+                        'error': function(xhr, textStatus, ThrownException) {
+                            alert('Error loading data. Exception: ' + ThrownException + '\n' + textStatus);
+                        }
+                    },
+                    columns: [
+                        {
+                            data: 'id',
+                            name: 'id',
+                        },
+                        {
+                            data: 'tanggal',
+                            name: 'tanggal',
+                            width: '10%'
+                        },
+                        {
+                            data: 'id_transaksi',
+                            name: 'id_transaksi',
+                            width: '15%'
+                        },
+                        {
+                            data: 'ref_id',
+                            name: 'ref_id',
+                            width: '10%'
+                        },
+                        {
+                            data: 'nama_pemasok',
+                            name: 'pemasok.nama_pemasok',
+                            width: '10%'
+                        },
+                        {
+                            data: 'catatan',
+                            name: 'catatan',
+                            width: '10%'
+                        },
+                        {
+                            data: 'total',
+                            name: 'total',
+                            width: '10%',
+                            className: 'text-right',
+                            render: function(data, type, row) {
+                                return formatCurr(formatNumberAsFloatFromDB(data));
+                            },
+                        },
+                        {
+                            data: 'bayar',
+                            name: 'bayar',
+                            width: '10%',
+                            className: 'text-right',
+                            render: function(data, type, row) {
+                                return formatCurr(formatNumberAsFloatFromDB(data));
+                            },
+                        },
+                        {
+                            data: 'sisa',
+                            name: 'sisa',
+                            width: '10%',
+                            className: 'text-right',
+                            render: function(data, type, row) {
+                                return formatCurr(formatNumberAsFloatFromDB(data));
+                            },
+                        },
+                        {
+                            data: 'sisa',
+                            width: '10%',
+                            render: function(data, type, row) {
+                                return '<input type="text" class="form-control transaction-bayar" value="'+formatCurr(formatNumberAsFloatFromDB(data))+'" onblur="this.value=formatCurr(this.value)"><input type="hidden" class="form-control transaction-id" value="'+row["id"]+'">';
+                            },
+                            orderable: false
+                        }
+                    ],
+                    'columnDefs': [
+                        {
+                           'targets': 0,
+                           'checkboxes': {
+                              'selectRow': true
+                           }
+                        }
+                     ],
+                     'select': {
+                        'style': 'multi'
+                     },
+                     'order': [[1, 'asc']]
+                })
+                break;
             case "retur_pembelian":
                 $("#table_retur_beli").DataTable().destroy()
                 let get_retur_pembelian_url = "{{ route('transaction-general-ledger-populate-transaction') }}"
@@ -1886,6 +2053,7 @@
         
         num = num.split('.').join("");;
         num = num.replace(/,/g, '.');
+        num = parseFloat(num).toFixed(2)
         num = num.toString().replace(/\,/gi, "");
 
         num += '';

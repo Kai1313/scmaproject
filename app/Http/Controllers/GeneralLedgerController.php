@@ -995,6 +995,9 @@ class GeneralLedgerController extends Controller
             $current_total = $trx->total;
             $current_bayar = $trx->bayar;
             $current_sisa = $trx->sisa;
+            // Log::info("trx");
+            // Log::info(json_encode($trx));
+            // Log::info($type);
             switch ($type) {
                 case 'Penjualan':
                     $trx_saldo->bayar = $current_bayar + $kredit;
@@ -1005,6 +1008,10 @@ class GeneralLedgerController extends Controller
                     $trx_saldo->sisa = $current_sisa - $debet;
                     break;
                 case 'Pembelian':
+                    $trx_saldo->bayar = $current_bayar + $debet;
+                    $trx_saldo->sisa = $current_sisa - $debet;
+                    break;
+                case 'Uang Muka Pembelian':
                     $trx_saldo->bayar = $current_bayar + $debet;
                     $trx_saldo->sisa = $current_sisa - $debet;
                     break;
@@ -1070,6 +1077,10 @@ class GeneralLedgerController extends Controller
                     $trx_saldo->sisa = $current_sisa + $debet;
                     break;
                 case 'Pembelian':
+                    $trx_saldo->bayar = $current_bayar - $debet;
+                    $trx_saldo->sisa = $current_sisa + $debet;
+                    break;
+                case 'Uang Muka Pembelian':
                     $trx_saldo->bayar = $current_bayar - $debet;
                     $trx_saldo->sisa = $current_sisa + $debet;
                     break;

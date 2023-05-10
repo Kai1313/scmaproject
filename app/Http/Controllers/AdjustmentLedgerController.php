@@ -327,7 +327,8 @@ class AdjustmentLedgerController extends Controller
             $trx_id = TrxSaldo::where("id_transaksi", $jurnal->id_transaksi)->first();
             $notes = str_replace("\n", '<br>', $jurnal->keterangan);
             $details[] = [
-                "guid" => (++$i == count($jurnal_detail)) ? "gen" : (($trx_id) ? "trx-" . $trx_id->id : $jurnal->index),
+                // "guid" => (++$i == count($jurnal_detail)) ? "gen" : (($trx_id) ? "trx-" . $trx_id->id : $jurnal->index),
+                "guid" => (++$i == count($jurnal_detail) && $trx_id) ? "trx-" . $trx_id->id : $jurnal->index,
                 "akun" => $akun->id_akun,
                 "nama_akun" => $akun->nama_akun,
                 "kode_akun" => $akun->kode_akun,
@@ -347,7 +348,7 @@ class AdjustmentLedgerController extends Controller
             "jurnal_detail" => json_encode($details),
             "jurnal_detail_count" => count($details),
         ];
-        // dd($details);
+        // dd($data);
 
         Log::debug(json_encode($request->session()->get('user')));
 
@@ -886,6 +887,10 @@ class AdjustmentLedgerController extends Controller
                     $trx_saldo->bayar = $current_bayar + $debet;
                     $trx_saldo->sisa = $current_sisa - $debet;
                     break;
+                case 'Uang Muka Pembelian':
+                    $trx_saldo->bayar = $current_bayar + $debet;
+                    $trx_saldo->sisa = $current_sisa - $debet;
+                    break;
                 case 'Retur Pembelian':
                     $trx_saldo->bayar = $current_bayar + $kredit;
                     $trx_saldo->sisa = $current_sisa - $kredit;
@@ -948,6 +953,10 @@ class AdjustmentLedgerController extends Controller
                     $trx_saldo->sisa = $current_sisa + $debet;
                     break;
                 case 'Pembelian':
+                    $trx_saldo->bayar = $current_bayar - $debet;
+                    $trx_saldo->sisa = $current_sisa + $debet;
+                    break;
+                case 'Uang Muka Pembelian':
                     $trx_saldo->bayar = $current_bayar - $debet;
                     $trx_saldo->sisa = $current_sisa + $debet;
                     break;
