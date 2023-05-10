@@ -29,7 +29,7 @@
     <table width="100%" class="table-header">
         <thead>
             <tr>
-                <th colspan="2" style="text-align: center; padding-bottom: 20px;"><b>Report {{ ucfirst($type) }} Ledger</b></th>
+                <th colspan="2" style="text-align: center; padding-bottom: 20px;"><b>Report {{ ucfirst($type) }} Neraca</b></th>
             </tr>
         </thead>
         <tbody>
@@ -63,8 +63,8 @@
     <table width="100%" class="table-bordered" style="margin-top: 20px">
         <thead>
             <tr style="font-size: 18px;">
-                <th width="60%">Header</th>
-                <th width="40%">Total</th>
+                <th width="70%">Header</th>
+                <th width="30%">Total</th>
             </tr>
         </thead>
         <tbody>

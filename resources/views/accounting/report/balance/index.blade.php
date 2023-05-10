@@ -160,8 +160,8 @@
                                             <table id="table_balance_recap" class="table table-bordered table-striped">
                                                 <thead>
                                                     <tr style="border: 1px solid #f4f4f4;">
-                                                        <th style="background-color: #ffffff;" width="60%">Header</th>
-                                                        <th style="background-color: #ffffff;" width="40%">Total</th>
+                                                        <th style="background-color: #ffffff;" width="70%">Header</th>
+                                                        <th style="background-color: #ffffff;" width="30%">Total</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="coa_table">
@@ -170,7 +170,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-12" id="table_detail_div">
+                                {{-- <div class="col-md-12" id="table_detail_div">
                                     <div class="box-body">
                                         <div class="table-responsive">
                                             <table id="table_balance_detail" class="table table-bordered table-striped">
@@ -186,7 +186,7 @@
                                             </table>
                                         </div>
                                     </div>
-                                </div>
+                                </div> --}}
                             </div>
                         </form>
                     </div>
@@ -451,29 +451,29 @@
     }
 
     function getTreetable(data, parent, fontSize){
-        data.forEach(element => {
+        Object.values(data).forEach(element => {
             if(parent == null){
                 body_coa += '<tr data-tt-id="' + element.header + '">';
             }else{
                 body_coa += '<tr data-tt-id="' + element.header + '" data-tt-parent-id="' + parent + '">';
             }
-            if(typeof(element.child) != "undefined"){
+            if(typeof(element.children) != "undefined"){
                 body_coa += '<td><b style="font-size:' + fontSize + 'px">' + element.header + '</b></td>';
                 body_coa += '<td></td>';
             }else{
-                body_coa += '<td style="font-size:' + fontSize + 'px">' + element.header + '</td>';
-                body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" >Rp ' + formatCurr(element.total) + '</td>';
+                body_coa += '<td style="font-size:' + fontSize + 'px">' + element.header + ' (Rp)</td>';
+                body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" >' + formatCurr(formatNumberAsFloatFromDB(element.total)) + '</td>';
             }
             body_coa += '</tr>';
-            if(typeof(element.child) != "undefined"){
-                getTreetable(element.child, element.header, fontSize - 2);
+            if(typeof(element.children) != "undefined"){
+                getTreetable(element.children, element.header, fontSize - 1);
                 if(parent == null){
                     body_coa += '<tr>';
                 }else{
                     body_coa += '<tr data-tt-id="total-' + element.header + '" data-tt-parent-id="' + parent + '">';
                 }
-                body_coa += '<td><b style="font-size:' + fontSize + 'px">Total</b></td>';
-                body_coa += '<td class="text-right"><b style="font-size:' + fontSize + 'px">Rp ' + formatCurr(element.total) + '</b></td>';
+                body_coa += '<td><b style="font-size:' + fontSize + 'px">Total ' + element.header + ' (Rp)</b></td>';
+                body_coa += '<td class="text-right"><b style="font-size:' + fontSize + 'px">' + formatCurr(formatNumberAsFloatFromDB(element.total)) + '</b></td>';
                 body_coa += '</tr>';
             }
         });

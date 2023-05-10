@@ -22,8 +22,6 @@ class ReportBalanceController extends Controller
 
         $data_cabang = Cabang::all();
 
-        // $this->getData(1, 2023, 2);
-
         $data = [
             "pageTitle" => "SCA Accounting | Report Neraca",
             "data_cabang" => $data_cabang,
@@ -43,7 +41,6 @@ class ReportBalanceController extends Controller
             $type = $request->type;
 
             $data = $this->getData($id_cabang, $year, $month, $type);
-            Log::debug(json_encode($data));
 
             return response()->json([
                 "result" => true,
@@ -63,7 +60,7 @@ class ReportBalanceController extends Controller
 
     public function exportPdf(Request $request)
     {
-        // try {
+        try {
             // dd($request->all());
             // Init Data
             Log::debug('test pdf');
@@ -85,7 +82,7 @@ class ReportBalanceController extends Controller
                 'data' => $data_balance
             ];
 
-            if (count($data["data"]) > 0) {
+            if (!empty($data["data"])) {
                 $pdf = PDF::loadView('accounting.report.balance.print', $data);
                 $pdf->setPaper('a4', 'potrait');
                 $headers = [
@@ -104,16 +101,16 @@ class ReportBalanceController extends Controller
                     "message"=>"Tidak ada data"
                 ]);
             }
-        // }
-        // catch (\Exception $e) {
-        //     $message = "Failed to print general ledger for pdf";
-        //     Log::error($message);
-        //     Log::error($e);
-        //     return response()->json([
-        //         "result"=>False,
-        //         "message"=>$message
-        //     ]);
-        // }
+        }
+        catch (\Exception $e) {
+            $message = "Failed to print general ledger for pdf";
+            Log::error($message);
+            Log::error($e);
+            return response()->json([
+                "result"=>False,
+                "message"=>$message
+            ]);
+        }
     }
 
     public function exportExcel(Request $request)
@@ -258,217 +255,347 @@ class ReportBalanceController extends Controller
     }
 
     private function getData($id_cabang, $tahun, $bulan, $type){
-        $data_header1 = Akun::where('header1', '<>', '')
-                        ->whereNotNull('header1')
-                        ->where('id_cabang', $id_cabang)
-                        ->selectRaw('DISTINCT header1')
-                        ->orderBy('header1', 'asc')
-                        ->pluck('header1');
-
-        $data_header2 = Akun::where('header1', '<>', '')
-                        ->whereNotNull('header1')
-                        ->where('header2', '<>', '')
-                        ->whereNotNull('header2')
-                        ->where('id_cabang', $id_cabang)
-                        ->select('header1', 'header2')
-                        ->groupBy('header2')
-                        ->orderBy('header2', 'asc')
-                        ->pluck('header1', 'header2');
-
-        $data_header3 = Akun::where('header1', '<>', '')
-                        ->whereNotNull('header1')
-                        ->where('header2', '<>', '')
-                        ->whereNotNull('header2')
-                        ->where('header3', '<>', '')
-                        ->whereNotNull('header3')
-                        ->where('id_cabang', $id_cabang)
-                        ->select('header2', 'header3')
-                        ->groupBy('header3')
-                        ->orderBy('header3', 'asc')
-                        ->pluck('header2', 'header3');
-
-        // dd($data_header2);
-
-        $data_summary = [];
-
-        foreach($data_header1 as $header1){
-            $header1 = $header1;
-            $total_header1 = 0;
-            $header2 = [];
-
-            foreach($data_header2 as $key => $value){
-                if($value == $header1){
-                    $header3 = [];
-                    $total_header2 = 0;
-
-                    foreach($data_header3 as $key_header3 => $value_header3){
-                        if($value_header3 == $key){
-                            if($type == 'recap'){
-                                $summary = $this->getSummaryBalance($key_header3, $id_cabang, $tahun, $bulan);
-                                if(empty($summary)){
-                                    $total = round(0, 2);
-                                }else{
-                                    $total = round($summary->total, 2);
-                                }
-
-                                $total_header2 += $total;
-
-                                array_push($header3, [
-                                    'header' => $key_header3,
-                                    'total' => $total
-                                ]);
-                            }else if($type == 'detail'){
-                                $detail = $this->getDetailBalance($key_header3, $id_cabang, $tahun, $bulan);
-                                $child = [];
-
-                                if(!empty($detail)){
-                                    $child = $detail['data'];
-                                }
-
-                                $total_header2 += $detail['total_header3'];
-
-                                array_push($header3, [
-                                    'header' => $key_header3,
-                                    'total' => $detail['total_header3'],
-                                    'child' => $child
-                                ]);
-                            }else{
-                                $init = $this->getInitBalance($key_header3, $id_cabang, $tahun, $bulan);
-                                if(empty($init)){
-                                    $total = round(0, 2);
-                                }else{
-                                    $total = round($init->total, 2);
-                                }
-
-                                $total_header2 += $total;
-
-                                array_push($header3, [
-                                    'header' => $key_header3,
-                                    'total' => $total
-                                ]);
-                            }
-                        }
-                    }
-
-                    $total_header1 += $total_header2;
-
-                    $data_temp_summary = [
-                        'header' => $key,
-                        'total' => $total_header2,
-                        'child' => $header3
-                    ];
-
-                    array_push($header2, $data_temp_summary);
-                }
-            }
-
-            $data = [
-                'header' => $header1,
-                'total' => $total_header1,
-                'child' => $header2
-            ];
-
-            array_push($data_summary, $data);
+        if($type == 'recap'){
+            $data_balance = $this->getSummaryBalance($id_cabang, $tahun, $bulan);
+        }else if($type == 'detail'){
+            $data_balance = $this->getDetailBalance($id_cabang, $tahun, $bulan);
+        }else{
+            $data_balance = $this->getInitBalance($id_cabang, $tahun, $bulan);
         }
 
-        return $data_summary;
+        return $data_balance;
     }
 
-    private function getSummaryBalance($header3, $id_cabang, $tahun, $bulan){
-        $data_summary_init = Akun::leftjoin('saldo_balance', 'saldo_balance.id_akun', 'master_akun.id_akun')
-                        ->where('saldo_balance.id_cabang', $id_cabang)
-                        ->where('master_akun.tipe_akun', 0)
-                        ->where('master_akun.header3', $header3)
-                        ->where('tahun', $tahun)
-                        ->where('bulan', $bulan)
-                        ->select('header3', DB::raw('ROUND(IFNULL(SUM(debet-credit), 0), 2) as total'))
-                        ->first();
+    private function getSummaryBalance($id_cabang, $tahun, $bulan){
+        $data = Akun::selectRaw('
+                CASE WHEN header1 IS NULL OR header1 = "" THEN "" ELSE header1 END as new_header1,
+                CASE WHEN header2 IS NULL OR header2 = "" THEN "" ELSE header2 END as new_header2,
+                CASE WHEN header3 IS NULL OR header3 = "" THEN "" ELSE header3 END as new_header3,
+                SUM(IFNULL(total_summary, 0)) as total
+            ')
+            ->leftJoin(DB::raw('(
+                SELECT id_akun, sum(total) AS total_summary
+                FROM
+                    (
+                    SELECT id_akun, sum( debet - credit ) AS total
+                    FROM
+                        jurnal_header a
+                        INNER JOIN jurnal_detail b ON a.id_jurnal = b.id_jurnal
+                    WHERE
+                        void = 0
+                        AND YEAR ( tanggal_jurnal ) = ' . $tahun . '
+                        AND MONTH ( tanggal_jurnal ) = ' . $bulan . '
+                        AND a.id_cabang = ' . $id_cabang . '
+                    GROUP BY id_akun
+                    UNION ALL
+                    SELECT id_akun, sum( debet - credit ) AS total
+                    FROM
+                        saldo_balance sb
+                    WHERE
+                        tahun = ' . $tahun . '
+                        AND bulan = ' . $bulan . '
+                        AND id_cabang = ' . $id_cabang . '
+                    GROUP BY id_akun
+                ) summary
+                GROUP BY id_akun
+            ) as jurnal'), 'master_akun.id_akun', '=', 'jurnal.id_akun')
+            ->where('isshown', 1)
+            ->where('tipe_akun', 0)
+            ->where('master_akun.id_cabang', $id_cabang)
+            ->groupBy('new_header1', 'new_header2', 'new_header3')
+            ->get();
 
-        $data_summary_jurnal = Akun::leftjoin('jurnal_detail as jd', 'jd.id_akun', 'master_akun.id_akun')
-                        ->leftjoin('jurnal_header as jh', function($join){
-                            $join->on('jh.id_jurnal', 'jd.id_jurnal');
-                            $join->on('jh.id_cabang', 'master_akun.id_cabang');
-                        })
-                        ->where('jh.void', 0)
-                        ->where('jh.id_cabang', $id_cabang)
-                        ->where('master_akun.tipe_akun', 0)
-                        ->where('master_akun.header3', $header3)
-                        ->whereRaw('YEAR(jh.tanggal_jurnal) = '. $tahun)
-                        ->whereRaw('MONTH(jh.tanggal_jurnal) = '. $bulan)
-                        ->select('header3', DB::raw('ROUND(IFNULL(SUM(debet-credit), 0), 2) as total'))
-                        ->first();
+        // Initialize a hash map to keep track of parent-child relationships
+        $map = [];
 
-        $data = [
-            "header" => $data_summary_jurnal->header3,
-            "total" => round((floatval($data_summary_init->total) + floatval($data_summary_jurnal->total)), 2)
-        ];
+        // Loop through the data and build the hierarchy
+        foreach ($data as $item) {
+            $newHeader1 = $item['new_header1'];
+            $newHeader2 = $item['new_header2'];
+            $newHeader3 = $item['new_header3'];
+
+            if($newHeader1 == ""){
+                $newHeader1 = "00. Header1";
+            }
+
+            if($newHeader2 == ""){
+                $newHeader2 = "00. Header2";
+            }
+
+            if($newHeader3 == ""){
+                $newHeader3 = "00. Header3";
+            }
+
+            // Add new_header1 as a parent
+            if (!isset($map[$newHeader1])) {
+                $map[$newHeader1] = [
+                    'header' => $newHeader1,
+                    'total' => 0,
+                    'children' => []
+                ];
+            }
+
+            // Add new_header2 as a child of new_header1
+            if (!empty($newHeader2)) {
+                if (!isset($map[$newHeader1]['children'][$newHeader2])) {
+                    $map[$newHeader1]['children'][$newHeader2] = [
+                        'header' => $newHeader2,
+                        'total' => 0,
+                        'children' => []
+                    ];
+                }
+
+                // Add new_header3 as a child of new_header2
+                if (!empty($newHeader3)) {
+                    $map[$newHeader1]['children'][$newHeader2]['children'][] = [
+                        'header' => $newHeader3,
+                        'total' => $item['total']
+                    ];
+
+                    $map[$newHeader1]['children'][$newHeader2]['total'] += $item['total'];
+                }
+                $map[$newHeader1]['total'] += $item['total'];
+
+            } else {
+                // Add new_header3 as a child of new_header1
+                if (!empty($newHeader3)) {
+                    $map[$newHeader1]['children'][] = [
+                        'header' => $newHeader3,
+                        'total' => $item['total']
+                    ];
+                    $map[$newHeader1]['total'] += $item['total'];
+                }
+            }
+        }
+
+        // Convert the hash map to an array
+        $data = array_values($map);
 
         return (object) $data;
     }
 
-    private function getDetailBalance($header3, $id_cabang, $tahun, $bulan){
-        $data_detail_init = Akun::leftjoin(DB::raw('(
-                            SELECT *
-                            FROM saldo_balance
-                            WHERE id_cabang = ' . $id_cabang . '
-                            AND tahun = ' . $tahun . '
-                            AND bulan = ' . $bulan . '
-                        ) saldo_balance'), 'saldo_balance.id_akun', 'master_akun.id_akun')
-                        ->where('master_akun.header3', $header3)
-                        ->where('master_akun.tipe_akun', 0)
-                        ->groupBy('master_akun.id_akun')
-                        ->select('master_akun.kode_akun', 'nama_akun', DB::raw('ROUND(IFNULL(SUM(debet-credit), 0), 2) as total'))
-                        ->get();
+    private function getDetailBalance($id_cabang, $tahun, $bulan){
+        $data = Akun::selectRaw('
+                CASE WHEN header1 IS NULL OR header1 = "" THEN "" ELSE header1 END as new_header1,
+                CASE WHEN header2 IS NULL OR header2 = "" THEN "" ELSE header2 END as new_header2,
+                CASE WHEN header3 IS NULL OR header3 = "" THEN "" ELSE header3 END as new_header3,
+                IFNULL(total_summary, 0) as total,
+                kode_akun,
+                nama_akun
+            ')
+            ->leftJoin(DB::raw('(
+                SELECT id_akun, sum(total) AS total_summary
+                FROM
+                    (
+                    SELECT id_akun, sum( debet - credit ) AS total
+                    FROM
+                        jurnal_header a
+                        INNER JOIN jurnal_detail b ON a.id_jurnal = b.id_jurnal
+                    WHERE
+                        void = 0
+                        AND YEAR ( tanggal_jurnal ) = ' . $tahun . '
+                        AND MONTH ( tanggal_jurnal ) = ' . $bulan . '
+                        AND a.id_cabang = ' . $id_cabang . '
+                    GROUP BY id_akun
+                    UNION ALL
+                    SELECT id_akun, sum( debet - credit ) AS total
+                    FROM
+                        saldo_balance sb
+                    WHERE
+                        tahun = ' . $tahun . '
+                        AND bulan = ' . $bulan . '
+                        AND id_cabang = ' . $id_cabang . '
+                    GROUP BY id_akun
+                ) summary
+                GROUP BY id_akun
+            ) as jurnal'), 'master_akun.id_akun', '=', 'jurnal.id_akun')
+            ->where('isshown', 1)
+            ->where('tipe_akun', 0)
+            ->where('master_akun.id_cabang', $id_cabang)
+            ->groupBy('new_header1', 'new_header2', 'new_header3', 'master_akun.id_akun')
+            ->get();
 
-        $data_detail_jurnal = Akun::leftjoin(DB::raw('(
-                            SELECT jd.*
-                            FROM jurnal_header jh
-                            JOIN jurnal_detail jd on jd.id_jurnal = jh.id_jurnal
-                            WHERE jh.void = 0
-                            AND jh.id_cabang = ' . $id_cabang . '
-                            AND YEAR(tanggal_jurnal) = ' . $tahun . '
-                            AND MONTH(tanggal_jurnal) = ' . $bulan . '
-                        ) jurnal'), 'jurnal.id_akun', 'master_akun.id_akun')
-                        ->where('master_akun.header3', $header3)
-                        ->where('master_akun.tipe_akun', 0)
-                        ->groupBy('master_akun.id_akun')
-                        ->select('master_akun.kode_akun', 'nama_akun', DB::raw('ROUND(IFNULL(SUM(debet-credit), 0), 2) as total'))
-                        ->get();
+        // Initialize a hash map to keep track of parent-child relationships
+        $map = [];
 
-        $data_detail = [];
-        $total_header3 = 0;
+        // Loop through the data and build the hierarchy
+        foreach ($data as $item) {
+            $newHeader1 = $item['new_header1'];
+            $newHeader2 = $item['new_header2'];
+            $newHeader3 = $item['new_header3'];
+            $newHeader4 = $item['kode_akun'] . '.' . $item['nama_akun'] ;
 
-        for($i = 0; $i < count($data_detail_init); $i++){
-            array_push($data_detail, (object) [
-                'header' => $data_detail_init[$i]->kode_akun . '.' . $data_detail_init[$i]->nama_akun,
-                'total' => round((floatval($data_detail_init[$i]->total) + floatval($data_detail_jurnal[$i]->total)), 2)
-            ]);
+            if($newHeader1 == ""){
+                $newHeader1 = "00. Header1";
+            }
 
-            $total_header3 += round((floatval($data_detail_init[$i]->total) + floatval($data_detail_jurnal[$i]->total)), 2);
+            if($newHeader2 == ""){
+                $newHeader2 = "00. Header2";
+            }
+
+            if($newHeader3 == ""){
+                $newHeader3 = "00. Header3";
+            }
+
+            // Add new_header1 as a parent
+            if (!isset($map[$newHeader1])) {
+                $map[$newHeader1] = [
+                    'header' => $newHeader1,
+                    'total' => 0,
+                    'children' => []
+                ];
+            }
+
+            // Add new_header2 as a child of new_header1
+            if (!empty($newHeader2)) {
+                if (!isset($map[$newHeader1]['children'][$newHeader2])) {
+                    $map[$newHeader1]['children'][$newHeader2] = [
+                        'header' => $newHeader2,
+                        'total' => 0,
+                        'children' => []
+                    ];
+                }
+
+                // Add new_header3 as a child of new_header2
+                if (!empty($newHeader3)) {
+                    if (!isset($map[$newHeader1]['children'][$newHeader2]['children'][$newHeader3])) {
+                        $map[$newHeader1]['children'][$newHeader2]['children'][$newHeader3] = [
+                            'header' => $newHeader3,
+                            'total' => 0,
+                            'children' => []
+                        ];
+                    }
+
+                    // Add new_header4 as a child of new_header3
+                    if (!empty($newHeader4)) {
+                        $map[$newHeader1]['children'][$newHeader2]['children'][$newHeader3]['children'][] = [
+                            'header' => $newHeader4,
+                            'total' => $item['total']
+                        ];
+
+                        $map[$newHeader1]['children'][$newHeader2]['children'][$newHeader3]['total'] += $item['total'];
+                    }
+
+                    $map[$newHeader1]['children'][$newHeader2]['total'] += $item['total'];
+                }else{
+                    // Add new_header3 as a child of new_header1
+                    if (!empty($newHeader3)) {
+                        $map[$newHeader1]['children'][] = [
+                            'header' => $newHeader3,
+                            'total' => $item['total']
+                        ];
+                        $map[$newHeader1]['children'][$newHeader2]['total'] += $item['total'];
+                    }
+                }
+                $map[$newHeader1]['total'] += $item['total'];
+
+            } else {
+                // maybe never execute
+                // Add new_header4 as a child of new_header1
+                if (!empty($newHeader4)) {
+                    $map[$newHeader1]['children'][] = [
+                        'header' => $newHeader4,
+                        'total' => $item['total']
+                    ];
+                    $map[$newHeader1]['total'] += $item['total'];
+                }
+            }
         }
 
-        $data = [
-            'data' => $data_detail,
-            'total_header3' => $total_header3
-        ];
+        // Convert the hash map to an array
+        $data = array_values($map);
 
-        return $data;
+        return (object) $data;
     }
 
-    private function getInitBalance($header3, $id_cabang, $tahun, $bulan){
-        $data_summary_init = Akun::leftjoin('saldo_balance', 'saldo_balance.id_akun', 'master_akun.id_akun')
-                        ->where('saldo_balance.id_cabang', $id_cabang)
-                        ->where('master_akun.tipe_akun', 0)
-                        ->where('master_akun.header3', $header3)
-                        ->where('tahun', $tahun)
-                        ->where('bulan', $bulan)
-                        ->select('header3', DB::raw('ROUND(IFNULL(SUM(debet-credit), 0), 2) as total'))
-                        ->first();
+    private function getInitBalance($id_cabang, $tahun, $bulan){
+        $data = Akun::selectRaw('
+                CASE WHEN header1 IS NULL OR header1 = "" THEN "" ELSE header1 END as new_header1,
+                CASE WHEN header2 IS NULL OR header2 = "" THEN "" ELSE header2 END as new_header2,
+                CASE WHEN header3 IS NULL OR header3 = "" THEN "" ELSE header3 END as new_header3,
+                SUM(IFNULL(total_summary, 0)) as total
+            ')
+            ->leftJoin(DB::raw('(
+                SELECT id_akun, sum( debet - credit ) AS total_summary
+                FROM
+                    saldo_balance sb
+                WHERE
+                    tahun = ' . $tahun . '
+                    AND bulan = ' . $bulan . '
+                    AND id_cabang = ' . $id_cabang .  '
+                GROUP BY id_akun
+            ) as jurnal'), 'master_akun.id_akun', '=', 'jurnal.id_akun')
+            ->where('isshown', 1)
+            ->where('tipe_akun', 0)
+            ->where('master_akun.id_cabang', $id_cabang)
+            ->groupBy('new_header1', 'new_header2', 'new_header3')
+            ->get();
 
-        $data = [
-            "header" => $data_summary_init->header3,
-            "total" => round((floatval($data_summary_init->total)), 2)
-        ];
+        // Initialize a hash map to keep track of parent-child relationships
+        $map = [];
+
+        // Loop through the data and build the hierarchy
+        foreach ($data as $item) {
+            $newHeader1 = $item['new_header1'];
+            $newHeader2 = $item['new_header2'];
+            $newHeader3 = $item['new_header3'];
+
+            if($newHeader1 == ""){
+                $newHeader1 = "00. Header1";
+            }
+
+            if($newHeader2 == ""){
+                $newHeader2 = "00. Header2";
+            }
+
+            if($newHeader3 == ""){
+                $newHeader3 = "00. Header3";
+            }
+
+            // Add new_header1 as a parent
+            if (!isset($map[$newHeader1])) {
+                $map[$newHeader1] = [
+                    'header' => $newHeader1,
+                    'total' => 0,
+                    'children' => []
+                ];
+            }
+
+            // Add new_header2 as a child of new_header1
+            if (!empty($newHeader2)) {
+                if (!isset($map[$newHeader1]['children'][$newHeader2])) {
+                    $map[$newHeader1]['children'][$newHeader2] = [
+                        'header' => $newHeader2,
+                        'total' => 0,
+                        'children' => []
+                    ];
+                }
+
+                // Add new_header3 as a child of new_header2
+                if (!empty($newHeader3)) {
+                    $map[$newHeader1]['children'][$newHeader2]['children'][] = [
+                        'header' => $newHeader3,
+                        'total' => $item['total']
+                    ];
+
+                    $map[$newHeader1]['children'][$newHeader2]['total'] += $item['total'];
+                }
+                $map[$newHeader1]['total'] += $item['total'];
+
+            } else {
+                // Add new_header3 as a child of new_header1
+                if (!empty($newHeader3)) {
+                    $map[$newHeader1]['children'][] = [
+                        'header' => $newHeader3,
+                        'total' => $item['total']
+                    ];
+                    $map[$newHeader1]['total'] += $item['total'];
+                }
+            }
+        }
+
+        // Convert the hash map to an array
+        $data = array_values($map);
 
         return (object) $data;
     }
