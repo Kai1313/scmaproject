@@ -140,7 +140,7 @@
                                         <select name="type" id="type" class="form-control select2">
                                             <option value="recap">Neraca</option>
                                             <option value="detail">Neraca Detail</option>
-                                            <option value="init">Neraca Awal</option>
+                                            <option value="awal">Neraca Awal</option>
                                         </select>
                                     </div>
                                 </div>
@@ -170,23 +170,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                {{-- <div class="col-md-12" id="table_detail_div">
-                                    <div class="box-body">
-                                        <div class="table-responsive">
-                                            <table id="table_balance_detail" class="table table-bordered table-striped">
-                                                <thead>
-                                                    <tr style="border: 1px solid #f4f4f4;">
-                                                        <th style="background-color: #ffffff;" width="15%">Header</th>
-                                                        <th style="background-color: #ffffff;" width="20%">Akun</th>
-                                                        <th style="background-color: #ffffff;" width="65%">Total</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="coa_table_detail">
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div> --}}
                             </div>
                         </form>
                     </div>
@@ -416,7 +399,7 @@
     }
 
     function excel(param) {
-        let route = "{{ Route('report-general-ledger-excel') }}"
+        let route = "{{ Route('report-balance-excel') }}"
         let base_url = "{{ url('') }}";
         window.open(route + param)
         excelButton.disabled = false
