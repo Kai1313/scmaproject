@@ -37,18 +37,20 @@
                 @for ($i = 0; $i < $space; $i++)
                     <td style="border: #000000 solid thin;"></td>
                 @endfor
-                <td style="border: #000000 solid thin; font-size:13px;">
-                    <b>Total {{$item['header']}} (Rp)</b>
-                </td>
+
                 @if($type == 'recap' || $type =='awal')
-                    <td colspan="{{ (3 - intval($space)) }}" style="border: #000000 solid thin; text-align:right;font-size:13px;">
-                        <b>{{round($item['total'], 2)}}</b>
+                    <td  colspan="{{ (3 - intval($space)) }}" style="border: #000000 solid thin; font-size:13px;">
+                        <b>Total {{$item['header']}} (Rp)</b>
                     </td>
                 @else
-                    <td colspan="{{ (4 - intval($space)) }}" style="border: #000000 solid thin; text-align:right;font-size:13px;">
-                        <b>{{round($item['total'], 2)}}</b>
+                    <td colspan="{{ (4 - intval($space)) }}"  style="border: #000000 solid thin; font-size:13px;">
+                        <b>Total {{$item['header']}} (Rp)</b>
                     </td>
                 @endif
+
+                <td  style="border: #000000 solid thin; text-align:right;font-size:13px;">
+                    <b>{{round($item['total'], 2)}}</b>
+                </td>
             </tr>
         @else
         @endif
