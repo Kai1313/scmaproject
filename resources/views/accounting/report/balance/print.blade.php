@@ -29,7 +29,7 @@
     <table width="100%" class="table-header">
         <thead>
             <tr>
-                <th colspan="2" style="text-align: center; padding-bottom: 20px;"><b>Report {{ ucfirst($type) }} Neraca</b></th>
+                <th colspan="2" style="text-align: center; padding-bottom: 20px;"><b>Report Neraca {{ ucfirst($type) }}</b></th>
             </tr>
         </thead>
         <tbody>

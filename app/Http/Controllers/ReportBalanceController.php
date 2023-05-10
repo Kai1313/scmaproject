@@ -77,7 +77,7 @@ class ReportBalanceController extends Controller
             Log::debug(json_encode($data_balance));
             $data = [
                 'cabang' => $nama_cabang,
-                'periode' => $month . '/' . $year,
+                'periode' => date('M Y', strtotime($year . '-' . $month . '-1')),
                 'type' => $type,
                 'data' => $data_balance
             ];
