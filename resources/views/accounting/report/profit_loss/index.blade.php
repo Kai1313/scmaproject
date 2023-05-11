@@ -415,7 +415,7 @@
     }
 
     function excel(param) {
-        let route = "{{ Route('report-general-ledger-excel') }}"
+        let route = "{{ Route('report-profit-loss-excel') }}"
         let base_url = "{{ url('') }}";
         window.open(route + param)
         excelButton.disabled = false
