@@ -2085,7 +2085,7 @@ class ApiController extends Controller
             $newTipePembayaran = $req->tipe_pembayaran;
             if (!$data) {
                 $data = new transactionBalance;
-                $payment = 0;
+                $payment = $newTipePembayaran == '1' ? $total : 0;
                 $remaining = $newTipePembayaran == '1' ? 0 : ($total - $payment);
 
                 $array['tipe_transaksi'] = $req->tipe_transaksi;
