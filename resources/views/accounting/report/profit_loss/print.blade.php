@@ -29,7 +29,7 @@
     <table width="100%" class="table-header">
         <thead>
             <tr>
-                <th colspan="2" style="text-align: center; padding-bottom: 20px;"><b>Report Neraca {{ ucfirst($type) }}</b></th>
+                <th colspan="2" style="text-align: center; padding-bottom: 20px;"><b>Report {{ ucfirst($type) }} Laba Rugi</b></th>
             </tr>
         </thead>
         <tbody>
@@ -63,8 +63,8 @@
     <table width="100%" class="table-bordered" style="margin-top: 20px">
         <thead>
             <tr style="font-size: 18px;">
-                <th width="70%">Header</th>
-                <th width="30%">Total</th>
+                <th width="60%">Header</th>
+                <th width="40%">Total</th>
             </tr>
         </thead>
         <tbody>
@@ -72,7 +72,7 @@
                 $fontSize = 18;
                 $space = 0;
             @endphp
-            @include('accounting.report.balance.balance-list',['data' => $data, 'fontSize' => $fontSize, 'space' => ($space)])
+            @include('accounting.report.profit_loss.balance-list',['data' => $data, 'fontSize' => $fontSize, 'space' => ($space)])
         </tbody>
     </table>
     <table width="100%" style="margin-top: 50px">

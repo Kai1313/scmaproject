@@ -389,7 +389,7 @@
                     className: 'text-left',
                     width: '15%',
                     render: function(data, type, row) {
-                        return data.replace(/\n/g, '<br>')
+                        return data != null ? data.replace(/\n/g, '<br>') : data
                     }
                 },
                 {

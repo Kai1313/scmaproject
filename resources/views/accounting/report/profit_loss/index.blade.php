@@ -10,6 +10,9 @@
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!-- bootstrap datepicker -->
 <link rel="stylesheet" href="{{ asset('assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css') }}">
+<!-- Treetable -->
+<link rel="stylesheet" href="{{ asset('assets/bower_components/jquery-treetable/css/jquery.treetable.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/bower_components/jquery-treetable/css/jquery.treetable.theme.default.css') }}">
 
 <style>
     .mt-1 {
@@ -41,6 +44,20 @@
 
     ul#horizontal-list li {
         display: inline;
+    }
+
+    #table_balance_recap th,
+    #table_balance_recap th{
+        text-align: center !important;
+        font-size: 18px !important;
+        border-color: white !important;
+        padding: 0.6rem 0.4rem;
+        font-weight: 600;
+    }
+
+    #table_balance_recap td,
+    #table_balance_recap td{
+        padding: 0.5rem !important;
     }
 </style>
 @endsection
@@ -88,9 +105,9 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-2">
+                                <div class="col-md-3">
                                     <div class="form-group">
-                                        <label>Bulan</label>
+                                        <label>Periode Bulan</label>
                                         <select name="month" id="month" class="form-control select2">
                                             <option value="1">Januari</option>
                                             <option value="2">Februari</option>
@@ -107,9 +124,9 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-2">
+                                <div class="col-md-3">
                                     <div class="form-group">
-                                        <label>Tahun</label>
+                                        <label>Periode Tahun</label>
                                         <select name="year" id="year" class="form-control select2">
                                             <option value="2023">2023</option>
                                             <option value="2024">2024</option>
@@ -122,7 +139,7 @@
                                         <label>Tipe</label>
                                         <select name="type" id="type" class="form-control select2">
                                             <option value="recap">Rekap</option>
-                                            <option value="detail">Detail</option>
+                                            <option value="detail">Rekap Detail</option>
                                         </select>
                                     </div>
                                 </div>
@@ -137,36 +154,38 @@
                             </div>
                             <div class="row mt-2">
                                 <div class="col-md-12" id="table_recap_div">
-                                    <table class="table table-striped" id="table_recap" width="100%">
-                                        <thead>
-                                            <tr>
-                                                <th>Header1</th>
-                                                <th>Header2</th>
-                                                <th>Header3</th>
-                                                <th>Debet</th>
-                                                <th>Kredit</th>
-                                                <th>Saldo Akhir</th>
-                                            </tr>
-                                        </thead>
-                                    </table>
+                                    <div class="box-body">
+                                        <div class="table-responsive">
+                                            <table id="table_balance_recap" class="table table-bordered table-striped">
+                                                <thead>
+                                                    <tr style="border: 1px solid #f4f4f4;">
+                                                        <th style="background-color: #ffffff;" width="70%">Header</th>
+                                                        <th style="background-color: #ffffff;" width="30%">Total</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="coa_table">
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col-md-12" id="table_detail_div">
-                                    <table class="table table-striped" id="table_detail" width="100%">
-                                        <thead>
-                                            <tr>
-                                                <th>Tanggal</th>
-                                                <th>No Jurnal</th>
-                                                <th>Kode Akun</th>
-                                                <th>Nama Akun</th>
-                                                <th>Keterangan</th>
-                                                <th>ID Transaksi</th>
-                                                <th>Debet</th>
-                                                <th>Kredit</th>
-                                                <th>Balance</th>
-                                            </tr>
-                                        </thead>
-                                    </table>
-                                </div>
+                                {{-- <div class="col-md-12" id="table_detail_div">
+                                    <div class="box-body">
+                                        <div class="table-responsive">
+                                            <table id="table_balance_detail" class="table table-bordered table-striped">
+                                                <thead>
+                                                    <tr style="border: 1px solid #f4f4f4;">
+                                                        <th style="background-color: #ffffff;" width="15%">Header</th>
+                                                        <th style="background-color: #ffffff;" width="20%">Akun</th>
+                                                        <th style="background-color: #ffffff;" width="65%">Total</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="coa_table_detail">
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div> --}}
                             </div>
                         </form>
                     </div>
@@ -199,6 +218,8 @@
 <script src="{{ asset('assets/bower_components/fastclick/lib/fastclick.js') }}"></script>
 <!-- Numeral -->
 <script src="//cdnjs.cloudflare.com/ajax/libs/numeral.js/2.0.6/numeral.min.js"></script>
+<!-- TreeTable -->
+<script src="{{ asset('assets/bower_components/jquery-treetable/jquery.treetable.js') }}"></script>
 @endsection
 
 @section('externalScripts')
@@ -235,15 +256,10 @@
                 onSubmit: function(node, formData, event) {
                     // Init data
                     let cabang = $("#cabang_input").val()
-                    let start = $("#start_date").val()
-                    let end = $("#end_date").val()
+                    let year = $("#year").val()
+                    let month = $("#month").val()
                     let type = $("#type").val()
-                    let coa = $("#coa").val()
-                    let param = "?id_cabang=" + cabang + "&start_date=" + start + "&end_date=" + end + "&type=" + type + "&coa=" + coa
-                    let route = "{{ Route('dummy-ajax') }}"
-                    route = route + param
-                    console.log(route)
-                    console.log(guid)
+                    let param = "?id_cabang=" + cabang + "&year=" + year + "&month=" + month + "&type=" + type
                     switch (guid) {
                         case "view":
                             // Prepare spinner on button
@@ -290,8 +306,6 @@
             format: "yyyy-mm-dd"
         })
 
-        getCoa()
-        checkType("recap")
         $("#table_recap_div").hide()
         $("#table_detail_div").hide()
 
@@ -309,17 +323,9 @@
             })
         })
 
-        $("#cabang_input").on("change", function() {
-            getCoa()
-        })
-
-        $("#type").on("change", function() {
-            let type = $(this).val()
-            checkType(type)
-        })
-
         $("#btn-view").on("click", function() {
             guid = 'view'
+            console.log('view')
             $("#hidden-btn").click()
         })
 
@@ -330,212 +336,78 @@
 
         $("#btn-print").on("click", function() {
             guid = 'print'
+            console.log('print')
             $("#hidden-btn").click()
         })
 
     })
 
-    function save_data(route, param, step) {
-        $.ajax({
-            type: "GET",
-            url: route + param,
-        }).done(function(data) {
-            console.log("ajax response " + step)
-            console.log(data)
-            let res = '<span><i class="fa fa-check-circle" style="color: green;"></i>' + data.message + '</span>'
-            let fail = '<span><i class="fa fa-times-circle" style="color: red;"></i> Proses jurnal closing Koreksi Stok gagal. ' + data.message + '</span>'
-            if (data.result) {
-                console.log("succeed")
-                $("#response" + step).append(res)
-                steps(step, param)
-            } else {
-                console.log("ajax response false " + step)
-                $("#response" + step).append(fail)
-                myButton.disabled = false
-                myButton.innerHTML = "Submit"
-            }
-        })
-    }
-
-    function checkType(type) {
-        if (type == "recap") {
-            getCoa()
-            $("#coa").attr("disabled", true)
-        }
-        else {
-            getCoa()
-            $("#coa").attr("disabled", false)
-        }
-    }
-
     function view(param, type) {
-        let route = "{{ Route('report-general-ledger-populate') }}"
+        let route = "{{ Route('report-profit-loss-populate') }}"
         if (type == "recap") {
+            console.log('recap')
             $("#table_detail_div").hide()
             $("#table_recap_div").show()
-            $('#table_recap').DataTable().destroy();
-            $('#table_recap').DataTable({
-                processing: true,
-                serverSide: true,
-                "scrollX": true,
-                "bDestroy": true,
-                responsive: true,
-                ajax: {
-                    "url": route + param,
-                    "type": "GET",
-                    "dataType": "JSON",
-                    "error": function(xhr, textStatus, ThrownException) {
-                        alert("Error loading data. Exception: " + ThrownException + '\n' + textStatus)
+            $('#table_balance_recap').treetable('destroy');
+            $.ajax({
+                url: route + param,
+                type: "GET",
+                dataType: "JSON",
+                success: function(data) {
+                    if (data.result) {
+                        let data_coa = data.data;
+                        body_coa = '';
+                        if(jQuery.isEmptyObject(data_coa) == false){
+                            getTreetable(data_coa, null, 18);
+                            $('#coa_table').html(body_coa);
+                            $('#table_balance_recap').treetable({expandable: true}).treetable('expandAll');
+                        }
+                        else{
+                            body_coa += '<tr><td colspan="8" class="text-center">Empty Data</td></tr>';
+                            $('#coa_table').html(body_coa);
+                        }
                     }
-                },
-                columns: [{
-                        data: 'kode_akun',
-                        name: 'kode_akun',
-                        width: '10%',
-                        className: 'text-left',
-                        responsivePriority: 1
-                    },
-                    {
-                        data: 'nama_akun',
-                        name: 'nama_akun',
-                        width: '12%',
-                        className: 'text-left',
-                        responsivePriority: 2
-                    },
-                    {
-                        data: 'saldo_awal',
-                        name: 'saldo_awal',
-                        width: '10%',
-                        className: 'text-right',
-                        searchable: false,
-                        orderable: false,
-                        render: function(data, type, row) {
-                            return formatCurr(formatNumberAsFloatFromDB(data))
-                        }
-                    },
-                    {
-                        data: 'debet',
-                        name: 'debet',
-                        width: '10%',
-                        className: 'text-right',
-                        searchable: false,
-                        orderable: false,
-                        render: function(data, type, row) {
-                            return formatCurr(formatNumberAsFloatFromDB(data))
-                        }
-                    },
-                    {
-                        data: 'kredit',
-                        name: 'kredit',
-                        width: '10%',
-                        className: 'text-right',
-                        searchable: false,
-                        orderable: false,
-                        render: function(data, type, row) {
-                            return formatCurr(formatNumberAsFloatFromDB(data))
-                        }
-                    },
-                    {
-                        data: 'saldo_akhir',
-                        name: 'saldo_akhir',
-                        width: '10%',
-                        className: 'text-right',
-                        searchable: false,
-                        orderable: false,
-                        render: function(data, type, row) {
-                            return formatCurr(formatNumberAsFloatFromDB(data))
-                        }
-                    },
-                ],
+                    else {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: data.message,
+                            icon: 'error',
+                            confirmButtonText: 'Close'
+                        })
+                    }
+                }
             })
         } else {
             $("#table_recap_div").hide()
-            $("#table_detail_div").show()
-            $('#table_detail').DataTable().destroy();
-            $('#table_detail').DataTable({
-                processing: true,
-                serverSide: true,
-                "scrollX": true,
-                "bDestroy": true,
-                responsive: true,
-                ajax: {
-                    "url": route + param,
-                    "type": "GET",
-                    "dataType": "JSON",
-                    "error": function(xhr, textStatus, ThrownException) {
-                        alert("Error loading data. Exception: " + ThrownException + '\n' + textStatus)
+            $("#table_recap_div").show()
+            $('#table_balance_recap').treetable('destroy');
+            $.ajax({
+                url: route + param,
+                type: "GET",
+                dataType: "JSON",
+                success: function(data) {
+                    if (data.result) {
+                        let data_coa = data.data;
+                        body_coa = '';
+                        if(jQuery.isEmptyObject(data_coa) == false){
+                            getTreetable(data_coa, null, 20);
+                            $('#coa_table').html(body_coa);
+                            $('#table_balance_recap').treetable({expandable: true}).treetable('expandAll');
+                        }
+                        else{
+                            body_coa += '<tr><td colspan="8" class="text-center">Empty Data</td></tr>';
+                            $('#coa_table').html(body_coa);
+                        }
                     }
-                },
-                columns: [{
-                        data: 'tanggal_jurnal',
-                        name: 'tanggal_jurnal',
-                        width: '10%',
-                        orderable: false,
-                    },
-                    {
-                        data: 'kode_jurnal',
-                        name: 'kode_jurnal',
-                        width: '10%',
-                        orderable: false,
-                    },
-                    {
-                        data: 'kode_akun',
-                        name: 'kode_akun',
-                        width: '10%',
-                        orderable: false,
-                    },
-                    {
-                        data: 'nama_akun',
-                        name: 'nama_akun',
-                        width: '12%',
-                        orderable: false,
-                    },
-                    {
-                        data: 'keterangan',
-                        name: 'keterangan',
-                        width: '10%',
-                        searchable: false,
-                        orderable: false,
-                    },
-                    {
-                        data: 'id_transaksi',
-                        name: 'id_transaksi',
-                        width: '10%',
-                        searchable: false,
-                        orderable: false,
-                    },
-                    {
-                        data: 'debet',
-                        name: 'debet',
-                        width: '10%',
-                        searchable: false,
-                        orderable: false,
-                        render: function(data, type, row) {
-                            return formatCurr(formatNumberAsFloatFromDB(data))
-                        }
-                    },
-                    {
-                        data: 'kredit',
-                        name: 'kredit',
-                        width: '10%',
-                        searchable: false,
-                        orderable: false,
-                        render: function(data, type, row) {
-                            return formatCurr(formatNumberAsFloatFromDB(data))
-                        }
-                    },
-                    {
-                        data: 'saldo_balance',
-                        name: 'saldo_balance',
-                        width: '10%',
-                        searchable: false,
-                        orderable: false,
-                        render: function(data, type, row) {
-                            return formatCurr(formatNumberAsFloatFromDB(data))
-                        }
-                    },
-                ],
-                "order": []
+                    else {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: data.message,
+                            icon: 'error',
+                            confirmButtonText: 'Close'
+                        })
+                    }
+                }
             })
         }
         viewButton.disabled = false
@@ -551,7 +423,7 @@
     }
 
     function print(param) {
-        let route = "{{ Route('report-general-ledger-pdf') }}"
+        let route = "{{ Route('report-profit-loss-pdf') }}"
         $.ajax({
             type: "GET",
             url: route + param
@@ -563,7 +435,7 @@
                 // Set the PDF data as href attribute
                 link.href = 'data:application/pdf;base64,' + data.pdfData;
                 // Set the PDF headers as download attribute
-                link.setAttribute('download', 'reportGeneralLedger.pdf');
+                link.setAttribute('download', 'reportProfitLoss.pdf');
                 link.setAttribute('target', '_blank');
                 // Append the anchor element to the document
                 document.body.appendChild(link);
@@ -577,50 +449,33 @@
         })
     }
 
-    function steps(step, param) {
-        switch (step) {
-            case "1":
-                save_data(routeProduction, param, "2")
-                break;
-            case "2":
-                save_data(routeInventoryTransfer, param, "3")
-                break;
-            case "3":
-                save_data(routeStockCorrection, param, "4")
-                break;
-            case "4":
-                save_data(routeSales, param, "5")
-                break;
-            case "5":
-                save_data(routeDepreciation, param, "6")
-                break;
-
-            default:
-                myButton.disabled = false
-                myButton.innerHTML = "Submit"
-                break;
-        }
-    }
-
-    function getCoa() {
-        let id_cabang = $("#cabang_input").val()
-        let current_coa_route = coa_by_cabang_route.replace(':id', id_cabang);
-
-        $.getJSON(current_coa_route, function(data) {
-            if (data.result) {
-                $('#coa').html('');
-
-                let data_akun = data.data;
-                let option_akun = '';
-
-                option_akun += `<option value="">Pilih Akun</option>`;
-                data_akun.forEach(akun => {
-                    option_akun +=
-                        `<option value="${akun.id_akun}" data-nama="${akun.nama_akun}" data-kode="${akun.kode_akun}">${akun.kode_akun} - ${akun.nama_akun}</option>`;
-                });
-                $('#coa').append(option_akun);
+    function getTreetable(data, parent, fontSize){
+        Object.values(data).forEach(element => {
+            if(parent == null){
+                body_coa += '<tr data-tt-id="' + element.header + '">';
+            }else{
+                body_coa += '<tr data-tt-id="' + element.header + '" data-tt-parent-id="' + parent + '">';
             }
-        })
+            if(typeof(element.children) != "undefined"){
+                body_coa += '<td><b style="font-size:' + fontSize + 'px">' + element.header + '</b></td>';
+                body_coa += '<td></td>';
+            }else{
+                body_coa += '<td style="font-size:' + fontSize + 'px">' + element.header + ' (Rp)</td>';
+                body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" >' + formatCurr(formatNumberAsFloatFromDB(element.total)) + '</td>';
+            }
+            body_coa += '</tr>';
+            if(typeof(element.children) != "undefined"){
+                getTreetable(element.children, element.header, fontSize - 1);
+                if(parent == null){
+                    body_coa += '<tr>';
+                }else{
+                    body_coa += '<tr data-tt-id="total-' + element.header + '" data-tt-parent-id="' + parent + '">';
+                }
+                body_coa += '<td><b style="font-size:' + fontSize + 'px">Total ' + element.header + ' (Rp)</b></td>';
+                body_coa += '<td class="text-right"><b style="font-size:' + fontSize + 'px">' + formatCurr(formatNumberAsFloatFromDB(element.total)) + '</b></td>';
+                body_coa += '</tr>';
+            }
+        });
     }
 
     function formatCurr(num) {
@@ -646,5 +501,11 @@
         // console.log(num)
         return num;
     }
+
+    $.fn.expandAll = function() {
+        $(this).find("tr").removeClass("collapsed").addClass("expanded").each(function(){
+            $(this).expand();
+        });
+    };
 </script>
 @endsection
