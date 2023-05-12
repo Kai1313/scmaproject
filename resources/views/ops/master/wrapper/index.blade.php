@@ -123,7 +123,7 @@
                 name: 'nama_wrapper'
             }, {
                 data: 'kategori_wrapper',
-                name: 'kategori_wrapper'
+                name: 'id_kategori_wrapper'
             }, {
                 data: 'weight',
                 name: 'weight',

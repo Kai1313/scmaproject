@@ -785,22 +785,22 @@
                                             </a>
                                         </li>
                                     @endif
-                                    {{-- @if (checkAccessMenu('laporan_persediaan')) --}}
-                                    <li data-alias=""
-                                        class="{{ request()->segment(1) == 'laporan_qc_penerimaan' ? 'active' : null }}">
-                                        <a href="{{ route('report_qc-index') }}">
-                                            <i class="glyphicon glyphicon-option-vertical"></i>QC Penerimaan Barang
-                                        </a>
-                                    </li>
-                                    {{-- @endif --}}
-                                    {{-- @if (checkAccessMenu('laporan_persediaan')) --}}
-                                    <li data-alias=""
-                                        class="{{ request()->segment(1) == 'laporan_uang_muka_pembelian' ? 'active' : null }}">
-                                        <a href="{{ route('report_purchase_down_payment-index') }}">
-                                            <i class="glyphicon glyphicon-option-vertical"></i>Uang Muka Pembelian
-                                        </a>
-                                    </li>
-                                    {{-- @endif --}}
+                                    @if (checkAccessMenu('laporan_qc_penerimaan'))
+                                        <li data-alias=""
+                                            class="{{ request()->segment(1) == 'laporan_qc_penerimaan' ? 'active' : null }}">
+                                            <a href="{{ route('report_qc-index') }}">
+                                                <i class="glyphicon glyphicon-option-vertical"></i>QC Penerimaan Barang
+                                            </a>
+                                        </li>
+                                    @endif
+                                    @if (checkAccessMenu('laporan_uang_muka_pembelian'))
+                                        <li data-alias=""
+                                            class="{{ request()->segment(1) == 'laporan_uang_muka_pembelian' ? 'active' : null }}">
+                                            <a href="{{ route('report_purchase_down_payment-index') }}">
+                                                <i class="glyphicon glyphicon-option-vertical"></i>Uang Muka Pembelian
+                                            </a>
+                                        </li>
+                                    @endif
                                 </ul>
                             </li>
                         @endif
@@ -914,46 +914,46 @@
                                             </a>
                                         </li>
                                     @endif
-                                    {{-- @if (checkAccessMenu('laporan_persediaan')) --}}
-                                    <li data-alias=""
-                                        class="{{ request()->segment(1) == 'laporan_kirim_ke_cabang' ? 'active' : null }}">
-                                        <a href="{{ route('report_send_to_branch-index') }}">
-                                            <i class="glyphicon glyphicon-option-vertical"></i>Kirim Ke Cabang
-                                        </a>
-                                    </li>
-                                    {{-- @endif --}}
-                                    {{-- @if (checkAccessMenu('laporan_persediaan')) --}}
-                                    <li data-alias=""
-                                        class="{{ request()->segment(1) == 'laporan_terima_dari_cabang' ? 'active' : null }}">
-                                        <a href="{{ route('report_received_from_branch-index') }}">
-                                            <i class="glyphicon glyphicon-option-vertical"></i>Terima Dari Cabang
-                                        </a>
-                                    </li>
-                                    {{-- @endif --}}
-                                    {{-- @if (checkAccessMenu('laporan_persediaan')) --}}
-                                    <li data-alias=""
-                                        class="{{ request()->segment(1) == 'laporan_kirim_ke_gudang' ? 'active' : null }}">
-                                        <a href="{{ route('report_send_to_warehouse-index') }}">
-                                            <i class="glyphicon glyphicon-option-vertical"></i>Kirim Ke Gudang
-                                        </a>
-                                    </li>
-                                    {{-- @endif --}}
-                                    {{-- @if (checkAccessMenu('laporan_persediaan')) --}}
-                                    <li data-alias=""
-                                        class="{{ request()->segment(1) == 'laporan_terima_dari_gudang' ? 'active' : null }}">
-                                        <a href="{{ route('report_received_from_warehouse-index') }}">
-                                            <i class="glyphicon glyphicon-option-vertical"></i>Terima Dari Gudang
-                                        </a>
-                                    </li>
-                                    {{-- @endif --}}
-                                    {{-- @if (checkAccessMenu('laporan_persediaan')) --}}
-                                    <li data-alias=""
-                                        class="{{ request()->segment(1) == 'laporan_pemakaian' ? 'active' : null }}">
-                                        <a href="{{ route('report_material_usage-index') }}">
-                                            <i class="glyphicon glyphicon-option-vertical"></i>Pemakaian
-                                        </a>
-                                    </li>
-                                    {{-- @endif --}}
+                                    @if (checkAccessMenu('laporan_kirim_ke_cabang'))
+                                        <li data-alias=""
+                                            class="{{ request()->segment(1) == 'laporan_kirim_ke_cabang' ? 'active' : null }}">
+                                            <a href="{{ route('report_send_to_branch-index') }}">
+                                                <i class="glyphicon glyphicon-option-vertical"></i>Kirim Ke Cabang
+                                            </a>
+                                        </li>
+                                    @endif
+                                    @if (checkAccessMenu('laporan_terima_dari_cabang'))
+                                        <li data-alias=""
+                                            class="{{ request()->segment(1) == 'laporan_terima_dari_cabang' ? 'active' : null }}">
+                                            <a href="{{ route('report_received_from_branch-index') }}">
+                                                <i class="glyphicon glyphicon-option-vertical"></i>Terima Dari Cabang
+                                            </a>
+                                        </li>
+                                    @endif
+                                    @if (checkAccessMenu('laporan_kirim_ke_gudang'))
+                                        <li data-alias=""
+                                            class="{{ request()->segment(1) == 'laporan_kirim_ke_gudang' ? 'active' : null }}">
+                                            <a href="{{ route('report_send_to_warehouse-index') }}">
+                                                <i class="glyphicon glyphicon-option-vertical"></i>Kirim Ke Gudang
+                                            </a>
+                                        </li>
+                                    @endif
+                                    @if (checkAccessMenu('laporan_terima_dari_gudang'))
+                                        <li data-alias=""
+                                            class="{{ request()->segment(1) == 'laporan_terima_dari_gudang' ? 'active' : null }}">
+                                            <a href="{{ route('report_received_from_warehouse-index') }}">
+                                                <i class="glyphicon glyphicon-option-vertical"></i>Terima Dari Gudang
+                                            </a>
+                                        </li>
+                                    @endif
+                                    @if (checkAccessMenu('laporan_pemakaian'))
+                                        <li data-alias=""
+                                            class="{{ request()->segment(1) == 'laporan_pemakaian' ? 'active' : null }}">
+                                            <a href="{{ route('report_material_usage-index') }}">
+                                                <i class="glyphicon glyphicon-option-vertical"></i>Pemakaian
+                                            </a>
+                                        </li>
+                                    @endif
                                 </ul>
                             </li>
                         @endif
@@ -1060,14 +1060,14 @@
                                             </a>
                                         </li>
                                     @endif
-                                    {{-- @if (checkAccessMenu('laporan_persediaan')) --}}
-                                    <li data-alias=""
-                                        class="{{ request()->segment(1) == 'laporan_uang_muka_penjualan' ? 'active' : null }}">
-                                        <a href="{{ route('report_sales_down_payment-index') }}">
-                                            <i class="glyphicon glyphicon-option-vertical"></i>Uang Muka Penjualan
-                                        </a>
-                                    </li>
-                                    {{-- @endif --}}
+                                    @if (checkAccessMenu('laporan_uang_muka_penjualan'))
+                                        <li data-alias=""
+                                            class="{{ request()->segment(1) == 'laporan_uang_muka_penjualan' ? 'active' : null }}">
+                                            <a href="{{ route('report_sales_down_payment-index') }}">
+                                                <i class="glyphicon glyphicon-option-vertical"></i>Uang Muka Penjualan
+                                            </a>
+                                        </li>
+                                    @endif
                                 </ul>
                             </li>
                         @endif
@@ -1195,7 +1195,8 @@
                     <li class="{{ request()->segment(2) == 'coa' ? 'active' : null }}">
                         <a href="{{ route('master-coa') }}">Master CoA</a>
                     </li>
-                    <li class="{{ request()->segment(2) == 'slip' ? 'active' : null }}">
+                    <li
+                        class="{{ request()->segment(1) == 'master' && request()->segment(2) == 'slip' ? 'active' : null }}">
                         <a href="{{ route('master-slip') }}">Master Slip</a>
                     </li>
                 </ul>
@@ -1207,23 +1208,45 @@
                     </span>
                 </a>
                 <ul class="treeview-menu">
-                    <li class="{{ request()->segment(2) == 'general_ledger' ? 'active' : null }}">
+                    <li
+                        class="{{ request()->segment(1) == 'transaction' && request()->segment(2) == 'slip' ? 'active' : null }}">
                         <a href="{{ route('transaction-general-ledger') }}">Jurnal Umum</a>
                     </li>
                     <li class="{{ request()->segment(2) == 'adjustment_ledger' ? 'active' : null }}">
                         <a href="{{ route('transaction-adjustment-ledger') }}">Jurnal Penyesuaian</a>
                     </li>
+                    <li class="{{ request()->segment(2) == 'closing_journal' ? 'active' : null }}">
+                        <a href="{{ route('transaction-closing-journal') }}">Jurnal Closing</a>
+                    </li>
                 </ul>
             </li>
-            <li class="treeview ">
+            <li class="treeview {{ request()->segment(1) == 'report' ? 'active' : null }}">
                 <a href="#"><i class="fa fa-link"></i> <span>Report</span>
                     <span class="pull-right-container">
                         <i class="fa fa-angle-left pull-right"></i>
                     </span>
                 </a>
                 <ul class="treeview-menu">
-                    <li class=""><a href="#">Link in level 2</a></li>
-                    <li><a href="#">Link in level 2</a></li>
+                    <li
+                        class="{{ request()->segment(1) == 'report' && request()->segment(2) == 'slip' ? 'active' : null }}">
+                        <a href="{{ route('report-slip') }}">Slip</a>
+                    </li>
+                    <li
+                        class="{{ request()->segment(1) == 'report' && request()->segment(2) == 'giro' ? 'active' : null }}">
+                        <a href="{{ route('report-giro') }}">Giro</a>
+                    </li>
+                    <li
+                        class="{{ request()->segment(1) == 'report' && request()->segment(2) == 'general_ledger' ? 'active' : null }}">
+                        <a href="{{ route('report-general-ledger') }}">Buku Besar</a>
+                    </li>
+                    <li
+                        class="{{ request()->segment(1) == 'report' && request()->segment(2) == 'profit_loss' ? 'active' : null }}">
+                        <a href="{{ route('report-profit-loss') }}">Laba Rugi</a>
+                    </li>
+                    <li
+                        class="{{ request()->segment(1) == 'report' && request()->segment(2) == 'balance' ? 'active' : null }}">
+                        <a href="{{ route('report-balance') }}">Neraca</a>
+                    </li>
                 </ul>
             </li>
         </ul>

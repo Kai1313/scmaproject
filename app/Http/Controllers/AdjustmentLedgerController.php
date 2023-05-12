@@ -235,10 +235,10 @@ class AdjustmentLedgerController extends Controller
             ->select('jurnal_detail.*', 'master_akun.kode_akun', 'master_akun.nama_akun')
             ->get();
 
-        $data_jurnal_header->catatan = str_replace("\n", '<br/>', $data_jurnal_header->catatan);
+        $data_jurnal_header->catatan = str_replace("\n", '<br>', $data_jurnal_header->catatan);
 
         foreach ($data_jurnal_detail as $key => $value) {
-            $notes = str_replace("\n", '<br/>', $value->keterangan);
+            $notes = str_replace("\n", '<br>', $value->keterangan);
             $value->keterangan = $notes;
         }
 
@@ -282,10 +282,10 @@ class AdjustmentLedgerController extends Controller
             ->select('jurnal_detail.*', 'master_akun.kode_akun', 'master_akun.nama_akun')
             ->get();
 
-        $data_jurnal_header->catatan = str_replace("\n", '<br/>', $data_jurnal_header->catatan);
+        $data_jurnal_header->catatan = str_replace("\n", '<br>', $data_jurnal_header->catatan);
 
         foreach ($data_jurnal_detail as $key => $value) {
-            $notes = str_replace("\n", '<br/>', $value->keterangan);
+            $notes = str_replace("\n", '<br>', $value->keterangan);
             $value->keterangan = $notes;
         }
 
@@ -325,9 +325,10 @@ class AdjustmentLedgerController extends Controller
         foreach ($jurnal_detail as $key => $jurnal) {
             $akun = Akun::find($jurnal->id_akun);
             $trx_id = TrxSaldo::where("id_transaksi", $jurnal->id_transaksi)->first();
-            $notes = str_replace("\n", '<br/>', $jurnal->keterangan);
+            $notes = str_replace("\n", '<br>', $jurnal->keterangan);
             $details[] = [
-                "guid" => (++$i == count($jurnal_detail)) ? "gen" : (($trx_id) ? "trx-" . $trx_id->id : $jurnal->index),
+                // "guid" => (++$i == count($jurnal_detail)) ? "gen" : (($trx_id) ? "trx-" . $trx_id->id : $jurnal->index),
+                "guid" => (++$i == count($jurnal_detail) && $trx_id) ? "trx-" . $trx_id->id : $jurnal->index,
                 "akun" => $akun->id_akun,
                 "nama_akun" => $akun->nama_akun,
                 "kode_akun" => $akun->kode_akun,
@@ -347,7 +348,7 @@ class AdjustmentLedgerController extends Controller
             "jurnal_detail" => json_encode($details),
             "jurnal_detail_count" => count($details),
         ];
-        // dd($details);
+        // dd($data);
 
         Log::debug(json_encode($request->session()->get('user')));
 
@@ -612,7 +613,7 @@ class AdjustmentLedgerController extends Controller
                 }
             }
         } else {
-            $data_general_ledger_table->orderBy('jurnal_header.dt_modified', 'DESC');
+            $data_general_ledger_table->orderBy('jurnal_header.id_jurnal', 'DESC');
         }
 
         // pagination
@@ -669,9 +670,46 @@ class AdjustmentLedgerController extends Controller
                 ]);
             }
 
-            // $session = $request->session()->get('access');
-
-            // if (($request->session()->has('token') && array_key_exists('Transaksi Jurnal Umum', $session)) && $session['Transaksi Jurnal Umum']['delete'] == 1) {
+            // Update saldo transaksi before delete
+            $old_details = JurnalDetail::where("id_jurnal", $id)->get();
+            foreach ($old_details as $key => $detail) {
+                $tolak = (str_contains($detail->keterangan, "GIRO-TOLAK"))?TRUE:FALSE;
+                $debet = $detail->debet;
+                $kredit = $detail->credit;
+                $trx_saldo = TrxSaldo::where("id_transaksi", $detail->id_transaksi)->first();
+                if ($trx_saldo) {
+                    // Log::info(json_encode($trx_saldo));
+                    $update_trx_saldo = $this->revertTrxSaldo($trx_saldo, $debet, $kredit);
+                    if (!$update_trx_saldo) {
+                        DB::rollback();
+                        return response()->json([
+                            "result" => false,
+                            "message" => "Error when store Jurnal data on revert saldo transaksi",
+                        ]);
+                    }
+                }
+                if ($tolak) {
+                    // Cek if journal have another trx
+                    $jouDetail = JurnalDetail::where("id_jurnal", $id)->get();
+                    if ($jouDetail) {
+                        foreach ($jouDetail as $key => $detail) {
+                            if ($detail->id_transaksi != "" && !str_contains($detail->keterangan, "GIRO-TOLAK")) {
+                                $trx_saldo_detail = TrxSaldo::where("id_transaksi", $detail->id_transaksi)->first();
+                                if ($trx_saldo_detail) {
+                                    $update_trx_saldo_detail = $this->updateTrxSaldo($trx_saldo_detail, $detail->credit, $detail->debet);
+                                    if (!$update_trx_saldo_detail) {
+                                        DB::rollback();
+                                        return response()->json([
+                                            "result" => false,
+                                            "message" => "Error when update saldo trnasaksi piutang giro tolak on revert saldo transaksi",
+                                        ]);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
             // Update Header Status
             $header->void = 1;
@@ -742,6 +780,43 @@ class AdjustmentLedgerController extends Controller
                     "message" => "Error when activate Jurnal data",
                 ]);
             }
+            $data_detail = JurnalDetail::where("id_jurnal", $id)->get();
+            foreach ($data_detail as $key => $detail) {
+                //  Update Saldo Transaksi
+                $trx_saldo = TrxSaldo::where("id_transaksi", $detail->id_transaksi)->first();
+                if ($trx_saldo) {
+                    $tolak = (str_contains($detail->keterangan, "GIRO-TOLAK"))?TRUE:FALSE;
+                    $update_trx_saldo = $this->updateTrxSaldo($trx_saldo, $detail->debet, $detail->credit, $tolak);
+                    if (!$update_trx_saldo) {
+                        DB::rollback();
+                        return response()->json([
+                            "result" => false,
+                            "message" => "Error when store Jurnal data on update saldo transaksi",
+                        ]);
+                    }
+                    if ($tolak) {
+                        // Cek if journal have another trx
+                        $jouDetail = JurnalDetail::where("id_jurnal", $trx_saldo->id_jurnal)->get();
+                        if ($jouDetail) {
+                            foreach ($jouDetail as $key => $detail) {
+                                if ($detail->id_transaksi != "") {
+                                    $trx_saldo_detail = TrxSaldo::where("id_transaksi", $detail->id_transaksi)->first();
+                                    if ($trx_saldo_detail) {
+                                        $update_trx_saldo_detail = $this->revertTrxSaldo($trx_saldo_detail, $detail->debet, $detail->credit);
+                                        if (!$update_trx_saldo_detail) {
+                                            DB::rollback();
+                                            return response()->json([
+                                                "result" => false,
+                                                "message" => "Error when update saldo trnasaksi piutang giro tolak on revert saldo transaksi",
+                                            ]);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
 
             DB::commit();
             return response()->json([
@@ -812,6 +887,10 @@ class AdjustmentLedgerController extends Controller
                     $trx_saldo->bayar = $current_bayar + $debet;
                     $trx_saldo->sisa = $current_sisa - $debet;
                     break;
+                case 'Uang Muka Pembelian':
+                    $trx_saldo->bayar = $current_bayar + $debet;
+                    $trx_saldo->sisa = $current_sisa - $debet;
+                    break;
                 case 'Retur Pembelian':
                     $trx_saldo->bayar = $current_bayar + $kredit;
                     $trx_saldo->sisa = $current_sisa - $kredit;
@@ -874,6 +953,10 @@ class AdjustmentLedgerController extends Controller
                     $trx_saldo->sisa = $current_sisa + $debet;
                     break;
                 case 'Pembelian':
+                    $trx_saldo->bayar = $current_bayar - $debet;
+                    $trx_saldo->sisa = $current_sisa + $debet;
+                    break;
+                case 'Uang Muka Pembelian':
                     $trx_saldo->bayar = $current_bayar - $debet;
                     $trx_saldo->sisa = $current_sisa + $debet;
                     break;

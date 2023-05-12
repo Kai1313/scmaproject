@@ -124,55 +124,53 @@ Route::prefix('pemakaian')->group(function () {
 
 Route::get('kirim_ke_gudang/print/{id}', 'SendToWarehouseController@print')->name('send_to_warehouse-print');
 
-Route::namespace ('Report')->group(function () {
+Route::namespace('Report')->group(function () {
     Route::prefix('laporan_qc_penerimaan')->group(function () {
         Route::get('index/{user_id?}', 'QcReceivedController@index')->name('report_qc-index');
         Route::get('print', 'QcReceivedController@print')->name('report_qc-print');
+        Route::get('excel', 'QcReceivedController@getExcel')->name('report_qc-excel');
     });
 
     Route::prefix('laporan_pemakaian')->group(function () {
         Route::get('index/{user_id?}', 'MaterialUsageController@index')->name('report_material_usage-index');
         Route::get('print', 'MaterialUsageController@print')->name('report_material_usage-print');
+        Route::get('excel', 'MaterialUsageController@getExcel')->name('report_material_usage-excel');
     });
 
     Route::prefix('laporan_terima_dari_cabang')->group(function () {
         Route::get('index/{user_id?}', 'ReceivedFromBranchController@index')->name('report_received_from_branch-index');
         Route::get('print', 'ReceivedFromBranchController@print')->name('report_received_from_branch-print');
-    });
-
-    Route::prefix('laporan_terima_dari_cabang')->group(function () {
-        Route::get('index/{user_id?}', 'ReceivedFromBranchController@index')->name('report_received_from_branch-index');
-        Route::get('print', 'ReceivedFromBranchController@print')->name('report_received_from_branch-print');
+        Route::get('excel', 'ReceivedFromBranchController@getExcel')->name('report_received_from_branch-excel');
     });
 
     Route::prefix('laporan_terima_dari_gudang')->group(function () {
         Route::get('index/{user_id?}', 'ReceivedFromWarehouseController@index')->name('report_received_from_warehouse-index');
         Route::get('print', 'ReceivedFromWarehouseController@print')->name('report_received_from_warehouse-print');
+        Route::get('excel', 'ReceivedFromWarehouseController@getExcel')->name('report_received_from_warehouse-excel');
     });
 
     Route::prefix('laporan_kirim_ke_cabang')->group(function () {
         Route::get('index/{user_id?}', 'SendToBranchController@index')->name('report_send_to_branch-index');
         Route::get('print', 'SendToBranchController@print')->name('report_send_to_branch-print');
+        Route::get('excel', 'SendToBranchController@getExcel')->name('report_send_to_branch-excel');
     });
 
     Route::prefix('laporan_kirim_ke_gudang')->group(function () {
         Route::get('index/{user_id?}', 'SendToWarehouseController@index')->name('report_send_to_warehouse-index');
         Route::get('print', 'SendToWarehouseController@print')->name('report_send_to_warehouse-print');
-    });
-
-    Route::prefix('laporan_kirim_ke_cabang')->group(function () {
-        Route::get('index/{user_id?}', 'SendToBranchController@index')->name('report_send_to_branch-index');
-        Route::get('print', 'SendToBranchController@print')->name('report_send_to_branch-print');
+        Route::get('excel', 'SendToWarehouseController@getExcel')->name('report_send_to_warehouse-excel');
     });
 
     Route::prefix('laporan_uang_muka_pembelian')->group(function () {
         Route::get('index/{user_id?}', 'PurchaseDownPaymentController@index')->name('report_purchase_down_payment-index');
         Route::get('print', 'PurchaseDownPaymentController@print')->name('report_purchase_down_payment-print');
+        Route::get('excel', 'PurchaseDownPaymentController@getExcel')->name('report_purchase_down_payment-excel');
     });
 
     Route::prefix('laporan_uang_muka_penjualan')->group(function () {
         Route::get('index/{user_id?}', 'SalesDownPaymentController@index')->name('report_sales_down_payment-index');
         Route::get('print', 'SalesDownPaymentController@print')->name('report_sales_down_payment-print');
+        Route::get('excel', 'SalesDownPaymentController@getExcel')->name('report_sales_down_payment-excel');
     });
 });
 
@@ -224,8 +222,8 @@ Route::prefix('transaction')->group(function () {
         Route::get('/void/{id?}', 'GeneralLedgerController@void')->name('transaction-general-ledger-void');
         Route::get('/active/{id?}', 'GeneralLedgerController@active')->name('transaction-general-ledger-active');
     });
+    // Jurnal Penyesuaian
     Route::prefix('adjustment_ledger')->group(function () {
-        // Jurnal Penyesuaian
         Route::get('/index/{user_id?}', 'AdjustmentLedgerController@index')->name('transaction-adjustment-ledger');
         Route::get('/form/create', 'AdjustmentLedgerController@create')->name('transaction-adjustment-ledger-create');
         Route::get('/form/edit/{id?}', 'AdjustmentLedgerController@edit')->name('transaction-adjustment-ledger-edit');
@@ -241,6 +239,60 @@ Route::prefix('transaction')->group(function () {
     Route::prefix('closing_journal')->group(function () {
         Route::get('/index/{user_id?}', 'ClosingJournalController@index')->name('transaction-closing-journal');
         Route::get('/form/create', 'ClosingJournalController@create')->name('transaction-closing-journal-create');
+        Route::get('/store', 'ClosingJournalController@store')->name('transaction-closing-journal-store');
         Route::get('/inventory_transfer', 'ClosingJournalController@inventoryTransfer')->name('transaction-closing-journal-inventory-transfer');
+        Route::get('/stock_correction', 'ClosingJournalController@stockCorrection')->name('transaction-closing-journal-stock-correction');
+        Route::get('/production', 'ClosingJournalController@production')->name('transaction-closing-journal-production');
+        Route::get('/selling_return', 'ClosingJournalController@sellingReturn')->name('transaction-closing-journal-selling-return');
+        Route::get('/usage', 'ClosingJournalController@usage')->name('transaction-closing-journal-usage');
+        Route::get('/sales', 'ClosingJournalController@sales')->name('transaction-closing-journal-sales');
+        Route::get('/depreciation', 'ClosingJournalController@depreciation')->name('transaction-closing-journal-depreciation');
     });
 });
+
+// Report
+Route::prefix('report')->group(function () {
+    // Slip
+    Route::prefix('slip')->group(function () {
+        Route::get('/index/{user_id?}', 'ReportSlipController@index')->name('report-slip');
+        Route::get('/populate', 'ReportSlipController@populate')->name('report-slip-populate');
+        Route::get('/excel', 'ReportSlipController@exportExcel')->name('report-slip-excel');
+        Route::get('/pdf', 'ReportSlipController@exportPdf')->name('report-slip-pdf');
+        Route::get('/getSlip', 'ReportSlipController@getSlip')->name('report-slip-get-slip');
+    });
+
+    // Giro
+    Route::prefix('giro')->group(function () {
+        Route::get('/index/{user_id?}', 'ReportGiroController@index')->name('report-giro');
+        Route::get('/populate', 'ReportGiroController@populate')->name('report-giro-populate');
+        Route::get('/excel', 'ReportGiroController@exportExcel')->name('report-giro-excel');
+        Route::get('/pdf', 'ReportGiroController@exportPdf')->name('report-giro-pdf');
+        Route::get('/getSlip', 'ReportGiroController@getSlip')->name('report-giro-get-slip');
+    });
+
+    // Ledger
+    Route::prefix('general_ledger')->group(function () {
+        Route::get('/index/{user_id?}', 'ReportGeneralLedgerController@index')->name('report-general-ledger');
+        Route::get('/populate', 'ReportGeneralLedgerController@populate')->name('report-general-ledger-populate');
+        Route::get('/excel', 'ReportGeneralLedgerController@exportExcel')->name('report-general-ledger-excel');
+        Route::get('/pdf', 'ReportGeneralLedgerController@exportPdf')->name('report-general-ledger-pdf');
+    });
+
+    // Profit Loss
+    Route::prefix('profit_loss')->group(function(){
+        Route::get('/index/{user_id?}', 'ReportProfitAndLossController@index')->name('report-profit-loss');
+        Route::get('/populate', 'ReportProfitAndLossController@populate')->name('report-profit-loss-populate');
+        Route::get('/excel', 'ReportProfitAndLossController@exportExcel')->name('report-profit-loss-excel');
+        Route::get('/pdf', 'ReportProfitAndLossController@exportPdf')->name('report-profit-loss-pdf');
+    });
+
+    // Balance
+    Route::prefix('balance')->group(function(){
+        Route::get('/index/{user_id?}', 'ReportBalanceController@index')->name('report-balance');
+        Route::get('/populate', 'ReportBalanceController@populate')->name('report-balance-populate');
+        Route::get('/excel', 'ReportBalanceController@exportExcel')->name('report-balance-excel');
+        Route::get('/pdf', 'ReportBalanceController@exportPdf')->name('report-balance-pdf');
+    });
+});
+
+Route::get('/dummyAjax', 'ClosingJournalController@dummyAjax')->name('dummy-ajax');

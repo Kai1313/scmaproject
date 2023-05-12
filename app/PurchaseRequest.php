@@ -47,8 +47,18 @@ class PurchaseRequest extends Model
 
         $gudang = $arrayCabang[$this->id_cabang];
         return $this->hasMany(PurchaseRequestDetail::class, 'purchase_request_id')
-            ->select('index', 'purchase_request_detail.id_barang', 'nama_barang', 'kode_barang', 'purchase_request_detail.id_satuan_barang', 'nama_satuan_barang', 'qty', 'notes',
-                DB::raw('(case when sum(sisa_master_qr_code) > 0 then sum(sisa_master_qr_code) else 0 end) as stok'))
+            ->select(
+                'index',
+                'purchase_request_detail.id_barang',
+                'nama_barang',
+                'kode_barang',
+                'purchase_request_detail.id_satuan_barang',
+                'nama_satuan_barang',
+                'qty',
+                'notes',
+                DB::raw('(case when closed = 0 then "Open" else "Closed" end) as status'),
+                DB::raw('(case when sum(sisa_master_qr_code) > 0 then sum(sisa_master_qr_code) else 0 end) as stok')
+            )
             ->leftJoin('barang', 'purchase_request_detail.id_barang', '=', 'barang.id_barang')
             ->leftJoin('satuan_barang', 'purchase_request_detail.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
             ->leftJoin('master_qr_code', function ($kartuStok) use ($gudang) {

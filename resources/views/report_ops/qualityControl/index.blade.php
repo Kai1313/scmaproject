@@ -1,5 +1,7 @@
 @extends('layouts.main')
 @section('addedStyles')
+    <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables-responsive/css/responsive.dataTables.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/bower_components/select2/dist/css/select2.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/bower_components/bootstrap-daterangepicker/daterangepicker.css') }}" />
     <style>
@@ -27,72 +29,60 @@
         <div class="box">
             <div class="box-header">
                 <div class="row">
-                    <div class="col-md-10">
-                        <div class="row">
-                            <div class="col-md-3">
-                                <label>Cabang</label>
-                                <div class="form-group">
-                                    <select name="id_cabang" class="form-control select2 trigger-change">
-                                        @foreach (getCabangForReport() as $branch)
-                                            <option value="{{ $branch['id'] }}">{{ $branch['text'] }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <label>Tanggal</label>
-                                <div class="form-group">
-                                    <input type="text" name="date" class="form-control trigger-change">
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <label>Status</label>
-                                <div class="form-group">
-                                    <select name="status_qc" class="form-control select2 trigger-change">
-                                        <option value="all">Semua Status</option>
-                                        @foreach ($arrayStatus as $key => $val)
-                                            <option value="{{ $key }}">{{ $val }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <label>Kode Pembelian</label>
-                                <div class="form-group">
-                                    <input type="text" class="form-control trigger-change" name="kode_pembelian">
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <label>Nama Barang</label>
-                                <div class="form-group">
-                                    <input type="text" class="form-control trigger-change" name="nama_barang">
-                                </div>
-                            </div>
+                    <div class="col-md-3">
+                        <label>Cabang</label>
+                        <div class="form-group">
+                            <select name="id_cabang" class="form-control select2 trigger-change">
+                                @foreach (getCabangForReport() as $branch)
+                                    <option value="{{ $branch['id'] }}">{{ $branch['text'] }}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
-                    <div class="col-md-2">
-                        <a href="{{ route('report_qc-print') }}"
-                            class="btn btn-primary btn-sm btn-flat pull-right btn-action" style="margin-top:26px;"
-                            target="_blank">
-                            <i class="glyphicon glyphicon-print"></i> Print
-                        </a>
+                    <div class="col-md-3">
+                        <label>Tanggal QC</label>
+                        <div class="form-group">
+                            <input type="text" name="date" class="form-control trigger-change">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <label>Status</label>
+                        <div class="form-group">
+                            <select name="status_qc" class="form-control select2 trigger-change">
+                                <option value="all">Semua Status</option>
+                                @foreach ($arrayStatus as $key => $val)
+                                    <option value="{{ $key }}">{{ $val }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
                 </div>
-
+                <div class="pull-right">
+                    <a href="{{ route('report_qc-print') }}" target="_blank"
+                        class="btn btn-danger btn-sm btn-flat btn-action">
+                        <i class="glyphicon glyphicon-print"></i> Print
+                    </a>
+                    <a href="{{ route('report_qc-excel') }}" class="btn btn-success btn-sm btn-flat btn-action">
+                        <i class="fa fa-file-excel-o"></i> Excel
+                    </a>
+                    <a href="javascript:void(0)" class="btn btn-default btn-sm btn-flat btn-view-action">
+                        <i class="glyphicon glyphicon-eye-open"></i> View
+                    </a>
+                </div>
             </div>
             <div class="box-body">
-                <div class="table-responsive">
+                <div class="table-responsive" id="target-table" style="display:none;">
                     <table class="table table-bordered data-table display responsive nowrap" width="100%">
                         <thead>
                             <tr>
-                                <th>No</th>
+                                <th>Tanggal Pembelian</th>
                                 <th>Kode Pembelian</th>
                                 <th>Nama Barang</th>
-                                <th>Jumlah</th>
                                 <th>Satuan</th>
+                                <th>Jumlah</th>
+                                <th>Tanggal QC</th>
                                 <th>Status</th>
                                 <th>Alasan</th>
-                                <th>Tanggal QC</th>
                                 <th>SG</th>
                                 <th>BE</th>
                                 <th>PH</th>
@@ -111,8 +101,9 @@
 @endsection
 
 @section('addedScripts')
+    <script src="{{ asset('assets/bower_components/datatables.net/js/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js') }}"></script>
     <script src="{{ asset('assets/bower_components/select2/dist/js/select2.min.js') }}"></script>
-    {{-- <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script> --}}
     <script type="text/javascript" src="{{ asset('assets/bower_components/moment/moment.js') }}"></script>
     <script type="text/javascript"
         src="{{ asset('assets/bower_components/bootstrap-daterangepicker/daterangepicker.js') }}"></script>
@@ -123,56 +114,74 @@
 @section('externalScripts')
     <script>
         let defaultUrlIndex = '{{ route('report_qc-index') }}'
-        let defaultUrlPrint = $('.btn-action').prop('href')
-        let countDown = '{{ $countDown }}'
-        let param = ''
 
-        $('.select2').select2()
-        $('[name="date"]').daterangepicker({
-            timePicker: true,
-            startDate: moment().subtract(countDown, 'days'),
-            endDate: moment(),
-            locale: {
-                format: 'YYYY-MM-DD'
-            }
-        });
-
-        $('.btn-action').prop('href', defaultUrlPrint + param)
-        $(document).ready(function() {
-            getData()
-        })
-
-        function getParam() {
-            param = ''
-            $('.trigger-change').each(function(i, v) {
-                param += (i == 0) ? '?' : '&'
-                param += $(v).prop('name') + '=' + $(v).val()
-            })
-
-            $('.btn-action').prop('href', defaultUrlPrint + param)
+        function loadDatatable() {
+            $('#target-table').show()
+            table = $('.data-table').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: defaultUrlIndex + param,
+                columns: [{
+                    data: 'tanggal_pembelian',
+                    name: 'p.tanggal_pembelian',
+                }, {
+                    data: 'nama_pembelian',
+                    name: 'p.nama_pembelian'
+                }, {
+                    data: 'nama_barang',
+                    name: 'b.nama_barang'
+                }, {
+                    data: 'nama_satuan_barang',
+                    name: 'sb.nama_satuan_barang',
+                }, {
+                    data: 'total_jumlah_purchase',
+                    name: 'pd.jumlah_purchase',
+                    render: function(data) {
+                        return data ? formatNumber(data, 2) : 0
+                    },
+                    className: 'text-right'
+                }, {
+                    data: 'tanggal_qc',
+                    name: 'qc.tanggal_qc',
+                }, {
+                    data: 'status_qc',
+                    name: 'qc.status_qc',
+                }, {
+                    data: 'reason',
+                    name: 'qc.reason',
+                }, {
+                    data: 'sg_pembelian_detail',
+                    name: 'qc.sg_pembelian_detail',
+                    render: function(data) {
+                        return data ? formatNumber(data, 4) : 0
+                    },
+                    className: 'text-right'
+                }, {
+                    data: 'be_pembelian_detail',
+                    name: 'qc.be_pembelian_detail',
+                    render: function(data) {
+                        return data ? formatNumber(data, 4) : 0
+                    },
+                    className: 'text-right'
+                }, {
+                    data: 'ph_pembelian_detail',
+                    name: 'qc.ph_pembelian_detail',
+                    render: function(data) {
+                        return data ? formatNumber(data, 4) : 0
+                    },
+                    className: 'text-right'
+                }, {
+                    data: 'warna_pembelian_detail',
+                    name: 'qc.warna_pembelian_detail',
+                }, {
+                    data: 'bentuk_pembelian_detail',
+                    name: 'qc.bentuk_pembelian_detail',
+                }, {
+                    data: 'keterangan_pembelian_detail',
+                    name: 'qc.keterangan_pembelian_detail',
+                }, ]
+            });
         }
-
-        function getData() {
-            getParam()
-
-            $('#cover-spin').show()
-            $.ajax({
-                url: defaultUrlIndex + param,
-                success: function(res) {
-                    $('tbody').html(res.html)
-                    $('#cover-spin').hide()
-                },
-                error: function(error) {
-                    let textError = error.hasOwnProperty('responseJSON') ? error.responseJSON.message : error
-                        .statusText
-                    Swal.fire("Gagal Mengambil Data. ", textError, 'error')
-                    $('#cover-spin').hide()
-                }
-            })
-        }
-
-        $('.trigger-change').change(function() {
-            getData()
-        })
     </script>
+    <script src="{{ asset('js/for-report.js') }}"></script>
 @endsection

@@ -102,21 +102,21 @@
             ajax: "{{ route('master-biaya') }}?c=" + $('[name="id_cabang"]').val(),
             columns: [{
                 data: 'nama_biaya',
-                name: 'nama_biaya'
+                name: 'mb.nama_biaya'
             }, {
                 data: 'akun_biaya',
                 name: 'ma.nama_akun'
             }, {
                 data: 'isppn',
-                name: 'isppn',
+                name: 'mb.isppn',
                 className: 'text-center'
             }, {
                 data: 'ispph',
-                name: 'ispph',
+                name: 'mb.ispph',
                 className: 'text-center'
             }, {
                 data: 'value_pph',
-                name: 'value_pph',
+                name: 'mb.value_pph',
                 render: function(data) {
                     return data ? formatNumber(data, 2) : 0
                 },
@@ -126,7 +126,7 @@
                 name: 'man.nama_akun'
             }, {
                 data: 'aktif',
-                name: 'aktif',
+                name: 'mb.aktif',
                 className: 'text-center'
             }, {
                 data: 'action',

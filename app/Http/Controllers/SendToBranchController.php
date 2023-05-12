@@ -6,6 +6,7 @@ use App\MoveBranch;
 use DB;
 use Illuminate\Http\Request;
 use Log;
+use PDF;
 use Yajra\DataTables\DataTables;
 
 class SendToBranchController extends Controller
@@ -18,7 +19,18 @@ class SendToBranchController extends Controller
 
         if ($request->ajax()) {
             $data = DB::table('pindah_barang')
-                ->select('id_pindah_barang', 'type', 'nama_gudang', 'tanggal_pindah_barang', 'kode_pindah_barang', 'nama_cabang', 'status_pindah_barang', 'keterangan_pindah_barang', 'transporter', 'void')
+                ->select(
+                    'id_pindah_barang',
+                    'type',
+                    'nama_gudang',
+                    'tanggal_pindah_barang',
+                    'kode_pindah_barang',
+                    'nama_cabang',
+                    'status_pindah_barang',
+                    'keterangan_pindah_barang',
+                    'transporter',
+                    'void'
+                )
                 ->leftJoin('gudang', 'pindah_barang.id_gudang', '=', 'gudang.id_gudang')
                 ->leftJoin('cabang', 'pindah_barang.id_cabang2', '=', 'cabang.id_cabang')
                 ->where('id_jenis_transaksi', 21)
@@ -42,6 +54,7 @@ class SendToBranchController extends Controller
                         $btn .= '<li><a href="' . route('send_to_branch-delete', $row->id_pindah_barang) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Void</a></li>';
                     }
 
+                    $btn .= '<li><a href="' . route('send_to_branch-print-data', $row->id_pindah_barang) . '" class="btn btn-default btn-xs mr-1 mb-1" target="_blank"><i class="glyphicon glyphicon-print"></i> Cetak</a></li>';
                     $btn .= '</ul>';
                     return $btn;
                 })
@@ -243,9 +256,8 @@ class SendToBranchController extends Controller
             return 'data tidak ditemukan';
         }
 
-        return view('ops.sendToBranch.print', [
-            'data' => $data,
-            "pageTitle" => "SCA OPS | Kirim Ke Cabang | Cetak",
-        ]);
+        $pdf = PDF::loadView('ops.sendToBranch.print', ['data' => $data]);
+        $pdf->setPaper('a5', 'landscape');
+        return $pdf->stream('Surat jalan pindah cabang ' . $data->kode_pindah_barang . '.pdf');
     }
 }

@@ -1,5 +1,7 @@
 @extends('layouts.main')
 @section('addedStyles')
+    <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables-responsive/css/responsive.dataTables.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/bower_components/select2/dist/css/select2.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/bower_components/bootstrap-daterangepicker/daterangepicker.css') }}" />
     <style>
@@ -27,89 +29,143 @@
         <div class="box">
             <div class="box-header">
                 <div class="row">
-                    <div class="col-md-10">
-                        <div class="row">
-                            <div class="col-md-3">
-                                <label>Cabang</label>
-                                <div class="form-group">
-                                    <select name="id_cabang" class="form-control select2 trigger-change">
-                                        @foreach (getCabangForReport() as $branch)
-                                            <option value="{{ $branch['id'] }}">{{ $branch['text'] }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <label>Gudang</label>
-                                <div class="form-group">
-                                    <select name="id_gudang" class="form-control select2 trigger-change">
-                                        <option value="all">Semua Gudang</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <label>Tanggal</label>
-                                <div class="form-group">
-                                    <input type="text" name="date" class="form-control trigger-change">
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <label>Status Kirim Ke Cabang</label>
-                                <div class="form-group">
-                                    <select name="status" class="form-control select2 trigger-change">
-                                        <option value="all">Semua Status</option>
-                                        @foreach ($arrayStatus as $key => $val)
-                                            <option value="{{ $key }}">{{ $val }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <label>Jenis Laporan</label>
-                                <div class="form-group">
-                                    <select name="type" class="form-control select2 trigger-change">
-                                        @foreach ($typeReport as $type)
-                                            <option value="{{ $type }}">{{ $type }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            {{-- <div class="col-md-3">
-                                <label>Kode Transaksi</label>
-                                <div class="form-group">
-                                    <input type="text" class="form-control trigger-change" name="kode_pindah_barang">
-                                </div>
-                            </div> --}}
-                            {{-- <div class="col-md-3">
-                                <label>Nama Barang</label>
-                                <div class="form-group">
-                                    <input type="text" class="form-control trigger-change" name="nama_barang">
-                                </div>
-                            </div> --}}
+                    <div class="col-md-3">
+                        <label>Cabang</label>
+                        <div class="form-group">
+                            <select name="id_cabang" class="form-control select2 trigger-change">
+                                @foreach (getCabangForReport() as $branch)
+                                    <option value="{{ $branch['id'] }}">{{ $branch['text'] }}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
-                    <div class="col-md-2">
-                        <a href="{{ route('report_send_to_branch-print') }}"
-                            class="btn btn-primary btn-sm btn-flat pull-right btn-action" style="margin-top:26px;"
-                            target="_blank">
-                            <i class="glyphicon glyphicon-print"></i> Print
-                        </a>
+                    <div class="col-md-3">
+                        <label>Gudang</label>
+                        <div class="form-group">
+                            <select name="id_gudang" class="form-control select2 trigger-change">
+                                <option value="all">Semua Gudang</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <label>Tanggal</label>
+                        <div class="form-group">
+                            <input type="text" name="date" class="form-control trigger-change">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <label>Status Kirim Ke Cabang</label>
+                        <div class="form-group">
+                            <select name="status" class="form-control select2 trigger-change">
+                                <option value="all">Semua Status</option>
+                                @foreach ($arrayStatus as $key => $val)
+                                    <option value="{{ $key }}">{{ $val }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <label>Jenis Laporan</label>
+                        <div class="form-group">
+                            <select name="type" class="form-control select2 trigger-change">
+                                @foreach ($typeReport as $type)
+                                    <option value="{{ $type }}">{{ $type }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
                 </div>
-
+                <div class="pull-right">
+                    <a href="{{ route('report_send_to_branch-print') }}" target="_blank"
+                        class="btn btn-danger btn-sm btn-flat btn-action">
+                        <i class="glyphicon glyphicon-print"></i> Print
+                    </a>
+                    <a href="{{ route('report_send_to_branch-excel') }}"
+                        class="btn btn-success btn-sm btn-flat btn-action">
+                        <i class="fa fa-file-excel-o"></i> Excel
+                    </a>
+                    <a href="javascript:void(0)" class="btn btn-default btn-sm btn-flat btn-view-action">
+                        <i class="glyphicon glyphicon-eye-open"></i> View
+                    </a>
+                </div>
             </div>
-        </div>
-        <div class="box">
-            <div class="box-body" id="target-html">
+            <div class="box-body">
+                <div class="table-responsive" id="target-table-rekap" style="display:none;">
+                    <table class="table table-bordered data-table-rekap display responsive nowrap" width="100%">
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Kode Transaksi</th>
+                                <th>Cabang</th>
+                                <th>Gudang</th>
+                                <th>Cabang Tujuan</th>
+                                <th>Keterangan</th>
+                                <th>Jasa Pengiriman</th>
+                                <th>Nomor Kendaraan</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
 
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="table-responsive" id="target-table-detail" style="display:none;">
+                    <table class="table table-bordered data-table-detail display responsive nowrap" width="100%">
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Kode Transaksi</th>
+                                <th>Cabang</th>
+                                <th>Gudang</th>
+                                <th>Cabang Tujuan</th>
+                                <th>QR Code</th>
+                                <th>Nama Barang</th>
+                                <th>Satuan</th>
+                                <th>Jumlah</th>
+                                <th>Batch</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="table-responsive" id="target-table-outstanding" style="display:none;">
+                    <table class="table table-bordered data-table-outstanding display responsive nowrap" width="100%">
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Kode Transaksi</th>
+                                <th>Cabang</th>
+                                <th>Gudang</th>
+                                <th>Cabang Tujuan</th>
+                                <th>QR Code</th>
+                                <th>Nama Barang</th>
+                                <th>Satuan</th>
+                                <th>Jumlah</th>
+                                <th>Batch</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 @endsection
 
 @section('addedScripts')
+    <script src="{{ asset('assets/bower_components/datatables.net/js/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js') }}"></script>
+    <script src="{{ asset('assets/bower_components/datatables-responsive/js/dataTables.responsive.js') }}"></script>
     <script src="{{ asset('assets/bower_components/select2/dist/js/select2.min.js') }}"></script>
-    {{-- <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script> --}}
     <script type="text/javascript" src="{{ asset('assets/bower_components/moment/moment.js') }}"></script>
     <script type="text/javascript"
         src="{{ asset('assets/bower_components/bootstrap-daterangepicker/daterangepicker.js') }}"></script>
@@ -120,103 +176,161 @@
 @section('externalScripts')
     <script>
         let defaultUrlIndex = '{{ route('report_send_to_branch-index') }}'
-        let defaultUrlPrint = $('.btn-action').prop('href')
-        let param = ''
         let branch = {!! json_encode(session()->get('access_cabang')) !!}
-        let gArray = [];
 
-        $('.select2').select2()
-        $('[name="date"]').daterangepicker({
-            timePicker: true,
-            startDate: moment().subtract(30, 'days'),
-            endDate: moment(),
-            locale: {
-                format: 'YYYY-MM-DD'
+        function loadDatatable() {
+            reportType = $('[name="type"]').val()
+            switch (reportType) {
+                case 'Rekap':
+                    $('#target-table-detail').hide()
+                    $('#target-table-outstanding').hide()
+                    $('.data-table-rekap').DataTable().destroy();
+                    $('.data-table-rekap').find('tbody').html('')
+
+                    $('#target-table-rekap').show()
+                    table = $('.data-table-rekap').DataTable({
+                        bDestroy: true,
+                        processing: true,
+                        serverSide: true,
+                        ajax: defaultUrlIndex + param,
+                        columns: [{
+                            data: 'tanggal_pindah_barang',
+                            name: 'pb.tanggal_pindah_barang'
+                        }, {
+                            data: 'kode_pindah_barang',
+                            name: 'pb.kode_pindah_barang'
+                        }, {
+                            data: 'nama_cabang',
+                            name: 'c.nama_cabang',
+                        }, {
+                            data: 'nama_gudang',
+                            name: 'g.nama_gudang',
+                        }, {
+                            data: 'nama_cabang2',
+                            name: 'c2.nama_cabang',
+                        }, {
+                            data: 'keterangan_pindah_barang',
+                            name: 'pb.keterangan_pindah_barang',
+                        }, {
+                            data: 'transporter',
+                            name: 'pb.transporter',
+                        }, {
+                            data: 'nomor_polisi',
+                            name: 'pb.nomor_polisi',
+                        }, {
+                            data: 'status_pindah_barang',
+                            name: 'pb.status_pindah_barang',
+                        }, ]
+                    });
+                    break;
+                case 'Detail':
+                    $('#target-table-rekap').hide()
+                    $('#target-table-outstanding').hide()
+                    $('.data-table-detail').DataTable().destroy();
+                    $('.data-table-detail').find('tbody').html('')
+
+                    $('#target-table-detail').show()
+                    table = $('.data-table-detail').DataTable({
+                        bDestroy: true,
+                        processing: true,
+                        serverSide: true,
+                        ajax: defaultUrlIndex + param,
+                        columns: [{
+                            data: 'tanggal_pindah_barang',
+                            name: 'pb.tanggal_pindah_barang'
+                        }, {
+                            data: 'kode_pindah_barang',
+                            name: 'pb.kode_pindah_barang'
+                        }, {
+                            data: 'nama_cabang',
+                            name: 'c.nama_cabang',
+                        }, {
+                            data: 'nama_gudang',
+                            name: 'g.nama_gudang',
+                        }, {
+                            data: 'nama_cabang2',
+                            name: 'c2.nama_cabang',
+                        }, {
+                            data: 'qr_code',
+                            name: 'pbd.qr_code',
+                        }, {
+                            data: 'nama_barang',
+                            name: 'b.nama_barang',
+                        }, {
+                            data: 'nama_satuan_barang',
+                            name: 'sb.nama_satuan_barang',
+                        }, {
+                            data: 'qty',
+                            name: 'pbd.qty',
+                            render: function(data) {
+                                return data ? formatNumber(data, 4) : 0
+                            },
+                            className: 'text-right'
+                        }, {
+                            data: 'batch',
+                            name: 'pbd.batch',
+                        }, {
+                            data: 'status_diterima',
+                            name: 'pbd.status_diterima',
+                        }, ]
+                    });
+                    break;
+                case 'Outstanding':
+                    $('#target-table-rekap').hide()
+                    $('#target-table-detail').hide()
+                    $('.data-table-outstanding').DataTable().destroy();
+                    $('.data-table-outstanding').find('tbody').html('')
+
+                    $('#target-table-outstanding').show()
+                    table = $('.data-table-outstanding').DataTable({
+                        bDestroy: true,
+                        processing: true,
+                        serverSide: true,
+                        ajax: defaultUrlIndex + param,
+                        columns: [{
+                            data: 'tanggal_pindah_barang',
+                            name: 'pb.tanggal_pindah_barang'
+                        }, {
+                            data: 'kode_pindah_barang',
+                            name: 'pb.kode_pindah_barang'
+                        }, {
+                            data: 'nama_cabang',
+                            name: 'c.nama_cabang',
+                        }, {
+                            data: 'nama_gudang',
+                            name: 'g.nama_gudang',
+                        }, {
+                            data: 'nama_cabang2',
+                            name: 'c2.nama_cabang',
+                        }, {
+                            data: 'qr_code',
+                            name: 'pbd.qr_code',
+                        }, {
+                            data: 'nama_barang',
+                            name: 'b.nama_barang',
+                        }, {
+                            data: 'nama_satuan_barang',
+                            name: 'sb.nama_satuan_barang',
+                        }, {
+                            data: 'qty',
+                            name: 'pbd.qty',
+                            render: function(data) {
+                                return data ? formatNumber(data, 4) : 0
+                            },
+                            className: 'text-right'
+                        }, {
+                            data: 'batch',
+                            name: 'pbd.batch',
+                        }, {
+                            data: 'status_diterima',
+                            name: 'pbd.status_diterima',
+                        }, ]
+                    });
+                    break;
+                default:
+                    break;
             }
-        });
-
-        $('.btn-action').prop('href', defaultUrlPrint + param)
-        $(document).ready(function() {
-            getData()
-        })
-
-        function getParam() {
-            param = ''
-            $('.trigger-change').each(function(i, v) {
-                param += (i == 0) ? '?' : '&'
-                param += $(v).prop('name') + '=' + $(v).val()
-            })
-
-            $('.btn-action').prop('href', defaultUrlPrint + param)
-        }
-
-        function getData() {
-            $('#cover-spin').show()
-            setTimeout(() => {
-                getParam()
-                $.ajax({
-                    url: defaultUrlIndex + param,
-                    success: function(res) {
-                        $('#target-html').html(res.html)
-                        $('#cover-spin').hide()
-                    },
-                    error: function(error) {
-                        let textError = error.hasOwnProperty('responseJSON') ? error.responseJSON
-                            .message : error
-                            .statusText
-                        Swal.fire("Gagal Mengambil Data. ", textError, 'error')
-                        $('#cover-spin').hide()
-                    }
-                })
-            }, 100);
-        }
-
-        $('.trigger-change').change(function() {
-            getData()
-        })
-
-        $('[name="id_cabang"]').select2().on('select2:select', function(e) {
-            let dataselect = e.params.data
-            clearWarehouse()
-            for (let i = 0; i < branch.length; i++) {
-                if (branch[i].id == dataselect.id) {
-                    getWarehouse(branch[i].gudang)
-                    break
-                }
-            }
-        });
-
-        function getWarehouse(arrayGudang) {
-            gArray = []
-            if (arrayGudang.length > 0) {
-                gArray.push({
-                    'id': arrayGudang.map(s => s.id).join(','),
-                    'text': 'Semua Gudang'
-                })
-            }
-
-            for (let a = 0; a < arrayGudang.length; a++) {
-                gArray.push({
-                    'id': arrayGudang[a].id,
-                    'text': arrayGudang[a].text
-                })
-            }
-
-            $('[name="id_gudang"]').empty()
-            $('[name="id_gudang"]').select2({
-                data: gArray
-            })
-        }
-
-        function clearWarehouse() {
-            console.log('asd')
-            $('[name="id_gudang"]').empty()
-            $('[name="id_gudang"]').select2({
-                data: [{
-                    'id': 'all',
-                    'text': 'Semua Gudang'
-                }]
-            })
         }
     </script>
+    <script src="{{ asset('js/for-report.js') }}"></script>
 @endsection

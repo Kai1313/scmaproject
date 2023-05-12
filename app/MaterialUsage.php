@@ -88,8 +88,8 @@ class MaterialUsage extends Model
             $trashQrCode = MasterQrCode::where('kode_batang_master_qr_code', $trash->kode_batang)->first();
             if ($trashQrCode) {
                 $trashQrCode->sisa_master_qr_code = $trashQrCode->sisa_master_qr_code + $trash->jumlah;
-                $trashQrCode->weight_zak = $trashQrCode->weight_zak + $trash->weight_zak;
-                $trashQrCode->zak = $trashQrCode->zak + $trash->jumlah_zak;
+                $trashQrCode->weight_zak = ($trashQrCode->weight_zak ? $trashQrCode->weight_zak : 0) + $trash->weight_zak;
+                $trashQrCode->zak = ($trashQrCode->zak ? $trashQrCode->zak : 0) + $trash->jumlah_zak;
                 $trashQrCode->save();
             }
 
@@ -122,8 +122,8 @@ class MaterialUsage extends Model
                 $master = MasterQrCode::where('kode_batang_master_qr_code', $store->kode_batang)->first();
                 if ($master) {
                     $master->sisa_master_qr_code = $master->sisa_master_qr_code - $store->jumlah;
-                    $master->zak = $master->zak - $store->jumlah_zak;
-                    $master->weight_zak = $master->weight_zak - $store->weight_zak;
+                    $master->zak = ($master->zak ? $master->zak : 0) - $store->jumlah_zak;
+                    $master->weight_zak = ($master->weight_zak ? $master->weight_zak : 0) - $store->weight_zak;
                     $master->save();
                 }
 

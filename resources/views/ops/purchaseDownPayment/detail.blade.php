@@ -58,12 +58,18 @@
                                 : {{ $data->purchaseOrder->nama_permintaan_pembelian }}
                             </div>
                         </div>
+                        <div class="row">
+                            <label class="col-md-4">Supplier</label>
+                            <div class="col-md-8">
+                                : {{ $data->purchaseOrder->supplier->nama_pemasok }}
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md-6">
                         <div class="row">
                             <label class="col-md-4">Slip</label>
                             <div class="col-md-8">
-                                : {{ $data->slip->kode_slip }} - {{ $data->slip->nama_slip }}
+                                : {{ $data->slip ? $data->slip->kode_slip . ' - ' . $data->slip->nama_slip : '' }}
                             </div>
                         </div>
                         <div class="row">

@@ -224,8 +224,9 @@
                     width: '20%',
                     render: function(data, type, row) {
                         let width = $(window).width();
+                        let notes = data == null ? '' : data.replace(/\n/g, '<br>')
                         width = width > 500 ? width - 330 : width - 100;
-                        return "<div style='white-space:normal;width:" + width + "px;'>" + data + "</div>";
+                        return "<div style='white-space:normal;width:" + width + "px;'>" + notes + "</div>";
                     },
                 },
                 {
@@ -264,16 +265,20 @@
         var action_btn = '<ul id="horizontal-list">';
         action_btn += '<li><a href="' + base_url + '/transaction/general_ledger/show/' + data +
             '" class="btn btn-xs mr-1 mb-1 btn-default"><span class="glyphicon glyphicon-search" aria-hidden="true"></span> Detail</a></li>';
-        action_btn += '<li><a href="' + base_url + '/transaction/general_ledger/form/edit/' + data +
-            '" class="btn btn-xs mr-1 mb-1 btn-warning"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Ubah</a></li>';
-        if (row['void'] == 0)
-            action_btn += '<li><button type="button" id="void-btn" data-ids="' + data + '" onclick="void_jurnal(' +
-            data +
-            ')" class="btn btn-xs mr-1 mb-1 btn-danger delete-btn"><span class="glyphicon glyphicon-remove-sign" aria-hidden="true"></span> Void</button></li>';
-        else {
-            action_btn += '<li><button type="button" id="void-btn" data-ids="' + data +
-                '" onclick="active_jurnal(' + data +
-                ')" class="btn btn-xs mr-1 mb-1 btn-success delete-btn"><span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span> Active</button></li>';
+        action_btn += (row["id_transaksi"] == null)?'<li><a href="' + base_url + '/transaction/general_ledger/form/edit/' + data +
+            '" class="btn btn-xs mr-1 mb-1 btn-warning"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Ubah</a></li>':'';
+        
+        if (row["id_transaksi"] == null) {
+            if (row['void'] == 0) {
+                action_btn += '<li><button type="button" id="void-btn" data-ids="' + data + '" onclick="void_jurnal(' +
+                data +
+                ')" class="btn btn-xs mr-1 mb-1 btn-danger delete-btn"><span class="glyphicon glyphicon-remove-sign" aria-hidden="true"></span> Void</button></li>';
+            }
+            else {
+                action_btn += '<li><button type="button" id="void-btn" data-ids="' + data +
+                    '" onclick="active_jurnal(' + data +
+                    ')" class="btn btn-xs mr-1 mb-1 btn-success delete-btn"><span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span> Active</button></li>';
+            }   
         }
         action_btn += '<li><a target="_blank" href="' + base_url + '/transaction/general_ledger/print/' + data +
             '" class="btn btn-xs mr-1 mb-1 btn-default"><span class="glyphicon glyphicon-print" aria-hidden="true"></span> Print</a></li>';

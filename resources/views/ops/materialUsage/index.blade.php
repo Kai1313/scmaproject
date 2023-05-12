@@ -113,19 +113,19 @@
             ajax: "{{ route('material_usage') }}?c=" + $('[name="id_cabang"]').val(),
             columns: [{
                 data: 'kode_pemakaian',
-                name: 'kode_pemakaian'
+                name: 'pemakaian_header.kode_pemakaian'
             }, {
                 data: 'tanggal',
-                name: 'tanggal'
+                name: 'pemakaian_header.tanggal'
             }, {
                 data: 'nama_cabang',
-                name: 'nama_cabang',
+                name: 'c.nama_cabang',
             }, {
                 data: 'nama_gudang',
-                name: 'nama_gudang',
+                name: 'g.nama_gudang',
             }, {
                 data: 'catatan',
-                name: 'catatan'
+                name: 'pemakaian_header.catatan'
             }, {
                 data: 'action',
                 name: 'action',

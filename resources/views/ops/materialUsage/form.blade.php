@@ -206,43 +206,55 @@
                                 </div>
                             </div>
                         </div>
-                        <label>QR Code</label>
-                        <div class="form-group">
-                            <input type="text" name="kode_batang" class="validate form-control" readonly>
-                        </div>
-                        <label>Nama Barang</label>
-                        <div class="form-group">
-                            <input type="text" name="nama_barang" class="validate form-control" readonly>
-                            <input type="hidden" name="id_barang" class="validate">
-                        </div>
-                        <label>Satuan</label>
-                        <div class="form-group">
-                            <input type="text" name="nama_satuan_barang" class="validate form-control" readonly>
-                            <input type="hidden" name="id_satuan_barang" class="validate">
-                        </div>
-                        <label>Jumlah Zak <span>*</span></label>
-                        <div class="form-group">
-                            <input type="text" name="jumlah_zak" class="form-control validate handle-number-4"
-                                autocomplete="off">
-                            <input type="hidden" name="weight_zak" class="validate">
-                            <input type="hidden" name="wrapper_weight" class="validate">
-                        </div>
-                        <label id="label-timbangan">Timbangan</label>
-                        <div class="form-group">
-                            <select name="id_timbangan" class="form-control select2">
-                            </select>
-                        </div>
-                        <label id="label-berat">Berat Barang</label>
-                        <div class="form-group">
-                            <input type="text" name="jumlah" class="form-control handle-number-4"
-                                autocomplete="off">
-                            <input type="hidden" name="max_weight" class="validate">
-                            <label id="alertWeight" style="display:none;color:red;"></label>
+                        <div class="result-form" style="display:none;">
+                            <label>QR Code <span>*</span></label>
+                            <div class="form-group">
+                                <input type="text" name="kode_batang" class="validate form-control" readonly>
+                            </div>
+                            <label>Nama Barang <span>*</span></label>
+                            <div class="form-group">
+                                <input type="text" name="nama_barang" class="validate form-control" readonly>
+                                <input type="hidden" name="id_barang" class="validate">
+                            </div>
+                            <label>Satuan <span>*</span></label>
+                            <div class="form-group">
+                                <input type="text" name="nama_satuan_barang" class="validate form-control" readonly>
+                                <input type="hidden" name="id_satuan_barang" class="validate">
+                            </div>
+                            <label id="label-jumlah-zak">Jumlah Zak</label>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input type="text" name="jumlah_zak" class="form-control validate handle-number-4"
+                                        autocomplete="off">
+                                    <span class="input-group-addon" id="max-jumlah-zak"></span>
+                                </div>
+                                <label id="alertZak" style="display:none;color:red;"></label>
+                                <input type="hidden" name="weight_zak" class="validate">
+                                <input type="hidden" name="wrapper_weight" class="validate">
+                            </div>
+                            <label id="label-timbangan">Timbangan</label>
+                            <div class="form-group">
+                                <select name="id_timbangan" class="form-control select2">
+                                    <option value="">Pilih Timbangan</option>
+                                </select>
+                            </div>
+                            <label id="label-berat">Berat Barang</label>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input type="text" name="jumlah" class="form-control handle-number-4"
+                                        autocomplete="off">
+                                    <span class="input-group-addon" id="max-jumlah"></span>
+                                </div>
+                                <input type="hidden" name="max_weight" class="validate">
+                                <label id="alertWeight" style="display:none;color:red;"></label>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary cancel-entry btn-flat">Batal</button>
-                        <button type="button" class="btn btn-primary save-entry btn-flat">Simpan</button>
+
+                        <button type="button" class="btn btn-primary save-entry btn-flat result-form"
+                            style="display:none;">Simpan</button>
                     </div>
                 </div>
             </div>
@@ -267,7 +279,6 @@
         let branch = {!! json_encode($cabang) !!}
         let timbangan = {!! $timbangan !!}
         let details = {!! $data ? $data->formatdetail : '[]' !!};
-        console.log(details)
         let detailSelect = []
         let count = details.length
         let statusModal = 'create'
@@ -395,17 +406,32 @@
         $('[name="id_timbangan"]').select2({
             data: timbangan
         }).on('select2:select', function(e) {
+            stopInterval()
             let dataselect = e.params.data
-            let beratTimbangan = dataselect.value
-            let beratMax = $('[name="max_weight"]').val()
-            if (parseFloat(beratTimbangan) > parseFloat(beratMax)) {
+            if (dataselect.id != '') {
+                let beratTimbangan = dataselect.value
+                let beratMax = $('[name="max_weight"]').val()
+                if (parseFloat(beratTimbangan) > parseFloat(beratMax)) {
+                    $('[name="jumlah"]').addClass('error-field')
+                    $('#alertWeight').text('Berat melebihi stok').show()
+                } else {
+                    $('[name="jumlah"]').removeClass('error-field')
+                    $('#alertWeight').text('').hide()
+                }
+
+                intervalReloadTimbangan = setInterval(reloadTimbangan, 2000)
+                $('#modalEntry').find('[name="jumlah"]').val(formatNumber(dataselect.value, 4))
+            }
+        })
+
+        $('#modalEntry').on('input', '[name="jumlah"]', function() {
+            if (normalizeNumber($(this).val()) > detailSelect.sisa_master_qr_code) {
+                $(this).addClass('error-field')
                 $('#alertWeight').text('Berat melebihi stok').show()
             } else {
+                $(this).removeClass('error-field')
                 $('#alertWeight').text('').hide()
             }
-
-            intervalReloadTimbangan = setInterval(reloadTimbangan, 2000)
-            $('#modalEntry').find('[name="jumlah"]').val(formatNumber(dataselect.value, 4))
         })
 
         function reloadTimbangan() {
@@ -415,6 +441,16 @@
                     id: $('[name="id_timbangan"]').val()
                 },
                 success: function(res) {
+                    let beratTimbangan = res.data
+                    let beratMax = $('[name="max_weight"]').val()
+                    if (parseFloat(beratTimbangan) > parseFloat(beratMax)) {
+                        $('[name="jumlah"]').addClass('error-field')
+                        $('#alertWeight').text('Berat melebihi stok').show()
+                    } else {
+                        $('[name="jumlah"]').removeClass('error-field')
+                        $('#alertWeight').text('').hide()
+                    }
+
                     $('#modalEntry').find('[name="jumlah"]').val(formatNumber(res.data, 4))
                 },
                 error: function(error) {
@@ -427,40 +463,54 @@
             detailSelect = []
             $('#modalEntry').find('input,select,textarea').each(function(i, v) {
                 $(v).val('').trigger('change')
+                $(v).removeClass('error-field')
             })
 
-            $('#alertModal').text('').hide()
+            $('#alertWeight').text('').hide()
+            $('#max-jumlah').text('')
+            $('#max-jumlah-zak').text('')
             statusModal = 'create'
             count += 1
             $('#modalEntry').find('[name="index"]').val(count)
-            // $('#modalEntry').find('[name="id_pemakaian_detail"]').val(0)
             $('#modalEntry').modal({
                 backdrop: 'static',
                 keyboard: false
             })
 
-            $('#message-stok').text('')
+            $('#message-stok').text('').hide()
+            $('#alertZak').text('').hide()
             $('#label-timbangan').html('Timbangan')
             $('#label-berat').html('Berat Barang')
+            $('#label-jumlah-zak').html('Jumlah Zak')
             $('[name="jumlah_zak"]').val(0)
             $('[name="weight_zak"]').val(0)
+            $('.result-form').hide()
             html5QrcodeScanner.render(onScanSuccess, onScanError);
         })
 
         $('#modalEntry').on('input', '[name="jumlah_zak"]', function() {
             let weightWrapper = $('[name="wrapper_weight"]').val()
-            let jumlah = $(this).val()
-            $('[name="weight_zak"]').val(jumlah * weightWrapper)
+            let jumlahZak = normalizeNumber($(this).val() ? $(this).val() : '0')
+            let weightZak = jumlahZak * weightWrapper
+            if (jumlahZak > detailSelect.jumlah_zak) {
+                $('#alertZak').text('Jumlah melebihi maksimal').show()
+                $(this).addClass('error-field')
+            } else {
+                $('#alertZak').text('').hide()
+                $(this).removeClass('error-field')
+            }
+
+            $('[name="jumlah_zak"]').val(jumlahZak)
+            $('[name="weight_zak"]').val(weightZak)
         })
 
         $('.save-entry').click(function() {
+            detailSelect = []
             let modal = $('#modalEntry')
             let valid = validatorModal(modal.find('[name="kode_batang"]').val())
             if (!valid.status) {
-                $('#alertModal').text(valid.message).show()
+                Swal.fire("Gagal Menyimpan Data. ", valid.message, 'error')
                 return false
-            } else {
-                $('#alertModal').text('').hide()
             }
 
             modal.find('input,select').each(function(i, v) {
@@ -488,7 +538,6 @@
 
             resDataTable.clear().rows.add(details).draw()
             stopInterval()
-            console.log('lalala')
             $('#modalEntry').modal('hide')
         })
 
@@ -501,41 +550,6 @@
 
             $('#modalEntry').modal('hide')
         })
-
-        // $('body').on('click', '.edit-entry', function() {
-        //     detailSelect = []
-        //     $('#modalEntry').find('input,select,textarea').each(function(i, v) {
-        //         $(v).val('').trigger('change')
-        //     })
-        //     $('#message-stok').text('')
-
-        //     $('#alertModal').text('').hide()
-        //     $('#modalEntry').modal({
-        //         backdrop: 'static',
-        //         keyboard: false
-        //     })
-        //     let index = $(this).data('index')
-        //     statusModal = 'edit'
-        //     detailSelect = details[index - 1]
-        //     for (select in detailSelect) {
-        //         if (['id_barang', 'id_satuan_barang'].includes(select)) {
-        //             let nameSelect = (select == 'id_barang') ? 'nama_barang' : 'nama_satuan_barang';
-        //             $('[name="' + select + '"]').append('<option value="' + detailSelect[select] + '" selected>' +
-        //                 detailSelect[nameSelect] + '</option>')
-        //         }
-
-        //         $('[name="' + select + '"]').val(detailSelect[select]).trigger('change')
-        //         if (select == 'stok') {
-        //             $('#message-stok').text(formatRupiah(detailSelect[select], 4) + ' ' + detailSelect
-        //                 .nama_satuan_barang)
-        //         }
-        //     }
-
-        //     $('.handle-number-4').each(function(i, v) {
-        //         let val = $(v).val().replace('.', ',')
-        //         $(v).val(formatRupiah(val, 4))
-        //     })
-        // })
 
         $('body').on('click', '.delete-entry', function() {
             let index = $(this).parents('tr').index()
@@ -583,23 +597,39 @@
                     id_gudang: $('[name="id_gudang"]').val()
                 },
                 success: function(res) {
+                    detailSelect = res.data
                     let modal = $('#modalEntry')
                     let data = res.data
                     for (let key in data) {
                         modal.find('[name="' + key + '"]').val(data[key])
+
+                        if (['weight_zak', 'wrapper_weight'].includes(key) && data[key] == null) {
+                            modal.find('[name="' + key + '"]').val(0)
+                        }
                     }
 
+                    $('#max-jumlah').text('Max ' + formatNumber(data.sisa_master_qr_code))
+
                     modal.find('[name="max_weight"]').val(data.sisa_master_qr_code)
+                    if (data.jumlah_zak == null) {
+                        modal.find('[name="jumlah_zak"]').prop('readonly', true).removeClass('validate')
+                    } else {
+                        $('#label-jumlah-zak').html('Jumlah Zak <span>*</span>')
+                        $('#max-jumlah-zak').text('Max ' + formatNumber(data.jumlah_zak, 4))
+                        modal.find('[name="jumlah_zak"]').prop('readonly', false).addClass('validate')
+                    }
+
+                    $('#label-berat').html('Berat Barang <span>*</span>')
                     if (data.isweighed == 1) {
-                        modal.find('[name="jumlah"]').prop('readonly', true).removeClass('validate')
+                        modal.find('[name="jumlah"]').prop('readonly', true).addClass('validate')
                         modal.find('[name="id_timbangan"]').prop('disabled', false).addClass('validate')
                         $('#label-timbangan').html('Timbangan <span>*</span>')
                     } else {
                         modal.find('[name="jumlah"]').prop('readonly', false).addClass('validate')
                         modal.find('[name="id_timbangan"]').prop('disabled', true).removeClass('validate')
-                        $('#label-berat').html('Berat barang <span>*</span>')
                     }
 
+                    $('.result-form').show()
                     $('#cover-spin').hide()
                 },
                 error: function(error) {
@@ -609,6 +639,7 @@
                     html5QrcodeScanner.render(onScanSuccess, onScanError);
                     $('[name="search-qrcode"]').val('')
                     $('#cover-spin').hide()
+                    $('.result-form').hide()
                 }
             })
         }
@@ -627,6 +658,11 @@
                         message = "QR Code sudah ada"
                         valid = false
                     }
+                }
+
+                if ($(v).hasClass('error-field')) {
+                    valid = false
+                    message = "Qty melebihi batas maksimal"
                 }
             })
 

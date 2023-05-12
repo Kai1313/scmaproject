@@ -94,6 +94,7 @@
                                 <th>Status</th>
                                 <th>Otorisasi</th>
                                 <th>Tanggal Otorisasi</th>
+                                <th>Jumlah Terpakai</th>
                                 <th width="150px">Action</th>
                             </tr>
                         </thead>
@@ -125,32 +126,35 @@
                 '[name="show_void"]').is(':checked'),
             columns: [{
                 data: 'purchase_request_code',
-                name: 'purchase_request_code'
+                name: 'prh.purchase_request_code'
             }, {
                 data: 'purchase_request_date',
-                name: 'purchase_request_date'
+                name: 'prh.purchase_request_date'
             }, {
                 data: 'purchase_request_estimation_date',
-                name: 'purchase_request_estimation_date',
+                name: 'prh.purchase_request_estimation_date',
             }, {
                 data: 'nama_gudang',
-                name: 'nama_gudang',
+                name: 'gudang.nama_gudang',
             }, {
                 data: 'user',
-                name: 'user',
+                name: 'user.nama_pengguna',
             }, {
                 data: 'catatan',
-                name: 'catatan'
+                name: 'prh.catatan'
             }, {
                 data: 'approval_status',
-                name: 'approval_status',
+                name: 'prh.approval_status',
                 className: 'text-center'
             }, {
                 data: 'approval_user',
-                name: 'approval_user',
+                name: 'approval.nama_pengguna',
             }, {
                 data: 'approval_date',
-                name: 'approval_date',
+                name: 'prh.approval_date',
+            }, {
+                data: 'closed',
+                name: 'closed'
             }, {
                 data: 'action',
                 name: 'action',

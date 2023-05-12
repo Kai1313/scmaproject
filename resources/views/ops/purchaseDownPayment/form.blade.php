@@ -81,7 +81,8 @@
                                     <option value="">Pilih Permintaan Pembelian (PO)</option>
                                     @if ($data && $data->id_permintaan_pembelian)
                                         <option value="{{ $data->id_permintaan_pembelian }}" selected>
-                                            {{ $data->purchaseOrder->nama_permintaan_pembelian }}
+                                            {{ $data->purchaseOrder->nama_permintaan_pembelian }} (
+                                            {{ $data->purchaseOrder->supplier->nama_pemasok }} )
                                         </option>
                                     @endif
                                 </select>
@@ -108,23 +109,22 @@
                                     data-max="{{ $maxPayment }}" data-validation="[NOTEMPTY]"
                                     data-validation-message="Nominal tidak boleh kosong">
                             </div>
-                            <label>Konversi Nominal <span>*</span></label>
+                            <label>Konversi Nominal</label>
                             <div class="form-group">
                                 <input type="text" name="konversi_nominal" class="form-control handle-number-2" readonly
                                     value="{{ old('konversi_nominal', $data ? $data->konversi_nominal : '') }}" readonly>
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <label>Total <span>*</span></label>
+                            <label>Total</label>
                             <div class="form-group">
                                 <input type="text" name="total" class="form-control handle-number-2" readonly
                                     value="{{ old('total', $data ? $data->total : '') }}" data-validation="[NOTEMPTY]"
                                     data-validation-message="Total tidak boleh kosong">
                             </div>
-                            <label>Slip <span>*</span></label>
+                            {{-- <label>Slip</label>
                             <div class="form-group">
-                                <select name="id_slip" class="form-control select2" data-validation="[NOTEMPTY]"
-                                    data-validation-message="Slip tidak boleh kosong">
+                                <select name="id_slip" class="form-control select2">
                                     <option value="">Pilih Slip</option>
                                     @foreach ($slip as $dataSlip)
                                         <option value="{{ $dataSlip->id }}"
@@ -132,7 +132,7 @@
                                             {{ $dataSlip->text }}</option>
                                     @endforeach
                                 </select>
-                            </div>
+                            </div> --}}
                             <label>Catatan</label>
                             <div class="form-group">
                                 <textarea name="catatan" class="form-control" rows="5">{{ old('catatan', $data ? $data->catatan : '') }}</textarea>
