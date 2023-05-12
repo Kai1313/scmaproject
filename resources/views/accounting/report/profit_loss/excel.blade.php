@@ -12,63 +12,40 @@
 <body>
     <table>
         <tr>
-            <th colspan="9" style="text-align: center;font-size: 16;"><b>Export Excel Report {{ ucfirst($data["type"]) }} General Ledger</b></th>
+            @if($data["type"] == 'recap')
+                <th colspan="4" style="text-align: center;font-size: 16;"><b>Export Excel Report Laba Rugi {{ ucfirst($data["type"]) }}</b></th>
+            @else
+                <th colspan="5" style="text-align: center;font-size: 16;"><b>Export Excel Report Laba Rugi {{ ucfirst($data["type"]) }}</b></th>
+            @endif
         </tr>
         <tr>
-            <th style="border: #000000 solid thin; font-size: 14; text-align: left; width: 160px; font-weight: bold; background-color: #CCCCCC">Cabang : </th>
-            <th style="border: #000000 solid thin; font-size: 14; text-align: left; width: 160px; font-weight: bold; background-color: #CCCCCC">{{ $data["cabang"] }}</th>
-            <th style="border: #000000 solid thin; font-size: 14; text-align: left; width: 160px; font-weight: bold; background-color: #CCCCCC">Periode : </th>
-            <th style="border: #000000 solid thin; font-size: 14; text-align: left; width: 160px; font-weight: bold; background-color: #CCCCCC">{{ $data["start_date"] }}</th>
-            <th style="border: #000000 solid thin; font-size: 14; text-align: left; width: 160px; font-weight: bold; background-color: #CCCCCC">s.d </th>
-            <th style="border: #000000 solid thin; font-size: 14; text-align: left; width: 160px; font-weight: bold; background-color: #CCCCCC">{{ $data["end_date"] }}</th>
+            <th style="font-size: 13; text-align: left;">Cabang : </th>
+            <th style="font-size: 13; text-align: left;">{{ $data["cabang"] }}</th>
+        </tr>
+        <tr>
+            <th style="font-size: 13; text-align: left;">Periode : </th>
+            <th style="font-size: 13; text-align: left;">{{ $data["periode"] }}</th>
         </tr>
         <tr></tr><tr></tr>
-        @if ($data["type"] == "recap")
-            <tr>
-                <th style="border: #000000 solid thin; font-size: 14; text-align: center; width: 160px; font-weight: bold; background-color: #CCCCCC">Kode Akun</th>
-                <th style="border: #000000 solid thin; font-size: 14; text-align: center; width: 160px; font-weight: bold; background-color: #CCCCCC">Nama Akun</th>
-                <th style="border: #000000 solid thin; font-size: 14; text-align: center; width: 160px; font-weight: bold; background-color: #CCCCCC">Saldo Awal</th>
-                <th style="border: #000000 solid thin; font-size: 14; text-align: center; width: 160px; font-weight: bold; background-color: #CCCCCC">Debet</th>
-                <th style="border: #000000 solid thin; font-size: 14; text-align: center; width: 160px; font-weight: bold; background-color: #CCCCCC">Kredit</th>
-                <th style="border: #000000 solid thin; font-size: 14; text-align: center; width: 160px; font-weight: bold; background-color: #CCCCCC">Saldo Akhir</th>
-            </tr>
-            @foreach ($data["data"] as $item)
-                <tr>
-                    <td style="border: #000000 solid thin; font-size: 12; text-align: center;">{{ $item->kode_akun }}</td>
-                    <td style="border: #000000 solid thin; font-size: 12; text-align: left; word-wrap: break-word;">{{ $item->nama_akun }}</td>
-                    <td style="border: #000000 solid thin; font-size: 12; text-align: right;">{{ number_format($item->saldo_awal, 2,",",".") }}</td>
-                    <td style="border: #000000 solid thin; font-size: 12; text-align: right;">{{ number_format($item->debet, 2,",",".") }}</td>
-                    <td style="border: #000000 solid thin; font-size: 12; text-align: right;">{{ number_format($item->kredit, 2,",",".") }}</td>
-                    <td style="border: #000000 solid thin; font-size: 12; text-align: right;">{{ number_format($item->saldo_akhir, 2,",",".") }}</td>
-                </tr>
-            @endforeach
-        @elseif ($data["type"] == "detail")
-            <tr>
-                <th style="border: #000000 solid thin; font-size: 14; text-align: center; width: 160px; font-weight: bold; background-color: #CCCCCC">Tanggal</th>
-                <th style="border: #000000 solid thin; font-size: 14; text-align: center; width: 160px; font-weight: bold; background-color: #CCCCCC">No Jurnal</th>
-                <th style="border: #000000 solid thin; font-size: 14; text-align: center; width: 160px; font-weight: bold; background-color: #CCCCCC">Kode Akun</th>
-                <th style="border: #000000 solid thin; font-size: 14; text-align: center; width: 160px; font-weight: bold; background-color: #CCCCCC">Nama Akun</th>
-                <th style="border: #000000 solid thin; font-size: 14; text-align: center; width: 160px; font-weight: bold; background-color: #CCCCCC">Keterangan</th>
-                <th style="border: #000000 solid thin; font-size: 14; text-align: center; width: 160px; font-weight: bold; background-color: #CCCCCC">ID Transaksi</th>
-                <th style="border: #000000 solid thin; font-size: 14; text-align: center; width: 160px; font-weight: bold; background-color: #CCCCCC">Debet</th>
-                <th style="border: #000000 solid thin; font-size: 14; text-align: center; width: 160px; font-weight: bold; background-color: #CCCCCC">Kredit</th>
-                <th style="border: #000000 solid thin; font-size: 14; text-align: center; width: 160px; font-weight: bold; background-color: #CCCCCC">Balance</th>
-            </tr>
-            @foreach ($data["data"] as $item)
-                <tr>
-                    <td style="border: #000000 solid thin; font-size: 12; text-align: center;">{{ $item->tanggal_jurnal }}</td>
-                    <td style="border: #000000 solid thin; font-size: 12; text-align: center;">{{ $item->kode_jurnal }}</td>
-                    <td style="border: #000000 solid thin; font-size: 12; text-align: center;">{{ $item->kode_akun }}</td>
-                    <td style="border: #000000 solid thin; font-size: 12; text-align: left; word-wrap: break-word;">{{ $item->nama_akun }}</td>
-                    <td style="border: #000000 solid thin; font-size: 12; text-align: left; word-wrap: break-word;">{{ $item->keterangan }}</td>
-                    <td style="border: #000000 solid thin; font-size: 12; text-align: left; word-wrap: break-word;">{{ $item->id_transaksi }}</td>
-                    <td style="border: #000000 solid thin; font-size: 12; text-align: right;">{{ number_format($item->debet, 2,",",".") }}</td>
-                    <td style="border: #000000 solid thin; font-size: 12; text-align: right;">{{ number_format($item->kredit, 2,",",".") }}</td>
-                    <td style="border: #000000 solid thin; font-size: 12; text-align: right;">{{ number_format($item->saldo_balance, 2,",",".") }}</td>
-                </tr>
-            @endforeach
-        @endif
-        
+        <tr>
+            @if($data["type"] == 'recap')
+                <th colspan="3" style="border: #000000 solid thin; font-size: 14; text-align: center; width: 160px; font-weight: bold; background-color: #CCCCCC">Header</th>
+            @else
+                <th colspan="4" style="border: #000000 solid thin; font-size: 14; text-align: center; width: 160px; font-weight: bold; background-color: #CCCCCC">Header</th>
+            @endif
+            <th style="border: #000000 solid thin; font-size: 14; text-align: center; width: 160px; font-weight: bold; background-color: #CCCCCC">Total</th>
+        </tr>
+        @php
+            $fontSize = 14;
+            $space = 0;
+        @endphp
+        @include('accounting.report.balance.balance_list_excel',['data' => $data['data'], 'type' => $data["type"], 'space' => $space])
+        {{-- @foreach ($data["data"] as $item) --}}
+            {{-- <tr>
+                <td style="border: #000000 solid thin; font-size: 12; text-align: center;">{{ $item->kode_akun }}</td>
+                <td style="border: #000000 solid thin; font-size: 12; text-align: right;">{{ number_format($item->saldo_awal, 2,",",".") }}</td>
+            </tr> --}}
+        {{-- @endforeach --}}
     </table>
 </body>
 

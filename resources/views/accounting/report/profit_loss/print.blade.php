@@ -72,7 +72,7 @@
                 $fontSize = 18;
                 $space = 0;
             @endphp
-            @include('accounting.report.profit_loss.balance-list',['data' => $data, 'fontSize' => $fontSize, 'space' => ($space)])
+            @include('accounting.report.profit_loss.profit-loss-list',['data' => $data, 'fontSize' => $fontSize, 'space' => ($space)])
         </tbody>
     </table>
     <table width="100%" style="margin-top: 50px">
