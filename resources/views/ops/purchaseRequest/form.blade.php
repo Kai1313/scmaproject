@@ -173,7 +173,7 @@
                                     <th>Satuan</th>
                                     <th>Catatan</th>
                                     <th>Stok</th>
-                                    <th>Status</th>
+                                    {{-- <th>Status</th> --}}
                                     <th style="width:150px;">Action</th>
                                 </tr>
                             </thead>
@@ -221,6 +221,7 @@
                             <textarea name="notes" class="form-control" rows="5"></textarea>
                         </div>
                         <input type="hidden" name="stok">
+                        {{-- <input type="hidden" name="status" value="Open"> --}}
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary cancel-entry btn-flat">Batal</button>
@@ -285,10 +286,6 @@
                     return formatNumber(data, 4)
                 },
                 className: 'text-right'
-            }, {
-                data: 'status',
-                name: 'status',
-                className: 'text-center'
             }, {
                 data: 'index',
                 className: 'text-center',
@@ -411,6 +408,7 @@
         $('.save-entry').click(function() {
             let modal = $('#modalEntry')
             let valid = validatorModal(modal.find('[name="id_barang"]').val())
+            console.log(valid)
             if (!valid.status) {
                 Swal.fire("Gagal tambah data. ", valid.message, 'error')
                 return false
