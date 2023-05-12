@@ -68,7 +68,7 @@ class ReceivedFromWarehouseController extends Controller
 
         $pdf = PDF::loadView('report_ops.receivedFromWarehouse.print', $array);
         $pdf->setPaper('a4', 'landscape');
-        return $pdf->download('laporan terima dari gudang.pdf');
+        return $pdf->stream('laporan terima dari gudang.pdf');
     }
 
     public function getExcel(Request $request)

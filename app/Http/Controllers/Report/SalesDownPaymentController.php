@@ -54,7 +54,7 @@ class SalesDownPaymentController extends Controller
 
         $pdf = PDF::loadView('report_ops.salesDownPayment.print', $array);
         $pdf->setPaper('a4', 'landscape');
-        return $pdf->download('laporan uang muka penjualan.pdf');
+        return $pdf->stream('laporan uang muka penjualan.pdf');
     }
 
     public function getExcel(Request $request)

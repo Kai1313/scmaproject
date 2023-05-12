@@ -76,7 +76,7 @@
                     </div>
                 </div>
                 <div class="pull-right">
-                    <a href="{{ route('report_send_to_warehouse-print') }}"
+                    <a href="{{ route('report_send_to_warehouse-print') }}" target="_blank"
                         class="btn btn-danger btn-sm btn-flat btn-action">
                         <i class="glyphicon glyphicon-print"></i> Print
                     </a>

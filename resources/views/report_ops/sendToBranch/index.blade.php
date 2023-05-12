@@ -76,7 +76,8 @@
                     </div>
                 </div>
                 <div class="pull-right">
-                    <a href="{{ route('report_send_to_branch-print') }}" class="btn btn-danger btn-sm btn-flat btn-action">
+                    <a href="{{ route('report_send_to_branch-print') }}" target="_blank"
+                        class="btn btn-danger btn-sm btn-flat btn-action">
                         <i class="glyphicon glyphicon-print"></i> Print
                     </a>
                     <a href="{{ route('report_send_to_branch-excel') }}"

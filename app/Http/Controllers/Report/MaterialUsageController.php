@@ -65,7 +65,7 @@ class MaterialUsageController extends Controller
 
         $pdf = PDF::loadView('report_ops.materialUsage.print', $array);
         $pdf->setPaper('a4', 'landscape');
-        return $pdf->download('laporan pemakaian.pdf');
+        return $pdf->stream('laporan pemakaian.pdf');
     }
 
     public function getExcel(Request $request)

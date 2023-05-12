@@ -68,7 +68,7 @@ class SendToBranchController extends Controller
 
         $pdf = PDF::loadView('report_ops.sendToBranch.print', $array);
         $pdf->setPaper('a4', 'landscape');
-        return $pdf->download('laporan kirim ke cabang.pdf');
+        return $pdf->stream('laporan kirim ke cabang.pdf');
     }
 
     public function getExcel(Request $request)

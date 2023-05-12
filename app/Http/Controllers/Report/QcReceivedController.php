@@ -60,7 +60,7 @@ class QcReceivedController extends Controller
 
         $pdf = PDF::loadView('report_ops.qualityControl.print', $array);
         $pdf->setPaper('a4', 'landscape');
-        return $pdf->download('laporan QC penerimaan.pdf');
+        return $pdf->stream('laporan QC penerimaan.pdf');
     }
 
     public function getExcel(Request $request)

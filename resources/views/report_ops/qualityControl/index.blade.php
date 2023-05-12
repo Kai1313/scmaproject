@@ -58,7 +58,8 @@
                     </div>
                 </div>
                 <div class="pull-right">
-                    <a href="{{ route('report_qc-print') }}" class="btn btn-danger btn-sm btn-flat btn-action">
+                    <a href="{{ route('report_qc-print') }}" target="_blank"
+                        class="btn btn-danger btn-sm btn-flat btn-action">
                         <i class="glyphicon glyphicon-print"></i> Print
                     </a>
                     <a href="{{ route('report_qc-excel') }}" class="btn btn-success btn-sm btn-flat btn-action">

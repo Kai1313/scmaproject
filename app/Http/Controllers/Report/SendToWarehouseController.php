@@ -68,7 +68,7 @@ class SendToWarehouseController extends Controller
 
         $pdf = PDF::loadView('report_ops.sendToWarehouse.print', $array);
         $pdf->setPaper('a4', 'landscape');
-        return $pdf->download('laporan kirim ke gudang.pdf');
+        return $pdf->stream('laporan kirim ke gudang.pdf');
     }
 
     public function getExcel(Request $request)
