@@ -505,7 +505,6 @@
         })
 
         $('.save-entry').click(function() {
-            detailSelect = []
             let modal = $('#modalEntry')
             let valid = validatorModal(modal.find('[name="kode_batang"]').val())
             if (!valid.status) {
@@ -513,6 +512,7 @@
                 return false
             }
 
+            detailSelect = []
             modal.find('input,select').each(function(i, v) {
                 if ($(v).hasClass('handle-number-4')) {
                     detailSelect[$(v).prop('name')] = normalizeNumber($(v).val())
@@ -649,6 +649,11 @@
             let valid = true
             $('#modalEntry').find('.validate').each(function(i, v) {
                 if ($(v).val() == '') {
+                    valid = false
+                }
+
+                if ($('[name="jumlah"]').val() == '0') {
+                    message = "Berat barang harus lebih dari 0"
                     valid = false
                 }
 
