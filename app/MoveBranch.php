@@ -102,6 +102,7 @@ class MoveBranch extends Model
                 'zak',
                 'weight_zak',
                 'id_wrapper_zak',
+                'pindah_barang_detail.id_barang as id_barang2',
                 DB::raw('count(*) as count_data')
             )
             ->leftJoin('barang', 'pindah_barang_detail.id_barang', '=', 'barang.id_barang')
