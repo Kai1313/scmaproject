@@ -140,23 +140,23 @@
         <table class="table">
             <tr>
                 <th width="15">No</th>
-                <th width="70">QR Code</th>
                 <th>Nama Barang</th>
                 <th width="50">Satuan</th>
                 <th width="50">Qty</th>
                 <th width="70">Batch</th>
                 <th width="70">kadaluarsa</th>
+                <th width="20">Keterangan</th>
             </tr>
-            @foreach ($data->formatdetail as $key => $detail)
+            @foreach ($data->formatDetailGroupBy as $key => $detail)
                 <tr>
                     <td class="text-center">{{ $key + 1 }}</td>
-                    <td>{{ $detail->qr_code }}</td>
                     <td>{{ $detail->nama_barang }}</td>
                     <td>{{ $detail->nama_satuan_barang }}</td>
                     <td class="text-right">{{ formatNumber($detail->qty) }}</td>
                     <td class="text-center">{{ $detail->batch }}</td>
                     <td>
                         {{ $detail->tanggal_kadaluarsa == '0000-00-00' ? '' : $detail->tanggal_kadaluarsa }}</td>
+                    <td>{{ $detail->count_data }} </td>
                 </tr>
             @endforeach
         </table>

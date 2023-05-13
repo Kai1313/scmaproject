@@ -180,6 +180,7 @@
                         <input name="id_jenis_transaksi" type="hidden"
                             value="{{ old('id_jenis_transaksi', $data ? $data->id_jenis_transaksi : '21') }}">
                         <input type="hidden" name="details" value="[]">
+                        <input type="hidden" name="detele_details" value="[]">
                         <table id="table-detail" class="table table-bordered data-table display responsive nowrap"
                             width="100%">
                             <thead>
@@ -338,6 +339,7 @@
             qrbox: 250
         });
         let details = {!! $data ? $data->formatdetail : '[]' !!};
+        let deleteDetails = []
         let detailSelect = []
         let statusModal = 'create'
 
@@ -537,10 +539,12 @@
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
+                    deleteDetails.push(details[index])
                     details.splice(index, 1)
                     resDataTable.clear().rows.add(details).draw()
                     $('#count-record-table').text(resDataTable.data().count())
                     $('[name="details"]').val(JSON.stringify(details))
+                    $('[name="detele_details"]').val(JSON.stringify(deleteDetails))
                 }
             })
         })
