@@ -119,6 +119,10 @@ class SendToBranchController extends Controller
             }
 
             $data->save();
+            if (isset($request->detele_details)) {
+                $data->removedetails($request->detele_details, 'out');
+            }
+
             $data->saveDetails($request->details, 'out');
             DB::commit();
             return response()->json([

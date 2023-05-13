@@ -79,6 +79,36 @@ class MoveBranch extends Model
         return $this->belongsTo(Production::class, 'id_produksi');
     }
 
+    public function formatDetailGroupBy()
+    {
+        return $this->hasMany(MoveBranchDetail::class, 'id_pindah_barang')
+            ->select(
+                'be',
+                'bentuk',
+                'pindah_barang_detail.id_barang',
+                'id_pindah_barang_detail',
+                'pindah_barang_detail.id_satuan_barang',
+                DB::raw('sum(qty) as qty'),
+                'keterangan',
+                'qr_code',
+                'nama_barang',
+                'nama_satuan_barang',
+                'ph',
+                'sg',
+                'warna',
+                'status_diterima',
+                'batch',
+                'tanggal_kadaluarsa',
+                'zak',
+                'weight_zak',
+                'id_wrapper_zak',
+                DB::raw('count(*) as count_data')
+            )
+            ->leftJoin('barang', 'pindah_barang_detail.id_barang', '=', 'barang.id_barang')
+            ->leftJoin('satuan_barang', 'pindah_barang_detail.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
+            ->groupBy(['nama_barang', 'batch']);
+    }
+
     public function formatdetail()
     {
         return $this->hasMany(MoveBranchDetail::class, 'id_pindah_barang')
@@ -135,33 +165,43 @@ class MoveBranch extends Model
         return $string . '.' . $nol . $check;
     }
 
-    public function savedetails($details, $type = 'in')
+    public function removedetails($details, $type = 'in')
     {
         $idJenisTransaksi = $this->id_jenis_transaksi;
         $detail = json_decode($details);
         $ids = array_column($detail, 'id_pindah_barang_detail');
-        // $selectTrash = MoveBranchDetail::where('id_pindah_barang', $this->id_pindah_barang)
-        //     ->whereNotIn('id_pindah_barang_detail', $ids)
-        //     ->get();
-        // foreach ($selectTrash as $trash) {
-        //     $trashQrCode = MasterQrCode::where('kode_batang_master_qr_code', $trash->qr_code)->first();
-        //     if ($trashQrCode) {
-        //         if ($type == 'out') {
-        //             $trashQrCode->sisa_master_qr_code = $trash->qty;
-        //         } else {
-        //             $trashQrCode->sisa_master_qr_code = 0;
-        //         }
+        foreach ($detail as $trash) {
+            $selectTrash = MoveBranchDetail::where('id_pindah_barang', $this->id_pindah_barang)
+                ->where('id_pindah_barang_detail', $trash->id_pindah_barang_detail)
+                ->first();
+            if ($selectTrash) {
+                $trashQrCode = MasterQrCode::where('kode_batang_master_qr_code', $trash->qr_code)->first();
+                if ($trashQrCode) {
+                    if ($type == 'out') {
+                        $trashQrCode->sisa_master_qr_code = $trash->qty;
+                    } else {
+                        $trashQrCode->sisa_master_qr_code = 0;
+                    }
 
-        //         $trashQrCode->save();
-        //     }
+                    $trashQrCode->save();
+                }
 
-        //     $kartuStok = KartuStok::where('id_jenis_transaksi', $idJenisTransaksi)
-        //         ->where('kode_batang_kartu_stok', $trash->qr_code)
-        //         ->where('kode_kartu_stok', $this->kode_pindah_barang)
-        //         ->delete();
+                $kartuStok = KartuStok::where('id_jenis_transaksi', $idJenisTransaksi)
+                    ->where('kode_batang_kartu_stok', $trash->qr_code)
+                    ->where('kode_kartu_stok', $this->kode_pindah_barang)
+                    ->delete();
 
-        //     $trash->delete();
-        // }
+                $selectTrash->delete();
+            }
+        }
+
+        return ['status' => 'success'];
+    }
+
+    public function savedetails($details, $type = 'in')
+    {
+        $idJenisTransaksi = $this->id_jenis_transaksi;
+        $detail = json_decode($details);
 
         foreach ($detail as $data) {
             $check = MoveBranchDetail::where('id_pindah_barang_detail', $data->id_pindah_barang_detail)->first();
