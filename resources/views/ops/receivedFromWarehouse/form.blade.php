@@ -224,7 +224,6 @@
 @section('externalScripts')
     <script>
         let idData = {{ $data ? $data->id_pindah_barang : 0 }}
-        console.log(idData)
         let arrayQRCode = {!! $data ? $data->getDetailQRCode->pluck('qr_code') : '[]' !!};
         let details = {!! $data ? $data->formatdetail : '[]' !!}
         let html5QrcodeScanner = new Html5QrcodeScanner("reader", {
@@ -298,7 +297,7 @@
                 success: function(res) {
                     let newDetail = res.details
                     for (let i = 0; i < newDetail.length; i++) {
-                        details.push(newDetail[i])
+                        details.unshift(newDetail[i])
                         if (arrayQRCode.includes(newDetail[i]['qr_code'])) {
                             details[i]['status_diterima'] = 1
                         } else {

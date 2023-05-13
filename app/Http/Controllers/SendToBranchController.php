@@ -124,7 +124,7 @@ class SendToBranchController extends Controller
             return response()->json([
                 "result" => true,
                 "message" => "Data berhasil disimpan",
-                "redirect" => route('send_to_branch'),
+                "redirect" => route('send_to_branch-entry', $data->id_pindah_barang),
             ], 200);
         } catch (\Exception $e) {
             DB::rollback();

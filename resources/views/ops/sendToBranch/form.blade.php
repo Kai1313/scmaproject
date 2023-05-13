@@ -171,7 +171,7 @@
                             <h4>Detil Barang</h4>
                         </div>
                         <div class="col-md-6">
-                            <button class="btn btn-info add-entry btn-flat pull-right" type="button">
+                            <button class="btn btn-info add-entry btn-flat pull-right btn-sm" type="button">
                                 <i class="glyphicon glyphicon-plus"></i> Tambah Barang
                             </button>
                         </div>
@@ -202,7 +202,10 @@
                         </table>
                     </div>
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                    <button class="btn btn-primary btn-flat pull-right" type="submit">
+                    <div>
+                        <b>Total Barang</b> : <span id="count-record-table">0</span>
+                    </div>
+                    <button class="btn btn-primary btn-flat pull-right btn-sm" type="submit">
                         <i class="glyphicon glyphicon-floppy-saved"></i> Simpan Data
                     </button>
                 </div>
@@ -228,82 +231,84 @@
                             </div>
                         </div>
                         <input type="hidden" name="id_pindah_barang_detail">
-                        <table class="table table-bordered">
-                            <tr>
-                                <td width="100"><b>QR Code</b></td>
-                                <td width="20">:</td>
-                                <td id="qr_code" class="setData"></td>
-                                <td id="id_pindah_barang_detail" class="setData" style="display:none;"></td>
-                            </tr>
-                            <tr>
-                                <td><b>Nama Barang</b></td>
-                                <td>:</td>
-                                <td id="nama_barang" class="setData"></td>
-                                <td id="id_barang" class="setData" style="display:none;"></td>
-                            </tr>
-                            <tr>
-                                <td><b>Jumlah</b></td>
-                                <td>:</td>
-                                <td id="qty" class="setData"></td>
-                            </tr>
-                            <tr>
-                                <td><b>Satuan</b></td>
-                                <td>:</td>
-                                <td id="nama_satuan_barang" class="setData"></td>
-                                <td id="id_satuan_barang" class="setData" style="display:none;"></td>
-                            </tr>
-                            <tr>
-                                <td><b>Jumlah Zak</b></td>
-                                <td>:</td>
-                                <td id="zak" class="setData"></td>
-                                <td id="id_wrapper_zak" class="setData" style="display:none;"></td>
-                                <td id="weight_zak" class="setData" style="display:none;"></td>
-                            </tr>
-                            <tr>
-                                <td><b>SG</b></td>
-                                <td>:</td>
-                                <td id="sg" class="setData"></td>
-                            </tr>
-                            <tr>
-                                <td><b>BE</b></td>
-                                <td>:</td>
-                                <td id="be" class="setData"></td>
-                            </tr>
-                            <tr>
-                                <td><b>PH</b></td>
-                                <td>:</td>
-                                <td id="ph" class="setData"></td>
-                            </tr>
-                            <tr>
-                                <td><b>Bentuk</b></td>
-                                <td>:</td>
-                                <td id="bentuk" class="setData"></td>
-                            </tr>
-                            <tr>
-                                <td><b>Warna</b></td>
-                                <td>:</td>
-                                <td id="warna" class="setData"></td>
-                            </tr>
-                            <tr>
-                                <td><b>Keterangan</b></td>
-                                <td>:</td>
-                                <td id="keterangan" class="setData"></td>
-                            </tr>
-                            <tr>
-                                <td><b>Batch</b></td>
-                                <td>:</td>
-                                <td id="batch" class="setData"></td>
-                            </tr>
-                            <tr>
-                                <td><b>Kadaluarsa</b></td>
-                                <td>:</td>
-                                <td id="tanggal_kadaluarsa" class="setData"></td>
-                            </tr>
-                        </table>
+                        <div class="result-form" style="display:none;">
+                            <table class="table table-bordered">
+                                <tr>
+                                    <td width="100"><b>QR Code</b></td>
+                                    <td width="20">:</td>
+                                    <td id="qr_code" class="setData"></td>
+                                    <td id="id_pindah_barang_detail" class="setData" style="display:none;"></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Nama Barang</b></td>
+                                    <td>:</td>
+                                    <td id="nama_barang" class="setData"></td>
+                                    <td id="id_barang" class="setData" style="display:none;"></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Jumlah</b></td>
+                                    <td>:</td>
+                                    <td id="qty" class="setData"></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Satuan</b></td>
+                                    <td>:</td>
+                                    <td id="nama_satuan_barang" class="setData"></td>
+                                    <td id="id_satuan_barang" class="setData" style="display:none;"></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Jumlah Zak</b></td>
+                                    <td>:</td>
+                                    <td id="zak" class="setData"></td>
+                                    <td id="id_wrapper_zak" class="setData" style="display:none;"></td>
+                                    <td id="weight_zak" class="setData" style="display:none;"></td>
+                                </tr>
+                                <tr>
+                                    <td><b>SG</b></td>
+                                    <td>:</td>
+                                    <td id="sg" class="setData"></td>
+                                </tr>
+                                <tr>
+                                    <td><b>BE</b></td>
+                                    <td>:</td>
+                                    <td id="be" class="setData"></td>
+                                </tr>
+                                <tr>
+                                    <td><b>PH</b></td>
+                                    <td>:</td>
+                                    <td id="ph" class="setData"></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Bentuk</b></td>
+                                    <td>:</td>
+                                    <td id="bentuk" class="setData"></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Warna</b></td>
+                                    <td>:</td>
+                                    <td id="warna" class="setData"></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Keterangan</b></td>
+                                    <td>:</td>
+                                    <td id="keterangan" class="setData"></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Batch</b></td>
+                                    <td>:</td>
+                                    <td id="batch" class="setData"></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Kadaluarsa</b></td>
+                                    <td>:</td>
+                                    <td id="tanggal_kadaluarsa" class="setData"></td>
+                                </tr>
+                            </table>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary cancel-entry btn-flat">Batal</button>
-                        <button type="button" class="btn btn-primary save-entry btn-flat">Simpan</button>
+                        <button type="button" class="btn btn-primary save-entry btn-flat result-form">Simpan</button>
                     </div>
                 </div>
             </div>
@@ -412,6 +417,8 @@
             ]
         });
 
+        $('#count-record-table').text(resDataTable.data().count())
+
         $('.select2').select2()
         $('.datepicker').datepicker({
             format: 'yyyy-mm-dd',
@@ -428,6 +435,7 @@
         });
 
         function getGudang(data) {
+            $('[name="id_gudang"]').empty()
             $('[name="id_gudang"]').select2({
                 data: [{
                     'id': "",
@@ -467,6 +475,7 @@
             })
 
             html5QrcodeScanner.render(onScanSuccess, onScanError);
+            $('.result-form').hide()
             $('.handle-number-4').each(function(i, v) {
                 let val = $(v).val().replace('.', ',')
                 $(v).val(formatRupiah(val, 4))
@@ -492,7 +501,7 @@
 
             let newObj = Object.assign({}, detailSelect)
             if (statusModal == 'create') {
-                details.push(newObj)
+                details.unshift(newObj)
             } else if (statusModal == 'edit') {
                 details[newObj.index - 1] = newObj
             }
@@ -503,6 +512,7 @@
             detailSelect = []
 
             resDataTable.clear().rows.add(details).draw()
+            $('#count-record-table').text(resDataTable.data().count())
             $('#modalEntry').modal('hide')
         })
 
@@ -529,6 +539,7 @@
                 if (result.isConfirmed) {
                     details.splice(index, 1)
                     resDataTable.clear().rows.add(details).draw()
+                    $('#count-record-table').text(resDataTable.data().count())
                     $('[name="details"]').val(JSON.stringify(details))
                 }
             })
@@ -575,6 +586,7 @@
                     }
 
                     $('[name="search-qrcode"]').val('')
+                    $('.result-form').show()
                     $('#cover-spin').hide()
                 },
                 error: function(error) {
@@ -582,6 +594,7 @@
                         .statusText
                     Swal.fire("Gagal Mengambil Data. ", textError, 'error')
                     html5QrcodeScanner.render(onScanSuccess, onScanError);
+                    $('.result-form').hide()
                     $('#cover-spin').hide()
                 }
             })
