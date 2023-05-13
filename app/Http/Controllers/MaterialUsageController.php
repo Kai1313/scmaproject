@@ -97,7 +97,7 @@ class MaterialUsageController extends Controller
             return response()->json([
                 "result" => true,
                 "message" => "Data berhasil disimpan",
-                "redirect" => route('material_usage'),
+                "redirect" => route('material_usage-entry', $data->id_pemakaian),
             ], 200);
         } catch (\Exception $e) {
             DB::rollback();

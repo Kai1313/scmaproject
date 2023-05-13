@@ -424,7 +424,7 @@
 
             let newObj = Object.assign({}, detailSelect)
             if (statusModal == 'create') {
-                details.push(newObj)
+                details.unshift(newObj)
             } else if (statusModal == 'edit') {
                 details[newObj.index - 1] = newObj
             }

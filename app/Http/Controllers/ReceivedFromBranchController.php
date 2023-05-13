@@ -131,7 +131,7 @@ class ReceivedFromBranchController extends Controller
             return response()->json([
                 "result" => true,
                 "message" => "Data berhasil disimpan",
-                "redirect" => route('received_from_branch'),
+                "redirect" => route('received_from_branch-entry', $data->id_pindah_barang),
             ], 200);
         } catch (\Exception $e) {
             DB::rollback();

@@ -140,28 +140,28 @@ class MoveBranch extends Model
         $idJenisTransaksi = $this->id_jenis_transaksi;
         $detail = json_decode($details);
         $ids = array_column($detail, 'id_pindah_barang_detail');
-        $selectTrash = MoveBranchDetail::where('id_pindah_barang', $this->id_pindah_barang)
-            ->whereNotIn('id_pindah_barang_detail', $ids)
-            ->get();
-        foreach ($selectTrash as $trash) {
-            $trashQrCode = MasterQrCode::where('kode_batang_master_qr_code', $trash->qr_code)->first();
-            if ($trashQrCode) {
-                if ($type == 'out') {
-                    $trashQrCode->sisa_master_qr_code = $trash->qty;
-                } else {
-                    $trashQrCode->sisa_master_qr_code = 0;
-                }
+        // $selectTrash = MoveBranchDetail::where('id_pindah_barang', $this->id_pindah_barang)
+        //     ->whereNotIn('id_pindah_barang_detail', $ids)
+        //     ->get();
+        // foreach ($selectTrash as $trash) {
+        //     $trashQrCode = MasterQrCode::where('kode_batang_master_qr_code', $trash->qr_code)->first();
+        //     if ($trashQrCode) {
+        //         if ($type == 'out') {
+        //             $trashQrCode->sisa_master_qr_code = $trash->qty;
+        //         } else {
+        //             $trashQrCode->sisa_master_qr_code = 0;
+        //         }
 
-                $trashQrCode->save();
-            }
+        //         $trashQrCode->save();
+        //     }
 
-            $kartuStok = KartuStok::where('id_jenis_transaksi', $idJenisTransaksi)
-                ->where('kode_batang_kartu_stok', $trash->qr_code)
-                ->where('kode_kartu_stok', $this->kode_pindah_barang)
-                ->delete();
+        //     $kartuStok = KartuStok::where('id_jenis_transaksi', $idJenisTransaksi)
+        //         ->where('kode_batang_kartu_stok', $trash->qr_code)
+        //         ->where('kode_kartu_stok', $this->kode_pindah_barang)
+        //         ->delete();
 
-            $trash->delete();
-        }
+        //     $trash->delete();
+        // }
 
         foreach ($detail as $data) {
             $check = MoveBranchDetail::where('id_pindah_barang_detail', $data->id_pindah_barang_detail)->first();
