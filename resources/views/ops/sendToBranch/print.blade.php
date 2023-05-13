@@ -145,18 +145,22 @@
                 <th width="50">Qty</th>
                 <th width="70">Batch</th>
                 <th width="70">Kadaluarsa</th>
-                <th width="20">Keterangan</th>
+                <th width="60">Keterangan</th>
             </tr>
             @foreach ($data->formatDetailGroupBy as $key => $detail)
                 <tr>
                     <td class="text-center">{{ $key + 1 }}</td>
                     <td>{{ $detail->nama_barang }}</td>
-                    <td>{{ $detail->nama_satuan_barang }}</td>
+                    <td class="text-center">{{ $detail->nama_satuan_barang }}</td>
                     <td class="text-right">{{ formatNumber($detail->qty) }}</td>
                     <td class="text-center">{{ $detail->batch }}</td>
                     <td>
-                        {{ $detail->tanggal_kadaluarsa == '0000-00-00' ? '' : $detail->tanggal_kadaluarsa }}</td>
-                    <td>{{ $detail->count_data }} </td>
+                        {{ $detail->tanggal_kadaluarsa == '0000-00-00' ? '' : $detail->tanggal_kadaluarsa }}
+                    </td>
+                    <td class="text-center">
+                        {{ $detail->count_data }}
+                        {{ isset($arraySatuan[$detail->id_barang2]) ? $arraySatuan[$detail->id_barang2] : '' }}
+                    </td>
                 </tr>
             @endforeach
         </table>
