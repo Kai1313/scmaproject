@@ -66,7 +66,7 @@
         }
 
         @page {
-            margin: 160px 25px 25px 25px;
+            margin: 180px 25px 25px 25px;
         }
 
         header {
@@ -144,7 +144,7 @@
                 <th width="50">Satuan</th>
                 <th width="50">Qty</th>
                 <th width="70">Batch</th>
-                <th width="70">kadaluarsa</th>
+                <th width="70">Kadaluarsa</th>
                 <th width="20">Keterangan</th>
             </tr>
             @foreach ($data->formatDetailGroupBy as $key => $detail)
