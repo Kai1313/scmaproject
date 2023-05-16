@@ -179,10 +179,10 @@
                 <td>Penerima</td>
             </tr>
             <tr>
-                <td style="border-top:1px solid black;">Tanggal:</td>
-                <td style="border-top:1px solid black;">Tanggal:</td>
-                <td style="border-top:1px solid black;">Tanggal:</td>
-                <td style="border-top:1px solid black;">Tanggal:</td>
+                <td style="border-top:1px solid black;">Tgl:</td>
+                <td style="border-top:1px solid black;">Tgl:</td>
+                <td style="border-top:1px solid black;">Tgl:</td>
+                <td style="border-top:1px solid black;">Tgl:</td>
             </tr>
         </table>
     </main>

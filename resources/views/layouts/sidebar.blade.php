@@ -557,7 +557,7 @@
                                             </a>
                                         </li>
                                     @endif
-                                    @if (checkAccessMenu('pemakaian_header'))
+                                    @if (checkAccessMenu('pemakaian'))
                                         <li data-alias="terima_dari_gudang"
                                             class="nav-item {{ request()->segment(1) == 'pemakaian' ? 'active' : null }}">
                                             <a href="{{ route('material_usage') }}">

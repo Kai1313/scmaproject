@@ -115,6 +115,7 @@
                                 <th>Bentuk</th>
                                 <th>Warna</th>
                                 <th>Keterangan</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                     </table>
@@ -191,6 +192,9 @@
                 }, {
                     data: 'keterangan',
                     name: 'keterangan',
+                }, {
+                    data: 'status_diterima',
+                    name: 'status_diterima',
                 }
             ]
         });
