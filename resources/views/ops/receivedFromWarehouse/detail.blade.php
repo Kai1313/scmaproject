@@ -168,18 +168,7 @@
     <script>
         let oldDetails = {!! $data && $data->parent ? $data->parent->formatdetail : '[]' !!};
         let arrayQRCode = {!! $data ? $data->getDetailQRCode->pluck('qr_code') : '[]' !!};
-        let details = []
-        for (let i = 0; i < oldDetails.length; i++) {
-            details.push(oldDetails[i])
-            if (arrayQRCode.includes(oldDetails[i]['qr_code'])) {
-                details[i]['status_diterima'] = 1
-            } else {
-                details[i]['id_pindah_barang_detail'] = 0
-                details[i]['status_diterima'] = 0
-            }
-        }
-
-        $('[name="details"]').val(JSON.stringify(details))
+        let details = oldDetails
 
         var resDataTable = $('#table-detail').DataTable({
             data: details,
@@ -208,20 +197,8 @@
                 data: 'tanggal_kadaluarsa',
                 name: 'tanggal_kadaluarsa',
             }, {
-                data: 'id_pindah_barang_detail',
-                className: 'text-center',
-                name: 'id_pindah_barang_detail',
-                searchable: false,
-                render: function(data, type, row, meta) {
-                    let btn = '';
-                    if (row.status_diterima == 1 && arrayQRCode.includes(row.qr_code)) {
-                        btn = '<label class="label label-success">Diterima</label>';
-                    } else {
-                        btn = '<label class="label label-default">Belum diterima</label>';
-                    }
-
-                    return btn;
-                }
+                data: 'status_diterima',
+                name: 'status_diterima',
             }, ]
         });
     </script>

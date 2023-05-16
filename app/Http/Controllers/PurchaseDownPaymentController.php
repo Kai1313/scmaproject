@@ -48,15 +48,17 @@ class PurchaseDownPaymentController extends Controller
             return Datatables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
-                    if ($row->void == '1') {
-                        $btn = '<label class="label label-default">Batal</label>';
-                    } else {
-                        $btn = '<ul class="horizontal-list">';
-                        $btn .= '<li><a href="' . route('purchase-down-payment-view', $row->id_uang_muka_pembelian) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
+                    $btn = '<ul class="horizontal-list">';
+                    $btn .= '<li><a href="' . route('purchase-down-payment-view', $row->id_uang_muka_pembelian) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
+                    if (
+                        $row->void == '0' &&
+                        in_array(session()->get('user')['id_grup_pengguna'], [session()->get('user')['id_grup_pengguna'], 1])
+                    ) {
                         $btn .= '<li><a href="' . route('purchase-down-payment-entry', $row->id_uang_muka_pembelian) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
                         $btn .= '<li><a href="' . route('purchase-down-payment-delete', $row->id_uang_muka_pembelian) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Void</a></li>';
-                        $btn .= '</ul>';
                     }
+
+                    $btn .= '</ul>';
                     return $btn;
                 })
                 ->rawColumns(['action'])

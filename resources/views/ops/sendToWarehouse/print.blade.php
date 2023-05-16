@@ -5,111 +5,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>Surat jalan pindah cabang {{ $data->kode_pindah_barang }}</title>
     <style type="text/css">
-        * {
-            font-family: Arial;
-            /* margin: 0px; */
-            padding: 0px;
-        }
-
-        body {
-            width: 19cm;
-            padding-left: 10px;
-            padding-right: 10px;
-        }
-
-        @page {
-            margin-left: 3cm 2cm 2cm 2cm;
-        }
-
-        table.grid {
-            font-size: 12px;
+        .table {
             border-collapse: collapse;
-        }
-
-        table.grid th {
-            padding: 5px;
-        }
-
-        table.grid th {
-            border-top: 0.2mm solid #000;
-            border-bottom: 0.2mm solid #000;
-            text-align: center;
-            border: 1px solid #000;
-        }
-
-        table.grid tr td {
-            padding: 2px;
-            border-bottom: 0.2mm solid #000;
-            border: 1px solid #000;
-        }
-
-        h1 {
-            font-size: 18px;
-        }
-
-        h2 {
-            font-size: 14px;
-        }
-
-        h3 {
-            font-size: 12px;
-        }
-
-        p {
-            font-size: 12px;
-        }
-
-        .atas {
-            display: block;
-            padding: 0px;
-        }
-
-        .top tr td {
-            font-size: 12px;
-        }
-
-        .kanan tr td {
-            font-size: 12px;
-        }
-
-        .kiri tr td {
-            font-size: 12px;
-        }
-
-        .attr {
-            font-size: 9pt;
             width: 100%;
-            padding-top: 2pt;
-            padding-bottom: 2pt;
-            border-top: 0.2mm solid #000;
-            border-bottom: 0.2mm solid #000;
         }
 
-        .pagebreak {
-            page-break-after: always;
-            margin-bottom: 10px;
+        .table td {
+            font-size: 12px;
+            border: #000000 solid thin;
         }
 
-        .akhir {
-            width: 19cm;
+        .table th {
             font-size: 13px;
+            border: #000000 solid thin;
+            max-width: 150px;
+            text-align: center;
+            font-weight: bold;
         }
 
-        .page {
+        .number {
+            text-align: right;
+        }
+
+        .table-header {
+            width: 100%;
+        }
+
+        .table-header th {
+            font-size: 17px;
+            font-weight: bold;
+        }
+
+        .table-subheader {
+            width: 100%;
+        }
+
+        .table-subheader td {
             font-size: 12px;
         }
 
-        table.footer {
-            font-size: 12px;
-            margin-left: 0.7cm;
-            border-collapse: collapse;
+        .table-signature {
+            border-spacing: 0.5em 0.5em;
         }
 
-        td {
+        .table-signature td {
+            font-size: 12px;
             vertical-align: top;
-            font-size: 12px;
+            width: 100px;
+            padding: 0px 5px 0px 5px;
         }
 
         .text-center {
@@ -120,37 +65,35 @@
             text-align: right;
         }
 
-        @media print {
+        @page {
+            margin: 160px 25px 25px 25px;
+        }
 
-            .no-print,
-            .no-print * {
-                display: none !important;
-            }
+        header {
+            position: fixed;
+            top: -130px;
+            left: 0px;
+            right: 0px;
         }
     </style>
 </head>
 
 <body>
-    <div class="atas">
-        <table style="width:100%;">
+    <header>
+        <table class="table-header">
             <tr>
-                <td style="width:80px;height:60px;">
-                    <img src='{{ env('OLD_API_ROOT') }}/uploads/logo2.jpg' style='padding:0; margin:0;' width='60'>
-                </td>
-                <td>
-                    <h1>PT. SINAR CEMARAMAS ABADI</h1>
-                </td>
-                <td style="text-align:right;width:150px;">
-                    <h1>Kirim Ke Gudang</h1>
-                </td>
+                <th style="width:80px;"><img src="{{ asset('images/logo2.jpg') }}" alt="logo" style="width:70px;">
+                </th>
+                <th style="width:100%;text-align:center;">PT. SINAR CEMARAMAS ABADI</th>
+                <th style="width:150px;" class="text-center">Surat Jalan <br>Pindah Gudang</th>
             </tr>
         </table>
-        <table>
+        <table class="table-subheader">
             <tr>
                 <td valign="top" style="width:67%;">
-                    <table class='kiri' style="width:100%;">
+                    <table class='table-subheader'>
                         <tr>
-                            <td width="100"><b>Cabang</b></td>
+                            <td width="70"><b>Cabang</b></td>
                             <td width="5">:</td>
                             <td>{{ $data->cabang->nama_cabang }}</td>
                         </tr>
@@ -159,29 +102,30 @@
                             <td>:</td>
                             <td>{{ $data->gudang->nama_gudang }}</td>
                         </tr>
+
                         <tr>
-                            <td><b>Gudang Tujuan</b></td>
+                            <td><b>Tujuan</b></td>
                             <td>:</td>
                             <td>{{ $data->gudang2->nama_gudang }}</td>
                         </tr>
                     </table>
                 </td>
                 <td valign="top">
-                    <table class='kanan' style="width:100%;">
+                    <table class='table-subheader'>
                         <tr>
-                            <td><b>Tanggal</b></td>
-                            <td>:</td>
+                            <td width="70"><b>Tanggal</b></td>
+                            <td width="5">:</td>
                             <td>{{ $data->tanggal_pindah_barang }}</td>
                         </tr>
                         <tr>
-                            <td width="100"><b>Kode Transaksi</b></td>
-                            <td width="5">:</td>
+                            <td><b>Kode Transaksi</b></td>
+                            <td>:</td>
                             <td>{{ $data->kode_pindah_barang }}</td>
                         </tr>
                         @if ($data->id_produksi)
                             <tr>
-                                <td width="100"><b>Kode Produksi</b></td>
-                                <td width="5">:</td>
+                                <td><b>Kode Produksi</b></td>
+                                <td>:</td>
                                 <td>{{ $data->produksi->nama_produksi }}</td>
                             </tr>
                         @endif
@@ -189,57 +133,63 @@
                 </td>
             </tr>
         </table>
-    </div>
-    <table class="grid" width="100%" style="margin-top:10px;">
-        <tr>
-            <th width="20">No</th>
-            <th width="80">QR Code</th>
-            <th>Nama Barang</th>
-            <th width="100">Qty</th>
-            <th width="70">Batch</th>
-            <th width="80">kadaluarsa</th>
-            <th width="80">Koreksi Stok</th>
-        </tr>
-        @foreach ($data->formatdetail as $key => $detail)
+    </header>
+    <main>
+        <table class="table">
             <tr>
-                <td class="text-center">{{ $key + 1 }}</td>
-                <td class="text-center">{{ $detail->qr_code }}</td>
-                <td>{{ $detail->nama_barang }}</td>
-                <td class="text-right">
-                    {{ number_format($detail->qty, 4, ',', '.') }}
-                    {{ $detail->nama_satuan_barang }}
-                </td>
-                <td class="text-center">{{ $detail->batch }}</td>
-                <td class="text-center">
-                    {{ $detail->tanggal_kadaluarsa == '0000-00-00' ? '' : $detail->tanggal_kadaluarsa }}
-                </td>
-                <td></td>
+                <th width="15">No</th>
+                <th width="60">Kode</th>
+                <th>Nama Barang</th>
+                <th width="50">Satuan</th>
+                <th width="50">Qty</th>
+                <th width="70">Batch</th>
+                <th width="70">Kadaluarsa</th>
             </tr>
-        @endforeach
-    </table>
-    <div style="display: flex;justify-content:space-between;">
-        <div>
-            <p><b>Keterangan :</b> {{ $data->keterangan_pindah_barang }}</p>
-            <table style="margin-left:30px;">
+            @foreach ($data->formatdetail as $key => $detail)
                 <tr>
-                    <td>Pengirim</td>
-                    <td style="width:150px;height:70px;"></td>
-                    <td>Penerima</td>
+                    <td class="text-center">{{ $key + 1 }}</td>
+                    <td>{{ $detail->qr_code }}</td>
+                    <td>{{ $detail->nama_barang }}</td>
+                    <td class="text-center">{{ $detail->nama_satuan_barang }}</td>
+                    <td class="text-right">{{ formatNumber($detail->qty) }}</td>
+                    <td class="text-center">{{ $detail->batch }}</td>
+                    <td>
+                        {{ $detail->tanggal_kadaluarsa == '0000-00-00' ? '' : $detail->tanggal_kadaluarsa }}
+                    </td>
                 </tr>
-                <tr>
-                    <td>.................</td>
-                    <td></td>
-                    <td>.................</td>
-                </tr>
-            </table>
-        </div>
-        <div class="text-right" style="margin:10px;">
-            {!! DNS2D::getBarcodeSVG($data->kode_pindah_barang, 'QRCODE', 5, 5) !!}
-        </div>
-    </div>
-    <script>
-        //window.print();
-    </script>
+            @endforeach
+        </table>
+        <table class='table-subheader'>
+            <tr>
+                <td valign="top" style="width:70px;"><b>Keterangan</b></td>
+                <td style="width:10px;" valign="top">:</td>
+                <td>{{ $data->keterangan_pindah_barang }}</td>
+            </tr>
+        </table>
+
+        <table class="table-subheader">
+            <tr>
+                <td>
+                    <table class="table-signature">
+                        <tr>
+                            <td style="height:70px;">Pembuat</td>
+                            <td>Disetujui</td>
+                            <td>Penerima</td>
+                        </tr>
+                        <tr>
+                            <td style="border-top:1px solid black;">Tgl:</td>
+                            <td style="border-top:1px solid black;">Tgl:</td>
+                            <td style="border-top:1px solid black;">Tgl:</td>
+                        </tr>
+                    </table>
+                </td>
+                <td>
+                    {!! DNS2D::getBarcodeHTML($data->kode_pindah_barang, 'QRCODE', 5, 5) !!}
+                </td>
+            </tr>
+        </table>
+
+    </main>
 </body>
 
 </html>

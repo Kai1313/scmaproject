@@ -12,7 +12,7 @@ class MaterialUsageController extends Controller
 {
     public function index(Request $request)
     {
-        if (checkUserSession($request, 'pemakaian_header', 'show') == false) {
+        if (checkUserSession($request, 'pemakaian', 'show') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
@@ -56,7 +56,7 @@ class MaterialUsageController extends Controller
 
     public function entry($id = 0)
     {
-        if (checkAccessMenu('pemakaian_header', $id == 0 ? 'create' : 'edit') == false) {
+        if (checkAccessMenu('pemakaian', $id == 0 ? 'create' : 'edit') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
@@ -112,7 +112,7 @@ class MaterialUsageController extends Controller
 
     public function viewData($id)
     {
-        if (checkAccessMenu('pemakaian_header', 'show') == false) {
+        if (checkAccessMenu('pemakaian', 'show') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 

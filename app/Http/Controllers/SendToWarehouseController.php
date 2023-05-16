@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\MoveBranch;
 use Illuminate\Http\Request;
+use PDF;
 
 class SendToWarehouseController extends Controller
 {
@@ -13,8 +14,8 @@ class SendToWarehouseController extends Controller
             return 'data tidak ditemukan';
         }
 
-        return view('ops.sendToWarehouse.print', [
-            'data' => $data,
-        ]);
+        $pdf = PDF::loadView('ops.sendToWarehouse.print', ['data' => $data]);
+        $pdf->setPaper('a5', 'landscape');
+        return $pdf->stream('Surat jalan pindah gudang ' . $data->kode_pindah_barang . '.pdf');
     }
 }
