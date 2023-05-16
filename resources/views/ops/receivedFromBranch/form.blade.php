@@ -165,9 +165,14 @@
             <div class="box">
                 <div class="box-header">
                     <h3 class="box-title">Detil Barang</h3>
-                    <button type="button" class="btn btn-sm btn-info btn-flat pull-right add-entry">
-                        <i class="glyphicon glyphicon-plus"></i> Tambah Barang
-                    </button>
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-sm btn-danger btn-flat check-entry">
+                            <i class="glyphicon glyphicon-list-alt"></i> Belum Diterima
+                        </button>
+                        <button type="button" class="btn btn-sm btn-info btn-flat add-entry">
+                            <i class="glyphicon glyphicon-plus"></i> Tambah Barang
+                        </button>
+                    </div>
                 </div>
                 <div class="box-body">
                     <div class="table-responsive">
@@ -305,6 +310,37 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="modalNotReceived" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Barang Belum Diterima</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table id="table-detail-item" class="table table-bordered data-table display responsive nowrap"
+                            width="100%">
+                            <thead>
+                                <tr>
+                                    <th>QR Code</th>
+                                    <th>Nama Barang</th>
+                                    <th>Jumlah</th>
+                                    <th>Satuan</th>
+                                    <th>Batch</th>
+                                    <th>Kadaluarsa</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default btn-flat" data-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('addedScripts')
@@ -323,6 +359,7 @@
     <script>
         let branches = {!! json_encode($cabang) !!};
         let details = {!! $data ? $data->formatdetail : '[]' !!};
+        let notReceived = {!! $data ? $data->parent->notReceivedDetail : '[]' !!}
         let html5QrcodeScanner = new Html5QrcodeScanner("reader", {
             fps: 10,
             qrbox: 250
@@ -406,6 +443,35 @@
                     }
                 },
             ]
+        });
+
+        $('#table-detail-item').DataTable({
+            data: notReceived,
+            ordering: false,
+            columns: [{
+                data: 'qr_code',
+                name: 'qr_code'
+            }, {
+                data: 'nama_barang',
+                name: 'nama_barang'
+            }, {
+                data: 'qty',
+                name: 'qty',
+                render: function(data) {
+                    return data ? formatNumber(data, 4) : 0
+                },
+                className: 'text-right'
+            }, {
+                data: 'nama_satuan_barang',
+                name: 'nama_satuan_barang'
+            }, {
+                data: 'batch',
+                name: 'batch',
+                className: 'text-right'
+            }, {
+                data: 'tanggal_kadaluarsa',
+                name: 'tanggal_kadaluarsa',
+            }]
         });
 
         $('.select2').select2()
@@ -612,6 +678,10 @@
             let self = $('[name="search-qrcode"]').val()
             html5QrcodeScanner.clear();
             searchAsset(self)
+        })
+
+        $('.check-entry').click(function() {
+            $('#modalNotReceived').modal();
         })
 
         function searchAsset(string) {

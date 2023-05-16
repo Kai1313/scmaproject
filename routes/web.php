@@ -279,7 +279,7 @@ Route::prefix('report')->group(function () {
     });
 
     // Profit Loss
-    Route::prefix('profit_loss')->group(function(){
+    Route::prefix('profit_loss')->group(function () {
         Route::get('/index/{user_id?}', 'ReportProfitAndLossController@index')->name('report-profit-loss');
         Route::get('/populate', 'ReportProfitAndLossController@populate')->name('report-profit-loss-populate');
         Route::get('/excel', 'ReportProfitAndLossController@exportExcel')->name('report-profit-loss-excel');
@@ -287,7 +287,7 @@ Route::prefix('report')->group(function () {
     });
 
     // Balance
-    Route::prefix('balance')->group(function(){
+    Route::prefix('balance')->group(function () {
         Route::get('/index/{user_id?}', 'ReportBalanceController@index')->name('report-balance');
         Route::get('/populate', 'ReportBalanceController@populate')->name('report-balance-populate');
         Route::get('/excel', 'ReportBalanceController@exportExcel')->name('report-balance-excel');

@@ -122,10 +122,10 @@
                 '[name="show_void"]').is(':checked'),
             columns: [{
                 data: 'tanggal_pindah_barang',
-                name: 'pindah_barang.tanggal_pindah_barang'
+                name: 'pb.tanggal_pindah_barang'
             }, {
                 data: 'kode_pindah_barang',
-                name: 'pindah_barang.kode_pindah_barang'
+                name: 'pb.kode_pindah_barang'
             }, {
                 data: 'nama_gudang',
                 name: 'gudang.nama_gudang'
@@ -134,13 +134,13 @@
                 name: 'cabang.nama_cabang',
             }, {
                 data: 'keterangan_pindah_barang',
-                name: 'pindah_barang.keterangan_pindah_barang',
+                name: 'pb.keterangan_pindah_barang',
             }, {
                 data: 'transporter',
-                name: 'pindah_barang.transporter',
+                name: 'pb.transporter',
             }, {
                 data: 'status_pindah_barang',
-                name: 'pindah_barang.status_pindah_barang',
+                name: 'pb.status_pindah_barang',
             }, {
                 data: 'action',
                 name: 'action',
