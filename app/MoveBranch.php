@@ -157,7 +157,7 @@ class MoveBranch extends Model
                 'nama_satuan_barang',
                 DB::raw('(case when pindah_barang_detail.status_diterima = 1 then "Diterima" else "Belum diterima" end) as status_diterima'),
                 'pindah_barang_detail.batch',
-                'pindah_barang_detail.tanggal_kadaluarsa',
+                'pindah_barang_detail.tanggal_kadaluarsa'
             )
             ->leftJoin('barang', 'pindah_barang_detail.id_barang', '=', 'barang.id_barang')
             ->leftJoin('satuan_barang', 'pindah_barang_detail.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
