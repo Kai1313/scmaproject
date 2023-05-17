@@ -252,6 +252,8 @@ class PurchaseDownPaymentController extends Controller
                 ], 500);
             }
 
+            $payment->delete();
+
             $resultJurnalUangMukaPembelian = (new ApiController)->journalUangMukaPembelian(new Request([
                 "no_transaksi" => $data->kode_uang_muka_pembelian,
                 "tanggal" => $data->tanggal,
