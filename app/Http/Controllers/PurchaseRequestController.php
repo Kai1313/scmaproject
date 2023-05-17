@@ -6,6 +6,7 @@ use App\PurchaseRequest;
 use DB;
 use Illuminate\Http\Request;
 use Log;
+use PDF;
 use Yajra\DataTables\DataTables;
 
 class PurchaseRequestController extends Controller
@@ -349,11 +350,10 @@ class PurchaseRequestController extends Controller
         }
 
         $data = PurchaseRequest::find($id);
-        return view('ops.purchaseRequest.print', [
-            'data' => $data,
-            'arrayStatus' => $this->arrayStatus,
-            "pageTitle" => "SCA OPS | Permintaan Pembelian | Cetak",
-        ]);
+
+        $pdf = PDF::loadView('ops.purchaseRequest.print', ['data' => $data, 'arrayStatus' => $this->arrayStatus]);
+        $pdf->setPaper('a5', 'landscape');
+        return $pdf->stream('Bukti permintaan pembelian ' . $data->purchase_request_code . '.pdf');
     }
 
     public function sendToWa($targetNumber, $message)
