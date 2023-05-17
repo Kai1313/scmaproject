@@ -18,45 +18,53 @@ class SendToBranchController extends Controller
         }
 
         if ($request->ajax()) {
-            $data = DB::table('pindah_barang')
+            $data = DB::table('pindah_barang as pb')
                 ->select(
-                    'id_pindah_barang',
-                    'type',
+                    'pb.id_pindah_barang',
+                    'pb.type',
                     'nama_gudang',
-                    'tanggal_pindah_barang',
-                    'kode_pindah_barang',
+                    'pb.tanggal_pindah_barang',
+                    'pb.kode_pindah_barang',
                     'nama_cabang',
-                    'status_pindah_barang',
-                    'keterangan_pindah_barang',
-                    'transporter',
-                    'user_created',
-                    'void'
+                    'pb.status_pindah_barang',
+                    'pb.keterangan_pindah_barang',
+                    'pb.transporter',
+                    'pb.user_created',
+                    'pb.void',
+                    'pb2.kode_pindah_barang as ref_code'
                 )
-                ->leftJoin('gudang', 'pindah_barang.id_gudang', '=', 'gudang.id_gudang')
-                ->leftJoin('cabang', 'pindah_barang.id_cabang2', '=', 'cabang.id_cabang')
-                ->where('id_jenis_transaksi', 21)
-                ->where('type', 0);
+                ->leftJoin('gudang', 'pb.id_gudang', '=', 'gudang.id_gudang')
+                ->leftJoin('cabang', 'pb.id_cabang2', '=', 'cabang.id_cabang')
+                ->leftJoin('pindah_barang as pb2', 'pb.id_pindah_barang', 'pb2.id_pindah_barang2')
+                ->where('pb.id_jenis_transaksi', 21)
+                ->where('pb.type', 0);
             if (isset($request->c)) {
-                $data = $data->where('pindah_barang.id_cabang', $request->c);
+                $data = $data->where('pb.id_cabang', $request->c);
             }
 
             if ($request->show_void == 'false') {
-                $data = $data->where('pindah_barang.void', '0');
+                $data = $data->where('pb.void', '0');
             }
 
-            $data = $data->orderBy('pindah_barang.kode_pindah_barang', 'desc');
+            $data = $data->orderBy('pb.kode_pindah_barang', 'desc');
+
+            $idUser = session()->get('user')['id_pengguna'];
+            $filterUser = DB::table('pengguna')
+                ->where(function ($w) {
+                    $w->where('id_grup_pengguna', session()->get('user')['id_grup_pengguna'])->orWhere('id_grup_pengguna', 1);
+                })
+                ->where('status_pengguna', '1')->pluck('id_pengguna')->toArray();
+
             return Datatables::of($data)
                 ->addIndexColumn()
-                ->addColumn('action', function ($row) {
+                ->addColumn('action', function ($row) use ($filterUser, $idUser) {
                     $btn = '<ul class="horizontal-list">';
                     $btn .= '<li><a href="' . route('send_to_branch-view', $row->id_pindah_barang) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
-                    if (
-                        $row->status_pindah_barang == 0 &&
-                        $row->void == 0 &&
-                        in_array(session()->get('user')['id_grup_pengguna'], [session()->get('user')['id_grup_pengguna'], 1])
-                    ) {
+                    if ($row->status_pindah_barang == 0 && $row->void == 0 && (in_array($idUser, $filterUser) || $idUser == $row->user_created)) {
                         $btn .= '<li><a href="' . route('send_to_branch-entry', $row->id_pindah_barang) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
-                        $btn .= '<li><a href="' . route('send_to_branch-delete', $row->id_pindah_barang) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Void</a></li>';
+                        if ($row->ref_code == null) {
+                            $btn .= '<li><a href="' . route('send_to_branch-delete', $row->id_pindah_barang) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Void</a></li>';
+                        }
                     }
 
                     $btn .= '<li><a href="' . route('send_to_branch-print-data', $row->id_pindah_barang) . '" class="btn btn-default btn-xs mr-1 mb-1" target="_blank"><i class="glyphicon glyphicon-print"></i> Cetak</a></li>';

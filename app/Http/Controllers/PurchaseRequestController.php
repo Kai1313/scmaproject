@@ -56,13 +56,19 @@ class PurchaseRequestController extends Controller
             $data = $data->groupBy('prh.purchase_request_id')->orderBy('prh.dt_created', 'desc');
             $access = DB::table('setting')->where('id_cabang', $request->c)->where('code', 'PR Approval')->first();
             $arrayAccess = explode(',', $access->value1);
+
+            $idUser = session()->get('user')['id_pengguna'];
+            $filterUser = DB::table('pengguna')
+                ->where(function ($w) {
+                    $w->where('id_grup_pengguna', session()->get('user')['id_grup_pengguna'])->orWhere('id_grup_pengguna', 1);
+                })
+                ->where('status_pengguna', '1')->pluck('id_pengguna')->toArray();
+
             return Datatables::of($data)
                 ->addIndexColumn()
-                ->addColumn('action', function ($row) use ($arrayAccess) {
-                    if ($row->void == '1') {
-                        $btn = '<label class="label label-default">Batal</label>';
-                    } else {
-                        $btn = '<ul class="horizontal-list">';
+                ->addColumn('action', function ($row) use ($arrayAccess, $filterUser, $idUser) {
+                    $btn = '<ul class="horizontal-list">';
+                    if ($row->void == '0') {
                         $btn .= '<li><a href="' . route('purchase-request-view', $row->purchase_request_id) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
                         if ($row->approval_status == 0) {
                             if (in_array(session()->get('user')['id_grup_pengguna'], $arrayAccess)) {
@@ -70,15 +76,14 @@ class PurchaseRequestController extends Controller
                                 $btn .= '<li><a href="' . route('purchase-request-change-status', [$row->purchase_request_id, 'reject']) . '" class="btn btn-default btn-xs mr-1 mb-1 btn-change-status" data-param="menolak"><i class="fa fa-times"></i> Reject</a></li>';
                             }
 
-                            if (session()->get('user')['id_pengguna'] == $row->purchase_request_user_id) {
+                            if (in_array($idUser, $filterUser) || $idUser == $row->purchase_request_user_id) {
                                 $btn .= '<li><a href="' . route('purchase-request-entry', $row->purchase_request_id) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
                                 $btn .= '<li><a href="' . route('purchase-request-delete', $row->purchase_request_id) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Void</a></li>';
                             }
                         }
-
-                        $btn .= '</ul>';
                     }
 
+                    $btn .= '</ul>';
                     return $btn;
                 })
                 ->editColumn('approval_status', function ($row) {

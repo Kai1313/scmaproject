@@ -410,8 +410,11 @@
                     searchable: false,
                     render: function(data, type, row, meta) {
                         let btn = '<ul class="horizontal-list">';
-                        btn +=
-                            '<li><a href="javascript:void(0)" class="btn btn-danger btn-xs mr-1 mb-1 delete-entry"><i class="glyphicon glyphicon-trash"></i></a></li>';
+                        if (row.accept_qr_code == null) {
+                            btn +=
+                                '<li><a href="javascript:void(0)" class="btn btn-danger btn-xs mr-1 mb-1 delete-entry"><i class="glyphicon glyphicon-trash"></i></a></li>';
+                        }
+
                         btn += '</ul>';
                         return btn;
                     }
