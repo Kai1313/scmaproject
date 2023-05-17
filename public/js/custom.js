@@ -174,12 +174,12 @@ function deleteData(url) {
                     }
                 })
             } else {
-                Swal.fire("Gagal", data.message, 'error')
+                Swal.fire("Gagal Proses Data.", data.message, 'error')
             }
         },
         error: function (data) {
             $('#cover-spin').hide()
-            Swal.fire("Gagal", data.responseJSON.message, 'error')
+            Swal.fire("Gagal Proses Data.", data.responseJSON.message, 'error')
         }
     })
 }
