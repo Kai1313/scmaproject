@@ -132,7 +132,7 @@ class ReceivedFromWarehouseController extends Controller
 
     public function viewData($id)
     {
-        if (checkAccessMenu('terima_dari_cabang', 'show') == false) {
+        if (checkAccessMenu('terima_dari_gudang', 'show') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
