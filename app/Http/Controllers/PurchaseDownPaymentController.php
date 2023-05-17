@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\ApiController;
 use App\PurchaseDownPayment;
+use App\TransactionBalance;
 use DB;
 use Illuminate\Http\Request;
 use Log;
@@ -59,7 +60,7 @@ class PurchaseDownPaymentController extends Controller
                     $btn = '<ul class="horizontal-list">';
                     $btn .= '<li><a href="' . route('purchase-down-payment-view', $row->id_uang_muka_pembelian) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
                     if ($row->void == '0' && (in_array($idUser, $filterUser) || $idUser == $row->user_created)) {
-                        $btn .= '<li><a href="' . route('purchase-down-payment-entry', $row->id_uang_muka_pembelian) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
+                        // $btn .= '<li><a href="' . route('purchase-down-payment-entry', $row->id_uang_muka_pembelian) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
                         $btn .= '<li><a href="' . route('purchase-down-payment-delete', $row->id_uang_muka_pembelian) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Void</a></li>';
                     }
 
@@ -243,15 +244,34 @@ class PurchaseDownPaymentController extends Controller
             $data->void_user_id = session()->get('user')['id_pengguna'];
             $data->save();
 
-            $resApi = $this->callApiJournal($data);
-            $convertResApi = (array) json_decode($resApi);
-            if ($convertResApi['result'] == false) {
-                DB::rollback();
-                Log::error($convertResApi['message']);
-                Log::error($convertResApi);
+            $payment = TransactionBalance::where('id_transaksi', $data->kode_uang_muka_pembelian)->where('tipe_transaksi', 'Uang Muka Pembelian')->first();
+            if ($payment && $payment->bayar > 0) {
                 return response()->json([
                     "result" => false,
-                    "message" => $convertResApi['message'],
+                    "message" => "Uang muka sudah terbayar",
+                ], 500);
+            }
+
+            $resultJurnalUangMukaPembelian = (new ApiController)->journalUangMukaPembelian(new Request([
+                "no_transaksi" => $data->kode_uang_muka_pembelian,
+                "tanggal" => $data->tanggal,
+                "slip" => null,
+                "cabang" => $data->id_cabang,
+                "pemasok" => $data->purchaseOrder->id_pemasok,
+                "void" => $data->void,
+                "user" => session()->get('user')['id_pengguna'],
+                "total" => $data->nominal,
+                "uang_muka" => $data->nominal,
+                "ppn" => 0,
+            ]));
+
+            if ($resultJurnalUangMukaPembelian->getData()->result == false) {
+                DB::rollback();
+                Log::error($resultJurnalUangMukaPembelian->getData()->message);
+                Log::error($resultJurnalUangMukaPembelian);
+                return response()->json([
+                    "result" => false,
+                    "message" => $resultJurnalUangMukaPembelian->getData()->message,
                 ], 500);
             }
 
@@ -267,7 +287,7 @@ class PurchaseDownPaymentController extends Controller
             Log::error($e);
             return response()->json([
                 "result" => false,
-                "message" => "Data gagal tersimpana",
+                "message" => "Data gagal diproses",
             ], 500);
         }
     }
