@@ -197,12 +197,12 @@
                             </thead>
                         </table>
                     </div>
-                    @if (!$data)
-                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                        <button class="btn btn-primary btn-flat pull-right btn-sm" type="submit">
-                            <i class="glyphicon glyphicon-check"></i> Terima Semua Barang
-                        </button>
-                    @endif
+
+                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                    <button class="btn btn-primary btn-flat pull-right btn-sm" type="submit">
+                        <i class="glyphicon glyphicon-check"></i> Terima Semua Barang
+                    </button>
+
                 </div>
             </div>
         </form>
@@ -263,20 +263,8 @@
                 data: 'tanggal_kadaluarsa',
                 name: 'tanggal_kadaluarsa',
             }, {
-                data: 'id_pindah_barang_detail',
-                className: 'text-center',
-                name: 'id_pindah_barang_detail',
-                searchable: false,
-                render: function(data, type, row, meta) {
-                    let btn = '';
-                    if (row.status_diterima == 1 && arrayQRCode.includes(row.qr_code)) {
-                        btn = '<label class="label label-success">Diterima</label>';
-                    } else {
-                        btn = '<label class="label label-default">Belum diterima</label>';
-                    }
-
-                    return btn;
-                }
+                data: 'status_akhir',
+                name: 'status_akhir',
             }, ]
         });
 
@@ -297,15 +285,18 @@
                 success: function(res) {
                     let newDetail = res.details
                     for (let i = 0; i < newDetail.length; i++) {
-                        details.unshift(newDetail[i])
+
                         if (arrayQRCode.includes(newDetail[i]['qr_code'])) {
-                            details[i]['status_diterima'] = 1
+                            newDetail[i]['status_diterima'] = 1
                         } else {
-                            details[i]['id_pindah_barang_detail'] = ''
-                            details[i]['status_diterima'] = 1
+                            newDetail[i]['id_pindah_barang_detail'] = ''
+                            newDetail[i]['status_diterima'] = 1
                         }
+
+                        details.push(newDetail[i])
                     }
 
+                    console.log(newDetail)
                     resDataTable.clear().rows.add(details).draw()
                     $('[name="details"]').val(JSON.stringify(details))
                     $('[name="id_cabang"]').val(res.data.id_cabang2)

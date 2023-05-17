@@ -42,6 +42,7 @@ class ReceivedFromWarehouseController extends Controller
                 ->addColumn('action', function ($row) {
                     $btn = '<ul class="horizontal-list">';
                     $btn .= '<li><a href="' . route('received_from_warehouse-view', $row->id_pindah_barang) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
+                    $btn .= '<li><a href="' . route('received_from_warehouse-entry', $row->id_pindah_barang) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
                     $btn .= '</ul>';
                     return $btn;
                 })
