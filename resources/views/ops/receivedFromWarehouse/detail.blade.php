@@ -197,8 +197,8 @@
                 data: 'tanggal_kadaluarsa',
                 name: 'tanggal_kadaluarsa',
             }, {
-                data: 'status_diterima',
-                name: 'status_diterima',
+                data: 'status_akhir',
+                name: 'status_akhir',
             }, ]
         });
     </script>

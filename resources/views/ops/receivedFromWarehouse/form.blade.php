@@ -225,6 +225,7 @@
     <script>
         let idData = {{ $data ? $data->id_pindah_barang : 0 }}
         let arrayQRCode = {!! $data ? $data->getDetailQRCode->pluck('qr_code') : '[]' !!};
+        let oldDetails = {!! $data && $data->parent ? $data->parent->formatdetail : '[]' !!};
         let details = {!! $data ? $data->formatdetail : '[]' !!}
         let html5QrcodeScanner = new Html5QrcodeScanner("reader", {
             fps: 10,
@@ -233,6 +234,14 @@
 
         if (idData == 0) {
             html5QrcodeScanner.render(onScanSuccess, onScanError);
+        }
+
+        for (let a = 0; a < oldDetails.length; a++) {
+            if (arrayQRCode.includes(oldDetails[a].qr_code) == false) {
+                oldDetails[a]['id_pindah_barang_detail'] = ''
+                oldDetails[a]['status_diterima'] = 1
+                details.push(oldDetails[a])
+            }
         }
 
         $('[name="details"]').val(JSON.stringify(details))
