@@ -193,8 +193,8 @@
                     data: 'keterangan',
                     name: 'keterangan',
                 }, {
-                    data: 'status_diterima',
-                    name: 'status_diterima',
+                    data: 'status_akhir',
+                    name: 'status_akhir',
                 }
             ]
         });

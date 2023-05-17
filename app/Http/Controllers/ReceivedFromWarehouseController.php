@@ -17,26 +17,28 @@ class ReceivedFromWarehouseController extends Controller
         }
 
         if ($request->ajax()) {
-            $data = DB::table('pindah_barang')
+            $data = DB::table('pindah_barang as pb')
                 ->select(
-                    'id_pindah_barang',
-                    'type',
+                    'pb.id_pindah_barang',
+                    'pb.type',
                     'g.nama_gudang as g_nama_gudang',
-                    'tanggal_pindah_barang',
-                    'kode_pindah_barang',
+                    'pb.tanggal_pindah_barang',
+                    'pb.kode_pindah_barang',
                     'g2.nama_gudang as g2_nama_gudang',
-                    'status_pindah_barang',
-                    'keterangan_pindah_barang'
+                    'pb.status_pindah_barang',
+                    'pb.keterangan_pindah_barang',
+                    'pb2.kode_pindah_barang as ref_code'
                 )
-                ->leftJoin('gudang as g', 'pindah_barang.id_gudang', '=', 'g.id_gudang')
-                ->leftJoin('gudang as g2', 'pindah_barang.id_gudang2', '=', 'g2.id_gudang')
-                ->where('id_jenis_transaksi', 24)
-                ->where('type', 1);
+                ->leftJoin('gudang as g', 'pb.id_gudang', '=', 'g.id_gudang')
+                ->leftJoin('gudang as g2', 'pb.id_gudang2', '=', 'g2.id_gudang')
+                ->leftJoin('pindah_barang as pb2', 'pb.id_pindah_barang2', 'pb2.id_pindah_barang')
+                ->where('pb.id_jenis_transaksi', 24)
+                ->where('pb.type', 1);
             if (isset($request->c)) {
-                $data = $data->where('pindah_barang.id_cabang', $request->c);
+                $data = $data->where('pb.id_cabang', $request->c);
             }
 
-            $data = $data->orderBy('pindah_barang.kode_pindah_barang', 'desc');
+            $data = $data->orderBy('pb.kode_pindah_barang', 'desc');
             return Datatables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {

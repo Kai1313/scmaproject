@@ -17,27 +17,29 @@ class ReceivedFromBranchController extends Controller
         }
 
         if ($request->ajax()) {
-            $data = DB::table('pindah_barang')
+            $data = DB::table('pindah_barang as pb')
                 ->select(
-                    'id_pindah_barang',
-                    'type',
+                    'pb.id_pindah_barang',
+                    'pb.type',
                     'nama_gudang',
-                    'tanggal_pindah_barang',
-                    'kode_pindah_barang',
+                    'pb.tanggal_pindah_barang',
+                    'pb.kode_pindah_barang',
                     'nama_cabang',
-                    'status_pindah_barang',
-                    'keterangan_pindah_barang',
-                    'transporter'
+                    'pb.status_pindah_barang',
+                    'pb.keterangan_pindah_barang',
+                    'pb.transporter',
+                    'pb2.kode_pindah_barang as ref_code'
                 )
-                ->leftJoin('gudang', 'pindah_barang.id_gudang', '=', 'gudang.id_gudang')
-                ->leftJoin('cabang', 'pindah_barang.id_cabang2', '=', 'cabang.id_cabang')
-                ->where('id_jenis_transaksi', 22)
-                ->where('type', 1);
+                ->leftJoin('gudang', 'pb.id_gudang', '=', 'gudang.id_gudang')
+                ->leftJoin('cabang', 'pb.id_cabang2', '=', 'cabang.id_cabang')
+                ->leftJoin('pindah_barang as pb2', 'pb.id_pindah_barang2', 'pb2.id_pindah_barang')
+                ->where('pb.id_jenis_transaksi', 22)
+                ->where('pb.type', 1);
             if (isset($request->c)) {
-                $data = $data->where('pindah_barang.id_cabang', $request->c);
+                $data = $data->where('pb.id_cabang', $request->c);
             }
 
-            $data = $data->orderBy('pindah_barang.kode_pindah_barang', 'desc');
+            $data = $data->orderBy('pb.kode_pindah_barang', 'desc');
 
             $idUser = session()->get('user')['id_pengguna'];
             $filterUser = DB::table('pengguna')

@@ -80,6 +80,7 @@
                             <tr>
                                 <th>Tanggal</th>
                                 <th>Kode Pindah Gudang</th>
+                                <th>Kode Referensi</th>
                                 <th>Gudang</th>
                                 <th>Gudang Asal</th>
                                 <th>Keterangan</th>
@@ -114,10 +115,13 @@
             ajax: "{{ route('received_from_warehouse') }}?c=" + $('[name="id_cabang"]').val(),
             columns: [{
                 data: 'tanggal_pindah_barang',
-                name: 'pindah_barang.tanggal_pindah_barang'
+                name: 'pb.tanggal_pindah_barang'
             }, {
                 data: 'kode_pindah_barang',
-                name: 'pindah_barang.kode_pindah_barang'
+                name: 'pb.kode_pindah_barang'
+            }, {
+                data: 'ref_code',
+                name: 'pb2.kode_pindah_barang'
             }, {
                 data: 'g_nama_gudang',
                 name: 'g.nama_gudang'
@@ -126,10 +130,10 @@
                 name: 'g2.nama_gudang',
             }, {
                 data: 'keterangan_pindah_barang',
-                name: 'pindah_barang.keterangan_pindah_barang',
+                name: 'pb.keterangan_pindah_barang',
             }, {
                 data: 'status_pindah_barang',
-                name: 'pindah_barang.status_pindah_barang',
+                name: 'pb.status_pindah_barang',
             }, {
                 data: 'action',
                 name: 'action',

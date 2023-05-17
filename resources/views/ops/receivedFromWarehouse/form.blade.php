@@ -283,9 +283,9 @@
                     qrcode: string
                 },
                 success: function(res) {
+                    details = []
                     let newDetail = res.details
                     for (let i = 0; i < newDetail.length; i++) {
-
                         if (arrayQRCode.includes(newDetail[i]['qr_code'])) {
                             newDetail[i]['status_diterima'] = 1
                         } else {
@@ -296,7 +296,6 @@
                         details.push(newDetail[i])
                     }
 
-                    console.log(newDetail)
                     resDataTable.clear().rows.add(details).draw()
                     $('[name="details"]').val(JSON.stringify(details))
                     $('[name="id_cabang"]').val(res.data.id_cabang2)
