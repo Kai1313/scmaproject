@@ -112,8 +112,9 @@ class ReceivedFromWarehouseController extends Controller
                 $data->status_pindah_barang = 1;
                 $data->save();
 
-                $parent->status_pindah_barang = 1;
-                $parent->save();
+                $updateParent = MoveBranch::find($data->id_pindah_barang2);
+                $updateParent->status_pindah_barang = 1;
+                $updateParent->save();
             }
 
             DB::commit();
