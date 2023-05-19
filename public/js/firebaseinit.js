@@ -17,7 +17,7 @@ messaging.requestPermission().then(function () {
 }).then(function (token) {
     if (!localStorage.getItem('fcmToken')) {
         $.ajax({
-            url: siteMain + '/store_fcm_token',
+            url: siteMain + '/api/store_fcm_token',
             type: 'post',
             data: { fcm_token: token, token: isi_token_pengguna },
             success: function (res) {
