@@ -194,6 +194,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <script src="{{ asset('assets/bower_components/jquery-slimscroll/jquery.slimscroll.min.js') }}"></script>
     <script src="https://www.gstatic.com/firebasejs/8.4.3/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.4.0/firebase-messaging.js"></script>
+    <script src="https://code.responsivevoice.org/responsivevoice.js?key=Od43k81C"></script>
     <script>
         let siteMain = '{{ url('/') }}';
     </script>

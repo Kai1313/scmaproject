@@ -35,6 +35,8 @@ messaging.requestPermission().then(function () {
 
 messaging.onMessage(function (payload) {
     console.log(payload)
+    let message = payload.data.body
+    responsiveVoice.speak(message, 'Indonesian Male');
     // var notify;
     // notify = new Notification(payload.notification.title, {
     //     body: payload.notification.body,
