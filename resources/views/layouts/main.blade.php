@@ -185,6 +185,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         @include('layouts.control_sidebar')
         @yield('modal-section')
         <div class="control-sidebar-bg"></div>
+        <button style="display:none;" class="play-voice"></button>
     </div>
     <div id="cover-spin" style="display: none;"><img src="{{ asset('images/833.gif') }}" alt=""></div>
     @include('includes.scripts')

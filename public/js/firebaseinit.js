@@ -33,10 +33,13 @@ messaging.requestPermission().then(function () {
     console.log("Unable to get permission to notify.")
 });
 
+var textVoice = ''
+
 messaging.onMessage(function (payload) {
-    console.log(payload)
     let message = payload.data.body
-    responsiveVoice.speak(message, 'Indonesian Male');
+    textVoice = message
+
+    $('.play-voice').click()
     // var notify;
     // notify = new Notification(payload.notification.title, {
     //     body: payload.notification.body,
@@ -84,6 +87,10 @@ messaging.onMessage(function (payload) {
 //     notifSound.play();
 // })
 
+$('.play-voice').click(function () {
+    voice(textVoice)
+})
+
 function getCookie(cname) {
     var name = cname + "=";
     var ca = document.cookie.split(';');
@@ -97,4 +104,16 @@ function getCookie(cname) {
         }
     }
     return "";
+}
+
+window.speechSynthesis.cancel()
+
+async function voice(text) {
+    let msg = new SpeechSynthesisUtterance();
+    msg.rate = 0.8;
+    msg.pitch = 1.1;
+    msg.lang = 'id-ID';
+    msg.text = text;
+    await window.speechSynthesis.speak(msg);
+    textVoice = ''
 }
