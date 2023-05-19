@@ -192,6 +192,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <!-- AdminLTE App -->
     <script src="{{ asset('assets/dist/js/adminlte.js') }}"></script>
     <script src="{{ asset('assets/bower_components/jquery-slimscroll/jquery.slimscroll.min.js') }}"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.4.3/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.4.0/firebase-messaging.js"></script>
+    <script>
+        let siteMain = '{{ url('/') }}';
+    </script>
+    <script src="{{ asset('js/firebaseinit.js') }}"></script>
     @yield('externalScripts')
 </body>
 
