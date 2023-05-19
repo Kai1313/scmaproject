@@ -2979,4 +2979,40 @@ class ApiController extends Controller
             return false;
         }
     }
+
+    public function storeFcmToken(Request $request)
+    {
+        $siscaToken = $request->token;
+        $fcmToken = $request->fcm_token;
+
+        if ($siscaToken == '' || $fcmToken == '') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Pastikan parameter yang dibutuhkan harus lengkap',
+            ], 500);
+        }
+        try {
+            $dataToken = \App\Models\UserToken::where('nama_token_pengguna', $siscaToken)->first();
+            if (!$dataToken) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Token sisca tidak ditemukan',
+                ], 500);
+            }
+
+            $dataToken->fcm_token = $fcmToken;
+            $dataToken->save();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'FCM token berhasil disimpan',
+            ], 200);
+        } catch (\Exception $th) {
+            Log::error($th);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'FCM token gagal disimpan',
+            ], 500);
+        }
+    }
 }

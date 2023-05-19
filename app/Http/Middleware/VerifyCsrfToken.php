@@ -20,5 +20,6 @@ class VerifyCsrfToken extends Middleware
      */
     protected $except = [
         'api/transaction-balance',
+        'api/store_fcm_token',
     ];
 }
