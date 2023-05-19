@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Route;
  */
 
 Route::post('login', 'ApiController@login');
+Route::post('store_fcm_token', 'ApiController@storeFcmToken');
 
 Route::group(['middleware' => ['auth:api']], function () {
     Route::get('profile', 'ApiController@profile');
@@ -34,4 +35,3 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::post('/jurnal_closing_retur_jual', 'ApiController@jurnalClosingReturJual')->name('jurnal-otomatis-closing-retur-jual');
     });
 });
-

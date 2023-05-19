@@ -185,6 +185,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         @include('layouts.control_sidebar')
         @yield('modal-section')
         <div class="control-sidebar-bg"></div>
+        <button style="display:none;" class="play-voice"></button>
     </div>
     <div id="cover-spin" style="display: none;"><img src="{{ asset('images/833.gif') }}" alt=""></div>
     @include('includes.scripts')
@@ -192,6 +193,13 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <!-- AdminLTE App -->
     <script src="{{ asset('assets/dist/js/adminlte.js') }}"></script>
     <script src="{{ asset('assets/bower_components/jquery-slimscroll/jquery.slimscroll.min.js') }}"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.4.3/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.4.0/firebase-messaging.js"></script>
+    <script>
+        let siteMain = '{{ url('/') }}';
+    </script>
+    <script src="{{ asset('js/firebaseinit.js') }}"></script>
+    <script src="https://code.responsivevoice.org/responsivevoice.js?key=Od43k81C"></script>
     @yield('externalScripts')
 </body>
 

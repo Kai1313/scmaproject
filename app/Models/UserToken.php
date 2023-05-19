@@ -8,4 +8,5 @@ class UserToken extends Model
 {
     protected $table = "token_pengguna";
     protected $primaryKey = 'id_token_pengguna';
+    public $timestamps = false;
 }
