@@ -56,6 +56,8 @@ class PurchaseRequest extends Model
                 'nama_satuan_barang',
                 'qty',
                 'notes',
+                'approval_notes',
+                'approval_status',
                 DB::raw('(case when closed = 0 then "Open" else "Closed" end) as status'),
                 DB::raw('(case when sum(sisa_master_qr_code) > 0 then sum(sisa_master_qr_code) else 0 end) as stok')
             )
@@ -99,6 +101,7 @@ class PurchaseRequest extends Model
                     'notes' => $data->notes,
                     'purchase_request_id' => $this->purchase_request_id,
                     'closed' => '0',
+                    'approval_status' => 0,
                 ]);
             }
         }
@@ -118,5 +121,29 @@ class PurchaseRequest extends Model
         }
 
         return $string . '.' . $nol . $check;
+    }
+
+    public function saveStatusDetail()
+    {
+        $detail = DB::table('purchase_request_detail')
+            ->where('purchase_request_id', $this->purchase_request_id)->get();
+
+        foreach ($detail as $data) {
+            $check = DB::table('purchase_request_detail')
+                ->where('purchase_request_id', $this->purchase_request_id)
+                ->where('index', $data->index)->first();
+            if ($check) {
+                DB::table('purchase_request_detail')
+                    ->where('purchase_request_id', $this->purchase_request_id)
+                    ->where('index', $data->index)
+                    ->update([
+                        'approval_status' => $this->approval_status,
+                        'approval_user_id' => $this->approval_user_id,
+                        'approval_date' => $this->approval_date,
+                    ]);
+            }
+        }
+
+        return ['status' => 'success'];
     }
 }

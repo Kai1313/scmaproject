@@ -7,6 +7,17 @@
         th {
             text-align: center;
         }
+
+        ul.horizontal-list {
+            min-width: 0px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        ul.horizontal-list li {
+            display: inline;
+        }
     </style>
 @endsection
 
@@ -103,12 +114,12 @@
                 @if (session()->get('user')['id_grup_pengguna'] == 13 && $data->approval_status == 0)
                     <a href="{{ route('purchase-request-change-status', [$data->purchase_request_id, 'reject']) }}"
                         class="btn btn-default btn-change-status btn-flat btn-sm pull-right" data-param="reject">
-                        <i class="fa fa-times"></i> Reject
+                        <i class="fa fa-times"></i> Tolak Semua
                     </a>
                     <a href="{{ route('purchase-request-change-status', [$data->purchase_request_id, 'approval']) }}"
                         class="btn btn-success btn-change-status btn-flat btn-sm pull-right" data-param="approval"
                         style="margin-right:10px;">
-                        <i class="glyphicon glyphicon-check"></i> Approval
+                        <i class="glyphicon glyphicon-check"></i> Setujui Semua
                     </a>
                 @endif
             </div>
@@ -125,9 +136,30 @@
                                 <th>Catatan</th>
                                 <th>Stok</th>
                                 <th>Status</th>
+                                <th>Catatan Persetujuan</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                     </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalChangeStatus" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <h3>Berikan alasan pada <span id="item_name"></span> untuk di<span id="type_item"></span></h3>
+                    <input type="hidden" name="approval_status" class="clear-input">
+                    <input type="hidden" name="index" class="clear-input">
+                    <input type="hidden" name="purchase_request_id" value="{{ $data->purchase_request_id }}">
+                    <textarea name="approval_notes" class="form-control clear-input" rows="4"
+                        placeholder="Harus di isi jika status ditolak"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-flat" data-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-primary save-change-status-detail btn-flat">Proses</button>
                 </div>
             </div>
         </div>
@@ -145,6 +177,8 @@
 @section('externalScripts')
     <script>
         let details = {!! $data ? $data->formatdetail : '[]' !!};
+        let approval_header = {{ $data->approval_status }};
+        let changeStatusDetail = '{{ route('purchase-request-change-status-detail') }}';
         var resDataTable = $('#table-detail').DataTable({
             data: details,
             ordering: false,
@@ -178,6 +212,34 @@
                 data: 'status',
                 name: 'status',
                 className: 'text-center'
+            }, {
+                data: 'approval_notes',
+                name: 'approval_notes'
+            }, {
+                data: 'index',
+                className: 'text-center',
+                name: 'index',
+                searchable: false,
+                render: function(data, type, row, meta) {
+                    let btn = '<ul class="horizontal-list">';
+                    if (approval_header == 0 && row.approval_status == 0) {
+                        btn +=
+                            '<li><a href="' + changeStatusDetail +
+                            '" class="btn btn-success btn-xs mr-1 mb-1 btn-change-status-modal" data-item="' +
+                            row.nama_barang +
+                            '" data-type="1" data-index="' + data +
+                            '"><i class="glyphicon glyphicon-check"></i> Approval</a></li>';
+                        btn +=
+                            '<li><a href="' + changeStatusDetail +
+                            '" class="btn btn-default btn-xs mr-1 mb-1 btn-change-status-modal" data-item="' +
+                            row.nama_barang +
+                            '" data-type="2" data-index="' + data +
+                            '"><i class="fa fa-times"></i> Reject</a></a></li>';
+                    }
+
+                    btn += '</ul>';
+                    return btn;
+                }
             }]
         });
 
@@ -200,6 +262,55 @@
                 $('#cover-spin').hide()
                 if (result.isConfirmed) {
                     changeData(self.prop('href'))
+                }
+            })
+        })
+
+        $('.btn-change-status-modal').click(function(e) {
+            e.preventDefault()
+            let url = $(this).prop('href')
+            let itemName = $(this).data('item')
+            let type = $(this).data('type')
+            $('#item_name').text(itemName)
+            $('#type_item').text(type == 1 ? 'terima' : 'tolak')
+            $('[name="index"]').val($(this).data('index'))
+            $('[name="approval_status"]').val(type)
+            $('.save-change-status-detail').attr('data-url', url)
+
+            $('#modalChangeStatus').modal()
+        })
+
+        $('.save-change-status-detail').click(function() {
+            if ($('[name="approval_status"]').val() == 2) {
+                if ($('[name="approval_notes"]').val().trim() == '') {
+                    Swal.fire("Gagal", "Alasan tidak boleh kosong", 'error')
+                    return false;
+                }
+            }
+
+            let url = $(this).data('url')
+            $('#cover-spin').show()
+            $.ajax({
+                url: url,
+                type: 'post',
+                data: {
+                    'index': $('[name="index"]').val(),
+                    'purchase_request_id': $('[name="purchase_request_id"]').val(),
+                    'approval_notes': $('[name="approval_notes"]').val().trim(),
+                    'approval_status': $('[name="approval_status"]').val()
+                },
+                success: function(data) {
+                    $('#cover-spin').hide()
+                    Swal.fire('Tersimpan!', data.message, 'success').then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = data.redirect;
+                        }
+                    })
+                },
+                error: function(error) {
+                    console.log(error)
+                    $('#cover-spin').hide()
+                    Swal.fire("Gagal", error.responseJSON.message, 'error')
                 }
             })
         })
