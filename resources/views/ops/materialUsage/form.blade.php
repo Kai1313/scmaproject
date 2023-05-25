@@ -55,6 +55,27 @@
         tfoot>tr>td {
             font-weight: bold;
         }
+
+        select[readonly].select2-hidden-accessible+.select2-container {
+            pointer-events: none;
+            touch-action: none;
+        }
+
+        .datepicker {
+            pointer-events: none;
+            touch-action: none;
+            background: #eee;
+        }
+
+        select[readonly].select2-hidden-accessible+.select2-container .select2-selection {
+            background: #eee;
+            box-shadow: none;
+        }
+
+        select[readonly].select2-hidden-accessible+.select2-container .select2-selection__arrow,
+        select[readonly].select2-hidden-accessible+.select2-container .select2-selection__clear {
+            display: none;
+        }
     </style>
 @endsection
 
@@ -106,7 +127,7 @@
                             <div class="form-group">
                                 <label>Cabang <span>*</span></label>
                                 <select name="id_cabang" class="form-control select2" data-validation="[NOTEMPTY]"
-                                    data-validation-message="Cabang tidak boleh kosong">
+                                    data-validation-message="Cabang tidak boleh kosong" {{ $data ? 'readonly' : '' }}>
                                     <option value="">Pilih Cabang</option>
                                     @if ($data && $data->id_cabang)
                                         <option value="{{ $data->id_cabang }}" selected>
@@ -118,7 +139,7 @@
                             <label>Gudang <span>*</span></label>
                             <div class="form-group">
                                 <select name="id_gudang" class="form-control select2" data-validation="[NOTEMPTY]"
-                                    data-validation-message="Gudang tidak boleh kosong">
+                                    data-validation-message="Gudang tidak boleh kosong" {{ $data ? 'readonly' : '' }}>
                                     <option value="">Pilih Gudang</option>
                                     @if ($data && $data->id_gudang)
                                         <option value="{{ $data->id_gudang }}" selected>
@@ -148,6 +169,12 @@
                             <div class="form-group">
                                 <textarea name="catatan" class="form-control" rows="3">{{ old('catatan', $data ? $data->catatan : '') }}</textarea>
                             </div>
+                            <label>Melakukan QC</label>
+
+                            {{-- <label for=""></label> --}}
+                            {{-- <div class="form-group"> --}}
+                            <input type="checkbox" name="is_qc" value="1">
+                            {{-- </div> --}}
                         </div>
                     </div>
                 </div>
@@ -388,13 +415,17 @@
         }
 
         $('[name="id_cabang"]').select2({
-            data: branch
+            data: [{
+                'id': '',
+                'text': 'Pilih Cabang'
+            }, ...branch]
         }).on('select2:select', function(e) {
             let dataselect = e.params.data
             getGudang(dataselect)
         });
 
         function getGudang(data) {
+            $('[name="id_gudang"]').empty()
             $('[name="id_gudang"]').select2({
                 data: [{
                     'id': "",
@@ -586,15 +617,26 @@
             searchAsset(self)
         })
 
+        $('[name="is_qc"]').click(function() {
+            details = []
+            resDataTable.clear().rows.add(details).draw()
+        })
+
         function searchAsset(string) {
             $('#cover-spin').show()
+            let isQc = 0
+            if ($('[name="is_qc"]').is(':checked')) {
+                isQc = $('[name="is_qc"]').val()
+            }
+
             $.ajax({
                 url: '{{ route('material_usage-qrcode') }}',
                 type: 'get',
                 data: {
                     qrcode: string,
                     id_cabang: $('[name="id_cabang"]').val(),
-                    id_gudang: $('[name="id_gudang"]').val()
+                    id_gudang: $('[name="id_gudang"]').val(),
+                    is_qc: isQc,
                 },
                 success: function(res) {
                     detailSelect = res.data

@@ -57,6 +57,7 @@ class QualityControl extends Model
             'warna_master_qr_code' => $this->warna_pembelian_detail,
             'bentuk_master_qr_code' => $this->bentuk_pembelian_detail,
             'keterangan_master_qr_code' => $this->keterangan_pembelian_detail,
+            'status_qc_qr_code' => $this->status_qc,
         ]);
 
         return true;

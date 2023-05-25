@@ -141,20 +141,23 @@ class PurchaseRequestController extends Controller
             $data->savedetails($request->details);
 
             if ($id == 0) {
-                // $userSendWa = DB::table('pengguna')
-                //     ->select('nama_pengguna', 'telepon1_pengguna')
-                //     ->whereIn('id_grup_pengguna', [7, 13])
-                //     ->where('status_pengguna', 1)->get();
-                // $settingMessage = DB::table('setting')->where('code', 'Pesan Permintaan Beli')->first();
-                // $strParam = [
-                //     '[[pembuat]]' => $data->pengguna->nama_pengguna,
-                //     '[[code]]' => $data->purchase_request_code,
-                //     '[[date]]' => date('d/m/Y'),
-                // ];
-                // foreach ($userSendWa as $user) {
-                //     $messageText = replaceMessage($strParam, $settingMessage->value1);
-                //     $this->sendToWa($user->telepon1_pengguna, $messageText);
-                // }
+                $access = DB::table('setting')->where('id_cabang', $request->id_cabang)->where('code', 'PR Send WA')->first();
+                if ($access && $access->value1 == '1') {
+                    $userSendWa = DB::table('pengguna')
+                        ->select('nama_pengguna', 'telepon1_pengguna')
+                        ->whereIn('id_grup_pengguna', [7, 13])
+                        ->where('status_pengguna', 1)->get();
+                    $settingMessage = DB::table('setting')->where('code', 'Pesan Permintaan Beli')->first();
+                    $strParam = [
+                        '[[pembuat]]' => $data->pengguna->nama_pengguna,
+                        '[[code]]' => $data->purchase_request_code,
+                        '[[date]]' => date('d/m/Y'),
+                    ];
+                    foreach ($userSendWa as $user) {
+                        $messageText = replaceMessage($strParam, $settingMessage->value1);
+                        $this->sendToWa($user->telepon1_pengguna, $messageText);
+                    }
+                }
             }
 
             DB::commit();
@@ -181,9 +184,15 @@ class PurchaseRequestController extends Controller
         }
 
         $data = PurchaseRequest::find($id);
+        $access = DB::table('setting')->where('id_cabang', $data->id_cabang)->where('code', 'PR Approval')->first();
+        $arrayAccess = explode(',', $access->value1);
+        $idUser = session()->get('user')['id_grup_pengguna'];
+
         return view('ops.purchaseRequest.detail', [
             'data' => $data,
             'status' => $this->arrayStatus,
+            'arrayAccess' => $arrayAccess,
+            'idUser' => $idUser,
             "pageTitle" => "SCA OPS | Permintaan Pembelian | Detail",
         ]);
     }
@@ -311,21 +320,24 @@ class PurchaseRequestController extends Controller
             $data->save();
             $data->saveStatusDetail();
 
-            // $userSendWa = DB::table('pengguna')
-            //     ->select('nama_pengguna', 'telepon1_pengguna')
-            //     ->whereIn('id_grup_pengguna', [7])
-            //     ->where('status_pengguna', 1)->get();
-            // $settingMessage = DB::table('setting')->where('code', 'Pesan Persetujuan Beli')->first();
-            // $strParam = [
-            //     '[[pembuat]]' => $data->pengguna->nama_pengguna,
-            //     '[[code]]' => $data->purchase_request_code,
-            //     '[[date]]' => date('d/m/Y'),
-            //     '[[status]]' => $type == 'approval' ? 'disetujui' : 'ditolak',
-            // ];
-            // foreach ($userSendWa as $user) {
-            //     $messageText = replaceMessage($strParam, $settingMessage->value1);
-            //     $this->sendToWa($user->telepon1_pengguna, $messageText);
-            // }
+            $access = DB::table('setting')->where('id_cabang', $data->id_cabang)->where('code', 'PR Send WA')->first();
+            if ($access && $access->value1 == '1') {
+                $userSendWa = DB::table('pengguna')
+                    ->select('nama_pengguna', 'telepon1_pengguna')
+                    ->whereIn('id_grup_pengguna', [7])
+                    ->where('status_pengguna', 1)->get();
+                $settingMessage = DB::table('setting')->where('code', 'Pesan Persetujuan Beli')->first();
+                $strParam = [
+                    '[[pembuat]]' => $data->pengguna->nama_pengguna,
+                    '[[code]]' => $data->purchase_request_code,
+                    '[[date]]' => date('d/m/Y'),
+                    '[[status]]' => $type == 'approval' ? 'disetujui' : 'ditolak',
+                ];
+                foreach ($userSendWa as $user) {
+                    $messageText = replaceMessage($strParam, $settingMessage->value1);
+                    $this->sendToWa($user->telepon1_pengguna, $messageText);
+                }
+            }
 
             DB::commit();
             return response()->json([
@@ -388,6 +400,7 @@ class PurchaseRequestController extends Controller
         $purchaseRequestId = $request->purchase_request_id;
         $approvalNotes = $request->approval_notes;
         $approvalStatus = $request->approval_status;
+        $qty = $request->qty;
 
         $check = DB::table('purchase_request_detail')->where('purchase_request_id', $purchaseRequestId)
             ->where('index', $index)->first();
@@ -413,6 +426,8 @@ class PurchaseRequestController extends Controller
                 'approval_status' => $approvalStatus,
                 'approval_user_id' => session()->get('user')['id_pengguna'],
                 'approval_date' => date('Y-m-d H:i:s'),
+                'qty' => $qty,
+                'approval_notes' => $approvalNotes,
             ]);
 
             $checkParent = $this->checkStatusParent($purchaseRequestId);
@@ -464,10 +479,29 @@ class PurchaseRequestController extends Controller
         }
 
         if (($countApproval + $countReject) == $totalRow) {
-            $parent->approval_status = ($countApproval > 1) ? 1 : 2;
+            $parent->approval_status = ($countApproval > 0) ? 1 : 2;
             $parent->approval_user_id = session()->get('user')['id_pengguna'];
             $parent->approval_date = date('Y-m-d H:i:s');
             $parent->save();
+
+            $access = DB::table('setting')->where('id_cabang', $parent->id_cabang)->where('code', 'PR Send WA')->first();
+            if ($access && $access->value1 == '1') {
+                $userSendWa = DB::table('pengguna')
+                    ->select('nama_pengguna', 'telepon1_pengguna')
+                    ->whereIn('id_grup_pengguna', [7])
+                    ->where('status_pengguna', 1)->get();
+                $settingMessage = DB::table('setting')->where('code', 'Pesan Persetujuan Beli')->first();
+                $strParam = [
+                    '[[pembuat]]' => $parent->pengguna->nama_pengguna,
+                    '[[code]]' => $parent->purchase_request_code,
+                    '[[date]]' => date('d/m/Y'),
+                    '[[status]]' => $parent->approval_status == '1' ? 'disetujui' : 'ditolak',
+                ];
+                foreach ($userSendWa as $user) {
+                    $messageText = replaceMessage($strParam, $settingMessage->value1);
+                    $this->sendToWa($user->telepon1_pengguna, $messageText);
+                }
+            }
         }
 
         return ['result' => true];

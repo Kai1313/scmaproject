@@ -177,6 +177,7 @@ class MaterialUsageController extends Controller
         $idCabang = $request->id_cabang;
         $idGudang = $request->id_gudang;
         $qrcode = $request->qrcode;
+        $isQc = $request->is_qc;
 
         $data = DB::table('master_qr_code as mqc')
             ->select(
@@ -196,8 +197,12 @@ class MaterialUsageController extends Controller
             ->leftJoin('satuan_barang as sb', 'mqc.id_satuan_barang', '=', 'sb.id_satuan_barang')
             ->leftJoin('master_wrapper', 'mqc.id_wrapper_zak', '=', 'master_wrapper.id_wrapper')
             ->where('mqc.id_cabang', $idCabang)
-            ->where('mqc.id_gudang', $idGudang)
-            ->where('kode_batang_master_qr_code', $qrcode)
+            ->where('mqc.id_gudang', $idGudang);
+        if ($isQc == 'false') {
+            $data = $data->where('mqc.status_qc_qr_code', 1);
+        }
+
+        $data = $data->where('kode_batang_master_qr_code', $qrcode)
             ->where('sisa_master_qr_code', '>', 0)->first();
         if (!$data) {
             return response()->json([

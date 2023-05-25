@@ -128,12 +128,12 @@
                                     class="form-control datepicker" data-validation="[NOTEMPTY]"
                                     data-validation-message="Tanggal tidak boleh kosong">
                             </div>
-                            <label>Estimasi <span>*</span></label>
+                            <label>Deadline <span>*</span></label>
                             <div class="form-group">
                                 <input type="text" name="purchase_request_estimation_date"
                                     value="{{ old('purchase_request_estimation_date', $data ? $data->purchase_request_estimation_date : date('Y-m-d')) }}"
                                     class=" form-control datepicker" data-validation="[NOTEMPTY]"
-                                    data-validation-message="Tanggal estimasi tidak boleh kosong">
+                                    data-validation-message="Tanggal deadline tidak boleh kosong">
                             </div>
                         </div>
                         <div class="col-md-4">
