@@ -82,6 +82,7 @@
                                 <th>Tanggal</th>
                                 <th>Cabang</th>
                                 <th>Gudang</th>
+                                <th>Jenis</th>
                                 <th>Catatan</th>
                                 <th width="150px">Action</th>
                             </tr>
@@ -123,6 +124,12 @@
             }, {
                 data: 'nama_gudang',
                 name: 'g.nama_gudang',
+            }, {
+                data: 'is_qc',
+                name: 'is_qc',
+                reader: function(data, type, row, meta) {
+                    return data == 1 ? 'QC' : ''
+                }
             }, {
                 data: 'catatan',
                 name: 'pemakaian_header.catatan'

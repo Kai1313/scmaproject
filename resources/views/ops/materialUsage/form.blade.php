@@ -170,11 +170,12 @@
                                 <textarea name="catatan" class="form-control" rows="3">{{ old('catatan', $data ? $data->catatan : '') }}</textarea>
                             </div>
                             <label>Melakukan QC</label>
-
-                            {{-- <label for=""></label> --}}
-                            {{-- <div class="form-group"> --}}
-                            <input type="checkbox" name="is_qc" value="1">
-                            {{-- </div> --}}
+                            @if (!$data)
+                                <input type="checkbox" name="is_qc" value="1">
+                            @else
+                                : <input type="checkbox" name="is_qc" value="1"
+                                    {{ $data->is_qc == '1' ? 'checked' : '' }} disabled>
+                            @endif
                         </div>
                     </div>
                 </div>

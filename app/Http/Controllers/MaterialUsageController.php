@@ -25,7 +25,8 @@ class MaterialUsageController extends Controller
                     'g.nama_gudang',
                     'c.nama_cabang',
                     'user_created',
-                    'catatan'
+                    'catatan',
+                    'is_qc'
                 )
                 ->leftJoin('gudang as g', 'pemakaian_header.id_gudang', '=', 'g.id_gudang')
                 ->leftJoin('cabang as c', 'pemakaian_header.id_cabang', '=', 'c.id_cabang');
@@ -94,10 +95,11 @@ class MaterialUsageController extends Controller
                 $data = new MaterialUsage;
             }
 
-            $data->fill($request->all());
+            $data->fill($request->except('is_qc'));
             if ($id == 0) {
                 $data->kode_pemakaian = MaterialUsage::createcode($request->id_cabang);
                 $data->user_created = session()->get('user')['id_pengguna'];
+                $data->is_qc = isset($request->is_qc) ? $request->is_qc : 0;
             } else {
                 $data->user_modified = session()->get('user')['id_pengguna'];
             }
@@ -198,7 +200,7 @@ class MaterialUsageController extends Controller
             ->leftJoin('master_wrapper', 'mqc.id_wrapper_zak', '=', 'master_wrapper.id_wrapper')
             ->where('mqc.id_cabang', $idCabang)
             ->where('mqc.id_gudang', $idGudang);
-        if ($isQc == 'false') {
+        if ($isQc == 0) {
             $data = $data->where('mqc.status_qc_qr_code', 1);
         }
 

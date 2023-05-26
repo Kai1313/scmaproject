@@ -24,6 +24,7 @@ class MaterialUsage extends Model
         'dt_created',
         'user_modified',
         'dt_modified',
+        'is_qc',
     ];
 
     public function cabang()

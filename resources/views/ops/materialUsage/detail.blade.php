@@ -77,6 +77,14 @@
                                 : {{ $data->catatan }}
                             </div>
                         </div>
+                        <div class="row">
+                            @if ($data && $data->is_qc == 1)
+                                <label class="col-md-4">Melakukan QC</label>
+                                <div class="col-md-8">
+                                    : <label class="label label-info">Ya</label>
+                                </div>
+                            @endif
+                        </div>
                     </div>
                 </div>
             </div>
