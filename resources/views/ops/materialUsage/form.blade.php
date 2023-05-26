@@ -102,7 +102,7 @@
                 </ul>
             </div>
         @endif
-        @if (count($errors) > 0)
+        {{-- @if (count($errors) > 0)
             <div class="alert alert-danger">
                 <ul>
                     @foreach ($errors->all() as $error)
@@ -110,7 +110,7 @@
                     @endforeach
                 </ul>
             </div>
-        @endif
+        @endif --}}
 
         <form action="{{ route('material_usage-save-entry', $data ? $data->id_pemakaian : 0) }}" method="post"
             class="post-action">
@@ -190,6 +190,7 @@
                 <div class="box-body">
                     <div class="table-responsive">
                         <input type="hidden" name="details" value="{{ $data ? json_encode($data->formatdetail) : '[]' }}">
+                        <input type="hidden" name="detele_details" value="[]">
                         <table id="table-detail" class="table table-bordered data-table display responsive nowrap"
                             width="100%">
                             <thead>
@@ -201,6 +202,7 @@
                                     <th>Jumlah Zak</th>
                                     <th>Tare</th>
                                     <th>Nett</th>
+                                    <th>Catatan</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -266,7 +268,7 @@
                                     <option value="">Pilih Timbangan</option>
                                 </select>
                             </div>
-                            <label id="label-berat">Berat Barang</label>
+                            <label id="label-berat">Jumlah</label>
                             <div class="form-group">
                                 <div class="input-group">
                                     <input type="text" name="jumlah" class="form-control handle-number-4"
@@ -275,6 +277,10 @@
                                 </div>
                                 <input type="hidden" name="max_weight" class="validate">
                                 <label id="alertWeight" style="display:none;color:red;"></label>
+                            </div>
+                            <label>Catatan</label>
+                            <div class="form-group">
+                                <textarea name="catatan" class="form-control" rows="3"></textarea>
                             </div>
                         </div>
                     </div>
@@ -362,6 +368,9 @@
                 },
                 className: 'text-right'
             }, {
+                data: 'catatan',
+                name: 'catatan',
+            }, {
                 data: 'index',
                 className: 'text-center',
                 name: 'index',
@@ -410,7 +419,7 @@
                 '<td class="text-right">' + formatNumber(totalJumlahZak, 4) + '</td>' +
                 '<td class="text-right">' + formatNumber(totalTare, 4) + '</td>' +
                 '<td class="text-right">' + formatNumber(totalNett, 4) + '</td>' +
-                '<td></td>' +
+                '<td></td><td></td>' +
                 '</tr></tfoot>'
             );
         }
@@ -545,7 +554,7 @@
             }
 
             detailSelect = []
-            modal.find('input,select').each(function(i, v) {
+            modal.find('input,select,textarea').each(function(i, v) {
                 if ($(v).hasClass('handle-number-4')) {
                     detailSelect[$(v).prop('name')] = normalizeNumber($(v).val())
                 } else {
@@ -558,12 +567,13 @@
 
             let newObj = Object.assign({}, detailSelect)
             if (statusModal == 'create') {
-                details.unshift(newObj)
+                details.push(newObj)
             } else if (statusModal == 'edit') {
                 details[newObj.index - 1] = newObj
             }
 
             $('[name="details"]').val(JSON.stringify(details))
+            console.log(details)
 
             statusModal = ''
             detailSelect = []
@@ -700,13 +710,13 @@
                     valid = false
                 }
 
-                if ($(v).prop('name') == 'kode_batang') {
-                    let findItem = details.filter(p => p.kode_batang == $(v).val())
-                    if (findItem.length > 0 && findItem[0].kode_batang == id && statusModal == 'create') {
-                        message = "QR Code sudah ada"
-                        valid = false
-                    }
-                }
+                // if ($(v).prop('name') == 'kode_batang') {
+                //     let findItem = details.filter(p => p.kode_batang == $(v).val())
+                //     if (findItem.length > 0 && findItem[0].kode_batang == id && statusModal == 'create') {
+                //         message = "QR Code sudah ada"
+                //         valid = false
+                //     }
+                // }
 
                 if ($(v).hasClass('error-field')) {
                     valid = false

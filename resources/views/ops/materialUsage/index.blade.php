@@ -127,7 +127,7 @@
             }, {
                 data: 'is_qc',
                 name: 'is_qc',
-                reader: function(data, type, row, meta) {
+                render: function(data) {
                     return data == 1 ? 'QC' : ''
                 }
             }, {

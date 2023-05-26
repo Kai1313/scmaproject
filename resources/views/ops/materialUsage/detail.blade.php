@@ -32,7 +32,7 @@
     <div class="content container-fluid">
         <div class="box box-primary">
             <div class="box-header">
-                <h3 class="box-title">Detail Kirim Ke Cabang <span class="text-muted"></span></h3>
+                <h3 class="box-title">Detail Pemakaian <span class="text-muted"></span></h3>
                 {{-- <a href="{{ route('send_to_branch-print-data', $data->id_pindah_barang) }}" target="_blank"
                     class="btn btn-sm btn-default btn-flat pull-right">
                     <span class="glyphicon glyphicon-print mr-1"></span> Cetak

@@ -19,6 +19,7 @@ class MaterialUsageDetail extends Model
         'weight',
         'jumlah_zak',
         'weight_zak',
+        'catatan',
     ];
 
     public function barang()

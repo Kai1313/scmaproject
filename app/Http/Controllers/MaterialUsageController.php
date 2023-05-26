@@ -105,6 +105,19 @@ class MaterialUsageController extends Controller
             }
 
             $data->save();
+            // if (isset($request->detele_details)) {
+            //     $data->removedetails($request->detele_details);
+            // }
+
+            $checkStock = $data->checkStockDetails($request->details);
+            if ($checkStock['result'] == false) {
+                DB::rollback();
+                return response()->json([
+                    "result" => $checkStock['result'],
+                    "message" => $checkStock['message'],
+                ], 500);
+            }
+
             $data->savedetails($request->details);
 
             DB::commit();
@@ -227,7 +240,7 @@ class MaterialUsageController extends Controller
             ->where('id_konfigurasi', $id)
             ->value('keterangan_konfigurasi');
         if ($data) {
-            $value = $data;
+            $value = $id == 38 ? ($data / 1000) : $data;
         }
 
         return response()->json([
