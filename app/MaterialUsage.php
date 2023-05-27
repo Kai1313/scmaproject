@@ -25,6 +25,8 @@ class MaterialUsage extends Model
         'user_modified',
         'dt_modified',
         'is_qc',
+        'void',
+        'void_user_ids',
     ];
 
     public function cabang()
@@ -152,7 +154,7 @@ class MaterialUsage extends Model
                     'id_satuan_barang' => $store->id_satuan_barang,
                     'nama_kartu_stok' => $this->id_pemakaian,
                     'nomor_kartu_stok' => $store->index,
-                    'tanggal_kartu_stok' => date('Y-m-d'),
+                    'tanggal_kartu_stok' => $this->tanggal,
                     'debit_kartu_stok' => 0,
                     'kredit_kartu_stok' => $store->jumlah,
                     'tanggal_kadaluarsa_kartu_stok' => $master->tanggal_expired_master_qr_code,
@@ -181,31 +183,22 @@ class MaterialUsage extends Model
         return ['status' => 'success'];
     }
 
-    // public function removedetails($details)
-    // {
-    //     $detail = json_decode($details);
-    //     $ids = array_column($detail, 'index');
-    //     foreach ($detail as $trash) {
-    //         $selectTrash = MaterialUsageDetail::where('id_pindah_barang', $this->id_pemakaian)
-    //             ->where('index', $trash->index)->first();
-    //         if ($selectTrash) {
-    //             $trashQrCode = MasterQrCode::where('kode_batang_master_qr_code', $trash->kode_batang)->first();
-    //             if ($trashQrCode) {
-    //                 $trashQrCode->sisa_master_qr_code = $trashQrCode->sisa_master_qr_code + $trash->jumlah;
-    //                 $trashQrCode->save();
-    //             }
+    public function voidDetails()
+    {
+        foreach ($this->details as $detail) {
+            $master = MasterQrCode::where('kode_batang_master_qr_code', $detail->kode_batang)->first();
+            if ($master) {
+                $master->sisa_master_qr_code = $master->sisa_master_qr_code + $detail->jumlah;
+                $master->zak = ($master->zak ? $master->zak : 0) + $detail->jumlah_zak;
+                $master->weight_zak = ($master->weight_zak ? $master->weight_zak : 0) + $detail->weight_zak;
+                $master->save();
+            }
 
-    //             $kartuStok = KartuStok::where('id_jenis_transaksi', $idJenisTransaksi)
-    //                 ->where('kode_batang_kartu_stok', $trash->qr_code)
-    //                 ->where('kode_kartu_stok', $this->kode_pindah_barang)
-    //                 ->update([
+            DB::table('kartu_stok')->where('kode_kartu_stok', $this->kode_pemakaian)
+                ->where('kode_batang_kartu_stok', $detail->kode_batang)
+                ->where('id_jenis_transaksi', $this->id_jenis_transaksi)->delete();
+        }
 
-    //                 ]);
-
-    //             $selectTrash->delete();
-    //         }
-    //     }
-
-    //     return ['status' => 'success'];
-    // }
+        return ['status' => 'success'];
+    }
 }

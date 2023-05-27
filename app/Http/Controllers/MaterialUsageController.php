@@ -26,7 +26,8 @@ class MaterialUsageController extends Controller
                     'c.nama_cabang',
                     'user_created',
                     'catatan',
-                    'is_qc'
+                    'is_qc',
+                    'void'
                 )
                 ->leftJoin('gudang as g', 'pemakaian_header.id_gudang', '=', 'g.id_gudang')
                 ->leftJoin('cabang as c', 'pemakaian_header.id_cabang', '=', 'c.id_cabang');
@@ -34,27 +35,42 @@ class MaterialUsageController extends Controller
                 $data = $data->where('pemakaian_header.id_cabang', $request->c);
             }
 
+            if ($request->show_void == 'false') {
+                $data = $data->where('pemakaian_header.void', '0');
+            }
+
             $data = $data->orderBy('pemakaian_header.dt_created', 'desc');
 
             $idUser = session()->get('user')['id_pengguna'];
+            $idGrupUser = session()->get('user')['id_grup_pengguna'];
             $filterUser = DB::table('pengguna')
                 ->where(function ($w) {
                     $w->where('id_grup_pengguna', session()->get('user')['id_grup_pengguna'])->orWhere('id_grup_pengguna', 1);
                 })
                 ->where('status_pengguna', '1')->pluck('id_pengguna')->toArray();
+            $accessVoid = getSetting('Pemakaian Void');
+            $arrayAccessVoid = explode(',', $accessVoid);
 
             return Datatables::of($data)
                 ->addIndexColumn()
-                ->addColumn('action', function ($row) use ($filterUser, $idUser) {
-                    $btn = '<ul class="horizontal-list">';
-                    $btn .= '<li><a href="' . route('material_usage-view', $row->id_pemakaian) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
-                    if (in_array($idUser, $filterUser) || $idUser == $row->user_created) {
-                        $btn .= '<li><a href="' . route('material_usage-entry', $row->id_pemakaian) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
+                ->addColumn('action', function ($row) use ($filterUser, $idUser, $idGrupUser, $arrayAccessVoid) {
+                    if ($row->void == '1') {
+                        return '<label class="label label-default">Batal</label>';
+                    } else {
+                        $btn = '<ul class="horizontal-list">';
+                        $btn .= '<li><a href="' . route('material_usage-view', $row->id_pemakaian) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
+                        if (in_array($idUser, $filterUser) || $idUser == $row->user_created) {
+                            $btn .= '<li><a href="' . route('material_usage-entry', $row->id_pemakaian) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
+                        }
+
+                        if (in_array($idGrupUser, $arrayAccessVoid)) {
+                            $btn .= '<li><a href="' . route('material_usage-delete', $row->id_pemakaian) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Void</a></li>';
+                        }
+
+                        $btn .= '</ul>';
+                        return $btn;
                     }
 
-                    // $btn .= '<li><a href="' . route('material_usage-delete-delete', $row->id_pemakaian) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Void</a></li>';
-                    $btn .= '</ul>';
-                    return $btn;
                 })
                 ->rawColumns(['action'])
                 ->make(true);
@@ -74,15 +90,16 @@ class MaterialUsageController extends Controller
         }
 
         $data = MaterialUsage::find($id);
+        $accessQC = getSetting('Pemakaian QC');
         $cabang = session()->get('access_cabang');
         $timbangan = DB::table('konfigurasi')->select('id_konfigurasi as id', 'nama_konfigurasi as text', 'keterangan_konfigurasi as value')
             ->where('id_kategori_konfigurasi', 5)->get();
-
         return view('ops.materialUsage.form', [
             'data' => $data,
             'cabang' => $cabang,
             "pageTitle" => "SCA OPS | Pemakaian | " . ($id == 0 ? 'Create' : 'Edit'),
             "timbangan" => $timbangan,
+            'accessQc' => in_array(session()->get('user')['id_grup_pengguna'], explode(',', $accessQC)) ? '1' : '0',
         ]);
     }
 
@@ -105,9 +122,6 @@ class MaterialUsageController extends Controller
             }
 
             $data->save();
-            // if (isset($request->detele_details)) {
-            //     $data->removedetails($request->detele_details);
-            // }
 
             $checkStock = $data->checkStockDetails($request->details);
             if ($checkStock['result'] == false) {
@@ -144,47 +158,51 @@ class MaterialUsageController extends Controller
         }
 
         $data = MaterialUsage::find($id);
+        $accessQC = getSetting('Pemakaian QC');
         return view('ops.materialUsage.detail', [
             'data' => $data,
             "pageTitle" => "SCA OPS | Pemakaian | Detail",
+            'accessQc' => in_array(session()->get('user')['id_grup_pengguna'], explode(',', $accessQC)) ? '1' : '0',
         ]);
     }
 
     public function destroy($id)
     {
-        // if (checkAccessMenu('pemakaian_header', 'delete') == false) {
-        //     return response()->json(['message' => 'Tidak mempunyai akses'], 500);
-        // }
+        if (checkAccessMenu('pemakaian', 'delete') == false) {
+            return response()->json(['message' => 'Tidak mempunyai akses'], 500);
+        }
 
-        // $data = MateialUsage::find($id);
-        // if (!$data) {
-        //     return response()->json([
-        //         "result" => false,
-        //         "message" => "Data tidak ditemukan",
-        //     ], 500);
-        // }
+        $data = MaterialUsage::find($id);
+        if (!$data) {
+            return response()->json([
+                "result" => false,
+                "message" => "Data tidak ditemukan",
+            ], 500);
+        }
 
-        // try {
-        //     DB::beginTransaction();
-        //     $data->void = 1;
-        //     $data->void_user_id = session()->get('user')['id_pengguna'];
-        //     $data->save();
+        try {
+            DB::beginTransaction();
+            $data->void = 1;
+            $data->void_user_id = session()->get('user')['id_pengguna'];
+            $data->save();
 
-        //     DB::commit();
-        //     return response()->json([
-        //         "result" => true,
-        //         "message" => "Data berhasil dibatalkan",
-        //         "redirect" => route('purchase-request'),
-        //     ], 200);
-        // } catch (\Exception $e) {
-        //     DB::rollback();
-        //     Log::error("Error when void purchase request");
-        //     Log::error($e);
-        //     return response()->json([
-        //         "result" => false,
-        //         "message" => "Data gagal dibatalkan",
-        //     ], 500);
-        // }
+            $data->voidDetails();
+
+            DB::commit();
+            return response()->json([
+                "result" => true,
+                "message" => "Data berhasil dibatalkan",
+                "redirect" => route('material_usage'),
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error("Error when void pemakaian");
+            Log::error($e);
+            return response()->json([
+                "result" => false,
+                "message" => "Data gagal dibatalkan",
+            ], 500);
+        }
     }
 
     public function autoQRCode(Request $request)

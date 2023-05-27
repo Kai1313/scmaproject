@@ -95,23 +95,6 @@
 
 @section('main-section')
     <div class="content container-fluid">
-        @if (session()->has('success'))
-            <div class="alert alert-success">
-                <ul>
-                    <li>{!! session()->get('success') !!}</li>
-                </ul>
-            </div>
-        @endif
-        {{-- @if (count($errors) > 0)
-            <div class="alert alert-danger">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif --}}
-
         <form action="{{ route('material_usage-save-entry', $data ? $data->id_pemakaian : 0) }}" method="post"
             class="post-action">
             <div class="box">
@@ -169,12 +152,14 @@
                             <div class="form-group">
                                 <textarea name="catatan" class="form-control" rows="3">{{ old('catatan', $data ? $data->catatan : '') }}</textarea>
                             </div>
-                            <label>Melakukan QC</label>
-                            @if (!$data)
-                                <input type="checkbox" name="is_qc" value="1">
-                            @else
-                                : <input type="checkbox" name="is_qc" value="1"
-                                    {{ $data->is_qc == '1' ? 'checked' : '' }} disabled>
+                            @if ($accessQc == '1')
+                                <label>QC</label>
+                                @if (!$data)
+                                    <input type="checkbox" name="is_qc" value="1">
+                                @else
+                                    : <input type="checkbox" name="is_qc" value="1"
+                                        {{ $data->is_qc == '1' ? 'checked' : '' }} disabled>
+                                @endif
                             @endif
                         </div>
                     </div>
@@ -223,7 +208,6 @@
                         <div class="alert alert-danger" style="display:none;" id="alertModal">
                         </div>
                         <input type="hidden" name="index" value="0">
-                        {{-- <input type="hidden" name="id_pemakaian_detail" value="0"> --}}
                         <div id="reader"></div>
                         <div class="form-group">
                             <div class="input-group">
@@ -274,6 +258,11 @@
                                     <input type="text" name="jumlah" class="form-control handle-number-4"
                                         autocomplete="off">
                                     <span class="input-group-addon" id="max-jumlah"></span>
+                                    <div class="input-group-btn">
+                                        <a href="javascript:void(0)" class="btn btn-warning reload-timbangan">
+                                            <i class="glyphicon glyphicon-refresh"></i>
+                                        </a>
+                                    </div>
                                 </div>
                                 <input type="hidden" name="max_weight" class="validate">
                                 <label id="alertWeight" style="display:none;color:red;"></label>
@@ -316,7 +305,6 @@
         let detailSelect = []
         let count = details.length
         let statusModal = 'create'
-        let intervalReloadTimbangan = ''
         let html5QrcodeScanner = new Html5QrcodeScanner("reader", {
             fps: 10,
             qrbox: 250
@@ -446,23 +434,6 @@
 
         $('[name="id_timbangan"]').select2({
             data: timbangan
-        }).on('select2:select', function(e) {
-            stopInterval()
-            let dataselect = e.params.data
-            if (dataselect.id != '') {
-                let beratTimbangan = dataselect.value
-                let beratMax = $('[name="max_weight"]').val()
-                if (parseFloat(beratTimbangan) > parseFloat(beratMax)) {
-                    $('[name="jumlah"]').addClass('error-field')
-                    $('#alertWeight').text('Berat melebihi stok').show()
-                } else {
-                    $('[name="jumlah"]').removeClass('error-field')
-                    $('#alertWeight').text('').hide()
-                }
-
-                intervalReloadTimbangan = setInterval(reloadTimbangan, 2000)
-                $('#modalEntry').find('[name="jumlah"]').val(formatNumber(dataselect.value, 4))
-            }
         })
 
         $('#modalEntry').on('input', '[name="jumlah"]', function() {
@@ -473,6 +444,10 @@
                 $(this).removeClass('error-field')
                 $('#alertWeight').text('').hide()
             }
+        })
+
+        $('.reload-timbangan').click(function() {
+            reloadTimbangan()
         })
 
         function reloadTimbangan() {
@@ -579,13 +554,11 @@
             detailSelect = []
 
             resDataTable.clear().rows.add(details).draw()
-            stopInterval()
             $('#modalEntry').modal('hide')
         })
 
         $('.cancel-entry').click(function() {
             html5QrcodeScanner.clear();
-            stopInterval()
             if (statusModal == 'create') {
                 count -= 1
             }
@@ -677,9 +650,11 @@
                         modal.find('[name="jumlah"]').prop('readonly', true).addClass('validate')
                         modal.find('[name="id_timbangan"]').prop('disabled', false).addClass('validate')
                         $('#label-timbangan').html('Timbangan <span>*</span>')
+                        $('.reload-timbangan').show()
                     } else {
                         modal.find('[name="jumlah"]').prop('readonly', false).addClass('validate')
                         modal.find('[name="id_timbangan"]').prop('disabled', true).removeClass('validate')
+                        $('.reload-timbangan').hide()
                     }
 
                     $('.result-form').show()
@@ -706,7 +681,7 @@
                 }
 
                 if ($('[name="jumlah"]').val() == '0') {
-                    message = "Berat barang harus lebih dari 0"
+                    message = "Jumlah harus lebih dari 0"
                     valid = false
                 }
 
@@ -720,7 +695,7 @@
 
                 if ($(v).hasClass('error-field')) {
                     valid = false
-                    message = "Qty melebihi batas maksimal"
+                    message = "Jumlah melebihi batas maksimal"
                 }
             })
 
@@ -738,10 +713,6 @@
 
         function onScanError(errorMessage) {
             toastr.error(JSON.strignify(errorMessage))
-        }
-
-        function stopInterval() {
-            clearInterval(intervalReloadTimbangan);
         }
     </script>
 @endsection

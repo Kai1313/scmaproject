@@ -284,7 +284,7 @@ class MoveBranch extends Model
                         'id_satuan_barang' => $data->id_satuan_barang,
                         'nama_kartu_stok' => $this->id_pindah_barang,
                         'nomor_kartu_stok' => $store->id_pindah_barang_detail,
-                        'tanggal_kartu_stok' => date('Y-m-d'),
+                        'tanggal_kartu_stok' => $this->tanggal_pindah_barang,
                         'debit_kartu_stok' => $type == 'in' ? $store->qty : 0,
                         'kredit_kartu_stok' => $type == 'out' ? $store->qty : 0,
                         'tanggal_kadaluarsa_kartu_stok' => $data->tanggal_kadaluarsa ? $data->tanggal_kadaluarsa : null,

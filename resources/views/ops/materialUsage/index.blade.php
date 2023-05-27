@@ -66,6 +66,12 @@
                         </div>
                     </div>
                     <div class="col-md-8">
+                        <span class="badge badge-default rounded-0 pull-right">
+                            <input class="form-check-input" type="checkbox" id="void" name="show_void">
+                            <label class="form-check-label" for="void">
+                                Void
+                            </label>
+                        </span>
                         <a href="{{ route('material_usage-entry') }}"
                             class="btn btn-success pull-right btn-flat btn-sm mr-1">
                             <i class="glyphicon glyphicon-plus"></i> Tambah Pemakaian
@@ -111,7 +117,8 @@
         var table = $('.data-table').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route('material_usage') }}?c=" + $('[name="id_cabang"]').val(),
+            ajax: "{{ route('material_usage') }}?c=" + $('[name="id_cabang"]').val() + '&show_void=' + $(
+                '[name="show_void"]').is(':checked'),
             columns: [{
                 data: 'kode_pemakaian',
                 name: 'pemakaian_header.kode_pemakaian'
@@ -143,7 +150,13 @@
         });
 
         $('[name="id_cabang"]').change(function() {
-            table.ajax.url("?c=" + $('[name="id_cabang"]').val()).load()
+            table.ajax.url("?c=" + $('[name="id_cabang"]').val() + '&show_void=' + $('[name="show_void"]').is(
+                ':checked')).load()
+        })
+
+        $('[name="show_void"]').change(function() {
+            table.ajax.url("?c=" + $('[name="id_cabang"]').val() + '&show_void=' + $('[name="show_void"]').is(
+                ':checked')).load()
         })
     </script>
 @endsection
