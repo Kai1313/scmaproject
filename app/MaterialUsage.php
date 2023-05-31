@@ -24,6 +24,9 @@ class MaterialUsage extends Model
         'dt_created',
         'user_modified',
         'dt_modified',
+        'is_qc',
+        'void',
+        'void_user_ids',
     ];
 
     public function cabang()
@@ -56,6 +59,7 @@ class MaterialUsage extends Model
                 'weight',
                 'weight_zak as tare',
                 'jumlah_zak',
+                'catatan',
                 DB::raw('jumlah - weight_zak as nett')
             )
             ->leftJoin('barang', 'pemakaian_detail.id_barang', '=', 'barang.id_barang')
@@ -76,30 +80,44 @@ class MaterialUsage extends Model
         return $string . '.' . $nol . $check;
     }
 
+    public function checkStockDetails($details)
+    {
+        $arrayQrCode = [];
+        $arrayStock = [];
+        $detail = json_decode($details);
+
+        foreach ($detail as $data) {
+            if (!isset($data->id_pemakaian)) {
+                if (isset($arrayStock[$data->kode_batang])) {
+                    $arrayStock[$data->kode_batang] = $arrayStock[$data->kode_batang] - $data->jumlah;
+                } else {
+                    $stock = MasterQrCode::where('kode_batang_master_qr_code', $data->kode_batang)->value('sisa_master_qr_code');
+                    $arrayStock[$data->kode_batang] = $stock - $data->jumlah;
+                }
+            }
+        }
+
+        $message = '';
+        foreach ($arrayStock as $key => $res) {
+            if ($res < 0) {
+                $message .= $key . ', ';
+            }
+        }
+
+        if ($message != '') {
+            return [
+                'result' => false,
+                'message' => 'QR Code ' . $message . ' stok tidak mencukupi',
+            ];
+        }
+
+        return ['result' => true];
+    }
+
     public function savedetails($details)
     {
         $idJenisTransaksi = 25;
         $detail = json_decode($details);
-        $ids = array_column($detail, 'index');
-        $selectTrash = MaterialUsageDetail::where('id_pemakaian', $this->id_pemakaian)
-            ->whereNotIn('index', $ids)
-            ->get();
-        foreach ($selectTrash as $trash) {
-            $trashQrCode = MasterQrCode::where('kode_batang_master_qr_code', $trash->kode_batang)->first();
-            if ($trashQrCode) {
-                $trashQrCode->sisa_master_qr_code = $trashQrCode->sisa_master_qr_code + $trash->jumlah;
-                $trashQrCode->weight_zak = ($trashQrCode->weight_zak ? $trashQrCode->weight_zak : 0) + $trash->weight_zak;
-                $trashQrCode->zak = ($trashQrCode->zak ? $trashQrCode->zak : 0) + $trash->jumlah_zak;
-                $trashQrCode->save();
-            }
-
-            $kartuStok = KartuStok::where('id_jenis_transaksi', $idJenisTransaksi)
-                ->where('kode_batang_kartu_stok', $trash->kode_batang)
-                ->where('kode_kartu_stok', $this->kode_pemakaian)
-                ->delete();
-
-            $trash->delete();
-        }
 
         foreach ($detail as $data) {
             $check = MaterialUsageDetail::where('id_pemakaian', $this->id_pemakaian)->where('index', $data->index)->first();
@@ -114,6 +132,7 @@ class MaterialUsage extends Model
                     'weight' => 0,
                     'jumlah_zak' => $data->jumlah_zak,
                     'weight_zak' => $data->weight_zak,
+                    'catatan' => $data->catatan,
                 ];
                 $store = new MaterialUsageDetail;
                 $store->fill($array);
@@ -135,7 +154,7 @@ class MaterialUsage extends Model
                     'id_satuan_barang' => $store->id_satuan_barang,
                     'nama_kartu_stok' => $this->id_pemakaian,
                     'nomor_kartu_stok' => $store->index,
-                    'tanggal_kartu_stok' => date('Y-m-d'),
+                    'tanggal_kartu_stok' => $this->tanggal,
                     'debit_kartu_stok' => 0,
                     'kredit_kartu_stok' => $store->jumlah,
                     'tanggal_kadaluarsa_kartu_stok' => $master->tanggal_expired_master_qr_code,
@@ -159,6 +178,25 @@ class MaterialUsage extends Model
                     'weight_zak' => $store->weight_zak,
                 ]);
             }
+        }
+
+        return ['status' => 'success'];
+    }
+
+    public function voidDetails()
+    {
+        foreach ($this->details as $detail) {
+            $master = MasterQrCode::where('kode_batang_master_qr_code', $detail->kode_batang)->first();
+            if ($master) {
+                $master->sisa_master_qr_code = $master->sisa_master_qr_code + $detail->jumlah;
+                $master->zak = ($master->zak ? $master->zak : 0) + $detail->jumlah_zak;
+                $master->weight_zak = ($master->weight_zak ? $master->weight_zak : 0) + $detail->weight_zak;
+                $master->save();
+            }
+
+            DB::table('kartu_stok')->where('kode_kartu_stok', $this->kode_pemakaian)
+                ->where('kode_batang_kartu_stok', $detail->kode_batang)
+                ->where('id_jenis_transaksi', $this->id_jenis_transaksi)->delete();
         }
 
         return ['status' => 'success'];

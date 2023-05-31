@@ -11,37 +11,10 @@
 |
  */
 
-// use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Route;
 
-// Route::get('firebase', function () {
-//     $url = "https://fcm.googleapis.com/fcm/send";
-//     $tokensender = env('FIREBASE_SERVER_KEY');
-
-//     $fcmToken = \DB::table('token_pengguna')->where('fcm_token', '!=', null)
-//         ->where('status_token_pengguna', 1)
-//         ->where('waktu_habis_token_pengguna', '>=', date('Y-m-d H:i:s'))
-//         ->pluck('fcm_token');
-
-//     $message = [
-//         'data' => [
-//             'body' => 'pesan berhasil ditampilkan',
-//             'title' => 'Judul pesan firebase',
-//         ],
-//     ];
-
-//     $fieldToken = ['registration_ids' => $fcmToken];
-
-//     $client = new Client();
-//     $req = $client->request('POST', $url, [
-//         'headers' => [
-//             'Authorization' => 'key=' . $tokensender,
-//             'Content-Type' => 'application/json',
-//         ],
-//         'body' => json_encode(array_merge($fieldToken, $message)),
-//     ]);
-//     return response()->json($req);
-// });
+//tes firebase
+Route::get('firebase', 'SessionController@tesFirebase');
 
 Route::get('/', 'SessionController@index')->name('welcome');
 Route::get('/logout', 'SessionController@logout')->name('logout');
@@ -81,6 +54,7 @@ Route::prefix('purchase_requisitions')->group(function () {
     Route::get('/auto_satuan', 'PurchaseRequestController@autoSatuan')->name('purchase-request-auto-satuan');
     Route::get('/change_status/{id}/{type}', 'PurchaseRequestController@changeStatus')->name('purchase-request-change-status');
     Route::get('/print/{id}', 'PurchaseRequestController@printData')->name('purchase-request-print-data');
+    Route::post('/change_status_detail', 'PurchaseRequestController@changeStatusDetail')->name('purchase-request-change-status-detail');
 });
 
 Route::prefix('uang_muka_pembelian')->group(function () {

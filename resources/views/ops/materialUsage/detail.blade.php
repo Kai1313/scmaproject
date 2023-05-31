@@ -32,7 +32,7 @@
     <div class="content container-fluid">
         <div class="box box-primary">
             <div class="box-header">
-                <h3 class="box-title">Detail Kirim Ke Cabang <span class="text-muted"></span></h3>
+                <h3 class="box-title">Detail Pemakaian <span class="text-muted"></span></h3>
                 {{-- <a href="{{ route('send_to_branch-print-data', $data->id_pindah_barang) }}" target="_blank"
                     class="btn btn-sm btn-default btn-flat pull-right">
                     <span class="glyphicon glyphicon-print mr-1"></span> Cetak
@@ -77,6 +77,16 @@
                                 : {{ $data->catatan }}
                             </div>
                         </div>
+                        @if ($accessQc)
+                            <div class="row">
+                                @if ($data && $data->is_qc == 1)
+                                    <label class="col-md-4">QC</label>
+                                    <div class="col-md-8">
+                                        : <label class="label label-info">Ya</label>
+                                    </div>
+                                @endif
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>

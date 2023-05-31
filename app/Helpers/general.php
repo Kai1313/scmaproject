@@ -168,3 +168,10 @@ function formatNumber($number, $prefix = 0)
 
     return $explode[0] . $koma;
 }
+
+function getSetting($code, $key = 'value1')
+{
+    $data = \DB::table('setting')->where('code', $code)->value($key);
+
+    return $data;
+}

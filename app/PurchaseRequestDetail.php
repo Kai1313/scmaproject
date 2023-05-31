@@ -8,6 +8,10 @@ class PurchaseRequestDetail extends Model
 {
     protected $table = 'purchase_request_detail';
     public $timestamps = false;
+
+    protected $fillable = [
+        'purchase_request_id', 'index', 'id_barang', 'id_satuan_barang', 'qty', 'notes', 'approval_notes', 'approval_status', 'approval_user_id', 'approval_date', 'closed',
+    ];
     // protected $primaryKey = 'purchase_request_id';
 
     // const CREATED_AT = 'dt_created';

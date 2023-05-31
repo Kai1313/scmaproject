@@ -55,6 +55,27 @@
         tfoot>tr>td {
             font-weight: bold;
         }
+
+        select[readonly].select2-hidden-accessible+.select2-container {
+            pointer-events: none;
+            touch-action: none;
+        }
+
+        /* .datepicker {
+                pointer-events: none;
+                touch-action: none;
+                background: #eee;
+            } */
+
+        select[readonly].select2-hidden-accessible+.select2-container .select2-selection {
+            background: #eee;
+            box-shadow: none;
+        }
+
+        select[readonly].select2-hidden-accessible+.select2-container .select2-selection__arrow,
+        select[readonly].select2-hidden-accessible+.select2-container .select2-selection__clear {
+            display: none;
+        }
     </style>
 @endsection
 
@@ -74,23 +95,6 @@
 
 @section('main-section')
     <div class="content container-fluid">
-        @if (session()->has('success'))
-            <div class="alert alert-success">
-                <ul>
-                    <li>{!! session()->get('success') !!}</li>
-                </ul>
-            </div>
-        @endif
-        @if (count($errors) > 0)
-            <div class="alert alert-danger">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
         <form action="{{ route('material_usage-save-entry', $data ? $data->id_pemakaian : 0) }}" method="post"
             class="post-action">
             <div class="box">
@@ -106,7 +110,7 @@
                             <div class="form-group">
                                 <label>Cabang <span>*</span></label>
                                 <select name="id_cabang" class="form-control select2" data-validation="[NOTEMPTY]"
-                                    data-validation-message="Cabang tidak boleh kosong">
+                                    data-validation-message="Cabang tidak boleh kosong" {{ $data ? 'readonly' : '' }}>
                                     <option value="">Pilih Cabang</option>
                                     @if ($data && $data->id_cabang)
                                         <option value="{{ $data->id_cabang }}" selected>
@@ -118,7 +122,7 @@
                             <label>Gudang <span>*</span></label>
                             <div class="form-group">
                                 <select name="id_gudang" class="form-control select2" data-validation="[NOTEMPTY]"
-                                    data-validation-message="Gudang tidak boleh kosong">
+                                    data-validation-message="Gudang tidak boleh kosong" {{ $data ? 'readonly' : '' }}>
                                     <option value="">Pilih Gudang</option>
                                     @if ($data && $data->id_gudang)
                                         <option value="{{ $data->id_gudang }}" selected>
@@ -148,6 +152,15 @@
                             <div class="form-group">
                                 <textarea name="catatan" class="form-control" rows="3">{{ old('catatan', $data ? $data->catatan : '') }}</textarea>
                             </div>
+                            @if ($accessQc == '1')
+                                <label>QC</label>
+                                @if (!$data)
+                                    <input type="checkbox" name="is_qc" value="1">
+                                @else
+                                    : <input type="checkbox" name="is_qc" value="1"
+                                        {{ $data->is_qc == '1' ? 'checked' : '' }} disabled>
+                                @endif
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -162,6 +175,7 @@
                 <div class="box-body">
                     <div class="table-responsive">
                         <input type="hidden" name="details" value="{{ $data ? json_encode($data->formatdetail) : '[]' }}">
+                        <input type="hidden" name="detele_details" value="[]">
                         <table id="table-detail" class="table table-bordered data-table display responsive nowrap"
                             width="100%">
                             <thead>
@@ -173,6 +187,7 @@
                                     <th>Jumlah Zak</th>
                                     <th>Tare</th>
                                     <th>Nett</th>
+                                    <th>Catatan</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -193,7 +208,6 @@
                         <div class="alert alert-danger" style="display:none;" id="alertModal">
                         </div>
                         <input type="hidden" name="index" value="0">
-                        {{-- <input type="hidden" name="id_pemakaian_detail" value="0"> --}}
                         <div id="reader"></div>
                         <div class="form-group">
                             <div class="input-group">
@@ -238,15 +252,24 @@
                                     <option value="">Pilih Timbangan</option>
                                 </select>
                             </div>
-                            <label id="label-berat">Berat Barang</label>
+                            <label id="label-berat">Jumlah</label>
                             <div class="form-group">
                                 <div class="input-group">
                                     <input type="text" name="jumlah" class="form-control handle-number-4"
                                         autocomplete="off">
                                     <span class="input-group-addon" id="max-jumlah"></span>
+                                    <div class="input-group-btn">
+                                        <a href="javascript:void(0)" class="btn btn-warning reload-timbangan">
+                                            <i class="glyphicon glyphicon-refresh"></i>
+                                        </a>
+                                    </div>
                                 </div>
                                 <input type="hidden" name="max_weight" class="validate">
                                 <label id="alertWeight" style="display:none;color:red;"></label>
+                            </div>
+                            <label>Catatan</label>
+                            <div class="form-group">
+                                <textarea name="catatan" class="form-control" rows="3"></textarea>
                             </div>
                         </div>
                     </div>
@@ -282,7 +305,6 @@
         let detailSelect = []
         let count = details.length
         let statusModal = 'create'
-        let intervalReloadTimbangan = ''
         let html5QrcodeScanner = new Html5QrcodeScanner("reader", {
             fps: 10,
             qrbox: 250
@@ -334,6 +356,9 @@
                 },
                 className: 'text-right'
             }, {
+                data: 'catatan',
+                name: 'catatan',
+            }, {
                 data: 'index',
                 className: 'text-center',
                 name: 'index',
@@ -382,19 +407,23 @@
                 '<td class="text-right">' + formatNumber(totalJumlahZak, 4) + '</td>' +
                 '<td class="text-right">' + formatNumber(totalTare, 4) + '</td>' +
                 '<td class="text-right">' + formatNumber(totalNett, 4) + '</td>' +
-                '<td></td>' +
+                '<td></td><td></td>' +
                 '</tr></tfoot>'
             );
         }
 
         $('[name="id_cabang"]').select2({
-            data: branch
+            data: [{
+                'id': '',
+                'text': 'Pilih Cabang'
+            }, ...branch]
         }).on('select2:select', function(e) {
             let dataselect = e.params.data
             getGudang(dataselect)
         });
 
         function getGudang(data) {
+            $('[name="id_gudang"]').empty()
             $('[name="id_gudang"]').select2({
                 data: [{
                     'id': "",
@@ -405,23 +434,6 @@
 
         $('[name="id_timbangan"]').select2({
             data: timbangan
-        }).on('select2:select', function(e) {
-            stopInterval()
-            let dataselect = e.params.data
-            if (dataselect.id != '') {
-                let beratTimbangan = dataselect.value
-                let beratMax = $('[name="max_weight"]').val()
-                if (parseFloat(beratTimbangan) > parseFloat(beratMax)) {
-                    $('[name="jumlah"]').addClass('error-field')
-                    $('#alertWeight').text('Berat melebihi stok').show()
-                } else {
-                    $('[name="jumlah"]').removeClass('error-field')
-                    $('#alertWeight').text('').hide()
-                }
-
-                intervalReloadTimbangan = setInterval(reloadTimbangan, 2000)
-                $('#modalEntry').find('[name="jumlah"]').val(formatNumber(dataselect.value, 4))
-            }
         })
 
         $('#modalEntry').on('input', '[name="jumlah"]', function() {
@@ -432,6 +444,10 @@
                 $(this).removeClass('error-field')
                 $('#alertWeight').text('').hide()
             }
+        })
+
+        $('.reload-timbangan').click(function() {
+            reloadTimbangan()
         })
 
         function reloadTimbangan() {
@@ -513,7 +529,7 @@
             }
 
             detailSelect = []
-            modal.find('input,select').each(function(i, v) {
+            modal.find('input,select,textarea').each(function(i, v) {
                 if ($(v).hasClass('handle-number-4')) {
                     detailSelect[$(v).prop('name')] = normalizeNumber($(v).val())
                 } else {
@@ -526,24 +542,23 @@
 
             let newObj = Object.assign({}, detailSelect)
             if (statusModal == 'create') {
-                details.unshift(newObj)
+                details.push(newObj)
             } else if (statusModal == 'edit') {
                 details[newObj.index - 1] = newObj
             }
 
             $('[name="details"]').val(JSON.stringify(details))
+            console.log(details)
 
             statusModal = ''
             detailSelect = []
 
             resDataTable.clear().rows.add(details).draw()
-            stopInterval()
             $('#modalEntry').modal('hide')
         })
 
         $('.cancel-entry').click(function() {
             html5QrcodeScanner.clear();
-            stopInterval()
             if (statusModal == 'create') {
                 count -= 1
             }
@@ -586,15 +601,26 @@
             searchAsset(self)
         })
 
+        $('[name="is_qc"]').click(function() {
+            details = []
+            resDataTable.clear().rows.add(details).draw()
+        })
+
         function searchAsset(string) {
             $('#cover-spin').show()
+            let isQc = 0
+            if ($('[name="is_qc"]').is(':checked')) {
+                isQc = $('[name="is_qc"]').val()
+            }
+
             $.ajax({
                 url: '{{ route('material_usage-qrcode') }}',
                 type: 'get',
                 data: {
                     qrcode: string,
                     id_cabang: $('[name="id_cabang"]').val(),
-                    id_gudang: $('[name="id_gudang"]').val()
+                    id_gudang: $('[name="id_gudang"]').val(),
+                    is_qc: isQc,
                 },
                 success: function(res) {
                     detailSelect = res.data
@@ -624,9 +650,11 @@
                         modal.find('[name="jumlah"]').prop('readonly', true).addClass('validate')
                         modal.find('[name="id_timbangan"]').prop('disabled', false).addClass('validate')
                         $('#label-timbangan').html('Timbangan <span>*</span>')
+                        $('.reload-timbangan').show()
                     } else {
                         modal.find('[name="jumlah"]').prop('readonly', false).addClass('validate')
                         modal.find('[name="id_timbangan"]').prop('disabled', true).removeClass('validate')
+                        $('.reload-timbangan').hide()
                     }
 
                     $('.result-form').show()
@@ -653,21 +681,21 @@
                 }
 
                 if ($('[name="jumlah"]').val() == '0') {
-                    message = "Berat barang harus lebih dari 0"
+                    message = "Jumlah harus lebih dari 0"
                     valid = false
                 }
 
-                if ($(v).prop('name') == 'kode_batang') {
-                    let findItem = details.filter(p => p.kode_batang == $(v).val())
-                    if (findItem.length > 0 && findItem[0].kode_batang == id && statusModal == 'create') {
-                        message = "QR Code sudah ada"
-                        valid = false
-                    }
-                }
+                // if ($(v).prop('name') == 'kode_batang') {
+                //     let findItem = details.filter(p => p.kode_batang == $(v).val())
+                //     if (findItem.length > 0 && findItem[0].kode_batang == id && statusModal == 'create') {
+                //         message = "QR Code sudah ada"
+                //         valid = false
+                //     }
+                // }
 
                 if ($(v).hasClass('error-field')) {
                     valid = false
-                    message = "Qty melebihi batas maksimal"
+                    message = "Jumlah melebihi batas maksimal"
                 }
             })
 
@@ -685,10 +713,6 @@
 
         function onScanError(errorMessage) {
             toastr.error(JSON.strignify(errorMessage))
-        }
-
-        function stopInterval() {
-            clearInterval(intervalReloadTimbangan);
         }
     </script>
 @endsection
