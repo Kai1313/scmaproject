@@ -258,7 +258,7 @@ class MaterialUsageController extends Controller
             ->where('id_konfigurasi', $id)
             ->value('keterangan_konfigurasi');
         if ($data) {
-            $value = $id == 38 ? ($data / 1000) : $data;
+            $value = $id == 38 ? (number_format($data / 1000, 4)) : $data;
         }
 
         return response()->json([
