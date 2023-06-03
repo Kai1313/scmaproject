@@ -346,6 +346,7 @@ class PurchaseDownPaymentController extends Controller
             'total' => $countDataPo->mtotal_permintaan_pembelian,
             'nilai_mata_uang' => $countDataPo->nilai_mata_uang,
             'id_mata_uang' => $countDataPo->id_mata_uang,
+            'nama_mata_uang' => $countDataPo->nama_mata_uang,
         ], 200);
     }
 

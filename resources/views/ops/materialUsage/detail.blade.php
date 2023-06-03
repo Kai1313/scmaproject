@@ -106,6 +106,7 @@
                                 <th>Jumlah Zak</th>
                                 <th>Tare</th>
                                 <th>Nett</th>
+                                <th>Catatan</th>
                             </tr>
                         </thead>
                     </table>
@@ -165,6 +166,9 @@
                     return data ? formatNumber(data, 4) : 0
                 },
                 className: 'text-right'
+            }, {
+                data: 'catatan',
+                name: 'catatan'
             }],
             initComplete: function(settings, json) {
                 sumDetail()
@@ -190,6 +194,7 @@
                 '<td class="text-right">' + formatNumber(totalJumlahZak, 4) + '</td>' +
                 '<td class="text-right">' + formatNumber(totalTare, 4) + '</td>' +
                 '<td class="text-right">' + formatNumber(totalNett, 4) + '</td>' +
+                '<td></td>' +
                 '</tr></tfoot>'
             );
         }
