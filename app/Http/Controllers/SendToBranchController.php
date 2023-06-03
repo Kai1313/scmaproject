@@ -233,12 +233,13 @@ class SendToBranchController extends Controller
                 'batch_master_qr_code as batch',
                 'zak',
                 'id_wrapper_zak',
-                'weight_zak'
+                'weight_zak',
+                'mqc.status_qc_qr_code'
             )
             ->leftJoin('barang', 'mqc.id_barang', '=', 'barang.id_barang')
             ->leftJoin('satuan_barang', 'mqc.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
             ->where('id_cabang', $idCabang)->where('mqc.id_gudang', $idGudang)
-            ->where('mqc.status_qc_qr_code', 1)
+        // ->where('mqc.status_qc_qr_code', 1)
             ->where('mqc.kode_batang_master_qr_code', $qrcode)
             ->first();
 
@@ -251,6 +252,9 @@ class SendToBranchController extends Controller
         } else if ($data && $data->sisa_master_qr_code <= 0) {
             $status = 500;
             $message = "Barang sudah habis";
+        } else if ($data && $data->status_qc_qr_code != '1') {
+            $status = 500;
+            $message = 'Barang belum di QC';
         } else {
             $message = '';
             $status = 200;
