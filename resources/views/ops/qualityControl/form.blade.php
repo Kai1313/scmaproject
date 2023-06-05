@@ -187,40 +187,43 @@
                                 </select>
                                 <input type="hidden" name="nama_barang" class="validate">
                             </div>
-                            <label>Total <span>*</span></label>
-                            <div class="form-group">
-                                <div class="input-group" id="qty">
-                                    <input type="text" name="jumlah_pembelian_detail" class="form-control" readonly>
-                                    <span class="input-group-addon">KG</span>
+                            <div class="show-after-search">
+                                <label>Total <span>*</span></label>
+                                <div class="form-group">
+                                    <div class="input-group" id="qty">
+                                        <input type="text" name="jumlah_pembelian_detail" class="form-control"
+                                            readonly>
+                                        <span class="input-group-addon">KG</span>
+                                    </div>
+                                    <input type="hidden" name="nama_satuan_barang" class="validate">
+                                    <input type="hidden" name="id_satuan_barang" class="validate">
+                                    <input type="hidden" name="tanggal_qc" value="{{ date('Y-m-d') }}">
                                 </div>
-                                <input type="hidden" name="nama_satuan_barang" class="validate">
-                                <input type="hidden" name="id_satuan_barang" class="validate">
-                                <input type="hidden" name="tanggal_qc" value="{{ date('Y-m-d') }}">
-                            </div>
-                            <label>Status <span>*</span></label>
-                            <div class="form-group">
-                                <select name="status_qc" class="form-control validate">
-                                </select>
-                            </div>
-                            <label>Alasan</label>
-                            <div class="form-group">
-                                <textarea name="reason" class="form-control" readonly></textarea>
+                                <label>Status <span>*</span></label>
+                                <div class="form-group">
+                                    <select name="status_qc" class="form-control validate">
+                                    </select>
+                                </div>
+                                <label>Alasan</label>
+                                <div class="form-group">
+                                    <textarea name="reason" class="form-control" readonly></textarea>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-6 show-after-search">
                             <div class="row">
                                 <div class="col-sm-6">
                                     <label>SG </label>
                                     <div class="form-group">
                                         <input type="text" name="sg_pembelian_detail"
-                                            class="form-control handle-number-4">
+                                            class="form-control handle-number-4 check-range" data-type="sg">
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
                                     <label>BE </label>
                                     <div class="form-group">
                                         <input type="text" name="be_pembelian_detail"
-                                            class="form-control handle-number-4">
+                                            class="form-control handle-number-4 check-range" data-type="be">
                                     </div>
                                 </div>
                             </div>
@@ -229,7 +232,7 @@
                                     <label>PH </label>
                                     <div class="form-group">
                                         <input type="text" name="ph_pembelian_detail"
-                                            class="form-control handle-number-4">
+                                            class="form-control handle-number-4 check-range" data-type="ph">
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
@@ -252,7 +255,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary cancel-entry btn-flat">Batal</button>
-                    <button type="button" class="btn btn-primary save-entry btn-flat">Simpan</button>
+                    <button type="button" class="btn btn-primary save-entry btn-flat show-after-search">Simpan</button>
                 </div>
             </div>
         </div>
@@ -277,6 +280,7 @@
         let detailSelect = []
         let statusModal = 'create'
         let indexSelect = 0
+        let paramQcSelect = []
         $('.select2').select2()
         $('[name="status_qc"]').select2({
             data: arrayStatus
@@ -423,6 +427,13 @@
                         $('[name="nama_barang"]').val(dataselect.text)
                         $('[name="nama_satuan_barang"]').val(dataselect.nama_satuan_barang)
                         $('[name="id_satuan_barang"]').val(dataselect.id_satuan_barang)
+                        paramQcSelect = dataselect
+
+                        if (dataselect.id) {
+                            $('.show-after-search').css('display', 'inline')
+                        } else {
+                            $('.show-after-search').css('display', 'none')
+                        }
                     });
 
                     details = res.qc
@@ -442,11 +453,7 @@
             detailSelect = []
             $('#modalEntry').find('input,select,textarea').each(function(i, v) {
                 if ($(v).hasClass('handle-number-4')) {
-                    if ($(v).prop('name') == 'sg_pembelian_detail') {
-                        $(v).val(1).trigger('change')
-                    } else {
-                        $(v).val(0).trigger('change')
-                    }
+                    $(v).val(0).trigger('change')
                 } else {
                     $(v).val('').trigger('change')
                 }
@@ -467,6 +474,8 @@
                 let val = $(v).val().replace('.', ',')
                 $(v).val(formatRupiah(val, 4))
             })
+
+            $('.show-after-search').css('display', 'none')
         })
 
         $('.save-entry').click(function() {
@@ -572,6 +581,34 @@
                 let val = $(v).val().replace('.', ',')
                 $(v).val(formatRupiah(val, 4))
             })
+        })
+
+        $('#modalEntry').on('input', '.check-range', function() {
+            let type = $(this).data('type')
+            console.log($(this).val())
+            $(this).parent().find('label').remove()
+            let d = normalizeNumber($(this).val() ? $(this).val() : '0')
+            if (type == 'sg') {
+                if (d < paramQcSelect.start_range_sg || d > paramQcSelect.final_range_sg) {
+                    $(this).after('<label class="label label-danger">Rentang ' + paramQcSelect
+                        .start_range_sg + ' - ' + paramQcSelect.final_range_sg + '</label>')
+                }
+            }
+
+            if (type == 'be') {
+                if (d < paramQcSelect.start_range_be || d > paramQcSelect.final_range_be) {
+                    $(this).after('<label class="label label-danger">Rentang ' + paramQcSelect
+                        .start_range_be + ' - ' + paramQcSelect.final_range_be + '</label>')
+                }
+            }
+
+            if (type == 'ph') {
+                if (d < paramQcSelect.start_range_ph || d > paramQcSelect.final_range_ph) {
+                    $(this).after('<label class="label label-danger">Rentang ' + paramQcSelect
+                        .start_range_ph + ' - ' + paramQcSelect.final_range_ph + '</label>')
+                }
+            }
+            $(this).val(d)
         })
 
         function validatorModal(barang, id) {

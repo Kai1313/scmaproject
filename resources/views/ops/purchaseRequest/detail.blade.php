@@ -235,8 +235,8 @@
                     return status;
                 }
             }, {
-                data: 'status',
-                name: 'status',
+                data: 'status_data',
+                name: 'status_data',
                 className: 'text-center'
             }, {
                 data: 'index',

@@ -58,7 +58,8 @@ class PurchaseRequest extends Model
                 'notes',
                 'approval_notes',
                 'approval_status',
-                DB::raw('(case when closed = 0 then "Open" else "Closed" end) as status'),
+                'closed',
+                DB::raw('(case when closed = 0 then "Open" else "Closed" end) as status_data'),
                 DB::raw('(case when sum(sisa_master_qr_code) > 0 then sum(sisa_master_qr_code) else 0 end) as stok')
             )
             ->leftJoin('barang', 'purchase_request_detail.id_barang', '=', 'barang.id_barang')
@@ -91,6 +92,9 @@ class PurchaseRequest extends Model
                         'id_satuan_barang' => $data->id_satuan_barang,
                         'qty' => $data->qty,
                         'notes' => $data->notes,
+                        'closed' => isset($data->closed) ? $data->closed : 0,
+                        'approval_status' => isset($data->approval_status) ? $data->approval_status : 0,
+                        'approval_notes' => isset($data->approval_notes) ? $data->approval_notes : null,
                     ]);
             } else {
                 DB::table('purchase_request_detail')->insert([
@@ -100,8 +104,9 @@ class PurchaseRequest extends Model
                     'qty' => $data->qty,
                     'notes' => $data->notes,
                     'purchase_request_id' => $this->purchase_request_id,
-                    'closed' => '0',
-                    'approval_status' => 0,
+                    'closed' => isset($data->closed) ? $data->closed : 0,
+                    'approval_status' => isset($data->approval_status) ? $data->approval_status : 0,
+                    'approval_notes' => isset($data->approval_notes) ? $data->approval_notes : null,
                 ]);
             }
         }

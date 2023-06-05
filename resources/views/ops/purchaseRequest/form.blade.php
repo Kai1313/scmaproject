@@ -162,7 +162,7 @@
                 </div>
                 <div class="box-body">
                     <div class="table-responsive">
-                        <input type="hidden" name="details" value="{{ $data ? json_encode($data->formatdetail) : '[]' }}">
+                        <input type="hidden" name="details" value="">
                         <table id="table-detail" class="table table-bordered data-table display responsive nowrap"
                             width="100%">
                             <thead>
@@ -221,7 +221,7 @@
                             <textarea name="notes" class="form-control" rows="5"></textarea>
                         </div>
                         <input type="hidden" name="stok">
-                        {{-- <input type="hidden" name="status" value="Open"> --}}
+                        <input type="hidden" name="closed" value="0">
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary cancel-entry btn-flat">Batal</button>
@@ -257,6 +257,13 @@
         });
 
         $('.select2').select2()
+
+        for (let i = 0; i < details.length; i++) {
+            details[i].index = i + 1
+        }
+
+        $('[name="details"]').val(JSON.stringify(details))
+
         var resDataTable = $('#table-detail').DataTable({
             data: details,
             ordering: false,
@@ -294,11 +301,9 @@
                 render: function(data, type, row, meta) {
                     let btn = '<ul class="horizontal-list">';
                     btn +=
-                        '<li><a href="javascript:void(0)" data-index="' + data +
-                        '" class="btn btn-warning btn-xs mr-1 mb-1 edit-entry"><i class="glyphicon glyphicon-pencil"></i></a></li>';
+                        '<li><a href="javascript:void(0)" class="btn btn-warning btn-xs mr-1 mb-1 edit-entry"><i class="glyphicon glyphicon-pencil"></i></a></li>';
                     btn +=
-                        '<li><a href="javascript:void(0)" data-index="' + data +
-                        '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1 delete-entry"><i class="glyphicon glyphicon-trash"></i></a></li>';
+                        '<li><a href="javascript:void(0)" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1 delete-entry"><i class="glyphicon glyphicon-trash"></i></a></li>';
                     btn += '</ul>';
                     return btn;
                 }
@@ -373,6 +378,7 @@
 
                     $('#message-stok').text(formatNumber(res.stok, 4) + ' ' + res.satuan_stok)
                     $('#modalEntry').find('[name="stok"]').val(res.stok)
+                    $('#modalEntry').find('[name="closed"]').val(0)
                     $('#cover-spin').hide()
                 },
                 error: function(error) {
@@ -408,7 +414,6 @@
         $('.save-entry').click(function() {
             let modal = $('#modalEntry')
             let valid = validatorModal(modal.find('[name="id_barang"]').val())
-            console.log(valid)
             if (!valid.status) {
                 Swal.fire("Gagal tambah data. ", valid.message, 'error')
                 return false
@@ -424,7 +429,7 @@
 
             let newObj = Object.assign({}, detailSelect)
             if (statusModal == 'create') {
-                details.unshift(newObj)
+                details.push(newObj)
             } else if (statusModal == 'edit') {
                 details[newObj.index - 1] = newObj
             }
@@ -456,9 +461,9 @@
                 backdrop: 'static',
                 keyboard: false
             })
-            let index = $(this).data('index')
+            let index = $(this).parents('tr').index()
             statusModal = 'edit'
-            detailSelect = details[index - 1]
+            detailSelect = details[index]
             for (select in detailSelect) {
                 if (['id_barang', 'id_satuan_barang'].includes(select)) {
                     let nameSelect = (select == 'id_barang') ? 'nama_barang' : 'nama_satuan_barang';
@@ -497,7 +502,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     details.splice(index, 1)
-                    count -= 1
+                    count = details.length
 
                     for (let i = 0; i < details.length; i++) {
                         details[i].index = i + 1
