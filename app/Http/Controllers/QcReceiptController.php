@@ -12,7 +12,7 @@ use Yajra\DataTables\DataTables;
 class QcReceiptController extends Controller
 {
     public $arrayStatus = [
-        ['text' => 'Pilih Status', 'class' => 'label label-default', 'id' => ''],
+        ['text' => 'Belum di qc', 'class' => 'label label-default', 'id' => ''],
         ['text' => 'Passed', 'class' => 'label label-success', 'id' => '1'],
         ['text' => 'Reject', 'class' => 'label label-danger', 'id' => '2'],
         ['text' => 'Hold', 'class' => 'label label-warning', 'id' => '3'],
@@ -59,8 +59,9 @@ class QcReceiptController extends Controller
             return Datatables::of($data)
                 ->addIndexColumn()
                 ->editColumn('status_qc', function ($row) {
+                    $index = $row->status_qc;
                     if ($row->status_qc) {
-                        return '<label class="' . $this->arrayStatus[$row->status_qc]['class'] . '">' . $this->arrayStatus[$row->status_qc]['text'] . '</label>';
+                        return '<label class="' . $this->arrayStatus[$index]['class'] . '">' . $this->arrayStatus[$index]['text'] . '</label>';
                     } else {
                         return '<label class="label label-default">Belum di QC</label>';
                     }
@@ -99,12 +100,13 @@ class QcReceiptController extends Controller
 
     public function saveEntry(Request $request, $id = 0)
     {
+        Log::info("tes qc");
+        DB::beginTransaction();
         try {
-            DB::beginTransaction();
             $datas = json_decode($request->details);
+
             foreach ($datas as $value) {
-                $data = QualityControl::find($value->id);
-                if (!$data) {
+                if ($value->id == '') {
                     $data = new QualityControl;
                     $data->tanggal_qc = date('Y-m-d');
                     $data->id_cabang = $request->id_cabang;
@@ -112,19 +114,19 @@ class QcReceiptController extends Controller
                     $data->id_barang = $value->id_barang;
                     $data->id_satuan_barang = $value->id_satuan_barang;
                     $data->jumlah_pembelian_detail = $value->jumlah_pembelian_detail;
+                    $data->status_qc = $value->status_qc;
+                    $data->reason = $value->reason;
+                    $data->sg_pembelian_detail = $value->sg_pembelian_detail;
+                    $data->bentuk_pembelian_detail = $value->bentuk_pembelian_detail;
+                    $data->be_pembelian_detail = $value->be_pembelian_detail;
+                    $data->ph_pembelian_detail = $value->ph_pembelian_detail;
+                    $data->warna_pembelian_detail = $value->warna_pembelian_detail;
+                    $data->keterangan_pembelian_detail = $value->keterangan_pembelian_detail;
+                    $data->save();
+
+                    Log::info("loop" . $value->id);
+                    $data->updatePembelianDetail();
                 }
-
-                $data->status_qc = $value->status_qc;
-                $data->reason = $value->reason;
-                $data->sg_pembelian_detail = $value->sg_pembelian_detail;
-                $data->bentuk_pembelian_detail = $value->bentuk_pembelian_detail;
-                $data->be_pembelian_detail = $value->be_pembelian_detail;
-                $data->ph_pembelian_detail = $value->ph_pembelian_detail;
-                $data->warna_pembelian_detail = $value->warna_pembelian_detail;
-                $data->keterangan_pembelian_detail = $value->keterangan_pembelian_detail;
-                $data->save();
-
-                $data->updatePembelianDetail();
             }
 
             $resApi = $this->callApiPembelian($request->id_pembelian);
@@ -178,6 +180,7 @@ class QcReceiptController extends Controller
 
     public function callApiPembelian($data)
     {
+        Log::info("access api");
         try {
             $client = new \GuzzleHttp\Client();
             $request = $client->get(env('OLD_API_ROOT') . "actions/aa_update_ppn_pembelian.php?id_pembelian=" . $data);

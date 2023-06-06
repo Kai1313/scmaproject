@@ -27,6 +27,8 @@ Route::get('/get-menu/{id}', 'DashboardController@getMenu')->name('get-menu');
 //     return view('accounting.master.slip');
 // });
 
+Route::get('tesss/{data}', 'QcReceiptController@callApiPembelian');
+
 Route::prefix('master_biaya')->group(function () {
     Route::get('/index/{user_id?}', 'MasterBiayaController@index')->name('master-biaya');
     Route::get('/entry/{id?}', 'MasterBiayaController@entry')->name('master-biaya-entry');

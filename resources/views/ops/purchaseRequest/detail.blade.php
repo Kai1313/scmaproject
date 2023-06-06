@@ -111,7 +111,7 @@
         <div class="box box-primary">
             <div class="box-header">
                 <h3 class="box-title">Detil Permintaan Barang</h3>
-                @if (session()->get('user')['id_grup_pengguna'] == 13 && $data->approval_status == 0)
+                @if (in_array(session()->get('user')['id_grup_pengguna'], $arrayAccess) && $data->approval_status == 0)
                     <a href="{{ route('purchase-request-change-status', [$data->purchase_request_id, 'reject']) }}"
                         class="btn btn-default btn-change-status btn-flat btn-sm pull-right" data-param="reject">
                         <i class="fa fa-times"></i> Tolak Semua
@@ -253,13 +253,13 @@
                                 '" class="btn btn-success btn-xs mr-1 mb-1 btn-change-status-modal" data-item="' +
                                 row.nama_barang +
                                 '" data-type="1" data-index="' + data +
-                                '"><i class="glyphicon glyphicon-check"></i> Approval</a></li>';
+                                '"><i class="glyphicon glyphicon-check"></i> Setuju</a></li>';
                             btn +=
                                 '<li><a href="' + changeStatusDetail +
                                 '" class="btn btn-default btn-xs mr-1 mb-1 btn-change-status-modal" data-item="' +
                                 row.nama_barang +
                                 '" data-type="2" data-index="' + data +
-                                '"><i class="fa fa-times"></i> Reject</a></a></li>';
+                                '"><i class="fa fa-times"></i> Tolak</a></a></li>';
                         }
                     }
 

@@ -48,6 +48,7 @@ class PurchaseRequest extends Model
         $gudang = $arrayCabang[$this->id_cabang];
         return $this->hasMany(PurchaseRequestDetail::class, 'purchase_request_id')
             ->select(
+                'index as old_index',
                 'index',
                 'purchase_request_detail.id_barang',
                 'nama_barang',
@@ -73,42 +74,41 @@ class PurchaseRequest extends Model
     public function savedetails($details)
     {
         $detail = json_decode($details);
-        $ids = array_column($detail, 'index');
-
-        DB::table('purchase_request_detail')
-            ->where('purchase_request_id', $this->purchase_request_id)
-            ->whereNotIn('index', $ids)->delete();
-
+        $array = [];
         foreach ($detail as $data) {
-            $check = DB::table('purchase_request_detail')
-                ->where('purchase_request_id', $this->purchase_request_id)
-                ->where('index', $data->index)->first();
-            if ($check) {
-                DB::table('purchase_request_detail')
+            if ($data->old_index != '') {
+                $check = DB::table('purchase_request_detail')
                     ->where('purchase_request_id', $this->purchase_request_id)
-                    ->where('index', $data->index)
-                    ->update([
-                        'id_barang' => $data->id_barang,
-                        'id_satuan_barang' => $data->id_satuan_barang,
-                        'qty' => $data->qty,
-                        'notes' => $data->notes,
-                        'closed' => isset($data->closed) ? $data->closed : 0,
-                        'approval_status' => isset($data->approval_status) ? $data->approval_status : 0,
-                        'approval_notes' => isset($data->approval_notes) ? $data->approval_notes : null,
-                    ]);
+                    ->where('index', $data->old_index)->first();
+                if ($check) {
+                    $check->index = $data->index;
+                    $check->id_barang = $data->id_barang;
+                    $check->id_satuan_barang = $data->id_satuan_barang;
+                    $check->qty = $data->qty;
+                    $check->notes = $data->notes;
+                    $array[] = $check;
+                }
             } else {
-                DB::table('purchase_request_detail')->insert([
-                    'index' => $data->index,
-                    'id_barang' => $data->id_barang,
-                    'id_satuan_barang' => $data->id_satuan_barang,
-                    'qty' => $data->qty,
-                    'notes' => $data->notes,
-                    'purchase_request_id' => $this->purchase_request_id,
-                    'closed' => isset($data->closed) ? $data->closed : 0,
-                    'approval_status' => isset($data->approval_status) ? $data->approval_status : 0,
-                    'approval_notes' => isset($data->approval_notes) ? $data->approval_notes : null,
-                ]);
+                $data->purchase_request_id = $this->purchase_request_id;
+                $array[] = $data;
             }
+        }
+
+        DB::table('purchase_request_detail')->where('purchase_request_id', $this->purchase_request_id)->delete();
+        foreach ($array as $a) {
+            DB::table('purchase_request_detail')->insert([
+                'purchase_request_id' => $a->purchase_request_id,
+                'index' => $a->index,
+                'id_barang' => $a->id_barang,
+                'id_satuan_barang' => $a->id_satuan_barang,
+                'qty' => $a->qty,
+                'notes' => $a->notes,
+                'approval_status' => isset($a->approval_status) ? $a->approval_status : 0,
+                'approval_user_id' => isset($a->approval_user_id) ? $a->approval_user_id : null,
+                'approval_date' => isset($a->approval_date) ? $a->approval_date : null,
+                'closed' => $a->closed,
+                'approval_notes' => isset($a->approval_notes) ? $a->approval_notes : null,
+            ]);
         }
 
         return ['status' => 'success'];

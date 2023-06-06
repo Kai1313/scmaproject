@@ -201,8 +201,8 @@
                                 </div>
                                 <label>Status <span>*</span></label>
                                 <div class="form-group">
-                                    <select name="status_qc" class="form-control validate">
-                                    </select>
+                                    <input name="label_status_qc" class="form-control validate" readonly>
+                                    <input type="hidden" name="status_qc" value="">
                                 </div>
                                 <label>Alasan</label>
                                 <div class="form-group">
@@ -213,26 +213,26 @@
                         <div class="col-md-6 show-after-search">
                             <div class="row">
                                 <div class="col-sm-6">
-                                    <label>SG </label>
+                                    <label>SG <span>*</span></label>
                                     <div class="form-group">
                                         <input type="text" name="sg_pembelian_detail"
-                                            class="form-control handle-number-4 check-range" data-type="sg">
+                                            class="form-control handle-number-4 check-range validate" data-type="sg">
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
-                                    <label>BE </label>
+                                    <label>BE <span>*</span></label>
                                     <div class="form-group">
                                         <input type="text" name="be_pembelian_detail"
-                                            class="form-control handle-number-4 check-range" data-type="be">
+                                            class="form-control handle-number-4 check-range validate" data-type="be">
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-sm-6">
-                                    <label>PH </label>
+                                    <label>PH <span>*</span></label>
                                     <div class="form-group">
                                         <input type="text" name="ph_pembelian_detail"
-                                            class="form-control handle-number-4 check-range" data-type="ph">
+                                            class="form-control handle-number-4 check-range validate" data-type="ph">
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
@@ -282,9 +282,6 @@
         let indexSelect = 0
         let paramQcSelect = []
         $('.select2').select2()
-        $('[name="status_qc"]').select2({
-            data: arrayStatus
-        })
 
         var resDataTable = $('#table-detail').DataTable({
             data: details,
@@ -309,7 +306,8 @@
                 data: 'status_qc',
                 name: 'status_qc',
                 render: function(data, type, row) {
-                    return '<label class="' + arrayStatus[data]['class'] + '">' + arrayStatus[data][
+                    let index = data
+                    return '<label class="' + arrayStatus[index]['class'] + '">' + arrayStatus[index][
                         'text'
                     ] + '</label>';
                 },
@@ -354,7 +352,7 @@
                 searchable: false,
                 render: function(data, type, row, meta) {
                     let btn = '';
-                    if (row.status_qc == 3) {
+                    if (row.status_qc == 3 || row.id == '') {
                         btn = '<ul class="horizontal-list">';
                         btn +=
                             '<li><a href="javascript:void(0)" data-id="' + data +
@@ -434,11 +432,14 @@
                         } else {
                             $('.show-after-search').css('display', 'none')
                         }
+
+                        checkRangeQc()
                     });
 
                     details = res.qc
                     $('.btn-print').attr('href', res.route_print).css('display', 'block')
                     resDataTable.clear().rows.add(details).draw()
+                    $('[name="details"]').val(JSON.stringify(details))
                     $('#cover-spin').hide()
                 },
                 error: function(error) {
@@ -466,10 +467,6 @@
             }, 500);
 
             $('[name="status_qc"]').empty()
-            $('[name="status_qc"]').select2({
-                data: arrayStatus
-            })
-
             $('.handle-number-4').each(function(i, v) {
                 let val = $(v).val().replace('.', ',')
                 $(v).val(formatRupiah(val, 4))
@@ -509,19 +506,20 @@
             detailSelect = []
 
             resDataTable.clear().rows.add(details).draw()
+            console.log(details)
             $('#modalEntry').modal('hide')
         })
 
-        $('[name="status_qc"]').change(function() {
-            $('[name="reason"]').attr('readonly', true)
-            if ($(this).val() == 2) {
-                $('[name="reason"]').attr('readonly', false).addClass('validate')
-            } else if ($(this).val() == 3) {
-                $('[name="reason"]').attr('readonly', false)
-            } else {
-                $('[name="reason"]').attr('readonly', true).removeClass('validate')
-            }
-        })
+        // $('[name="status_qc"]').change(function() {
+        //     $('[name="reason"]').attr('readonly', true)
+        //     if ($(this).val() == 2) {
+        //         $('[name="reason"]').attr('readonly', false).addClass('validate')
+        //     } else if ($(this).val() == 3) {
+        //         $('[name="reason"]').attr('readonly', false)
+        //     } else {
+        //         $('[name="reason"]').attr('readonly', true).removeClass('validate')
+        //     }
+        // })
 
         $('.cancel-entry').click(function() {
             $('#modalEntry').modal('hide')
@@ -563,17 +561,6 @@
                         detailSelect[nameSelect] + '</option>')
                 }
 
-                if (['status_qc'].includes(select)) {
-                    $('[name="' + select + '"]').empty()
-                    $('[name="' + select + '"]').select2({
-                        data: [
-                            arrayStatus[1],
-                            arrayStatus[2],
-                            arrayStatus[3]
-                        ]
-                    })
-                }
-
                 $('[name="' + select + '"]').val(detailSelect[select]).trigger('change')
             }
 
@@ -584,38 +571,16 @@
         })
 
         $('#modalEntry').on('input', '.check-range', function() {
-            let type = $(this).data('type')
-            console.log($(this).val())
-            $(this).parent().find('label').remove()
-            let d = normalizeNumber($(this).val() ? $(this).val() : '0')
-            if (type == 'sg') {
-                if (d < paramQcSelect.start_range_sg || d > paramQcSelect.final_range_sg) {
-                    $(this).after('<label class="label label-danger">Rentang ' + paramQcSelect
-                        .start_range_sg + ' - ' + paramQcSelect.final_range_sg + '</label>')
-                }
-            }
-
-            if (type == 'be') {
-                if (d < paramQcSelect.start_range_be || d > paramQcSelect.final_range_be) {
-                    $(this).after('<label class="label label-danger">Rentang ' + paramQcSelect
-                        .start_range_be + ' - ' + paramQcSelect.final_range_be + '</label>')
-                }
-            }
-
-            if (type == 'ph') {
-                if (d < paramQcSelect.start_range_ph || d > paramQcSelect.final_range_ph) {
-                    $(this).after('<label class="label label-danger">Rentang ' + paramQcSelect
-                        .start_range_ph + ' - ' + paramQcSelect.final_range_ph + '</label>')
-                }
-            }
-            $(this).val(d)
+            checkRangeQc()
         })
 
         function validatorModal(barang, id) {
             let message = 'Lengkapi inputan yang diperlukan'
             let valid = true
             $('#modalEntry').find('.validate').each(function(i, v) {
+                $(v).parent().removeClass('has-error')
                 if ($(v).val() == '') {
+                    $(v).parent().addClass('has-error')
                     valid = false
                 }
 
@@ -631,6 +596,62 @@
             return {
                 'status': valid,
                 'message': message
+            }
+        }
+
+        function checkRangeQc() {
+            let countError = 0;
+            $('.check-range').each(function(i, v) {
+                let type = $(v).data('type')
+                let val = $(v).val()
+
+                if ($(v).parent().find('label')) {
+                    $(v).parent().find('label').remove()
+                }
+
+                let value = val ? normalizeNumber(val) : 0
+                if (type == 'sg') {
+                    if (value < paramQcSelect.start_range_sg || value > paramQcSelect.final_range_sg) {
+                        $(this).after('<label class="label label-danger">Rentang ' + paramQcSelect
+                            .start_range_sg + ' - ' + paramQcSelect.final_range_sg + '</label>')
+                        countError++
+                    }
+                }
+
+                if (type == 'be') {
+                    if (value < paramQcSelect.start_range_be || value > paramQcSelect.final_range_be) {
+                        $(this).after('<label class="label label-danger">Rentang ' + paramQcSelect
+                            .start_range_be + ' - ' + paramQcSelect.final_range_be + '</label>')
+                        countError++
+                    }
+                }
+
+                if (type == 'ph') {
+                    if (value < paramQcSelect.start_range_ph || value > paramQcSelect.final_range_ph) {
+                        $(this).after('<label class="label label-danger">Rentang ' + paramQcSelect
+                            .start_range_ph + ' - ' + paramQcSelect.final_range_ph + '</label>')
+                        countError++
+                    }
+                }
+            })
+
+            let selectArray = []
+            if (countError > 0) {
+                selectArray = arrayStatus[3]
+            } else {
+                selectArray = arrayStatus[1]
+            }
+
+            $('[name="status_qc"]').val(selectArray['id'])
+            $('[name="label_status_qc"]').val(selectArray['text'])
+
+
+            if (selectArray['id'] == 2) {
+                $('[name="reason"]').attr('readonly', false).addClass('validate')
+            } else if (selectArray['id'] == 3) {
+                $('[name="reason"]').attr('readonly', false).addClass('validate')
+            } else {
+                $('[name="reason"]').attr('readonly', true).removeClass('validate')
             }
         }
     </script>

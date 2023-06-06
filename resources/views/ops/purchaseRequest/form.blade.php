@@ -222,6 +222,7 @@
                         </div>
                         <input type="hidden" name="stok">
                         <input type="hidden" name="closed" value="0">
+                        <input type="hidden" name="old_index">
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary cancel-entry btn-flat">Batal</button>
@@ -263,6 +264,7 @@
         }
 
         $('[name="details"]').val(JSON.stringify(details))
+        console.log(details)
 
         var resDataTable = $('#table-detail').DataTable({
             data: details,
@@ -435,6 +437,7 @@
             }
 
             $('[name="details"]').val(JSON.stringify(details))
+            console.log(details)
 
             statusModal = ''
             detailSelect = []
@@ -510,6 +513,7 @@
 
                     resDataTable.clear().rows.add(details).draw()
                     $('[name="details"]').val(JSON.stringify(details))
+                    console.log(details)
                 }
             })
         })
