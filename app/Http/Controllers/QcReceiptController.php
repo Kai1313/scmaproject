@@ -100,36 +100,36 @@ class QcReceiptController extends Controller
 
     public function saveEntry(Request $request, $id = 0)
     {
-        Log::info("tes qc");
         DB::beginTransaction();
         try {
             $datas = json_decode($request->details);
-
             foreach ($datas as $value) {
                 if ($value->id == '') {
-                    $data = new QualityControl;
-                    $data->tanggal_qc = date('Y-m-d');
-                    $data->id_cabang = $request->id_cabang;
-                    $data->id_pembelian = $request->id_pembelian;
-                    $data->id_barang = $value->id_barang;
-                    $data->id_satuan_barang = $value->id_satuan_barang;
-                    $data->jumlah_pembelian_detail = $value->jumlah_pembelian_detail;
-                    $data->status_qc = $value->status_qc;
-                    $data->reason = $value->reason;
-                    $data->sg_pembelian_detail = $value->sg_pembelian_detail;
-                    $data->bentuk_pembelian_detail = $value->bentuk_pembelian_detail;
-                    $data->be_pembelian_detail = $value->be_pembelian_detail;
-                    $data->ph_pembelian_detail = $value->ph_pembelian_detail;
-                    $data->warna_pembelian_detail = $value->warna_pembelian_detail;
-                    $data->keterangan_pembelian_detail = $value->keterangan_pembelian_detail;
-                    $data->save();
+                    $data = QualityControl::where('id_pembelian', $request->id_pembelian)->where('id_barang', $value->id_barang)->first();
+                    if (!$data) {
+                        $data = new QualityControl;
+                        $data->tanggal_qc = date('Y-m-d');
+                        $data->id_cabang = $request->id_cabang;
+                        $data->id_pembelian = $request->id_pembelian;
+                        $data->id_barang = $value->id_barang;
+                        $data->id_satuan_barang = $value->id_satuan_barang;
+                        $data->jumlah_pembelian_detail = $value->jumlah_pembelian_detail;
+                        $data->status_qc = $value->status_qc;
+                        $data->reason = $value->reason;
+                        $data->sg_pembelian_detail = $value->sg_pembelian_detail;
+                        $data->bentuk_pembelian_detail = $value->bentuk_pembelian_detail;
+                        $data->be_pembelian_detail = $value->be_pembelian_detail;
+                        $data->ph_pembelian_detail = $value->ph_pembelian_detail;
+                        $data->warna_pembelian_detail = $value->warna_pembelian_detail;
+                        $data->keterangan_pembelian_detail = $value->keterangan_pembelian_detail;
+                        $data->save();
 
-                    Log::info("loop" . $value->id);
-                    $data->updatePembelianDetail();
+                        $data->updatePembelianDetail();
+                    }
                 }
             }
 
-            $resApi = $this->callApiPembelian($request->id_pembelian);
+            $this->callApiPembelianNative($request->id_pembelian);
 
             DB::commit();
             return response()->json([
@@ -178,15 +178,16 @@ class QcReceiptController extends Controller
         ], 200);
     }
 
-    public function callApiPembelian($data)
+    public function callApiPembelianNative($data)
     {
-        Log::info("access api");
         try {
-            $client = new \GuzzleHttp\Client();
-            $request = $client->get(env('OLD_API_ROOT') . "actions/aa_update_ppn_pembelian.php?id_pembelian=" . $data);
-            $response = $request->getBody()->getContents();
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, env('OLD_API_ROOT') . "actions/aa_update_ppn_pembelian.php?id_pembelian=" . $data);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            $output = curl_exec($ch);
+            curl_close($ch);
 
-            return $response;
+            return $output;
         } catch (\Exception $th) {
             Log::error("Error when access api pembelian");
             Log::error($th);

@@ -51,6 +51,21 @@
         .handle-number-4 {
             text-align: right;
         }
+
+        select[readonly].select2-hidden-accessible+.select2-container {
+            pointer-events: none;
+            touch-action: none;
+        }
+
+        select[readonly].select2-hidden-accessible+.select2-container .select2-selection {
+            background: #eee;
+            box-shadow: none;
+        }
+
+        select[readonly].select2-hidden-accessible+.select2-container .select2-selection__arrow,
+        select[readonly].select2-hidden-accessible+.select2-container .select2-selection__clear {
+            display: none;
+        }
     </style>
 @endsection
 
@@ -276,10 +291,11 @@
     <script>
         let branch = {!! json_encode($cabang) !!}
         let arrayStatus = {!! json_encode($arrayStatus) !!};
+        let items = []
         let details = [];
         let detailSelect = []
         let statusModal = 'create'
-        let indexSelect = 0
+        let indexSelect = -1
         let paramQcSelect = []
         $('.select2').select2()
 
@@ -357,6 +373,9 @@
                         btn +=
                             '<li><a href="javascript:void(0)" data-id="' + data +
                             '" class="btn btn-warning btn-xs mr-1 mb-1 edit-entry"><i class="glyphicon glyphicon-pencil"></i></a></li>';
+                        btn +=
+                            '<li><a href="javascript:void(0)" data-id="' + data +
+                            '" class="btn btn-danger btn-xs mr-1 mb-1 remove-entry"><i class="glyphicon glyphicon-trash"></i></a></li>';
                         btn += '</ul>';
                     }
 
@@ -370,6 +389,7 @@
         }).on('select2:select', function(e) {
             let dataselect = e.params.data
             getPurchasingNumber()
+            $('[name="id_barang"]').empty()
         });
 
 
@@ -397,7 +417,6 @@
                     $('#cover-spin').hide()
                 },
                 error: function(error) {
-                    console.log(error)
                     $('#cover-spin').hide()
                 }
             })
@@ -411,29 +430,29 @@
                     number: param,
                 },
                 success: function(res) {
+                    items = res.list_item
                     $('[name="id_barang"]').empty()
                     $('[name="id_barang"]').select2({
                         data: [{
                             'id': "",
                             'text': 'Pilih Barang'
-                        }, ...res.list_item]
+                        }, ...items]
                     }).on('select2:select', function(e) {
                         let dataselect = e.params.data
+                        paramQcSelect = dataselect
                         $('#qty').find('[name="jumlah_pembelian_detail"]').val(dataselect
                             .jumlah_pembelian_detail).trigger('input')
                         $('#qty').find('span').text(dataselect.nama_satuan_barang)
                         $('[name="nama_barang"]').val(dataselect.text)
                         $('[name="nama_satuan_barang"]').val(dataselect.nama_satuan_barang)
                         $('[name="id_satuan_barang"]').val(dataselect.id_satuan_barang)
-                        paramQcSelect = dataselect
+                        checkRangeQc()
 
                         if (dataselect.id) {
                             $('.show-after-search').css('display', 'inline')
                         } else {
                             $('.show-after-search').css('display', 'none')
                         }
-
-                        checkRangeQc()
                     });
 
                     details = res.qc
@@ -444,7 +463,6 @@
                 },
                 error: function(error) {
                     $('#cover-spin').hide()
-                    console.log(error)
                 }
             })
         }
@@ -452,6 +470,7 @@
         $('.add-entry').click(function() {
             statusModal = 'create'
             detailSelect = []
+            indexSelect = -1
             $('#modalEntry').find('input,select,textarea').each(function(i, v) {
                 if ($(v).hasClass('handle-number-4')) {
                     $(v).val(0).trigger('change')
@@ -472,6 +491,7 @@
                 $(v).val(formatRupiah(val, 4))
             })
 
+            $('[name="id_barang"]').attr('readonly', false)
             $('.show-after-search').css('display', 'none')
         })
 
@@ -495,7 +515,7 @@
 
             let newObj = Object.assign({}, detailSelect)
             if (statusModal == 'create') {
-                details.unshift(newObj)
+                details.push(newObj)
             } else if (statusModal == 'edit') {
                 details[indexSelect] = newObj
                 detailSelect = 0
@@ -506,23 +526,35 @@
             detailSelect = []
 
             resDataTable.clear().rows.add(details).draw()
-            console.log(details)
             $('#modalEntry').modal('hide')
         })
 
-        // $('[name="status_qc"]').change(function() {
-        //     $('[name="reason"]').attr('readonly', true)
-        //     if ($(this).val() == 2) {
-        //         $('[name="reason"]').attr('readonly', false).addClass('validate')
-        //     } else if ($(this).val() == 3) {
-        //         $('[name="reason"]').attr('readonly', false)
-        //     } else {
-        //         $('[name="reason"]').attr('readonly', true).removeClass('validate')
-        //     }
-        // })
-
         $('.cancel-entry').click(function() {
             $('#modalEntry').modal('hide')
+        })
+
+        $('body').on('click', '.remove-entry', function() {
+            let index = $(this).parents('tr').index()
+            Swal.fire({
+                title: 'Anda yakin ingin menghapus data ini?',
+                icon: 'info',
+                showDenyButton: true,
+                confirmButtonText: 'Yes',
+                denyButtonText: 'No',
+                reverseButtons: true,
+                customClass: {
+                    actions: 'my-actions',
+                    confirmButton: 'order-1',
+                    denyButton: 'order-3',
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    details.splice(index, 1)
+
+                    resDataTable.clear().rows.add(details).draw()
+                    $('[name="details"]').val(JSON.stringify(details))
+                }
+            })
         })
 
         $('body').on('click', '.edit-entry', function() {
@@ -550,24 +582,30 @@
                 detailSelect = []
             }
 
+            for (let i = 0; i < items.length; i++) {
+                if (items[i]['id'] == detailSelect.id_barang) {
+                    paramQcSelect = items[i]
+                    break
+                }
+            }
+
             for (select in detailSelect) {
                 if (['jumlah_pembelian_detail'].includes(select)) {
                     $('#qty').find('span').text(detailSelect['nama_satuan_barang'])
                 }
 
-                if (['id_barang'].includes(select)) {
-                    let nameSelect = 'nama_barang';
-                    $('[name="' + select + '"]').append('<option value="' + detailSelect[select] + '" selected>' +
-                        detailSelect[nameSelect] + '</option>')
-                }
-
                 $('[name="' + select + '"]').val(detailSelect[select]).trigger('change')
             }
 
+            checkRangeQc()
+            $('[name="label_status_qc"]').val(arrayStatus[detailSelect.status_qc]['text'])
             $('.handle-number-4').each(function(i, v) {
                 let val = $(v).val().replace('.', ',')
                 $(v).val(formatRupiah(val, 4))
             })
+
+            $('[name="id_barang"]').attr('readonly', true)
+            $('.show-after-search').css('display', 'inline')
         })
 
         $('#modalEntry').on('input', '.check-range', function() {
@@ -586,7 +624,7 @@
 
                 if ($(v).prop('name') == 'id_barang') {
                     let findItem = details.filter(p => p.id_barang == $(v).val())
-                    if (findItem.length > 0 && id == 0 && findItem[0].id_barang == barang) {
+                    if (findItem.length > 0 && id == '' && findItem[0].id_barang == barang && indexSelect < 0) {
                         message = "Barang sudah ada dalam daftar"
                         valid = false
                     }
@@ -637,7 +675,7 @@
 
             let selectArray = []
             if (countError > 0) {
-                selectArray = arrayStatus[3]
+                selectArray = arrayStatus[2]
             } else {
                 selectArray = arrayStatus[1]
             }
