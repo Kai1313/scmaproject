@@ -104,8 +104,9 @@
                                 <th>Bentuk</th>
                                 <th>Keterangan</th>
                                 <th>Status</th>
-                                <th>Alasan</th>
                                 <th>Tanggal QC</th>
+                                <th>Alasan</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -115,12 +116,35 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="modalEntry" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Perubahan Status QC Penerimaan Barang</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-danger" style="display:none;" id="alertModal">
+                        asd
+                    </div>
+                    <label>Alasan <span>*</span></label>
+                    <div class="form-group">
+                        <textarea name="approval_reason" class="form-control"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-flat" data-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-primary save-entry btn-flat">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('addedScripts')
     <script src="{{ asset('assets/bower_components/datatables.net/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js') }}"></script>
-    <script src="{{ asset('assets/bower_components/datatables-responsive/js/dataTables.responsive.js') }}"></script>
+    {{-- <script src="{{ asset('assets/bower_components/datatables-responsive/js/dataTables.responsive.js') }}"></script> --}}
     <script src="{{ asset('assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js') }}"></script>
     <script src="{{ asset('assets/bower_components/select2/dist/js/select2.min.js') }}"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -190,17 +214,37 @@
                 name: 'qc.status_qc',
                 className: 'text-center'
             }, {
+                data: 'tanggal_qc',
+                name: 'qc.tanggal_qc'
+            }, {
                 data: 'reason',
                 name: 'qc.reason',
             }, {
-                data: 'tanggal_qc',
-                name: 'qc.tanggal_qc'
-            }]
+                data: 'action',
+                name: 'action',
+            }, ]
         });
 
         $('[name="id_cabang"],[name="start_date"],[name="end_date"]').change(function() {
             table.ajax.url("?c=" + $('[name="id_cabang"]').val() + '&start_date=' + $('[name="start_date"]').val() +
                 '&end_date=' + $('[name="end_date"]').val()).load()
+        })
+
+        $('body').on('click', '.btn-revision', function() {
+            $('#cover-spin').show()
+            let id = $(this).data('id')
+            $.ajax({
+                url: "{{ route('qc_receipt-find-data-qc') }}?id=" + id,
+                type: 'get',
+                success: function(res) {
+                    $('#cover-spin').hide()
+                },
+                error: function(error) {
+                    $('#cover-spin').hide()
+                }
+            })
+
+            $('#modalEntry').modal('show')
         })
     </script>
 @endsection

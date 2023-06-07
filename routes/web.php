@@ -84,6 +84,7 @@ Route::prefix('qc_penerimaan_barang')->group(function () {
     Route::get('/auto_purchasing', 'QcReceiptController@autoPurchasing')->name('qc_receipt-auto-purchasing');
     Route::get('/auto-item', 'QcReceiptController@autoItem')->name('qc_receipt-auto-item');
     Route::get('/print/{id}', 'QcReceiptController@printData')->name('qc_receipt-print-data');
+    Route::get('/find', 'QcReceiptController@findDataQc')->name('qc_receipt-find-data-qc');
 });
 
 Route::prefix('kirim_ke_cabang')->group(function () {

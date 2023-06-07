@@ -40,7 +40,8 @@ class QcReceiptController extends Controller
                     'qc.ph_pembelian_detail',
                     'qc.warna_pembelian_detail',
                     'qc.keterangan_pembelian_detail',
-                    'qc.bentuk_pembelian_detail'
+                    'qc.bentuk_pembelian_detail',
+                    'qc.id as id_qc'
                 )
                 ->leftJoin('qc', function ($qc) {
                     $qc->on('pembelian_detail.id_pembelian', '=', 'qc.id_pembelian')->on('pembelian_detail.id_barang', '=', 'qc.id_barang');
@@ -66,7 +67,17 @@ class QcReceiptController extends Controller
                         return '<label class="label label-default">Belum di QC</label>';
                     }
                 })
-                ->rawColumns(['status_qc'])
+                ->addColumn('action', function ($row) {
+
+                    $btn = '<ul class="horizontal-list" style="min-width:0px;">';
+                    if ($row->status_qc == 2) {
+                        $btn .= '<li><a href="javascript:void(0)" class="btn btn-warning btn-xs mr-1 mb-1 btn-revision" data-id="' . $row->id_qc . '"><i class="glyphicon glyphicon-pencil"></i> Revisi Ke Passed</a></li>';
+                    }
+
+                    $btn .= '</ul>';
+                    return $btn;
+                })
+                ->rawColumns(['status_qc', 'action'])
                 ->make(true);
         }
 
@@ -129,9 +140,8 @@ class QcReceiptController extends Controller
                 }
             }
 
-            $this->callApiPembelianNative($request->id_pembelian);
-
             DB::commit();
+            $this->callApiPembelianNative($request->id_pembelian);
             return response()->json([
                 "result" => true,
                 "message" => "Data berhasil disimpan",
@@ -210,5 +220,22 @@ class QcReceiptController extends Controller
             'arrayStatus' => $this->arrayStatus,
             "pageTitle" => "SCA OPS | QC Penerimaan Pembelian | Cetak",
         ]);
+    }
+
+    public function findDataQc(Request $request)
+    {
+        $id = isset($request->id) ? $request->id : 0;
+        $data = QualityControl::find($id);
+        if ($data) {
+            return response()->json([
+                'status' => 'success',
+                'data' => $data,
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Data tidak ditemukan',
+        ], 500);
     }
 }
