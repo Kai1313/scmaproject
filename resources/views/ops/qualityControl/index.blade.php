@@ -109,8 +109,9 @@
                                 <th>Keterangan</th>
                                 <th>Status</th>
                                 <th>Tanggal QC</th>
-                                <th>Alasan</th>
+                                <th>Alasan QC</th>
                                 <th>Otorisasi</th>
+                                <th>Alasan Persetujuan</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -145,13 +146,16 @@
                                 <td width="20" style="vertical-align: top;">:</td>
                                 <td id="namaBarang" style="vertical-align: top;"></td>
                             </tr>
+                            <tr>
+                                <td width="150" style="vertical-align: top;font-weight:bold;">Jumlah</td>
+                                <td width="20" style="vertical-align: top;">:</td>
+                                <td id="jumlah" style="vertical-align: top;"></td>
+                            </tr>
                         </table>
                         <label>Alasan <span>*</span></label>
                         <div class="form-group">
                             <textarea name="approval_reason" class="form-control" rows="3" placeholder="Masukkan alasan perubahan status"
-                                data-validation="[NOTEMPTY]" data-validation-message="Alasan tidak boleh kosong">
-
-                            </textarea>
+                                data-validation="[NOTEMPTY]" data-validation-message="Alasan perubahan status tidak boleh kosong"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -247,6 +251,9 @@
                 data: 'nama_pengguna',
                 name: 'pengguna.nama_pengguna',
             }, {
+                data: 'approval_reason',
+                name: 'qc.approval_reason',
+            }, {
                 data: 'action',
                 name: 'action',
             }, ]
@@ -268,6 +275,7 @@
                     modal.find('form').attr('action', res.urlToChangeStatus)
                     modal.find('#kodePenerimaan').text(res.kodePenerimaan)
                     modal.find('#namaBarang').text(res.namaBarang)
+                    modal.find('#jumlah').text(res.jumlah)
                     $('#cover-spin').hide()
                     $('#modalEntry').modal('show')
                 },

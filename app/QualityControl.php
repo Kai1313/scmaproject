@@ -32,7 +32,7 @@ class QualityControl extends Model
 
     public function satuan()
     {
-        return $this->belongsTo(Satuan::class, 'id_satuan_barang');
+        return $this->belongsTo(SatuanBarang::class, 'id_satuan_barang');
     }
 
     public function updatePembelianDetail()

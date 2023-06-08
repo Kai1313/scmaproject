@@ -34,10 +34,8 @@ class QcReceiptController extends Controller
                     DB::raw('sum(pembelian_detail.nett) as jumlah_pembelian_detail'),
                     'status_qc',
                     'nama_satuan_barang',
-                    DB::raw('(CASE
-                        WHEN approval_user_id IS NOT NULL THEN approval_reason
-                        ELSE reason
-                    END) AS reason'),
+                    'reason',
+                    'approval_reason',
                     'qc.sg_pembelian_detail',
                     'qc.be_pembelian_detail',
                     'qc.ph_pembelian_detail',
@@ -62,6 +60,9 @@ class QcReceiptController extends Controller
             $data = $data->groupBy('pembelian_detail.id_pembelian', 'pembelian_detail.id_barang')
                 ->orderBy('pembelian.tanggal_pembelian', 'desc');
 
+            $qcApproval = DB::table('setting')->where('code', 'QC Approval')->value('value1');
+            $encode = explode(',', $qcApproval);
+
             return Datatables::of($data)
                 ->addIndexColumn()
                 ->editColumn('status_qc', function ($row) {
@@ -72,10 +73,9 @@ class QcReceiptController extends Controller
                         return '<label class="label label-default">Belum di QC</label>';
                     }
                 })
-                ->addColumn('action', function ($row) {
-
+                ->addColumn('action', function ($row) use ($encode) {
                     $btn = '<ul class="horizontal-list" style="min-width:0px;">';
-                    if ($row->status_qc == 2) {
+                    if ($row->status_qc == 2 && in_array(session()->get('user')['id_grup_pengguna'], $encode)) {
                         $btn .= '<li><a href="javascript:void(0)" class="btn btn-warning btn-xs mr-1 mb-1 btn-revision" data-id="' . $row->id_qc . '"><i class="glyphicon glyphicon-pencil"></i> Revisi Ke Passed</a></li>';
                     }
 
@@ -237,6 +237,7 @@ class QcReceiptController extends Controller
                 'kodePenerimaan' => $data->purchase->nama_pembelian,
                 'namaBarang' => $data->barang->nama_barang,
                 'urlToChangeStatus' => route('qc_receipt-save-change-status', $id),
+                'jumlah' => formatNumber($data->jumlah_pembelian_detail) . ' ' . $data->satuan->nama_satuan_barang,
             ]);
         }
 
@@ -259,7 +260,7 @@ class QcReceiptController extends Controller
             $data->updatePembelianDetail();
             DB::commit();
 
-            $this->callApiPembelianNative($request->id_pembelian);
+            $this->callApiPembelianNative($data->id_pembelian);
             return response()->json([
                 "result" => true,
                 "message" => "Data berhasil disimpan",

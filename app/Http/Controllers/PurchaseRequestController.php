@@ -184,8 +184,8 @@ class PurchaseRequestController extends Controller
         }
 
         $data = PurchaseRequest::find($id);
-        $access = DB::table('setting')->where('id_cabang', $data->id_cabang)->where('code', 'PR Approval')->first();
-        $arrayAccess = explode(',', $access->value1);
+        $access = DB::table('setting')->where('id_cabang', $data->id_cabang)->where('code', 'PR Approval')->value('value1');
+        $arrayAccess = explode(',', $access);
         $idUser = session()->get('user')['id_grup_pengguna'];
 
         return view('ops.purchaseRequest.detail', [
