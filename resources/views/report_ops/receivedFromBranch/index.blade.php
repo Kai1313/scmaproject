@@ -99,10 +99,10 @@
                                 <th>Cabang</th>
                                 <th>Gudang</th>
                                 <th>Cabang Asal</th>
-                                <th>Keterangan</th>
                                 <th>Jasa Pengiriman</th>
                                 <th>Nomor Kendaraan</th>
                                 <th>Status</th>
+                                <th>Keterangan</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -209,9 +209,6 @@
                             data: 'nama_cabang2',
                             name: 'c2.nama_cabang',
                         }, {
-                            data: 'keterangan_pindah_barang',
-                            name: 'pb.keterangan_pindah_barang',
-                        }, {
                             data: 'transporter',
                             name: 'pb.transporter',
                         }, {
@@ -220,6 +217,9 @@
                         }, {
                             data: 'status_pindah_barang',
                             name: 'pb.status_pindah_barang',
+                        }, {
+                            data: 'keterangan_pindah_barang',
+                            name: 'pb.keterangan_pindah_barang',
                         }, ]
                     });
                     break;

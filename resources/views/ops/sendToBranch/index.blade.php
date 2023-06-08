@@ -88,9 +88,9 @@
                                 <th>Kode Pindah Cabang</th>
                                 <th>Gudang</th>
                                 <th>Cabang Tujuan</th>
-                                <th>Keterangan</th>
                                 <th>Jasa Pengiriman</th>
                                 <th>Status</th>
+                                <th>Keterangan</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -133,14 +133,14 @@
                 data: 'nama_cabang',
                 name: 'cabang.nama_cabang',
             }, {
-                data: 'keterangan_pindah_barang',
-                name: 'pb.keterangan_pindah_barang',
-            }, {
                 data: 'transporter',
                 name: 'pb.transporter',
             }, {
                 data: 'status_pindah_barang',
                 name: 'pb.status_pindah_barang',
+            }, {
+                data: 'keterangan_pindah_barang',
+                name: 'pb.keterangan_pindah_barang',
             }, {
                 data: 'action',
                 name: 'action',

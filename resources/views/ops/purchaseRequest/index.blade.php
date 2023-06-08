@@ -90,11 +90,11 @@
                                 <th>Estimasi</th>
                                 <th>Gudang</th>
                                 <th>Pemohon</th>
-                                <th>Catatan</th>
                                 <th>Status</th>
                                 <th>Otorisasi</th>
                                 <th>Tanggal Otorisasi</th>
                                 <th>Jumlah Terpakai</th>
+                                <th>Catatan</th>
                                 <th width="150px">Action</th>
                             </tr>
                         </thead>
@@ -140,9 +140,6 @@
                 data: 'user',
                 name: 'user.nama_pengguna',
             }, {
-                data: 'catatan',
-                name: 'prh.catatan'
-            }, {
                 data: 'approval_status',
                 name: 'prh.approval_status',
                 className: 'text-center'
@@ -155,6 +152,9 @@
             }, {
                 data: 'closed',
                 name: 'closed'
+            }, {
+                data: 'catatan',
+                name: 'prh.catatan'
             }, {
                 data: 'action',
                 name: 'action',

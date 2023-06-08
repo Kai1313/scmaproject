@@ -34,14 +34,18 @@ class QcReceiptController extends Controller
                     DB::raw('sum(pembelian_detail.nett) as jumlah_pembelian_detail'),
                     'status_qc',
                     'nama_satuan_barang',
-                    'reason',
+                    DB::raw('(CASE
+                        WHEN approval_user_id IS NOT NULL THEN approval_reason
+                        ELSE reason
+                    END) AS reason'),
                     'qc.sg_pembelian_detail',
                     'qc.be_pembelian_detail',
                     'qc.ph_pembelian_detail',
                     'qc.warna_pembelian_detail',
                     'qc.keterangan_pembelian_detail',
                     'qc.bentuk_pembelian_detail',
-                    'qc.id as id_qc'
+                    'qc.id as id_qc',
+                    'pengguna.nama_pengguna'
                 )
                 ->leftJoin('qc', function ($qc) {
                     $qc->on('pembelian_detail.id_pembelian', '=', 'qc.id_pembelian')->on('pembelian_detail.id_barang', '=', 'qc.id_barang');
@@ -49,6 +53,7 @@ class QcReceiptController extends Controller
                 ->leftJoin('pembelian', 'pembelian_detail.id_pembelian', '=', 'pembelian.id_pembelian')
                 ->leftJoin('barang', 'pembelian_detail.id_barang', '=', 'barang.id_barang')
                 ->leftJoin('satuan_barang', 'pembelian_detail.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
+                ->leftJoin('pengguna', 'approval_user_id', '=', 'pengguna.id_pengguna')
                 ->whereBetween('pembelian.tanggal_pembelian', [$request->start_date, $request->end_date]);
             if (isset($request->c)) {
                 $data = $data->where('pembelian.id_cabang', $request->c);
@@ -229,7 +234,9 @@ class QcReceiptController extends Controller
         if ($data) {
             return response()->json([
                 'status' => 'success',
-                'data' => $data,
+                'kodePenerimaan' => $data->purchase->nama_pembelian,
+                'namaBarang' => $data->barang->nama_barang,
+                'urlToChangeStatus' => route('qc_receipt-save-change-status', $id),
             ]);
         }
 
@@ -237,5 +244,35 @@ class QcReceiptController extends Controller
             'status' => 'error',
             'message' => 'Data tidak ditemukan',
         ], 500);
+    }
+
+    public function saveChangeStatus(Request $request, $id)
+    {
+        DB::beginTransaction();
+        $data = QualityControl::find($id);
+        try {
+            $data->approval_user_id = session()->get('user')['id_pengguna'];
+            $data->approval_date = date('Y-m-d');
+            $data->approval_reason = $request->approval_reason;
+            $data->status_qc = 1;
+            $data->save();
+            $data->updatePembelianDetail();
+            DB::commit();
+
+            $this->callApiPembelianNative($request->id_pembelian);
+            return response()->json([
+                "result" => true,
+                "message" => "Data berhasil disimpan",
+                "redirect" => route('qc_receipt'),
+            ], 200);
+        } catch (\Exception $th) {
+            DB::rollback();
+            Log::error("Error when change save qc receipt");
+            Log::error($e);
+            return response()->json([
+                "result" => false,
+                "message" => "Data gagal tersimpan",
+            ], 500);
+        }
     }
 }
