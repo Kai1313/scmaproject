@@ -7,7 +7,8 @@
 <!-- DataTables -->
 <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css') }}">
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+<!-- bootstrap datepicker -->
+<link rel="stylesheet" href="{{ asset('assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css') }}">
 <style>
     .mt-1 {
         margin-top: .25rem !important;
@@ -92,7 +93,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label>Tanggal Jurnal</label>
-                                        <input type="date" class="form-control" id="tanggal" name="tanggal" placeholder="Masukkan tanggal jurnal umum" value="{{ isset($jurnal_header->tanggal_jurnal)?$jurnal_header->tanggal_jurnal:'' }}" data-validation="[NOTEMPTY]" data-validation-message="Tanggal Jurnal tidak boleh kosong">
+                                        <input type="text" class="form-control datepicker" id="tanggal" name="tanggal" placeholder="Masukkan tanggal jurnal umum" value="{{ isset($jurnal_header->tanggal_jurnal)?$jurnal_header->tanggal_jurnal:'' }}" data-validation="[NOTEMPTY]" data-validation-message="Tanggal Jurnal tidak boleh kosong">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -451,6 +452,8 @@
 <script src="{{ asset('assets/bower_components/datatables.net/js/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js') }}"></script>
 <script src="{{ asset('assets/plugins/jquery-datatables-checkboxes-1.2.12/js/dataTables.checkboxes.min.js') }}"></script>
+<!-- bootstrap datepicker -->
+<script src="{{ asset('assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js') }}"></script>
 <!-- SlimScroll -->
 <script src="{{ asset('assets/bower_components/jquery-slimscroll/jquery.slimscroll.min.js') }}"></script>
 <!-- FastClick -->
@@ -566,6 +569,10 @@
         getCoa()
         getSlip(current_slip)
         getSetting($("#cabang_input").val())
+
+        $(".datepicker").datepicker({
+            format: "yyyy-mm-dd"
+        })
 
         $('.select2').select2({
             width: '100%'
@@ -1841,7 +1848,7 @@
             case "piutang_giro":
                 $("#table_piutang_giro").DataTable().destroy()
                 let get_piutang_giro_url = "{{ route('transaction-general-ledger-populate-transaction') }}"
-                get_piutang_giro_url += '?transaction_type=' + $("#transaction_type").val() + '&supplier=' + $("#supplier_transaction").val() + '&slip=' + $("#slip_giro").val()
+                get_piutang_giro_url += '?transaction_type=' + $("#transaction_type").val() + '&supplier=' + $("#supplier_transaction").val() + '&slip='
                 $('#table_piutang_giro').DataTable({
                     processing: true,
                     serverSide: true,
@@ -1916,7 +1923,7 @@
             case "hutang_giro":
                 $("#table_hutang_giro").DataTable().destroy()
                 let get_hutang_giro_url = "{{ route('transaction-general-ledger-populate-transaction') }}"
-                get_hutang_giro_url += '?transaction_type=' + $("#transaction_type").val() + '&supplier=' + $("#supplier_transaction").val() + '&slip=' + $("#slip_giro").val()
+                get_hutang_giro_url += '?transaction_type=' + $("#transaction_type").val() + '&supplier=' + $("#supplier_transaction").val() + '&slip='
                 $('#table_hutang_giro').DataTable({
                     processing: true,
                     serverSide: true,
@@ -1991,7 +1998,7 @@
             case "piutang_giro_tolak":
                 $("#table_piutang_giro_tolak").DataTable().destroy()
                 let get_piutang_giro_tolak_url = "{{ route('transaction-general-ledger-populate-transaction') }}"
-                get_piutang_giro_tolak_url += '?transaction_type=' + $("#transaction_type").val() + '&supplier=' + $("#supplier_transaction").val() + '&slip=' + $("#slip_giro").val()
+                get_piutang_giro_tolak_url += '?transaction_type=' + $("#transaction_type").val() + '&supplier=' + $("#supplier_transaction").val() + '&slip='
                 $('#table_piutang_giro_tolak').DataTable({
                     processing: true,
                     serverSide: true,
@@ -2066,7 +2073,7 @@
             case "hutang_giro_tolak":
                 $("#table_hutang_giro_tolak").DataTable().destroy()
                 let get_hutang_giro_tolak_url = "{{ route('transaction-general-ledger-populate-transaction') }}"
-                get_hutang_giro_tolak_url += '?transaction_type=' + $("#transaction_type").val() + '&supplier=' + $("#supplier_transaction").val() + '&slip=' + $("#slip_giro").val()
+                get_hutang_giro_tolak_url += '?transaction_type=' + $("#transaction_type").val() + '&supplier=' + $("#supplier_transaction").val() + '&slip='
                 $('#table_hutang_giro_tolak').DataTable({
                     processing: true,
                     serverSide: true,
