@@ -51,6 +51,21 @@
         .handle-number-4 {
             text-align: right;
         }
+
+        select[readonly].select2-hidden-accessible+.select2-container {
+            pointer-events: none;
+            touch-action: none;
+        }
+
+        select[readonly].select2-hidden-accessible+.select2-container .select2-selection {
+            background: #eee;
+            box-shadow: none;
+        }
+
+        select[readonly].select2-hidden-accessible+.select2-container .select2-selection__arrow,
+        select[readonly].select2-hidden-accessible+.select2-container .select2-selection__clear {
+            display: none;
+        }
     </style>
 @endsection
 
@@ -187,49 +202,52 @@
                                 </select>
                                 <input type="hidden" name="nama_barang" class="validate">
                             </div>
-                            <label>Total <span>*</span></label>
-                            <div class="form-group">
-                                <div class="input-group" id="qty">
-                                    <input type="text" name="jumlah_pembelian_detail" class="form-control" readonly>
-                                    <span class="input-group-addon">KG</span>
+                            <div class="show-after-search">
+                                <label>Total <span>*</span></label>
+                                <div class="form-group">
+                                    <div class="input-group" id="qty">
+                                        <input type="text" name="jumlah_pembelian_detail" class="form-control"
+                                            readonly>
+                                        <span class="input-group-addon">KG</span>
+                                    </div>
+                                    <input type="hidden" name="nama_satuan_barang" class="validate">
+                                    <input type="hidden" name="id_satuan_barang" class="validate">
+                                    <input type="hidden" name="tanggal_qc" value="{{ date('Y-m-d') }}">
                                 </div>
-                                <input type="hidden" name="nama_satuan_barang" class="validate">
-                                <input type="hidden" name="id_satuan_barang" class="validate">
-                                <input type="hidden" name="tanggal_qc" value="{{ date('Y-m-d') }}">
-                            </div>
-                            <label>Status <span>*</span></label>
-                            <div class="form-group">
-                                <select name="status_qc" class="form-control validate">
-                                </select>
-                            </div>
-                            <label>Alasan</label>
-                            <div class="form-group">
-                                <textarea name="reason" class="form-control" readonly></textarea>
+                                <label>Status <span>*</span></label>
+                                <div class="form-group">
+                                    <input name="label_status_qc" class="form-control validate" readonly>
+                                    <input type="hidden" name="status_qc" value="">
+                                </div>
+                                <label>Alasan</label>
+                                <div class="form-group">
+                                    <textarea name="reason" class="form-control" readonly></textarea>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-6 show-after-search">
                             <div class="row">
                                 <div class="col-sm-6">
-                                    <label>SG </label>
+                                    <label>SG <span>*</span></label>
                                     <div class="form-group">
                                         <input type="text" name="sg_pembelian_detail"
-                                            class="form-control handle-number-4">
+                                            class="form-control handle-number-4 check-range validate" data-type="sg">
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
-                                    <label>BE </label>
+                                    <label>BE <span>*</span></label>
                                     <div class="form-group">
                                         <input type="text" name="be_pembelian_detail"
-                                            class="form-control handle-number-4">
+                                            class="form-control handle-number-4 check-range validate" data-type="be">
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-sm-6">
-                                    <label>PH </label>
+                                    <label>PH <span>*</span></label>
                                     <div class="form-group">
                                         <input type="text" name="ph_pembelian_detail"
-                                            class="form-control handle-number-4">
+                                            class="form-control handle-number-4 check-range validate" data-type="ph">
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
@@ -252,7 +270,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary cancel-entry btn-flat">Batal</button>
-                    <button type="button" class="btn btn-primary save-entry btn-flat">Simpan</button>
+                    <button type="button" class="btn btn-primary save-entry btn-flat show-after-search">Simpan</button>
                 </div>
             </div>
         </div>
@@ -273,14 +291,13 @@
     <script>
         let branch = {!! json_encode($cabang) !!}
         let arrayStatus = {!! json_encode($arrayStatus) !!};
+        let items = []
         let details = [];
         let detailSelect = []
         let statusModal = 'create'
-        let indexSelect = 0
+        let indexSelect = -1
+        let paramQcSelect = []
         $('.select2').select2()
-        $('[name="status_qc"]').select2({
-            data: arrayStatus
-        })
 
         var resDataTable = $('#table-detail').DataTable({
             data: details,
@@ -305,7 +322,8 @@
                 data: 'status_qc',
                 name: 'status_qc',
                 render: function(data, type, row) {
-                    return '<label class="' + arrayStatus[data]['class'] + '">' + arrayStatus[data][
+                    let index = data
+                    return '<label class="' + arrayStatus[index]['class'] + '">' + arrayStatus[index][
                         'text'
                     ] + '</label>';
                 },
@@ -350,11 +368,14 @@
                 searchable: false,
                 render: function(data, type, row, meta) {
                     let btn = '';
-                    if (row.status_qc == 3) {
+                    if (row.status_qc == 3 || row.id == '') {
                         btn = '<ul class="horizontal-list">';
                         btn +=
                             '<li><a href="javascript:void(0)" data-id="' + data +
                             '" class="btn btn-warning btn-xs mr-1 mb-1 edit-entry"><i class="glyphicon glyphicon-pencil"></i></a></li>';
+                        btn +=
+                            '<li><a href="javascript:void(0)" data-id="' + data +
+                            '" class="btn btn-danger btn-xs mr-1 mb-1 remove-entry"><i class="glyphicon glyphicon-trash"></i></a></li>';
                         btn += '</ul>';
                     }
 
@@ -368,6 +389,7 @@
         }).on('select2:select', function(e) {
             let dataselect = e.params.data
             getPurchasingNumber()
+            $('[name="id_barang"]').empty()
         });
 
 
@@ -395,7 +417,6 @@
                     $('#cover-spin').hide()
                 },
                 error: function(error) {
-                    console.log(error)
                     $('#cover-spin').hide()
                 }
             })
@@ -409,30 +430,39 @@
                     number: param,
                 },
                 success: function(res) {
+                    items = res.list_item
                     $('[name="id_barang"]').empty()
                     $('[name="id_barang"]').select2({
                         data: [{
                             'id': "",
                             'text': 'Pilih Barang'
-                        }, ...res.list_item]
+                        }, ...items]
                     }).on('select2:select', function(e) {
                         let dataselect = e.params.data
+                        paramQcSelect = dataselect
                         $('#qty').find('[name="jumlah_pembelian_detail"]').val(dataselect
                             .jumlah_pembelian_detail).trigger('input')
                         $('#qty').find('span').text(dataselect.nama_satuan_barang)
                         $('[name="nama_barang"]').val(dataselect.text)
                         $('[name="nama_satuan_barang"]').val(dataselect.nama_satuan_barang)
                         $('[name="id_satuan_barang"]').val(dataselect.id_satuan_barang)
+                        checkRangeQc()
+
+                        if (dataselect.id) {
+                            $('.show-after-search').css('display', 'inline')
+                        } else {
+                            $('.show-after-search').css('display', 'none')
+                        }
                     });
 
                     details = res.qc
                     $('.btn-print').attr('href', res.route_print).css('display', 'block')
                     resDataTable.clear().rows.add(details).draw()
+                    $('[name="details"]').val(JSON.stringify(details))
                     $('#cover-spin').hide()
                 },
                 error: function(error) {
                     $('#cover-spin').hide()
-                    console.log(error)
                 }
             })
         }
@@ -440,13 +470,10 @@
         $('.add-entry').click(function() {
             statusModal = 'create'
             detailSelect = []
+            indexSelect = -1
             $('#modalEntry').find('input,select,textarea').each(function(i, v) {
                 if ($(v).hasClass('handle-number-4')) {
-                    if ($(v).prop('name') == 'sg_pembelian_detail') {
-                        $(v).val(1).trigger('change')
-                    } else {
-                        $(v).val(0).trigger('change')
-                    }
+                    $(v).val(0).trigger('change')
                 } else {
                     $(v).val('').trigger('change')
                 }
@@ -459,14 +486,13 @@
             }, 500);
 
             $('[name="status_qc"]').empty()
-            $('[name="status_qc"]').select2({
-                data: arrayStatus
-            })
-
             $('.handle-number-4').each(function(i, v) {
                 let val = $(v).val().replace('.', ',')
                 $(v).val(formatRupiah(val, 4))
             })
+
+            $('[name="id_barang"]').attr('readonly', false)
+            $('.show-after-search').css('display', 'none')
         })
 
         $('.save-entry').click(function() {
@@ -489,7 +515,7 @@
 
             let newObj = Object.assign({}, detailSelect)
             if (statusModal == 'create') {
-                details.unshift(newObj)
+                details.push(newObj)
             } else if (statusModal == 'edit') {
                 details[indexSelect] = newObj
                 detailSelect = 0
@@ -503,19 +529,32 @@
             $('#modalEntry').modal('hide')
         })
 
-        $('[name="status_qc"]').change(function() {
-            $('[name="reason"]').attr('readonly', true)
-            if ($(this).val() == 2) {
-                $('[name="reason"]').attr('readonly', false).addClass('validate')
-            } else if ($(this).val() == 3) {
-                $('[name="reason"]').attr('readonly', false)
-            } else {
-                $('[name="reason"]').attr('readonly', true).removeClass('validate')
-            }
-        })
-
         $('.cancel-entry').click(function() {
             $('#modalEntry').modal('hide')
+        })
+
+        $('body').on('click', '.remove-entry', function() {
+            let index = $(this).parents('tr').index()
+            Swal.fire({
+                title: 'Anda yakin ingin menghapus data ini?',
+                icon: 'info',
+                showDenyButton: true,
+                confirmButtonText: 'Yes',
+                denyButtonText: 'No',
+                reverseButtons: true,
+                customClass: {
+                    actions: 'my-actions',
+                    confirmButton: 'order-1',
+                    denyButton: 'order-3',
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    details.splice(index, 1)
+
+                    resDataTable.clear().rows.add(details).draw()
+                    $('[name="details"]').val(JSON.stringify(details))
+                }
+            })
         })
 
         $('body').on('click', '.edit-entry', function() {
@@ -543,48 +582,49 @@
                 detailSelect = []
             }
 
+            for (let i = 0; i < items.length; i++) {
+                if (items[i]['id'] == detailSelect.id_barang) {
+                    paramQcSelect = items[i]
+                    break
+                }
+            }
+
             for (select in detailSelect) {
                 if (['jumlah_pembelian_detail'].includes(select)) {
                     $('#qty').find('span').text(detailSelect['nama_satuan_barang'])
                 }
 
-                if (['id_barang'].includes(select)) {
-                    let nameSelect = 'nama_barang';
-                    $('[name="' + select + '"]').append('<option value="' + detailSelect[select] + '" selected>' +
-                        detailSelect[nameSelect] + '</option>')
-                }
-
-                if (['status_qc'].includes(select)) {
-                    $('[name="' + select + '"]').empty()
-                    $('[name="' + select + '"]').select2({
-                        data: [
-                            arrayStatus[1],
-                            arrayStatus[2],
-                            arrayStatus[3]
-                        ]
-                    })
-                }
-
                 $('[name="' + select + '"]').val(detailSelect[select]).trigger('change')
             }
 
+            checkRangeQc()
+            $('[name="label_status_qc"]').val(arrayStatus[detailSelect.status_qc]['text'])
             $('.handle-number-4').each(function(i, v) {
                 let val = $(v).val().replace('.', ',')
                 $(v).val(formatRupiah(val, 4))
             })
+
+            $('[name="id_barang"]').attr('readonly', true)
+            $('.show-after-search').css('display', 'inline')
+        })
+
+        $('#modalEntry').on('input', '.check-range', function() {
+            checkRangeQc()
         })
 
         function validatorModal(barang, id) {
             let message = 'Lengkapi inputan yang diperlukan'
             let valid = true
             $('#modalEntry').find('.validate').each(function(i, v) {
+                $(v).parent().removeClass('has-error')
                 if ($(v).val() == '') {
+                    $(v).parent().addClass('has-error')
                     valid = false
                 }
 
                 if ($(v).prop('name') == 'id_barang') {
                     let findItem = details.filter(p => p.id_barang == $(v).val())
-                    if (findItem.length > 0 && id == 0 && findItem[0].id_barang == barang) {
+                    if (findItem.length > 0 && id == '' && findItem[0].id_barang == barang && indexSelect < 0) {
                         message = "Barang sudah ada dalam daftar"
                         valid = false
                     }
@@ -594,6 +634,62 @@
             return {
                 'status': valid,
                 'message': message
+            }
+        }
+
+        function checkRangeQc() {
+            let countError = 0;
+            $('.check-range').each(function(i, v) {
+                let type = $(v).data('type')
+                let val = $(v).val()
+
+                if ($(v).parent().find('label')) {
+                    $(v).parent().find('label').remove()
+                }
+
+                let value = val ? normalizeNumber(val) : 0
+                if (type == 'sg') {
+                    if (value < paramQcSelect.start_range_sg || value > paramQcSelect.final_range_sg) {
+                        $(this).after('<label class="label label-danger">Rentang ' + paramQcSelect
+                            .start_range_sg + ' - ' + paramQcSelect.final_range_sg + '</label>')
+                        countError++
+                    }
+                }
+
+                if (type == 'be') {
+                    if (value < paramQcSelect.start_range_be || value > paramQcSelect.final_range_be) {
+                        $(this).after('<label class="label label-danger">Rentang ' + paramQcSelect
+                            .start_range_be + ' - ' + paramQcSelect.final_range_be + '</label>')
+                        countError++
+                    }
+                }
+
+                if (type == 'ph') {
+                    if (value < paramQcSelect.start_range_ph || value > paramQcSelect.final_range_ph) {
+                        $(this).after('<label class="label label-danger">Rentang ' + paramQcSelect
+                            .start_range_ph + ' - ' + paramQcSelect.final_range_ph + '</label>')
+                        countError++
+                    }
+                }
+            })
+
+            let selectArray = []
+            if (countError > 0) {
+                selectArray = arrayStatus[2]
+            } else {
+                selectArray = arrayStatus[1]
+            }
+
+            $('[name="status_qc"]').val(selectArray['id'])
+            $('[name="label_status_qc"]').val(selectArray['text'])
+
+
+            if (selectArray['id'] == 2) {
+                $('[name="reason"]').attr('readonly', false).addClass('validate')
+            } else if (selectArray['id'] == 3) {
+                $('[name="reason"]').attr('readonly', false).addClass('validate')
+            } else {
+                $('[name="reason"]').attr('readonly', true).removeClass('validate')
             }
         }
     </script>

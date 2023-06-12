@@ -61,12 +61,6 @@
             touch-action: none;
         }
 
-        /* .datepicker {
-                pointer-events: none;
-                touch-action: none;
-                background: #eee;
-            } */
-
         select[readonly].select2-hidden-accessible+.select2-container .select2-selection {
             background: #eee;
             box-shadow: none;

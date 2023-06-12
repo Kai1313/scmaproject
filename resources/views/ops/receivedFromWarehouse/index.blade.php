@@ -83,8 +83,8 @@
                                 <th>Kode Referensi</th>
                                 <th>Gudang</th>
                                 <th>Gudang Asal</th>
-                                <th>Keterangan</th>
                                 <th>Status</th>
+                                <th>Keterangan</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -129,11 +129,11 @@
                 data: 'g2_nama_gudang',
                 name: 'g2.nama_gudang',
             }, {
-                data: 'keterangan_pindah_barang',
-                name: 'pb.keterangan_pindah_barang',
-            }, {
                 data: 'status_pindah_barang',
                 name: 'pb.status_pindah_barang',
+            }, {
+                data: 'keterangan_pindah_barang',
+                name: 'pb.keterangan_pindah_barang',
             }, {
                 data: 'action',
                 name: 'action',

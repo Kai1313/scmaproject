@@ -2062,6 +2062,7 @@ class ApiController extends Controller
 
     public function transactionBalance(Request $req)
     {
+        Log::info("simpan saldo transaksi");
         //param : tipe_transaksi,id_transaksi,tanggal,ref_id,catatan,target(supplier/customer),dpp,ppn,uang_muka,biaya,payment_status
         $data = TransactionBalance::where('id_transaksi', $req->id_transaksi)->where('tipe_transaksi', $req->tipe_transaksi)->first();
         try {

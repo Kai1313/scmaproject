@@ -80,15 +80,15 @@
                                 <th>Nama Barang</th>
                                 <th>Satuan</th>
                                 <th>Jumlah</th>
-                                <th>Tanggal QC</th>
-                                <th>Status</th>
-                                <th>Alasan</th>
                                 <th>SG</th>
                                 <th>BE</th>
                                 <th>PH</th>
                                 <th>Warna</th>
                                 <th>Bentuk</th>
                                 <th>Keterangan</th>
+                                <th>Status</th>
+                                <th>Tanggal QC</th>
+                                <th>Alasan</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -141,15 +141,6 @@
                     },
                     className: 'text-right'
                 }, {
-                    data: 'tanggal_qc',
-                    name: 'qc.tanggal_qc',
-                }, {
-                    data: 'status_qc',
-                    name: 'qc.status_qc',
-                }, {
-                    data: 'reason',
-                    name: 'qc.reason',
-                }, {
                     data: 'sg_pembelian_detail',
                     name: 'qc.sg_pembelian_detail',
                     render: function(data) {
@@ -179,6 +170,15 @@
                 }, {
                     data: 'keterangan_pembelian_detail',
                     name: 'qc.keterangan_pembelian_detail',
+                }, {
+                    data: 'status_qc',
+                    name: 'qc.status_qc',
+                }, {
+                    data: 'tanggal_qc',
+                    name: 'qc.tanggal_qc',
+                }, {
+                    data: 'reason',
+                    name: 'qc.reason',
                 }, ]
             });
         }

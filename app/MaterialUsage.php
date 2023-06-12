@@ -169,7 +169,7 @@ class MaterialUsage extends Model
                     'be_kartu_stok' => $master->be_master_qr_code,
                     'ph_kartu_stok' => $master->ph_master_qr_code,
                     'warna_kartu_stok' => $master->warna_master_qr_code,
-                    'keterangan_kartu_stok' => $master->keterangan_master_qr_code,
+                    'keterangan_kartu_stok' => $this->catatan . ', ' . $data->catatan,
                     'status_kartu_stok' => 1,
                     'user_kartu_stok' => session()->get('user')['id_pengguna'],
                     'date_kartu_stok' => date('Y-m-d H:i:s'),

@@ -80,7 +80,19 @@ class Purchase extends Model
     public function detailgroup()
     {
         return $this->hasMany(PurchaseDetail::class, 'id_pembelian')
-            ->select(DB::raw('sum(pembelian_detail.nett) as jumlah_pembelian_detail'), 'pembelian_detail.id_barang as id', 'barang.nama_barang as text', 'pembelian_detail.id_satuan_barang', 'nama_satuan_barang')
+            ->select(
+                DB::raw('sum(pembelian_detail.nett) as jumlah_pembelian_detail'),
+                'pembelian_detail.id_barang as id',
+                'barang.nama_barang as text',
+                'pembelian_detail.id_satuan_barang',
+                'nama_satuan_barang',
+                'start_range_sg',
+                'final_range_sg',
+                'start_range_be',
+                'final_range_be',
+                'start_range_ph',
+                'final_range_ph'
+            )
             ->leftJoin('barang', 'pembelian_detail.id_barang', '=', 'barang.id_barang')
             ->leftJoin('satuan_barang', 'pembelian_detail.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
             ->leftJoin('qc', function ($qc) {
