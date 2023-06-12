@@ -169,7 +169,8 @@
                                 <th class="text-center" width="7%">Tanggal</th>
                             </tr>
                         </thead>
-                        <tbody></tbody>
+                        <tbody id="table_report-body">
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -217,7 +218,6 @@
         });
 
         $('#btn-excel-report').on('click', function() {
-            console.log('excel');
             let form = validateFormValue()
 
             if (form.status) {
@@ -316,6 +316,8 @@
                 }
             })
         });
+
+        // $('#table_report').DataTable();
     })
 
     function validateFormValue() {
@@ -399,99 +401,145 @@
     }
 
     function populate_table(data) {
-        let get_data_url = "{{ route('report-giro-populate') }}"
+        let get_data_url = "{{ route('report-giro-populate2') }}"
         get_data_url += '?cabang=' + data.cabang + '&slip=' + data.slip + '&tanggal=' + data.giro_date + '&tipe=' + data.tipe + '&status=' + data.status
 
         $('#table_report').css('display', '')
 
         $('#table_report').DataTable().destroy();
-        $('#table_report').DataTable({
-            processing: true,
-            serverSide: true,
-            "scrollX": true,
-            "bDestroy": true,
-            responsive: false,
-            ajax: {
-                "url": get_data_url,
-                "type": "GET",
-                "dataType": "JSON",
-                "error": function(xhr, textStatus, ThrownException) {
-                    alert("Error loading data. Exception: " + ThrownException + '\n' + textStatus)
-                }
-            },
-            columns: [{
-                    data: 'kode_jurnal',
-                    name: 'kode_jurnal',
-                    className: 'text-left',
-                    width: '10%'
-                },
-                {
-                    data: 'tanggal_jurnal',
-                    name: 'tanggal_jurnal',
-                    className: 'text-center',
-                    width: '7%'
-                },
-                {
-                    data: 'no_giro',
-                    name: 'no_giro',
-                    className: 'text-left',
-                    width: '11%'
-                },
-                {
-                    data: 'tanggal_giro',
-                    name: 'tanggal_giro',
-                    className: 'text-center',
-                    width: '7%'
-                },
-                {
-                    data: 'tanggal_giro_jt',
-                    name: 'tanggal_giro_jt',
-                    className: 'text-center',
-                    width: '7%'
-                },
-                {
-                    data: 'total',
-                    name: 'total',
-                    width: '11%',
-                    searchable: false,
-                    orderable: false,
-                    className: 'text-right',
-                    render: function(data, type, row) {
-                        return formatCurr(formatNumberAsFloatFromDB(data))
+
+        $.ajax({
+            type: "GET",
+            url: get_data_url
+        }).done(function(data) {
+            if (data.result) {
+                rows = '';
+                let route = '';
+                let detail_route = "{{ route('transaction-general-ledger-show') }}"
+
+                data.data.forEach(val => {
+                    rows += '<tr>';
+                    if (val.id_jurnal) {
+                        rows += '<td><a href="' + detail_route + '/' + val.id_jurnal + '" target="_blank">' + val.kode_jurnal + '</a></td>';
+                    } else {
+                        rows += '<td>' + val.kode_jurnal + '</td>';
                     }
-                },
-                {
-                    data: 'cair_kode_jurnal',
-                    name: 'cair_kode_jurnal',
-                    className: 'text-left',
-                    width: '11%'
-                },
-                {
-                    data: 'cair_tanggal_giro',
-                    name: 'cair_tanggal_giro',
-                    className: 'text-center',
-                    width: '7%'
-                },
-                {
-                    data: 'cair_slip',
-                    name: 'cair_slip',
-                    className: 'text-left',
-                    width: '11%'
-                },
-                {
-                    data: 'tolak_kode_jurnal',
-                    name: 'tolak_kode_jurnal',
-                    className: 'text-left',
-                    width: '11%'
-                },
-                {
-                    data: 'tolak_tanggal_giro',
-                    name: 'tolak_tanggal_giro',
-                    className: 'text-left',
-                    width: '7%'
-                }
-            ],
+                    rows += '<td>' + val.tanggal_jurnal + '</td>';
+                    rows += '<td>' + val.no_giro + '</td>';
+                    rows += '<td>' + val.tanggal_giro + '</td>';
+                    rows += '<td>' + val.tanggal_giro_jt + '</td>';
+                    rows += '<td class="text-right">' + formatCurr(formatNumberAsFloatFromDB(val.total)) + '</td>';
+                    if (val.cair_id_jurnal) {
+                        rows += '<td><a href="' + detail_route + '/' + val.cair_id_jurnal + '" target="_blank">' + val.cair_kode_jurnal + '</a></td>';
+                    } else {
+                        rows += '<td>' + val.cair_kode_jurnal + '</td>';
+                    }
+                    rows += '<td>' + val.cair_tanggal_jurnal + '</td>';
+                    rows += '<td>' + val.cair_slip + '</td>';
+                    if (val.tolak_id_jurnal) {
+                        rows += '<td><a href="' + detail_route + '/' + val.tolak_id_jurnal + '" target="_blank">' + val.tolak_kode_jurnal + '</a></td>';
+                    } else {
+                        rows += '<td>' + val.tolak_kode_jurnal + '</td>';
+                    }
+                    rows += '<td>' + val.tolak_tanggal_jurnal + '</td>';
+                    rows += '</tr>';
+                });
+
+                $('#table_report-body').html(rows)
+
+                $('#table_report').DataTable();
+            } else {
+                alert('Get report data failed. Contact administrator!')
+            }
         })
+
+        // $('#table_report').DataTable({
+        //     processing: true,
+        //     serverSide: true,
+        //     "scrollX": true,
+        //     "bDestroy": true,
+        //     responsive: false,
+        //     ajax: {
+        //         "url": get_data_url,
+        //         "type": "GET",
+        //         "dataType": "JSON",
+        //         "error": function(xhr, textStatus, ThrownException) {
+        //             alert("Error loading data. Exception: " + ThrownException + '\n' + textStatus)
+        //         }
+        //     },
+        //     columns: [{
+        //             data: 'kode_jurnal',
+        //             name: 'kode_jurnal',
+        //             className: 'text-left',
+        //             width: '10%'
+        //         },
+        //         {
+        //             data: 'tanggal_jurnal',
+        //             name: 'tanggal_jurnal',
+        //             className: 'text-center',
+        //             width: '7%'
+        //         },
+        //         {
+        //             data: 'no_giro',
+        //             name: 'no_giro',
+        //             className: 'text-left',
+        //             width: '11%'
+        //         },
+        //         {
+        //             data: 'tanggal_giro',
+        //             name: 'tanggal_giro',
+        //             className: 'text-center',
+        //             width: '7%'
+        //         },
+        //         {
+        //             data: 'tanggal_giro_jt',
+        //             name: 'tanggal_giro_jt',
+        //             className: 'text-center',
+        //             width: '7%'
+        //         },
+        //         {
+        //             data: 'total',
+        //             name: 'total',
+        //             width: '11%',
+        //             searchable: false,
+        //             orderable: false,
+        //             className: 'text-right',
+        //             render: function(data, type, row) {
+        //                 return formatCurr(formatNumberAsFloatFromDB(data))
+        //             }
+        //         },
+        //         {
+        //             data: 'cair_kode_jurnal',
+        //             name: 'cair_kode_jurnal',
+        //             className: 'text-left',
+        //             width: '11%'
+        //         },
+        //         {
+        //             data: 'cair_tanggal_giro',
+        //             name: 'cair_tanggal_giro',
+        //             className: 'text-center',
+        //             width: '7%'
+        //         },
+        //         {
+        //             data: 'cair_slip',
+        //             name: 'cair_slip',
+        //             className: 'text-left',
+        //             width: '11%'
+        //         },
+        //         {
+        //             data: 'tolak_kode_jurnal',
+        //             name: 'tolak_kode_jurnal',
+        //             className: 'text-left',
+        //             width: '11%'
+        //         },
+        //         {
+        //             data: 'tolak_tanggal_giro',
+        //             name: 'tolak_tanggal_giro',
+        //             className: 'text-left',
+        //             width: '7%'
+        //         }
+        //     ],
+        // })
     }
 
     function formatCurr(num) {

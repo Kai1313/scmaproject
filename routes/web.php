@@ -191,6 +191,7 @@ Route::prefix('report')->group(function(){
     Route::prefix('giro')->group(function(){
         Route::get('/index/{user_id?}', 'ReportGiroController@index')->name('report-giro');
         Route::get('/populate', 'ReportGiroController@populate')->name('report-giro-populate');
+        Route::get('/populate2', 'ReportGiroController@populate2')->name('report-giro-populate2');
         Route::get('/excel', 'ReportGiroController@exportExcel')->name('report-giro-excel');
         Route::get('/pdf', 'ReportGiroController@exportPdf')->name('report-giro-pdf');
         Route::get('/getSlip', 'ReportGiroController@getSlip')->name('report-giro-get-slip');

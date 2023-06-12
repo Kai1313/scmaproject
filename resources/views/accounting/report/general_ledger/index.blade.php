@@ -353,8 +353,7 @@
         if (type == "recap") {
             getCoa()
             $("#coa").attr("disabled", true)
-        }
-        else {
+        } else {
             getCoa()
             $("#coa").attr("disabled", false)
         }
@@ -461,40 +460,43 @@
                 columns: [{
                         data: 'tanggal_jurnal',
                         name: 'tanggal_jurnal',
-                        width: '10%',
-                        orderable: false,
+                        width: '10%'
                     },
                     {
                         data: 'kode_jurnal',
                         name: 'kode_jurnal',
                         width: '10%',
-                        orderable: false,
+                        render: function(data, type, row) {
+                            let route = '';
+                            let detail_route = "{{ route('transaction-general-ledger-show') }}"
+
+                            if (row.id_jurnal) {
+                                route = '<a href="' + detail_route + '/' + row.id_jurnal + '" target="_blank">' + data + '</a>'
+                            } else {
+                                route = '';
+                            }
+                            return route
+                        }
                     },
                     {
                         data: 'kode_akun',
                         name: 'kode_akun',
-                        width: '10%',
-                        orderable: false,
+                        width: '10%'
                     },
                     {
                         data: 'nama_akun',
                         name: 'nama_akun',
-                        width: '12%',
-                        orderable: false,
+                        width: '12%'
                     },
                     {
                         data: 'keterangan',
                         name: 'keterangan',
-                        width: '10%',
-                        searchable: false,
-                        orderable: false,
+                        width: '10%'
                     },
                     {
                         data: 'id_transaksi',
                         name: 'id_transaksi',
-                        width: '10%',
-                        searchable: false,
-                        orderable: false,
+                        width: '10%'
                     },
                     {
                         data: 'debet',
