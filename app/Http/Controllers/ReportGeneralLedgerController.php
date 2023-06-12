@@ -152,9 +152,19 @@ class ReportGeneralLedgerController extends Controller
                 $data_ledgers = $data_ledgers->where("jurnal_detail.id_akun", $coa);
             }
             if (isset($keyword)) {
-                $data_ledgers->where(function ($query) use ($keyword) {
-                    $query->orWhere("master_akun.kode_akun", "LIKE", "%$keyword%")
-                        ->orWhere("master_akun.nama_akun", "LIKE", "%$keyword%");
+                $data_ledgers->where(function ($query) use ($keyword, $type) {
+                    if ($type == "recap") {
+                        $query->orWhere("master_akun.kode_akun", "LIKE", "%$keyword%")
+                            ->orWhere("master_akun.nama_akun", "LIKE", "%$keyword%");
+                    }
+                    else {
+                        $query->orWhere("master_akun.kode_akun", "LIKE", "%$keyword%")
+                            ->orWhere("master_akun.nama_akun", "LIKE", "%$keyword%")
+                            ->orWhere("jurnal_header.kode_jurnal", "LIKE", "%$keyword%")
+                            ->orWhere("jurnal_detail.id_transaksi", "LIKE", "%$keyword%")
+                            ->orWhere("jurnal_detail.keterangan", "LIKE", "%$keyword%");
+                            
+                    }
                 });
             }
             $filtered_data = $data_ledgers->get();
@@ -182,7 +192,6 @@ class ReportGeneralLedgerController extends Controller
                     $data_ledgers->orderBy("master_akun.kode_akun", "DESC");
                 }
                 else {
-                    Log::info("masuk sini");
                     $data_ledgers->orderBy("jurnal_header.tanggal_jurnal", "DESC");
                     $data_ledgers->orderBy("master_akun.kode_akun", "DESC");
                 }
