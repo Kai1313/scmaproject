@@ -164,7 +164,8 @@ class ReportSlipController extends Controller
                 ->join('jurnal_detail as det', 'head.id_jurnal', 'det.id_jurnal')
                 ->join('master_akun as akun', 'akun.id_akun', 'det.id_akun')
                 ->join('master_slip as slip', 'slip.id_slip', 'head.id_slip')
-                ->selectRaw('head.tanggal_jurnal,
+                ->selectRaw('head.id_jurnal,
+                head.tanggal_jurnal,
                 head.kode_jurnal,
                 slip.nama_slip,
                 akun.nama_akun,
