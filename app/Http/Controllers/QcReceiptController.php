@@ -185,9 +185,21 @@ class QcReceiptController extends Controller
     {
         $idPembelian = $request->number;
         $parent = Purchase::find($idPembelian);
+
+        $specialGroup = DB::table('setting')->where('code', 'QC Special Group')->value('value1');
+        $explodeSpecialGroup = explode(',', $specialGroup);
+
+        $listItem = $parent->detailgroup;
+        if (in_array(session()->get('user')['id_grup_pengguna'], $explodeSpecialGroup)) {
+            $specialCategory = DB::table('setting')->where('code', 'QC Special Category Item')->value('value1');
+            $explodeSpecialCategory = explode(',', $specialCategory);
+
+            $listItem = $parent->detailgroup->whereIn('id_kategori_barang', $explodeSpecialCategory);
+        }
+
         return response()->json([
             'result' => true,
-            'list_item' => $parent->detailgroup,
+            'list_item' => $listItem,
             'qc' => $parent->qc,
             'route_print' => route('qc_receipt-print-data', $idPembelian),
         ], 200);
