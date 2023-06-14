@@ -38,9 +38,7 @@ class ReportGiroController extends Controller
                 'value' => '2',
                 'title' => 'Tolak'
             )
-        );
-
-        //    dd($data_status);
+        );        
 
         $data = [
             "pageTitle" => "SCA Accounting | Report Giro",
@@ -67,77 +65,88 @@ class ReportGiroController extends Controller
         $tanggal = $request->tanggal;
         $status = $request->status;
 
-        Log::debug($request->all());
-
-        $giro = DB::table("jurnal_header as head")
-            ->join('jurnal_detail as det', 'head.id_jurnal', 'det.id_jurnal')
-            ->join('saldo_transaksi as saldo', 'saldo.id_jurnal', 'head.id_jurnal')
-            ->selectRaw('head.id_jurnal,
-                head.tanggal_jurnal,
-                head.kode_jurnal,
-                head.no_giro,
-                head.tanggal_giro,
-                head.tanggal_giro_jt,
-                saldo.total')
-            ->where('head.void', 0)
-            ->where('head.id_cabang', $cabang)
-            ->where('head.jenis_jurnal', $tipe)
-            ->where('head.tanggal_giro_jt', '<=',  $tanggal);
-
-        if ($slip != 'All') {
-            $giro = $giro->where('head.id_slip', $slip);
-        }
-
-        if ($status != 'All') {
-            if ($status == 0) {
-                $giro = $giro->where('saldo.sisa', '>', 0);
-                $giro = $giro->where('saldo.status_giro', $status);
-            } else {
-                $giro = $giro->where('saldo.sisa', 0);
-                $giro = $giro->where('saldo.status_giro', $status);
+        try {
+            $giro = DB::table("jurnal_header as head")
+                ->join('jurnal_detail as det', 'head.id_jurnal', 'det.id_jurnal')
+                ->join('saldo_transaksi as saldo', 'saldo.id_jurnal', 'head.id_jurnal')
+                ->selectRaw('head.id_jurnal,
+                    head.tanggal_jurnal,
+                    head.kode_jurnal,
+                    head.no_giro,
+                    head.tanggal_giro,
+                    head.tanggal_giro_jt,
+                    saldo.total')
+                ->where('head.void', 0)
+                ->where('head.id_cabang', $cabang)
+                ->where('head.jenis_jurnal', $tipe)
+                ->where('head.tanggal_giro_jt', '<=',  $tanggal);
+    
+            if ($slip != 'All') {
+                $giro = $giro->where('head.id_slip', $slip);
             }
+    
+            if ($status != 'All') {
+                if ($status == 0) {
+                    $giro = $giro->where('saldo.sisa', '>', 0);
+                    $giro = $giro->where('saldo.status_giro', $status);
+                } else {
+                    $giro = $giro->where('saldo.sisa', 0);
+                    $giro = $giro->where('saldo.status_giro', $status);
+                }
+            }
+    
+            $giro = $giro->groupBy('det.id_jurnal')
+                ->orderBy('head.tanggal_jurnal', 'DESC');
+    
+            $data = $giro->get();
+            foreach ($data as $key => $value) {
+                $cair = DB::table('jurnal_header as head')
+                    ->join('saldo_transaksi as saldo', 'saldo.id_jurnal', 'head.id_jurnal')
+                    ->join('master_slip as slip', 'slip.id_slip', 'head.id_slip')
+                    ->selectRaw('head.id_jurnal,
+                        head.kode_jurnal,
+                        head.tanggal_giro_jt,
+                        slip.nama_slip')
+                    ->where('head.id_jurnal', $value->id_jurnal)
+                    ->where('saldo.sisa', '=', 0)
+                    ->where('saldo.status_giro', '=', 1)
+                    ->first();
+    
+                $value->cair_id_jurnal = isset($cair) ? $cair->id_jurnal : '';
+                $value->cair_kode_jurnal = isset($cair) ? $cair->kode_jurnal : '';
+                $value->cair_tanggal_jurnal = isset($cair) ? $cair->tanggal_giro_jt : '';
+                $value->cair_slip = isset($cair) ? $cair->nama_slip : '';
+    
+                $tolak = DB::table('jurnal_header as head')
+                    ->join('saldo_transaksi as saldo', 'saldo.id_jurnal', 'head.id_jurnal')
+                    ->join('master_slip as slip', 'slip.id_slip', 'head.id_slip')
+                    ->selectRaw('head.id_jurnal,
+                        head.kode_jurnal,
+                        head.tanggal_giro_jt,
+                        slip.nama_slip')
+                    ->where('head.id_jurnal', $value->id_jurnal)
+                    ->where('saldo.sisa', '=', 0)
+                    ->where('saldo.status_giro', '=', 2)
+                    ->first();
+    
+                $value->tolak_id_jurnal = isset($tolak) ? $tolak->id_jurnal : '';
+                $value->tolak_kode_jurnal = isset($tolak) ? $tolak->kode_jurnal : '';
+                $value->tolak_tanggal_jurnal = isset($tolak) ? $tolak->tanggal_giro_jt : '';
+            }
+
+            return response()->json([
+                "result" => true,
+                "data" => $data
+            ]);
+        } catch (\Exception $e) {
+            Log::debug($e);
+           
+            return response()->json([
+                "result" => false,
+                "data" => $data
+            ]); 
         }
 
-        $giro = $giro->groupBy('det.id_jurnal')
-            ->orderBy('head.tanggal_jurnal', 'DESC');
-
-        $data = $giro->get();
-
-        Log::debug($data);
-        foreach ($data as $key => $value) {
-            $cair = DB::table('jurnal_header as head')
-                ->join('saldo_transaksi as saldo', 'saldo.id_jurnal', 'head.id_jurnal')
-                ->join('master_slip as slip', 'slip.id_slip', 'head.id_slip')
-                ->selectRaw('head.kode_jurnal,
-                    head.tanggal_giro_jt,
-                    slip.nama_slip')
-                ->where('head.id_jurnal', $value->id_jurnal)
-                ->where('saldo.sisa', '=', 0)
-                ->where('saldo.status_giro', '=', 1)
-                ->first();
-            Log::debug(json_encode($cair));
-
-            $value->cair_kode_jurnal = isset($cair) ? $cair->kode_jurnal : '';
-            $value->cair_tanggal_giro = isset($cair) ? $cair->tanggal_giro_jt : '';
-            $value->cair_slip = isset($cair) ? $cair->nama_slip : '';
-
-            $tolak = DB::table('jurnal_header as head')
-                ->join('saldo_transaksi as saldo', 'saldo.id_jurnal', 'head.id_jurnal')
-                ->join('master_slip as slip', 'slip.id_slip', 'head.id_slip')
-                ->selectRaw('head.kode_jurnal,
-                    head.tanggal_giro_jt,
-                    slip.nama_slip')
-                ->where('head.id_jurnal', $value->id_jurnal)
-                ->where('saldo.sisa', '=', 0)
-                ->where('saldo.status_giro', '=', 2)
-                ->first();
-            Log::debug(json_encode($tolak));
-
-            $value->tolak_kode_jurnal = isset($tolak) ? $tolak->kode_jurnal : '';
-            $value->tolak_tanggal_giro = isset($tolak) ? $tolak->tanggal_giro_jt : '';
-        }
-
-        Log::debug($data);
 
         return $data;
     }

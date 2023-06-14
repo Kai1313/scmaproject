@@ -91,7 +91,8 @@ class Purchase extends Model
                 'start_range_be',
                 'final_range_be',
                 'start_range_ph',
-                'final_range_ph'
+                'final_range_ph',
+                'id_kategori_barang'
             )
             ->leftJoin('barang', 'pembelian_detail.id_barang', '=', 'barang.id_barang')
             ->leftJoin('satuan_barang', 'pembelian_detail.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')

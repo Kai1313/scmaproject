@@ -369,7 +369,18 @@
                     data: 'kode_jurnal',
                     name: 'kode_jurnal',
                     className: 'text-left',
-                    width: '10%'
+                    width: '10%',
+                    render: function(data, type, row) {
+                        let route = '';
+                        let detail_route = "{{ route('transaction-general-ledger-show') }}"
+
+                        if (row.id_jurnal) {
+                            route = '<a href="' + detail_route + '/' + row.id_jurnal + '" target="_blank">' + data + '</a>'
+                        } else {
+                            route = '';
+                        }
+                        return route
+                    }
                 },
                 {
                     data: 'nama_slip',

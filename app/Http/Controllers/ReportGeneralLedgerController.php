@@ -140,10 +140,10 @@ class ReportGeneralLedgerController extends Controller
                 ->join("master_akun", "master_akun.id_akun", "jurnal_detail.id_akun")
                 ->whereBetween("jurnal_header.tanggal_jurnal", [$start_date, $end_date]);
             if ($type == "recap") {
-                $data_ledgers = $data_ledgers->selectRaw("master_akun.id_cabang, master_akun.id_akun, master_akun.kode_akun, master_akun.nama_akun, SUM(jurnal_detail.debet) as debet, SUM(jurnal_detail.credit) as kredit")->groupBy("jurnal_detail.id_akun");
+                $data_ledgers = $data_ledgers->selectRaw("jurnal_header.id_jurnal, master_akun.id_cabang, master_akun.id_akun, master_akun.kode_akun, master_akun.nama_akun, SUM(jurnal_detail.debet) as debet, SUM(jurnal_detail.credit) as kredit")->groupBy("jurnal_detail.id_akun");
             }
             else {
-                $data_ledgers = $data_ledgers->selectRaw("master_akun.id_cabang, master_akun.id_akun, master_akun.kode_akun, master_akun.nama_akun, jurnal_header.kode_jurnal, jurnal_detail.keterangan, jurnal_detail.id_transaksi, jurnal_detail.debet as debet, jurnal_detail.credit as kredit, jurnal_header.tanggal_jurnal");
+                $data_ledgers = $data_ledgers->selectRaw("jurnal_header.id_jurnal, master_akun.id_cabang, master_akun.id_akun, master_akun.kode_akun, master_akun.nama_akun, jurnal_header.kode_jurnal, jurnal_detail.keterangan, jurnal_detail.id_transaksi, jurnal_detail.debet as debet, jurnal_detail.credit as kredit, jurnal_header.tanggal_jurnal");
             }
             if ($id_cabang != "all") {
                 $data_ledgers = $data_ledgers->where("jurnal_header.id_cabang", $id_cabang);
@@ -152,9 +152,19 @@ class ReportGeneralLedgerController extends Controller
                 $data_ledgers = $data_ledgers->where("jurnal_detail.id_akun", $coa);
             }
             if (isset($keyword)) {
-                $data_ledgers->where(function ($query) use ($keyword) {
-                    $query->orWhere("master_akun.kode_akun", "LIKE", "%$keyword%")
-                        ->orWhere("master_akun.nama_akun", "LIKE", "%$keyword%");
+                $data_ledgers->where(function ($query) use ($keyword, $type) {
+                    if ($type == "recap") {
+                        $query->orWhere("master_akun.kode_akun", "LIKE", "%$keyword%")
+                            ->orWhere("master_akun.nama_akun", "LIKE", "%$keyword%");
+                    }
+                    else {
+                        $query->orWhere("master_akun.kode_akun", "LIKE", "%$keyword%")
+                            ->orWhere("master_akun.nama_akun", "LIKE", "%$keyword%")
+                            ->orWhere("jurnal_header.kode_jurnal", "LIKE", "%$keyword%")
+                            ->orWhere("jurnal_detail.id_transaksi", "LIKE", "%$keyword%")
+                            ->orWhere("jurnal_detail.keterangan", "LIKE", "%$keyword%");
+                            
+                    }
                 });
             }
             $filtered_data = $data_ledgers->get();
@@ -182,7 +192,6 @@ class ReportGeneralLedgerController extends Controller
                     $data_ledgers->orderBy("master_akun.kode_akun", "DESC");
                 }
                 else {
-                    Log::info("masuk sini");
                     $data_ledgers->orderBy("jurnal_header.tanggal_jurnal", "DESC");
                     $data_ledgers->orderBy("master_akun.kode_akun", "DESC");
                 }
@@ -246,6 +255,7 @@ class ReportGeneralLedgerController extends Controller
                         $saldo_awal_kredit = $saldo_kredit + $kredit;
                         $saldo_balance = $saldo_awal_debet - $saldo_awal_kredit;
                         $result_detail[] = (object)[
+                            "id_jurnal"=>$value->id_jurnal,
                             "id_cabang"=>$value->id_cabang,
                             "id_akun"=>$value->id_akun,
                             "kode_akun"=>$value->kode_akun,
@@ -261,6 +271,7 @@ class ReportGeneralLedgerController extends Controller
                     }
                     $saldo_balance = $saldo_balance + $value->debet - $value->kredit;
                     $result_detail[] = (object)[
+                        "id_jurnal"=>$value->id_jurnal,
                         "id_cabang"=>$value->id_cabang,
                         "id_akun"=>$value->id_akun,
                         "kode_akun"=>$value->kode_akun,
