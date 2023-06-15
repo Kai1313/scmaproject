@@ -116,6 +116,7 @@
         var table = $('.data-table').DataTable({
             processing: true,
             serverSide: true,
+            order: [],
             ajax: "{{ route('master-wrapper') }}" + "?c=" + $('[name="id_cabang"]').val() + '&show_img=' + $(
                 '[name="show_image"]').is(':checked'),
             columns: [{
