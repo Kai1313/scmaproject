@@ -64,14 +64,14 @@
                                 : {{ $data->purchaseOrder->supplier->nama_pemasok }}
                             </div>
                         </div>
-                    </div>
-                    <div class="col-md-6">
                         <div class="row">
                             <label class="col-md-4">Slip</label>
                             <div class="col-md-8">
                                 : {{ $data->slip ? $data->slip->kode_slip . ' - ' . $data->slip->nama_slip : '' }}
                             </div>
                         </div>
+                    </div>
+                    <div class="col-md-6">
                         <div class="row">
                             <label class="col-md-4">Rate</label>
                             <div class="col-md-8">
@@ -85,7 +85,13 @@
                             </div>
                         </div>
                         <div class="row">
-                            <label class="col-md-4">Total</label>
+                            <label class="col-md-4">Konversi Rupiah</label>
+                            <div class="col-md-8">
+                                : {{ number_format($data->konversi_nominal, 2, ',', '.') }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label class="col-md-4">Total Tagihan</label>
                             <div class="col-md-8">
                                 : {{ number_format($data->total, 2, ',', '.') }}
                             </div>

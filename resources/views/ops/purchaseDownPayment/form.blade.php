@@ -109,14 +109,14 @@
                                     data-max="{{ $maxPayment }}" data-validation="[NOTEMPTY]"
                                     data-validation-message="Nominal tidak boleh kosong">
                             </div>
-                            <label>Konversi Nominal</label>
+                            <label>Konversi Rupiah</label>
                             <div class="form-group">
                                 <input type="text" name="konversi_nominal" class="form-control handle-number-2" readonly
                                     value="{{ old('konversi_nominal', $data ? $data->konversi_nominal : '') }}" readonly>
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <label>Total</label>
+                            <label>Total Tagihan</label>
                             <div class="form-group">
                                 <input type="text" name="total" class="form-control handle-number-2" readonly
                                     value="{{ old('total', $data ? $data->total : '') }}" data-validation="[NOTEMPTY]"

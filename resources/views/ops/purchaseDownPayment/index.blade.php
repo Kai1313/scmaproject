@@ -92,7 +92,8 @@
                                 <th>Mata Uang</th>
                                 <th>Rate</th>
                                 <th>Nominal</th>
-                                <th>Total</th>
+                                <th>Konversi Rupiah</th>
+                                <th>Total Tagihan</th>
                                 <th>Catatan</th>
                                 <th width="150px">Action</th>
                             </tr>
@@ -148,6 +149,13 @@
             }, {
                 data: 'nominal',
                 name: 'ump.nominal',
+                render: function(data) {
+                    return data ? formatNumber(data, 4) : 0
+                },
+                className: 'text-right'
+            }, {
+                data: 'konversi_nominal',
+                name: 'ump.konversi_nominal',
                 render: function(data) {
                     return data ? formatNumber(data, 4) : 0
                 },
