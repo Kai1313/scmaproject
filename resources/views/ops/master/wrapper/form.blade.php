@@ -68,7 +68,7 @@
                                         Palet
                                     </option>
                                     <option value="2" {{ old('id_kategori_wrapper') == '2' ? 'selected' : '' }}>
-                                        Zak
+                                        Wadah
                                     </option>
                                 </select>
                             </div>

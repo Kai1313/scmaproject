@@ -31,7 +31,8 @@ class PurchaseDownPaymentController extends Controller
                     'nominal',
                     'total',
                     'catatan',
-                    'void'
+                    'void',
+                    'konversi_nominal'
                 )
                 ->leftJoin('permintaan_pembelian as pp', 'ump.id_permintaan_pembelian', '=', 'pp.id_permintaan_pembelian')
                 ->leftJoin('pemasok as p', 'pp.id_pemasok', '=', 'p.id_pemasok')
@@ -142,7 +143,7 @@ class PurchaseDownPaymentController extends Controller
                 'catatan' => $data->catatan,
                 'id_pelanggan' => null,
                 'id_pemasok' => $data->purchaseOrder->id_pemasok,
-                'dpp' => $data->nominal,
+                'dpp' => $data->konversi_nominal,
                 'ppn' => 0,
                 'uang_muka' => 0,
                 'biaya' => 0,
@@ -167,8 +168,8 @@ class PurchaseDownPaymentController extends Controller
                 "pemasok" => $data->purchaseOrder->id_pemasok,
                 "void" => $data->void,
                 "user" => session()->get('user')['id_pengguna'],
-                "total" => $data->nominal,
-                "uang_muka" => $data->nominal,
+                "total" => $data->konversi_nominal,
+                "uang_muka" => $data->konversi_nominal,
                 "ppn" => 0,
             ]));
 
@@ -262,8 +263,8 @@ class PurchaseDownPaymentController extends Controller
                 "pemasok" => $data->purchaseOrder->id_pemasok,
                 "void" => $data->void,
                 "user" => session()->get('user')['id_pengguna'],
-                "total" => $data->nominal,
-                "uang_muka" => $data->nominal,
+                "total" => $data->konversi_nominal,
+                "uang_muka" => $data->konversi_nominal,
                 "ppn" => 0,
             ]));
 

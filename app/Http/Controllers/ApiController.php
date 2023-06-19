@@ -2125,6 +2125,8 @@ class ApiController extends Controller
             $hasil_produksi = $data['data_hasil']; // Diisi dengan data hasil produksi
             $biaya_listrik = $data['biaya_listrik']; // Diisi dengan data biaya listrik
             $biaya_operator = $data['biaya_operator']; // Diisi dengan data biaya operator
+            $kwh_listrik = $data['kwh_listrik']; // Diisi dengan data biaya listrik
+            $tenaga_kerja = $data['tenaga_kerja']; // Diisi dengan data biaya operator
             $journalDate = date('Y-m-d');
             $journalType = "ME";
             $cabangID = $data['cabang'];
@@ -2188,7 +2190,7 @@ class ApiController extends Controller
                     $detail->id_jurnal = $header->id_jurnal;
                     $detail->index = $index;
                     $detail->id_akun = $val['akun'];
-                    $detail->keterangan = "Pemakaian produksi " . $val['notes'] . " " . $id_transaksi;
+                    $detail->keterangan = "Pemakaian produksi - " . $val['notes'];
                     $detail->id_transaksi = null;
                     $detail->debet = floatval($val['debet']);
                     $detail->credit = floatval($val['kredit']);
@@ -2212,7 +2214,7 @@ class ApiController extends Controller
                 $detail->id_jurnal = $header->id_jurnal;
                 $detail->index = $index;
                 $detail->id_akun = $get_akun_biaya_listrik->value2;
-                $detail->keterangan = "Biaya Listrik Produksi " . $id_transaksi;
+                $detail->keterangan = "Biaya Listrik Produksi - " . $id_transaksi . ' - ' . $kwh_listrik;
                 $detail->id_transaksi = "Biaya Listrik";
                 $detail->debet = 0;
                 $detail->credit = floatval($biaya_listrik);
@@ -2235,7 +2237,7 @@ class ApiController extends Controller
                 $detail->id_jurnal = $header->id_jurnal;
                 $detail->index = $index;
                 $detail->id_akun = $get_akun_biaya_operator->value2;
-                $detail->keterangan = "Biaya Operator Produksi " . $id_transaksi;
+                $detail->keterangan = "Biaya Operator Produksi - " . $id_transaksi . ' - ' . $tenaga_kerja;
                 $detail->id_transaksi = "Biaya Operator";
                 $detail->debet = 0;
                 $detail->credit = floatval($biaya_operator);
@@ -2259,8 +2261,8 @@ class ApiController extends Controller
                     $detail->id_jurnal = $header->id_jurnal;
                     $detail->index = $index;
                     $detail->id_akun = $val['akun'];
-                    $detail->keterangan = "Hasil produksi " . $val['notes'] . " " . $id_transaksi;
-                    $detail->id_transaksi = $val['notes'];
+                    $detail->keterangan = "Hasil produksi  - " . $val['notes'];
+                    $detail->id_transaksi = $val['id_barang'];
                     $detail->debet = floatval($val['debet']);
                     $detail->credit = floatval($val['kredit']);
                     $detail->user_created = $userRecord;
@@ -2286,7 +2288,7 @@ class ApiController extends Controller
                     $detail->id_jurnal = $header->id_jurnal;
                     $detail->index = $index;
                     $detail->id_akun = $get_akun_pembulatan->value2;
-                    $detail->keterangan = "Pembulatan Produksi " . $id_transaksi;
+                    $detail->keterangan = "Pembulatan Produksi - " . $id_transaksi;
                     $detail->id_transaksi = "Pembulatan";
                     if ($selisih > 0) {
                         $detail->debet = floatval($selisih);
@@ -2327,7 +2329,9 @@ class ApiController extends Controller
             ->join('barang', 'barang.id_barang', 'produksi_detail.id_barang')
             ->join('master_qr_code', 'master_qr_code.kode_batang_master_qr_code', 'produksi_detail.kode_batang_lama_produksi_detail')
             ->selectRaw('produksi_detail.id_barang,
+                                    barang.nama_barang,
                                     produksi.nama_produksi,
+                                    ROUND(IFNULL(SUM(produksi_detail.kredit_produksi_detail), 0), 2) as kredit_produksi,
                                     ROUND(IFNULL(SUM(produksi_detail.kredit_produksi_detail * master_qr_code.beli_master_qr_code), 0), 2) as beli,
                                     ROUND(IFNULL(SUM(produksi_detail.kredit_produksi_detail * master_qr_code.biaya_beli_master_qr_code), 0), 2) as biaya,
                                     ROUND(IFNULL(SUM(produksi_detail.kredit_produksi_detail * master_qr_code.produksi_master_qr_code), 0), 2) as produksi,
@@ -2354,7 +2358,7 @@ class ApiController extends Controller
 
             array_push($data_supplies, [
                 'akun' => $production->id_akun,
-                'notes' => $production->id_barang,
+                'notes' => $production->nama_barang . ' - ' . $production->nama_produksi . ' - ' . $production->kredit_produksi,
                 'debet' => 0,
                 'kredit' => round($total, 2),
             ]);
@@ -2420,7 +2424,9 @@ class ApiController extends Controller
         // data return biaya listrik dan pegawai
         $data = [
             'biaya_listrik' => $biaya_listrik,
+            'kwh_listrik' => $beban_listrik,
             'biaya_operator' => $biaya_operator,
+            'tenaga_kerja' => $beban_pegawai,
         ];
 
         return $data;
@@ -2469,7 +2475,8 @@ class ApiController extends Controller
             ->join('barang', 'barang.id_barang', 'produksi_detail.id_barang')
             ->join('master_qr_code', 'master_qr_code.kode_batang_master_qr_code', 'produksi_detail.kode_batang_produksi_detail')
             ->selectRaw('produksi_detail.id_barang,
-                                                ROUND(SUM(debit_produksi_detail),2) as debit_produksi_detail,
+                                                barang.nama_barang,
+                                                ROUND(SUM(debit_produksi_detail),2) as debit_produksi,
                                                 barang.id_akun,
                                                 ROUND(SUM(ROUND(master_qr_code.listrik_master_qr_code * produksi_detail.debit_produksi_detail, 2) + ROUND(master_qr_code.pegawai_master_qr_code * produksi_detail.debit_produksi_detail, 2) + ROUND(master_qr_code.produksi_master_qr_code * produksi_detail.debit_produksi_detail, 2)), 2) as total')
             ->where('produksi.nomor_referensi_produksi', $production_id)
@@ -2479,10 +2486,14 @@ class ApiController extends Controller
 
         $data_results = [];
 
+        // untuk mendapatkan kode produksi
+        $data_production = DB::table('produksi')->where('id_produksi', $production_id)->first();
+
         foreach ($data_production_results_groupby_barang as $production) {
             array_push($data_results, [
                 'akun' => $production->id_akun,
-                'notes' => $production->id_barang,
+                'notes' => $production->nama_barang . ' - ' . $data_production->nama_produksi . ' - ' . $production->debit_produksi,
+                'id_barang' => $production->id_barang,
                 'debet' => round($production->total, 2),
                 'kredit' => 0,
             ]);
@@ -2595,6 +2606,87 @@ class ApiController extends Controller
             dd(json_encode($th));
         }
 
+        $id_produksi = $data_produksi->id_produksi;
+
+        // tahap 1
+        $data_production_supplies = $this->productionSupplies($id_produksi);
+
+        if ($data_production_supplies == false) {
+            DB::rollBack();
+            return response()->json([
+                "result" => false,
+                "code" => 400,
+                "message" => "Error when store Jurnal Hpp data. Data Produksi " . $no_transaksi . " not found ",
+            ], 400);
+        }
+
+        // tahap 2 dan 3
+        $data_production_cost = $this->productionCost($id_produksi, $id_cabang);
+
+        if ($data_production_cost == false) {
+            DB::rollBack();
+            return response()->json([
+                "result" => false,
+                "code" => 400,
+                "message" => "Error when store Jurnal Hpp data. Data Beban Produksi " . $no_transaksi . " not found ",
+            ], 400);
+        }
+
+        $total_supplies = $data_production_supplies['total_supplies'];
+        $biaya_listrik = $data_production_cost['biaya_listrik'];
+        $biaya_operator = $data_production_cost['biaya_operator'];
+        $kwh_listrik = $data_production_cost['kwh_listrik'];
+        $tenaga_kerja = $data_production_cost['tenaga_kerja'];
+
+        // tahap 4
+        $data_production_results = $this->productionResults($id_produksi, $total_supplies, $biaya_listrik, $biaya_operator);
+
+        // init data jurnal
+        $data_production = DB::table('produksi')->where('id_produksi', $id_produksi)->first();
+
+        $id_transaksi = $data_production->nama_produksi;
+        $data_pemakaian = $data_production_supplies['data_supplies'];
+        $data_hasil = $data_production_results['data_results'];
+        $user_data = Auth::guard('api')->user();
+
+        if (count($data_hasil) < 1) {
+            DB::rollBack();
+            return response()->json([
+                "result" => false,
+                "code" => 400,
+                "message" => "Error when store Jurnal Hpp data. Data Hasil Produksi empty",
+            ], 400);
+        }
+
+        $data = [
+            'id_transaksi' => $id_transaksi,
+            'cabang' => $id_cabang,
+            'data_pemakaian' => $data_pemakaian,
+            'biaya_listrik' => $biaya_listrik,
+            'biaya_operator' => $biaya_operator,
+            'kwh_listrik' => $kwh_listrik,
+            'tenaga_kerja' => $tenaga_kerja,
+            'data_hasil' => $data_hasil,
+            'user_data' => $user_data,
+            'void' => $void,
+        ];
+
+        // tahap 5
+        $store_data = $this->storeHppJournal($data);
+
+        if ($store_data) {
+            return response()->json([
+                "result" => true,
+                "code" => 200,
+                "message" => "Successfully stored Jurnal Hpp data",
+            ], 200);
+        } else {
+            return response()->json([
+                "result" => false,
+                "code" => 400,
+                "message" => "Error when store Jurnal Hpp data",
+            ], 400);
+        }
     }
 
     public function getPemakaian($tanggal_closing)

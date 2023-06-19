@@ -18,12 +18,14 @@ class MasterWrapperController extends Controller
 
         if ($request->ajax()) {
             $data = DB::table('master_wrapper')
-                ->select('id_wrapper', 'nama_wrapper', 'weight', 'catatan', 'path2', 'path', 'dt_created as created_at', DB::raw('(CASE WHEN id_kategori_wrapper = 1 THEN "Palet" ELSE "Zak" END) AS kategori_wrapper'));
+                ->select('id_wrapper', 'nama_wrapper', 'weight', 'catatan', 'path2', 'path', 'dt_created as created_at', DB::raw('(CASE WHEN id_kategori_wrapper = 1 THEN "Palet" ELSE "Wadah" END) AS kategori_wrapper'));
             if (isset($request->c)) {
                 $data = $data->where('id_cabang', $request->c);
             }
 
-            $data = $data->orderBy('master_wrapper.dt_created', 'desc');
+            if ($request->order == null) {
+                $data = $data->orderBy('master_wrapper.dt_created', 'desc');
+            }
 
             return Datatables::of($data)
                 ->addIndexColumn()
@@ -43,6 +45,7 @@ class MasterWrapperController extends Controller
                     }
                 })
                 ->rawColumns(['action', 'path2'])
+                ->orderColumns(['nama_wrapper', 'weight', 'catatan', 'id_kategori_wrapper'], '-:column $1')
                 ->make(true);
         }
 
@@ -83,12 +86,14 @@ class MasterWrapperController extends Controller
             $checkData = DB::table('master_wrapper')
                 ->where('id_cabang', $request->id_cabang)
                 ->where('nama_wrapper', $request->nama_wrapper)
-                ->where('id_wrapper', '!=', $id)->first();
+                ->where('id_wrapper', '!=', $id)
+                ->where('id_kategori_wrapper', $request->id_kategori_wrapper)
+                ->where('weight', $request->weight)->first();
             if ($checkData) {
                 DB::rollback();
                 return response()->json([
                     "result" => false,
-                    "message" => "Nama " . $request->nama_wrapper . " sudah ada",
+                    "message" => "Data master sudah ada",
                 ], 500);
             }
 
