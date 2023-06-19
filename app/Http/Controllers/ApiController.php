@@ -2134,11 +2134,11 @@ class ApiController extends Controller
             $biaya_operator =  $data['biaya_operator']; // Diisi dengan data biaya operator
             $kwh_listrik = $data['kwh_listrik']; // Diisi dengan data biaya listrik
             $tenaga_kerja =  $data['tenaga_kerja']; // Diisi dengan data biaya operator
-            $journalDate = date('Y-m-d');
+            $journalDate = date('Y-m-d', strtotime($data['tanggal_hasil_produksi']));
             $journalType = "ME";
             $cabangID = $data['cabang'];
             $void = $data['void'];
-            $noteHeader = "notes";
+            $noteHeader = $data['note'];
             $userData = $data['user_data'];
             $userRecord = $userData->id_pengguna;
             $userModified = $userData->id_pengguna;
@@ -2221,7 +2221,7 @@ class ApiController extends Controller
                 $detail->id_jurnal = $header->id_jurnal;
                 $detail->index = $index;
                 $detail->id_akun = $get_akun_biaya_listrik->value2;
-                $detail->keterangan = "Biaya Listrik Produksi - " . $id_transaksi . ' - ' . $kwh_listrik;
+                $detail->keterangan = "Biaya Listrik Produksi - " . $kwh_listrik . ' kWh';
                 $detail->id_transaksi = "Biaya Listrik";
                 $detail->debet = 0;
                 $detail->credit = floatval($biaya_listrik);
@@ -2245,7 +2245,7 @@ class ApiController extends Controller
                 $detail->id_jurnal = $header->id_jurnal;
                 $detail->index = $index;
                 $detail->id_akun = $get_akun_biaya_operator->value2;
-                $detail->keterangan = "Biaya Operator Produksi - " . $id_transaksi . ' - ' . $tenaga_kerja;
+                $detail->keterangan = "Biaya Operator Produksi - " . $tenaga_kerja;
                 $detail->id_transaksi = "Biaya Operator";
                 $detail->debet = 0;
                 $detail->credit = floatval($biaya_operator);
@@ -2296,7 +2296,7 @@ class ApiController extends Controller
                     $detail->id_jurnal = $header->id_jurnal;
                     $detail->index = $index;
                     $detail->id_akun = $get_akun_pembulatan->value2;
-                    $detail->keterangan = "Pembulatan Produksi - " . $id_transaksi;
+                    $detail->keterangan = "Pembulatan Produksi";
                     $detail->id_transaksi = "Pembulatan";
                     if($selisih > 0){
                         $detail->debet = floatval($selisih);
@@ -2336,9 +2336,11 @@ class ApiController extends Controller
                                     ->join('produksi', 'produksi.id_produksi', 'produksi_detail.id_produksi')
                                     ->join('barang', 'barang.id_barang', 'produksi_detail.id_barang')
                                     ->join('master_qr_code', 'master_qr_code.kode_batang_master_qr_code', 'produksi_detail.kode_batang_lama_produksi_detail')
+                                    ->leftJoin('satuan_barang', 'satuan_barang.id_satuan_barang', 'produksi_detail.id_satuan_barang')
                                     ->selectRaw('produksi_detail.id_barang,
                                     barang.nama_barang,
                                     produksi.nama_produksi,
+                                    IFNULL(satuan_barang.nama_satuan_barang, "") as nama_satuan,
                                     ROUND(IFNULL(SUM(produksi_detail.kredit_produksi_detail), 0), 2) as kredit_produksi,
                                     ROUND(IFNULL(SUM(produksi_detail.kredit_produksi_detail * master_qr_code.beli_master_qr_code), 0), 2) as beli,
                                     ROUND(IFNULL(SUM(produksi_detail.kredit_produksi_detail * master_qr_code.biaya_beli_master_qr_code), 0), 2) as biaya,
@@ -2366,7 +2368,7 @@ class ApiController extends Controller
 
             array_push($data_supplies, [
                 'akun' => $production->id_akun,
-                'notes' => $production->nama_barang . ' - ' . $production->nama_produksi . ' - ' . $production->kredit_produksi,
+                'notes' => $production->nama_barang . ' - ' . $production->kredit_produksi . ' ' . $production->nama_satuan,
                 'debet' => 0,
                 'kredit' => round($total, 2),
             ]);
@@ -2446,7 +2448,7 @@ class ApiController extends Controller
                                     ->join('produksi', 'produksi.id_produksi', 'produksi_detail.id_produksi')
                                     ->join('barang', 'barang.id_barang', 'produksi_detail.id_barang')
                                     ->join('master_qr_code', 'master_qr_code.kode_batang_master_qr_code', 'produksi_detail.kode_batang_produksi_detail')
-                                    ->select('produksi_detail.*')
+                                    ->select('produksi_detail.*', 'produksi.nama_produksi', 'produksi.tanggal_produksi')
                                     ->where('produksi.nomor_referensi_produksi', $production_id)
                                     ->orderBy('produksi_detail.id_barang', 'ASC')
                                     ->get();
@@ -2481,8 +2483,11 @@ class ApiController extends Controller
                                                 ->join('produksi', 'produksi.id_produksi', 'produksi_detail.id_produksi')
                                                 ->join('barang', 'barang.id_barang', 'produksi_detail.id_barang')
                                                 ->join('master_qr_code', 'master_qr_code.kode_batang_master_qr_code', 'produksi_detail.kode_batang_produksi_detail')
+                                                ->leftJoin('satuan_barang', 'satuan_barang.id_satuan_barang', 'produksi_detail.id_satuan_barang')
                                                 ->selectRaw('produksi_detail.id_barang,
+                                                produksi.nama_produksi,
                                                 barang.nama_barang,
+                                                IFNULL(satuan_barang.nama_satuan_barang, "") as nama_satuan,
                                                 ROUND(SUM(debit_produksi_detail),2) as debit_produksi,
                                                 barang.id_akun,
                                                 ROUND(SUM(ROUND(master_qr_code.listrik_master_qr_code * produksi_detail.debit_produksi_detail, 2) + ROUND(master_qr_code.pegawai_master_qr_code * produksi_detail.debit_produksi_detail, 2) + ROUND(master_qr_code.produksi_master_qr_code * produksi_detail.debit_produksi_detail, 2)), 2) as total')
@@ -2493,14 +2498,11 @@ class ApiController extends Controller
 
         $data_results = [];
 
-        // untuk mendapatkan kode produksi
-        $data_production = DB::table('produksi')->where('id_produksi', $production_id)->first();
-
 
         foreach($data_production_results_groupby_barang as $production){
             array_push($data_results, [
                 'akun' => $production->id_akun,
-                'notes' => $production->nama_barang . ' - ' . $data_production->nama_produksi . ' - ' . $production->debit_produksi,
+                'notes' => $production->nama_barang . ' - ' . $production->debit_produksi . ' ' . $production->nama_satuan,
                 'id_barang' => $production->id_barang,
                 'debet' => round($production->total, 2),
                 'kredit' => 0,
@@ -2509,7 +2511,9 @@ class ApiController extends Controller
 
         // data yang direturn
         $data = [
-            'data_results' => $data_results
+            'data_results' => $data_results,
+            'nama_hasil_produksi' => $data_production_results[0]->nama_produksi,
+            'tanggal_hasil_produksi' => $data_production_results[0]->tanggal_produksi
         ];
 
         return $data;
@@ -2573,6 +2577,8 @@ class ApiController extends Controller
         $id_transaksi = $data_production->nama_produksi;
         $data_pemakaian = $data_production_supplies['data_supplies'];
         $data_hasil = $data_production_results['data_results'];
+        $id_transaksi_hasil_produksi = $data_production_results['nama_hasil_produksi'];
+        $tanggal_hasil_produksi = $data_production_results['tanggal_hasil_produksi'];
         $user_data = Auth::guard('api')->user();
 
         if(count($data_hasil) < 1){
@@ -2594,7 +2600,9 @@ class ApiController extends Controller
             'tenaga_kerja' => $tenaga_kerja,
             'data_hasil' => $data_hasil,
             'user_data' => $user_data,
-            'void' => $void
+            'void' => $void,
+            'note' => $id_transaksi . ' ==> ' . $id_transaksi_hasil_produksi,
+            'tanggal_hasil_produksi' => $tanggal_hasil_produksi
         ];
 
         // tahap 5
