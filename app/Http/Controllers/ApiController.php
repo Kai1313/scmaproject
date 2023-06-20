@@ -3108,4 +3108,82 @@ class ApiController extends Controller
             ], 500);
         }
     }
+
+    public function stokmin(Request $request)
+    {
+        $setting = Setting::where("id_cabang",1)->where("code", 'like' ,"Stok Min %")->select('code','value2')->get()->toArray();
+        $setting = array_column($setting,'value2','code');
+        session(['stokMin'=>$setting]);
+        \DB::unprepared( \DB::raw( "DROP TEMPORARY TABLE IF EXISTS tTotalPenjualanInfo" ) );
+        \DB::insert( \DB::raw( "CREATE TEMPORARY TABLE tTotalPenjualanInfo(id_barang int(11) NOT NULL,nama_barang varchar(200), total_jual decimal(15,6),
+        total_jual_per_bulan decimal(15,6),plus_persen decimal(15,6),per_bulan_plus_persen decimal(15,6),avg_prorate double,
+        pemakaian_per_barang_jadi double)") );
+        self::getSalesWithProrate($request->id,1);
+        $debug = false;
+        if(!empty($request->debug) && $request->debug == true){
+            $debug = \DB::table('tTotalPenjualanInfo AS ttp')->get();
+        }
+        $total = \DB::table('tTotalPenjualanInfo AS ttp')
+        ->select(\DB::raw('SUM(ttp.pemakaian_per_barang_jadi)'))->value('total');
+        $barang = \App\Barang::find($request->id);
+        if($barang->keterangan_barang === 1){
+            $total *= floatval($setting['Stok Min Import']);
+        }else{
+            $total *= floatval($setting['Stok Min Lokal']);
+        }
+        $respon = [
+            'total' => round($total,6),
+        ];
+        if($debug !== false){
+            $respon['debug'] = $debug;
+        }
+        return response()->json($respon);
+    }
+
+    private function getSalesWithProrate($id_barang,$value){
+        $childsub = \DB::table('bom_detail AS bd')
+        ->select('b.id_barang','b.keterangan_bom','brg.nama_barang',\DB::raw('SUM(bd.jumlah_bom_detail) AS total_pemakaian'),
+        'b.jumlah_bom',\DB::raw('(SUM(bd.jumlah_bom_detail)/b.jumlah_bom) AS prorate'))
+        ->join('bom AS b', 'bd.id_bom', '=', 'b.id_bom')
+        ->join('barang AS brg', 'brg.id_barang', '=', 'b.id_barang')
+        ->whereRaw('bd.id_barang = '.$id_barang. ' AND b.status_bom = 1')
+        ->groupBy('bd.id_barang','b.id_bom');
+        $child = \DB::table(\DB::raw("({$childsub->toSql()}) as a"))
+        ->select('a.*',\DB::raw('AVG(a.prorate) AS avg_prorate'))
+        ->groupBy('a.id_barang')->get();
+        if(empty($child)){
+            return;
+        }
+        $stokMin = session('stokMin');
+        $jual = \DB::table('penjualan AS p')
+        ->select('brg.nama_barang',\DB::raw('SUM(pd.jumlah_penjualan_detail) AS total_jual'),
+        \DB::raw('(SUM(pd.jumlah_penjualan_detail)/'.intval($stokMin['Stok Min Range']).') AS total_jual_per_bulan'))
+        ->join('penjualan_detail AS pd', 'pd.id_penjualan', '=', 'p.id_penjualan')
+        ->join('barang AS brg', 'brg.id_barang', '=', 'pd.id_barang')
+        ->where('pd.id_barang',$id_barang)
+        ->whereRaw('p.tanggal_penjualan BETWEEN "2021-12-01" AND "2023-06-08"')->get()->toArray();
+        if(!empty($jual[0]->total_jual)){
+            $persen = floatval($jual[0]->total_jual_per_bulan) * (floatval($stokMin['Stok Min Persen'])/100);
+            $plusPersen = floatval($jual[0]->total_jual_per_bulan) + $persen;
+            $pemakaian = $plusPersen * $value;
+            \DB::table('tTotalPenjualanInfo')->insert([
+                "id_barang" => $id_barang,
+                "nama_barang" => $jual[0]->nama_barang,
+                "total_jual" => $jual[0]->total_jual,
+                "total_jual_per_bulan" => $jual[0]->total_jual_per_bulan,
+                "plus_persen" => $persen,
+                "per_bulan_plus_persen" => $plusPersen,
+                "avg_prorate" => $value,
+                "pemakaian_per_barang_jadi" => $pemakaian,
+            ]);
+        }
+
+        foreach($child as $itemChild){
+            if(strpos(strtolower($itemChild->keterangan_bom), 'blending') || $itemChild->id_barang == $id_barang){
+                continue;
+            }
+            $new_val = $value * floatval($itemChild->avg_prorate);
+            self::getSalesWithProrate($itemChild->id_barang, $new_val);
+        }
+    }
 }
