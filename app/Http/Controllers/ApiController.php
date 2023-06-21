@@ -2127,11 +2127,11 @@ class ApiController extends Controller
             $biaya_operator = $data['biaya_operator']; // Diisi dengan data biaya operator
             $kwh_listrik = $data['kwh_listrik']; // Diisi dengan data biaya listrik
             $tenaga_kerja = $data['tenaga_kerja']; // Diisi dengan data biaya operator
-            $journalDate = date('Y-m-d');
+            $journalDate = date('Y-m-d', strtotime($data['tanggal_hasil_produksi']));
             $journalType = "ME";
             $cabangID = $data['cabang'];
             $void = $data['void'];
-            $noteHeader = "notes";
+            $noteHeader = $data['note'];
             $userData = $data['user_data'];
             $userRecord = $userData->id_pengguna;
             $userModified = $userData->id_pengguna;
@@ -2214,7 +2214,7 @@ class ApiController extends Controller
                 $detail->id_jurnal = $header->id_jurnal;
                 $detail->index = $index;
                 $detail->id_akun = $get_akun_biaya_listrik->value2;
-                $detail->keterangan = "Biaya Listrik Produksi - " . $id_transaksi . ' - ' . $kwh_listrik;
+                $detail->keterangan = "Biaya Listrik Produksi - " . $kwh_listrik . ' kWh';
                 $detail->id_transaksi = "Biaya Listrik";
                 $detail->debet = 0;
                 $detail->credit = floatval($biaya_listrik);
@@ -2237,7 +2237,7 @@ class ApiController extends Controller
                 $detail->id_jurnal = $header->id_jurnal;
                 $detail->index = $index;
                 $detail->id_akun = $get_akun_biaya_operator->value2;
-                $detail->keterangan = "Biaya Operator Produksi - " . $id_transaksi . ' - ' . $tenaga_kerja;
+                $detail->keterangan = "Biaya Operator Produksi - " . $tenaga_kerja;
                 $detail->id_transaksi = "Biaya Operator";
                 $detail->debet = 0;
                 $detail->credit = floatval($biaya_operator);
@@ -2288,7 +2288,7 @@ class ApiController extends Controller
                     $detail->id_jurnal = $header->id_jurnal;
                     $detail->index = $index;
                     $detail->id_akun = $get_akun_pembulatan->value2;
-                    $detail->keterangan = "Pembulatan Produksi - " . $id_transaksi;
+                    $detail->keterangan = "Pembulatan Produksi";
                     $detail->id_transaksi = "Pembulatan";
                     if ($selisih > 0) {
                         $detail->debet = floatval($selisih);
@@ -2328,9 +2328,11 @@ class ApiController extends Controller
             ->join('produksi', 'produksi.id_produksi', 'produksi_detail.id_produksi')
             ->join('barang', 'barang.id_barang', 'produksi_detail.id_barang')
             ->join('master_qr_code', 'master_qr_code.kode_batang_master_qr_code', 'produksi_detail.kode_batang_lama_produksi_detail')
+            ->leftJoin('satuan_barang', 'satuan_barang.id_satuan_barang', 'produksi_detail.id_satuan_barang')
             ->selectRaw('produksi_detail.id_barang,
                                     barang.nama_barang,
                                     produksi.nama_produksi,
+                                    IFNULL(satuan_barang.nama_satuan_barang, "") as nama_satuan,
                                     ROUND(IFNULL(SUM(produksi_detail.kredit_produksi_detail), 0), 2) as kredit_produksi,
                                     ROUND(IFNULL(SUM(produksi_detail.kredit_produksi_detail * master_qr_code.beli_master_qr_code), 0), 2) as beli,
                                     ROUND(IFNULL(SUM(produksi_detail.kredit_produksi_detail * master_qr_code.biaya_beli_master_qr_code), 0), 2) as biaya,
@@ -2358,7 +2360,7 @@ class ApiController extends Controller
 
             array_push($data_supplies, [
                 'akun' => $production->id_akun,
-                'notes' => $production->nama_barang . ' - ' . $production->nama_produksi . ' - ' . $production->kredit_produksi,
+                'notes' => $production->nama_barang . ' - ' . $production->kredit_produksi . ' ' . $production->nama_satuan,
                 'debet' => 0,
                 'kredit' => round($total, 2),
             ]);
@@ -2440,7 +2442,7 @@ class ApiController extends Controller
             ->join('produksi', 'produksi.id_produksi', 'produksi_detail.id_produksi')
             ->join('barang', 'barang.id_barang', 'produksi_detail.id_barang')
             ->join('master_qr_code', 'master_qr_code.kode_batang_master_qr_code', 'produksi_detail.kode_batang_produksi_detail')
-            ->select('produksi_detail.*')
+            ->select('produksi_detail.*', 'produksi.nama_produksi', 'produksi.tanggal_produksi')
             ->where('produksi.nomor_referensi_produksi', $production_id)
             ->orderBy('produksi_detail.id_barang', 'ASC')
             ->get();
@@ -2474,8 +2476,11 @@ class ApiController extends Controller
             ->join('produksi', 'produksi.id_produksi', 'produksi_detail.id_produksi')
             ->join('barang', 'barang.id_barang', 'produksi_detail.id_barang')
             ->join('master_qr_code', 'master_qr_code.kode_batang_master_qr_code', 'produksi_detail.kode_batang_produksi_detail')
+            ->leftJoin('satuan_barang', 'satuan_barang.id_satuan_barang', 'produksi_detail.id_satuan_barang')
             ->selectRaw('produksi_detail.id_barang,
+                                                produksi.nama_produksi,
                                                 barang.nama_barang,
+                                                IFNULL(satuan_barang.nama_satuan_barang, "") as nama_satuan,
                                                 ROUND(SUM(debit_produksi_detail),2) as debit_produksi,
                                                 barang.id_akun,
                                                 ROUND(SUM(ROUND(master_qr_code.listrik_master_qr_code * produksi_detail.debit_produksi_detail, 2) + ROUND(master_qr_code.pegawai_master_qr_code * produksi_detail.debit_produksi_detail, 2) + ROUND(master_qr_code.produksi_master_qr_code * produksi_detail.debit_produksi_detail, 2)), 2) as total')
@@ -2486,13 +2491,10 @@ class ApiController extends Controller
 
         $data_results = [];
 
-        // untuk mendapatkan kode produksi
-        $data_production = DB::table('produksi')->where('id_produksi', $production_id)->first();
-
         foreach ($data_production_results_groupby_barang as $production) {
             array_push($data_results, [
                 'akun' => $production->id_akun,
-                'notes' => $production->nama_barang . ' - ' . $data_production->nama_produksi . ' - ' . $production->debit_produksi,
+                'notes' => $production->nama_barang . ' - ' . $production->debit_produksi . ' ' . $production->nama_satuan,
                 'id_barang' => $production->id_barang,
                 'debet' => round($production->total, 2),
                 'kredit' => 0,
@@ -2502,6 +2504,8 @@ class ApiController extends Controller
         // data yang direturn
         $data = [
             'data_results' => $data_results,
+            'nama_hasil_produksi' => $data_production_results[0]->nama_produksi,
+            'tanggal_hasil_produksi' => $data_production_results[0]->tanggal_produksi,
         ];
 
         return $data;
@@ -2647,6 +2651,8 @@ class ApiController extends Controller
         $id_transaksi = $data_production->nama_produksi;
         $data_pemakaian = $data_production_supplies['data_supplies'];
         $data_hasil = $data_production_results['data_results'];
+        $id_transaksi_hasil_produksi = $data_production_results['nama_hasil_produksi'];
+        $tanggal_hasil_produksi = $data_production_results['tanggal_hasil_produksi'];
         $user_data = Auth::guard('api')->user();
 
         if (count($data_hasil) < 1) {
@@ -2669,6 +2675,8 @@ class ApiController extends Controller
             'data_hasil' => $data_hasil,
             'user_data' => $user_data,
             'void' => $void,
+            'note' => $id_transaksi . ' ==> ' . $id_transaksi_hasil_produksi,
+            'tanggal_hasil_produksi' => $tanggal_hasil_produksi,
         ];
 
         // tahap 5
@@ -3111,59 +3119,60 @@ class ApiController extends Controller
 
     public function stokmin(Request $request)
     {
-        $setting = Setting::where("id_cabang",1)->where("code", 'like' ,"Stok Min %")->select('code','value2')->get()->toArray();
-        $setting = array_column($setting,'value2','code');
-        session(['stokMin'=>$setting]);
-        \DB::unprepared( \DB::raw( "DROP TEMPORARY TABLE IF EXISTS tTotalPenjualanInfo" ) );
-        \DB::insert( \DB::raw( "CREATE TEMPORARY TABLE tTotalPenjualanInfo(id_barang int(11) NOT NULL,nama_barang varchar(200), total_jual decimal(15,6),
+        $setting = Setting::where("id_cabang", 1)->where("code", 'like', "Stok Min %")->select('code', 'value2')->get()->toArray();
+        $setting = array_column($setting, 'value2', 'code');
+        session(['stokMin' => $setting]);
+        \DB::unprepared(\DB::raw("DROP TEMPORARY TABLE IF EXISTS tTotalPenjualanInfo"));
+        \DB::insert(\DB::raw("CREATE TEMPORARY TABLE tTotalPenjualanInfo(id_barang int(11) NOT NULL,nama_barang varchar(200), total_jual decimal(15,6),
         total_jual_per_bulan decimal(15,6),plus_persen decimal(15,6),per_bulan_plus_persen decimal(15,6),avg_prorate double,
-        pemakaian_per_barang_jadi double)") );
-        self::getSalesWithProrate($request->id,1);
+        pemakaian_per_barang_jadi double)"));
+        self::getSalesWithProrate($request->id, 1);
         $debug = false;
-        if(!empty($request->debug) && $request->debug == true){
+        if (!empty($request->debug) && $request->debug == true) {
             $debug = \DB::table('tTotalPenjualanInfo AS ttp')->get();
         }
         $total = \DB::table('tTotalPenjualanInfo AS ttp')
-        ->select(\DB::raw('SUM(ttp.pemakaian_per_barang_jadi)'))->value('total');
+            ->select(\DB::raw('SUM(ttp.pemakaian_per_barang_jadi)'))->value('total');
         $barang = \App\Barang::find($request->id);
-        if($barang->keterangan_barang === 1){
+        if ($barang->keterangan_barang === 1) {
             $total *= floatval($setting['Stok Min Import']);
-        }else{
+        } else {
             $total *= floatval($setting['Stok Min Lokal']);
         }
         $respon = [
-            'total' => round($total,6),
+            'total' => round($total, 6),
         ];
-        if($debug !== false){
+        if ($debug !== false) {
             $respon['debug'] = $debug;
         }
         return response()->json($respon);
     }
 
-    private function getSalesWithProrate($id_barang,$value){
+    private function getSalesWithProrate($id_barang, $value)
+    {
         $childsub = \DB::table('bom_detail AS bd')
-        ->select('b.id_barang','b.keterangan_bom','brg.nama_barang',\DB::raw('SUM(bd.jumlah_bom_detail) AS total_pemakaian'),
-        'b.jumlah_bom',\DB::raw('(SUM(bd.jumlah_bom_detail)/b.jumlah_bom) AS prorate'))
-        ->join('bom AS b', 'bd.id_bom', '=', 'b.id_bom')
-        ->join('barang AS brg', 'brg.id_barang', '=', 'b.id_barang')
-        ->whereRaw('bd.id_barang = '.$id_barang. ' AND b.status_bom = 1')
-        ->groupBy('bd.id_barang','b.id_bom');
+            ->select('b.id_barang', 'b.keterangan_bom', 'brg.nama_barang', \DB::raw('SUM(bd.jumlah_bom_detail) AS total_pemakaian'),
+                'b.jumlah_bom', \DB::raw('(SUM(bd.jumlah_bom_detail)/b.jumlah_bom) AS prorate'))
+            ->join('bom AS b', 'bd.id_bom', '=', 'b.id_bom')
+            ->join('barang AS brg', 'brg.id_barang', '=', 'b.id_barang')
+            ->whereRaw('bd.id_barang = ' . $id_barang . ' AND b.status_bom = 1')
+            ->groupBy('bd.id_barang', 'b.id_bom');
         $child = \DB::table(\DB::raw("({$childsub->toSql()}) as a"))
-        ->select('a.*',\DB::raw('AVG(a.prorate) AS avg_prorate'))
-        ->groupBy('a.id_barang')->get();
-        if(empty($child)){
+            ->select('a.*', \DB::raw('AVG(a.prorate) AS avg_prorate'))
+            ->groupBy('a.id_barang')->get();
+        if (empty($child)) {
             return;
         }
         $stokMin = session('stokMin');
         $jual = \DB::table('penjualan AS p')
-        ->select('brg.nama_barang',\DB::raw('SUM(pd.jumlah_penjualan_detail) AS total_jual'),
-        \DB::raw('(SUM(pd.jumlah_penjualan_detail)/'.intval($stokMin['Stok Min Range']).') AS total_jual_per_bulan'))
-        ->join('penjualan_detail AS pd', 'pd.id_penjualan', '=', 'p.id_penjualan')
-        ->join('barang AS brg', 'brg.id_barang', '=', 'pd.id_barang')
-        ->where('pd.id_barang',$id_barang)
-        ->whereRaw('p.tanggal_penjualan BETWEEN "2021-12-01" AND "2023-06-08"')->get()->toArray();
-        if(!empty($jual[0]->total_jual)){
-            $persen = floatval($jual[0]->total_jual_per_bulan) * (floatval($stokMin['Stok Min Persen'])/100);
+            ->select('brg.nama_barang', \DB::raw('SUM(pd.jumlah_penjualan_detail) AS total_jual'),
+                \DB::raw('(SUM(pd.jumlah_penjualan_detail)/' . intval($stokMin['Stok Min Range']) . ') AS total_jual_per_bulan'))
+            ->join('penjualan_detail AS pd', 'pd.id_penjualan', '=', 'p.id_penjualan')
+            ->join('barang AS brg', 'brg.id_barang', '=', 'pd.id_barang')
+            ->where('pd.id_barang', $id_barang)
+            ->whereRaw('p.tanggal_penjualan BETWEEN "2021-12-01" AND "2023-06-08"')->get()->toArray();
+        if (!empty($jual[0]->total_jual)) {
+            $persen = floatval($jual[0]->total_jual_per_bulan) * (floatval($stokMin['Stok Min Persen']) / 100);
             $plusPersen = floatval($jual[0]->total_jual_per_bulan) + $persen;
             $pemakaian = $plusPersen * $value;
             \DB::table('tTotalPenjualanInfo')->insert([
@@ -3178,8 +3187,8 @@ class ApiController extends Controller
             ]);
         }
 
-        foreach($child as $itemChild){
-            if(strpos(strtolower($itemChild->keterangan_bom), 'blending') || $itemChild->id_barang == $id_barang){
+        foreach ($child as $itemChild) {
+            if (strpos(strtolower($itemChild->keterangan_bom), 'blending') || $itemChild->id_barang == $id_barang) {
                 continue;
             }
             $new_val = $value * floatval($itemChild->avg_prorate);
