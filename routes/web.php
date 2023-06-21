@@ -33,6 +33,7 @@ Route::prefix('master_biaya')->group(function () {
     Route::get('/view/{id}', 'MasterBiayaController@viewData')->name('master-biaya-view');
     Route::post('/save_entry/{id}', 'MasterBiayaController@saveEntry')->name('master-biaya-save-entry');
     Route::get('/delete/{id}', 'MasterBiayaController@destroy')->name('master-biaya-delete');
+    Route::get('/get-account', 'MasterBiayaController@getAccountFilter')->name('master-biaya-get-account');
 });
 
 Route::prefix('master_wrapper')->group(function () {
