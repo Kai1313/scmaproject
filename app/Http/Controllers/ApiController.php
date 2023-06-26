@@ -3134,7 +3134,7 @@ class ApiController extends Controller
         $total = \DB::table('tTotalPenjualanInfo AS ttp')
             ->select(\DB::raw('SUM(ttp.pemakaian_per_barang_jadi)'))->value('total');
         $barang = \App\Barang::find($request->id);
-        if ($barang->keterangan_barang === 1) {
+        if ($barang->keterangan_barang == '1') {
             $total *= floatval($setting['Stok Min Import']);
         } else {
             $total *= floatval($setting['Stok Min Lokal']);
