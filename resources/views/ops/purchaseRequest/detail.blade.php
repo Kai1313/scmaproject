@@ -292,7 +292,7 @@
             })
         })
 
-        $('.btn-change-status-modal').click(function(e) {
+        $('body').on('click', '.btn-change-status-modal', function(e) {
             e.preventDefault()
             let url = $(this).prop('href')
             let type = $(this).data('type')
