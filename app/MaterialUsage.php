@@ -196,7 +196,7 @@ class MaterialUsage extends Model
 
             DB::table('kartu_stok')->where('kode_kartu_stok', $this->kode_pemakaian)
                 ->where('kode_batang_kartu_stok', $detail->kode_batang)
-                ->where('id_jenis_transaksi', $this->id_jenis_transaksi)->delete();
+                ->where('id_jenis_transaksi', 25)->delete();
         }
 
         return ['status' => 'success'];

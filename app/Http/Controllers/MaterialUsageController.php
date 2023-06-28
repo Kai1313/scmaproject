@@ -67,7 +67,7 @@ class MaterialUsageController extends Controller
                             $btn .= '<li><a href="' . route('material_usage-entry', $row->id_pemakaian) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
                         }
 
-                        if (in_array($idGrupUser, $arrayAccessVoid)) {
+                        if (in_array($idGrupUser, $arrayAccessVoid) || $idUser == $row->user_created) {
                             $btn .= '<li><a href="' . route('material_usage-delete', $row->id_pemakaian) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Void</a></li>';
                         }
 
