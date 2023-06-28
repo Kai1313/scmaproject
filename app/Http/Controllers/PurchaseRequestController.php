@@ -268,7 +268,9 @@ class PurchaseRequestController extends Controller
         $satuan = DB::table('isi_satuan_barang')->select('satuan_barang.id_satuan_barang as id', 'nama_satuan_barang as text')
             ->leftJoin('satuan_barang', 'isi_satuan_barang.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
             ->where('id_barang', $item)
-            ->where('status_satuan_barang', 1)->get();
+            ->where('status_satuan_barang', 1)
+            ->where('satuan_jual_isi_satuan_barang', 1)
+            ->where('satuan_wadah_isi_satuan_barang', 0)->get();
 
         $messageStock = '0';
         $messageSatuanStok = '';

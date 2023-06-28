@@ -69,11 +69,11 @@
                                 <select name="id_akun_biaya" class="form-control select2" data-validation="[NOTEMPTY]"
                                     data-validation-message="Akun Biaya tidak boleh kosong">
                                     <option value="">Pilih Akun Biaya</option>
-                                    @foreach ($akunBiaya as $biaya)
-                                        <option value="{{ $biaya->id_akun }}"
-                                            {{ old('id_akun_biaya', $data ? $data->id_akun_biaya : '') == $biaya->id_akun ? 'selected' : '' }}>
-                                            {{ $biaya->kode_akun }} - {{ $biaya->nama_akun }}</option>
-                                    @endforeach
+                                    @if ($data && $data->id_akun_biaya)
+                                        <option value="{{ $data->id_akun_biaya }}" selected>
+                                            {{ $data->akunBiaya->kode_akun }} - {{ $data->akunBiaya->nama_akun }}
+                                        </option>
+                                    @endif
                                 </select>
                             </div>
                         </div>
@@ -103,11 +103,11 @@
                                 <label>Akun PPh</label>
                                 <select name="id_akun_pph" class="form-control select2 show-pph">
                                     <option value="">Pilih Akun PPh</option>
-                                    @foreach ($akunBiaya as $pph)
-                                        <option value="{{ $pph->id_akun }}"
-                                            {{ old('id_akun_biaya', $data ? $data->id_akun_pph : '') == $pph->id_akun ? 'selected' : '' }}>
-                                            {{ $pph->kode_akun }} - {{ $pph->nama_akun }}</option>
-                                    @endforeach
+                                    @if ($data && $data->id_akun_pph)
+                                        <option value="{{ $data->id_akun_pph }}" selected>
+                                            {{ $data->akunPph->kode_akun }} - {{ $data->akunPph->nama_akun }}
+                                        </option>
+                                    @endif
                                 </select>
                             </div>
                             <div class="form-group">
@@ -141,6 +141,26 @@
             data: branch
         })
 
+        $('[name="id_akun_biaya"],[name="id_akun_pph"]').select2({
+            delay: 250,
+            ajax: {
+                url: '{{ route('master-biaya-get-account') }}',
+                dataType: 'json',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        id_cabang: $('[name="id_cabang"]').val()
+                    }
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.data
+                    };
+                }
+            }
+        });
+
+
         $('[name="ispph"]').change(function() {
             if ($(this).is(':checked')) {
                 $('.show-pph').prop('disabled', false)
@@ -155,7 +175,7 @@
             }
         })
 
-        $('.select2').select2()
+        // $('.select2').select2()
         if ($('[name="ispph"]').is(':checked')) {
             $('.show-pph').prop('disabled', false)
             $('[name="value_pph"]').attr('data-validation', '[NOTEMPTY]').attr('data-validation-message',

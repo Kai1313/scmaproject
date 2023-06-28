@@ -21,6 +21,7 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::post('logout', 'ApiController@logout');
 
     Route::post('transaction-balance', 'ApiController@transactionBalance')->name('transaction-balance');
+    Route::post('minimal-stok', 'ApiController@stokmin')->name('minimal-stok');
 
     Route::prefix('/jurnal_otomatis')->group(function () {
         Route::post('/uangmuka_penjualan', 'ApiController@journalUangMukaPenjualan')->name('jurnal-otomatis-uangmuka-penjualan');
