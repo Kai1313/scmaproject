@@ -55,7 +55,11 @@ class MaterialUsageController extends Controller
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) use ($filterUser, $idUser, $idGrupUser, $arrayAccessVoid) {
                     if ($row->void == '1') {
-                        return '<label class="label label-default">Batal</label>';
+                        $btn = '<label class="label label-default">Batal</label>';
+                        $btn .= '<ul class="horizontal-list">';
+                        $btn .= '<li><a href="' . route('material_usage-view', $row->id_pemakaian) . '" class="btn btn-info btn-xs mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
+                        $btn .= '</ul>';
+                        return $btn;
                     } else {
                         $btn = '<ul class="horizontal-list">';
                         $btn .= '<li><a href="' . route('material_usage-view', $row->id_pemakaian) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
