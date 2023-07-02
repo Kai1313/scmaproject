@@ -504,6 +504,7 @@
                         width: '10%',
                         searchable: false,
                         orderable: false,
+                        className: 'text-right',
                         render: function(data, type, row) {
                             return formatCurr(formatNumberAsFloatFromDB(data))
                         }
@@ -514,6 +515,7 @@
                         width: '10%',
                         searchable: false,
                         orderable: false,
+                        className: 'text-right',
                         render: function(data, type, row) {
                             return formatCurr(formatNumberAsFloatFromDB(data))
                         }
@@ -524,6 +526,7 @@
                         width: '10%',
                         searchable: false,
                         orderable: false,
+                        className: 'text-right',
                         render: function(data, type, row) {
                             return formatCurr(formatNumberAsFloatFromDB(data))
                         }
