@@ -491,7 +491,10 @@
                     {
                         data: 'keterangan',
                         name: 'keterangan',
-                        width: '10%'
+                        width: '10%',
+                        render: function(data, type, row) {
+                            return data.substring(0, 15)
+                        }
                     },
                     {
                         data: 'id_transaksi',
