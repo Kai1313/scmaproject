@@ -169,6 +169,16 @@ class ReceivedFromWarehouseController extends Controller
             ], 500);
         }
 
+        $check = MoveBranch::where('id_jenis_transaksi', 24)
+            ->where('id_pindah_barang2', $data->id_pindah_barang)
+            ->first();
+        if ($check) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Pindah barang sudah diterima',
+            ], 500);
+        }
+
         return response()->json([
             'data' => $data,
             'details' => $data->formatdetail,
