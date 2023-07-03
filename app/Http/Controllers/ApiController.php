@@ -902,6 +902,20 @@ class ApiController extends Controller
             $total = round(floatval($request->total), 2);
             $uang_muka = round(floatval($request->uang_muka), 2);
             $nominal_ppn = round(floatval($request->ppn), 2);
+            $discount = round(floatval($request->discount), 2);
+
+            if(isset($discount) && $discount > 0){
+                $data_akun_potongan_pembelian = DB::table('setting')->where('code', 'Potongan Pembelian')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
+                if (empty($data_akun_potongan_pembelian)) {
+                    return response()->json([
+                        "result" => false,
+                        "code" => 404,
+                        "message" => "Error, Setting Potongan Pembelian not found",
+                    ], 404);
+                }
+
+                $akun_potongan_pembelian = $data_akun_potongan_pembelian->value2;
+            }
 
             // Check balance
             $check_balance_debit = 0;
@@ -923,6 +937,16 @@ class ApiController extends Controller
                     'id_transaksi' => null,
                 ],
             ];
+
+            if(isset($discount) && $discount > 0){
+                array_push($jurnal_detail_me, [
+                    'akun' => $akun_potongan_pembelian,
+                    'debet' => 0,
+                    'credit' => $discount,
+                    'keterangan' => 'Jurnal Otomatis Potongan Pembelian - ' . $id_transaksi . ' - ' . $nama_pemasok,
+                    'id_transaksi' => null,
+                ]);
+            }
 
             if(isset($uang_muka) && $uang_muka > 0){
                 array_push($jurnal_detail_me, [
@@ -2133,7 +2157,11 @@ class ApiController extends Controller
             $biaya_listrik = $data['biaya_listrik']; // Diisi dengan data biaya listrik
             $biaya_operator =  $data['biaya_operator']; // Diisi dengan data biaya operator
             $kwh_listrik = $data['kwh_listrik']; // Diisi dengan data biaya listrik
+            $daya_mesin = $data['daya_mesin']; // Diisi dengan data daya mesin
             $tenaga_kerja =  $data['tenaga_kerja']; // Diisi dengan data biaya operator
+            $jumlah_pegawai =  $data['jumlah_pegawai']; // Diisi dengan data biaya operator
+            $nominal_listrik = $data['nominal_listrik']; // Diisi dengan data nominal listrik (setting)
+            $nominal_gaji = $data['nominal_gaji']; // Diisi dengan data nominal gaji (setting)
             $journalDate = date('Y-m-d', strtotime($data['tanggal_hasil_produksi']));
             $journalType = "ME";
             $cabangID = $data['cabang'];
@@ -2142,7 +2170,7 @@ class ApiController extends Controller
             $userData = $data['user_data'];
             $userRecord = $userData->id_pengguna;
             $userModified = $userData->id_pengguna;
-            $dateRecord = date('Y-m-d');
+            $dateRecord = date('Y-m-d H:i:s');
 
             // Get akun biaya listrik, biaya operator, pembulatan
             // $cabang = Cabang::find(1); // Diganti sesuai auth atau user session
@@ -2174,7 +2202,9 @@ class ApiController extends Controller
                 $header->tanggal_jurnal = $journalDate;
                 $header->user_created = $userRecord;
                 $header->user_modified = $userModified;
-                $header->dt_created = $dateRecord;
+                if(empty($jurnal_header)){
+                    $header->dt_created = $dateRecord;
+                }
                 $header->dt_modified = $dateRecord;
                 $header->kode_jurnal = $this->generateJournalCode($cabangID, $journalType);
                 if (!$header->save()) {
@@ -2197,7 +2227,7 @@ class ApiController extends Controller
                     $detail->id_jurnal = $header->id_jurnal;
                     $detail->index = $index;
                     $detail->id_akun = $val['akun'];
-                    $detail->keterangan = "Pemakaian produksi - ". $val['notes'];
+                    $detail->keterangan = "PBH - ". $val['notes'];
                     $detail->id_transaksi = NULL;
                     $detail->debet = floatval($val['debet']);
                     $detail->credit = floatval($val['kredit']);
@@ -2221,7 +2251,7 @@ class ApiController extends Controller
                 $detail->id_jurnal = $header->id_jurnal;
                 $detail->index = $index;
                 $detail->id_akun = $get_akun_biaya_listrik->value2;
-                $detail->keterangan = "Biaya Listrik Produksi - " . $kwh_listrik . ' kWh';
+                $detail->keterangan = "Biaya Listrik - " . $daya_mesin . ' Watt - ' . $kwh_listrik . ' kWh - WPH '. $nominal_listrik;
                 $detail->id_transaksi = "Biaya Listrik";
                 $detail->debet = 0;
                 $detail->credit = floatval($biaya_listrik);
@@ -2245,7 +2275,7 @@ class ApiController extends Controller
                 $detail->id_jurnal = $header->id_jurnal;
                 $detail->index = $index;
                 $detail->id_akun = $get_akun_biaya_operator->value2;
-                $detail->keterangan = "Biaya Operator Produksi - " . $tenaga_kerja;
+                $detail->keterangan = "Biaya Operator Produksi - " . $jumlah_pegawai . ' Orang - ' . $tenaga_kerja . ' Menit - GPM ' . $nominal_gaji;
                 $detail->id_transaksi = "Biaya Operator";
                 $detail->debet = 0;
                 $detail->credit = floatval($biaya_operator);
@@ -2269,7 +2299,7 @@ class ApiController extends Controller
                     $detail->id_jurnal = $header->id_jurnal;
                     $detail->index = $index;
                     $detail->id_akun = $val['akun'];
-                    $detail->keterangan = "Hasil produksi  - ". $val['notes'];
+                    $detail->keterangan = "HP - ". $val['notes'];
                     $detail->id_transaksi = $val['id_barang'];
                     $detail->debet = floatval($val['debet']);
                     $detail->credit = floatval($val['kredit']);
@@ -2392,8 +2422,12 @@ class ApiController extends Controller
 
         // cari beban produksi dari produksi yang diinput
         $data_production_cost = DB::table("beban_produksi")
+                                ->join('produksi', 'produksi.id_produksi', 'beban_produksi.id_produksi')
+                                ->join('master_mesin', 'master_mesin.id_mesin', 'produksi.id_mesin')
                                 ->where('beban_produksi.id_produksi', $id_hasil_produksi)
+                                ->select('beban_produksi.id_produksi', 'beban_produksi.kwh_beban_produksi', 'beban_produksi.tenaga_kerja_beban_produksi', 'beban_produksi.listrik_beban_produksi', 'master_mesin.daya')
                                 ->first();
+
 
         if(empty($data_production_cost)){
             return false;
@@ -2402,6 +2436,8 @@ class ApiController extends Controller
         // init beban listrik dan pegawai
         $beban_listrik = round($data_production_cost->kwh_beban_produksi, 2);
         $beban_pegawai = round(($data_production_cost->tenaga_kerja_beban_produksi * $data_production_cost->listrik_beban_produksi), 2);
+        $jumlah_pegawai = round(($data_production_cost->tenaga_kerja_beban_produksi), 2);
+        $daya_mesin = round($data_production_cost->daya, 2);
 
         // cari nominal biaya listrik dan gaji dari table setting
         $setting_nominal_listrik = DB::table('setting')
@@ -2425,17 +2461,21 @@ class ApiController extends Controller
         $biaya_operator = round(($beban_pegawai * $nominal_gaji), 2);
 
         // cari data produksi detail untuk melakukan update beban biaya
-        $data_production_detail = DB::table("produksi_detail")
-                                    ->join('master_qr_code', 'master_qr_code.kode_batang_master_qr_code', 'produksi_detail.kode_batang_lama_produksi_detail')
-                                    ->where('produksi_detail.id_produksi', $id_hasil_produksi)
-                                    ->get();
+        // $data_production_detail = DB::table("produksi_detail")
+        //                             ->join('master_qr_code', 'master_qr_code.kode_batang_master_qr_code', 'produksi_detail.kode_batang_lama_produksi_detail')
+        //                             ->where('produksi_detail.id_produksi', $id_hasil_produksi)
+        //                             ->get();
 
         // data return biaya listrik dan pegawai
         $data = [
             'biaya_listrik' => $biaya_listrik,
             'kwh_listrik' => $beban_listrik,
+            'daya_mesin' => $daya_mesin,
             'biaya_operator' => $biaya_operator,
-            'tenaga_kerja' => $beban_pegawai
+            'tenaga_kerja' => $beban_pegawai,
+            'jumlah_pegawai' => $jumlah_pegawai,
+            'nominal_listrik' => $nominal_listrik,
+            'nominal_gaji' => $nominal_gaji
         ];
 
         return $data;
@@ -2566,7 +2606,11 @@ class ApiController extends Controller
         $biaya_listrik = $data_production_cost['biaya_listrik'];
         $biaya_operator = $data_production_cost['biaya_operator'];
         $kwh_listrik = $data_production_cost['kwh_listrik'];
+        $daya_mesin = $data_production_cost['daya_mesin'];
         $tenaga_kerja = $data_production_cost['tenaga_kerja'];
+        $jumlah_pegawai = $data_production_cost['jumlah_pegawai'];
+        $nominal_listrik = $data_production_cost['nominal_listrik'];
+        $nominal_gaji = $data_production_cost['nominal_gaji'];
 
         // tahap 4
         $data_production_results = $this->productionResults($id_produksi, $total_supplies, $biaya_listrik, $biaya_operator);
@@ -2597,7 +2641,11 @@ class ApiController extends Controller
             'biaya_listrik' => $biaya_listrik,
             'biaya_operator' => $biaya_operator,
             'kwh_listrik' => $kwh_listrik,
+            'daya_mesin' => $daya_mesin,
             'tenaga_kerja' => $tenaga_kerja,
+            'jumlah_pegawai' => $jumlah_pegawai,
+            'nominal_listrik' => $nominal_listrik,
+            'nominal_gaji' => $nominal_gaji,
             'data_hasil' => $data_hasil,
             'user_data' => $user_data,
             'void' => $void,
@@ -2704,7 +2752,7 @@ class ApiController extends Controller
             $userData = $data['user_data'];
             $userRecord = $userData->id_pengguna;
             $userModified = $userData->id_pengguna;
-            $dateRecord = date('Y-m-d');
+            $dateRecord = date('Y-m-d H:i:s');
 
             $get_akun_hpp_pemakaian = Setting::where("id_cabang", $cabangID)->where("code", "HPP Pemakaian")->first();
 
@@ -2896,7 +2944,7 @@ class ApiController extends Controller
             $userData = $data['user_data'];
             $userRecord = $userData->id_pengguna;
             $userModified = $userData->id_pengguna;
-            $dateRecord = date('Y-m-d');
+            $dateRecord = date('Y-m-d H:i:s');
 
             $get_akun_hpp_retur_jual = Setting::where("id_cabang", $cabangID)->where("code", "HPP Retur Penjualan")->first();
 
