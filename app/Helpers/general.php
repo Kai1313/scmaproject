@@ -1,7 +1,9 @@
 <?php
 
+use App\Models\Master\Cabang;
 use App\Models\User;
 use App\Models\UserToken;
+use App\Pengguna;
 use Illuminate\Support\Facades\DB;
 
 function normalizeNumber($number = 0)
@@ -92,4 +94,22 @@ function replaceMessage($array, $message)
     }
 
     return $message;
+}
+
+function getCabang()
+{
+    $user_id = session()->get('user')->id_pengguna;
+    $cabang = DB::table('pengguna')
+        ->selectRaw('DISTINCT
+            gudang.id_cabang,
+            cabang.nama_cabang,
+            cabang.kode_cabang ')
+        ->join('akses_gudang', 'akses_gudang.id_grup_pengguna', 'pengguna.id_grup_pengguna')
+        ->join('gudang', 'gudang.id_gudang', 'akses_gudang.id_gudang')
+        ->join('cabang', 'cabang.id_cabang', 'gudang.id_cabang')
+        ->where('id_pengguna', $user_id)
+        ->where('cabang.status_cabang', 1)
+        ->get();
+
+    return $cabang;
 }
