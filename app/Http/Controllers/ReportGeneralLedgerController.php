@@ -6,6 +6,7 @@ use App\Models\Accounting\JurnalDetail;
 use App\Models\Accounting\JurnalHeader;
 use App\Models\Accounting\SaldoBalance;
 use App\Exports\ReportGeneralLedgerExport;
+use App\Models\Master\Akun;
 use App\Models\Master\Cabang;
 use App\Models\Master\Slip;
 use Illuminate\Http\Request;
@@ -29,12 +30,27 @@ class ReportGeneralLedgerController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
+        // Check get parameter
+        $cabang = ($request->has("cabang"))?$request->cabang:NULL;
+        $id_akun = ($request->has("id_akun"))?$request->id_akun:NULL;
+        $startdate = ($request->has("startdate"))?$request->startdate:NULL;
+        $enddate = ($request->has("enddate"))?$request->enddate:NULL;
+        $type = ($request->has("type"))?$request->type:NULL;
+        $akun = ($id_akun)?Akun::find($id_akun):NULL;
+
         $data_cabang = Cabang::all();
 
         $data = [
             "pageTitle" => "SCA Accounting | Report Buku Besar",
             "data_cabang" => $data_cabang,
+            "id_akun" => $id_akun,
+            "akun" => $akun,
+            "startdate" => $startdate,
+            "enddate" => $enddate,
+            "cabang" => $cabang,
+            "type" => $type
         ];
+        // dd($data);
 
         return view('accounting.report.general_ledger.index', $data);
     }
