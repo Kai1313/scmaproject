@@ -266,7 +266,9 @@ class GeneralLedgerController extends Controller
             ->select('jurnal_detail.*', 'master_akun.kode_akun', 'master_akun.nama_akun')
             ->get();
 
-        $data_jurnal_header->catatan = str_replace("\n", '<br>', $data_jurnal_header->catatan);
+        if ($data_jurnal_header->catatan) {
+            $data_jurnal_header->catatan = str_replace("\n", '<br>', $data_jurnal_header->catatan);
+        }
 
         foreach ($data_jurnal_detail as $key => $value) {
             $notes = str_replace("\n", '<br>', $value->keterangan);
