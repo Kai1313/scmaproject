@@ -491,7 +491,10 @@
                     {
                         data: 'keterangan',
                         name: 'keterangan',
-                        width: '10%'
+                        width: '10%',
+                        render: function(data, type, row) {
+                            return data.substring(0, 15)
+                        }
                     },
                     {
                         data: 'id_transaksi',
@@ -504,6 +507,7 @@
                         width: '10%',
                         searchable: false,
                         orderable: false,
+                        className: 'text-right',
                         render: function(data, type, row) {
                             return formatCurr(formatNumberAsFloatFromDB(data))
                         }
@@ -514,6 +518,7 @@
                         width: '10%',
                         searchable: false,
                         orderable: false,
+                        className: 'text-right',
                         render: function(data, type, row) {
                             return formatCurr(formatNumberAsFloatFromDB(data))
                         }
@@ -524,6 +529,7 @@
                         width: '10%',
                         searchable: false,
                         orderable: false,
+                        className: 'text-right',
                         render: function(data, type, row) {
                             return formatCurr(formatNumberAsFloatFromDB(data))
                         }
