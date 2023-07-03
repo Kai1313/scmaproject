@@ -38,7 +38,7 @@ class ReportGeneralLedgerController extends Controller
         $type = ($request->has("type"))?$request->type:NULL;
         $akun = ($id_akun)?Akun::find($id_akun):NULL;
 
-        $data_cabang = Cabang::all();
+        $data_cabang = getCabang();
 
         $data = [
             "pageTitle" => "SCA Accounting | Report Buku Besar",

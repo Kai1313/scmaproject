@@ -21,7 +21,18 @@ class ReportProfitAndLossController extends Controller
         //     return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         // }
 
-        $data_cabang = Cabang::all();
+        $data_cabang = getCabang();
+
+        $data_cabang = $data_cabang->toArray();
+
+        if (count($data_cabang) > 1) {
+            $all = (object) [
+                    "id_cabang" => "",
+                    "nama_cabang" => "ALL",
+                    "kode_cabang" => "ALL"
+                ];
+            array_unshift($data_cabang, $all);
+        }
 
         $data = [
             "pageTitle" => "SCA Accounting | Report Laba Rugi",
