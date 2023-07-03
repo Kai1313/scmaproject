@@ -29,7 +29,7 @@ class ReportGeneralLedgerController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        $data_cabang = Cabang::all();
+        $data_cabang = getCabang();
 
         $data = [
             "pageTitle" => "SCA Accounting | Report Buku Besar",

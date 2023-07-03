@@ -30,7 +30,7 @@ class GeneralLedgerController extends Controller
         }
 
         $cabang = Cabang::find(1);
-        $data_cabang = Cabang::all();
+        $data_cabang = getCabang();
 
         $data = [
             "pageTitle" => "SCA Accounting | Transaksi Jurnal Umum | List",
@@ -52,7 +52,7 @@ class GeneralLedgerController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        $data_cabang = Cabang::where("status_cabang", 1)->get();
+        $data_cabang = getCabang();
         $data_pelanggan = Pelanggan::all();
         $data_pemasok = Pemasok::all();
         $piutang_dagang = Setting::where("code", "Piutang Dagang")->where("id_cabang", "1")->first();
@@ -353,7 +353,7 @@ class GeneralLedgerController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        $data_cabang = Cabang::where("status_cabang", 1)->get();
+        $data_cabang = getCabang();
         $data_pelanggan = Pelanggan::all();
         $data_pemasok = Pemasok::all();
         $jurnal_header = JurnalHeader::find($id);

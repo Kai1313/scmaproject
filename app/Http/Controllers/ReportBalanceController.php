@@ -21,7 +21,18 @@ class ReportBalanceController extends Controller
         //     return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         // }
 
-        $data_cabang = Cabang::all();
+        $data_cabang = getCabang();
+
+        $data_cabang = $data_cabang->toArray();
+
+        if (count($data_cabang) > 1) {
+            $all = (object) [
+                    "id_cabang" => "",
+                    "nama_cabang" => "ALL",
+                    "kode_cabang" => "ALL"
+                ];
+            array_unshift($data_cabang, $all);
+        }
 
         $data = [
             "pageTitle" => "SCA Accounting | Report Neraca",
@@ -47,14 +58,13 @@ class ReportBalanceController extends Controller
                 "result" => true,
                 "data" => $data,
             ]);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $message = "Failed to get populate balance for view";
             Log::error($message);
             Log::error($e);
             return response()->json([
-                "result"=>False,
-                "message"=>$message
+                "result" => False,
+                "message" => $message
             ]);
         }
     }
@@ -91,25 +101,23 @@ class ReportBalanceController extends Controller
                     'Content-Disposition' => 'attachment; filename="download.pdf"',
                 ];
                 return response()->json([
-                    "result"=>True,
-                    "pdfData"=>base64_encode($pdf->output()),
-                    "pdfHeaders"=>$headers,
+                    "result" => True,
+                    "pdfData" => base64_encode($pdf->output()),
+                    "pdfHeaders" => $headers,
                 ]);
-            }
-            else {
+            } else {
                 return response()->json([
-                    "result"=>False,
-                    "message"=>"Tidak ada data"
+                    "result" => False,
+                    "message" => "Tidak ada data"
                 ]);
             }
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $message = "Failed to print general ledger for pdf";
             Log::error($message);
             Log::error($e);
             return response()->json([
-                "result"=>False,
-                "message"=>$message
+                "result" => False,
+                "message" => $message
             ]);
         }
     }
@@ -117,36 +125,35 @@ class ReportBalanceController extends Controller
     public function exportExcel(Request $request)
     {
         // try {
-            // dd($request->all());
-            // Init Data
-            $id_cabang = $request->id_cabang;
-            $month = $request->month;
-            $year = $request->year;
-            $type = $request->type;
+        // dd($request->all());
+        // Init Data
+        $id_cabang = $request->id_cabang;
+        $month = $request->month;
+        $year = $request->year;
+        $type = $request->type;
 
-            $data_cabang = Cabang::find($id_cabang);
-            $nama_cabang = $data_cabang->nama_cabang;
+        $data_cabang = Cabang::find($id_cabang);
+        $nama_cabang = $data_cabang->nama_cabang;
 
-            $data_balance = $this->getData($id_cabang, $year, $month, $type);
+        $data_balance = $this->getData($id_cabang, $year, $month, $type);
 
-            // Log::debug(json_encode($data_balance));
-            $data = [
-                'cabang' => $nama_cabang,
-                'periode' => date('M Y', strtotime($year . '-' . $month . '-1')),
-                'type' => $type,
-                'data' => $data_balance
-            ];
+        // Log::debug(json_encode($data_balance));
+        $data = [
+            'cabang' => $nama_cabang,
+            'periode' => date('M Y', strtotime($year . '-' . $month . '-1')),
+            'type' => $type,
+            'data' => $data_balance
+        ];
 
-            // dd(count($data["data"]));
-            if (!empty($data["data"])) {
-                return Excel::download(new ReportBalanceExport($data), 'ReportBalance.xlsx');
-            }
-            else {
-                return response()->json([
-                    "result"=>False,
-                    "message"=>"Tidak ada data"
-                ]);
-            }
+        // dd(count($data["data"]));
+        if (!empty($data["data"])) {
+            return Excel::download(new ReportBalanceExport($data), 'ReportBalance.xlsx');
+        } else {
+            return response()->json([
+                "result" => False,
+                "message" => "Tidak ada data"
+            ]);
+        }
         // }
         // catch (\Exception $e) {
         //     $message = "Failed to print general ledger for excel";
@@ -159,19 +166,21 @@ class ReportBalanceController extends Controller
         // }
     }
 
-    private function getData($id_cabang, $tahun, $bulan, $type){
-        if($type == 'recap'){
+    private function getData($id_cabang, $tahun, $bulan, $type)
+    {
+        if ($type == 'recap') {
             $data_balance = $this->getSummaryBalance($id_cabang, $tahun, $bulan);
-        }else if($type == 'detail'){
+        } else if ($type == 'detail') {
             $data_balance = $this->getDetailBalance($id_cabang, $tahun, $bulan);
-        }else{
+        } else {
             $data_balance = $this->getInitBalance($id_cabang, $tahun, $bulan);
         }
 
         return $data_balance;
     }
 
-    private function getSummaryBalance($id_cabang, $tahun, $bulan){
+    private function getSummaryBalance($id_cabang, $tahun, $bulan)
+    {
         $data = Akun::selectRaw('
                 CASE WHEN header1 IS NULL OR header1 = "" THEN "" ELSE header1 END as new_header1,
                 CASE WHEN header2 IS NULL OR header2 = "" THEN "" ELSE header2 END as new_header2,
@@ -219,15 +228,15 @@ class ReportBalanceController extends Controller
             $newHeader2 = $item['new_header2'];
             $newHeader3 = $item['new_header3'];
 
-            if($newHeader1 == ""){
+            if ($newHeader1 == "") {
                 $newHeader1 = "00. Header1";
             }
 
-            if($newHeader2 == ""){
+            if ($newHeader2 == "") {
                 $newHeader2 = "00. Header2";
             }
 
-            if($newHeader3 == ""){
+            if ($newHeader3 == "") {
                 $newHeader3 = "00. Header3";
             }
 
@@ -260,7 +269,6 @@ class ReportBalanceController extends Controller
                     $map[$newHeader1]['children'][$newHeader2]['total'] += $item['total'];
                 }
                 $map[$newHeader1]['total'] += $item['total'];
-
             } else {
                 // Add new_header3 as a child of new_header1
                 if (!empty($newHeader3)) {
@@ -279,7 +287,8 @@ class ReportBalanceController extends Controller
         return (object) $data;
     }
 
-    private function getDetailBalance($id_cabang, $tahun, $bulan){
+    private function getDetailBalance($id_cabang, $tahun, $bulan)
+    {
         $data = Akun::selectRaw('
                 CASE WHEN header1 IS NULL OR header1 = "" THEN "" ELSE header1 END as new_header1,
                 CASE WHEN header2 IS NULL OR header2 = "" THEN "" ELSE header2 END as new_header2,
@@ -328,17 +337,17 @@ class ReportBalanceController extends Controller
             $newHeader1 = $item['new_header1'];
             $newHeader2 = $item['new_header2'];
             $newHeader3 = $item['new_header3'];
-            $newHeader4 = $item['kode_akun'] . '.' . $item['nama_akun'] ;
+            $newHeader4 = $item['kode_akun'] . '.' . $item['nama_akun'];
 
-            if($newHeader1 == ""){
+            if ($newHeader1 == "") {
                 $newHeader1 = "00. Header1";
             }
 
-            if($newHeader2 == ""){
+            if ($newHeader2 == "") {
                 $newHeader2 = "00. Header2";
             }
 
-            if($newHeader3 == ""){
+            if ($newHeader3 == "") {
                 $newHeader3 = "00. Header3";
             }
 
@@ -382,7 +391,7 @@ class ReportBalanceController extends Controller
                     }
 
                     $map[$newHeader1]['children'][$newHeader2]['total'] += $item['total'];
-                }else{
+                } else {
                     // Add new_header3 as a child of new_header1
                     if (!empty($newHeader3)) {
                         $map[$newHeader1]['children'][] = [
@@ -393,7 +402,6 @@ class ReportBalanceController extends Controller
                     }
                 }
                 $map[$newHeader1]['total'] += $item['total'];
-
             } else {
                 // maybe never execute
                 // Add new_header4 as a child of new_header1
@@ -413,7 +421,8 @@ class ReportBalanceController extends Controller
         return (object) $data;
     }
 
-    private function getInitBalance($id_cabang, $tahun, $bulan){
+    private function getInitBalance($id_cabang, $tahun, $bulan)
+    {
         $data = Akun::selectRaw('
                 CASE WHEN header1 IS NULL OR header1 = "" THEN "" ELSE header1 END as new_header1,
                 CASE WHEN header2 IS NULL OR header2 = "" THEN "" ELSE header2 END as new_header2,
@@ -445,15 +454,15 @@ class ReportBalanceController extends Controller
             $newHeader2 = $item['new_header2'];
             $newHeader3 = $item['new_header3'];
 
-            if($newHeader1 == ""){
+            if ($newHeader1 == "") {
                 $newHeader1 = "00. Header1";
             }
 
-            if($newHeader2 == ""){
+            if ($newHeader2 == "") {
                 $newHeader2 = "00. Header2";
             }
 
-            if($newHeader3 == ""){
+            if ($newHeader3 == "") {
                 $newHeader3 = "00. Header3";
             }
 
@@ -486,7 +495,6 @@ class ReportBalanceController extends Controller
                     $map[$newHeader1]['children'][$newHeader2]['total'] += $item['total'];
                 }
                 $map[$newHeader1]['total'] += $item['total'];
-
             } else {
                 // Add new_header3 as a child of new_header1
                 if (!empty($newHeader3)) {
