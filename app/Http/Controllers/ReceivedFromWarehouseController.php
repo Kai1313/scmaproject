@@ -33,7 +33,8 @@ class ReceivedFromWarehouseController extends Controller
                 ->leftJoin('gudang as g2', 'pb.id_gudang2', '=', 'g2.id_gudang')
                 ->leftJoin('pindah_barang as pb2', 'pb.id_pindah_barang2', 'pb2.id_pindah_barang')
                 ->where('pb.id_jenis_transaksi', 24)
-                ->where('pb.type', 1);
+                ->where('pb.type', 1)
+                ->where('status_pindah_barang', '!=', '2');
             if (isset($request->c)) {
                 $data = $data->where('pb.id_cabang', $request->c);
             }
