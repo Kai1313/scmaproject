@@ -190,11 +190,11 @@ class ReportGeneralLedgerController extends Controller
             }
             else {
                 if ($type == "recap") {
-                    $data_ledgers->orderBy("master_akun.kode_akun", "DESC");
+                    $data_ledgers->orderBy("master_akun.kode_akun", "ASC");
                 }
                 else {
-                    $data_ledgers->orderBy("jurnal_header.tanggal_jurnal", "DESC");
-                    $data_ledgers->orderBy("master_akun.kode_akun", "DESC");
+                    $data_ledgers->orderBy("jurnal_header.tanggal_jurnal", "ASC");
+                    $data_ledgers->orderBy("master_akun.kode_akun", "ASC");
                 }
             }
             // pagination
@@ -338,11 +338,11 @@ class ReportGeneralLedgerController extends Controller
                 $data_ledgers = $data_ledgers->where("jurnal_detail.id_akun", $coa);
             }
             if ($type == "recap") {
-                $data_ledgers->orderBy("master_akun.kode_akun", "DESC");
+                $data_ledgers->orderBy("master_akun.kode_akun", "ASC");
             }
             else {
-                $data_ledgers->orderBy("jurnal_header.tanggal_jurnal", "DESC");
-                $data_ledgers->orderBy("master_akun.kode_akun", "DESC");
+                $data_ledgers->orderBy("jurnal_header.tanggal_jurnal", "ASC");
+                $data_ledgers->orderBy("master_akun.kode_akun", "ASC");
             }
             // Get saldo awal dan saldo akhir
             $result = $data_ledgers->get();
@@ -489,11 +489,11 @@ class ReportGeneralLedgerController extends Controller
                 $data_ledgers = $data_ledgers->where("jurnal_detail.id_akun", $coa);
             }
             if ($type == "recap") {
-                $data_ledgers->orderBy("master_akun.kode_akun", "DESC");
+                $data_ledgers->orderBy("master_akun.kode_akun", "ASC");
             }
             else {
-                $data_ledgers->orderBy("jurnal_header.tanggal_jurnal", "DESC");
-                $data_ledgers->orderBy("master_akun.kode_akun", "DESC");
+                $data_ledgers->orderBy("jurnal_header.tanggal_jurnal", "ASC");
+                $data_ledgers->orderBy("master_akun.kode_akun", "ASC");
             }
             // Get saldo awal dan saldo akhir
             $result = $data_ledgers->get();
