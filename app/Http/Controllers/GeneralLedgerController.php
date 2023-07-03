@@ -244,7 +244,7 @@ class GeneralLedgerController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        $data_jurnal_header = JurnalHeader::join('master_slip', 'master_slip.id_slip', 'jurnal_header.id_slip')
+        $data_jurnal_header = JurnalHeader::leftJoin('master_slip', 'master_slip.id_slip', 'jurnal_header.id_slip')
             ->leftJoin('master_slip as ms2', 'ms2.id_slip', 'jurnal_header.id_slip2')
             ->join('cabang', 'cabang.id_cabang', 'jurnal_header.id_cabang')
             ->where('id_jurnal', $id)
