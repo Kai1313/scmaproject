@@ -79,13 +79,14 @@
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label>Cabang</label>
-                                        <select name="cabang_input" id="cabang_input" class="form-control select2" style="width: 100%;">
+                                        <select  class="form-control" style="width: 100%;" disabled>
                                             @foreach ($data_cabang as $cabang)
                                             <option value="{{ $cabang->id_cabang }}" {{ isset($jurnal_header->id_cabang) ? ($jurnal_header->id_cabang == $cabang->id_cabang ? 'selected' : '') : '' }}>
                                                 {{ $cabang->kode_cabang . ' - ' . $cabang->nama_cabang }}
                                             </option>
                                             @endforeach
                                         </select>
+                                        <input type="hidden" name="cabang_input" id="cabang_input" value="{{ $jurnal_header->id_cabang }}">
                                     </div>
                                     <div class="form-group">
                                         <label>Nomor Jurnal</label>
