@@ -179,6 +179,18 @@ Route::namespace('Report')->group(function () {
         Route::get('print', 'SalesDownPaymentController@print')->name('report_sales_down_payment-print');
         Route::get('excel', 'SalesDownPaymentController@getExcel')->name('report_sales_down_payment-excel');
     });
+
+    Route::prefix('laporan_hutang_current')->group(function () {
+        Route::get('index/{user_id?}', 'LaporanHutangCurrentController@index')->name('report_payable-index');
+        Route::get('print', 'LaporanHutangCurrentController@print')->name('report_payable-print');
+        Route::get('excel', 'LaporanHutangCurrentController@getExcel')->name('report_payable-excel');
+    });
+
+    Route::prefix('laporan_piutang_current')->group(function () {
+        Route::get('index/{user_id?}', 'LaporanPiutangCurrentController@index')->name('report_receiveable-index');
+        Route::get('print', 'LaporanPiutangCurrentController@print')->name('report_receiveable-print');
+        Route::get('excel', 'LaporanPiutangCurrentController@getExcel')->name('report_receiveable-excel');
+    });
 });
 
 // Master
