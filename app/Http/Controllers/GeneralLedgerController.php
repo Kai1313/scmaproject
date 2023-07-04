@@ -337,7 +337,7 @@ class GeneralLedgerController extends Controller
         // return view('accounting.journal.general_ledger.print', $data);
 
         $pdf = PDF::loadView('accounting.journal.general_ledger.print', $data);
-        $pdf->setPaper('a4', 'potrait');
+        $pdf->setPaper('a5', 'potrait');
         return $pdf->stream('printJurnal_' . $data_jurnal_header->kode_jurnal . '.pdf');
     }
 
