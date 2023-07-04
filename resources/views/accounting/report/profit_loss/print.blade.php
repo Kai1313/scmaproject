@@ -36,7 +36,7 @@
             <tr>
                 <td width="50%">
                     <table>
-                        <img src="{{ asset('images/logo2.jpg') }}" alt="Logo Perusahaan" style="width:120px; height:100px">
+                        <img src="{{ asset('images/logo2.jpg') }}" alt="Logo Perusahaan" style="width:60px; height:45px">
                     </table>
                 </td>
                 <td width="50%">

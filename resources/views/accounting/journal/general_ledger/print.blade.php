@@ -3,6 +3,10 @@
 <head>
     <title>Print Slip Jurnal</title>
     <style>
+        * {
+            font-size: 8px;
+        }
+
         body {
             font-family: sans-serif;
         }
