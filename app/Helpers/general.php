@@ -130,7 +130,7 @@ function getCabangForReport()
                 $tempGudang[] = $g;
             }
         }
-        $array[] = ['id' => implode(array_column($cabang, 'id'), ','), 'text' => 'Semua Cabang', 'gudang' => $tempGudang];
+        $array[] = ['id' => implode(',',array_column($cabang, 'id')), 'text' => 'Semua Cabang', 'gudang' => $tempGudang];
     }
 
     foreach ($cabang as $c) {
