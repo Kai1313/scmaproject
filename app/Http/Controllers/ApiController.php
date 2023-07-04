@@ -2062,8 +2062,7 @@ class ApiController extends Controller
 
     public function transactionBalance(Request $req)
     {
-        Log::info("simpan saldo transaksi");
-        //param : tipe_transaksi,id_transaksi,tanggal,ref_id,catatan,target(supplier/customer),dpp,ppn,uang_muka,biaya,payment_status
+        //param : tipe_transaksi,id_transaksi,tanggal,ref_id,catatan,target(supplier/customer),dpp,ppn,uang_muka,biaya,payment_status,discount
         $data = TransactionBalance::where('id_transaksi', $req->id_transaksi)->where('tipe_transaksi', $req->tipe_transaksi)->first();
         try {
             DB::beginTransaction();
@@ -2081,6 +2080,7 @@ class ApiController extends Controller
                 'uang_muka' => handleNull($req->uang_muka),
                 'biaya' => handleNull($req->biaya),
                 'total' => $total,
+                'discount' => isset($req->discount) ? handleNull($req->discount) : 0,
             ];
 
             $newTipePembayaran = $req->tipe_pembayaran;
