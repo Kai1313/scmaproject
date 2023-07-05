@@ -35,8 +35,8 @@
         <tbody>
             <tr>
                 <td width="50%">
-                    <table border="1px">
-                        <th><b>KOP PERUSAHAAN</b></th>
+                    <table>
+                        <img src="{{ asset('images/logo2.jpg') }}" alt="Logo Perusahaan" style="width:60px; height:45px">
                     </table>
                 </td>
                 <td width="50%">

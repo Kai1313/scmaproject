@@ -35,8 +35,8 @@
         <tbody>
             <tr>
                 <td width="50%">
-                    <table border="1px">
-                        <th><b>KOP PERUSAHAAN</b></th>
+                    <table>
+                        <img src="{{ asset('images/logo2.jpg') }}" alt="Logo Perusahaan" style="width:60px; height:45px">
                     </table>
                 </td>
                 <td width="50%">
@@ -69,8 +69,8 @@
         </thead>
         <tbody>
             @php
-                $fontSize = 18;
-                $space = 0;
+            $fontSize = 18;
+            $space = 0;
             @endphp
             @include('accounting.report.profit_loss.profit-loss-list',['data' => $data, 'fontSize' => $fontSize, 'space' => ($space)])
         </tbody>

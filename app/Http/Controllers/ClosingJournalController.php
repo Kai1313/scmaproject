@@ -37,7 +37,7 @@ class ClosingJournalController extends Controller
     public function index()
     {
         $cabang = Cabang::find(1);
-        $data_cabang = Cabang::all();
+        $data_cabang = getCabang();
 
         $data = [
             "pageTitle" => "SCA Accounting | Transaksi Jurnal Closing | List",
@@ -55,7 +55,7 @@ class ClosingJournalController extends Controller
      */
     public function create()
     {
-        $data_cabang = Cabang::where("status_cabang", 1)->get();
+        $data_cabang = getCabang($request);
         $data_pelanggan = Pelanggan::all();
         $data_pemasok = Pemasok::all();
 

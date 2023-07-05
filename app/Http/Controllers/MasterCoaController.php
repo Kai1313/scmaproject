@@ -26,7 +26,7 @@ class MasterCoaController extends Controller
         }
 
         $cabang = Cabang::find(1);
-        $data_cabang = Cabang::all();
+        $data_cabang = getCabang();
 
         $data = [
             "pageTitle" => "SCA Accounting | Master CoA | List",
@@ -74,7 +74,7 @@ class MasterCoaController extends Controller
         }
 
         // Get data for select
-        $data_cabang = Cabang::all();
+        $data_cabang = getCabang();
         $data_akun = Akun::all();
         // $session = $request->session()->get('access');
         // dd($akun);
@@ -162,7 +162,7 @@ class MasterCoaController extends Controller
         }
 
         // Get data for select
-        $data_cabang = Cabang::all();
+        $data_cabang = getCabang();
         // $data_akun = Akun::all();
 
         // Get data akun
@@ -194,7 +194,7 @@ class MasterCoaController extends Controller
         }
 
         // Get data for select
-        $data_cabang = Cabang::all();
+        $data_cabang = getCabang();
         $data_akun = Akun::all();
 
         // Get data akun

@@ -19,7 +19,7 @@ class ReportGiroController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        $data_cabang = Cabang::all();
+        $data_cabang = getCabang();
         $data_slip = Slip::where('jenis_slip', 3)->where('id_cabang', 1)->get();
         $data_status = array(
             array(
