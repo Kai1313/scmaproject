@@ -141,6 +141,7 @@
                                             <option value="recap">Neraca</option>
                                             <option value="detail">Neraca Detail</option>
                                             <option value="awal">Neraca Awal</option>
+                                            <option value="awal_detail">Neraca Awal Detail</option>
                                         </select>
                                     </div>
                                 </div>
@@ -160,7 +161,7 @@
                                             <table id="table_balance_recap" class="table table-bordered table-striped">
                                                 <thead>
                                                     <tr style="border: 1px solid #f4f4f4;">
-                                                        <th style="background-color: #ffffff;" width="70%">Header</th>
+                                                        <th style="background-color: #ffffff;" width="70%"><span id="header_table">Neraca</span></th>
                                                         <th style="background-color: #ffffff;" width="30%">Total</th>
                                                     </tr>
                                                 </thead>
@@ -239,11 +240,15 @@
             callback: {
                 onSubmit: function(node, formData, event) {
                     // Init data
+                    const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
                     let cabang = $("#cabang_input").val()
                     let year = $("#year").val()
                     let month = $("#month").val()
                     let type = $("#type").val()
-                    let param = "?id_cabang=" + cabang + "&year=" + year + "&month=" + month + "&type=" + type
+                    let param = "?id_cabang=" + cabang + "&year=" + year + "&month=" + month + "&type=" + type;
+
+                    $('#header_table').text('Neraca ' + monthNames[month-1] + ' ' + year);
+
                     switch (guid) {
                         case "view":
                             // Prepare spinner on button
