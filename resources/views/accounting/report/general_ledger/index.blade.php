@@ -80,9 +80,9 @@
                                     <div class="form-group">
                                         <label>Cabang</label>
                                         <select name="cabang_input" id="cabang_input" class="form-control select2" style="width: 100%;">
-                                            @foreach ($data_cabang as $cabang)
-                                            <option value="{{ $cabang->id_cabang }}" {{ isset($data_jurnal_umum->id_cabang) ? ($data_jurnal_umum->id_cabang == $cabang->id_cabang ? 'selected' : '') : '' }}>
-                                                {{ $cabang->kode_cabang . ' - ' . $cabang->nama_cabang }}
+                                            @foreach ($data_cabang as $cb)
+                                            <option value="{{ $cb->id_cabang }}" {{ isset($cabang) ? ($cabang == $cb->id_cabang ? 'selected' : '') : '' }}>
+                                                {{ $cb->kode_cabang . ' - ' . $cb->nama_cabang }}
                                             </option>
                                             @endforeach
                                         </select>
@@ -91,21 +91,21 @@
                                 <div class="col-md-2">
                                     <div class="form-group">
                                         <label>Tanggal Awal</label>
-                                        <input type="text" class="form-control datepicker" id="start_date" name="start_date" placeholder="Masukkan tanggal awal" value="{{ date('Y-m-d') }}" data-validation="[NOTEMPTY]" data-validation-message="Tanggal awal tidak boleh kosong">
+                                        <input type="text" class="form-control datepicker" id="start_date" name="start_date" placeholder="Masukkan tanggal awal" value="{{ (isset($startdate))?$startdate:date('Y-m-d') }}" data-validation="[NOTEMPTY]" data-validation-message="Tanggal awal tidak boleh kosong">
                                     </div>
                                 </div>
                                 <div class="col-md-2">
                                     <div class="form-group">
                                         <label>Tanggal Akhir</label>
-                                        <input type="text" class="form-control datepicker" id="end_date" name="end_date" placeholder="Masukkan tanggal akhir" value="{{ date('Y-m-d') }}" data-validation="[NOTEMPTY]" data-validation-message="Tanggal akhir tidak boleh kosong">
+                                        <input type="text" class="form-control datepicker" id="end_date" name="end_date" placeholder="Masukkan tanggal akhir" value="{{ (isset($enddate))?$enddate:date('Y-m-d') }}" data-validation="[NOTEMPTY]" data-validation-message="Tanggal akhir tidak boleh kosong">
                                     </div>
                                 </div>
                                 <div class="col-md-2">
                                     <div class="form-group">
                                         <label>Tipe</label>
                                         <select name="type" id="type" class="form-control select2">
-                                            <option value="recap">Rekap</option>
-                                            <option value="detail">Detail</option>
+                                            <option value="recap" {{ ($type == "recap")?"selected":"" }}>Rekap</option>
+                                            <option value="detail" {{ ($type == "detail")?"selected":"" }}>Detail</option>
                                         </select>
                                     </div>
                                 </div>
@@ -209,6 +209,13 @@
     var excelButton = document.getElementById("btn-excel")
     var printButton = document.getElementById("btn-print")
 
+    // Init data from controller
+    var ctrlAkun = "<?php echo $id_akun ?>"
+    var ctrlStartDate = "<?php echo $startdate ?>"
+    var ctrlEndDate = "<?php echo $enddate ?>"
+    var ctrlCabang = "<?php echo $cabang ?>"
+    var ctrlType = "<?php echo $type ?>"
+
     var validateLedger = {
         submit: {
             settings: {
@@ -282,8 +289,11 @@
             format: "yyyy-mm-dd"
         })
 
-        getCoa()
-        checkType("recap")
+        // console.log("akun "+ctrlAkun+" start "+ctrlStartDate+" end "+ctrlEndDate+" type "+ctrlType);
+
+        // getCoa()
+        let initType = (ctrlType)?ctrlType:"recap"
+        checkType(initType)
         $("#table_recap_div").hide()
         $("#table_detail_div").hide()
 
@@ -391,7 +401,16 @@
                         name: 'nama_akun',
                         width: '12%',
                         className: 'text-left',
-                        responsivePriority: 2
+                        responsivePriority: 2,
+                        render: function(data, type, row) {
+                            let cabang = $("#cabang_input").val()
+                            let startdate = $("#start_date").val()
+                            let enddate = $("#end_date").val()
+                            let customRoute = "{{ route('report-general-ledger') }}"
+                            customRoute += '?id_akun='+row["id_akun"]+'&cabang='+cabang+'&startdate='+startdate+'&enddate='+enddate+'&type=detail'
+                            let namaAkun = '<a href="'+customRoute+'" target="__blank">'+data+'</a>'
+                            return namaAkun
+                        }
                     },
                     {
                         data: 'saldo_awal',
@@ -620,6 +639,13 @@
                 });
                 $('#coa').append(option_akun);
             }
+        }).done(function() {
+            if (ctrlAkun != null) {
+                console.log(ctrlAkun)
+                $("#coa").val(ctrlAkun).trigger("change")
+                $("#btn-view").click()
+            }
+            ctrlAkun = null
         })
     }
 
