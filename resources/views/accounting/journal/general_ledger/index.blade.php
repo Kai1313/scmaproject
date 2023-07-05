@@ -59,6 +59,14 @@
             <div class="box">
                 <div class="box-header">
                     <div class="row">
+                        @if (isset($closePeriod))
+                            <div class="alert alert-danger alert-dismissible" role="alert">
+                                <strong>Periode sudah di tutup!</strong> Transaksi tidak dapat diubah kembali.
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        @endif
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>Cabang</label>
