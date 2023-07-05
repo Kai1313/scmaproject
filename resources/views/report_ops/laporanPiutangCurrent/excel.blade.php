@@ -13,7 +13,7 @@
         <tbody>
             <tr>
                 <td colspan="7" style="text-align:center;font-weight:bold;font-size:20px;">
-                    LAPORAN PIUTANG
+                    LAPORAN PIUTANG SAAT INI
                 </td>
             </tr>
             <tr></tr>
@@ -31,28 +31,36 @@
         </tbody>
         <thead>
             <tr>
-                <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Tanggal</th>
-                <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Cabang</th>
-                <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Kode Transaksi
+                <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Kode Pelanggan
                 </th>
-                <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Nomor PO</th>
-                <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Supplier</th>
-                <th style="border: #000000 solid thin;width:200px;text-align:center;font-weight:bold;">Akun Slip</th>
-                <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Mata Uang</th>
-                <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Nominal</th>
+                <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Nama Pelanggan
+                </th>
+                <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">No. Faktur
+                </th>
+                <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Tgl Faktur</th>
+                <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Jatuh Tempo</th>
+                <th style="border: #000000 solid thin;width:200px;text-align:center;font-weight:bold;">Nilai Faktur</th>
+                <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Piutang Asing
+                </th>
+                <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Piutang Pajak
+                </th>
+                <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Umur</th>
             </tr>
         </thead>
         <tbody>
             @foreach ($datas as $key => $data)
                 <tr>
-                    <td style="border: #000000 solid thin;">{{ $data->tanggal }}</td>
-                    <td style="border: #000000 solid thin;">{{ $data->nama_cabang }}</td>
-                    <td style="border: #000000 solid thin;">{{ $data->kode_uang_muka_pembelian }}</td>
-                    <td style="border: #000000 solid thin;">{{ $data->nama_permintaan_pembelian }}</td>
-                    <td style="border: #000000 solid thin;">{{ $data->nama_pemasok }}</td>
-                    <td style="border: #000000 solid thin;">{{ $data->nama_slip }}</td>
-                    <td style="border: #000000 solid thin;">{{ $data->nama_mata_uang }}</td>
-                    <td style="border: #000000 solid thin;text-align:right;">{{ number_format($data->nominal, 2) }}</td>
+                    <td style="border: #000000 solid thin;">{{ $data->kode_pelanggan }}</td>
+                    <td style="border: #000000 solid thin;">{{ $data->nama_pelanggan }}</td>
+                    <td style="border: #000000 solid thin;">{{ $data->id_transaksi }}</td>
+                    <td style="border: #000000 solid thin;">{{ $data->tanggal_penjualan }}</td>
+                    <td style="border: #000000 solid thin;">{{ $data->top }}</td>
+                    <td style="border: #000000 solid thin;text-align:right;">
+                        {{ number_format($data->mtotal_penjualan, 2) }}</td>
+                    <td style="border: #000000 solid thin;text-align:right;">{{ number_format($data->sisa, 2) }}</td>
+                    <td style="border: #000000 solid thin;text-align:right;">{{ number_format($data->sisa_tax, 2) }}
+                    </td>
+                    <td style="border: #000000 solid thin;">{{ $data->aging }}</td>
                 </tr>
             @endforeach
         </tbody>

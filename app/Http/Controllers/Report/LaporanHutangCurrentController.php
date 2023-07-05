@@ -1,14 +1,12 @@
 <?php
 
 namespace App\Http\Controllers\Report;
-
-use App\Http\Controllers\ApiController;
+use App\Exports\ReportLaporanHutangCurrentExport;
 use App\Http\Controllers\Controller;
-use App\PurchaseDownPayment;
-use App\TransactionBalance;
 use DB;
 use Illuminate\Http\Request;
 use PDF;
+use Excel;
 use Yajra\DataTables\DataTables;
 
 class LaporanHutangCurrentController extends Controller
@@ -50,7 +48,7 @@ class LaporanHutangCurrentController extends Controller
         $array = [
             "datas" => $data,
             'cabang' => implode(', ', $sCabang),
-            'date' => $request->date,
+            'date' => date('Y-m-d'),
             'type' => $request->type,
         ];
 
@@ -80,10 +78,10 @@ class LaporanHutangCurrentController extends Controller
         $array = [
             "datas" => $data,
             'cabang' => implode(', ', $sCabang),
-            'date' => $request->date,
+            'date' => date('Y-m-d'),
             'type' => $request->type,
         ];
-        return Excel::download(new ReportPurchaseDownPaymentExport('report_ops.purchaseDownPayment.excel', $array), 'laporan uang muka pembelian.xlsx');
+        return Excel::download(new ReportLaporanHutangCurrentExport('report_ops.laporanHutangCurrent.excel', $array), 'LaporanHutangSaatIni.xlsx');
     }
 
     public function getData($request, $type)
