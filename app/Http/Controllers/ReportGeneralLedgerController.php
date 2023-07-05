@@ -333,7 +333,7 @@ class ReportGeneralLedgerController extends Controller
             $end_date = $request->end_date;
             $type = $request->type;
             $coa = $request->coa;
-            $month = date("m", strtotime("-1 month $start_date"));
+            $month = date("m", strtotime("$start_date"));
             $year = date("Y", strtotime($start_date));
             $start_of_the_month = date("Y-m-01", strtotime($start_date));
             $saldo_date = date("Y-m-d", strtotime($start_date." -1 day"));
@@ -484,7 +484,7 @@ class ReportGeneralLedgerController extends Controller
             $end_date = $request->end_date;
             $type = $request->type;
             $coa = $request->coa;
-            $month = date("m", strtotime("-1 month $start_date"));
+            $month = date("m", strtotime("$start_date"));
             $year = date("Y", strtotime($start_date));
             $start_of_the_month = date("Y-m-01", strtotime($start_date));
             $saldo_date = date("Y-m-d", strtotime($start_date." -1 day"));
