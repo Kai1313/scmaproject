@@ -98,8 +98,7 @@ class LaporanPiutangCurrentController extends Controller
             'p2.mtotal_penjualan',
             'a.sisa',
             DB::Raw('0 as sisa_tax'),
-            DB::Raw('DATEDIFF(NOW(),DATE_ADD(p2.tanggal_penjualan, INTERVAL p2.tempo_hari_penjualan DAY)) as aging'),
-            )
+            DB::Raw('DATEDIFF(NOW(),DATE_ADD(p2.tanggal_penjualan, INTERVAL p2.tempo_hari_penjualan DAY)) as aging'))
             ->join('pelanggan as p', 'p.id_pelanggan', 'a.id_pelanggan')
             ->join('penjualan as p2', 'a.id_transaksi', 'p2.nama_penjualan')
             ->where('a.sisa','>', 0)

@@ -98,8 +98,7 @@ class LaporanHutangCurrentController extends Controller
             'p2.mtotal_pembelian',
             'a.sisa',
             DB::Raw('0 as sisa_tax'),
-            DB::Raw('DATEDIFF(NOW(),DATE_ADD(p2.tanggal_pembelian, INTERVAL p2.tempo_hari_pembelian DAY)) as aging'),
-            )
+            DB::Raw('DATEDIFF(NOW(),DATE_ADD(p2.tanggal_pembelian, INTERVAL p2.tempo_hari_pembelian DAY)) as aging'))
             ->join('pemasok as p', 'p.id_pemasok', 'a.id_pemasok')
             ->join('pembelian as p2', 'a.id_transaksi', 'p2.nama_pembelian')
             ->where('a.sisa','>', 0)
