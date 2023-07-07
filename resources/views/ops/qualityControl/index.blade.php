@@ -86,6 +86,12 @@
                         </div>
                     </div>
                     <div class="col-md-4">
+                        <span class="badge badge-default rounded-0 pull-right">
+                            <input class="form-check-input" type="checkbox" id="show_image" name="show_image">
+                            <label class="form-check-label" for="show_image">
+                                Gambar
+                            </label>
+                        </span>
                         <a href="{{ route('qc_receipt-entry') }}" class="btn btn-success pull-right btn-flat btn-sm mr-1">
                             <i class="glyphicon glyphicon-plus"></i> Tambah QC Penerimaan Pembelian
                         </a>
@@ -112,6 +118,7 @@
                                 <th>Alasan QC</th>
                                 <th>Otorisasi</th>
                                 <th>Alasan Persetujuan</th>
+                                <th>Foto</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -254,6 +261,9 @@
                 data: 'approval_reason',
                 name: 'qc.approval_reason',
             }, {
+                data: 'path',
+                name: 'qc.path',
+            }, {
                 data: 'action',
                 name: 'action',
             }, ]
@@ -261,7 +271,8 @@
 
         $('[name="id_cabang"],[name="start_date"],[name="end_date"]').change(function() {
             table.ajax.url("?c=" + $('[name="id_cabang"]').val() + '&start_date=' + $('[name="start_date"]').val() +
-                '&end_date=' + $('[name="end_date"]').val()).load()
+                '&end_date=' + $('[name="end_date"]').val() + '&show_img=' + $('[name="show_image"]').is(
+                    ':checked')).load()
         })
 
         $('body').on('click', '.btn-revision', function() {
@@ -283,6 +294,12 @@
                     $('#cover-spin').hide()
                 }
             })
+        })
+
+        $('[name="show_image"]').change(function() {
+            table.ajax.url("?c=" + $('[name="id_cabang"]').val() + '&start_date=' + $('[name="start_date"]').val() +
+                '&end_date=' + $('[name="end_date"]').val() + '&show_img=' + $('[name="show_image"]').is(
+                    ':checked')).load()
         })
     </script>
 @endsection

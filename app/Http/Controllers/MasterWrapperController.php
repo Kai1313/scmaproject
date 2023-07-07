@@ -39,7 +39,7 @@ class MasterWrapperController extends Controller
                 })
                 ->editColumn('path2', function ($row) use ($request) {
                     if ($request->show_img == "true") {
-                        return '<img src="' . env('FTP_GET_FILE') . $row->path2 . '" width="100">';
+                        return '<img src="' . asset('asset/' . $row->path) . '" width="100">';
                     } else {
                         return '<span style="color:#a9a9a9;">Gambar tidak ditampilkan</span>';
                     }

@@ -66,23 +66,19 @@ class QualityControl extends Model
     public function uploadfile($req, $data)
     {
         if ($req->image_path) {
-            if ($data->path) {
-                \Storage::delete([$data->path, $data->path2]);
-            }
-
             $explode = explode(";base64,", $req->image_path);
-            $media = base64_decode($explode[1]);
-            $media2 = base64_decode($explode[1]);
+            $findExt = explode("image/", $explode[0]);
+
+            $ext = $findExt[1];
             $name = uniqid();
-            $fileName = ($data->path ? $data->path : $name);
-            \Storage::put($fileName, $media);
 
-            $fileName2 = ($data->path2 ? $data->path2 : $name . '-thumbnail');
-            $newImg = \Image::make($media2)->fit(150);
-            \Storage::put($fileName2, (string) $newImg->encode());
+            $media = base64_decode($explode[1]);
+            $mainpath = $name . '.' . $ext;
 
-            $data->path = $fileName;
-            $data->path2 = $fileName2;
+            $img = \Image::make($media)->fit(150);
+            $img->save('asset/' . $mainpath);
+
+            $data->path = $mainpath;
             $data->save();
         }
 

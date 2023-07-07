@@ -170,6 +170,7 @@
                                     <th>Warna</th>
                                     <th>Bentuk</th>
                                     <th>Keterangan</th>
+                                    <th>Foto</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -380,6 +381,12 @@
             }, {
                 data: 'keterangan_pembelian_detail',
                 name: 'keterangan_pembelian_detail',
+            }, {
+                data: 'path',
+                name: 'path',
+                render: function(data, type, row, meta) {
+                    return '<img src="{{ asset('asset') }}' + data + " width='50'>"
+                }
             }, {
                 data: 'id_barang',
                 className: 'text-center',
