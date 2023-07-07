@@ -185,6 +185,7 @@
 @section('externalScripts')
     <script>
         let details = {!! $data ? $data->formatdetail : '[]' !!};
+        console.log(details)
         let approval_header = {{ $data->approval_status }};
         let arrayAccess = {!! json_encode($arrayAccess) !!}
         let idUser = '{{ $idUser }}'

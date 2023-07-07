@@ -61,7 +61,11 @@ class PurchaseRequest extends Model
                 'approval_status',
                 'closed',
                 DB::raw('(case when closed = 0 then "Open" else "Closed" end) as status_data'),
-                DB::raw('(case when sum(sisa_master_qr_code) > 0 then sum(sisa_master_qr_code) else 0 end) as stok')
+                DB::raw('(case
+                    when sum(sisa_master_qr_code) > 0 and barang.id_kategori_barang <> 7
+                    then sum(sisa_master_qr_code)
+                    else 0
+                end) as stok')
             )
             ->leftJoin('barang', 'purchase_request_detail.id_barang', '=', 'barang.id_barang')
             ->leftJoin('satuan_barang', 'purchase_request_detail.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
