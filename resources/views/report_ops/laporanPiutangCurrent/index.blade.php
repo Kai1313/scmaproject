@@ -8,18 +8,23 @@
         th {
             text-align: center;
         }
+
+        table.dataTable tr.dtrg-group th {
+            background-color: #e0e0e0;
+            text-align: left;
+        }
     </style>
 @endsection
 
 @section('header')
     <section class="content-header">
         <h1>
-            Laporan Piutang Saat Ini
+            Laporan Piutang
             <small></small>
         </h1>
         <ol class="breadcrumb">
             <li><a href="#"><i class="fa fa-dashboard"></i> Dashboard</a></li>
-            <li class="active">Laporan Piutang Saat Ini</li>
+            <li class="active">Laporan Piutang </li>
         </ol>
     </section>
 @endsection
@@ -39,12 +44,23 @@
                             </select>
                         </div>
                     </div>
-                    {{-- <div class="col-md-3">
+                    <div class="col-md-5">
+                        <label>Pelanggan</label>
+                        <div class="form-group">
+                            <select name="id_pelanggan" class="form-control select2 trigger-change">
+                                @foreach (getPelangganForReport() as $branch)
+                                    <option value="{{ $branch['id'] }}">{{ $branch['text'] }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
                         <label>Tanggal</label>
                         <div class="form-group">
-                            <input type="text" name="date" class="form-control trigger-change">
+                            <input type="date" name="dateReport" class="form-control trigger-change"
+                                value="{{ date('Y-m-d') }}">
                         </div>
-                    </div> --}}
+                    </div>
                 </div>
                 <div class="pull-right">
                     <a href="{{ route('report_receiveable-print') }}" target="_blank"
@@ -70,8 +86,7 @@
                                 <th>Tgl Faktur</th>
                                 <th>Jatuh Tempo</th>
                                 <th>Nilai Faktur</th>
-                                <th>Piutang Asing</th>
-                                <th>Piutang Pajak</th>
+                                <th>Piutang</th>
                                 <th>Umur</th>
                             </tr>
                         </thead>
@@ -92,6 +107,7 @@
     <script type="text/javascript" src="{{ asset('assets/bower_components/moment/moment.js') }}"></script>
     <script type="text/javascript"
         src="{{ asset('assets/bower_components/bootstrap-daterangepicker/daterangepicker.js') }}"></script>
+    <script src="https://cdn.datatables.net/rowgroup/1.4.0/js/dataTables.rowGroup.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/custom.js') }}"></script>
 @endsection
@@ -106,21 +122,69 @@
                 processing: true,
                 serverSide: true,
                 ajax: defaultUrlIndex + param,
+                fnDrawCallback: function(oSettings) {
+                    setTimeout(function() {
+                        var xxxx = $('.dtrg-end th');
+                        $.each(xxxx, function(index, value) {
+                            var ccccc = $(value).text().split(" | ");
+                            $(value).parent().html(
+                                "<td colspan='3' style='text-align: left;background-color: #B9B9B9'><b>" +
+                                ccccc[0] +
+                                "</b></td><td style='text-align: right;background-color: #B9B9B9'><b>" +
+                                ccccc[1] +
+                                "</b></td><td style='text-align: right;background-color: #B9B9B9'><b>" +
+                                ccccc[2] +
+                                "</b></td><td style='text-align: right;background-color: #B9B9B9'></td>"
+                            );
+                        });
+                    }, 100);
+                },
+                rowGroup: {
+                    startRender: function(rows, group) {
+                        return '(' + group + ') ' + rows.data()[0].nama_pelanggan;
+                    },
+                    endRender: function(rows, group) {
+                        var nilaiFaktur = rows
+                            .data()
+                            .pluck('mtotal_penjualan')
+                            .reduce(function(a, b) {
+                                return a + b * 1;
+                            }, 0);
+                        var hutang = rows
+                            .data()
+                            .pluck('sisa')
+                            .reduce(function(a, b) {
+                                return a + b * 1;
+                            }, 0);
+                        return '' + ' | ' + $.fn.dataTable.render.number('.',
+                            ',', 0, '').display(nilaiFaktur) + ' | ' + $.fn.dataTable.render.number('.',
+                            ',', 0, '').display(hutang);
+                    },
+                    dataSrc: 'kode_pelanggan'
+                },
                 columns: [{
                     data: 'kode_pelanggan',
-                    name: 'kode_pelanggan'
+                    name: 'kode_pelanggan',
+                    visible: false
                 }, {
                     data: 'nama_pelanggan',
-                    name: 'nama_pelanggan'
+                    name: 'nama_pelanggan',
+                    visible: false
                 }, {
                     data: 'id_transaksi',
                     name: 'id_transaksi',
                 }, {
                     data: 'tanggal_penjualan',
                     name: 'tanggal_penjualan',
+                    render: function(data) {
+                        return data ? formatDate(data) : ''
+                    },
                 }, {
                     data: 'top',
                     name: 'top',
+                    render: function(data) {
+                        return data ? formatDate(data) : ''
+                    },
                 }, {
                     data: 'mtotal_penjualan',
                     name: 'mtotal_penjualan',
@@ -131,13 +195,6 @@
                 }, {
                     data: 'sisa',
                     name: 'sisa',
-                    render: function(data) {
-                        return data ? formatNumber(data, 2) : 0
-                    },
-                    className: 'text-right'
-                }, {
-                    data: 'sisa_tax',
-                    name: 'sisa_tax',
                     render: function(data) {
                         return data ? formatNumber(data, 2) : 0
                     },

@@ -13,7 +13,7 @@
         <tbody>
             <tr>
                 <td colspan="7" style="text-align:center;font-weight:bold;font-size:20px;">
-                    LAPORAN HUTANG SAAT INI
+                    LAPORAN HUTANG
                 </td>
             </tr>
             <tr></tr>
