@@ -30,7 +30,7 @@ class GeneralLedgerController extends Controller
         }
 
         $cabang = Cabang::find(1);
-        $data_cabang = Cabang::all();
+        $data_cabang = getCabang();
 
         $data = [
             "pageTitle" => "SCA Accounting | Transaksi Jurnal Umum | List",
@@ -52,7 +52,7 @@ class GeneralLedgerController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        $data_cabang = Cabang::where("status_cabang", 1)->get();
+        $data_cabang = getCabang();
         $data_pelanggan = Pelanggan::all();
         $data_pemasok = Pemasok::all();
         $piutang_dagang = Setting::where("code", "Piutang Dagang")->where("id_cabang", "1")->first();
@@ -244,7 +244,7 @@ class GeneralLedgerController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        $data_jurnal_header = JurnalHeader::join('master_slip', 'master_slip.id_slip', 'jurnal_header.id_slip')
+        $data_jurnal_header = JurnalHeader::leftJoin('master_slip', 'master_slip.id_slip', 'jurnal_header.id_slip')
             ->leftJoin('master_slip as ms2', 'ms2.id_slip', 'jurnal_header.id_slip2')
             ->join('cabang', 'cabang.id_cabang', 'jurnal_header.id_cabang')
             ->where('id_jurnal', $id)
@@ -266,7 +266,9 @@ class GeneralLedgerController extends Controller
             ->select('jurnal_detail.*', 'master_akun.kode_akun', 'master_akun.nama_akun')
             ->get();
 
-        $data_jurnal_header->catatan = str_replace("\n", '<br>', $data_jurnal_header->catatan);
+        if ($data_jurnal_header->catatan) {
+            $data_jurnal_header->catatan = str_replace("\n", '<br>', $data_jurnal_header->catatan);
+        }
 
         foreach ($data_jurnal_detail as $key => $value) {
             $notes = str_replace("\n", '<br>', $value->keterangan);
@@ -335,7 +337,7 @@ class GeneralLedgerController extends Controller
         // return view('accounting.journal.general_ledger.print', $data);
 
         $pdf = PDF::loadView('accounting.journal.general_ledger.print', $data);
-        $pdf->setPaper('a4', 'potrait');
+        $pdf->setPaper('a5', 'potrait');
         return $pdf->stream('printJurnal_' . $data_jurnal_header->kode_jurnal . '.pdf');
     }
 
@@ -351,7 +353,7 @@ class GeneralLedgerController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        $data_cabang = Cabang::where("status_cabang", 1)->get();
+        $data_cabang = getCabang();
         $data_pelanggan = Pelanggan::all();
         $data_pemasok = Pemasok::all();
         $jurnal_header = JurnalHeader::find($id);

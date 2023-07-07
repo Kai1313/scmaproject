@@ -739,7 +739,7 @@
                 </li>
             @endif
             @if (checkAccessMenu('laporan_1'))
-                <li class="treeview {{ in_array(request()->segment(1), ['laporan_uang_muka_pembelian', 'laporan_qc_penerimaan', 'laporan_kirim_ke_cabang', 'laporan_terima_dari_cabang', 'laporan_kirim_ke_gudang', 'laporan_terima_dari_gudang', 'laporan_pemakaian', 'laporan_uang_muka_penjualan']) ? 'active' : null }}"
+                <li class="treeview {{ in_array(request()->segment(1), ['laporan_uang_muka_pembelian', 'laporan_qc_penerimaan', 'laporan_kirim_ke_cabang', 'laporan_terima_dari_cabang', 'laporan_kirim_ke_gudang', 'laporan_terima_dari_gudang', 'laporan_pemakaian', 'laporan_uang_muka_penjualan', 'laporan_piutang_current', 'laporan_hutang_current']) ? 'active' : null }}"
                     data-alias="laporan_1">
                     <a href="#"><i class="glyphicon glyphicon-stats"></i> <span>Laporan</span>
                         <span class="pull-right-container">
@@ -748,7 +748,7 @@
                     </a>
                     <ul class="treeview-menu">
                         @if (checkAccessMenu('laporan_pembelian_kepala'))
-                            <li class="treeview {{ in_array(request()->segment(1), ['laporan_uang_muka_pembelian', 'laporan_qc_penerimaan']) ? 'active' : null }}"
+                            <li class="treeview {{ in_array(request()->segment(1), ['laporan_uang_muka_pembelian', 'laporan_qc_penerimaan', 'laporan_hutang_current']) ? 'active' : null }}"
                                 data-alias="laporan_pembelian_kepala">
                                 <a href="#"><i class="glyphicon glyphicon-arrow-right"></i>
                                     <span>Pembelian</span>
@@ -798,6 +798,14 @@
                                             class="{{ request()->segment(1) == 'laporan_uang_muka_pembelian' ? 'active' : null }}">
                                             <a href="{{ route('report_purchase_down_payment-index') }}">
                                                 <i class="glyphicon glyphicon-option-vertical"></i>Uang Muka Pembelian
+                                            </a>
+                                        </li>
+                                    @endif
+                                    @if (checkAccessMenu('laporan_hutang_current'))
+                                        <li data-alias=""
+                                            class="{{ request()->segment(1) == 'laporan_hutang_current' ? 'active' : null }}">
+                                            <a href="{{ route('report_payable-index') }}">
+                                                <i class="glyphicon glyphicon-option-vertical"></i>Laporan Hutang
                                             </a>
                                         </li>
                                     @endif
@@ -1001,7 +1009,7 @@
                             </li>
                         @endif
                         @if (checkAccessMenu('laporan_penjualan_kepala'))
-                            <li class="treeview {{ in_array(request()->segment(1), ['laporan_uang_muka_penjualan']) ? 'active' : null }}"
+                            <li class="treeview {{ in_array(request()->segment(1), ['laporan_uang_muka_penjualan', 'laporan_piutang_current']) ? 'active' : null }}"
                                 data-alias="laporan_penjualan_kepala">
                                 <a href="#"><i class="glyphicon glyphicon-arrow-right"></i>
                                     <span>Penjualan</span>
@@ -1065,6 +1073,14 @@
                                             class="{{ request()->segment(1) == 'laporan_uang_muka_penjualan' ? 'active' : null }}">
                                             <a href="{{ route('report_sales_down_payment-index') }}">
                                                 <i class="glyphicon glyphicon-option-vertical"></i>Uang Muka Penjualan
+                                            </a>
+                                        </li>
+                                    @endif
+                                    @if (checkAccessMenu('laporan_piutang_current'))
+                                        <li data-alias=""
+                                            class="{{ request()->segment(1) == 'laporan_piutang_current' ? 'active' : null }}">
+                                            <a href="{{ route('report_receiveable-index') }}">
+                                                <i class="glyphicon glyphicon-option-vertical"></i>Laporan Piutang
                                             </a>
                                         </li>
                                     @endif

@@ -6,6 +6,7 @@ use App\Models\Accounting\JurnalDetail;
 use App\Models\Accounting\JurnalHeader;
 use App\Models\Accounting\SaldoBalance;
 use App\Exports\ReportGeneralLedgerExport;
+use App\Models\Master\Akun;
 use App\Models\Master\Cabang;
 use App\Models\Master\Slip;
 use Illuminate\Http\Request;
@@ -29,12 +30,27 @@ class ReportGeneralLedgerController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        $data_cabang = Cabang::all();
+        // Check get parameter
+        $cabang = ($request->has("cabang"))?$request->cabang:NULL;
+        $id_akun = ($request->has("id_akun"))?$request->id_akun:NULL;
+        $startdate = ($request->has("startdate"))?$request->startdate:NULL;
+        $enddate = ($request->has("enddate"))?$request->enddate:NULL;
+        $type = ($request->has("type"))?$request->type:NULL;
+        $akun = ($id_akun)?Akun::find($id_akun):NULL;
+
+        $data_cabang = getCabang();
 
         $data = [
             "pageTitle" => "SCA Accounting | Report Buku Besar",
             "data_cabang" => $data_cabang,
+            "id_akun" => $id_akun,
+            "akun" => $akun,
+            "startdate" => $startdate,
+            "enddate" => $enddate,
+            "cabang" => $cabang,
+            "type" => $type
         ];
+        // dd($data);
 
         return view('accounting.report.general_ledger.index', $data);
     }
@@ -115,7 +131,7 @@ class ReportGeneralLedgerController extends Controller
             $end_date = $request->end_date;
             $type = $request->type;
             $coa = $request->coa;
-            $month = date("m", strtotime("-1 month $start_date"));
+            $month = date("m", strtotime("$start_date"));
             $year = date("Y", strtotime($start_date));
             $start_of_the_month = date("Y-m-01", strtotime($start_date));
             $saldo_date = date("Y-m-d", strtotime($start_date." -1 day"));
@@ -139,6 +155,7 @@ class ReportGeneralLedgerController extends Controller
             $data_ledgers = JurnalDetail::join("jurnal_header", "jurnal_header.id_jurnal", "jurnal_detail.id_jurnal")
                 ->join("master_akun", "master_akun.id_akun", "jurnal_detail.id_akun")
                 ->where("jurnal_header.void", "0")
+                ->where("master_akun.id_cabang", $id_cabang)
                 ->whereBetween("jurnal_header.tanggal_jurnal", [$start_date, $end_date]);
             if ($type == "recap") {
                 $data_ledgers = $data_ledgers->selectRaw("jurnal_header.id_jurnal, master_akun.id_cabang, master_akun.id_akun, master_akun.kode_akun, master_akun.nama_akun, SUM(jurnal_detail.debet) as debet, SUM(jurnal_detail.credit) as kredit")->groupBy("jurnal_detail.id_akun");
@@ -316,7 +333,7 @@ class ReportGeneralLedgerController extends Controller
             $end_date = $request->end_date;
             $type = $request->type;
             $coa = $request->coa;
-            $month = date("m", strtotime("-1 month $start_date"));
+            $month = date("m", strtotime("$start_date"));
             $year = date("Y", strtotime($start_date));
             $start_of_the_month = date("Y-m-01", strtotime($start_date));
             $saldo_date = date("Y-m-d", strtotime($start_date." -1 day"));
@@ -467,7 +484,7 @@ class ReportGeneralLedgerController extends Controller
             $end_date = $request->end_date;
             $type = $request->type;
             $coa = $request->coa;
-            $month = date("m", strtotime("-1 month $start_date"));
+            $month = date("m", strtotime("$start_date"));
             $year = date("Y", strtotime($start_date));
             $start_of_the_month = date("Y-m-01", strtotime($start_date));
             $saldo_date = date("Y-m-d", strtotime($start_date." -1 day"));

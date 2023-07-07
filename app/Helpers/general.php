@@ -130,7 +130,7 @@ function getCabangForReport()
                 $tempGudang[] = $g;
             }
         }
-        $array[] = ['id' => implode(array_column($cabang, 'id'), ','), 'text' => 'Semua Cabang', 'gudang' => $tempGudang];
+        $array[] = ['id' => implode(',', array_column($cabang, 'id')), 'text' => 'Semua Cabang', 'gudang' => $tempGudang];
     }
 
     foreach ($cabang as $c) {
@@ -174,4 +174,22 @@ function getSetting($code, $key = 'value1')
     $data = \DB::table('setting')->where('code', $code)->value($key);
 
     return $data;
+}
+
+function getCabang()
+{
+    $user_id = session()->get('user')->id_pengguna;
+    $cabang = DB::table('pengguna')
+        ->selectRaw('DISTINCT
+            gudang.id_cabang,
+            cabang.nama_cabang,
+            cabang.kode_cabang ')
+        ->join('akses_gudang', 'akses_gudang.id_grup_pengguna', 'pengguna.id_grup_pengguna')
+        ->join('gudang', 'gudang.id_gudang', 'akses_gudang.id_gudang')
+        ->join('cabang', 'cabang.id_cabang', 'gudang.id_cabang')
+        ->where('id_pengguna', $user_id)
+        ->where('cabang.status_cabang', 1)
+        ->get();
+
+    return $cabang;
 }

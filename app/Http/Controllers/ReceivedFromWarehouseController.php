@@ -90,7 +90,15 @@ class ReceivedFromWarehouseController extends Controller
         try {
             DB::beginTransaction();
             if (!$data) {
-                $data = new MoveBranch;
+                $check = MoveBranch::where('id_jenis_transaksi', 24)->where('id_pindah_barang2', $request->id_pindah_barang2)->first();
+                if ($check) {
+                    return response()->json([
+                        "result" => false,
+                        "message" => "Pindah barang sudah diterima dengan device lain",
+                    ], 500);
+                } else {
+                    $data = new MoveBranch;
+                }
             }
 
             $data->fill($request->all());

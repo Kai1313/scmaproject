@@ -250,16 +250,24 @@
                                             class="form-control handle-number-4 check-range validate" data-type="ph">
                                     </div>
                                 </div>
-                                <div class="col-sm-6">
-                                    <label>Warna</label>
-                                    <div class="form-group">
-                                        <input type="text" name="warna_pembelian_detail" class="form-control">
-                                    </div>
+                            </div>
+                            <label>Warna</label>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input type="text" name="warna_pembelian_detail" class="form-control" readonly>
+                                    <span class="input-group-addon">
+                                        <input type="checkbox" name="checkbox_warna" class="check-checkbox">
+                                    </span>
                                 </div>
                             </div>
                             <label>Bentuk</label>
                             <div class="form-group">
-                                <input type="text" name="bentuk_pembelian_detail" class="form-control">
+                                <div class="input-group">
+                                    <input type="text" name="bentuk_pembelian_detail" class="form-control" readonly>
+                                    <span class="input-group-addon">
+                                        <input type="checkbox" name="checkbox_bentuk" class="check-checkbox">
+                                    </span>
+                                </div>
                             </div>
                             <label>Keterangan</label>
                             <div class="form-group">
@@ -446,6 +454,8 @@
                         $('[name="nama_barang"]').val(dataselect.text)
                         $('[name="nama_satuan_barang"]').val(dataselect.nama_satuan_barang)
                         $('[name="id_satuan_barang"]').val(dataselect.id_satuan_barang)
+                        $('[name="warna_pembelian_detail"]').val(dataselect.warna_qc_barang)
+                        $('[name="bentuk_pembelian_detail"]').val(dataselect.bentuk_qc_barang)
                         checkRangeQc()
 
                         if (dataselect.id) {
@@ -637,6 +647,10 @@
             }
         }
 
+        $('.check-checkbox').click(function() {
+            checkRangeQc()
+        })
+
         function checkRangeQc() {
             let countError = 0;
             $('.check-range').each(function(i, v) {
@@ -673,6 +687,19 @@
                 }
             })
 
+            $('.check-checkbox').each(function(i, v) {
+                // if ($(v).parents('.form-group').find('label')) {
+                $(v).parents('.form-group').find('label').remove()
+                // }
+
+                console.log($(v).parents('.form-group'))
+
+                if ($(v).val() == false) {
+                    $(this).parents('.input-group').after('<label class="label label-danger">Tidak Sesuai</label>')
+                    countError++
+                }
+            })
+
             let selectArray = []
             if (countError > 0) {
                 selectArray = arrayStatus[2]
@@ -682,7 +709,6 @@
 
             $('[name="status_qc"]').val(selectArray['id'])
             $('[name="label_status_qc"]').val(selectArray['text'])
-
 
             if (selectArray['id'] == 2) {
                 $('[name="reason"]').attr('readonly', false).addClass('validate')
