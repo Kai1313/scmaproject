@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Laporan Hutang Saat Ini</title>
+    <title>Laporan Hutang </title>
     <style>
         .table {
             border-collapse: collapse;
@@ -39,7 +39,7 @@
     <table style="width:100%;margin-bottom:10px;" class="table-header">
         <tr>
             <td style="width:80px;"><img src="{{ asset('images/logo2.jpg') }}" alt="logo" style="width:70px;"></td>
-            <td style="text-align:center;">LAPORAN HUTANG SAAT INI</td>
+            <td style="text-align:center;">LAPORAN HUTANG </td>
         </tr>
     </table>
     <table style="width:100%;margin-bottom:5px;" class="table">

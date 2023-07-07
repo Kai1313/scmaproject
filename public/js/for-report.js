@@ -119,3 +119,8 @@ function clearWarehouse() {
         }]
     })
 }
+
+function formatDate(date) {
+    const d = new Date(date);
+    return moment(d).format('DD MMM YYYY');
+}
