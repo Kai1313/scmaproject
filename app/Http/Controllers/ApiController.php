@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Accounting\JurnalDetail;
 use App\Models\Accounting\JurnalHeader;
 use App\Models\Accounting\TrxSaldo;
+use App\Models\Transaction\StokMinimalHitung;
 use App\Models\Master\Akun;
 use App\Models\Master\Cabang;
 use App\Models\Master\Setting;
@@ -3192,7 +3193,27 @@ class ApiController extends Controller
         if ($debug !== false) {
             $respon['debug'] = $debug;
         }
+        self::storeStokMinHitung($setting,$request->id,$respon['total']);
         return response()->json($respon);
+    }
+
+    private function storeStokMinHitung($setting, $id_barang, $jumlah){
+        $bulan = date('m');
+        $tahun = date('Y');
+        StokMinimalHitung::updateOrInsert(
+            [
+                'bulan' => $bulan,
+                'tahun' => $tahun,
+                'id_barang' => $id_barang
+            ],
+            [
+                'jumlah' => $jumlah,
+                'range' => $setting['Stok Min Range'],
+                'persen' => $setting['Stok Min Persen'],
+                'lokal' => $setting['Stok Min Lokal'],
+                'import' => $setting['Stok Min Import'],
+            ]
+        );
     }
 
     private function getSalesWithProrate($id_barang, $value)
