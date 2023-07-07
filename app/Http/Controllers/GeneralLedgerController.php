@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Accounting\JurnalDetail;
 use App\Models\Accounting\JurnalHeader;
+use App\Models\Accounting\Periode;
 use App\Models\Accounting\TrxSaldo;
 use App\Models\Master\Akun;
 use App\Models\Master\Cabang;
@@ -110,6 +111,15 @@ class GeneralLedgerController extends Controller
             $dateRecord = date('Y-m-d h:i:s');
             $detailData = $request->detail;
             // dd($detailData);
+
+            // Check periode close
+            $period = Periode::checkPeriod($journalDate);
+            if ($period) {
+                return response()->json([
+                    "result" => false,
+                    "message" => "Period close, cannot save with this date",
+                ]);
+            }
 
             DB::beginTransaction();
             // Store Header
@@ -386,6 +396,24 @@ class GeneralLedgerController extends Controller
             "jurnal_detail_count" => count($details),
         ];
         // dd($details);
+        // Check periode close
+        $period = Periode::checkPeriod($jurnal_header->tanggal_jurnal);
+        if ($period) {
+            if (checkUserSession($request, 'general_ledger', 'show') == false) {
+                return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+            }
+    
+            $cabang = Cabang::find(1);
+    
+            $data = [
+                "pageTitle" => "SCA Accounting | Transaksi Jurnal Umum | List",
+                "cabang" => $cabang,
+                "data_cabang" => $data_cabang,
+                "closePeriod" => $period
+            ];
+    
+            return view('accounting.journal.general_ledger.index', $data);
+        }
 
         Log::debug(json_encode($request->session()->get('user')));
 
@@ -428,6 +456,15 @@ class GeneralLedgerController extends Controller
             $userModified = $userData->id_pengguna;
             $dateModified = date('Y-m-d h:i:s');
             $detailData = $request->detail;
+
+            // Check periode close
+            $period = Periode::checkPeriod($journalDate);
+            if ($period) {
+                return response()->json([
+                    "result" => false,
+                    "message" => "Period close, cannot update this transaction",
+                ]);
+            }
 
             DB::beginTransaction();
 
@@ -705,6 +742,14 @@ class GeneralLedgerController extends Controller
 
             // Find Header data
             $header = JurnalHeader::where("id_jurnal", $id)->first();
+            // Check periode close
+            $period = Periode::checkPeriod($header->tanggal_jurnal);
+            if ($period) {
+                return response()->json([
+                    "result" => false,
+                    "message" => "Period close, cannot void this transaction",
+                ]);
+            }
             $session = $request->session()->get('access');
             if (checkAccessMenu('general_ledger', 'delete') == false) {
                 return response()->json([
