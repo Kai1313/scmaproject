@@ -140,6 +140,8 @@ class QcReceiptController extends Controller
                         $data->keterangan_pembelian_detail = $value->keterangan_pembelian_detail;
                         $data->save();
 
+                        $data->uploadfile($value, $data);
+
                         $data->updatePembelianDetail();
                     }
                 }

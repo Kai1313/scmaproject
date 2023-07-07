@@ -229,6 +229,11 @@
                                 <div class="form-group">
                                     <textarea name="reason" class="form-control" readonly></textarea>
                                 </div>
+                                <label>Upload Foto</label>
+                                <input id="f_image" type="file" class="form-control" name="file_upload"
+                                    accept=".png,.jpeg,.jpg">
+                                <input type="hidden" name="image_path">
+                                <img alt="" height="100" id="uploadPreview1" style="margin:10px;">
                             </div>
                         </div>
                         <div class="col-md-6 show-after-search">
@@ -540,6 +545,7 @@
             }
 
             $('[name="details"]').val(JSON.stringify(details))
+            console.log(details)
             statusModal = ''
             detailSelect = []
 
@@ -726,5 +732,44 @@
                 $('[name="reason"]').attr('readonly', true).removeClass('validate')
             }
         }
+
+        $('[name="file_upload"]').change(function() {
+            if ($(this).val()) {
+                let oFReader = new FileReader();
+                let file = document.getElementById("f_image").files[0];
+                if (file.type.match(/image.*/)) {
+                    let reader = new FileReader();
+                    reader.onload = function(readerEvent) {
+                        let image = new Image();
+                        image.onload = function(imageEvent) {
+                            let canvas = document.createElement('canvas'),
+                                max_size = 1000,
+                                width = image.width,
+                                height = image.height;
+                            if (width > height) {
+                                if (width > max_size) {
+                                    height *= max_size / width;
+                                    width = max_size;
+                                }
+                            } else {
+                                if (height > max_size) {
+                                    width *= max_size / height;
+                                    height = max_size;
+                                }
+                            }
+                            canvas.width = width;
+                            canvas.height = height;
+                            canvas.getContext('2d').drawImage(image, 0, 0, width, height);
+                            let dataUrl = canvas.toDataURL('image/jpeg');
+                            $('[name="image_path"]').val(dataUrl)
+                            $('[name="file_upload"]').val('')
+                            document.getElementById("uploadPreview1").src = dataUrl;
+                        }
+                        image.src = readerEvent.target.result;
+                    }
+                    reader.readAsDataURL(file);
+                }
+            }
+        })
     </script>
 @endsection
