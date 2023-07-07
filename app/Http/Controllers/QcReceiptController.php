@@ -133,10 +133,10 @@ class QcReceiptController extends Controller
                         $data->status_qc = $value->status_qc;
                         $data->reason = $value->reason;
                         $data->sg_pembelian_detail = $value->sg_pembelian_detail;
-                        $data->bentuk_pembelian_detail = $value->bentuk_pembelian_detail;
+                        $data->bentuk_pembelian_detail = $value->checkbox_bentuk == 1 ? $value->bentuk_pembelian_detail : '';
                         $data->be_pembelian_detail = $value->be_pembelian_detail;
                         $data->ph_pembelian_detail = $value->ph_pembelian_detail;
-                        $data->warna_pembelian_detail = $value->warna_pembelian_detail;
+                        $data->warna_pembelian_detail = $value->checkbox_warna == 1 ? $value->warna_pembelian_detail : '';
                         $data->keterangan_pembelian_detail = $value->keterangan_pembelian_detail;
                         $data->save();
 

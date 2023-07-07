@@ -214,10 +214,16 @@
                                     <input type="hidden" name="id_satuan_barang" class="validate">
                                     <input type="hidden" name="tanggal_qc" value="{{ date('Y-m-d') }}">
                                 </div>
-                                <label>Status <span>*</span></label>
-                                <div class="form-group">
-                                    <input name="label_status_qc" class="form-control validate" readonly>
-                                    <input type="hidden" name="status_qc" value="">
+                                <div class="row">
+                                    <label class="col-md-4">Status</label>
+                                    <div class="form-group col-md-8">
+                                        <div id="target-status">
+
+                                        </div>
+                                        <input name="label_status_qc" class="form-control validate" readonly
+                                            style="display:none;">
+                                        <input type="hidden" name="status_qc" value="">
+                                    </div>
                                 </div>
                                 <label>Alasan</label>
                                 <div class="form-group">
@@ -518,6 +524,8 @@
             modal.find('input,select,textarea').each(function(i, v) {
                 if ($(v).hasClass('handle-number-4')) {
                     detailSelect[$(v).prop('name')] = normalizeNumber($(v).val())
+                } else if ($(v).prop('type') == 'checkbox') {
+                    detailSelect[$(v).prop('name')] = $(v).is(':checked') ? 1 : 0;
                 } else {
                     detailSelect[$(v).prop('name')] = $(v).val()
                 }
@@ -688,13 +696,11 @@
             })
 
             $('.check-checkbox').each(function(i, v) {
-                // if ($(v).parents('.form-group').find('label')) {
-                $(v).parents('.form-group').find('label').remove()
-                // }
+                if ($(v).parents('.form-group').find('label')) {
+                    $(v).parents('.form-group').find('label').remove()
+                }
 
-                console.log($(v).parents('.form-group'))
-
-                if ($(v).val() == false) {
+                if (!$(v).is(':checked')) {
                     $(this).parents('.input-group').after('<label class="label label-danger">Tidak Sesuai</label>')
                     countError++
                 }
@@ -707,6 +713,8 @@
                 selectArray = arrayStatus[1]
             }
 
+            $('#target-status').html('<label class="' + selectArray['class'] + '" style="font-size:20px;">' + selectArray[
+                'text'] + '</label>')
             $('[name="status_qc"]').val(selectArray['id'])
             $('[name="label_status_qc"]').val(selectArray['text'])
 
