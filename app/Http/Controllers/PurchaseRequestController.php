@@ -280,10 +280,15 @@ class PurchaseRequestController extends Controller
                 '2' => [5],
             ];
 
-            $stok = DB::table('master_qr_code')->select(DB::raw('sum(sisa_master_qr_code) as stok'), 'nama_satuan_barang')
+            $stok = DB::table('master_qr_code')->select(DB::raw('(case
+                    when sum(sisa_master_qr_code) > 0 and barang.id_kategori_barang <> 7
+                    then sum(sisa_master_qr_code)
+                    else 0
+                end) as stok'), 'nama_satuan_barang')
+                ->join('barang', 'master_qr_code.id_barang', 'barang.id_barang')
                 ->join('satuan_barang', 'master_qr_code.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
-                ->where('id_barang', $item)->whereIn('id_gudang', $arrayCabang[$cabang])
-                ->groupBy('id_barang')->first();
+                ->where('master_qr_code.id_barang', $item)->whereIn('master_qr_code.id_gudang', $arrayCabang[$cabang])
+                ->groupBy('master_qr_code.id_barang')->first();
             if ($stok) {
                 $messageStock = $stok->stok;
                 $messageSatuanStok = $stok->nama_satuan_barang;
