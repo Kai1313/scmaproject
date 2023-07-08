@@ -26,13 +26,13 @@ class MasterSlipController extends Controller
         }
 
         $data_slip = Slip::join('master_akun', 'master_slip.id_akun', '=', 'master_akun.id_akun')->select('master_slip.*', 'master_akun.nama_akun')->get();
-        $cabang = Cabang::find(1);
+        // $cabang = Cabang::find(1); // REDUNDANT
         $data_cabang = getCabang();
         $user_id = $request->user_id;
 
         $data = [
             "pageTitle" => "SCA Accounting | Master Slip | List",
-            "cabang" => $cabang,
+            // "cabang" => $cabang,
             "data_cabang" => $data_cabang,
             "data_slip" => $data_slip,
         ];
@@ -51,9 +51,13 @@ class MasterSlipController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        $cabang = Cabang::find(1);
-        $data_akun = Akun::where("isshown", 1)->where("id_cabang", $cabang->id_cabang)->get(); //DB::select('select * from master_akun');
         $data_cabang = getCabang();
+        if (count($data_cabang) == 0) {
+            $cabang = Cabang::find(1);
+        }else{
+            $cabang = Cabang::find($data_cabang[0]->id_cabang);
+        }
+        $data_akun = Akun::where("isshown", 1)->where("id_cabang", $cabang->id_cabang)->get(); //DB::select('select * from master_akun');
 
         $data = [
             "pageTitle" => "SCA Accounting | Master Slip | Create",

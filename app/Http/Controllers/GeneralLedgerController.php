@@ -30,12 +30,12 @@ class GeneralLedgerController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        $cabang = Cabang::find(1);
+        // $cabang = Cabang::find(1);
         $data_cabang = getCabang();
 
         $data = [
             "pageTitle" => "SCA Accounting | Transaksi Jurnal Umum | List",
-            "cabang" => $cabang,
+            // "cabang" => $cabang,
             "data_cabang" => $data_cabang,
         ];
 
@@ -403,11 +403,11 @@ class GeneralLedgerController extends Controller
                 return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
             }
     
-            $cabang = Cabang::find(1);
+            // $cabang = Cabang::find(1);
     
             $data = [
                 "pageTitle" => "SCA Accounting | Transaksi Jurnal Umum | List",
-                "cabang" => $cabang,
+                // "cabang" => $cabang,
                 "data_cabang" => $data_cabang,
                 "closePeriod" => $period
             ];

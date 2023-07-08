@@ -34,14 +34,19 @@ class ClosingJournalController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $cabang = Cabang::find(1);
+        if (checkUserSession($request, 'closing_journal', 'show') == false) {
+            // Log::debug(checkUserSession($request, 'closing_journal', 'show'));
+            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+        }
+
+        // $cabang = Cabang::find(1);
         $data_cabang = getCabang();
 
         $data = [
             "pageTitle" => "SCA Accounting | Transaksi Jurnal Closing | List",
-            "cabang" => $cabang,
+            // "cabang" => $cabang,
             "data_cabang" => $data_cabang,
         ];
 
@@ -55,7 +60,7 @@ class ClosingJournalController extends Controller
      */
     public function create()
     {
-        $data_cabang = getCabang($request);
+        $data_cabang = getCabang();
         $data_pelanggan = Pelanggan::all();
         $data_pemasok = Pemasok::all();
 
