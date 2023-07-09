@@ -18,9 +18,9 @@ class ReportBalanceController extends Controller
 {
     public function index(Request $request)
     {
-        // if (checkUserSession($request, 'general_ledger', 'show') == false) {
-        //     return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
-        // }
+        if (checkUserSession($request, 'report_balance', 'show') == false) {
+            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+        }
 
         $data_cabang = getCabang();
 
