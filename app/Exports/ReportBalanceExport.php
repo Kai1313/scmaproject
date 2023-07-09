@@ -30,6 +30,8 @@ class ReportBalanceExport implements FromView, ShouldAutoSize, WithColumnFormatt
             'C' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED2,
             'D' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED2,
             'E' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED2,
+            'F' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED2,
+            'G' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED2,
         ];
     }
 }
