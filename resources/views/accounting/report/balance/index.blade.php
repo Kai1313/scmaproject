@@ -52,7 +52,7 @@
         font-size: 13px !important;
         border-color: white !important;
         padding: 0.6rem 0.4rem;
-        font-weight: 600;
+        font-weight: 800;
     }
 
     #table_balance_recap td,
@@ -333,6 +333,7 @@
 
     function view(param, type, month, year) {
         const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        let report_type = type;
         let route = "{{ Route('report-balance-populate') }}"
 
             $("#table_detail_div").hide()
@@ -346,6 +347,7 @@
                     if (data.result) {
                         let data_coa = data.data;
                         let list_cabang = null;
+                        let route_general_ledger = "{{ route('report-general-ledger') }}";
                         if($('#cabang_input').val() == ''){
                             data_coa = data.data.data;
                             list_cabang = data.data.cabang;
@@ -357,17 +359,17 @@
                                 let html_thead = '<th style="background-color: #ffffff;" width="40%"><span id="header_table">Neraca ' + monthNames[month-1] + ' ' + year + '</span></th><th style="background-color: #ffffff;" width="70%">Total</th>';
                                 $('#head_row').html('');
                                 $('#head_row').html(html_thead);
-                                getTreetable(data_coa, null, 13);
+                                getTreetable(data_coa, null, 13, report_type, route_general_ledger);
                             }else{
                                 let html_thead = '<th style="background-color: #ffffff;" width="40%"><span id="header_table">Neraca ' + monthNames[month-1] + ' ' + year + '</span></th>';
                                 list_cabang.forEach(function(cabang){
-                                    html_thead += '<th style="background-color: #ffffff;" width="20%">Total ' + capitalize(cabang.replace('_', ' ')) + '</th>';
+                                    html_thead += '<th style="background-color: #ffffff;" width="20%">Total ' + capitalize(cabang.new_nama_cabang.replace('_', ' ')) + '</th>';
                                 });
                                 html_thead += '<th style="background-color: #ffffff;" width="20%">Total</th>';
                                 $('#head_row').html('');
                                 $('#head_row').html(html_thead);
 
-                                getTreetableConsolidation(data_coa, null, 13, list_cabang);
+                                getTreetableConsolidation(data_coa, null, 13, list_cabang, report_type, route_general_ledger);
                             }
                             $('#coa_table').html(body_coa);
                             $('#table_balance_recap').treetable({expandable: true}).treetable('expandAll');
@@ -426,7 +428,7 @@
         })
     }
 
-    function getTreetableConsolidation(data, parent, fontSize, listCabang){
+    function getTreetableConsolidation(data, parent, fontSize, listCabang, reportType, ledgerRoute){
         Object.values(data).forEach(element => {
             if(parent == null){
                 body_coa += '<tr data-tt-id="' + element.header + '">';
@@ -442,15 +444,19 @@
             }else{
                 body_coa += '<td style="font-size:' + fontSize + 'px">' + element.header + ' (Rp)</td>';
                 listCabang.forEach(function(cabang){
-                    let format = 'total_' + cabang;
-                    body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" >' + formatCurr(formatNumberAsFloatFromDB(element[format].toFixed(2))) + '</td>';
+                    let format = 'total_' + cabang.new_nama_cabang;
+                    if(reportType.includes('detail') && reportType.includes('awal') == false){
+                        body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" ><a href="' + ledgerRoute + '?id_akun=' + element.akun + '&cabang=' + cabang.id_cabang + '&startdate=' + element.start_date + '&enddate=' + element.end_date + '&type=detail" target="_blank">' + formatCurr(formatNumberAsFloatFromDB(element[format].toFixed(2))) + '</a></td>';
+                    }else{
+                        body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" >' + formatCurr(formatNumberAsFloatFromDB(element[format].toFixed(2))) + '</td>';
+                    }
                 });
 
                 body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" >' + formatCurr(formatNumberAsFloatFromDB(element['total_all'].toFixed(2))) + '</td>';
             }
             body_coa += '</tr>';
             if(typeof(element.children) != "undefined"){
-                getTreetableConsolidation(element.children, element.header, fontSize, listCabang);
+                getTreetableConsolidation(element.children, element.header, fontSize, listCabang, reportType, ledgerRoute);
                 if(parent == null){
                     body_coa += '<tr>';
                 }else{
@@ -458,7 +464,7 @@
                 }
                 body_coa += '<td><b style="font-size:' + fontSize + 'px">Total ' + element.header + ' (Rp)</b></td>';
                 listCabang.forEach(function(cabang){
-                    let format = 'total_' + cabang;
+                    let format = 'total_' + cabang.new_nama_cabang;
                     body_coa += '<td class="text-right"><b style="font-size:' + fontSize + 'px">' + formatCurr(formatNumberAsFloatFromDB(element[format].toFixed(2))) + '</b></td>';
                 });
 
@@ -468,7 +474,8 @@
         });
     }
 
-    function getTreetable(data, parent, fontSize){
+    function getTreetable(data, parent, fontSize, reportType, ledgerRoute){
+        console.log(reportType);
         Object.values(data).forEach(element => {
             if(parent == null){
                 body_coa += '<tr data-tt-id="' + element.header + '">';
@@ -480,11 +487,15 @@
                 body_coa += '<td></td>';
             }else{
                 body_coa += '<td style="font-size:' + fontSize + 'px">' + element.header + ' (Rp)</td>';
-                body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" >' + formatCurr(formatNumberAsFloatFromDB(element.total.toFixed(2))) + '</td>';
+                if(reportType.includes("detail") && reportType.includes('awal') == false){
+                    body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" ><a href="' + ledgerRoute + '?id_akun=' + element.akun + '&cabang=' + element.id_cabang + '&startdate=' + element.start_date + '&enddate=' + element.end_date + '&type=detail" target="_blank">' + formatCurr(formatNumberAsFloatFromDB(element.total.toFixed(2))) + '</a></td>';
+                }else{
+                    body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" >' + formatCurr(formatNumberAsFloatFromDB(element.total.toFixed(2))) + '</td>';
+                }
             }
             body_coa += '</tr>';
             if(typeof(element.children) != "undefined"){
-                getTreetable(element.children, element.header, fontSize);
+                getTreetable(element.children, element.header, fontSize, reportType, ledgerRoute);
                 if(parent == null){
                     body_coa += '<tr>';
                 }else{

@@ -70,7 +70,7 @@
                 @if($nama_cabang == 'all')
                     <th width="40%">Neraca {{ $periode_table }}</th>
                     @foreach ($list_cabang as $cabang)
-                        <th width="20%">Total {{ $cabang }}</th>
+                        <th width="20%">Total {{ ucwords(str_replace('_', ' ', $cabang->new_nama_cabang)) }}</th>
                     @endforeach
                     <th width="20%">Total</th>
                 @else

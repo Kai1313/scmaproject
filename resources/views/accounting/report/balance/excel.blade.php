@@ -43,7 +43,7 @@
             @endif
             @if($data['nama_cabang'] == 'all')
                 @foreach ($data['list_cabang'] as $cabang)
-                    <th style="border: #000000 solid thin; font-size: 11; text-align: center; width: 160px; font-weight: bold; background-color: #CCCCCC">Total {{ $cabang }}</th>
+                    <th style="border: #000000 solid thin; font-size: 11; text-align: center; width: 160px; font-weight: bold; background-color: #CCCCCC">Total {{ ucwords(str_replace('_', ' ', $cabang->new_nama_cabang)) }}</th>
                 @endforeach
             @endif
             <th style="border: #000000 solid thin; font-size: 11; text-align: center; width: 160px; font-weight: bold; background-color: #CCCCCC">Total</th>

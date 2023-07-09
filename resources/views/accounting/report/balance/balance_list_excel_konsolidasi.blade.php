@@ -31,7 +31,7 @@
 
             @foreach ($list_cabang as $cabang)
                 @php
-                    $format = 'total_' . $cabang;
+                    $format = 'total_' . $cabang->new_nama_cabang;
                 @endphp
                 <td style="border: #000000 solid thin; font-size:10px; text-align:right;" >
                     {{round($item[$format], 2)}}
@@ -63,7 +63,7 @@
 
                 @foreach ($list_cabang as $cabang)
                     @php
-                        $format = 'total_' . $cabang;
+                        $format = 'total_' . $cabang->new_nama_cabang;
                     @endphp
                     <td  style="border: #000000 solid thin; text-align:right;font-size:10px;">
                         <b>{{round($item[$format], 2)}}</b>

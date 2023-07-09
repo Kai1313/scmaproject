@@ -20,7 +20,7 @@
             </td>
             @foreach ($list_cabang as $cabang)
                 @php
-                    $format = 'total_' . $cabang;
+                    $format = 'total_' . $cabang->new_nama_cabang;
                 @endphp
 
                 <td style="font-size:{{ $fontSize }}px; text-align:right;" >
@@ -45,7 +45,7 @@
                 </td>
                 @foreach ($list_cabang as $cabang)
                     @php
-                        $format = 'total_' . $cabang;
+                        $format = 'total_' . $cabang->new_nama_cabang;
                     @endphp
                     <td style="text-align:right;">
                         <b style="font-size:{{ $fontSize }}px">{{number_format($item[$format], 2, ",", ".")}}</b>
