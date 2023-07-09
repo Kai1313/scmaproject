@@ -512,7 +512,11 @@
                         name: 'keterangan',
                         width: '10%',
                         render: function(data, type, row) {
-                            return data.substring(0, 15)
+                            if(data != '' && data != null){
+                                return data.substring(0, 15)
+                            }else{
+                                return data;
+                            }
                         }
                     },
                     {
