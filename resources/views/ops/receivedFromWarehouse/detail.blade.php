@@ -171,6 +171,7 @@
         let details = oldDetails
 
         var resDataTable = $('#table-detail').DataTable({
+            paging: false,
             data: details,
             ordering: false,
             columns: [{
