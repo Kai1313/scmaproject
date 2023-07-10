@@ -5,11 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Accounting\JurnalDetail;
 use App\Models\Accounting\JurnalHeader;
 use App\Models\Accounting\TrxSaldo;
-use App\Models\Transaction\StokMinimalHitung;
 use App\Models\Master\Akun;
 use App\Models\Master\Cabang;
 use App\Models\Master\Setting;
 use App\Models\Master\Slip;
+use App\Models\Transaction\StokMinimalHitung;
 use App\Models\User;
 use App\Models\UserToken;
 use App\TransactionBalance;
@@ -2087,8 +2087,11 @@ class ApiController extends Controller
 
     public function transactionBalance(Request $req)
     {
-        //param : tipe_transaksi,id_transaksi,tanggal,ref_id,catatan,target(supplier/customer),dpp,ppn,uang_muka,biaya,payment_status,discount
-        $data = TransactionBalance::where('id_transaksi', $req->id_transaksi)->where('tipe_transaksi', $req->tipe_transaksi)->first();
+        //param : tipe_transaksi,id_transaksi,tanggal,ref_id,catatan,target(supplier/customer),dpp,ppn,uang_muka,biaya,payment_status,discount,branch_id
+        $data = TransactionBalance::where('id_cabang', $req->id_cabang)
+            ->where('id_transaksi', $req->id_transaksi)
+            ->where('tipe_transaksi', $req->tipe_transaksi)
+            ->first();
         try {
             DB::beginTransaction();
 
@@ -2106,6 +2109,7 @@ class ApiController extends Controller
                 'biaya' => handleNull($req->biaya),
                 'total' => $total,
                 'discount' => isset($req->discount) ? handleNull($req->discount) : 0,
+                'id_cabang' => $req->id_cabang,
             ];
 
             $newTipePembayaran = $req->tipe_pembayaran;
@@ -3193,18 +3197,19 @@ class ApiController extends Controller
         if ($debug !== false) {
             $respon['debug'] = $debug;
         }
-        self::storeStokMinHitung($setting,$request->id,$respon['total']);
+        self::storeStokMinHitung($setting, $request->id, $respon['total']);
         return response()->json($respon);
     }
 
-    private function storeStokMinHitung($setting, $id_barang, $jumlah){
+    private function storeStokMinHitung($setting, $id_barang, $jumlah)
+    {
         $bulan = date('m');
         $tahun = date('Y');
         StokMinimalHitung::updateOrInsert(
             [
                 'bulan' => $bulan,
                 'tahun' => $tahun,
-                'id_barang' => $id_barang
+                'id_barang' => $id_barang,
             ],
             [
                 'jumlah' => $jumlah,
