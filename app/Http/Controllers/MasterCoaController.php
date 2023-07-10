@@ -25,8 +25,13 @@ class MasterCoaController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        $cabang = Cabang::find(1);
         $data_cabang = getCabang();
+        
+        if (count($data_cabang) == 0) {
+            $cabang = Cabang::find(1);
+        }else{
+            $cabang = Cabang::find($data_cabang[0]->id_cabang);
+        }
 
         $data = [
             "pageTitle" => "SCA Accounting | Master CoA | List",

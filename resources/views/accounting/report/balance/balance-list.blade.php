@@ -21,7 +21,7 @@
         @endif
     </tr>
     @if(isset($item['children']))
-        @include('accounting.report.balance.balance-list',['data' => $item['children'], 'fontSize' => ($fontSize - 1), 'space' => ($space + 2)])
+        @include('accounting.report.balance.balance-list',['data' => $item['children'], 'fontSize' => ($fontSize), 'space' => ($space + 2)])
 
         @if(isset($item['children']))
             <tr>

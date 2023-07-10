@@ -49,10 +49,10 @@
     #table_balance_recap th,
     #table_balance_recap th{
         text-align: center !important;
-        font-size: 18px !important;
+        font-size: 13px !important;
         border-color: white !important;
         padding: 0.6rem 0.4rem;
-        font-weight: 600;
+        font-weight: 800;
     }
 
     #table_balance_recap td,
@@ -160,7 +160,7 @@
                                         <div class="table-responsive">
                                             <table id="table_balance_recap" class="table table-bordered table-striped">
                                                 <thead>
-                                                    <tr style="border: 1px solid #f4f4f4;">
+                                                    <tr style="border: 1px solid #f4f4f4;" id="head_row">
                                                         <th style="background-color: #ffffff;" width="70%"><span id="header_table">Neraca</span></th>
                                                         <th style="background-color: #ffffff;" width="30%">Total</th>
                                                     </tr>
@@ -247,14 +247,12 @@
                     let type = $("#type").val()
                     let param = "?id_cabang=" + cabang + "&year=" + year + "&month=" + month + "&type=" + type;
 
-                    $('#header_table').text('Neraca ' + monthNames[month-1] + ' ' + year);
-
                     switch (guid) {
                         case "view":
                             // Prepare spinner on button
                             viewButton.disabled = true;
                             viewButton.innerHTML = '<i class="fa fa-spinner fa-spin"></i>'
-                            view(param, type)
+                            view(param, type, month, year)
                             break;
                         case "excel":
                             // Prepare spinner on button
@@ -272,6 +270,8 @@
                         default:
                             break;
                     }
+
+                    $('#header_table').text('Neraca ' + monthNames[month-1] + ' ' + year);
                 }
             }
         },
@@ -331,10 +331,11 @@
 
     })
 
-    function view(param, type) {
+    function view(param, type, month, year) {
+        const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        let report_type = type;
         let route = "{{ Route('report-balance-populate') }}"
-        if (type == "recap") {
-            console.log('recap')
+
             $("#table_detail_div").hide()
             $("#table_recap_div").show()
             $('#table_balance_recap').treetable('destroy');
@@ -345,9 +346,31 @@
                 success: function(data) {
                     if (data.result) {
                         let data_coa = data.data;
+                        let list_cabang = null;
+                        let route_general_ledger = "{{ route('report-general-ledger') }}";
+                        if($('#cabang_input').val() == ''){
+                            data_coa = data.data.data;
+                            list_cabang = data.data.cabang;
+                        }
                         body_coa = '';
                         if(jQuery.isEmptyObject(data_coa) == false){
-                            getTreetable(data_coa, null, 18);
+                            console.log(data_coa);
+                            if(list_cabang == null){
+                                let html_thead = '<th style="background-color: #ffffff;" width="40%"><span id="header_table">Neraca ' + monthNames[month-1] + ' ' + year + '</span></th><th style="background-color: #ffffff;" width="70%">Total</th>';
+                                $('#head_row').html('');
+                                $('#head_row').html(html_thead);
+                                getTreetable(data_coa, null, 13, report_type, route_general_ledger);
+                            }else{
+                                let html_thead = '<th style="background-color: #ffffff;" width="40%"><span id="header_table">Neraca ' + monthNames[month-1] + ' ' + year + '</span></th>';
+                                list_cabang.forEach(function(cabang){
+                                    html_thead += '<th style="background-color: #ffffff;" width="20%">Total ' + capitalize(cabang.new_nama_cabang.replace('_', ' ')) + '</th>';
+                                });
+                                html_thead += '<th style="background-color: #ffffff;" width="20%">Total</th>';
+                                $('#head_row').html('');
+                                $('#head_row').html(html_thead);
+
+                                getTreetableConsolidation(data_coa, null, 13, list_cabang, report_type, route_general_ledger);
+                            }
                             $('#coa_table').html(body_coa);
                             $('#table_balance_recap').treetable({expandable: true}).treetable('expandAll');
                         }
@@ -366,39 +389,6 @@
                     }
                 }
             })
-        } else {
-            $("#table_recap_div").hide()
-            $("#table_recap_div").show()
-            $('#table_balance_recap').treetable('destroy');
-            $.ajax({
-                url: route + param,
-                type: "GET",
-                dataType: "JSON",
-                success: function(data) {
-                    if (data.result) {
-                        let data_coa = data.data;
-                        body_coa = '';
-                        if(jQuery.isEmptyObject(data_coa) == false){
-                            getTreetable(data_coa, null, 20);
-                            $('#coa_table').html(body_coa);
-                            $('#table_balance_recap').treetable({expandable: true}).treetable('expandAll');
-                        }
-                        else{
-                            body_coa += '<tr><td colspan="8" class="text-center">Empty Data</td></tr>';
-                            $('#coa_table').html(body_coa);
-                        }
-                    }
-                    else {
-                        Swal.fire({
-                            title: 'Error!',
-                            text: data.message,
-                            icon: 'error',
-                            confirmButtonText: 'Close'
-                        })
-                    }
-                }
-            })
-        }
         viewButton.disabled = false
         viewButton.innerHTML = '<i class="fa fa-eye"></i> View'
     }
@@ -438,7 +428,54 @@
         })
     }
 
-    function getTreetable(data, parent, fontSize){
+    function getTreetableConsolidation(data, parent, fontSize, listCabang, reportType, ledgerRoute){
+        Object.values(data).forEach(element => {
+            if(parent == null){
+                body_coa += '<tr data-tt-id="' + element.header + '">';
+            }else{
+                body_coa += '<tr data-tt-id="' + element.header + '" data-tt-parent-id="' + parent + '">';
+            }
+            if(typeof(element.children) != "undefined"){
+                body_coa += '<td><b style="font-size:' + fontSize + 'px">' + element.header + '</b></td>';
+                listCabang.forEach(function(cabang){
+                    body_coa += '<td></td>';
+                });
+                body_coa += '<td></td>';
+            }else{
+                body_coa += '<td style="font-size:' + fontSize + 'px">' + element.header + ' (Rp)</td>';
+                listCabang.forEach(function(cabang){
+                    let format = 'total_' + cabang.new_nama_cabang;
+                    if(reportType.includes('detail') && reportType.includes('awal') == false){
+                        body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" ><a href="' + ledgerRoute + '?id_akun=' + element.akun + '&cabang=' + cabang.id_cabang + '&startdate=' + element.start_date + '&enddate=' + element.end_date + '&type=detail" target="_blank">' + formatCurr(formatNumberAsFloatFromDB(element[format].toFixed(2))) + '</a></td>';
+                    }else{
+                        body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" >' + formatCurr(formatNumberAsFloatFromDB(element[format].toFixed(2))) + '</td>';
+                    }
+                });
+
+                body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" >' + formatCurr(formatNumberAsFloatFromDB(element['total_all'].toFixed(2))) + '</td>';
+            }
+            body_coa += '</tr>';
+            if(typeof(element.children) != "undefined"){
+                getTreetableConsolidation(element.children, element.header, fontSize, listCabang, reportType, ledgerRoute);
+                if(parent == null){
+                    body_coa += '<tr>';
+                }else{
+                    body_coa += '<tr data-tt-id="total-' + element.header + '" data-tt-parent-id="' + parent + '">';
+                }
+                body_coa += '<td><b style="font-size:' + fontSize + 'px">Total ' + element.header + ' (Rp)</b></td>';
+                listCabang.forEach(function(cabang){
+                    let format = 'total_' + cabang.new_nama_cabang;
+                    body_coa += '<td class="text-right"><b style="font-size:' + fontSize + 'px">' + formatCurr(formatNumberAsFloatFromDB(element[format].toFixed(2))) + '</b></td>';
+                });
+
+                body_coa += '<td class="text-right"><b style="font-size:' + fontSize + 'px">' + formatCurr(formatNumberAsFloatFromDB(element['total_all'].toFixed(2))) + '</b></td>';
+                body_coa += '</tr>';
+            }
+        });
+    }
+
+    function getTreetable(data, parent, fontSize, reportType, ledgerRoute){
+        console.log(reportType);
         Object.values(data).forEach(element => {
             if(parent == null){
                 body_coa += '<tr data-tt-id="' + element.header + '">';
@@ -450,18 +487,22 @@
                 body_coa += '<td></td>';
             }else{
                 body_coa += '<td style="font-size:' + fontSize + 'px">' + element.header + ' (Rp)</td>';
-                body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" >' + formatCurr(formatNumberAsFloatFromDB(element.total)) + '</td>';
+                if(reportType.includes("detail") && reportType.includes('awal') == false){
+                    body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" ><a href="' + ledgerRoute + '?id_akun=' + element.akun + '&cabang=' + element.id_cabang + '&startdate=' + element.start_date + '&enddate=' + element.end_date + '&type=detail" target="_blank">' + formatCurr(formatNumberAsFloatFromDB(element.total.toFixed(2))) + '</a></td>';
+                }else{
+                    body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" >' + formatCurr(formatNumberAsFloatFromDB(element.total.toFixed(2))) + '</td>';
+                }
             }
             body_coa += '</tr>';
             if(typeof(element.children) != "undefined"){
-                getTreetable(element.children, element.header, fontSize - 1);
+                getTreetable(element.children, element.header, fontSize, reportType, ledgerRoute);
                 if(parent == null){
                     body_coa += '<tr>';
                 }else{
                     body_coa += '<tr data-tt-id="total-' + element.header + '" data-tt-parent-id="' + parent + '">';
                 }
                 body_coa += '<td><b style="font-size:' + fontSize + 'px">Total ' + element.header + ' (Rp)</b></td>';
-                body_coa += '<td class="text-right"><b style="font-size:' + fontSize + 'px">' + formatCurr(formatNumberAsFloatFromDB(element.total)) + '</b></td>';
+                body_coa += '<td class="text-right"><b style="font-size:' + fontSize + 'px">' + formatCurr(formatNumberAsFloatFromDB(element.total.toFixed(2))) + '</b></td>';
                 body_coa += '</tr>';
             }
         });
@@ -489,6 +530,24 @@
         num = num.replace('.', ',');
         // console.log(num)
         return num;
+    }
+
+    function capitalize(string){
+        //split the above string into an array of strings
+        //whenever a blank space is encountered
+        const arr = string.split(" ");
+
+        //loop through each element of the array and capitalize the first letter.
+        for (var i = 0; i < arr.length; i++) {
+            arr[i] = arr[i].charAt(0).toUpperCase() + arr[i].slice(1);
+
+        }
+
+        //Join all the elements of the array back into a string
+        //using a blankspace as a separator
+        const str2 = arr.join(" ");
+
+        return str2;
     }
 
     $.fn.expandAll = function() {

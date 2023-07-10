@@ -26,7 +26,7 @@ class ReportGeneralLedgerController extends Controller
      */
     public function index(Request $request)
     {
-        if (checkUserSession($request, 'general_ledger', 'show') == false) {
+        if (checkUserSession($request, 'report_general_ledger', 'show') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
