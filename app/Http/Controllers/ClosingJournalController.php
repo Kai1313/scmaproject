@@ -9,6 +9,7 @@ use App\Models\Accounting\StockCorrectionHeader;
 use App\Models\Accounting\StockCorrectionDetail;
 use App\Models\Accounting\JurnalDetail;
 use App\Models\Accounting\JurnalHeader;
+use App\Models\Accounting\SaldoBalance;
 use App\Models\Accounting\TrxSaldo;
 use App\Models\Master\Akun;
 use App\Barang;
@@ -1117,7 +1118,7 @@ class ClosingJournalController extends Controller
                     $check = Closing::where("month", $month)->where("year", $year)->first();
                     if ($check) {
                         $delete = Closing::where("month", $month)->where("year", $year)->delete();
-            }
+                    }
                     return response()->json([
                         "result" => false,
                         "message" => "Jurnal Closing Koreksi Stok Gagal. Error when store Jurnal data on table detail",
@@ -1908,5 +1909,90 @@ class ClosingJournalController extends Controller
             "result"=>TRUE,
             "message"=>"Ajax function succeed"
         ]);
+    }
+
+    public function saldoTransfer(Request $request) {
+        try {
+            // Init Data
+            $id_cabang = $request->id_cabang;
+            $month = $request->month;
+            $year = $request->year;
+            $start_date = date("Y-m-d", strtotime("$year-$month-1"));
+            $end_date = date("Y-m-t", strtotime("$year-$month-1"));
+            $nextMonth = date("n", strtotime("+1 month $start_date"));
+            $nextYear = date("Y", strtotime("+1 month $start_date"));
+
+            DB::beginTransaction();
+            // Get all account that is shown 1
+            $dataAkun = Akun::where("id_cabang". $id_cabang)->where("isshown", 1)->get();
+            foreach ($dataAkun as $key => $akun) {
+                // Get sum debet dan sum kredit
+                $data_ledgers = JurnalDetail::join("jurnal_header", "jurnal_header.id_jurnal", "jurnal_detail.id_jurnal")
+                ->join("master_akun", "master_akun.id_akun", "jurnal_detail.id_akun")
+                ->where("jurnal_header.void", "0")
+                ->where("master_akun.id_cabang", $id_cabang)
+                ->whereBetween("jurnal_header.tanggal_jurnal", [$start_date, $end_date])
+                ->selectRaw("jurnal_header.id_jurnal, master_akun.id_cabang, master_akun.id_akun, master_akun.kode_akun, master_akun.nama_akun, IFNULL(SUM(jurnal_detail.debet), 0) as debet, IFNULL(SUM(jurnal_detail.credit), 0) as kredit")->groupBy("jurnal_detail.id_akun");
+                $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")->where("id_akun", $value->id_akun)->where("id_cabang", $value->id_cabang)->where("bulan", $month)->where("tahun", $year)->first();
+                $data_saldo_ledgers = JurnalDetail::selectRaw("IFNULL(SUM(jurnal_detail.debet), 0) as debet, IFNULL(SUM(jurnal_detail.credit), 0) as kredit")
+                ->join("jurnal_header", "jurnal_header.id_jurnal", "jurnal_detail.id_jurnal")
+                ->join("master_akun", "master_akun.id_akun", "jurnal_detail.id_akun")
+                ->where("jurnal_detail.id_akun", $akun->id_akun)
+                ->where("jurnal_header.id_cabang", $akun->id_cabang)
+                ->where("jurnal_header.tanggal_jurnal", ">=", $start_date)
+                ->where("jurnal_header.tanggal_jurnal", "<", $start_date)
+                ->groupBy("jurnal_detail.id_akun")->first();
+                $saldo_debet = ($saldo)?$saldo->saldo_debet:0;
+                $saldo_kredit = ($saldo)?$saldo->saldo_kredit:0;
+                $debet = ($data_saldo_ledgers)?$data_saldo_ledgers->debet:0;
+                $kredit = ($data_saldo_ledgers)?$data_saldo_ledgers->kredit:0;
+                // $saldo_awal = ($saldo_debet - $saldo_kredit) + ($debet - $kredit);
+                // $saldo_akhir = $saldo_awal + $data_ledgers->debet - $data_ledgers->kredit;
+                $saldo_debet = $saldo_debet + $debet + $data_ledgers->debet;
+                $saldo_kredit = $saldo_kredit + $kredit + $data_ledgers->kredit;
+                
+                // Insert into saldo balance
+                $saldo_balance = new SaldoBalance;
+                $saldo_balance->id_cabang = $akun->id_cabang;
+                $saldo_balance->id_akun = $akun->id_akun;
+                $saldo_balance->bulan = $nextMonth;
+                $saldo_balance->tahun = $nextYear;
+                $saldo_balance->debet = $saldo_debet;
+                $saldo_balance->credit = $saldo_kredit;
+                if (!$saldo_balance->save()) {
+                    // Revert post closing
+                    DB::rollback();
+                    $check = Closing::where("month", $month)->where("year", $year)->first();
+                    if ($check) {
+                        $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                    }
+                    return response()->json([
+                        "result" => false,
+                        "message" => "Jurnal Closing Transfer Saldo Gagal.",
+                    ]);
+                }
+            }
+            DB::commit();
+            return response()->json([
+                "result"=>TRUE,
+                "message"=>"Successfully proceed closing journal stock correction"
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            $message = "Error when transfer saldo";
+            // Revert post closing
+            $month = $request->month;
+            $year = $request->year;
+            $check = Closing::where("month", $month)->where("year", $year)->first();
+            if ($check) {
+                $delete = Closing::where("month", $month)->where("year", $year)->delete();
+            }
+            Log::error($message);
+            Log::error($e);
+            return response()->json([
+                "result" => FALSE,
+                "message" => $message
+            ]);
+        }
     }
 }
