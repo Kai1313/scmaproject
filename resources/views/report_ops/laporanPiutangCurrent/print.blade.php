@@ -46,6 +46,7 @@
         <tr>
             <td>Cabang : {{ $cabang }}</td>
             <td>Tanggal : {{ $date }}</td>
+            <td>Pelanggan : {{ $pelanggan }}</td>
         </tr>
     </table>
     <table width="100%" class="table">
@@ -57,8 +58,7 @@
                 <th>Tgl Faktur</th>
                 <th>Jatuh Tempo</th>
                 <th>Nilai Faktur</th>
-                <th>Piutang Asing</th>
-                <th>Piutang Pajak</th>
+                <th>Piutang</th>
                 <th>Umur</th>
             </tr>
         </thead>
@@ -72,7 +72,6 @@
                     <td>{{ $data->top }}</td>
                     <td class="number">{{ formatNumber($data->mtotal_penjualan, 2) }}</td>
                     <td class="number">{{ formatNumber($data->sisa, 2) }}</td>
-                    <td class="number">{{ formatNumber($data->sisa_tax, 2) }}</td>
                     <td class="number">{{ $data->aging }}</td>
                 </tr>
             @endforeach

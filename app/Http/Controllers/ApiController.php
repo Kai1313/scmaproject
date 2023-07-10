@@ -3173,6 +3173,9 @@ class ApiController extends Controller
     {
         $setting = Setting::where("id_cabang", 1)->where("code", 'like', "Stok Min %")->select('code', 'value2')->get()->toArray();
         $setting = array_column($setting, 'value2', 'code');
+        $today = Carbon::today();
+        $setting['penj_sampai'] = $today->toDateString();
+        $setting['penj_dari'] = $today->subMonths(intval($setting['Stok Min Range']))->toDateString();
         session(['stokMin' => $setting]);
         \DB::unprepared(\DB::raw("DROP TEMPORARY TABLE IF EXISTS tTotalPenjualanInfo"));
         \DB::insert(\DB::raw("CREATE TEMPORARY TABLE tTotalPenjualanInfo(id_barang int(11) NOT NULL,nama_barang varchar(200), total_jual decimal(15,6),
@@ -3192,7 +3195,7 @@ class ApiController extends Controller
             $total *= floatval($setting['Stok Min Lokal']);
         }
         $respon = [
-            'total' => round($total, 6),
+            'total' => round($total, 4),
         ];
         if ($debug !== false) {
             $respon['debug'] = $debug;
@@ -3205,20 +3208,42 @@ class ApiController extends Controller
     {
         $bulan = date('m');
         $tahun = date('Y');
-        StokMinimalHitung::updateOrInsert(
-            [
+        try {
+            StokMinimalHitung::updateOrInsert(
+                [
+                    'bulan' => $bulan,
+                    'tahun' => $tahun,
+                    'id_barang' => $id_barang,
+                ],
+                [
+                    'jumlah' => $jumlah,
+                    'range' => $setting['Stok Min Range'],
+                    'persen' => $setting['Stok Min Persen'],
+                    'lokal' => $setting['Stok Min Lokal'],
+                    'import' => $setting['Stok Min Import'],
+                    'penj_dari' => $setting['penj_dari'],
+                    'penj_sampai' => $setting['penj_sampai'],
+                ]
+            );
+            $stokHeader = DB::table('stok_minimal_hitung')->where([
                 'bulan' => $bulan,
                 'tahun' => $tahun,
                 'id_barang' => $id_barang,
-            ],
-            [
-                'jumlah' => $jumlah,
-                'range' => $setting['Stok Min Range'],
-                'persen' => $setting['Stok Min Persen'],
-                'lokal' => $setting['Stok Min Lokal'],
-                'import' => $setting['Stok Min Import'],
-            ]
-        );
+            ])->first();
+            if (!empty($stokHeader)) {
+                DB::table('stok_minimal_hitung_detil')->where('stok_minimal_hitung_id', $stokHeader->id)->delete();
+                DB::table('stok_minimal_hitung_detil')
+                    ->insert(
+                        DB::table('tTotalPenjualanInfo')
+                            ->selectRaw("{$stokHeader->id} as stok_minimal_hitung_id,id_barang,nama_barang,total_jual,total_jual_per_bulan,plus_persen,per_bulan_plus_persen,avg_prorate,pemakaian_per_barang_jadi")
+                            ->get()->map(function ($item) {return (array) $item;})->toArray()
+                    );
+            }
+        } catch (\Exception $e) {
+            $message = "Error when storing stok minimal hitung";
+            Log::error($message);
+            Log::error($e);
+        }
     }
 
     private function getSalesWithProrate($id_barang, $value)
@@ -3243,7 +3268,7 @@ class ApiController extends Controller
             ->join('penjualan_detail AS pd', 'pd.id_penjualan', '=', 'p.id_penjualan')
             ->join('barang AS brg', 'brg.id_barang', '=', 'pd.id_barang')
             ->where('pd.id_barang', $id_barang)
-            ->whereRaw('p.tanggal_penjualan BETWEEN "2021-12-01" AND "2023-06-08"')->get()->toArray();
+            ->whereRaw('p.tanggal_penjualan BETWEEN "' . $stokMin['penj_dari'] . '" AND "' . $stokMin['penj_sampai'] . '"')->get()->toArray();
         if (!empty($jual[0]->total_jual)) {
             $persen = floatval($jual[0]->total_jual_per_bulan) * (floatval($stokMin['Stok Min Persen']) / 100);
             $plusPersen = floatval($jual[0]->total_jual_per_bulan) + $persen;

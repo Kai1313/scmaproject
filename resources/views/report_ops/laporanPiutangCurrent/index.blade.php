@@ -34,7 +34,7 @@
         <div class="box">
             <div class="box-header">
                 <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <label>Cabang</label>
                         <div class="form-group">
                             <select name="id_cabang" class="form-control select2 trigger-change">
@@ -44,7 +44,14 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-5">
+                    <div class="col-md-2">
+                        <label>Tanggal</label>
+                        <div class="form-group">
+                            <input type="date" name="dateReport" class="form-control trigger-change"
+                                value="{{ date('Y-m-d') }}">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
                         <label>Pelanggan</label>
                         <div class="form-group">
                             <select name="id_pelanggan" class="form-control select2 trigger-change">
@@ -54,25 +61,22 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <label>Tanggal</label>
-                        <div class="form-group">
-                            <input type="date" name="dateReport" class="form-control trigger-change"
-                                value="{{ date('Y-m-d') }}">
+                    <div class="col-md-4">
+                        <label style="width:100%;"> &nbsp</label>
+                        <div class="form-group pull-right">
+                            <a href="{{ route('report_receiveable-print') }}" target="_blank"
+                                class="btn btn-danger btn-sm btn-flat btn-action">
+                                <i class="glyphicon glyphicon-print"></i> Print
+                            </a>
+                            <a href="{{ route('report_receiveable-excel') }}"
+                                class="btn btn-success btn-sm btn-flat btn-action">
+                                <i class="fa fa-file-excel-o"></i> Excel
+                            </a>
+                            <a href="javascript:void(0)" class="btn btn-default btn-sm btn-flat btn-view-action">
+                                <i class="glyphicon glyphicon-eye-open"></i> View
+                            </a>
                         </div>
                     </div>
-                </div>
-                <div class="pull-right">
-                    <a href="{{ route('report_receiveable-print') }}" target="_blank"
-                        class="btn btn-danger btn-sm btn-flat btn-action">
-                        <i class="glyphicon glyphicon-print"></i> Print
-                    </a>
-                    <a href="{{ route('report_receiveable-excel') }}" class="btn btn-success btn-sm btn-flat btn-action">
-                        <i class="fa fa-file-excel-o"></i> Excel
-                    </a>
-                    <a href="javascript:void(0)" class="btn btn-default btn-sm btn-flat btn-view-action">
-                        <i class="glyphicon glyphicon-eye-open"></i> View
-                    </a>
                 </div>
             </div>
             <div class="box-body">
@@ -202,9 +206,6 @@
                 }, {
                     data: 'aging',
                     name: 'aging',
-                    render: function(data) {
-                        return data ? formatNumber(data, 2) : 0
-                    },
                     className: 'text-right'
                 }, ]
             });

@@ -1,12 +1,13 @@
 <?php
 
 namespace App\Http\Controllers\Report;
+
 use App\Exports\ReportLaporanHutangCurrentExport;
 use App\Http\Controllers\Controller;
 use DB;
+use Excel;
 use Illuminate\Http\Request;
 use PDF;
-use Excel;
 use Yajra\DataTables\DataTables;
 
 class LaporanHutangCurrentController extends Controller
@@ -27,13 +28,21 @@ class LaporanHutangCurrentController extends Controller
         ]);
     }
 
-    function print(Request $request) {
+    public function print(Request $request) {
         if (checkAccessMenu('laporan_hutang_current', 'print') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
         $data = $this->getData($request, 'print');
-        // dd($data);
+        $date = $request->dateReport;
+        $idPemasok = $request->id_pemasok;
+        $pemasok = 'Semua Pemasok';
+        if ($idPemasok != 'all') {
+            $result = DB::table('pemasok')->where('id_pemasok', $idPemasok)->first();
+            if (!empty($result)) {
+                $pemasok = "({$result->kode_pemasok}) {$result->nama_pemasok}";
+            }
+        }
         $arrayCabang = [];
         foreach (session()->get('access_cabang') as $c) {
             $arrayCabang[$c['id']] = $c['text'];
@@ -48,7 +57,8 @@ class LaporanHutangCurrentController extends Controller
         $array = [
             "datas" => $data,
             'cabang' => implode(', ', $sCabang),
-            'date' => date('Y-m-d'),
+            'date' => $date,
+            'pemasok' => $pemasok,
             'type' => $request->type,
         ];
 
@@ -64,6 +74,15 @@ class LaporanHutangCurrentController extends Controller
         }
 
         $data = $this->getData($request, 'print');
+        $date = $request->dateReport;
+        $idPemasok = $request->id_pemasok;
+        $pemasok = 'Semua Pemasok';
+        if ($idPemasok != 'all') {
+            $result = DB::table('pemasok')->where('id_pemasok', $idPemasok)->first();
+            if (!empty($result)) {
+                $pemasok = "({$result->kode_pemasok}) {$result->nama_pemasok}";
+            }
+        }
         $arrayCabang = [];
         foreach (session()->get('access_cabang') as $c) {
             $arrayCabang[$c['id']] = $c['text'];
@@ -78,7 +97,8 @@ class LaporanHutangCurrentController extends Controller
         $array = [
             "datas" => $data,
             'cabang' => implode(', ', $sCabang),
-            'date' => date('Y-m-d'),
+            'date' => $date,
+            'pemasok' => $pemasok,
             'type' => $request->type,
         ];
         return Excel::download(new ReportLaporanHutangCurrentExport('report_ops.laporanHutangCurrent.excel', $array), 'LaporanHutangSaatIni.xlsx');
@@ -86,25 +106,48 @@ class LaporanHutangCurrentController extends Controller
 
     public function getData($request, $type)
     {
-        $date = explode(' - ', $request->date);
+        $date = $request->dateReport;
+        $idPemasok = $request->id_pemasok;
         $idCabang = explode(',', $request->id_cabang);
 
+        $joinJurnal = DB::table('jurnal_header as jh')
+            ->select('jd.id_transaksi', DB::raw('ifnull(sum(jd.debet-jd.credit),0) as Total'))
+            ->leftJoin('jurnal_detail AS jd', function ($join) {
+                $join->on('jh.id_jurnal', '=', 'jd.id_jurnal')
+                    ->on(DB::Raw("ifnull(jd.id_transaksi,'')"), '<>', DB::Raw("''"));
+            })
+            ->leftJoin('saldo_transaksi AS st', 'st.id_transaksi', 'jd.id_transaksi')
+            ->where('jh.void', 0)
+            ->where('jh.tanggal_jurnal', '<=', $date)
+            ->whereIn('st.tipe_transaksi', ['Pembelian', 'Retur Pembelian'])
+            ->groupBy('jd.id_transaksi');
+        if ($idPemasok != 'all') {
+            $joinJurnal->where('st.id_pemasok', $idPemasok);
+        }
+
         $data = DB::table('saldo_transaksi as a')->Select(
-            'p.kode_pemasok',
-            'p.nama_pemasok',
+            'pe.kode_pemasok',
+            'pe.nama_pemasok',
             'a.id_transaksi',
             'p2.tanggal_pembelian',
-            DB::Raw('DATE_ADD(p2.tanggal_pembelian, INTERVAL p2.tempo_hari_pembelian DAY) as top'),
-            'p2.mtotal_pembelian',
-            'a.sisa',
-            DB::Raw('0 as sisa_tax'),
-            DB::Raw('DATEDIFF(NOW(),DATE_ADD(p2.tanggal_pembelian, INTERVAL p2.tempo_hari_pembelian DAY)) as aging'))
-            ->join('pemasok as p', 'p.id_pemasok', 'a.id_pemasok')
-            ->join('pembelian as p2', 'a.id_transaksi', 'p2.nama_pembelian')
-            ->where('a.sisa','>', 0)
-            ->whereIn('a.tipe_transaksi',['Pembelian','Retur Pembelian'])
-            ->whereIn('p2.id_cabang',$idCabang)
-            ->orderBy('p.nama_pemasok', 'asc');
+            DB::raw('DATE_ADD(p2.tanggal_pembelian, INTERVAL p2.tempo_hari_pembelian DAY) as top'),
+            'a.total as mtotal_pembelian',
+            DB::raw('a.total-ifnull(p.total,0) as sisa'),
+            DB::raw('ifnull(p.Total,0) as bayar'),
+            DB::raw('DATEDIFF("' . $date . '",DATE(DATE_ADD(p2.tanggal_pembelian, INTERVAL p2.tempo_hari_pembelian DAY))) as aging'))
+            ->leftJoinSub($joinJurnal, 'p', function ($join) {
+                $join->on('a.id_transaksi', '=', 'p.id_transaksi');
+            })
+            ->leftJoin('pemasok as pe', 'pe.id_pemasok', 'a.id_pemasok')
+            ->leftJoin('pembelian as p2', 'a.id_transaksi', 'p2.nama_pembelian')
+            ->where('a.tanggal', '<=', $date)
+            ->where(DB::raw('a.total-ifnull(p.total,0)'), '<>', 0)
+            ->whereIn('a.tipe_transaksi', ['Pembelian', 'Retur Pembelian'])
+            ->whereIn('p2.id_cabang', $idCabang)
+            ->orderBy('pe.nama_pemasok', 'asc');
+        if ($idPemasok != 'all') {
+            $data->where('a.id_pemasok', $idPemasok);
+        }
 
         if ($type == 'datatable') {
             return Datatables::of($data)

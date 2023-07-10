@@ -22,10 +22,12 @@
                 </td>
                 <td style="font-weight:bold;border: #000000 solid thin;">Cabang : </td>
                 <td style="font-weight:bold;border: #000000 solid thin;">Tanggal : </td>
+                <td style="font-weight:bold;border: #000000 solid thin;">Pemasok : </td>
             </tr>
             <tr>
                 <td style="border: #000000 solid thin;">{{ $cabang }}</td>
                 <td style="border: #000000 solid thin;">{{ $date }}</td>
+                <td style="border: #000000 solid thin;">{{ $pemasok }}</td>
             </tr>
             <tr></tr>
         </tbody>
@@ -38,8 +40,7 @@
                 <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Tgl Faktur</th>
                 <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Jatuh Tempo</th>
                 <th style="border: #000000 solid thin;width:200px;text-align:center;font-weight:bold;">Nilai Faktur</th>
-                <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Hutang Asing</th>
-                <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Hutang Pajak</th>
+                <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Hutang</th>
                 <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Umur</th>
             </tr>
         </thead>
@@ -54,8 +55,6 @@
                     <td style="border: #000000 solid thin;text-align:right;">
                         {{ number_format($data->mtotal_pembelian, 2) }}</td>
                     <td style="border: #000000 solid thin;text-align:right;">{{ number_format($data->sisa, 2) }}</td>
-                    <td style="border: #000000 solid thin;text-align:right;">{{ number_format($data->sisa_tax, 2) }}
-                    </td>
                     <td style="border: #000000 solid thin;">{{ $data->aging }}</td>
                 </tr>
             @endforeach
