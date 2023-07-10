@@ -21,7 +21,7 @@
         @endif
     </tr>
     @if(isset($item['children']))
-        @include('accounting.report.profit_loss.profit-loss-list',['data' => $item['children'], 'fontSize' => ($fontSize - 1), 'space' => ($space + 2)])
+        @include('accounting.report.profit_loss.profit_loss-list',['data' => $item['children'], 'fontSize' => ($fontSize), 'space' => ($space + 2)])
 
         @if(isset($item['children']))
             <tr>

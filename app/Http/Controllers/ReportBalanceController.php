@@ -158,9 +158,11 @@ class ReportBalanceController extends Controller
             'list_cabang' => $list_cabang,
             'periode_table' => $monthName[$month-1] . ' ' . $year,
             'periode' => date('M Y', strtotime($year . '-' . $month . '-1')),
-            'type' => ucwords(str_replace('_', ' ', $type)),
+            'type' => str_replace('_', ' ', $type),
             'data' => $data_balance
         ];
+
+        // dd($data);
 
         // dd(count($data["data"]));
         if (!empty($data["data"])) {
