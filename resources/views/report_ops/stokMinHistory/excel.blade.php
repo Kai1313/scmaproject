@@ -12,7 +12,7 @@
     <table width="100%">
         <tbody>
             <tr>
-                <td colspan="6" style="text-align:center;font-weight:bold;font-size:20px;">
+                <td colspan="7" style="text-align:center;font-weight:bold;font-size:20px;">
                     DATA PERHITUNGAN STOK MINIMAL BULAN {{ $historyHeader->bulan . ' ' . $historyHeader->tahun }}
                 </td>
             </tr>
@@ -64,6 +64,7 @@
                 <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Kenaikan</th>
                 <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Rata-rata +
                     Kenaikan</th>
+                <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">BOM</th>
                 <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Kebutuhan Per
                     Bulan</th>
             </tr>
@@ -87,11 +88,13 @@
                     <td style="border: #000000 solid thin;text-align:right;">
                         {{ number_format($data->per_bulan_plus_persen, 4) }}</td>
                     <td style="border: #000000 solid thin;text-align:right;">
+                        {{ number_format($data->avg_prorate, 4) }}</td>
+                    <td style="border: #000000 solid thin;text-align:right;">
                         {{ number_format($data->pemakaian_per_barang_jadi, 4) }}</td>
                 </tr>
             @endforeach
             <tr>
-                <td colspan=5 style="border: #000000 solid thin;text-align:right;">
+                <td colspan=6 style="border: #000000 solid thin;text-align:right;">
                     Total Kebutuhan Per Bulan</td>
                 <td style="border: #000000 solid thin;text-align:right;font-weight:bold">
                     {{ number_format($total, 4) }}</td>
