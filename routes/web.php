@@ -267,6 +267,7 @@ Route::prefix('transaction')->group(function () {
         Route::get('/usage', 'ClosingJournalController@usage')->name('transaction-closing-journal-usage');
         Route::get('/sales', 'ClosingJournalController@sales')->name('transaction-closing-journal-sales');
         Route::get('/depreciation', 'ClosingJournalController@depreciation')->name('transaction-closing-journal-depreciation');
+        Route::get('/saldo_transfer', 'ClosingJournalController@saldoTransfer')->name('transaction-closing-journal-saldo-transfer');
     });
 });
 

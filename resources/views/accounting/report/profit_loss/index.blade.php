@@ -47,16 +47,16 @@
     }
 
     #table_balance_recap th,
-    #table_balance_recap th{
+    #table_balance_recap th {
         text-align: center !important;
-        font-size: 18px !important;
+        font-size: 13px !important;
         border-color: white !important;
         padding: 0.6rem 0.4rem;
-        font-weight: 600;
+        font-weight: 800;
     }
 
     #table_balance_recap td,
-    #table_balance_recap td{
+    #table_balance_recap td {
         padding: 0.5rem !important;
     }
 </style>
@@ -138,8 +138,10 @@
                                     <div class="form-group">
                                         <label>Tipe</label>
                                         <select name="type" id="type" class="form-control select2">
-                                            <option value="recap">Rekap</option>
-                                            <option value="detail">Rekap Detail</option>
+                                            <option value="recap">Laba Rugi</option>
+                                            <option value="detail">Laba Rugi Detail</option>
+                                            <option value="awal">Laba Rugi Awal</option>
+                                            <option value="awal_detail">Laba Rugi Awal Detail</option>
                                         </select>
                                     </div>
                                 </div>
@@ -158,8 +160,8 @@
                                         <div class="table-responsive">
                                             <table id="table_balance_recap" class="table table-bordered table-striped">
                                                 <thead>
-                                                    <tr style="border: 1px solid #f4f4f4;">
-                                                        <th style="background-color: #ffffff;" width="70%">Header</th>
+                                                    <tr style="border: 1px solid #f4f4f4;" id="head_row">
+                                                        <th style="background-color: #ffffff;" width="70%"><span id="header_table">Laba Rugi</span></th>
                                                         <th style="background-color: #ffffff;" width="30%">Total</th>
                                                     </tr>
                                                 </thead>
@@ -169,23 +171,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                {{-- <div class="col-md-12" id="table_detail_div">
-                                    <div class="box-body">
-                                        <div class="table-responsive">
-                                            <table id="table_balance_detail" class="table table-bordered table-striped">
-                                                <thead>
-                                                    <tr style="border: 1px solid #f4f4f4;">
-                                                        <th style="background-color: #ffffff;" width="15%">Header</th>
-                                                        <th style="background-color: #ffffff;" width="20%">Akun</th>
-                                                        <th style="background-color: #ffffff;" width="65%">Total</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="coa_table_detail">
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div> --}}
                             </div>
                         </form>
                     </div>
@@ -255,17 +240,19 @@
             callback: {
                 onSubmit: function(node, formData, event) {
                     // Init data
+                    const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
                     let cabang = $("#cabang_input").val()
                     let year = $("#year").val()
                     let month = $("#month").val()
                     let type = $("#type").val()
-                    let param = "?id_cabang=" + cabang + "&year=" + year + "&month=" + month + "&type=" + type
+                    let param = "?id_cabang=" + cabang + "&year=" + year + "&month=" + month + "&type=" + type;
+
                     switch (guid) {
                         case "view":
                             // Prepare spinner on button
                             viewButton.disabled = true;
                             viewButton.innerHTML = '<i class="fa fa-spinner fa-spin"></i>'
-                            view(param, type)
+                            view(param, type, month, year)
                             break;
                         case "excel":
                             // Prepare spinner on button
@@ -283,6 +270,8 @@
                         default:
                             break;
                     }
+
+                    $('#header_table').text('Laba Rugi ' + monthNames[month - 1] + ' ' + year);
                 }
             }
         },
@@ -342,74 +331,64 @@
 
     })
 
-    function view(param, type) {
+    function view(param, type, month, year) {
+        const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        let report_type = type;
         let route = "{{ Route('report-profit-loss-populate') }}"
-        if (type == "recap") {
-            console.log('recap')
-            $("#table_detail_div").hide()
-            $("#table_recap_div").show()
-            $('#table_balance_recap').treetable('destroy');
-            $.ajax({
-                url: route + param,
-                type: "GET",
-                dataType: "JSON",
-                success: function(data) {
-                    if (data.result) {
-                        let data_coa = data.data;
-                        body_coa = '';
-                        if(jQuery.isEmptyObject(data_coa) == false){
-                            getTreetable(data_coa, null, 18);
-                            $('#coa_table').html(body_coa);
-                            $('#table_balance_recap').treetable({expandable: true}).treetable('expandAll');
-                        }
-                        else{
-                            body_coa += '<tr><td colspan="8" class="text-center">Empty Data</td></tr>';
-                            $('#coa_table').html(body_coa);
-                        }
+
+        $("#table_detail_div").hide()
+        $("#table_recap_div").show()
+        $('#table_balance_recap').treetable('destroy');
+        $.ajax({
+            url: route + param,
+            type: "GET",
+            dataType: "JSON",
+            success: function(data) {
+                if (data.result) {
+                    let data_coa = data.data;
+                    let list_cabang = null;
+                    let route_general_ledger = "{{ route('report-general-ledger') }}";
+                    if ($('#cabang_input').val() == '') {
+                        data_coa = data.data.data;
+                        list_cabang = data.data.cabang;
                     }
-                    else {
-                        Swal.fire({
-                            title: 'Error!',
-                            text: data.message,
-                            icon: 'error',
-                            confirmButtonText: 'Close'
-                        })
+                    body_coa = '';
+                    if (jQuery.isEmptyObject(data_coa) == false) {
+                        console.log(data_coa);
+                        if (list_cabang == null) {
+                            let html_thead = '<th style="background-color: #ffffff;" width="40%"><span id="header_table">Laba Rugi ' + monthNames[month - 1] + ' ' + year + '</span></th><th style="background-color: #ffffff;" width="70%">Total</th>';
+                            $('#head_row').html('');
+                            $('#head_row').html(html_thead);
+                            getTreetable(data_coa, null, 13, report_type, route_general_ledger);
+                        } else {
+                            let html_thead = '<th style="background-color: #ffffff;" width="40%"><span id="header_table">Laba Rugi ' + monthNames[month - 1] + ' ' + year + '</span></th>';
+                            list_cabang.forEach(function(cabang) {
+                                html_thead += '<th style="background-color: #ffffff;" width="20%">Total ' + capitalize(cabang.new_nama_cabang.replace('_', ' ')) + '</th>';
+                            });
+                            html_thead += '<th style="background-color: #ffffff;" width="20%">Total</th>';
+                            $('#head_row').html('');
+                            $('#head_row').html(html_thead);
+
+                            getTreetableConsolidation(data_coa, null, 13, list_cabang, report_type, route_general_ledger);
+                        }
+                        $('#coa_table').html(body_coa);
+                        $('#table_balance_recap').treetable({
+                            expandable: true
+                        }).treetable('expandAll');
+                    } else {
+                        body_coa += '<tr><td colspan="8" class="text-center">Empty Data</td></tr>';
+                        $('#coa_table').html(body_coa);
                     }
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: data.message,
+                        icon: 'error',
+                        confirmButtonText: 'Close'
+                    })
                 }
-            })
-        } else {
-            $("#table_recap_div").hide()
-            $("#table_recap_div").show()
-            $('#table_balance_recap').treetable('destroy');
-            $.ajax({
-                url: route + param,
-                type: "GET",
-                dataType: "JSON",
-                success: function(data) {
-                    if (data.result) {
-                        let data_coa = data.data;
-                        body_coa = '';
-                        if(jQuery.isEmptyObject(data_coa) == false){
-                            getTreetable(data_coa, null, 20);
-                            $('#coa_table').html(body_coa);
-                            $('#table_balance_recap').treetable({expandable: true}).treetable('expandAll');
-                        }
-                        else{
-                            body_coa += '<tr><td colspan="8" class="text-center">Empty Data</td></tr>';
-                            $('#coa_table').html(body_coa);
-                        }
-                    }
-                    else {
-                        Swal.fire({
-                            title: 'Error!',
-                            text: data.message,
-                            icon: 'error',
-                            confirmButtonText: 'Close'
-                        })
-                    }
-                }
-            })
-        }
+            }
+        })
         viewButton.disabled = false
         viewButton.innerHTML = '<i class="fa fa-eye"></i> View'
     }
@@ -449,30 +428,81 @@
         })
     }
 
-    function getTreetable(data, parent, fontSize){
+    function getTreetableConsolidation(data, parent, fontSize, listCabang, reportType, ledgerRoute) {
         Object.values(data).forEach(element => {
-            if(parent == null){
+            if (parent == null) {
                 body_coa += '<tr data-tt-id="' + element.header + '">';
-            }else{
+            } else {
                 body_coa += '<tr data-tt-id="' + element.header + '" data-tt-parent-id="' + parent + '">';
             }
-            if(typeof(element.children) != "undefined"){
+            if (typeof(element.children) != "undefined") {
                 body_coa += '<td><b style="font-size:' + fontSize + 'px">' + element.header + '</b></td>';
+                listCabang.forEach(function(cabang) {
+                    body_coa += '<td></td>';
+                });
                 body_coa += '<td></td>';
-            }else{
+            } else {
                 body_coa += '<td style="font-size:' + fontSize + 'px">' + element.header + ' (Rp)</td>';
-                body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" >' + formatCurr(formatNumberAsFloatFromDB(element.total)) + '</td>';
+                listCabang.forEach(function(cabang) {
+                    let format = 'total_' + cabang.new_nama_cabang;
+                    if (reportType.includes('detail') && reportType.includes('awal') == false) {
+                        body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" ><a href="' + ledgerRoute + '?id_akun=' + element.akun + '&cabang=' + cabang.id_cabang + '&startdate=' + element.start_date + '&enddate=' + element.end_date + '&type=detail" target="_blank">' + formatCurr(formatNumberAsFloatFromDB(element[format].toFixed(2))) + '</a></td>';
+                    } else {
+                        body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" >' + formatCurr(formatNumberAsFloatFromDB(element[format].toFixed(2))) + '</td>';
+                    }
+                });
+
+                body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" >' + formatCurr(formatNumberAsFloatFromDB(element['total_all'].toFixed(2))) + '</td>';
             }
             body_coa += '</tr>';
-            if(typeof(element.children) != "undefined"){
-                getTreetable(element.children, element.header, fontSize - 1);
-                if(parent == null){
+            if (typeof(element.children) != "undefined") {
+                getTreetableConsolidation(element.children, element.header, fontSize, listCabang, reportType, ledgerRoute);
+                if (parent == null) {
                     body_coa += '<tr>';
-                }else{
+                } else {
                     body_coa += '<tr data-tt-id="total-' + element.header + '" data-tt-parent-id="' + parent + '">';
                 }
                 body_coa += '<td><b style="font-size:' + fontSize + 'px">Total ' + element.header + ' (Rp)</b></td>';
-                body_coa += '<td class="text-right"><b style="font-size:' + fontSize + 'px">' + formatCurr(formatNumberAsFloatFromDB(element.total)) + '</b></td>';
+                listCabang.forEach(function(cabang) {
+                    let format = 'total_' + cabang.new_nama_cabang;
+                    body_coa += '<td class="text-right"><b style="font-size:' + fontSize + 'px">' + formatCurr(formatNumberAsFloatFromDB(element[format].toFixed(2))) + '</b></td>';
+                });
+
+                body_coa += '<td class="text-right"><b style="font-size:' + fontSize + 'px">' + formatCurr(formatNumberAsFloatFromDB(element['total_all'].toFixed(2))) + '</b></td>';
+                body_coa += '</tr>';
+            }
+        });
+    }
+
+    function getTreetable(data, parent, fontSize, reportType, ledgerRoute) {
+        console.log(reportType);
+        Object.values(data).forEach(element => {
+            if (parent == null) {
+                body_coa += '<tr data-tt-id="' + element.header + '">';
+            } else {
+                body_coa += '<tr data-tt-id="' + element.header + '" data-tt-parent-id="' + parent + '">';
+            }
+            if (typeof(element.children) != "undefined") {
+                body_coa += '<td><b style="font-size:' + fontSize + 'px">' + element.header + '</b></td>';
+                body_coa += '<td></td>';
+            } else {
+                body_coa += '<td style="font-size:' + fontSize + 'px">' + element.header + ' (Rp)</td>';
+                if (reportType.includes("detail") && reportType.includes('awal') == false) {
+                    body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" ><a href="' + ledgerRoute + '?id_akun=' + element.akun + '&cabang=' + element.id_cabang + '&startdate=' + element.start_date + '&enddate=' + element.end_date + '&type=detail" target="_blank">' + formatCurr(formatNumberAsFloatFromDB(element.total.toFixed(2))) + '</a></td>';
+                } else {
+                    body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" >' + formatCurr(formatNumberAsFloatFromDB(element.total.toFixed(2))) + '</td>';
+                }
+            }
+            body_coa += '</tr>';
+            if (typeof(element.children) != "undefined") {
+                getTreetable(element.children, element.header, fontSize, reportType, ledgerRoute);
+                if (parent == null) {
+                    body_coa += '<tr>';
+                } else {
+                    body_coa += '<tr data-tt-id="total-' + element.header + '" data-tt-parent-id="' + parent + '">';
+                }
+                body_coa += '<td><b style="font-size:' + fontSize + 'px">Total ' + element.header + ' (Rp)</b></td>';
+                body_coa += '<td class="text-right"><b style="font-size:' + fontSize + 'px">' + formatCurr(formatNumberAsFloatFromDB(element.total.toFixed(2))) + '</b></td>';
                 body_coa += '</tr>';
             }
         });
@@ -502,8 +532,26 @@
         return num;
     }
 
+    function capitalize(string) {
+        //split the above string into an array of strings
+        //whenever a blank space is encountered
+        const arr = string.split(" ");
+
+        //loop through each element of the array and capitalize the first letter.
+        for (var i = 0; i < arr.length; i++) {
+            arr[i] = arr[i].charAt(0).toUpperCase() + arr[i].slice(1);
+
+        }
+
+        //Join all the elements of the array back into a string
+        //using a blankspace as a separator
+        const str2 = arr.join(" ");
+
+        return str2;
+    }
+
     $.fn.expandAll = function() {
-        $(this).find("tr").removeClass("collapsed").addClass("expanded").each(function(){
+        $(this).find("tr").removeClass("collapsed").addClass("expanded").each(function() {
             $(this).expand();
         });
     };
