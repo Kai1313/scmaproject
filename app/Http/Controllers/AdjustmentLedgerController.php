@@ -27,12 +27,12 @@ class AdjustmentLedgerController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        $cabang = Cabang::find(1);
+        // $cabang = Cabang::find(1);
         $data_cabang = getCabang();
 
         $data = [
             "pageTitle" => "SCA Accounting | Transaksi Jurnal Penyesuaian | List",
-            "cabang" => $cabang,
+            // "cabang" => $cabang,
             "data_cabang" => $data_cabang,
         ];
 

@@ -96,8 +96,8 @@
                                 <input type="hidden" name="image_path">
                                 <br>
                                 @if ($data && $data->path)
-                                    <a href="{{ env('FTP_GET_FILE') . $data->path }}" target="_blank">
-                                        <img src="{{ env('FTP_GET_FILE') . $data->path2 }}" alt="" width="100"
+                                    <a href="{{ asset('asset/' . $data->path) }}" target="_blank">
+                                        <img src="{{ asset('asset/' . $data->path) }}" alt="" width="100"
                                             id="uploadPreview1" style="margin:10px 10px 10px 0px;border-radius:5px;">
                                     </a>
                                 @else

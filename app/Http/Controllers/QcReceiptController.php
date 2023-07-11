@@ -43,7 +43,8 @@ class QcReceiptController extends Controller
                     'qc.keterangan_pembelian_detail',
                     'qc.bentuk_pembelian_detail',
                     'qc.id as id_qc',
-                    'pengguna.nama_pengguna'
+                    'pengguna.nama_pengguna',
+                    'path'
                 )
                 ->leftJoin('qc', function ($qc) {
                     $qc->on('pembelian_detail.id_pembelian', '=', 'qc.id_pembelian')->on('pembelian_detail.id_barang', '=', 'qc.id_barang');
@@ -73,6 +74,13 @@ class QcReceiptController extends Controller
                         return '<label class="label label-default">Belum di QC</label>';
                     }
                 })
+                ->editColumn('path', function ($row) use ($request) {
+                    if ($request->show_img == "true") {
+                        return '<img src="' . asset('asset/' . $row->path) . '" width="100">';
+                    } else {
+                        return '<span style="color:#a9a9a9;">Gambar tidak ditampilkan</span>';
+                    }
+                })
                 ->addColumn('action', function ($row) use ($encode) {
                     $btn = '<ul class="horizontal-list" style="min-width:0px;">';
                     if ($row->status_qc == 2 && in_array(session()->get('user')['id_grup_pengguna'], $encode)) {
@@ -82,7 +90,7 @@ class QcReceiptController extends Controller
                     $btn .= '</ul>';
                     return $btn;
                 })
-                ->rawColumns(['status_qc', 'action'])
+                ->rawColumns(['status_qc', 'action', 'path'])
                 ->make(true);
         }
 
@@ -139,6 +147,8 @@ class QcReceiptController extends Controller
                         $data->warna_pembelian_detail = $value->checkbox_warna == 1 ? $value->warna_pembelian_detail : '';
                         $data->keterangan_pembelian_detail = $value->keterangan_pembelian_detail;
                         $data->save();
+
+                        $data->uploadfile($value, $data);
 
                         $data->updatePembelianDetail();
                     }

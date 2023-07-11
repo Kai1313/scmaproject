@@ -30,6 +30,8 @@ class ReportProfitAndLossExport implements FromView, ShouldAutoSize, WithColumnF
             'C' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED2,
             'D' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED2,
             'E' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED2,
+            'F' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED2,
+            'G' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED2,
         ];
     }
 }

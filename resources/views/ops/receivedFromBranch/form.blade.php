@@ -446,6 +446,7 @@
         });
 
         $('#table-detail-item').DataTable({
+            pading: false,
             data: notReceived,
             ordering: false,
             columns: [{
@@ -573,7 +574,7 @@
 
             let newObj = Object.assign({}, detailSelect)
             if (statusModal == 'create') {
-                details.unshift(newObj)
+                details.push(newObj)
             } else if (statusModal == 'edit') {
                 details[newObj.index - 1] = newObj
             }

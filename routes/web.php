@@ -130,6 +130,7 @@ Route::prefix('pemakaian')->group(function () {
 });
 
 Route::get('kirim_ke_gudang/print/{id}', 'SendToWarehouseController@print')->name('send_to_warehouse-print');
+Route::get('stok_minimal/excel/{id}', 'StokMinHistoryController@getExcel')->name('stok_minimal-excel');
 
 Route::namespace('Report')->group(function () {
     Route::prefix('laporan_qc_penerimaan')->group(function () {
@@ -266,6 +267,7 @@ Route::prefix('transaction')->group(function () {
         Route::get('/usage', 'ClosingJournalController@usage')->name('transaction-closing-journal-usage');
         Route::get('/sales', 'ClosingJournalController@sales')->name('transaction-closing-journal-sales');
         Route::get('/depreciation', 'ClosingJournalController@depreciation')->name('transaction-closing-journal-depreciation');
+        Route::get('/saldo_transfer', 'ClosingJournalController@saldoTransfer')->name('transaction-closing-journal-saldo-transfer');
     });
 });
 

@@ -30,7 +30,7 @@
         @endif
     </tr>
     @if(isset($item['children']))
-        @include('accounting.report.balance.balance_list_excel',['data' => $item['children'], 'type' => $type, 'space' => ($space + 1)])
+        @include('accounting.report.profit_loss.profit_loss_list_excel',['data' => $item['children'], 'type' => $type, 'space' => ($space + 1)])
 
         @if(isset($item['children']))
             <tr>

@@ -71,7 +71,9 @@ class Purchase extends Model
                 'ph_pembelian_detail',
                 'warna_pembelian_detail',
                 'keterangan_pembelian_detail',
-                'bentuk_pembelian_detail'
+                'bentuk_pembelian_detail',
+                'path',
+                'path2'
             )
             ->leftJoin('barang', 'qc.id_barang', '=', 'barang.id_barang')
             ->leftJoin('satuan_barang', 'qc.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang');

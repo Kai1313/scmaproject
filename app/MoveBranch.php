@@ -234,7 +234,7 @@ class MoveBranch extends Model
         $detail = json_decode($details);
 
         foreach ($detail as $data) {
-            $check = MoveBranchDetail::where('id_pindah_barang_detail', $data->id_pindah_barang_detail)->first();
+            $check = MoveBranchDetail::where('id_pindah_barang', $this->id_pindah_barang)->where('qr_code', $data->qr_code)->first();
             if (!$check) {
                 $array = [
                     'id_pindah_barang' => $this->id_pindah_barang,

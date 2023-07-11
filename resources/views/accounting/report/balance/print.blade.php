@@ -22,6 +22,10 @@
         .table-bordered td {
             border: 2px solid black;
         }
+
+        td, th{
+            font-size: 14px;
+        }
     </style>
 </head>
 
@@ -45,7 +49,7 @@
                             <td width="20%">Cabang</td>
                             <td width="2%">:</td>
                             <td width="78%">
-                                {{ $cabang }}
+                                {{ ucwords($nama_cabang) }}
                             </td>
                         </tr>
                         <tr>
@@ -63,16 +67,28 @@
     <table width="100%" class="table-bordered" style="margin-top: 20px">
         <thead>
             <tr style="font-size: 18px;">
-                <th width="70%">Header</th>
-                <th width="30%">Total</th>
+                @if($nama_cabang == 'all')
+                    <th width="40%">Neraca {{ $periode_table }}</th>
+                    @foreach ($list_cabang as $cabang)
+                        <th width="20%">Total {{ ucwords(str_replace('_', ' ', $cabang->new_nama_cabang)) }}</th>
+                    @endforeach
+                    <th width="20%">Total</th>
+                @else
+                    <th width="70%">Neraca {{ $periode_table }}</th>
+                    <th width="30%">Total</th>
+                @endif
             </tr>
         </thead>
         <tbody>
             @php
-                $fontSize = 18;
+                $fontSize = 12;
                 $space = 0;
             @endphp
-            @include('accounting.report.balance.balance-list',['data' => $data, 'fontSize' => $fontSize, 'space' => ($space)])
+            @if ($nama_cabang == 'all')
+                @include('accounting.report.balance.balance-list-konsolidasi',['data' => $data, 'fontSize' => $fontSize, 'space' => ($space), 'list_cabang' => $list_cabang])
+            @else
+                @include('accounting.report.balance.balance-list',['data' => $data, 'fontSize' => $fontSize, 'space' => ($space)])
+            @endif
         </tbody>
     </table>
     <table width="100%" style="margin-top: 50px">

@@ -310,6 +310,7 @@
 
         $('.select2').select2()
         var resDataTable = $('#table-detail').DataTable({
+            paging: false,
             data: details,
             ordering: false,
             columns: [{
