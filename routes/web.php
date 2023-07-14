@@ -129,6 +129,22 @@ Route::prefix('pemakaian')->group(function () {
     Route::get('/reload-timbangan', 'MaterialUsageController@reloadWeight')->name('material_usage-reload-weight');
 });
 
+Route::prefix('jadwal_kunjungan')->group(function () {
+    Route::get('/index/{user_id?}', 'ScheduleVisitController@index')->name('pre_visit');
+    Route::get('/entry/{id?}', 'ScheduleVisitController@entry')->name('pre_visit-entry');
+    Route::post('/save_entry/{id}', 'ScheduleVisitController@saveEntry')->name('pre_visit-save-entry');
+    Route::get('/view/{id}', 'ScheduleVisitController@viewData')->name('pre_visit-view');
+    Route::get('/delete/{id}', 'ScheduleVisitController@destroy')->name('pre_visit-delete');
+});
+
+Route::prefix('kunjungan')->group(function () {
+    Route::get('/index/{user_id?}', 'VisitController@index')->name('visit');
+    Route::get('/entry/{id?}', 'MaterialUsageController@entry')->name('visit-entry');
+    Route::post('/save_entry/{id}', 'MaterialUsageController@saveEntry')->name('visit-save-entry');
+    Route::get('/view/{id}', 'MaterialUsageController@viewData')->name('visit-view');
+    Route::get('/delete/{id}', 'MaterialUsageController@destroy')->name('visit-delete');
+});
+
 Route::get('kirim_ke_gudang/print/{id}', 'SendToWarehouseController@print')->name('send_to_warehouse-print');
 Route::get('stok_minimal/excel/{id}', 'StokMinHistoryController@getExcel')->name('stok_minimal-excel');
 

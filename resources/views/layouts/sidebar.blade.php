@@ -660,6 +660,16 @@
                                     </span>
                                 </a>
                                 <ul class="treeview-menu">
+                                    <li data-alias="permintaan_penjualan">
+                                        <a href="{{ route('pre_visit') }}">
+                                            <i class="glyphicon glyphicon-option-vertical"></i>Jadwal Kunjungan
+                                        </a>
+                                    </li>
+                                    <li data-alias="permintaan_penjualan">
+                                        <a href="{{ route('visit') }}">
+                                            <i class="glyphicon glyphicon-option-vertical"></i>Kunjungan
+                                        </a>
+                                    </li>
                                     @if (checkAccessMenu('permintaan_penjualan'))
                                         <li data-alias="permintaan_penjualan">
                                             <a href="{{ env('OLD_URL_ROOT') }}#permintaan_penjualan">
