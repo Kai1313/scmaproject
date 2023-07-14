@@ -264,9 +264,9 @@
         }
 
         $('[name="details"]').val(JSON.stringify(details))
-        console.log(details)
 
         var resDataTable = $('#table-detail').DataTable({
+            paging: false,
             data: details,
             ordering: false,
             columns: [{
