@@ -252,7 +252,7 @@ class PurchaseRequestController extends Controller
         $search = $request->search;
         $datas = DB::table('barang')->select('id_barang as id', 'nama_barang as text', 'kode_barang')
             ->where('status_barang', 1)
-            ->where('nama_barang', 'like', '%' . $search . '%')->limit(10)->get();
+            ->where('nama_barang', 'like', '%' . $search . '%')->orderBy('nama_barang', 'asc')->get();
 
         return response()->json([
             'result' => true,
