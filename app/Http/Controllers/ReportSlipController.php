@@ -19,8 +19,8 @@ class ReportSlipController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        $data_cabang = Cabang::all();
-        $data_slip = Slip::where('id_cabang', 1)->get();
+        $data_cabang = getCabang();
+        $data_slip = Slip::where('id_cabang', $data_cabang[0]->id_cabang)->get();
 
         $data = [
             "pageTitle" => "SCA Accounting | Report Slip",
