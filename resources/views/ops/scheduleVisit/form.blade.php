@@ -76,12 +76,12 @@
 @section('header')
     <section class="content-header">
         <h1>
-            Pemakaian
+            Jadwal Kunjungan
             <small>| {{ $data ? 'Edit' : 'Tambah' }}</small>
         </h1>
         <ol class="breadcrumb">
             <li><a href="#"><i class="fa fa-dashboard"></i> Dashboard</a></li>
-            <li><a href="{{ route('material_usage') }}">Pemakaian</a></li>
+            <li><a href="{{ route('pre_visit') }}">Jadwal Kunjungan</a></li>
             <li class="active">Form</li>
         </ol>
     </section>
@@ -89,12 +89,12 @@
 
 @section('main-section')
     <div class="content container-fluid">
-        <form action="{{ route('material_usage-save-entry', $data ? $data->id_pemakaian : 0) }}" method="post"
+        <form action="{{ route('pre_visit-save-entry', $data ? $data->id_pemakaian : 0) }}" method="post"
             class="post-action">
             <div class="box">
                 <div class="box-header">
-                    <h3 class="box-title">{{ $data ? 'Ubah' : 'Tambah' }} Pemakaian</h3>
-                    <a href="{{ route('material_usage') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right">
+                    <h3 class="box-title">{{ $data ? 'Ubah' : 'Tambah' }} Jadwal Kunjungan</h3>
+                    <a href="{{ route('pre_visit') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right">
                         <span class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali
                     </a>
                 </div>
@@ -113,7 +113,7 @@
                                     @endif
                                 </select>
                             </div>
-                            <label>Gudang <span>*</span></label>
+                            {{-- <label>Gudang <span>*</span></label>
                             <div class="form-group">
                                 <select name="id_gudang" class="form-control select2" data-validation="[NOTEMPTY]"
                                     data-validation-message="Gudang tidak boleh kosong" {{ $data ? 'readonly' : '' }}>
@@ -124,7 +124,7 @@
                                         </option>
                                     @endif
                                 </select>
-                            </div>
+                            </div> --}}
                         </div>
                         <div class="col-md-4">
                             <label>Kode Pemakaian</label>
@@ -159,40 +159,6 @@
                     </div>
                 </div>
             </div>
-            <div class="box">
-                <div class="box-header">
-                    <h3 class="box-title">Detail Barang</h3>
-                    <button class="btn btn-info add-entry btn-flat pull-right btn-sm" type="button">
-                        <i class="glyphicon glyphicon-plus"></i> Tambah Barang
-                    </button>
-                </div>
-                <div class="box-body">
-                    <div class="table-responsive">
-                        <input type="hidden" name="details" value="{{ $data ? json_encode($data->formatdetail) : '[]' }}">
-                        <input type="hidden" name="detele_details" value="[]">
-                        <table id="table-detail" class="table table-bordered data-table display responsive nowrap"
-                            width="100%">
-                            <thead>
-                                <tr>
-                                    <th>Kode</th>
-                                    <th>Nama Barang</th>
-                                    <th>Satuan</th>
-                                    <th>Gross</th>
-                                    <th>Jumlah Zak</th>
-                                    <th>Tare</th>
-                                    <th>Nett</th>
-                                    <th>Catatan</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                        </table>
-                    </div>
-                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                    <button class="btn btn-primary btn-flat pull-right btn-sm" type="submit">
-                        <i class="glyphicon glyphicon-floppy-saved"></i> Simpan Data
-                    </button>
-                </div>
-            </div>
         </form>
 
         <div class="modal fade" id="modalEntry" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -205,8 +171,8 @@
                         <div id="reader"></div>
                         <div class="form-group">
                             <div class="input-group">
-                                <input type="text" name="search-qrcode" class="form-control"
-                                    placeholder="Scan QRCode" autocomplete="off">
+                                <input type="text" name="search-qrcode" class="form-control" placeholder="Scan QRCode"
+                                    autocomplete="off">
                                 <div class="input-group-btn">
                                     <button class="btn btn-info btn-search btn-flat" type="button">
                                         <i class="fa fa-search"></i>

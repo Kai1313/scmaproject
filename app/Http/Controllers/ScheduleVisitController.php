@@ -84,16 +84,16 @@ class ScheduleVisitController extends Controller
 
     public function entry($id = 0)
     {
-        if (checkAccessMenu('pemakaian', $id == 0 ? 'create' : 'edit') == false) {
-            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
-        }
+        // if (checkAccessMenu('pemakaian', $id == 0 ? 'create' : 'edit') == false) {
+        //     return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+        // }
 
         $data = MaterialUsage::find($id);
         $accessQC = getSetting('Pemakaian QC');
         $cabang = session()->get('access_cabang');
         $timbangan = DB::table('konfigurasi')->select('id_konfigurasi as id', 'nama_konfigurasi as text', 'keterangan_konfigurasi as value')
             ->where('id_kategori_konfigurasi', 5)->get();
-        return view('ops.materialUsage.form', [
+        return view('ops.scheduleVisit.form', [
             'data' => $data,
             'cabang' => $cabang,
             "pageTitle" => "SCA OPS | Pemakaian | " . ($id == 0 ? 'Create' : 'Edit'),
