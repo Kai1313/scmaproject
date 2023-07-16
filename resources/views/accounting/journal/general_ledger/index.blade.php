@@ -222,8 +222,8 @@
                     width: '10%'
                 },
                 {
-                    data: 'id_transaksi',
-                    name: 'jurnal_header.id_transaksi',
+                    data: 'concat_id_transaksi',
+                    name: 'jurnal_header.concat_id_transaksi',
                     width: '10%'
                 },
                 {

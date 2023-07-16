@@ -639,7 +639,9 @@ class GeneralLedgerController extends Controller
         $draw = $request->draw;
         $current_page = $offset / $limit + 1;
 
-        $data_general_ledger = JurnalHeader::join('master_slip', 'jurnal_header.id_slip', 'master_slip.id_slip')->select('jurnal_header.*', 'master_slip.kode_slip', DB::raw('
+        $data_general_ledger = JurnalHeader::join('master_slip', 'jurnal_header.id_slip', 'master_slip.id_slip')
+        ->leftJoin('jurnal_detail', 'jurnal_detail.id_jurnal', 'jurnal_header.id_jurnal')
+        ->select('jurnal_header.*', DB::raw('GROUP_CONCAT(jurnal_detail.id_transaksi SEPARATOR \', \') AS concat_id_transaksi'), 'master_slip.kode_slip', DB::raw('
                     (CASE
                         WHEN jenis_jurnal = "KK" THEN "Kas Keluar"
                         WHEN jenis_jurnal = "KM" THEN "Kas Masuk"
@@ -648,24 +650,24 @@ class GeneralLedgerController extends Controller
                         WHEN jenis_jurnal = "PG" THEN "Piutang Giro"
                         WHEN jenis_jurnal = "HG" THEN "Hutang Giro"
                         WHEN jenis_jurnal = "ME" THEN "Memorial"
-                    END) as jenis_name
-        '));
+                    END) as jenis_name')
+        )
+        ->groupBy('jurnal_header.id_jurnal');
         $data_general_ledger_table = DB::table(DB::raw('(' . $data_general_ledger->toSql() . ') as jurnal_header'))
-            ->leftJoin('jurnal_detail', 'jurnal_detail.id_jurnal', 'jurnal_header.id_jurnal')
+            ->join('jurnal_detail', 'jurnal_detail.id_jurnal', 'jurnal_header.id_jurnal')
             ->where('jurnal_header.void', $void)
             ->where('jurnal_header.jenis_jurnal', '<>', 'ME')
             ->where('id_cabang', $cabang)
             ->groupBy('jurnal_header.id_jurnal', 'jurnal_header.tanggal_jurnal')
-            ->select('jurnal_header.*', DB::raw("GROUP_CONCAT(jurnal_detail.id_transaksi SEPARATOR ', ') AS id_transaksi"), DB::raw('SUM(jurnal_detail.credit) as jumlah'));
+            // ->select('jurnal_header.*', DB::raw("GROUP_CONCAT(jurnal_detail.id_transaksi SEPARATOR ', ') AS id_transaksi"), DB::raw('SUM(jurnal_detail.credit) as jumlah'));
+            ->select('jurnal_header.*', DB::raw('SUM(jurnal_detail.credit) as jumlah'));
                 
         if (isset($keyword)) {
             $data_general_ledger_table->where(function ($query) use ($keyword) {
                 $query->orWhere('kode_jurnal', 'LIKE', "%$keyword%")
                     ->orWhere('tanggal_jurnal', 'LIKE', "%$keyword%")
                     ->orWhere('jenis_name', 'LIKE', "%$keyword%")
-                    // ->orWhere('jurnal_header.id_transaksi', 'LIKE', "%$keyword%")
-                    // ->orWhere('jurnal_detail.id_transaksi', 'LIKE', "%$keyword%")
-                    ->orWhere(DB::raw("CONCAT(jurnal_detail.id_transaksi)"), 'LIKE', "%$keyword%")
+                    ->orWhere('concat_id_transaksi', 'LIKE', "%$keyword%")
                     ->orWhere('catatan', 'LIKE', "%$keyword%")
                     ->orWhere('kode_slip', 'LIKE', "%$keyword%");
             });
