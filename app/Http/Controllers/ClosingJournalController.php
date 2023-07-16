@@ -978,7 +978,7 @@ class ClosingJournalController extends Controller
             }
 
             // Get data koreksi stok
-            $data_header = StockCorrectionHeader::where("status_koreksi_stok", $status)->where("id_cabang", $cabang)->whereBetween("tanggal_koreksi_stok", [$start_date, $end_date])->get();
+            $data_header = StockCorrectionHeader::where("status_koreksi_stok", $status)->where("id_cabang", $id_cabang)->whereBetween("tanggal_koreksi_stok", [$start_date, $end_date])->get();
             // dd(json_encode($data_header));
             $details = [];
             DB::beginTransaction();
