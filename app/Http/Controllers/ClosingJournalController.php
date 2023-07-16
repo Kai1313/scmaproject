@@ -116,6 +116,10 @@ class ClosingJournalController extends Controller
         }
         catch (\Exception $e) {
             DB::rollback();
+            $check = Closing::where("month", $month)->where("year", $year)->first();
+            if ($check) {
+                $delete = Closing::where("month", $month)->where("year", $year)->delete();
+            }
             $message = "Error when store closing";
             Log::error($message);
             Log::error($e);
@@ -453,7 +457,7 @@ class ClosingJournalController extends Controller
                                             ->where('void', 0)
                                             ->whereNotNull('jurnal_header.id_transaksi')
                                             ->whereRaw('jurnal_header.id_transaksi NOT LIKE "%Closing%"')
-                                            ->where('jurnal_header.id_transaksi', '<>', 'Selisih HPP Produksi')
+                                            ->whereRaw('jurnal_header.id_transaksi NOT LIKE "%Selisih HPP Produksi%"')
                                             ->where('jurnal_detail.id_akun', $get_akun_biaya_listrik->value2)
                                             ->selectRaw('ROUND(SUM(credit-debet), 2) as value')
                                             ->first();
@@ -464,7 +468,7 @@ class ClosingJournalController extends Controller
                                             ->where('void', 0)
                                             ->whereNotNull('jurnal_header.id_transaksi')
                                             ->whereRaw('jurnal_header.id_transaksi NOT LIKE "%Closing%"')
-                                            ->where('jurnal_header.id_transaksi', '<>', 'Selisih HPP Produksi')
+                                            ->whereRaw('jurnal_header.id_transaksi NOT LIKE "%Selisih HPP Produksi%"')
                                             ->where('jurnal_detail.id_akun', $get_akun_biaya_operator->value2)
                                             ->selectRaw('ROUND(SUM(credit-debet), 2) as value')
                                             ->first();
@@ -1571,8 +1575,10 @@ class ClosingJournalController extends Controller
 
 
                 // Get header out detail
-                $data_detail = SalesDetail::select("penjualan_detail.id_barang", "penjualan_detail.kode_batang_lama_penjualan_detail", "master_qr_code.beli_master_qr_code", "master_qr_code.biaya_beli_master_qr_code", "master_qr_code.jumlah_master_qr_code", "master_qr_code.produksi_master_qr_code", "master_qr_code.listrik_master_qr_code", "master_qr_code.pegawai_master_qr_code")
+                $data_detail = SalesDetail::select("penjualan_detail.id_barang", "penjualan_detail.kode_batang_lama_penjualan_detail", "master_qr_code.beli_master_qr_code", "master_qr_code.biaya_beli_master_qr_code", "master_qr_code.jumlah_master_qr_code", "master_qr_code.produksi_master_qr_code", "master_qr_code.listrik_master_qr_code", "master_qr_code.pegawai_master_qr_code", "barang.nama_barang", DB::raw("IFNULL(satuan_barang.nama_satuan_barang, '') as nama_satuan"), "penjualan_detail.jumlah_penjualan_detail")
                             ->join("master_qr_code", "kode_batang_master_qr_code", "penjualan_detail.kode_batang_lama_penjualan_detail")
+                            ->join("barang", "barang.id_barang", "penjualan_detail.id_barang")
+                            ->leftJoin("satuan_barang", "satuan_barang.id_satuan_barang", "penjualan_detail.id_satuan_barang")
                             ->where("id_penjualan", $header->id_penjualan)
                             ->get();
 
@@ -1584,7 +1590,8 @@ class ClosingJournalController extends Controller
                         "qr_code"=>$detail->kode_batang_lama_penjualan_detail,
                         "barang"=>$detail->id_barang,
                         "qty"=>$qty,
-                        "sum"=>$sum
+                        "sum"=>$sum,
+                        "note"=>$detail->nama_barang . ' - ' . $detail->jumlah_penjualan_detail . ' ' . $detail->nama_satuan
                     ];
                 }
                 // Log::info(json_encode($details));
@@ -1593,10 +1600,12 @@ class ClosingJournalController extends Controller
                     $product = $out['barang'];
                     $sum = $out['sum'];
                     if (isset($result[$product])) {
-                        $result[$product] += $sum;
+                        $result[$product]['sum'] += $sum;
                     }
                     else {
-                        $result[$product] = $sum;
+                        // $result[$product] = $sum;
+                        $result[$product]['sum'] = $sum;
+                        $result[$product]['note'] = $out['note'];
                     }
                     return $result;
                 }, []);
@@ -1652,10 +1661,10 @@ class ClosingJournalController extends Controller
                     $detail->id_jurnal = $header->id_jurnal;
                     $detail->index = $i + 1;
                     $detail->id_akun = $barang->id_akun;
-                    $detail->keterangan = "Harga Produksi Penjualan ".$id_transaksi;
+                    $detail->keterangan = "Harga Produksi Penjualan ".$id_transaksi . ' - ' . $out['note'];
                     // $detail->id_transaksi = $id_transaksi;
                     $detail->debet = 0;
-                    $detail->credit = $out;
+                    $detail->credit = $out['sum'];
                     $detail->user_created = NULL;
                     $detail->user_modified = NULL;
                     $detail->dt_created = $end_date;
@@ -1672,7 +1681,7 @@ class ClosingJournalController extends Controller
                             "message" => "Error when store Jurnal data on table detail",
                         ]);
                     }
-                    $sum_debet += $out;
+                    $sum_debet += $out['sum'];
                     $i++;
                 }
                 $detail = new JurnalDetail();
@@ -1924,7 +1933,7 @@ class ClosingJournalController extends Controller
 
             DB::beginTransaction();
             // Get all account that is shown 1
-            $dataAkun = Akun::where("id_cabang". $id_cabang)->where("isshown", 1)->get();
+            $dataAkun = Akun::where("id_cabang", $id_cabang)->where("isshown", 1)->get();
             foreach ($dataAkun as $key => $akun) {
                 // Get sum debet dan sum kredit
                 $data_ledgers = JurnalDetail::join("jurnal_header", "jurnal_header.id_jurnal", "jurnal_detail.id_jurnal")
@@ -1933,7 +1942,7 @@ class ClosingJournalController extends Controller
                 ->where("master_akun.id_cabang", $id_cabang)
                 ->whereBetween("jurnal_header.tanggal_jurnal", [$start_date, $end_date])
                 ->selectRaw("jurnal_header.id_jurnal, master_akun.id_cabang, master_akun.id_akun, master_akun.kode_akun, master_akun.nama_akun, IFNULL(SUM(jurnal_detail.debet), 0) as debet, IFNULL(SUM(jurnal_detail.credit), 0) as kredit")->groupBy("jurnal_detail.id_akun");
-                $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")->where("id_akun", $value->id_akun)->where("id_cabang", $value->id_cabang)->where("bulan", $month)->where("tahun", $year)->first();
+                $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")->where("id_akun", $akun->id_akun)->where("id_cabang", $akun->id_cabang)->where("bulan", $month)->where("tahun", $year)->first();
                 $data_saldo_ledgers = JurnalDetail::selectRaw("IFNULL(SUM(jurnal_detail.debet), 0) as debet, IFNULL(SUM(jurnal_detail.credit), 0) as kredit")
                 ->join("jurnal_header", "jurnal_header.id_jurnal", "jurnal_detail.id_jurnal")
                 ->join("master_akun", "master_akun.id_akun", "jurnal_detail.id_akun")
@@ -1948,9 +1957,9 @@ class ClosingJournalController extends Controller
                 $kredit = ($data_saldo_ledgers)?$data_saldo_ledgers->kredit:0;
                 // $saldo_awal = ($saldo_debet - $saldo_kredit) + ($debet - $kredit);
                 // $saldo_akhir = $saldo_awal + $data_ledgers->debet - $data_ledgers->kredit;
-                $saldo_debet = $saldo_debet + $debet + $data_ledgers->debet;
-                $saldo_kredit = $saldo_kredit + $kredit + $data_ledgers->kredit;
-                
+                $saldo_debet = $saldo_debet + $debet + (isset($data_ledgers->debet) ? $data_ledgers->debet : 0) ;
+                $saldo_kredit = $saldo_kredit + $kredit + (isset($data_ledgers->kredit) ? $data_ledgers->kredit : 0);
+
                 // Insert into saldo balance
                 $saldo_balance = new SaldoBalance;
                 $saldo_balance->id_cabang = $akun->id_cabang;
