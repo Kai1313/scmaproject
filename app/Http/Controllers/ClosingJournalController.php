@@ -1934,6 +1934,8 @@ class ClosingJournalController extends Controller
             DB::beginTransaction();
             // Get all account that is shown 1
             $dataAkun = Akun::where("id_cabang", $id_cabang)->where("isshown", 1)->get();
+            $debet = 0;
+            $kredit = 0;
             foreach ($dataAkun as $key => $akun) {
                 // Get sum debet dan sum kredit
                 $data_ledgers = JurnalDetail::join("jurnal_header", "jurnal_header.id_jurnal", "jurnal_detail.id_jurnal")
