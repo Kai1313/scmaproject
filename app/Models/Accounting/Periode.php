@@ -18,7 +18,7 @@ class Periode extends Model
             // Get periode
             $periode = self::where("tahun_periode", $year)->where("bulan_periode", $month)->first();
             if ($periode) {
-                if ($periode->status_periode == 1) {
+                if ($periode->status_periode == 0) {
                     return TRUE;
                 }
                 return FALSE;

@@ -225,7 +225,9 @@ class ReportGeneralLedgerController extends Controller
                 if ($offset < 0) {
                     $offset = 0;
                 }
-                $data_ledgers->skip($offset)->take($limit_data);
+                if ($limit != -1) {
+                    $data_ledgers->skip($offset)->take($limit_data);
+                }
             }
 
             // Get saldo awal dan saldo akhir
