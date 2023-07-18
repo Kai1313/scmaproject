@@ -208,7 +208,8 @@ class ClosingJournalController extends Controller
             ->selectRaw('SUM(beban_produksi.tenaga_kerja_beban_produksi * beban_produksi.listrik_beban_produksi) as tenaga,
                 SUM(beban_produksi.kwh_beban_produksi) as listrik')
             ->first();
-
+        $data_beban_produksi->listrik = ((int)$data_beban_produksi->listrik > 0)?$data_beban_produksi->listrik:1;
+        $data_beban_produksi->tenaga = ((int)$data_beban_produksi->tenaga > 0)?$data_beban_produksi->tenaga:1;
         $avg_listrik = ($biaya_listrik->total_listrik && $data_beban_produksi->listrik)?$biaya_listrik->total_listrik / $data_beban_produksi->listrik:0;
         $avg_gaji = ($biaya_operator->total_gaji && $data_beban_produksi->tenaga)?$biaya_operator->total_gaji / $data_beban_produksi->tenaga:0;
 
