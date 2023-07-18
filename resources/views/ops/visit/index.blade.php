@@ -40,12 +40,12 @@
 @section('header')
     <section class="content-header">
         <h1>
-            Pemakaian
+            Jadwal Kunjungan
             <small></small>
         </h1>
         <ol class="breadcrumb">
             <li><a href="#"><i class="fa fa-dashboard"></i> Dashboard</a></li>
-            <li class="active">Pemakaian</li>
+            <li class="active">Jadwal Kunjungan</li>
         </ol>
     </section>
 @endsection
@@ -66,16 +66,13 @@
                         </div>
                     </div>
                     <div class="col-md-8">
-                        <span class="badge badge-default rounded-0 pull-right">
-                            <input class="form-check-input" type="checkbox" id="void" name="show_void">
-                            <label class="form-check-label" for="void">
-                                Void
-                            </label>
-                        </span>
-                        <a href="{{ route('material_usage-entry') }}"
-                            class="btn btn-success pull-right btn-flat btn-sm mr-1">
-                            <i class="glyphicon glyphicon-plus"></i> Tambah Pemakaian
-                        </a>
+                        <label> &nbsp</label>
+                        <div class="form-group">
+                            <a href="{{ route('pre_visit-entry') }}"
+                                class="btn btn-success pull-right btn-flat btn-sm mr-1">
+                                <i class="glyphicon glyphicon-plus"></i> Jadwal Kunjungan
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -84,11 +81,11 @@
                     <table class="table table-bordered data-table display responsive nowrap" width="100%">
                         <thead>
                             <tr>
-                                <th>Kode Pemakaian</th>
+                                <th>Kode Jadwal</th>
                                 <th>Tanggal</th>
-                                <th>Cabang</th>
-                                <th>Gudang</th>
-                                <th>Jenis</th>
+                                <th>Salesman</th>
+                                <th>Pelanggan</th>
+                                <th>Alamat</th>
                                 <th>Catatan</th>
                                 <th width="150px">Action</th>
                             </tr>
@@ -113,33 +110,29 @@
 
 @section('externalScripts')
     <script>
-        $('.select2').select2()
+        $('.select2').select2();
         var table = $('.data-table').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route('material_usage') }}?c=" + $('[name="id_cabang"]').val() + '&show_void=' + $(
-                '[name="show_void"]').is(':checked'),
+            ajax: "{{ route('pre_visit') }}",
             columns: [{
-                data: 'kode_pemakaian',
-                name: 'pemakaian_header.kode_pemakaian'
+                data: 'visit_code',
+                name: 'v.visit_code'
             }, {
-                data: 'tanggal',
-                name: 'pemakaian_header.tanggal'
+                data: 'visit_date',
+                name: 'v.visit_date'
             }, {
-                data: 'nama_cabang',
-                name: 'c.nama_cabang',
+                data: 'nama_salesman',
+                name: 's.nama_salesman',
             }, {
-                data: 'nama_gudang',
-                name: 'g.nama_gudang',
+                data: 'nama_pelanggan',
+                name: 'p.nama_pelanggan',
             }, {
-                data: 'is_qc',
-                name: 'is_qc',
-                render: function(data) {
-                    return data == 1 ? 'QC' : ''
-                }
+                data: 'alamat_pelanggan',
+                name: 'p.alamat_pelanggan',
             }, {
-                data: 'catatan',
-                name: 'pemakaian_header.catatan'
+                data: 'pre_visit_desc',
+                name: 'v.pre_visit_desc'
             }, {
                 data: 'action',
                 name: 'action',
@@ -148,15 +141,5 @@
                 searchable: false
             }, ]
         });
-
-        $('[name="id_cabang"]').change(function() {
-            table.ajax.url("?c=" + $('[name="id_cabang"]').val() + '&show_void=' + $('[name="show_void"]').is(
-                ':checked')).load()
-        })
-
-        $('[name="show_void"]').change(function() {
-            table.ajax.url("?c=" + $('[name="id_cabang"]').val() + '&show_void=' + $('[name="show_void"]').is(
-                ':checked')).load()
-        })
     </script>
 @endsection

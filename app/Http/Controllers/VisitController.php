@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\MaterialUsage;
+use App\Visit;
 use DB;
 use Illuminate\Http\Request;
 use Log;
@@ -89,21 +89,20 @@ class VisitController extends Controller
 
     public function entry($id = 0)
     {
-        if (checkAccessMenu('pemakaian', $id == 0 ? 'create' : 'edit') == false) {
-            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
-        }
+        // if (checkAccessMenu('pemakaian', $id == 0 ? 'create' : 'edit') == false) {
+        //     return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+        // }
 
-        $data = MaterialUsage::find($id);
-        $accessQC = getSetting('Pemakaian QC');
+        $data = Visit::find($id);
+        $pelanggan = DB::table('pelanggan')->get();
+        $salesman = DB::table('salesman')->get();
         $cabang = session()->get('access_cabang');
-        $timbangan = DB::table('konfigurasi')->select('id_konfigurasi as id', 'nama_konfigurasi as text', 'keterangan_konfigurasi as value')
-            ->where('id_kategori_konfigurasi', 5)->get();
-        return view('ops.materialUsage.form', [
+        return view('ops.visit.form', [
             'data' => $data,
             'cabang' => $cabang,
-            "pageTitle" => "SCA OPS | Pemakaian | " . ($id == 0 ? 'Create' : 'Edit'),
-            "timbangan" => $timbangan,
-            'accessQc' => in_array(session()->get('user')['id_grup_pengguna'], explode(',', $accessQC)) ? '1' : '0',
+            'salesman' => $salesman,
+            'pelanggan' => $pelanggan,
+            "pageTitle" => "SCA OPS | Kunjungan | " . ($id == 0 ? 'Create' : 'Edit'),
         ]);
     }
 
@@ -207,66 +206,5 @@ class VisitController extends Controller
                 "message" => "Data gagal dibatalkan",
             ], 500);
         }
-    }
-
-    public function autoQRCode(Request $request)
-    {
-        $idCabang = $request->id_cabang;
-        $idGudang = $request->id_gudang;
-        $qrcode = $request->qrcode;
-        $isQc = $request->is_qc;
-
-        $data = DB::table('master_qr_code as mqc')
-            ->select(
-                'kode_batang_master_qr_code as kode_batang',
-                'nama_barang',
-                'mqc.id_barang',
-                'nama_satuan_barang',
-                'mqc.id_satuan_barang',
-                'sisa_master_qr_code',
-                'isweighed',
-                'master_wrapper.weight as wrapper_weight',
-                'id_wrapper_zak',
-                'weight_zak',
-                'zak as jumlah_zak'
-            )
-            ->leftJoin('barang', 'mqc.id_barang', '=', 'barang.id_barang')
-            ->leftJoin('satuan_barang as sb', 'mqc.id_satuan_barang', '=', 'sb.id_satuan_barang')
-            ->leftJoin('master_wrapper', 'mqc.id_wrapper_zak', '=', 'master_wrapper.id_wrapper')
-            ->where('mqc.id_cabang', $idCabang)
-            ->where('mqc.id_gudang', $idGudang);
-        if ($isQc == 0) {
-            $data = $data->where('mqc.status_qc_qr_code', 1);
-        }
-
-        $data = $data->where('kode_batang_master_qr_code', $qrcode)
-            ->where('sisa_master_qr_code', '>', 0)->first();
-        if (!$data) {
-            return response()->json([
-                'message' => 'Barang tidak ditemukan',
-                'status' => 'error',
-            ], 500);
-        }
-
-        return response()->json([
-            'data' => $data,
-        ], 200);
-    }
-
-    public function reloadWeight(Request $request)
-    {
-        $id = $request->id;
-        $value = 0;
-        $data = DB::table('konfigurasi')
-            ->where('id_kategori_konfigurasi', 5)
-            ->where('id_konfigurasi', $id)
-            ->value('keterangan_konfigurasi');
-        if ($data) {
-            $value = $id == 38 ? (number_format($data / 1000, 4)) : $data;
-        }
-
-        return response()->json([
-            'data' => $value,
-        ], 200);
     }
 }

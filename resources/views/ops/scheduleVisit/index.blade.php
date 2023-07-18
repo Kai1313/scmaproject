@@ -116,10 +116,10 @@
             serverSide: true,
             ajax: "{{ route('pre_visit') }}",
             columns: [{
-                data: 'pre_visit_code',
-                name: 'v.pre_visit_code'
+                data: 'visit_code',
+                name: 'v.visit_code'
             }, {
-                data: 'tanggal',
+                data: 'visit_date',
                 name: 'v.visit_date'
             }, {
                 data: 'nama_salesman',
@@ -131,7 +131,7 @@
                 data: 'alamat_pelanggan',
                 name: 'p.alamat_pelanggan',
             }, {
-                data: 'Keterangan',
+                data: 'pre_visit_desc',
                 name: 'v.pre_visit_desc'
             }, {
                 data: 'action',
@@ -141,15 +141,5 @@
                 searchable: false
             }, ]
         });
-
-        $('[name="id_cabang"]').change(function() {
-            table.ajax.url("?c=" + $('[name="id_cabang"]').val() + '&show_void=' + $('[name="show_void"]').is(
-                ':checked')).load()
-        })
-
-        $('[name="show_void"]').change(function() {
-            table.ajax.url("?c=" + $('[name="id_cabang"]').val() + '&show_void=' + $('[name="show_void"]').is(
-                ':checked')).load()
-        })
     </script>
 @endsection

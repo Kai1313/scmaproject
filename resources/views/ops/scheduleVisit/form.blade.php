@@ -89,8 +89,7 @@
 
 @section('main-section')
     <div class="content container-fluid">
-        <form action="{{ route('pre_visit-save-entry', $data ? $data->id_pemakaian : 0) }}" method="post"
-            class="post-action">
+        <form action="{{ route('pre_visit-save-entry', $data ? $data->id : 0) }}" method="post" class="post-action">
             <div class="box">
                 <div class="box-header">
                     <h3 class="box-title">{{ $data ? 'Ubah' : 'Tambah' }} Jadwal Kunjungan</h3>
@@ -100,6 +99,21 @@
                 </div>
                 <div class="box-body">
                     <div class="row">
+                        <div class="col-md-4">
+                            <label>Kode Kunjungan</label>
+                            <div class="form-group">
+                                <input type="text" name="visit_code"
+                                    value="{{ old('visit_code', $data ? $data->visit_code : '') }}" class="form-control"
+                                    readonly placeholder="Otomatis">
+                            </div>
+                            <label>Tanggal <span>*</span></label>
+                            <div class="form-group">
+                                <input type="text" name="visit_date"
+                                    value="{{ old('visit_date', $data ? $data->visit_date : date('Y-m-d')) }}"
+                                    class="form-control datepicker" data-validation="[NOTEMPTY]"
+                                    data-validation-message="Tanggal tidak boleh kosong">
+                            </div>
+                        </div>
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>Cabang <span>*</span></label>
@@ -113,50 +127,35 @@
                                     @endif
                                 </select>
                             </div>
-                            {{-- <label>Gudang <span>*</span></label>
+                            <label>Salesman <span>*</span></label>
                             <div class="form-group">
-                                <select name="id_gudang" class="form-control select2" data-validation="[NOTEMPTY]"
-                                    data-validation-message="Gudang tidak boleh kosong" {{ $data ? 'readonly' : '' }}>
-                                    <option value="">Pilih Gudang</option>
-                                    @if ($data && $data->id_gudang)
-                                        <option value="{{ $data->id_gudang }}" selected>
-                                            {{ $data->gudang->kode_gudang }} - {{ $data->gudang->nama_gudang }}
-                                        </option>
-                                    @endif
+                                <select name="id_salesman" class="form-control select2 trigger-change">
+                                    @foreach ($salesman as $item)
+                                        <option value="{{ $item->id_salesman }}">{{ $item->nama_salesman }}</option>
+                                    @endforeach
                                 </select>
-                            </div> --}}
-                        </div>
-                        <div class="col-md-4">
-                            <label>Kode Pemakaian</label>
-                            <div class="form-group">
-                                <input type="text" name="kode_pemakaian"
-                                    value="{{ old('kode_pemakaian', $data ? $data->kode_pemakaian : '') }}"
-                                    class="form-control" readonly placeholder="Otomatis">
-                            </div>
-                            <label>Tanggal <span>*</span></label>
-                            <div class="form-group">
-                                <input type="text" name="tanggal"
-                                    value="{{ old('tanggal', $data ? $data->tanggal : date('Y-m-d')) }}"
-                                    class="form-control datepicker" data-validation="[NOTEMPTY]"
-                                    data-validation-message="Tanggal tidak boleh kosong">
                             </div>
                         </div>
+
                         <div class="col-md-4">
+                            <label>Pelanggan <span>*</span></label>
+                            <div class="form-group">
+                                <select name="id_pelanggan" class="form-control select2 trigger-change">
+                                    @foreach ($pelanggan as $item)
+                                        <option value="{{ $item->id_pelanggan }}">{{ $item->nama_pelanggan }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                             <label>Catatan</label>
                             <div class="form-group">
-                                <textarea name="catatan" class="form-control" rows="3">{{ old('catatan', $data ? $data->catatan : '') }}</textarea>
+                                <textarea name="pre_visit_desc" class="form-control" rows="3">{{ old('pre_visit_desc', $data ? $data->pre_visit_desc : '') }}</textarea>
                             </div>
-                            @if ($accessQc == '1')
-                                <label>QC</label>
-                                @if (!$data)
-                                    <input type="checkbox" name="is_qc" value="1">
-                                @else
-                                    : <input type="checkbox" name="is_qc" value="1"
-                                        {{ $data->is_qc == '1' ? 'checked' : '' }} disabled>
-                                @endif
-                            @endif
                         </div>
                     </div>
+                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                    <button class="btn btn-primary btn-flat pull-right" type="submit">
+                        <i class="glyphicon glyphicon-floppy-saved"></i> Simpan Data
+                    </button>
                 </div>
             </div>
         </form>
@@ -260,7 +259,7 @@
 @section('externalScripts')
     <script>
         let branch = {!! json_encode($cabang) !!}
-        let timbangan = {!! $timbangan !!}
+        let timbangan = '';
         let details = {!! $data ? $data->formatdetail : '[]' !!};
         let detailSelect = []
         let count = details.length

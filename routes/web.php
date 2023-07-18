@@ -139,10 +139,10 @@ Route::prefix('jadwal_kunjungan')->group(function () {
 
 Route::prefix('kunjungan')->group(function () {
     Route::get('/index/{user_id?}', 'VisitController@index')->name('visit');
-    Route::get('/entry/{id?}', 'MaterialUsageController@entry')->name('visit-entry');
-    Route::post('/save_entry/{id}', 'MaterialUsageController@saveEntry')->name('visit-save-entry');
-    Route::get('/view/{id}', 'MaterialUsageController@viewData')->name('visit-view');
-    Route::get('/delete/{id}', 'MaterialUsageController@destroy')->name('visit-delete');
+    Route::get('/entry/{id?}', 'VisitController@entry')->name('visit-entry');
+    Route::post('/save_entry/{id}', 'VisitController@saveEntry')->name('visit-save-entry');
+    Route::get('/view/{id}', 'VisitController@viewData')->name('visit-view');
+    Route::get('/delete/{id}', 'VisitController@destroy')->name('visit-delete');
 });
 
 Route::get('kirim_ke_gudang/print/{id}', 'SendToWarehouseController@print')->name('send_to_warehouse-print');

@@ -76,12 +76,12 @@
 @section('header')
     <section class="content-header">
         <h1>
-            Pemakaian
+            Kunjungan
             <small>| {{ $data ? 'Edit' : 'Tambah' }}</small>
         </h1>
         <ol class="breadcrumb">
             <li><a href="#"><i class="fa fa-dashboard"></i> Dashboard</a></li>
-            <li><a href="{{ route('material_usage') }}">Pemakaian</a></li>
+            <li><a href="{{ route('pre_visit') }}">Kunjungan</a></li>
             <li class="active">Form</li>
         </ol>
     </section>
@@ -89,17 +89,31 @@
 
 @section('main-section')
     <div class="content container-fluid">
-        <form action="{{ route('material_usage-save-entry', $data ? $data->id_pemakaian : 0) }}" method="post"
-            class="post-action">
+        <form action="{{ route('pre_visit-save-entry', $data ? $data->id : 0) }}" method="post" class="post-action">
             <div class="box">
                 <div class="box-header">
-                    <h3 class="box-title">{{ $data ? 'Ubah' : 'Tambah' }} Pemakaian</h3>
-                    <a href="{{ route('material_usage') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right">
+                    <h3 class="box-title">{{ $data ? 'Ubah' : 'Tambah' }} Kunjungan</h3>
+                    <a href="{{ route('pre_visit') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right">
                         <span class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali
                     </a>
                 </div>
                 <div class="box-body">
                     <div class="row">
+                        <div class="col-md-4">
+                            <label>Kode Kunjungan</label>
+                            <div class="form-group">
+                                <input type="text" name="visit_code"
+                                    value="{{ old('visit_code', $data ? $data->visit_code : '') }}" class="form-control"
+                                    readonly placeholder="Otomatis">
+                            </div>
+                            <label>Tanggal <span>*</span></label>
+                            <div class="form-group">
+                                <input type="text" name="visit_date"
+                                    value="{{ old('visit_date', $data ? $data->visit_date : date('Y-m-d')) }}"
+                                    class="form-control datepicker" data-validation="[NOTEMPTY]"
+                                    data-validation-message="Tanggal tidak boleh kosong">
+                            </div>
+                        </div>
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>Cabang <span>*</span></label>
@@ -113,82 +127,33 @@
                                     @endif
                                 </select>
                             </div>
-                            <label>Gudang <span>*</span></label>
+                            <label>Salesman <span>*</span></label>
                             <div class="form-group">
-                                <select name="id_gudang" class="form-control select2" data-validation="[NOTEMPTY]"
-                                    data-validation-message="Gudang tidak boleh kosong" {{ $data ? 'readonly' : '' }}>
-                                    <option value="">Pilih Gudang</option>
-                                    @if ($data && $data->id_gudang)
-                                        <option value="{{ $data->id_gudang }}" selected>
-                                            {{ $data->gudang->kode_gudang }} - {{ $data->gudang->nama_gudang }}
-                                        </option>
-                                    @endif
+                                <select name="id_salesman" class="form-control select2 trigger-change">
+                                    @foreach ($salesman as $item)
+                                        <option value="{{ $item->id_salesman }}">{{ $item->nama_salesman }}</option>
+                                    @endforeach
                                 </select>
                             </div>
                         </div>
+
                         <div class="col-md-4">
-                            <label>Kode Pemakaian</label>
+                            <label>Pelanggan <span>*</span></label>
                             <div class="form-group">
-                                <input type="text" name="kode_pemakaian"
-                                    value="{{ old('kode_pemakaian', $data ? $data->kode_pemakaian : '') }}"
-                                    class="form-control" readonly placeholder="Otomatis">
+                                <select name="id_pelanggan" class="form-control select2 trigger-change">
+                                    @foreach ($pelanggan as $item)
+                                        <option value="{{ $item->id_pelanggan }}">{{ $item->nama_pelanggan }}</option>
+                                    @endforeach
+                                </select>
                             </div>
-                            <label>Tanggal <span>*</span></label>
-                            <div class="form-group">
-                                <input type="text" name="tanggal"
-                                    value="{{ old('tanggal', $data ? $data->tanggal : date('Y-m-d')) }}"
-                                    class="form-control datepicker" data-validation="[NOTEMPTY]"
-                                    data-validation-message="Tanggal tidak boleh kosong">
-                            </div>
-                        </div>
-                        <div class="col-md-4">
                             <label>Catatan</label>
                             <div class="form-group">
-                                <textarea name="catatan" class="form-control" rows="3">{{ old('catatan', $data ? $data->catatan : '') }}</textarea>
+                                <textarea name="pre_visit_desc" class="form-control" rows="3">{{ old('pre_visit_desc', $data ? $data->pre_visit_desc : '') }}</textarea>
                             </div>
-                            @if ($accessQc == '1')
-                                <label>QC</label>
-                                @if (!$data)
-                                    <input type="checkbox" name="is_qc" value="1">
-                                @else
-                                    : <input type="checkbox" name="is_qc" value="1"
-                                        {{ $data->is_qc == '1' ? 'checked' : '' }} disabled>
-                                @endif
-                            @endif
                         </div>
                     </div>
-                </div>
-            </div>
-            <div class="box">
-                <div class="box-header">
-                    <h3 class="box-title">Detail Barang</h3>
-                    <button class="btn btn-info add-entry btn-flat pull-right btn-sm" type="button">
-                        <i class="glyphicon glyphicon-plus"></i> Tambah Barang
-                    </button>
-                </div>
-                <div class="box-body">
-                    <div class="table-responsive">
-                        <input type="hidden" name="details" value="{{ $data ? json_encode($data->formatdetail) : '[]' }}">
-                        <input type="hidden" name="detele_details" value="[]">
-                        <table id="table-detail" class="table table-bordered data-table display responsive nowrap"
-                            width="100%">
-                            <thead>
-                                <tr>
-                                    <th>Kode</th>
-                                    <th>Nama Barang</th>
-                                    <th>Satuan</th>
-                                    <th>Gross</th>
-                                    <th>Jumlah Zak</th>
-                                    <th>Tare</th>
-                                    <th>Nett</th>
-                                    <th>Catatan</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                        </table>
-                    </div>
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                    <button class="btn btn-primary btn-flat pull-right btn-sm" type="submit">
+                    <button class="btn btn-primary btn-flat pull-right" type="submit">
                         <i class="glyphicon glyphicon-floppy-saved"></i> Simpan Data
                     </button>
                 </div>
@@ -205,8 +170,8 @@
                         <div id="reader"></div>
                         <div class="form-group">
                             <div class="input-group">
-                                <input type="text" name="search-qrcode" class="form-control"
-                                    placeholder="Scan QRCode" autocomplete="off">
+                                <input type="text" name="search-qrcode" class="form-control" placeholder="Scan QRCode"
+                                    autocomplete="off">
                                 <div class="input-group-btn">
                                     <button class="btn btn-info btn-search btn-flat" type="button">
                                         <i class="fa fa-search"></i>
@@ -294,7 +259,7 @@
 @section('externalScripts')
     <script>
         let branch = {!! json_encode($cabang) !!}
-        let timbangan = {!! $timbangan !!}
+        let timbangan = '';
         let details = {!! $data ? $data->formatdetail : '[]' !!};
         let detailSelect = []
         let count = details.length
