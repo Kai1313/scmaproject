@@ -101,6 +101,7 @@ class ClosingJournalController extends Controller
             $closing = new Closing;
             $closing->month = $month;
             $closing->year = $year;
+            $closing->id_cabang = $id_cabang;
             if (!$closing->save()) {
                 DB::rollback();
                 return response()->json([
@@ -668,9 +669,9 @@ class ClosingJournalController extends Controller
                 $id_transaksi = $header->kode_pindah_barang;
                 // Delete detail and header existing first
                 JurnalDetail::where("id_transaksi", $id_transaksi)->where("keterangan", "HPP Transfer Cabang Keluar ".$id_transaksi)->delete();
-                JurnalHeader::where("id_transaksi", $id_transaksi)->where("catatan", "Closing Transfer Barang Keluar")->delete();
+                JurnalHeader::where("id_transaksi", "Closing ".$id_transaksi)->where("catatan", "Closing Transfer Barang Keluar")->delete();
                 JurnalDetail::where("id_transaksi", $id_transaksi)->where("keterangan", "HPP Transfer Cabang Masuk ".$id_transaksi)->delete();
-                JurnalHeader::where("id_transaksi", $id_transaksi)->where("catatan", "Closing Transfer Barang Masuk")->delete();
+                JurnalHeader::where("id_transaksi", "Closing ".$id_transaksi)->where("catatan", "Closing Transfer Barang Masuk")->delete();
                 if ($header->type == 0) {
                     // Get header out detail
                     $data_detail = InventoryTransferDetail::select("pindah_barang_detail.id_barang", "pindah_barang_detail.qr_code", "master_qr_code.beli_master_qr_code", "master_qr_code.biaya_beli_master_qr_code", "master_qr_code.jumlah_master_qr_code", "master_qr_code.produksi_master_qr_code", "master_qr_code.listrik_master_qr_code", "master_qr_code.pegawai_master_qr_code")->join("master_qr_code", "kode_batang_master_qr_code", "pindah_barang_detail.qr_code")->where("pindah_barang_detail.id_pindah_barang", $header->id_pindah_barang)->get();
@@ -702,7 +703,7 @@ class ClosingJournalController extends Controller
                     $header = new JurnalHeader();
                     $header->id_cabang = $id_cabang;
                     $header->jenis_jurnal = $journal_type;
-                    $header->id_transaksi = $id_transaksi;
+                    $header->id_transaksi = "Closing ".$id_transaksi;
                     $header->catatan = "Closing Transfer Barang Keluar";
                     $header->void = 0;
                     $header->tanggal_jurnal = $end_date;
@@ -833,7 +834,7 @@ class ClosingJournalController extends Controller
                     $header = new JurnalHeader();
                     $header->id_cabang = $id_cabang;
                     $header->jenis_jurnal = $journal_type;
-                    $header->id_transaksi = $id_transaksi;
+                    $header->id_transaksi = "Closing ".$id_transaksi;
                     $header->catatan = "Closing Transfer Barang Masuk";
                     $header->void = 0;
                     $header->tanggal_jurnal = $end_date;
@@ -943,9 +944,10 @@ class ClosingJournalController extends Controller
             // Revert post closing
             $month = $request->month;
             $year = $request->year;
-            $check = Closing::where("month", $month)->where("year", $year)->first();
+            $id_cabang = $request->id_cabang;
+            $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
             if ($check) {
-                $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
             }
             $message = "Jurnal Closing Transfer Cabang Gagal. Error when inventory transfer";
             Log::error($message);
@@ -991,7 +993,7 @@ class ClosingJournalController extends Controller
                 $id_transaksi = $header->nama_koreksi_stok;
                 // Delete detail and header existing first
                 JurnalDetail::where("id_transaksi", $id_transaksi)->where("keterangan", "Koreksi Stok ".$id_transaksi)->delete();
-                JurnalHeader::where("id_transaksi", $id_transaksi)->where("catatan", "Koreksi Stok")->delete();
+                JurnalHeader::where("id_transaksi", "Closing ".$id_transaksi)->where("catatan", "Koreksi Stok")->delete();
                 // get koreksi stok detail
                 // $data_detail = StockCorrectionDetail::select("id_koreksi_stok_detail", "id_barang", DB::raw("SUM(debit_koreksi_stok_detail) as debet"), DB::raw("SUM(kredit_koreksi_stok_detail) as kredit"))->where("id_koreksi_stok", $header->id_koreksi_stok)->groupBy("id_barang")->get();
                 $data_detail = StockCorrectionDetail::selectRaw("koreksi_stok_detail.id_koreksi_stok, koreksi_stok_detail.id_barang, koreksi_stok_detail.debit_koreksi_stok_detail as debet, koreksi_stok_detail.kredit_koreksi_stok_detail as kredit, koreksi_stok_detail.kode_batang_koreksi_stok_detail, koreksi_stok_detail.kode_batang_lama_koreksi_stok_detail,
@@ -1033,7 +1035,7 @@ class ClosingJournalController extends Controller
                 $header = new JurnalHeader();
                 $header->id_cabang = $id_cabang;
                 $header->jenis_jurnal = $journal_type;
-                $header->id_transaksi = $id_transaksi;
+                $header->id_transaksi = "Closing ".$id_transaksi;
                 $header->catatan = "Koreksi Stok";
                 $header->void = 0;
                 $header->tanggal_jurnal = $end_date;
@@ -1142,9 +1144,10 @@ class ClosingJournalController extends Controller
             // Revert post closing
             $month = $request->month;
             $year = $request->year;
-            $check = Closing::where("month", $month)->where("year", $year)->first();
+            $id_cabang = $request->id_cabang;
+            $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
             if ($check) {
-                $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
             }
             $message = "Jurnal Closing Koreksi Stok Gagal. Error when stock correction";
             Log::error($message);
@@ -1933,6 +1936,9 @@ class ClosingJournalController extends Controller
             $nextYear = date("Y", strtotime("+1 month $start_date"));
 
             DB::beginTransaction();
+            // Delete saldo transfer if exist
+            $delete = SaldoBalance::where("bulan", $nextMonth)->where("tahun", $nextYear)->where("id_cabang", $id_cabang)->delete();
+
             // Get all account that is shown 1
             $dataAkun = Akun::where("id_cabang", $id_cabang)->where("isshown", 1)->get();
             $debet = 0;
@@ -1987,7 +1993,7 @@ class ClosingJournalController extends Controller
             DB::commit();
             return response()->json([
                 "result"=>TRUE,
-                "message"=>"Successfully proceed closing journal stock correction"
+                "message"=>"Successfully proceed closing transfer saldo"
             ]);
         } catch (\Exception $e) {
             DB::rollback();
@@ -1995,9 +2001,10 @@ class ClosingJournalController extends Controller
             // Revert post closing
             $month = $request->month;
             $year = $request->year;
-            $check = Closing::where("month", $month)->where("year", $year)->first();
+            $id_cabang = $request->id_cabang;
+            $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
             if ($check) {
-                $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
             }
             Log::error($message);
             Log::error($e);

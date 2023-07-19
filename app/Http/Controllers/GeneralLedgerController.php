@@ -641,7 +641,8 @@ class GeneralLedgerController extends Controller
 
         $data_general_ledger = JurnalHeader::join('master_slip', 'jurnal_header.id_slip', 'master_slip.id_slip')
         ->leftJoin('jurnal_detail', 'jurnal_detail.id_jurnal', 'jurnal_header.id_jurnal')
-        ->select('jurnal_header.*', DB::raw('GROUP_CONCAT(jurnal_detail.id_transaksi SEPARATOR \', \') AS concat_id_transaksi'), 'master_slip.kode_slip', DB::raw('
+        ->leftJoin('saldo_transaksi', 'saldo_transaksi.id_transaksi', 'jurnal_detail.id_transaksi')
+        ->select('jurnal_header.*', DB::raw('GROUP_CONCAT(CONCAT(jurnal_detail.id_transaksi, "-", saldo_transaksi.ref_id) SEPARATOR \', \') AS concat_id_transaksi'), 'master_slip.kode_slip', DB::raw('
                     (CASE
                         WHEN jenis_jurnal = "KK" THEN "Kas Keluar"
                         WHEN jenis_jurnal = "KM" THEN "Kas Masuk"
@@ -693,7 +694,8 @@ class GeneralLedgerController extends Controller
                     $data_general_ledger_table->orderBy($column, $directon);
                 }
             }
-        } else {
+        } 
+        else {
             $data_general_ledger_table->orderBy('jurnal_header.id_jurnal', 'DESC');
         }
 
@@ -713,11 +715,11 @@ class GeneralLedgerController extends Controller
 
             $data_general_ledger_table->skip($offset)->take($limit_data);
         }
-
+        $dataTable = $data_general_ledger_table->get();
         $table['draw'] = $draw;
-        $table['recordsTotal'] = $data_general_ledger_table->count();
-        $table['recordsFiltered'] = $filtered_data->count();
-        $table['data'] = $data_general_ledger_table->get();
+        $table['recordsTotal'] = count($dataTable);
+        $table['recordsFiltered'] = count($filtered_data);
+        $table['data'] = $dataTable;
 
         return json_encode($table);
     }
