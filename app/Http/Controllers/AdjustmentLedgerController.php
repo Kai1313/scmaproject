@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Accounting\JurnalDetail;
 use App\Models\Accounting\JurnalHeader;
+use App\Models\Accounting\Periode;
 use App\Models\Accounting\TrxSaldo;
 use App\Models\Master\Akun;
 use App\Models\Master\Cabang;
@@ -97,6 +98,15 @@ class AdjustmentLedgerController extends Controller
             $dateRecord = date('Y-m-d');
             $detailData = $request->detail;
             // dd($detailData);
+
+            // Check periode close
+            $period = Periode::checkPeriod($journalDate);
+            if ($period) {
+                return response()->json([
+                    "result" => false,
+                    "message" => "Period close, cannot save with this date",
+                ]);
+            }
 
             DB::beginTransaction();
             // Store Header
@@ -350,6 +360,25 @@ class AdjustmentLedgerController extends Controller
         ];
         // dd($data);
 
+        // Check periode close
+        $period = Periode::checkPeriod($jurnal_header->tanggal_jurnal);
+        if ($period) {
+            if (checkUserSession($request, 'general_ledger', 'show') == false) {
+                return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+            }
+    
+            // $cabang = Cabang::find(1);
+    
+            $data = [
+                "pageTitle" => "SCA Accounting | Transaksi Jurnal Penyesuaian | List",
+                // "cabang" => $cabang,
+                "data_cabang" => $data_cabang,
+                "closePeriod" => $period
+            ];
+    
+            return view('accounting.journal.adjusting_journal.index', $data);
+        }
+
         Log::debug(json_encode($request->session()->get('user')));
 
         return view('accounting.journal.adjusting_journal.form_edit', $data);
@@ -387,6 +416,15 @@ class AdjustmentLedgerController extends Controller
             $userModified = $userData->id_pengguna;
             $dateModified = date('Y-m-d');
             $detailData = $request->detail;
+
+            // Check periode close
+            $period = Periode::checkPeriod($journalDate);
+            if ($period) {
+                return response()->json([
+                    "result" => false,
+                    "message" => "Period close, cannot update this transaction",
+                ]);
+            }
 
             DB::beginTransaction();
 
@@ -562,7 +600,7 @@ class AdjustmentLedgerController extends Controller
         $draw = $request->draw;
         $current_page = $offset / $limit + 1;
 
-        $data_general_ledger = JurnalHeader::select('jurnal_header.*', DB::raw('
+        $data_general_ledger = JurnalHeader::leftJoin('jurnal_detail', 'jurnal_detail.id_jurnal', 'jurnal_header.id_jurnal')->select('jurnal_header.*', DB::raw('GROUP_CONCAT(jurnal_detail.id_transaksi SEPARATOR \', \') AS concat_id_transaksi'), DB::raw('
                     (CASE
                         WHEN jenis_jurnal = "KK" THEN "Kas Keluar"
                         WHEN jenis_jurnal = "KM" THEN "Kas Masuk"
@@ -572,23 +610,24 @@ class AdjustmentLedgerController extends Controller
                         WHEN jenis_jurnal = "HG" THEN "Hutang Giro"
                         WHEN jenis_jurnal = "ME" THEN "Memorial"
                     END) as jenis_name
-                '));
+                '))->groupBy('jurnal_header.id_jurnal');
 
         $data_general_ledger_table = DB::table(DB::raw('(' . $data_general_ledger->toSql() . ') as jurnal_header'))
             ->join('jurnal_detail', 'jurnal_detail.id_jurnal', 'jurnal_header.id_jurnal')
             ->where('jurnal_header.void', $void)
-            ->groupBy('jurnal_header.id_jurnal')
+            ->where('jenis_jurnal', 'ME')
+            ->where('id_cabang', $cabang)
+            ->groupBy('jurnal_header.id_jurnal', 'jurnal_header.tanggal_jurnal')
             ->select('jurnal_header.*', DB::raw('SUM(jurnal_detail.credit) as jumlah'));
-        $data_general_ledger_table = $data_general_ledger_table->where('id_cabang', $cabang)->where('jenis_jurnal', 'ME');
 
         if (!empty($keyword)) {
             $data_general_ledger_table->where(function ($query) use ($keyword) {
                 $query->orWhere('kode_jurnal', 'LIKE', "%$keyword%")
                     ->orWhere('tanggal_jurnal', 'LIKE', "%$keyword%")
                     ->orWhere('jenis_name', 'LIKE', "%$keyword%")
-                    ->orWhere('jurnal_header.id_transaksi', 'LIKE', "%$keyword%")
+                    // ->orWhere('jurnal_header.id_transaksi', 'LIKE', "%$keyword%")
+                    ->orWhere('concat_id_transaksi', 'LIKE', "%$keyword%")
                     ->orWhere('catatan', 'LIKE', "%$keyword%");
-                // ->orWhere('jumlah', 'LIKE', "%$keyword%")
             });
         }
 
@@ -658,6 +697,17 @@ class AdjustmentLedgerController extends Controller
             $userData = $request->session()->get('user');
             $userVoid = $userData->id_pengguna;
             $dateVoid = date('Y-m-d');
+
+            // Find Header data
+            $header = JurnalHeader::where("id_jurnal", $id)->first();
+            // Check periode close
+            $period = Periode::checkPeriod($header->tanggal_jurnal);
+            if ($period) {
+                return response()->json([
+                    "result" => false,
+                    "message" => "Period close, cannot void this transaction",
+                ]);
+            }
 
             DB::beginTransaction();
 
