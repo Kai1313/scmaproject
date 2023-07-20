@@ -111,7 +111,7 @@ class LaporanPiutangCurrentController extends Controller
         $idCabang = explode(',', $request->id_cabang);
 
         $joinJurnal = DB::table('jurnal_header as jh')
-            ->select('jd.id_transaksi', DB::raw('ifnull(sum(jd.debet-jd.credit),0) as Total'))
+            ->select('jd.id_transaksi', DB::raw('ifnull(sum(jd.credit-jd.debet),0) as Total'))
             ->leftJoin('jurnal_detail AS jd', function ($join) {
                 $join->on('jh.id_jurnal', '=', 'jd.id_jurnal')
                     ->on(DB::Raw("ifnull(jd.id_transaksi,'')"), '<>', DB::Raw("''"));
