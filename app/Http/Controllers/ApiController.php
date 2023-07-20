@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Barang;
 use App\Models\Accounting\JurnalDetail;
 use App\Models\Accounting\JurnalHeader;
 use App\Models\Accounting\TrxSaldo;
@@ -592,8 +593,33 @@ class ApiController extends Controller
             }
 
             foreach ($detail_inventory as $d_inv) {
+                $barang = Barang::find($d_inv['id_barang']);
+                if($id_cabang == 1){
+                    $akun_penjualan_barang = $barang->id_akun_penjualan;
+                }else{
+                    $format_akun = 'id_akun_penjualan' . $id_cabang;
+                    $akun_penjualan_barang = $barang->$format_akun;
+                }
+
+                if($akun_penjualan_barang == null){
+                    DB::rollback();
+                    return response()->json([
+                        "result" => false,
+                        "message" => "Error when store Jurnal data on table detail. Akun Penjualan Barang " . $barang->kode_barang . ' - ' . $barang->nama_barang . ' can not null.',
+                    ]);
+                }else{
+                    $data_akun_penjualan_barang = Akun::find($akun_penjualan_barang);
+                    if(empty($data_akun_penjualan_barang)){
+                        DB::rollback();
+                        return response()->json([
+                            "result" => false,
+                            "message" => "Error when store Jurnal data on table detail. Akun Penjualan Barang " . $barang->kode_barang . ' - ' . $barang->nama_barang . ' not found.',
+                        ]);
+                    }
+                }
+
                 array_push($jurnal_detail_me, [
-                    'akun' => $akun_penjualan,
+                    'akun' => $akun_penjualan_barang,
                     'debet' => 0,
                     'credit' => round(floatval($d_inv['total']), 2),
                     'keterangan' => 'Jurnal Otomatis Penjualan - ' . $id_transaksi . ' - ' . $nama_pelanggan . ' - ' . $d_inv['nama_barang'],
@@ -1301,8 +1327,33 @@ class ApiController extends Controller
             ];
 
             foreach ($detail_inventory as $d_inv) {
+                $barang = Barang::find($d_inv['id_barang']);
+                if($id_cabang == 1){
+                    $akun_retur_penjualan_barang = $barang->id_akun_retur_penjualan;
+                }else{
+                    $format_akun = 'id_akun_retur_penjualan' . $id_cabang;
+                    $akun_retur_penjualan_barang = $barang->$format_akun;
+                }
+
+                if($akun_retur_penjualan_barang == null){
+                    DB::rollback();
+                    return response()->json([
+                        "result" => false,
+                        "message" => "Error when store Jurnal data on table detail. Akun Retur Penjualan Barang " . $barang->kode_barang . ' - ' . $barang->nama_barang . ' can not null.',
+                    ]);
+                }else{
+                    $data_akun_penjualan_barang = Akun::find($akun_retur_penjualan_barang);
+                    if(empty($data_akun_penjualan_barang)){
+                        DB::rollback();
+                        return response()->json([
+                            "result" => false,
+                            "message" => "Error when store Jurnal data on table detail. Akun Retur Penjualan Barang " . $barang->kode_barang . ' - ' . $barang->nama_barang . ' not found.',
+                        ]);
+                    }
+                }
+
                 array_push($jurnal_detail_me, [
-                    'akun' => $akun_penjualan,
+                    'akun' => $akun_retur_penjualan_barang,
                     'debet' => round(floatval($d_inv['total']), 2),
                     'credit' => 0,
                     'keterangan' => 'Jurnal Otomatis Retur Penjualan - ' . $id_transaksi . ' - ' . $nama_pelanggan . ' - ' . $d_inv['nama_barang'],

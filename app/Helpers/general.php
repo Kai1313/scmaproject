@@ -214,6 +214,7 @@ function getCabang()
         ->join('cabang', 'cabang.id_cabang', 'gudang.id_cabang')
         ->where('id_pengguna', $user_id)
         ->where('cabang.status_cabang', 1)
+        ->where('akses_gudang.status_akses_gudang', 1)
         ->get();
 
     return $cabang;
