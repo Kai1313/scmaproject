@@ -660,12 +660,12 @@
                                     </span>
                                 </a>
                                 <ul class="treeview-menu">
-                                    <li data-alias="permintaan_penjualan">
+                                    <li data-alias="jadwal_kunjungan">
                                         <a href="{{ route('pre_visit') }}">
                                             <i class="glyphicon glyphicon-option-vertical"></i>Jadwal Kunjungan
                                         </a>
                                     </li>
-                                    <li data-alias="permintaan_penjualan">
+                                    <li data-alias="kunjungan">
                                         <a href="{{ route('visit') }}">
                                             <i class="glyphicon glyphicon-option-vertical"></i>Kunjungan
                                         </a>

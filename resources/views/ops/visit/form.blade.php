@@ -90,72 +90,153 @@
 @section('main-section')
     <div class="content container-fluid">
         <form action="{{ route('pre_visit-save-entry', $data ? $data->id : 0) }}" method="post" class="post-action">
-            <div class="box">
-                <div class="box-header">
-                    <h3 class="box-title">{{ $data ? 'Ubah' : 'Tambah' }} Kunjungan</h3>
-                    <a href="{{ route('pre_visit') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right">
-                        <span class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali
-                    </a>
-                </div>
-                <div class="box-body">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <label>Kode Kunjungan</label>
-                            <div class="form-group">
-                                <input type="text" name="visit_code"
-                                    value="{{ old('visit_code', $data ? $data->visit_code : '') }}" class="form-control"
-                                    readonly placeholder="Otomatis">
-                            </div>
-                            <label>Tanggal <span>*</span></label>
-                            <div class="form-group">
-                                <input type="text" name="visit_date"
-                                    value="{{ old('visit_date', $data ? $data->visit_date : date('Y-m-d')) }}"
-                                    class="form-control datepicker" data-validation="[NOTEMPTY]"
-                                    data-validation-message="Tanggal tidak boleh kosong">
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Cabang <span>*</span></label>
-                                <select name="id_cabang" class="form-control select2" data-validation="[NOTEMPTY]"
-                                    data-validation-message="Cabang tidak boleh kosong" {{ $data ? 'readonly' : '' }}>
-                                    <option value="">Pilih Cabang</option>
-                                    @if ($data && $data->id_cabang)
-                                        <option value="{{ $data->id_cabang }}" selected>
-                                            {{ $data->cabang->kode_cabang }} - {{ $data->cabang->nama_cabang }}
-                                        </option>
-                                    @endif
-                                </select>
-                            </div>
-                            <label>Salesman <span>*</span></label>
-                            <div class="form-group">
-                                <select name="id_salesman" class="form-control select2 trigger-change">
-                                    @foreach ($salesman as $item)
-                                        <option value="{{ $item->id_salesman }}">{{ $item->nama_salesman }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <label>Pelanggan <span>*</span></label>
-                            <div class="form-group">
-                                <select name="id_pelanggan" class="form-control select2 trigger-change">
-                                    @foreach ($pelanggan as $item)
-                                        <option value="{{ $item->id_pelanggan }}">{{ $item->nama_pelanggan }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <label>Catatan</label>
-                            <div class="form-group">
-                                <textarea name="pre_visit_desc" class="form-control" rows="3">{{ old('pre_visit_desc', $data ? $data->pre_visit_desc : '') }}</textarea>
-                            </div>
-                        </div>
+            <div class="col-sm-6">
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title">{{ $data ? 'Ubah' : 'Tambah' }} Jadwal Kunjungan</h3>
+                        <a href="{{ route('pre_visit') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right">
+                            <span class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali
+                        </a>
                     </div>
-                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                    <button class="btn btn-primary btn-flat pull-right" type="submit">
-                        <i class="glyphicon glyphicon-floppy-saved"></i> Simpan Data
-                    </button>
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-md-12" id="map">
+
+                            </div>
+                            <div class="col-md-6">
+                                <label>Kode Kunjungan</label>
+                                <div class="form-group">
+                                    <input type="text" name="visit_code"
+                                        value="{{ old('visit_code', $data ? $data->visit_code : '') }}" class="form-control"
+                                        readonly placeholder="Otomatis">
+                                </div>
+
+                            </div>
+                            <div class="col-sm-6 disabled">
+                                <label>Tanggal <span>*</span></label>
+                                <div class="form-group">
+                                    <input readonly type="text" name="visit_date"
+                                        value="{{ old('visit_date', $data ? $data->visit_date : date('Y-m-d')) }}"
+                                        class="form-control datepicker" data-validation="[NOTEMPTY]"
+                                        data-validation-message="Tanggal tidak boleh kosong">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Cabang <span>*</span></label>
+                                    <select name="id_cabang" class="form-control select2" data-validation="[NOTEMPTY]"
+                                        data-validation-message="Cabang tidak boleh kosong" {{ $data ? 'readonly' : '' }}>
+                                        <option value="">Pilih Cabang</option>
+                                        @if ($data && $data->id_cabang)
+                                            <option value="{{ $data->id_cabang }}" selected>
+                                                {{ $data->cabang->kode_cabang }} - {{ $data->cabang->nama_cabang }}
+                                            </option>
+                                        @endif
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6 disabled">
+                                <label>Salesman <span>*</span></label>
+                                <div class="form-group">
+                                    <select name="id_salesman" class="form-control select2 trigger-change">
+                                        @foreach ($salesman as $item)
+                                            <option {{ $data->id_salesman == $item->id_salesman ? 'selected' : '' }}
+                                                value="{{ $item->id_salesman }}">{{ $item->nama_salesman }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <label>Pelanggan</label>
+                                <div class="form-group">
+                                    <input type="text" class="form-control" readonly id="pelanggan"
+                                        value="{{ $data->pelanggan->nama_pelanggan }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label>Latitude</label>
+                                <div class="form-group">
+                                    <input type="text" readonly name="latitude" id="latitude" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label>Longitude</label>
+                                <div class="form-group">
+                                    <input type="text" readonly name="longitude" id="longitude" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <label>Catatan</label>
+                                <div class="form-group">
+                                    <textarea name="pre_visit_desc" readonly class="form-control" rows="3">{{ old('pre_visit_desc', $data ? $data->pre_visit_desc : '') }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 main-menu" id="main-menu">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <button type="button" class="btn btn-primary w-full mb-3" onclick="checkin()">CHECK IN</button>
+                    </div>
+                    <div class="col-sm-12">
+                        <button type="button" class="btn btn-success w-full mb-3"
+                            onclick="window.open(`https://api.whatsapp.com/send?phone={{ $data->kontak_person_pelanggan }}`)">FOLLOW
+                            UP BY WA</button>
+                    </div>
+                    <div class="col-sm-12">
+                        <button type="button" class="btn btn-warning w-full mb-3"
+                            onclick="location.href = '{{ route('pre_visit-entry', [$data->id]) }}'">UBAH JADWAL</button>
+                    </div>
+                    <div class="col-sm-12">
+                        <button type="button" class="btn btn-danger w-full mb-3"
+                            onclick="cancelAction('main')">CANCEL</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 hidden main-menu" id="checkin">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <button type="button" class="btn btn-primary w-full mb-3"
+                            onclick="submitLocation('checkin')">SUBMIT
+                            LOCATION</button>
+                    </div>
+                    <div class="col-sm-12">
+                        <button type="button" class="btn btn-danger w-full mb-3"
+                            onclick="cancelAction('checkin')">CANCEL</button>
+                    </div>
+                    <div class="col-sm-12">
+                        <hr>
+                    </div>
+                    <div class="col-sm-12">
+                        <button type="button" class="btn btn-warning w-full mb-3">REFRESH LOCATION</button>
+                    </div>
+                    <div class="col-sm-12">
+                        <button type="button" class="btn btn-success w-full mb-3" onclick="setCustLocation()">SET CUST
+                            LOCATION</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 hidden main-menu" id="set-cust-location">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <button type="button" class="btn btn-primary w-full mb-3"
+                            onclick="submitLocation('set_location')">SUBMIT SET CUST
+                            LOCATION</button>
+                    </div>
+                    <div class="col-sm-12">
+                        <button type="button" class="btn btn-danger w-full mb-3"
+                            onclick="cancelAction('set-cust-location')">CANCEL</button>
+                    </div>
+                    <div class="col-sm-12">
+                        <hr>
+                    </div>
+                    <div class="col-sm-12">
+                        <button type="button" class="btn btn-warning w-full mb-3">REFRESH LOCATION</button>
+                    </div>
                 </div>
             </div>
         </form>
@@ -170,8 +251,8 @@
                         <div id="reader"></div>
                         <div class="form-group">
                             <div class="input-group">
-                                <input type="text" name="search-qrcode" class="form-control" placeholder="Scan QRCode"
-                                    autocomplete="off">
+                                <input type="text" name="search-qrcode" class="form-control"
+                                    placeholder="Scan QRCode" autocomplete="off">
                                 <div class="input-group-btn">
                                     <button class="btn btn-info btn-search btn-flat" type="button">
                                         <i class="fa fa-search"></i>
@@ -260,7 +341,7 @@
     <script>
         let branch = {!! json_encode($cabang) !!}
         let timbangan = '';
-        let details = {!! $data ? $data->formatdetail : '[]' !!};
+        let details = [];
         let detailSelect = []
         let count = details.length
         let statusModal = 'create'
@@ -346,6 +427,11 @@
                 sumDetail()
             }
         });
+
+        $(document).ready(function() {
+            appendMap('{{ $data->pelanggan->latitude_pelanggan }}',
+                '{{ $data->pelanggan->longitude_pelanggan }}');
+        })
 
         function sumDetail() {
             let totalJumlah = 0;
@@ -434,51 +520,6 @@
                 }
             })
         }
-
-        $('.add-entry').click(function() {
-            detailSelect = []
-            $('#modalEntry').find('input,select,textarea').each(function(i, v) {
-                $(v).val('').trigger('change')
-                $(v).removeClass('error-field')
-            })
-
-            $('#alertWeight').text('').hide()
-            $('#max-jumlah').text('')
-            $('#max-jumlah-zak').text('')
-            statusModal = 'create'
-            count += 1
-            $('#modalEntry').find('[name="index"]').val(count)
-            $('#modalEntry').modal({
-                backdrop: 'static',
-                keyboard: false
-            })
-
-            $('#message-stok').text('').hide()
-            $('#alertZak').text('').hide()
-            $('#label-timbangan').html('Timbangan')
-            $('#label-berat').html('Berat Barang')
-            $('#label-jumlah-zak').html('Jumlah Zak')
-            $('[name="jumlah_zak"]').val(0)
-            $('[name="weight_zak"]').val(0)
-            $('.result-form').hide()
-            html5QrcodeScanner.render(onScanSuccess, onScanError);
-        })
-
-        $('#modalEntry').on('input', '[name="jumlah_zak"]', function() {
-            let weightWrapper = $('[name="wrapper_weight"]').val()
-            let jumlahZak = normalizeNumber($(this).val() ? $(this).val() : '0')
-            let weightZak = jumlahZak * weightWrapper
-            if (jumlahZak > detailSelect.jumlah_zak) {
-                $('#alertZak').text('Jumlah melebihi maksimal').show()
-                $(this).addClass('error-field')
-            } else {
-                $('#alertZak').text('').hide()
-                $(this).removeClass('error-field')
-            }
-
-            $('[name="jumlah_zak"]').val(jumlahZak)
-            $('[name="weight_zak"]').val(weightZak)
-        })
 
         $('.save-entry').click(function() {
             let modal = $('#modalEntry')
@@ -673,6 +714,85 @@
 
         function onScanError(errorMessage) {
             toastr.error(JSON.strignify(errorMessage))
+        }
+
+        function appendMap(latitude, longitude) {
+            $.ajax({
+                url: '{{ route('append-map') }}',
+                data: {
+                    latitude: latitude,
+                    longitude: longitude,
+                },
+                success: function(response) {
+                    $('#map').html(response);
+                }
+            });
+        }
+
+        function cancelAction(param) {
+            $('.main-menu').addClass('hidden');
+            switch (param) {
+                case 'main':
+                    $('#main-menu').removeClass('hidden');
+                    break;
+                case 'checkin':
+                    $('#main-menu').removeClass('hidden');
+                    break;
+                case 'set-cust-location':
+                    $('#checkin').removeClass('hidden');
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        function checkin() {
+            $('.main-menu').addClass('hidden');
+            $('#checkin').removeClass('hidden');
+        }
+
+        function setCustLocation() {
+            $('.main-menu').addClass('hidden');
+            $('#set-cust-location').removeClass('hidden');
+        }
+
+        function cancelData() {
+            Swal.fire({
+                title: 'Anda yakin ingin membatalkan data ini?',
+                icon: 'info',
+                showDenyButton: true,
+                confirmButtonText: 'Yes',
+                denyButtonText: 'No',
+                reverseButtons: true,
+                customClass: {
+                    actions: 'my-actions',
+                    confirmButton: 'order-1',
+                    denyButton: 'order-3',
+                }
+            }).then((result) => {
+                $('#cover-spin').show()
+                $.ajax({
+                    url: '{{ route('cancel-jadwal') }}',
+                    type: "get",
+                    dataType: "JSON",
+                    success: function(data) {
+                        $('#cover-spin').hide()
+                        if (data.result) {
+                            Swal.fire('Berhasil!', data.message, 'success').then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.href = data.redirect;
+                                }
+                            })
+                        } else {
+                            Swal.fire("Gagal Proses Data.", data.message, 'error')
+                        }
+                    },
+                    error: function(data) {
+                        $('#cover-spin').hide()
+                        Swal.fire("Gagal Proses Data.", data.responseJSON.message, 'error')
+                    }
+                })
+            })
         }
     </script>
 @endsection

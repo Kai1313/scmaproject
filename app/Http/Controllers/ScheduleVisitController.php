@@ -191,4 +191,11 @@ class ScheduleVisitController extends Controller
         }
     }
 
+    public function appendMap(Request $req)
+    {
+        return view('ops.scheduleVisit.map', [
+            'req' => $req,
+        ]);
+    }
+
 }

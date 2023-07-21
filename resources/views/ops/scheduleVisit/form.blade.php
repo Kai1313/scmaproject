@@ -90,76 +90,105 @@
 @section('main-section')
     <div class="content container-fluid">
         <form action="{{ route('pre_visit-save-entry', $data ? $data->id : 0) }}" method="post" class="post-action">
-            <div class="box">
-                <div class="box-header">
-                    <h3 class="box-title">{{ $data ? 'Ubah' : 'Tambah' }} Jadwal Kunjungan</h3>
-                    <a href="{{ route('pre_visit') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right">
-                        <span class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali
-                    </a>
-                </div>
-                <div class="box-body">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <label>Kode Kunjungan</label>
-                            <div class="form-group">
-                                <input type="text" name="visit_code"
-                                    value="{{ old('visit_code', $data ? $data->visit_code : '') }}" class="form-control"
-                                    readonly placeholder="Otomatis">
-                            </div>
-                            <label>Tanggal <span>*</span></label>
-                            <div class="form-group">
-                                <input type="text" name="visit_date"
-                                    value="{{ old('visit_date', $data ? $data->visit_date : date('Y-m-d')) }}"
-                                    class="form-control datepicker" data-validation="[NOTEMPTY]"
-                                    data-validation-message="Tanggal tidak boleh kosong">
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Cabang <span>*</span></label>
-                                <select name="id_cabang" class="form-control select2" data-validation="[NOTEMPTY]"
-                                    data-validation-message="Cabang tidak boleh kosong" {{ $data ? 'readonly' : '' }}>
-                                    <option value="">Pilih Cabang</option>
-                                    @if ($data && $data->id_cabang)
-                                        <option value="{{ $data->id_cabang }}" selected>
-                                            {{ $data->cabang->kode_cabang }} - {{ $data->cabang->nama_cabang }}
-                                        </option>
-                                    @endif
-                                </select>
-                            </div>
-                            <label>Salesman <span>*</span></label>
-                            <div class="form-group">
-                                <select name="id_salesman" class="form-control select2 trigger-change">
-                                    @foreach ($salesman as $item)
-                                        <option value="{{ $item->id_salesman }}">{{ $item->nama_salesman }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <label>Pelanggan <span>*</span></label>
-                            <div class="form-group">
-                                <select name="id_pelanggan" class="form-control select2 trigger-change">
-                                    @foreach ($pelanggan as $item)
-                                        <option value="{{ $item->id_pelanggan }}">{{ $item->nama_pelanggan }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <label>Catatan</label>
-                            <div class="form-group">
-                                <textarea name="pre_visit_desc" class="form-control" rows="3">{{ old('pre_visit_desc', $data ? $data->pre_visit_desc : '') }}</textarea>
-                            </div>
-                        </div>
+            <div class="col-sm-6">
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title">{{ $data ? 'Ubah' : 'Tambah' }} Jadwal Kunjungan</h3>
+                        <a href="{{ route('pre_visit') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right">
+                            <span class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali
+                        </a>
                     </div>
-                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                    <button class="btn btn-primary btn-flat pull-right" type="submit">
-                        <i class="glyphicon glyphicon-floppy-saved"></i> Simpan Data
-                    </button>
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label>Kode Kunjungan</label>
+                                <div class="form-group">
+                                    <input type="text" name="visit_code"
+                                        value="{{ old('visit_code', $data ? $data->visit_code : '') }}" class="form-control"
+                                        readonly placeholder="Otomatis">
+                                </div>
+
+                            </div>
+                            <div class="col-sm-6">
+                                <label>Tanggal <span>*</span></label>
+                                <div class="form-group">
+                                    <input type="text" name="visit_date"
+                                        value="{{ old('visit_date', $data ? $data->visit_date : date('Y-m-d')) }}"
+                                        class="form-control datepicker" data-validation="[NOTEMPTY]"
+                                        data-validation-message="Tanggal tidak boleh kosong">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Cabang <span>*</span></label>
+                                    <select name="id_cabang" class="form-control select2" data-validation="[NOTEMPTY]"
+                                        data-validation-message="Cabang tidak boleh kosong" {{ $data ? 'readonly' : '' }}>
+                                        <option value="">Pilih Cabang</option>
+                                        @if ($data && $data->id_cabang)
+                                            <option value="{{ $data->id_cabang }}" selected>
+                                                {{ $data->cabang->kode_cabang }} - {{ $data->cabang->nama_cabang }}
+                                            </option>
+                                        @endif
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label>Salesman <span>*</span></label>
+                                <div class="form-group">
+                                    <select name="id_salesman" class="form-control select2 trigger-change">
+                                        @foreach ($salesman as $item)
+                                            <option value="{{ $item->id_salesman }}">{{ $item->nama_salesman }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <label>Pelanggan <span>*</span>&nbsp;&nbsp;<a href="javascript:;"
+                                        onclick="window.open(`https://vps.scasda.my.id//v2/#pelanggan`)">Tambah
+                                        Pelanggan</a></label>
+                                <div class="form-group">
+                                    <select name="id_pelanggan" class="form-control select2 trigger-change"
+                                        id="id_pelanggan">
+                                        @foreach ($pelanggan as $item)
+                                            <option data-latitude="{{ $item->latitude_pelanggan }}"
+                                                data-longitude="{{ $item->longitude_pelanggan }}"
+                                                value="{{ $item->id_pelanggan }}">{{ $item->nama_pelanggan }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label>Latitude</label>
+                                <div class="form-group">
+                                    <input type="text" readonly name="latitude" id="latitude" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label>Longitude</label>
+                                <div class="form-group">
+                                    <input type="text" readonly name="longitude" id="longitude" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <label>Catatan</label>
+                                <div class="form-group">
+                                    <textarea name="pre_visit_desc" class="form-control" rows="3">{{ old('pre_visit_desc', $data ? $data->pre_visit_desc : '') }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                        <button class="btn btn-primary btn-flat pull-right" type="submit">
+                            <i class="glyphicon glyphicon-floppy-saved"></i> Simpan Data
+                        </button>
+                    </div>
                 </div>
             </div>
-        </form>
+            <div class="col-sm-6 map hidden" id="map">
 
+                <br />
+            </div>
+        </form>
         <div class="modal fade" id="modalEntry" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-sm" role="document">
                 <div class="modal-content">
@@ -170,8 +199,8 @@
                         <div id="reader"></div>
                         <div class="form-group">
                             <div class="input-group">
-                                <input type="text" name="search-qrcode" class="form-control" placeholder="Scan QRCode"
-                                    autocomplete="off">
+                                <input type="text" name="search-qrcode" class="form-control"
+                                    placeholder="Scan QRCode" autocomplete="off">
                                 <div class="input-group-btn">
                                     <button class="btn btn-info btn-search btn-flat" type="button">
                                         <i class="fa fa-search"></i>
@@ -272,6 +301,24 @@
         $('.datepicker').datepicker({
             format: 'yyyy-mm-dd',
         });
+
+        $("#id_pelanggan").change(function() {
+            var lat = $(this).find('option:selected').data('latitude');
+            var long = $(this).find('option:selected').data('longitude');
+            if (lat != '' && long != '') {
+                console.log(lat, long);
+                $('#map').removeClass('hidden');
+                $("#google-map").prop('src',
+                    `https://maps.google.com/maps?q=${lat},${long}&hl=id&z=14&amp;output=embed`)
+                appendMap();
+                $('#latitude').val(lat);
+                $('#longitude').val(long);
+            } else {
+                $('#map').addClass('hidden');
+                $('#latitude').val('');
+                $('#longitude').val('');
+            }
+        })
 
         $('.select2').select2()
         var resDataTable = $('#table-detail').DataTable({
@@ -673,6 +720,19 @@
 
         function onScanError(errorMessage) {
             toastr.error(JSON.strignify(errorMessage))
+        }
+
+        function appendMap(latitude, longitude) {
+            $.ajax({
+                url: '{{ route('append-map') }}',
+                data: {
+                    latitude: latitude,
+                    longitude: longitude,
+                },
+                success: function(response) {
+                    $('#map').html(response);
+                }
+            });
         }
     </script>
 @endsection

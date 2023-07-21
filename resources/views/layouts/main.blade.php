@@ -153,6 +153,18 @@ scratch. This page gets rid of all links and provides the needed markup only.
             display: inline-block;
             margin: 5px;
         }
+
+        .disabled {
+            pointer-events: none;
+        }
+
+        .w-full {
+            width: 100%;
+        }
+
+        .mb-3 {
+            margin-bottom: 1.25rem;
+        }
     </style>
     <!-- AdminLTE Skins. We have chosen the skin-blue for this starter
             page. However, you can choose any other skin. Make sure you

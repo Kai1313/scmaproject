@@ -3,7 +3,6 @@
 use App\Models\User;
 use App\Models\UserToken;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 function normalizeNumber($number = 0)
 {
@@ -144,11 +143,11 @@ function getCabangForReport()
 function getPemasokForReport()
 {
     $pelanggan = DB::table('pemasok')
-        ->select('id_pemasok','kode_pemasok', 'nama_pemasok')
+        ->select('id_pemasok', 'kode_pemasok', 'nama_pemasok')
         ->get();
     $array[] = ['id' => 'all', 'text' => 'Semua Pemasok'];
     foreach ($pelanggan as $ca) {
-        $array[] = ['id'=>$ca->id_pemasok,'text'=> '('.$ca->kode_pemasok.') '.$ca->nama_pemasok];
+        $array[] = ['id' => $ca->id_pemasok, 'text' => '(' . $ca->kode_pemasok . ') ' . $ca->nama_pemasok];
     }
     return $array;
 }
@@ -156,11 +155,11 @@ function getPemasokForReport()
 function getPelangganForReport()
 {
     $pelanggan = DB::table('pelanggan')
-        ->select('id_pelanggan','kode_pelanggan', 'nama_pelanggan')
+        ->select('id_pelanggan', 'kode_pelanggan', 'nama_pelanggan')
         ->get();
-        $array[] = ['id' => 'all', 'text' => 'Semua Pelanggan'];
+    $array[] = ['id' => 'all', 'text' => 'Semua Pelanggan'];
     foreach ($pelanggan as $ca) {
-        $array[] = ['id'=>$ca->id_pelanggan,'text'=> '('.$ca->kode_pelanggan.') '.$ca->nama_pelanggan];
+        $array[] = ['id' => $ca->id_pelanggan, 'text' => '(' . $ca->kode_pelanggan . ') ' . $ca->nama_pelanggan];
     }
     return $array;
 }
