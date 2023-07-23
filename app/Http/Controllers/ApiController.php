@@ -495,6 +495,19 @@ class ApiController extends Controller
             $nama_pelanggan = $data_pelanggan->nama_pelanggan;
             $catatan_me = 'Journal Otomatis Penjualan - ' . $id_transaksi . ' - ' . $nama_pelanggan;
 
+            $array_inventory = [];
+            foreach($detail_inventory as $detail_inv){
+                if(isset($array_inventory[$detail_inv['id_barang']])){
+                    $array_inventory[$detail_inv['id_barang']]['total'] += $detail_inv['total'];
+                }else{
+                    $array_inventory[$detail_inv['id_barang']] = [
+                        'id_barang' => $detail_inv['id_barang'],
+                        'nama_barang' => $detail_inv['nama_barang'],
+                        'total' => $detail_inv['total']
+                    ];
+                }
+            }
+
             // init setting
             $data_akun_piutang_dagang = DB::table('setting')->where('code', 'Piutang Dagang')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
             if (empty($data_akun_piutang_dagang)) {
@@ -592,7 +605,7 @@ class ApiController extends Controller
                 ]);
             }
 
-            foreach ($detail_inventory as $d_inv) {
+            foreach ($array_inventory as $d_inv) {
                 $barang = Barang::find($d_inv['id_barang']);
                 if($id_cabang == 1){
                     $akun_penjualan_barang = $barang->id_akun_penjualan;
