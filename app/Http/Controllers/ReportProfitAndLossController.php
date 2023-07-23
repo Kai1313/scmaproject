@@ -443,7 +443,7 @@ class ReportProfitAndLossController extends Controller
             ) as jurnal'), 'master_akun.id_akun', '=', 'jurnal.id_akun')
             ->where('isshown', 1)
             ->where('tipe_akun', 1)
-            ->groupBy('new_header1', 'new_header2', 'new_header3', 'master_akun.id_akun')
+            ->groupBy('new_header1', 'new_header2', 'new_header3', 'master_akun.kode_akun')
             ->get()->toArray();
 
             if($urutan_cabang == 1){
@@ -651,7 +651,7 @@ class ReportProfitAndLossController extends Controller
             ) as jurnal'), 'master_akun.id_akun', '=', 'jurnal.id_akun')
             ->where('isshown', 1)
             ->where('tipe_akun', 1)
-            ->groupBy('new_header1', 'new_header2', 'new_header3', 'master_akun.id_akun')
+            ->groupBy('new_header1', 'new_header2', 'new_header3', 'master_akun.kode_akun')
             ->get()->toArray();
 
             if($urutan_cabang == 1){
