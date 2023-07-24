@@ -70,6 +70,11 @@
         select[readonly].select2-hidden-accessible+.select2-container .select2-selection__clear {
             display: none;
         }
+
+        .disabled {
+            background: white;
+            opacity: 0.5;
+        }
     </style>
 @endsection
 
@@ -154,18 +159,7 @@
                                         value="{{ $data->pelanggan->nama_pelanggan }}">
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <label>Latitude</label>
-                                <div class="form-group">
-                                    <input type="text" readonly name="latitude" id="latitude" class="form-control">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <label>Longitude</label>
-                                <div class="form-group">
-                                    <input type="text" readonly name="longitude" id="longitude" class="form-control">
-                                </div>
-                            </div>
+
                             <div class="col-md-12">
                                 <label>Catatan</label>
                                 <div class="form-group">
@@ -199,8 +193,8 @@
             </div>
             <div class="col-sm-6 hidden main-menu" id="checkin">
                 <div class="row">
-                    <div class="col-sm-12">
-                        <button type="button" class="btn btn-primary w-full mb-3"
+                    <div class="col-sm-12 checkin disabled">
+                        <button type="button" class="btn btn-checkin btn-primary w-full mb-3"
                             onclick="submitLocation('checkin')">SUBMIT
                             LOCATION</button>
                     </div>
@@ -212,16 +206,35 @@
                         <hr>
                     </div>
                     <div class="col-sm-12">
-                        <button type="button" class="btn btn-warning w-full mb-3">REFRESH LOCATION</button>
-                    </div>
-                    <div class="col-sm-12">
-                        <button type="button" class="btn btn-success w-full mb-3" onclick="setCustLocation()">SET CUST
+                        <i>Jarak : <span class="jarak">Tidak Diketahui</span></i>
+                        <button type="button" class="btn btn-warning w-full mb-3" onclick="refreshLocation()">REFRESH
                             LOCATION</button>
                     </div>
+                    @if ($data->pelanggan->latitude_pelanggan != null or $data->pelanggan->longitude_pelanggan == null)
+                        <div class="col-sm-12">
+                            <button type="button" class="btn btn-success w-full mb-3 set-cust-location"
+                                onclick="setCustLocation()">SET CUST
+                                LOCATION</button>
+                        </div>
+                    @endif
                 </div>
             </div>
             <div class="col-sm-6 hidden main-menu" id="set-cust-location">
                 <div class="row">
+                    <div class="col-md-6">
+                        <label>Latitude</label>
+                        <div class="form-group">
+                            <input type="text" name="latitude" id="latitude" class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Longitude</label>
+                        <div class="form-group">
+                            <input type="text" name="longitude" id="longitude" class="form-control">
+                            <a href="javascript:;" onclick="window.open('https://www.google.com/maps')">Lihat di google
+                                maps</a>
+                        </div>
+                    </div>
                     <div class="col-sm-12">
                         <button type="button" class="btn btn-primary w-full mb-3"
                             onclick="submitLocation('set_location')">SUBMIT SET CUST
@@ -233,9 +246,6 @@
                     </div>
                     <div class="col-sm-12">
                         <hr>
-                    </div>
-                    <div class="col-sm-12">
-                        <button type="button" class="btn btn-warning w-full mb-3">REFRESH LOCATION</button>
                     </div>
                 </div>
             </div>
@@ -349,6 +359,13 @@
             fps: 10,
             qrbox: 250
         });
+
+        var range = '{{ $range ? $range->value2 : null }}';
+
+        let locationPelanggan = {
+            latitude: '{{ $data->pelanggan->latitude_pelanggan }}' * 1,
+            longitude: '{{ $data->pelanggan->longitude_pelanggan }}' * 1,
+        };
 
         $('.datepicker').datepicker({
             format: 'yyyy-mm-dd',
@@ -749,6 +766,9 @@
         function checkin() {
             $('.main-menu').addClass('hidden');
             $('#checkin').removeClass('hidden');
+            $('.checkin').addClass('disabled');
+            $('.jarak').html('Tidak Diketahui');
+            btnLocation('ok');
         }
 
         function setCustLocation() {
@@ -795,8 +815,137 @@
             })
         }
 
-        function submitLocation(param) {
 
+        function distance(lat1, lon1, lat2, lon2, unit) {
+            if ((lat1 === lat2) && (lon1 === lon2)) {
+                return 0;
+            } else {
+                var theta = lon1 - lon2;
+                var dist = Math.sin(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(
+                    lat2)) * Math.cos(deg2rad(theta));
+                dist = Math.acos(dist);
+                dist = rad2deg(dist);
+                var miles = dist * 60 * 1.1515;
+                unit = unit.toUpperCase();
+                if (unit === "K") {
+                    return (miles * 1.609344);
+                } else if (unit === "N") {
+                    return (miles * 0.8684);
+                } else {
+                    return miles;
+                }
+            }
+        }
+
+        function deg2rad(deg) {
+            return deg * (Math.PI / 180);
+        }
+
+        function rad2deg(rad) {
+            return rad * (180 / Math.PI);
+        }
+
+        function refreshLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition);
+            } else {
+                x.innerHTML = "Geolocation is not supported by this browser.";
+            }
+        }
+
+        function showPosition(position) {
+
+            var dis = distance(
+                locationPelanggan.latitude,
+                locationPelanggan.longitude,
+                position.coords.latitude,
+                position.coords.longitude,
+                'K'
+            );
+
+            dis = dis * 1000
+            console.info(locationPelanggan.latitude, locationPelanggan.longitude);
+            console.info(position.coords.latitude, position.coords.longitude);
+            if (range == null) {
+                $('.jarak').html(`Cabang ini belum disetting untuk range checkin nya.`);
+                return true;
+            }
+
+            if (dis <= range) {
+                $('.checkin').removeClass('disabled');
+                btnLocation('ok');
+            } else {
+                btnLocation('error');
+            }
+
+            $('.jarak').html(`${Math.round(dis)} Meter`);
+        }
+
+        function btnLocation(param) {
+            $('.btn-checkin').removeClass('btn-danger');
+            $('.btn-checkin').removeClass('btn-primary');
+            if (param == 'error') {
+                $('.btn-checkin').addClass('btn-danger');
+                $('.btn-checkin').html('<i class="fa fa-exclamation-triangle"></i>&nbsp;&nbsp;OUT OF RANGE');
+            } else {
+                $('.btn-checkin').addClass('btn-primary');
+                $('.btn-checkin').text('SUBMIT LOCATION');
+            }
+        }
+
+        function submitLocation(param) {
+            Swal.fire({
+                title: 'Anda yakin ingin menentukan titik lokasi ini?',
+                icon: 'info',
+                showDenyButton: true,
+                confirmButtonText: 'Yes',
+                denyButtonText: 'No',
+                reverseButtons: true,
+                customClass: {
+                    actions: 'my-actions',
+                    confirmButton: 'order-1',
+                    denyButton: 'order-3',
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $('#cover-spin').show()
+                    $.ajax({
+                        url: '{{ route('submit-location') }}',
+                        type: "post",
+                        data: {
+                            latitude: function() {
+                                return $('#latitude').val();
+                            },
+                            longitude: function() {
+                                return $('#longitude').val();
+                            },
+                            param: param,
+                            id: '{{ $data->id }}',
+                            pelanggan_id: '{{ $data->id_pelanggan }}',
+                        },
+                        dataType: "JSON",
+                        success: function(data) {
+                            $('#cover-spin').hide()
+                            locationPelanggan.latitude = data.data.latitude;
+                            locationPelanggan.longitude = data.data.longitude;
+                            if (data.result) {
+                                Swal.fire('Berhasil!', data.message, 'success').then((result) => {
+                                    appendMap(data.data.latitude, data.data.longitude);
+                                    cancelAction('set-cust-location');
+                                    $('.btn .set-cust-location').remove();
+                                })
+                            } else {
+                                Swal.fire("Gagal Proses Data.", data.message, 'error')
+                            }
+                        },
+                        error: function(data) {
+                            $('#cover-spin').hide()
+                            Swal.fire("Gagal Proses Data.", data.responseJSON.message, 'error')
+                        }
+                    })
+                }
+
+            })
         }
     </script>
 @endsection

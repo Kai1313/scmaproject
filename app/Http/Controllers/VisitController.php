@@ -2,9 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Master\Pelanggan;
+use App\Models\Master\Setting;
+use App\Pengguna;
 use App\Visit;
 use DB;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Log;
 use Yajra\DataTables\DataTables;
 
@@ -74,7 +79,6 @@ class VisitController extends Controller
                         $btn .= '</ul>';
                         return $btn;
                     }
-
                 })
                 ->rawColumns(['action'])
                 ->make(true);
@@ -92,8 +96,24 @@ class VisitController extends Controller
         // if (checkAccessMenu('pemakaian', $id == 0 ? 'create' : 'edit') == false) {
         //     return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         // }
+        // Setting::create([
+        //     "id_cabang" => 2,
+        //     "code" => "Range Checkin Kunjungan",
+        //     "description" => "Range Checkin Kunjungan",
+        //     "tipe" => 1,
+        //     "value1" => "",
+        //     "value2" => "100",
+        //     "user_created" => 1,
+        //     "dt_created" => now(),
+        //     "user_modified" => 1,
+        //     "dt_modified" => now(),
+        // ]);
 
         $data = Visit::find($id);
+
+        $range = Setting::where('code', 'Range Checkin Kunjungan')
+            ->where('id_cabang', $data->id_cabang)
+            ->first();
         $pelanggan = DB::table('pelanggan')->get();
         $salesman = DB::table('salesman')->get();
         $cabang = session()->get('access_cabang');
@@ -102,6 +122,7 @@ class VisitController extends Controller
             'cabang' => $cabang,
             'salesman' => $salesman,
             'pelanggan' => $pelanggan,
+            'range' => $range,
             "pageTitle" => "SCA OPS | Kunjungan | " . ($id == 0 ? 'Create' : 'Edit'),
         ]);
     }
@@ -204,6 +225,29 @@ class VisitController extends Controller
             return response()->json([
                 "result" => false,
                 "message" => "Data gagal dibatalkan",
+            ], 500);
+        }
+    }
+
+    public function submitLocation(Request $req): JsonResponse
+    {
+        try {
+            if ($req->param == 'set_location') {
+                $data = Pelanggan::findOrFail($req->pelanggan_id);
+                $data->latitude_pelanggan = $req->latitude;
+                $data->longitude_pelanggan = $req->longitude;
+                $data->save();
+            }
+            return response()->json([
+                "result" => true,
+                "data" => $req->only(['latitude', 'longitude']),
+                "message" => "Data lokasi pelanggan berhasil ditentukan",
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "result" => true,
+                "data" => $req->only(['latitude', 'longitude']),
+                "message" => $th->getMessage(),
             ], 500);
         }
     }
