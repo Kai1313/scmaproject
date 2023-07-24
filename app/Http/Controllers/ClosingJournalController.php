@@ -91,7 +91,7 @@ class ClosingJournalController extends Controller
 
             // Store to closing table
             DB::beginTransaction();
-            $check = Closing::where("month", $month)->where("year", $year)->first();
+            $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
             if ($check) {
                 return response()->json([
                     "result" => FALSE,
