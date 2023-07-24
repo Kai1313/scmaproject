@@ -35,6 +35,11 @@ class Visit extends Model
         return $this->belongsTo(Cabang::class, 'id_cabang', 'id_cabang');
     }
 
+    public function pelanggan()
+    {
+        return $this->belongsTo(Models\Master\Pelanggan::class, 'id_pelanggan', 'id_pelanggan');
+    }
+
     public static function createcode($id_cabang)
     {
         $branchCode = DB::table('cabang')->where('id_cabang', $id_cabang)->first();

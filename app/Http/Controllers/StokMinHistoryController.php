@@ -21,7 +21,10 @@ class StokMinHistoryController extends Controller
         //     return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         // }
 
-        $historyHeader = \DB::table('stok_minimal_hitung')->where('id_barang', $request->id)->orderBy('id', 'DESC')->first();
+        $historyHeader = \DB::table('stok_minimal_hitung')
+            ->where('id_barang', $request->id)
+            ->where('id_cabang', $request->id_cabang)
+            ->orderBy('id', 'DESC')->first();
         $sumStok = \DB::table('master_qr_code')
             ->where('id_barang', $request->id)->value(\DB::raw('sum(sisa_master_qr_code) as stok_aktif'));
         $barang = Barang::find($request->id);
@@ -31,9 +34,6 @@ class StokMinHistoryController extends Controller
             ->format('d/m/Y');
         $historyHeader->penj_sampai = Carbon::createFromFormat('Y-m-d', $historyHeader->penj_sampai)
             ->format('d/m/Y');
-        // var_dump($sumStok);die();
-        // dd($sumStok);
-        //$total = array_sum(array_column());
         $array = [
             'historyHeader' => $historyHeader,
             'sumStok' => $sumStok,

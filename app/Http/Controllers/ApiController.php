@@ -3235,8 +3235,12 @@ class ApiController extends Controller
 
     public function stokmin(Request $request)
     {
-        $setting = Setting::where("id_cabang", 1)->where("code", 'like', "Stok Min %")->select('code', 'value2')->get()->toArray();
+        $id_cabang = $request->id_cabang;
+        $setting = Setting::where("id_cabang", $id_cabang)->where("code", 'like', "Stok Min %")->select('code', 'value1', 'value2')->get()->toArray();
+        $settingValue1 = array_column($setting, 'value1', 'code');
         $setting = array_column($setting, 'value2', 'code');
+        $settingBrgArr = json_decode($settingValue1['Stok Min Khusus'], true);
+        $settingBrgArr = array_column($settingBrgArr, 'stokMin', 'id_barang');
         $today = Carbon::today();
         $setting['penj_sampai'] = $today->toDateString();
         $setting['penj_dari'] = $today->subMonths(intval($setting['Stok Min Range']))->toDateString();
@@ -3245,7 +3249,7 @@ class ApiController extends Controller
         \DB::insert(\DB::raw("CREATE TEMPORARY TABLE tTotalPenjualanInfo(id_barang int(11) NOT NULL,nama_barang varchar(200), total_jual decimal(15,6),
         total_jual_per_bulan decimal(15,6),plus_persen decimal(15,6),per_bulan_plus_persen decimal(15,6),avg_prorate double,
         pemakaian_per_barang_jadi double)"));
-        self::getSalesWithProrate($request->id, 1);
+        self::getSalesWithProrate($request->id, $id_cabang, 1);
         $debug = false;
         if (!empty($request->debug) && $request->debug == true) {
             $debug = \DB::table('tTotalPenjualanInfo AS ttp')->get();
@@ -3261,14 +3265,22 @@ class ApiController extends Controller
         $respon = [
             'total' => round($total, 4),
         ];
+        $setting['Stok Min Khusus'] = null;
+        $setting['stok_min_hitung'] = $respon['total'];
+        if (array_key_exists($request->id, $settingBrgArr)) {
+            $setting['Stok Min Khusus'] = $settingBrgArr[$request->id];
+            if ($respon['total'] < $setting['Stok Min Khusus']) {
+                $respon['total'] = $setting['Stok Min Khusus'];
+            }
+        }
         if ($debug !== false) {
             $respon['debug'] = $debug;
         }
-        self::storeStokMinHitung($setting, $request->id, $respon['total']);
+        self::storeStokMinHitung($setting, $request->id, $id_cabang, $respon['total']);
         return response()->json($respon);
     }
 
-    private function storeStokMinHitung($setting, $id_barang, $jumlah)
+    private function storeStokMinHitung($setting, $id_barang, $id_cabang, $jumlah)
     {
         $bulan = date('m');
         $tahun = date('Y');
@@ -3278,6 +3290,7 @@ class ApiController extends Controller
                     'bulan' => $bulan,
                     'tahun' => $tahun,
                     'id_barang' => $id_barang,
+                    'id_cabang' => $id_cabang,
                 ],
                 [
                     'jumlah' => $jumlah,
@@ -3285,6 +3298,8 @@ class ApiController extends Controller
                     'persen' => $setting['Stok Min Persen'],
                     'lokal' => $setting['Stok Min Lokal'],
                     'import' => $setting['Stok Min Import'],
+                    'stok_min_khusus' => $setting['Stok Min Khusus'],
+                    'stok_min_hitung' => $setting['stok_min_hitung'],
                     'penj_dari' => $setting['penj_dari'],
                     'penj_sampai' => $setting['penj_sampai'],
                 ]
@@ -3293,6 +3308,7 @@ class ApiController extends Controller
                 'bulan' => $bulan,
                 'tahun' => $tahun,
                 'id_barang' => $id_barang,
+                'id_cabang' => $id_cabang,
             ])->first();
             if (!empty($stokHeader)) {
                 DB::table('stok_minimal_hitung_detil')->where('stok_minimal_hitung_id', $stokHeader->id)->delete();
@@ -3310,7 +3326,7 @@ class ApiController extends Controller
         }
     }
 
-    private function getSalesWithProrate($id_barang, $value)
+    private function getSalesWithProrate($id_barang, $id_cabang, $value)
     {
         $childsub = \DB::table('bom_detail AS bd')
             ->select('b.id_barang', 'b.keterangan_bom', 'brg.nama_barang', \DB::raw('SUM(bd.jumlah_bom_detail) AS total_pemakaian'),
@@ -3327,11 +3343,12 @@ class ApiController extends Controller
         }
         $stokMin = session('stokMin');
         $jual = \DB::table('penjualan AS p')
-            ->select('brg.nama_barang', \DB::raw('SUM(pd.jumlah_penjualan_detail) AS total_jual'),
-                \DB::raw('(SUM(pd.jumlah_penjualan_detail)/' . intval($stokMin['Stok Min Range']) . ') AS total_jual_per_bulan'))
+            ->select('brg.nama_barang', \DB::raw('SUM(if(pd.id_satuan_barang != 6,pd.jumlah_penjualan_detail * pd.sg_penjualan_detail,pd.jumlah_penjualan_detail)) AS total_jual'),
+                \DB::raw('(SUM(if(pd.id_satuan_barang != 6,pd.jumlah_penjualan_detail * pd.sg_penjualan_detail,pd.jumlah_penjualan_detail))/' . intval($stokMin['Stok Min Range']) . ') AS total_jual_per_bulan'))
             ->join('penjualan_detail AS pd', 'pd.id_penjualan', '=', 'p.id_penjualan')
             ->join('barang AS brg', 'brg.id_barang', '=', 'pd.id_barang')
             ->where('pd.id_barang', $id_barang)
+            ->where('p.id_cabang', $id_cabang)
             ->whereRaw('p.tanggal_penjualan BETWEEN "' . $stokMin['penj_dari'] . '" AND "' . $stokMin['penj_sampai'] . '"')->get()->toArray();
         if (!empty($jual[0]->total_jual)) {
             $persen = floatval($jual[0]->total_jual_per_bulan) * (floatval($stokMin['Stok Min Persen']) / 100);
@@ -3354,7 +3371,7 @@ class ApiController extends Controller
                 continue;
             }
             $new_val = $value * floatval($itemChild->avg_prorate);
-            self::getSalesWithProrate($itemChild->id_barang, $new_val);
+            self::getSalesWithProrate($itemChild->id_barang, $id_cabang, $new_val);
         }
     }
 }

@@ -132,6 +132,7 @@ Route::prefix('pemakaian')->group(function () {
 Route::prefix('jadwal_kunjungan')->group(function () {
     Route::get('/index/{user_id?}', 'ScheduleVisitController@index')->name('pre_visit');
     Route::get('/entry/{id?}', 'ScheduleVisitController@entry')->name('pre_visit-entry');
+    Route::get('/append-map', 'ScheduleVisitController@appendMap')->name('append-map');
     Route::post('/save_entry/{id}', 'ScheduleVisitController@saveEntry')->name('pre_visit-save-entry');
     Route::get('/view/{id}', 'ScheduleVisitController@viewData')->name('pre_visit-view');
     Route::get('/delete/{id}', 'ScheduleVisitController@destroy')->name('pre_visit-delete');
@@ -142,11 +143,15 @@ Route::prefix('kunjungan')->group(function () {
     Route::get('/entry/{id?}', 'VisitController@entry')->name('visit-entry');
     Route::post('/save_entry/{id}', 'VisitController@saveEntry')->name('visit-save-entry');
     Route::get('/view/{id}', 'VisitController@viewData')->name('visit-view');
+    Route::post('/cancel-visit', 'VisitController@cancelVisit')->name('cancel-visit');
+    Route::post('/submit-location', 'VisitController@submitLocation')->name('submit-location');
     Route::get('/delete/{id}', 'VisitController@destroy')->name('visit-delete');
+    Route::get('/cancel-visit', 'VisitController@updateStatusVisit')->name('cancel-visit');
+
 });
 
 Route::get('kirim_ke_gudang/print/{id}', 'SendToWarehouseController@print')->name('send_to_warehouse-print');
-Route::get('stok_minimal/excel/{id}', 'StokMinHistoryController@getExcel')->name('stok_minimal-excel');
+Route::get('stok_minimal/excel/{id}/{id_cabang}', 'StokMinHistoryController@getExcel')->name('stok_minimal-excel');
 
 Route::namespace('Report')->group(function () {
     Route::prefix('laporan_qc_penerimaan')->group(function () {
