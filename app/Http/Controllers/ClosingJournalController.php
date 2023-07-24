@@ -1096,6 +1096,7 @@ class ClosingJournalController extends Controller
     public function stockCorrection(Request $request)
     {
         try {
+            // dd('aaaa');
             // Init data
             $id_cabang = $request->id_cabang;
             $journal_type = "ME";
@@ -1120,6 +1121,7 @@ class ClosingJournalController extends Controller
 
             // Get data koreksi stok
             $data_header = StockCorrectionHeader::where("status_koreksi_stok", $status)->where("id_cabang", $id_cabang)->whereBetween("tanggal_koreksi_stok", [$start_date, $end_date])->get();
+            // dd(count($data_header));
             // dd(json_encode($data_header));
             $details = [];
             DB::beginTransaction();
@@ -1130,13 +1132,15 @@ class ClosingJournalController extends Controller
                 JurnalHeader::where("id_transaksi", "Closing ".$id_transaksi)->where("catatan", "Koreksi Stok")->delete();
                 // get koreksi stok detail
                 // $data_detail = StockCorrectionDetail::select("id_koreksi_stok_detail", "id_barang", DB::raw("SUM(debit_koreksi_stok_detail) as debet"), DB::raw("SUM(kredit_koreksi_stok_detail) as kredit"))->where("id_koreksi_stok", $header->id_koreksi_stok)->groupBy("id_barang")->get();
-                $data_detail = StockCorrectionDetail::selectRaw("koreksi_stok_detail.id_koreksi_stok, koreksi_stok_detail.id_barang, koreksi_stok_detail.debit_koreksi_stok_detail as debet, koreksi_stok_detail.kredit_koreksi_stok_detail as kredit, koreksi_stok_detail.kode_batang_koreksi_stok_detail, koreksi_stok_detail.kode_batang_lama_koreksi_stok_detail,
+                $data_detail = StockCorrectionDetail::selectRaw("koreksi_stok_detail.id_koreksi_stok_detail, koreksi_stok_detail.id_koreksi_stok, koreksi_stok_detail.id_barang, koreksi_stok_detail.debit_koreksi_stok_detail as debet, koreksi_stok_detail.kredit_koreksi_stok_detail as kredit, koreksi_stok_detail.kode_batang_koreksi_stok_detail, koreksi_stok_detail.kode_batang_lama_koreksi_stok_detail,
                 ks.beli_master_qr_code as debet_beli, ks.biaya_beli_master_qr_code as debet_biaya_beli, ks.produksi_master_qr_code as debet_produksi, ks.listrik_master_qr_code as debet_listrik, ks.pegawai_master_qr_code as debet_pegawai,
                 ksl.beli_master_qr_code as kredit_beli, ksl.biaya_beli_master_qr_code as kredit_biaya_beli, ksl.produksi_master_qr_code as kredit_produksi, ksl.listrik_master_qr_code as kredit_listrik, ksl.pegawai_master_qr_code as kredit_pegawai")
                 ->leftJoin("master_qr_code as ks", "ks.kode_batang_master_qr_code", "koreksi_stok_detail.kode_batang_koreksi_stok_detail")
                 ->leftJoin("master_qr_code as ksl", "ksl.kode_batang_lama_master_qr_code", "koreksi_stok_detail.kode_batang_lama_koreksi_stok_detail")
-                ->where("koreksi_stok_detail.id_koreksi_stok", $header->id_koreksi_stok)->get();
-                // dd(json_encode($data_detail));
+                ->where("koreksi_stok_detail.id_koreksi_stok", $header->id_koreksi_stok)
+                // ->where("koreksi_stok_detail.id_koreksi_stok", "296")
+                ->groupBy("koreksi_stok_detail.id_koreksi_stok_detail")->get();
+                // dd(count($data_detail));
                 $i = 0;
                 foreach ($data_detail as $key => $detail) {
                     // Get master qr code
@@ -2086,7 +2090,8 @@ class ClosingJournalController extends Controller
                     "result"=>TRUE,
                     "message"=>"Successfully proceed closing journal penyusutan"
                 ]);
-            }else{
+            }
+            else{
                 return response()->json([
                     "result"=>TRUE,
                     "message"=>"Successfully proceed closing journal penyusutan, with status empty data"
@@ -2162,6 +2167,7 @@ class ClosingJournalController extends Controller
             $dataAkun = Akun::where("id_cabang", $id_cabang)->where("isshown", 1)->get();
             $debet = 0;
             $kredit = 0;
+            // dd(count($dataAkun));
             foreach ($dataAkun as $key => $akun) {
                 // Get sum debet dan sum kredit
                 $data_ledgers = JurnalDetail::join("jurnal_header", "jurnal_header.id_jurnal", "jurnal_detail.id_jurnal")
@@ -2169,22 +2175,23 @@ class ClosingJournalController extends Controller
                 ->where("jurnal_header.void", "0")
                 ->where("master_akun.id_cabang", $id_cabang)
                 ->whereBetween("jurnal_header.tanggal_jurnal", [$start_date, $end_date])
-                ->selectRaw("jurnal_header.id_jurnal, master_akun.id_cabang, master_akun.id_akun, master_akun.kode_akun, master_akun.nama_akun, IFNULL(SUM(jurnal_detail.debet), 0) as debet, IFNULL(SUM(jurnal_detail.credit), 0) as kredit")->groupBy("jurnal_detail.id_akun");
+                ->selectRaw("jurnal_header.id_jurnal, master_akun.id_cabang, master_akun.id_akun, master_akun.kode_akun, master_akun.nama_akun, IFNULL(SUM(jurnal_detail.debet), 0) as debet, IFNULL(SUM(jurnal_detail.credit), 0) as kredit")->groupBy("jurnal_detail.id_akun")->first();
                 $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")->where("id_akun", $akun->id_akun)->where("id_cabang", $akun->id_cabang)->where("bulan", $month)->where("tahun", $year)->first();
                 $data_saldo_ledgers = JurnalDetail::selectRaw("IFNULL(SUM(jurnal_detail.debet), 0) as debet, IFNULL(SUM(jurnal_detail.credit), 0) as kredit")
                 ->join("jurnal_header", "jurnal_header.id_jurnal", "jurnal_detail.id_jurnal")
                 ->join("master_akun", "master_akun.id_akun", "jurnal_detail.id_akun")
                 ->where("jurnal_detail.id_akun", $akun->id_akun)
                 ->where("jurnal_header.id_cabang", $akun->id_cabang)
+                ->where("jurnal_header.void", "0")
                 ->where("jurnal_header.tanggal_jurnal", ">=", $start_date)
-                ->where("jurnal_header.tanggal_jurnal", "<", $start_date)
+                ->where("jurnal_header.tanggal_jurnal", "<=", $end_date)
                 ->groupBy("jurnal_detail.id_akun")->first();
                 $saldo_debet = ($saldo)?$saldo->saldo_debet:0;
                 $saldo_kredit = ($saldo)?$saldo->saldo_kredit:0;
+                // Log::info("saldo debet ".$saldo_debet." saldo kredit ".$saldo_kredit);
                 $debet = ($data_saldo_ledgers)?$data_saldo_ledgers->debet:0;
                 $kredit = ($data_saldo_ledgers)?$data_saldo_ledgers->kredit:0;
-                // $saldo_awal = ($saldo_debet - $saldo_kredit) + ($debet - $kredit);
-                // $saldo_akhir = $saldo_awal + $data_ledgers->debet - $data_ledgers->kredit;
+                // Log::info("saldo debet ".$debet." saldo kredit ".$kredit);
                 $saldo_debet = $saldo_debet + $debet + (isset($data_ledgers->debet) ? $data_ledgers->debet : 0) ;
                 $saldo_kredit = $saldo_kredit + $kredit + (isset($data_ledgers->kredit) ? $data_ledgers->kredit : 0);
 
