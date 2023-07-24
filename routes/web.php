@@ -11,6 +11,7 @@
 |
  */
 
+use App\Http\Controllers\ReportingVisitController;
 use Illuminate\Support\Facades\Route;
 
 //tes firebase
@@ -144,11 +145,17 @@ Route::prefix('kunjungan')->group(function () {
     Route::post('/save_entry/{id}', 'VisitController@saveEntry')->name('visit-save-entry');
     Route::get('/view/{id}', 'VisitController@viewData')->name('visit-view');
     Route::post('/cancel-visit', 'VisitController@cancelVisit')->name('cancel-visit');
-    Route::post('/submit-location', 'VisitController@submitLocation')->name('submit-location');
+    Route::post('/update-visit', 'VisitController@updateVisit')->name('update-visit');
     Route::get('/delete/{id}', 'VisitController@destroy')->name('visit-delete');
-    Route::get('/cancel-visit', 'VisitController@updateStatusVisit')->name('cancel-visit');
-
+    Route::resource('reporting', 'ReportingVisitController', [
+        'as' => 'kunjungan'
+    ]);
+    Route::prefix('/reporting')->group(function () {
+        Route::get('/select-reporting-visit', 'ReportingVisitController@select')->name('kunjungan.reporting.select');
+    });
 });
+
+
 
 Route::get('kirim_ke_gudang/print/{id}', 'SendToWarehouseController@print')->name('send_to_warehouse-print');
 Route::get('stok_minimal/excel/{id}', 'StokMinHistoryController@getExcel')->name('stok_minimal-excel');
