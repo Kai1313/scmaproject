@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Barang;
+use App\Cabang;
 use App\Exports\ReportStokMinHistoryExport;
 use Carbon\Carbon;
 use Excel;
@@ -28,6 +29,7 @@ class StokMinHistoryController extends Controller
         $sumStok = \DB::table('master_qr_code')
             ->where('id_barang', $request->id)->value(\DB::raw('sum(sisa_master_qr_code) as stok_aktif'));
         $barang = Barang::find($request->id);
+        $cabang = Cabang::find($request->id_cabang);
         $data = \DB::table('stok_minimal_hitung_detil')
             ->where('stok_minimal_hitung_id', $historyHeader->id)->orderBy('id', 'asc')->get();
         $historyHeader->penj_dari = Carbon::createFromFormat('Y-m-d', $historyHeader->penj_dari)
@@ -37,6 +39,7 @@ class StokMinHistoryController extends Controller
         $array = [
             'historyHeader' => $historyHeader,
             'sumStok' => $sumStok,
+            'cabang' => $cabang,
             'barang' => $barang,
             "datas" => $data,
         ];
