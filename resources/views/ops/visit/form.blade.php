@@ -772,7 +772,7 @@
             }).then((result) => {
                 $('#cover-spin').show()
                 $.ajax({
-                    url: '{{ route('cancel-jadwal') }}',
+                    url: '{{ route('cancel-visit') }}',
                     type: "get",
                     dataType: "JSON",
                     success: function(data) {
@@ -793,6 +793,10 @@
                     }
                 })
             })
+        }
+
+        function submitLocation(param) {
+
         }
     </script>
 @endsection
