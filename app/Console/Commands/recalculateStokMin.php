@@ -48,6 +48,7 @@ class recalculateStokMin extends Command
             foreach ($allStokMin as $rowItem) {
                 $resultCalculated = (new ApiController)->stokmin(new Request([
                     'id' => $rowItem->id_barang,
+                    'id_cabang' => $rowItem->id_cabang,
                 ]));
                 $rowItem->jumlah_stok_minimal_barang_gudang = $resultCalculated->getData()->total;
                 $rowItem->date_stok_minimal_barang_gudang = date("Y-m-d H:i:s");

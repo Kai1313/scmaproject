@@ -151,7 +151,7 @@ Route::prefix('kunjungan')->group(function () {
 });
 
 Route::get('kirim_ke_gudang/print/{id}', 'SendToWarehouseController@print')->name('send_to_warehouse-print');
-Route::get('stok_minimal/excel/{id}', 'StokMinHistoryController@getExcel')->name('stok_minimal-excel');
+Route::get('stok_minimal/excel/{id}/{id_cabang}', 'StokMinHistoryController@getExcel')->name('stok_minimal-excel');
 
 Route::namespace('Report')->group(function () {
     Route::prefix('laporan_qc_penerimaan')->group(function () {

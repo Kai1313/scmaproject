@@ -22,12 +22,26 @@
                 <td style="font-weight:bold;border: #000000 solid thin;">{{ $barang->nama_barang }}</td>
             </tr>
             <tr>
+                <td style="font-weight:bold;border: #000000 solid thin;">Stok Minimal Hitung</td>
+                <td style="font-weight:bold;border: #000000 solid thin;text-align:right;">
+                    {{ number_format($historyHeader->stok_min_hitung, 4) }}</td>
+            </tr>
+            <tr>
+                <td style="font-weight:bold;border: #000000 solid thin;">Stok Minimal Khusus</td>
+                <td style="font-weight:bold;border: #000000 solid thin;text-align:right;">
+                    {{ empty($historyHeader->stok_min_khusus) ? '-' : number_format($historyHeader->stok_min_khusus, 4) }}
+                </td>
+            </tr>
+            <tr>
                 <td style="font-weight:bold;border: #000000 solid thin;">Stok Minimal</td>
-                <td style="font-weight:bold;border: #000000 solid thin;">{{ $historyHeader->jumlah }}</td>
+                <td style="font-weight:bold;border: #000000 solid thin;text-align:right;">
+                    {{ number_format($historyHeader->jumlah, 4) }}
+                </td>
             </tr>
             <tr>
                 <td style="font-weight:bold;border: #000000 solid thin;">Stok Aktif</td>
-                <td style="font-weight:bold;border: #000000 solid thin;">{{ $sumStok }}</td>
+                <td style="font-weight:bold;border: #000000 solid thin;text-align:right;">
+                    {{ number_format($sumStok, 4) }}</td>
             </tr>
             <tr>
                 <td style="font-weight:bold;border: #000000 solid thin;">Range Data Penjualan</td>
