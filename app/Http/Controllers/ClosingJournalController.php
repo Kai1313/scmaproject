@@ -2170,12 +2170,12 @@ class ClosingJournalController extends Controller
             // dd(count($dataAkun));
             foreach ($dataAkun as $key => $akun) {
                 // Get sum debet dan sum kredit
-                $data_ledgers = JurnalDetail::join("jurnal_header", "jurnal_header.id_jurnal", "jurnal_detail.id_jurnal")
-                ->join("master_akun", "master_akun.id_akun", "jurnal_detail.id_akun")
-                ->where("jurnal_header.void", "0")
-                ->where("master_akun.id_cabang", $id_cabang)
-                ->whereBetween("jurnal_header.tanggal_jurnal", [$start_date, $end_date])
-                ->selectRaw("jurnal_header.id_jurnal, master_akun.id_cabang, master_akun.id_akun, master_akun.kode_akun, master_akun.nama_akun, IFNULL(SUM(jurnal_detail.debet), 0) as debet, IFNULL(SUM(jurnal_detail.credit), 0) as kredit")->groupBy("jurnal_detail.id_akun")->first();
+                // $data_ledgers = JurnalDetail::join("jurnal_header", "jurnal_header.id_jurnal", "jurnal_detail.id_jurnal")
+                // ->join("master_akun", "master_akun.id_akun", "jurnal_detail.id_akun")
+                // ->where("jurnal_header.void", "0")
+                // ->where("master_akun.id_cabang", $id_cabang)
+                // ->whereBetween("jurnal_header.tanggal_jurnal", [$start_date, $end_date])
+                // ->selectRaw("jurnal_header.id_jurnal, master_akun.id_cabang, master_akun.id_akun, master_akun.kode_akun, master_akun.nama_akun, IFNULL(SUM(jurnal_detail.debet), 0) as debet, IFNULL(SUM(jurnal_detail.credit), 0) as kredit")->groupBy("jurnal_detail.id_akun")->first();
                 $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")->where("id_akun", $akun->id_akun)->where("id_cabang", $akun->id_cabang)->where("bulan", $month)->where("tahun", $year)->first();
                 $data_saldo_ledgers = JurnalDetail::selectRaw("IFNULL(SUM(jurnal_detail.debet), 0) as debet, IFNULL(SUM(jurnal_detail.credit), 0) as kredit")
                 ->join("jurnal_header", "jurnal_header.id_jurnal", "jurnal_detail.id_jurnal")
