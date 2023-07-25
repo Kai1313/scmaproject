@@ -140,8 +140,8 @@
                                         <select name="type" id="type" class="form-control select2">
                                             <option value="recap">Laba Rugi</option>
                                             <option value="detail">Laba Rugi Detail</option>
-                                            <option value="awal">Laba Rugi Awal</option>
-                                            <option value="awal_detail">Laba Rugi Awal Detail</option>
+                                            {{-- <option value="awal">Laba Rugi Awal</option>
+                                            <option value="awal_detail">Laba Rugi Awal Detail</option> --}}
                                         </select>
                                     </div>
                                 </div>
