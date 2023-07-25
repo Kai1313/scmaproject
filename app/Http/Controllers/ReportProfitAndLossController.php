@@ -1041,6 +1041,7 @@ class ReportProfitAndLossController extends Controller
                         $array_item = [
                             'header' => $newHeader4,
                             'akun' => $item['id_akun'],
+                            'kode_akun' => $item['kode_akun'],
                             'start_date' => $start_date,
                             'end_date' => $end_date,
                         ];
