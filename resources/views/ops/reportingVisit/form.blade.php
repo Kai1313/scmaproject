@@ -75,6 +75,88 @@
             background: white;
             opacity: 0.5;
         }
+
+        // now for the good stuff 🎉
+        .range-slider {
+            outline: 12;
+            border: 0;
+            border-radius: 500px;
+            display: inline !important;
+            width: 400px;
+            max-width: 100%;
+            margin: 24px 0;
+            transition: box-shadow 0.2s ease-in-out;
+        }
+
+        /* @media screen and (-webkit-min-device-pixel-ratio: 0) {
+                                                                                                                                                                                                                                                                                                                                    .range-slider {
+                                                                                                                                                                                                                                                                                                                                        overflow: hidden;
+                                                                                                                                                                                                                                                                                                                                        height: 40px;
+                                                                                                                                                                                                                                                                                                                                        -webkit-appearance: none;
+                                                                                                                                                                                                                                                                                                                                        background-color: #ddd;
+                                                                                                                                                                                                                                                                                                                                    }
+
+                                                                                                                                                                                                                                                                                                                                    .range-slider::-webkit-slider-runnable-track {
+                                                                                                                                                                                                                                                                                                                                        height: 40px;
+                                                                                                                                                                                                                                                                                                                                        -webkit-appearance: none;
+                                                                                                                                                                                                                                                                                                                                        color: #444;
+                                                                                                                                                                                                                                                                                                                                        margin-top: -1px;
+                                                                                                                                                                                                                                                                                                                                        transition: box-shadow 0.2s ease-in-out;
+                                                                                                                                                                                                                                                                                                                                    }
+
+                                                                                                                                                                                                                                                                                                                                    .range-slider::-webkit-slider-thumb {
+                                                                                                                                                                                                                                                                                                                                        width: 40px;
+                                                                                                                                                                                                                                                                                                                                        -webkit-appearance: none;
+                                                                                                                                                                                                                                                                                                                                        height: 40px;
+                                                                                                                                                                                                                                                                                                                                        cursor: ew-resize;
+                                                                                                                                                                                                                                                                                                                                        background: #fff;
+                                                                                                                                                                                                                                                                                                                                        box-shadow: -340px 0 0 320px #1597ff, inset 0 0 0 40px #1597ff;
+                                                                                                                                                                                                                                                                                                                                        border-radius: 50%;
+                                                                                                                                                                                                                                                                                                                                        transition: box-shadow 0.2s ease-in-out;
+                                                                                                                                                                                                                                                                                                                                        position: relative;
+                                                                                                                                                                                                                                                                                                                                    }
+
+                                                                                                                                                                                                                                                                                                                                    .range-slider:active::-webkit-slider-thumb {
+                                                                                                                                                                                                                                                                                                                                        background: #fff;
+                                                                                                                                                                                                                                                                                                                                        box-shadow: -340px 0 0 320px #1597ff, inset 0 0 0 3px #1597ff;
+                                                                                                                                                                                                                                                                                                                                    }
+                                                                                                                                                                                                                                                                                                                                } */
+
+        .range-slider::-moz-range-progress {
+            background-color: #43e5f7;
+        }
+
+        .range-slider::-moz-range-track {
+            background-color: #9a905d;
+        }
+
+        .range-slider::-ms-fill-lower {
+            background-color: #43e5f7;
+        }
+
+        .range-slider::-ms-fill-upper {
+            background-color: #9a905d;
+        }
+
+        h1.slider {
+            color: #333;
+            font-weight: 500;
+        }
+
+        h3.slider {
+            color: #aaa;
+            font-weight: 500;
+        }
+
+        h4.slider {
+            color: #999;
+            font-weight: 500;
+        }
+
+        h4.slider:after {
+            content: "%";
+            padding-left: 1px;
+        }
     </style>
 @endsection
 
@@ -94,11 +176,11 @@
 
 @section('main-section')
     <div class="content container-fluid">
-        <form action="{{ route('pre_visit-save-entry', $data ? $data->id : 0) }}" method="post" class="post-action">
+        <form action="{{ route('kunjungan.reporting.store') }}" method="post" class="post-action">
             <div class="col-sm-6">
                 <div class="box">
                     <div class="box-header">
-                        <h3 class="box-title">{{ $data ? 'Ubah' : 'Tambah' }} Jadwal Kunjungan</h3>
+                        <h3 class="box-title">Detail Kunjungan</h3>
                         <a href="{{ route('pre_visit') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right">
                             <span class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali
                         </a>
@@ -171,82 +253,67 @@
                     </div>
                 </div>
             </div>
-            <div class="col-sm-6 main-menu" id="main-menu">
-                <div class="row">
-                    <div class="col-sm-12">
-                        <button type="button" class="btn btn-primary w-full mb-3" onclick="checkin()">CHECK IN</button>
+            <div class="col-sm-6">
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title">Catatan Kunjungan</h3>
                     </div>
-                    <div class="col-sm-12">
-                        <button type="button" class="btn btn-success w-full mb-3" onclick="updateVisit('whatsapp')">FOLLOW
-                            UP BY WA</button>
-                    </div>
-                    <div class="col-sm-12">
-                        <button type="button" class="btn btn-warning w-full mb-3"
-                            onclick="location.href = '{{ route('pre_visit-entry', [$data->id]) }}'">UBAH JADWAL</button>
-                    </div>
-                    <div class="col-sm-12">
-                        <button type="button" class="btn btn-danger w-full mb-3" onclick="cancelAction('main')">CANCEL
-                            VISIT</button>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-6 hidden main-menu" id="checkin">
-                <div class="row">
-                    <div class="col-sm-12 checkin disabled">
-                        <button type="button" class="btn btn-checkin btn-primary w-full mb-3"
-                            onclick="updateVisit('checkin')">SUBMIT
-                            LOCATION</button>
-                    </div>
-                    <div class="col-sm-12">
-                        <button type="button" class="btn btn-danger w-full mb-3"
-                            onclick="cancelAction('checkin')">CANCEL</button>
-                    </div>
-                    <div class="col-sm-12">
-                        <hr>
-                    </div>
-                    <div class="col-sm-12">
-                        <i>Jarak : <span class="jarak">Tidak Diketahui</span></i>
-                        <button type="button" class="btn btn-warning w-full mb-3" onclick="refreshLocation()">REFRESH
-                            LOCATION</button>
-                    </div>
-                    @if ($data->pelanggan->latitude_pelanggan != null or $data->pelanggan->longitude_pelanggan == null)
-                        <div class="col-sm-12">
-                            <button type="button" class="btn btn-success w-full mb-3 set-cust-location"
-                                onclick="setCustLocation()">SET CUST
-                                LOCATION</button>
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Issue <span>*</span></label>
+                                    <input type="text" class="form-control" placeholder="ex:Pengembangan customer"
+                                        id="visit_title">
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Progress Indicator <span>*</span></label>
+                                    <select name="progress_ind" class="form-control select2 trigger-change">
+                                        <option value="">Pilih Progress</option>
+                                        @foreach (App\Visit::$progressIndicator as $key => $item)
+                                            <option value="{{ $key }}">{{ $item }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-12 section-2">
+                                <div class="form-group">
+                                    <label>Range Potensial <span>*</span></label>
+                                    <input type="range" value="0" min="0" max="100" step="1"
+                                        class="range-slider">
+                                    <h4 class="slider">0</h4>
+                                </div>
+                            </div>
+                            <div class="col-md-12 section-3">
+                                <div class="form-group">
+                                    <label>Nomor Sales Order</label>
+                                    <select name="sales_order_id" id="sales_order_id" class="select2"></select>
+                                </div>
+                            </div>
+                            <div class="col-sm-12 section-3">
+                                <div class="form-group">
+                                    <label>Total Order</label>
+                                    <div class="input-group">
+                                        <span class="input-group-addon">
+                                            <select name="kurs_id" id="kurs_id">
+                                                <option value="RP">RP</option>
+                                                <option value="USD">USD</option>
+                                            </select>
+                                        </span>
+                                        <input type="text" name="total" placeholder="xxx,xxx,xxx" id="total"
+                                            class="form-control text-right">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Catatan <span>*</span></label>
+                                    <textarea name="visit_desc" id="visit_desc" class="form-control" placeholder="ex:pernah membeli di PT SCMA"></textarea>
+                                </div>
+                            </div>
                         </div>
-                    @endif
-                </div>
-            </div>
-            <div class="col-sm-6 hidden main-menu" id="set-cust-location">
-                <div class="row">
-                    <div class="col-md-6">
-                        <label>Latitude</label>
-                        <div class="form-group">
-                            <input type="text" name="latitude" id="latitude" class="form-control">
-                            <a href="javascript:;" onclick="setLocationNow()">Tentukan lokasi
-                                ini sebagai titik kordinat.</a>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <label>Longitude</label>
-                        <div class="form-group">
-                            <input type="text" name="longitude" id="longitude" class="form-control">
-                            <a href="javascript:;" onclick="window.open('https://www.google.com/maps')">Lihat di google
-                                maps</a>
-                        </div>
-                    </div>
-                    <div class="col-sm-12">
-                        <button type="button" class="btn btn-primary w-full mb-3"
-                            onclick="updateVisit('set_location')">SUBMIT SET CUST
-                            LOCATION</button>
-                    </div>
-                    <div class="col-sm-12">
-                        <button type="button" class="btn btn-danger w-full mb-3"
-                            onclick="cancelAction('set-cust-location')">CANCEL</button>
-                    </div>
-                    <div class="col-sm-12">
-                        <hr>
                     </div>
                 </div>
             </div>
@@ -369,6 +436,7 @@
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/html5-qrcode.min.js') }}"></script>
     <script src="{{ asset('js/custom.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-maskmoney@3.0.2/dist/jquery.maskMoney.min.js"></script>
 @endsection
 
 @section('externalScripts')
@@ -392,6 +460,20 @@
         };
 
         let locationUser = {};
+        $('#total').maskMoney({
+            precision: 0,
+            defaultZero: true,
+            allowZero: true,
+        })
+
+        $(function() {
+            var rangePercent = $('[type="range"]').val();
+            $('[type="range"]').on('change input', function() {
+                rangePercent = $('[type="range"]').val();
+                $('h4.slider').text(rangePercent);
+                $('[type="range"]').css('filter', 'hue-rotate(-' + rangePercent + 'deg)');
+            });
+        });
 
         $('.datepicker').datepicker({
             format: 'yyyy-mm-dd',
@@ -776,252 +858,50 @@
             $("#modal-reason-cancel").modal('toggle');
         }
 
-        function cancelAction(param) {
-            $('.main-menu').addClass('hidden');
-            switch (param) {
-                case 'main':
-                    $('#main-menu').removeClass('hidden');
-                    openReasonCancelModal();
-                    break;
-                case 'checkin':
-                    $('#main-menu').removeClass('hidden');
-                    break;
-                case 'set-cust-location':
-                    $('#checkin').removeClass('hidden');
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        function checkin() {
-            btnLocation('ok');
-            $('.main-menu').addClass('hidden');
-            $('#checkin').removeClass('hidden');
-            $('.checkin').addClass('disabled');
-            $('.jarak').html('Tidak Diketahui');
-        }
-
-        function setCustLocation() {
-            $('.main-menu').addClass('hidden');
-            $('#set-cust-location').removeClass('hidden');
-        }
-
-        function cancelData() {
-
-            if ($('#alasan_pembatalan').val() == null) {
-                Swal.fire("Gagal Menyimpan Data. ", valid.message, 'error')
-                return false
-            }
-
-            Swal.fire({
-                title: 'Anda Yakin Ingin Membatalkan Visit Ini?',
-                text: 'Aksi ini tidak bisa dikembalikan.',
-                icon: 'info',
-                showDenyButton: true,
-                confirmButtonText: 'Yes',
-                denyButtonText: 'No',
-                reverseButtons: true,
-                customClass: {
-                    actions: 'my-actions',
-                    confirmButton: 'order-1',
-                    denyButton: 'order-3',
-                }
-            }).then((result) => {
-                $('#cover-spin').show()
-                $.ajax({
-                    url: '{{ route('cancel-visit') }}',
-                    type: "post",
-                    data: {
-                        alasan_pembatalan: function() {
-                            return $('#alasan_pembatalan').val();
-                        },
-                        id: '{{ $data->id }}'
-                    },
-                    dataType: "JSON",
-                    success: function(data) {
-                        $('#cover-spin').hide()
-                        if (data.result) {
-                            Swal.fire('Berhasil!', data.message, 'success').then((result) => {
-                                if (result.isConfirmed) {
-                                    window.location.href = data.url;
-                                }
-                            })
-                        } else {
-                            Swal.fire("Gagal Proses Data.", data.message, 'error')
+        $("#sales_order_id").select2({
+            width: '100%',
+            ajax: {
+                url: "{{ route('kunjungan.reporting.select') }}?param=sales_order_id",
+                dataType: 'json',
+                data: function(params) {
+                    return {
+                        q: params.term,
+                        page: params.page
+                    };
+                },
+                processResults: function(data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.data,
+                        pagination: {
+                            more: (params.page * 10) < data.total
                         }
-                    },
-                    error: function(data) {
-                        $('#cover-spin').hide()
-                        Swal.fire("Gagal Proses Data.", data.responseJSON.message, 'error')
-                    }
-                })
-            })
+                    };
+                },
+                cache: true,
+                type: 'GET',
+            },
+            placeholder: 'Pilih Sales Order',
+            minimumInputLength: 0,
+            templateResult: formatRepoNormal,
+            templateSelection: formatRepoNormalSelection
+        });
+
+        $('#district_id').on('select2:select', function(event) {
+            $('#village_id').val(null).trigger('change.select2');
+        })
+
+        function formatRepoNormalSelection(repo) {
+            return repo.text || repo.text;
         }
 
-
-        function distance(lat1, lon1, lat2, lon2, unit) {
-            if ((lat1 === lat2) && (lon1 === lon2)) {
-                return 0;
-            } else {
-                var theta = lon1 - lon2;
-                var dist = Math.sin(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(
-                    lat2)) * Math.cos(deg2rad(theta));
-                dist = Math.acos(dist);
-                dist = rad2deg(dist);
-                var miles = dist * 60 * 1.1515;
-                unit = unit.toUpperCase();
-                if (unit === "K") {
-                    return (miles * 1.609344);
-                } else if (unit === "N") {
-                    return (miles * 0.8684);
-                } else {
-                    return miles;
-                }
+        function formatRepoNormal(repo) {
+            if (repo.loading) {
+                return repo.text;
             }
-        }
-
-        function deg2rad(deg) {
-            return deg * (Math.PI / 180);
-        }
-
-        function rad2deg(rad) {
-            return rad * (180 / Math.PI);
-        }
-
-        function refreshLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(showPosition);
-            } else {
-                x.innerHTML = "Geolocation is not supported by this browser.";
-            }
-        }
-
-        function showPosition(position) {
-
-            var dis = distance(
-                locationPelanggan.latitude,
-                locationPelanggan.longitude,
-                position.coords.latitude,
-                position.coords.longitude,
-                'K'
-            );
-
-            dis = dis * 1000
-            console.info(locationPelanggan.latitude, locationPelanggan.longitude);
-            console.info(position.coords.latitude, position.coords.longitude);
-            locationUser = position.coords;
-            if (range == null) {
-                $('.jarak').html(`Cabang ini belum disetting untuk range checkin nya.`);
-                return true;
-            }
-
-            if (dis <= range) {
-                btnLocation('ok');
-            } else {
-                btnLocation('error');
-            }
-
-            $('.jarak').html(`${Math.round(dis)} Meter`);
-        }
-
-        function btnLocation(param) {
-            $('.btn-checkin').removeClass('btn-danger');
-            $('.btn-checkin').removeClass('btn-primary');
-            if (param == 'error') {
-                $('.btn-checkin').addClass('btn-danger');
-                $('.btn-checkin').html('<i class="fa fa-exclamation-triangle"></i>&nbsp;&nbsp;OUT OF RANGE');
-                $('.checkin').addClass('disabled');
-            } else {
-                $('.btn-checkin').addClass('btn-primary');
-                $('.btn-checkin').text('SUBMIT LOCATION');
-                $('.checkin').removeClass('disabled');
-            }
-        }
-
-        function updateVisit(param) {
-            Swal.fire({
-                title: 'Anda yakin ingin menentukan titik lokasi ini?',
-                icon: 'info',
-                showDenyButton: true,
-                confirmButtonText: 'Yes',
-                denyButtonText: 'No',
-                reverseButtons: true,
-                customClass: {
-                    actions: 'my-actions',
-                    confirmButton: 'order-1',
-                    denyButton: 'order-3',
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $('#cover-spin').show()
-                    $.ajax({
-                        url: '{{ route('update-visit') }}',
-                        type: "post",
-                        data: {
-                            latitude: function() {
-                                return $('#latitude').val();
-                            },
-                            longitude: function() {
-                                return $('#longitude').val();
-                            },
-                            param: param,
-                            latitude_visit: locationUser.latitude,
-                            longitude_visit: locationUser.longitude,
-                            id: '{{ $data->id }}',
-                            pelanggan_id: '{{ $data->id_pelanggan }}',
-                        },
-                        dataType: "JSON",
-                        success: function(data) {
-                            $('#cover-spin').hide()
-                            locationPelanggan.latitude = data.data.latitude;
-                            locationPelanggan.longitude = data.data.longitude;
-                            if (data.result) {
-                                Swal.fire('Berhasil!', data.message, 'success').then((result) => {
-                                    if (data.url == null) {
-                                        appendMap(data.data.latitude, data.data.longitude);
-                                        cancelAction('set-cust-location');
-                                        $('.btn .set-cust-location').remove();
-                                    } else {
-                                        location.href = data.url;
-                                    }
-
-                                    if (param == 'whatsapp') {
-                                        window.open(
-                                            `https://api.whatsapp.com/send?phone={{ $data->kontak_person_pelanggan }}`
-                                        );
-                                    }
-
-                                    if (param == 'telepon') {
-                                        window.open(
-                                            `https://api.whatsapp.com/send?phone={{ $data->kontak_person_pelanggan }}`
-                                        );
-                                    }
-
-                                })
-                            } else {
-                                Swal.fire("Gagal Proses Data.", data.message, 'error')
-                            }
-                        },
-                        error: function(data) {
-                            $('#cover-spin').hide()
-                            Swal.fire("Gagal Proses Data.", data.responseJSON.message, 'error')
-                        }
-                    })
-                }
-
-            })
-        }
-
-        function setLocationNow() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(setCurrentLocation);
-            }
-        }
-
-        function setCurrentLocation(geo) {
-            $('#latitude').val(geo.coords.latitude)
-            $('#longitude').val(geo.coords.longitude)
+            // scrolling can be used
+            var markup = $('<span  data-name=' + repo.name + ' value=' + repo.id + '>' + repo.text + '</span>');
+            return markup;
         }
     </script>
 @endsection

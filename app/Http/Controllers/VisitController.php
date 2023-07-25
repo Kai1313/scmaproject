@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\MaterialUsage;
 use App\Models\Master\Pelanggan;
 use App\Models\Master\Setting;
 use App\Pengguna;
 use App\Visit;
-use DB;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Log;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\DataTables;
 
 class VisitController extends Controller
@@ -20,6 +21,7 @@ class VisitController extends Controller
         if (checkUserSession($request, 'pemakaian', 'show') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
+
 
         if ($request->ajax()) {
             $data = DB::table('pemakaian_header')
@@ -127,54 +129,6 @@ class VisitController extends Controller
         ]);
     }
 
-    public function saveEntry(Request $request, $id = 0)
-    {
-        $data = MaterialUsage::find($id);
-        try {
-            DB::beginTransaction();
-            if (!$data) {
-                $data = new MaterialUsage;
-            }
-
-            $data->fill($request->except('is_qc'));
-            if ($id == 0) {
-                $data->kode_pemakaian = MaterialUsage::createcode($request->id_cabang);
-                $data->user_created = session()->get('user')['id_pengguna'];
-                $data->is_qc = isset($request->is_qc) ? $request->is_qc : 0;
-            } else {
-                $data->user_modified = session()->get('user')['id_pengguna'];
-            }
-
-            $data->save();
-
-            $checkStock = $data->checkStockDetails($request->details);
-            if ($checkStock['result'] == false) {
-                DB::rollback();
-                return response()->json([
-                    "result" => $checkStock['result'],
-                    "message" => $checkStock['message'],
-                ], 500);
-            }
-
-            $data->savedetails($request->details);
-
-            DB::commit();
-            return response()->json([
-                "result" => true,
-                "message" => "Data berhasil disimpan",
-                "redirect" => route('material_usage-entry', $data->id_pemakaian),
-            ], 200);
-        } catch (\Exception $e) {
-            DB::rollback();
-            Log::error("Error when save material usage");
-            Log::error($e);
-            return response()->json([
-                "result" => false,
-                "message" => "Data gagal tersimpan",
-            ], 500);
-        }
-    }
-
     public function viewData($id)
     {
         if (checkAccessMenu('pemakaian', 'show') == false) {
@@ -229,19 +183,67 @@ class VisitController extends Controller
         }
     }
 
-    public function submitLocation(Request $req): JsonResponse
+    public function updateVisit(Request $req): JsonResponse
     {
         try {
+            $message = '';
+            $url = url('kunjungan/reporting');
             if ($req->param == 'set_location') {
                 $data = Pelanggan::findOrFail($req->pelanggan_id);
                 $data->latitude_pelanggan = $req->latitude;
                 $data->longitude_pelanggan = $req->longitude;
                 $data->save();
+                $message = "Data lokasi pelanggan berhasil ditentukan";
+                $url = null;
+            } elseif ($req->param == 'checkin') {
+                $data = Visit::findOrFail($req->id);
+                $data->latitude_visit = $req->latitude_visit;
+                $data->longitude_visit = $req->longitude_visit;
+                $data->visit_type = 'LOKASI';
+                $data->status = 2;
+                $data->save();
+                $message = "Berhasil checkin";
+                $url = "$url/$data->id";
+            } else {
+                $data = Visit::findOrFail($req->id);
+                $data->visit_type = strtoupper($req->param);
+                $data->status = 2;
+                $data->save();
+                $message = "Berhasil mengupdate status visit";
+                $url = "$url/$data->id";
             }
+
+
+
+            Log::info("Berhasil update status visit", $data->toArray());
             return response()->json([
                 "result" => true,
                 "data" => $req->only(['latitude', 'longitude']),
-                "message" => "Data lokasi pelanggan berhasil ditentukan",
+                'url' => $url,
+                "message" => $message,
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "result" => true,
+                "data" => $req->only(['latitude', 'longitude']),
+                "message" => $th->getMessage(),
+            ], 500);
+        }
+    }
+
+    function cancelVisit(Request $req): JsonResponse
+    {
+        try {
+            $message = 'Berhasil membatalkan visit';
+            $url = url('jadwal_kunjungan/index');
+            $data = Visit::findOrFail($req->id);
+            $data->alasan_pembatalan = $req->alasan_pembatalan;
+            $data->status = 0;
+            $data->save();
+            return response()->json([
+                "result" => true,
+                'url' => $url,
+                "message" => $message,
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([

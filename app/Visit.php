@@ -28,6 +28,13 @@ class Visit extends Model
         'visit_code',
         'progress_ind',
         'visit_type',
+        'alasan_pembatalan',
+    ];
+
+    public static $progressIndicator = [
+        '1' => 'Perkenalan',
+        '2' => 'Potensial',
+        '3' => 'Penawaran/Order',
     ];
 
     public function cabang()

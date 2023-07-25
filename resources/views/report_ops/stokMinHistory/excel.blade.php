@@ -18,30 +18,34 @@
             </tr>
             <tr></tr>
             <tr>
+                <td style="font-weight:bold;border: #000000 solid thin;">Cabang</td>
+                <td style="font-weight:bold;border: #000000 solid thin;">{{ $cabang->nama_cabang }}</td>
+            </tr>
+            <tr>
                 <td style="font-weight:bold;border: #000000 solid thin;">Nama Bahan</td>
                 <td style="font-weight:bold;border: #000000 solid thin;">{{ $barang->nama_barang }}</td>
             </tr>
             <tr>
                 <td style="font-weight:bold;border: #000000 solid thin;">Stok Minimal Hitung</td>
                 <td style="font-weight:bold;border: #000000 solid thin;text-align:right;">
-                    {{ number_format($historyHeader->stok_min_hitung, 4) }}</td>
+                    {{ formatNumber($historyHeader->stok_min_hitung, 4) }}</td>
             </tr>
             <tr>
                 <td style="font-weight:bold;border: #000000 solid thin;">Stok Minimal Khusus</td>
                 <td style="font-weight:bold;border: #000000 solid thin;text-align:right;">
-                    {{ empty($historyHeader->stok_min_khusus) ? '-' : number_format($historyHeader->stok_min_khusus, 4) }}
+                    {{ empty($historyHeader->stok_min_khusus) ? '-' : formatNumber($historyHeader->stok_min_khusus, 4) }}
                 </td>
             </tr>
             <tr>
                 <td style="font-weight:bold;border: #000000 solid thin;">Stok Minimal</td>
                 <td style="font-weight:bold;border: #000000 solid thin;text-align:right;">
-                    {{ number_format($historyHeader->jumlah, 4) }}
+                    {{ formatNumber($historyHeader->jumlah, 4) }}
                 </td>
             </tr>
             <tr>
                 <td style="font-weight:bold;border: #000000 solid thin;">Stok Aktif</td>
                 <td style="font-weight:bold;border: #000000 solid thin;text-align:right;">
-                    {{ number_format($sumStok, 4) }}</td>
+                    {{ formatNumber($sumStok, 4) }}</td>
             </tr>
             <tr>
                 <td style="font-weight:bold;border: #000000 solid thin;">Range Data Penjualan</td>
@@ -94,24 +98,24 @@
                 <tr>
                     <td style="border: #000000 solid thin;">{{ $data->nama_barang }}</td>
                     <td style="border: #000000 solid thin;text-align:right;">
-                        {{ number_format($data->total_jual, 4) }}</td>
+                        {{ formatNumber($data->total_jual, 4) }}</td>
                     <td style="border: #000000 solid thin;text-align:right;">
-                        {{ number_format($data->total_jual_per_bulan, 4) }}</td>
+                        {{ formatNumber($data->total_jual_per_bulan, 4) }}</td>
                     <td style="border: #000000 solid thin;text-align:right;">
-                        {{ number_format($data->plus_persen, 4) }}</td>
+                        {{ formatNumber($data->plus_persen, 4) }}</td>
                     <td style="border: #000000 solid thin;text-align:right;">
-                        {{ number_format($data->per_bulan_plus_persen, 4) }}</td>
+                        {{ formatNumber($data->per_bulan_plus_persen, 4) }}</td>
                     <td style="border: #000000 solid thin;text-align:right;">
-                        {{ number_format($data->avg_prorate, 4) }}</td>
+                        {{ formatNumber($data->avg_prorate, 4) }}</td>
                     <td style="border: #000000 solid thin;text-align:right;">
-                        {{ number_format($data->pemakaian_per_barang_jadi, 4) }}</td>
+                        {{ formatNumber($data->pemakaian_per_barang_jadi, 4) }}</td>
                 </tr>
             @endforeach
             <tr>
                 <td colspan=6 style="border: #000000 solid thin;text-align:right;">
                     Total Kebutuhan Per Bulan</td>
                 <td style="border: #000000 solid thin;text-align:right;font-weight:bold">
-                    {{ number_format($total, 4) }}</td>
+                    {{ formatNumber($total, 4) }}</td>
             </tr>
         </tbody>
     </table>
