@@ -32,7 +32,13 @@ class ReportGeneralLedgerController extends Controller
 
         // Check get parameter
         $cabang = ($request->has("cabang"))?$request->cabang:NULL;
-        $id_akun = ($request->has("id_akun"))?$request->id_akun:NULL;
+        if ($request->has("kode_akun")) {
+            $kode_akun = $request->kode_akun;
+            $getAkun = Akun::where("kode_akun", $kode_akun)->where("id_cabang", $id)->first();
+            $id_akun = ($getAkun)?$getAkun->id_akun:NULL;
+        } else {
+            $id_akun = ($request->has("id_akun"))?$request->id_akun:NULL;
+        }
         $startdate = ($request->has("startdate"))?$request->startdate:NULL;
         $enddate = ($request->has("enddate"))?$request->enddate:NULL;
         $type = ($request->has("type"))?$request->type:NULL;
