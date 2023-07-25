@@ -20,7 +20,7 @@ class ReportGiroController extends Controller
         }
 
         $data_cabang = getCabang();
-        $data_slip = Slip::where('jenis_slip', 3)->where('id_cabang', 1)->get();
+        $data_slip = Slip::where('jenis_slip', 3)->where('id_cabang', $data_cabang[0]->id_cabang)->get();
         $data_status = array(
             array(
                 'value' => 'All',

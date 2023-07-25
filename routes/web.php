@@ -288,6 +288,8 @@ Route::prefix('transaction')->group(function () {
         Route::get('/index/{user_id?}', 'ClosingJournalController@index')->name('transaction-closing-journal');
         Route::get('/form/create', 'ClosingJournalController@create')->name('transaction-closing-journal-create');
         Route::get('/store', 'ClosingJournalController@store')->name('transaction-closing-journal-store');
+        Route::get('/populate', 'ClosingJournalController@populate')->name('transaction-closing-journal-populate');
+        Route::get('/destroy/{id?}', 'ClosingJournalController@destroy')->name('transaction-closing-journal-destroy');
         Route::get('/inventory_transfer', 'ClosingJournalController@inventoryTransfer')->name('transaction-closing-journal-inventory-transfer');
         Route::get('/stock_correction', 'ClosingJournalController@stockCorrection')->name('transaction-closing-journal-stock-correction');
         Route::get('/production', 'ClosingJournalController@production')->name('transaction-closing-journal-production');

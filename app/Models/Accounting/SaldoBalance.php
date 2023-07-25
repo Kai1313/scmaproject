@@ -7,4 +7,5 @@ use Illuminate\Database\Eloquent\Model;
 class SaldoBalance extends Model
 {
     protected $table = 'saldo_balance';
+    public $timestamps = false;
 }

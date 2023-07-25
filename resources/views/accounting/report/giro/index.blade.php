@@ -9,6 +9,11 @@
 <link rel="stylesheet" href="{{ asset('assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css') }}">
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <style>
+    .dataTable {
+        width: 100%;
+        max-width: 100%;
+    }
+
     .dataTables_scrollHeadInner {
         width: 100% !important;
     }
@@ -148,30 +153,32 @@
                 </div>
                 @endif
                 <div class="box-body">
-                    <table id="table_report" style="display:none" class="table table-bordered table-striped display responsive nowrap" width="100%">
-                        <thead width="100%">
-                            <tr>
-                                <th class="text-center" colspan="6">Giro</th>
-                                <th class="text-center" colspan="3">Cair</th>
-                                <th class="text-center" colspan="2">Tolak</th>
-                            </tr>
-                            <tr>
-                                <th class="text-center" width="10%" data-priority="2">No Jurnal</th>
-                                <th class="text-center" width="7%" data-priority="1">Tanggal Jurnal</th>
-                                <th class="text-center" width="11%">Giro No</th>
-                                <th class="text-center" width="7%">Giro Date</th>
-                                <th class="text-center" width="7%">Giro Due Date</th>
-                                <th class="text-center" width="11%">Total</th>
-                                <th class="text-center" width="11%">No Jurnal</th>
-                                <th class="text-center" width="7%">Tanggal</th>
-                                <th class="text-center" width="11%">Slip</th>
-                                <th class="text-center" width="11%">No Jurnal</th>
-                                <th class="text-center" width="7%">Tanggal</th>
-                            </tr>
-                        </thead>
-                        <tbody id="table_report-body">
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table id="table_report" style="display:none" class="table table-bordered table-striped display responsive nowrap" width="100%">
+                            <thead width="100%">
+                                <tr>
+                                    <th class="text-center" colspan="6">Giro</th>
+                                    <th class="text-center" colspan="3">Cair</th>
+                                    <th class="text-center" colspan="2">Tolak</th>
+                                </tr>
+                                <tr>
+                                    <th class="text-center" width="10%" data-priority="2">No Jurnal</th>
+                                    <th class="text-center" width="7%" data-priority="1">Tanggal Jurnal</th>
+                                    <th class="text-center" width="11%">Giro No</th>
+                                    <th class="text-center" width="7%">Giro Date</th>
+                                    <th class="text-center" width="7%">Giro Due Date</th>
+                                    <th class="text-center" width="11%">Total</th>
+                                    <th class="text-center" width="11%">No Jurnal</th>
+                                    <th class="text-center" width="7%">Tanggal</th>
+                                    <th class="text-center" width="11%">Slip</th>
+                                    <th class="text-center" width="11%">No Jurnal</th>
+                                    <th class="text-center" width="7%">Tanggal</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table_report-body">
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -447,7 +454,13 @@
 
                 $('#table_report-body').html(rows)
 
-                $('#table_report').DataTable();
+                $('#table_report').DataTable({
+                    responsive: true,
+                    "lengthMenu": [
+                        [-1, 100, 50, 20, 10],
+                        ["All", 100, 50, 20, 10]
+                    ],
+                });
             } else {
                 alert('Get report data failed. Contact administrator!')
             }
