@@ -9,6 +9,11 @@
 <link rel="stylesheet" href="{{ asset('assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css') }}">
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <style>
+    .dataTable {
+        width: 100%;
+        max-width: 100%;
+    }
+
     .dataTables_scrollHeadInner {
         width: 100% !important;
     }
@@ -131,22 +136,24 @@
                 </div>
                 @endif
                 <div class="box-body">
-                    <table id="table_report" style="display:none" class="table table-bordered table-striped display responsive nowrap" width="100%">
-                        <thead width="100%">
-                            <tr>
-                                <th class="text-center" width="7%" data-priority="1">Tanggal Jurnal</th>
-                                <th class="text-center" width="10%" data-priority="2">No Jurnal</th>
-                                <th class="text-center" width="11%">Slip</th>
-                                <th class="text-center" width="10%">Akun</th>
-                                <th class="text-center" width="15%">Keterangan</th>
-                                <th class="text-center" width="10%">ID Transaksi</th>
-                                <th class="text-center" width="9%">Debet</th>
-                                <th class="text-center" width="9%">Credit</th>
-                                <th class="text-center" width="9%">Balance</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table id="table_report" style="display:none" class="table table-bordered table-striped display responsive nowrap" width="100%">
+                            <thead width="100%">
+                                <tr>
+                                    <th class="text-center" width="7%" data-priority="1">Tanggal Jurnal</th>
+                                    <th class="text-center" width="10%" data-priority="2">No Jurnal</th>
+                                    <th class="text-center" width="11%">Slip</th>
+                                    <th class="text-center" width="10%">Akun</th>
+                                    <th class="text-center" width="15%">Keterangan</th>
+                                    <th class="text-center" width="10%">ID Transaksi</th>
+                                    <th class="text-center" width="9%">Debet</th>
+                                    <th class="text-center" width="9%">Credit</th>
+                                    <th class="text-center" width="9%">Balance</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -348,9 +355,13 @@
         $('#table_report').DataTable({
             processing: true,
             serverSide: true,
-            "scrollX": true,
+            "scrollX": false,
             "bDestroy": true,
             responsive: true,
+            "lengthMenu": [
+                [-1, 100, 50, 20, 10],
+                ["All", 100, 50, 20, 10]
+            ],
             ajax: {
                 "url": get_data_url,
                 "type": "GET",
@@ -444,6 +455,8 @@
                 }
             ],
         })
+
+        // $('#table_report').columns.adjust().draw();
     }
 
     function formatCurr(num) {

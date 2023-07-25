@@ -12,6 +12,19 @@
 <link rel="stylesheet" href="{{ asset('assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css') }}">
 
 <style>
+    .dataTable {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .dataTables_scrollHeadInner {
+        width: 100% !important;
+    }
+
+    .table {
+        width: 100% !important;
+    }
+
     .mt-1 {
         margin-top: .25rem !important;
     }
@@ -292,7 +305,7 @@
         // console.log("akun "+ctrlAkun+" start "+ctrlStartDate+" end "+ctrlEndDate+" type "+ctrlType);
 
         // getCoa()
-        let initType = (ctrlType)?ctrlType:"recap"
+        let initType = (ctrlType) ? ctrlType : "recap"
         checkType(initType)
         $("#table_recap_div").hide()
         $("#table_detail_div").hide()
@@ -378,9 +391,13 @@
             $('#table_recap').DataTable({
                 processing: true,
                 serverSide: true,
-                "scrollX": true,
+                "scrollX": false,
                 "bDestroy": true,
                 responsive: true,
+                "lengthMenu": [
+                    [-1, 100, 50, 20, 10],
+                    ["All", 100, 50, 20, 10]
+                ],
                 ajax: {
                     "url": route + param,
                     "type": "GET",
@@ -407,8 +424,8 @@
                             let startdate = $("#start_date").val()
                             let enddate = $("#end_date").val()
                             let customRoute = "{{ route('report-general-ledger') }}"
-                            customRoute += '?id_akun='+row["id_akun"]+'&cabang='+cabang+'&startdate='+startdate+'&enddate='+enddate+'&type=detail'
-                            let namaAkun = '<a href="'+customRoute+'" target="__blank">'+data+'</a>'
+                            customRoute += '?id_akun=' + row["id_akun"] + '&cabang=' + cabang + '&startdate=' + startdate + '&enddate=' + enddate + '&type=detail'
+                            let namaAkun = '<a href="' + customRoute + '" target="__blank">' + data + '</a>'
                             return namaAkun
                         }
                     },
@@ -465,9 +482,13 @@
             $('#table_detail').DataTable({
                 processing: true,
                 serverSide: true,
-                "scrollX": true,
+                "scrollX": false,
                 "bDestroy": true,
                 responsive: true,
+                "lengthMenu": [
+                    [-1, 100, 50, 20, 10],
+                    ["All", 100, 50, 20, 10]
+                ],
                 ajax: {
                     "url": route + param,
                     "type": "GET",
@@ -512,9 +533,9 @@
                         name: 'keterangan',
                         width: '10%',
                         render: function(data, type, row) {
-                            if(data != '' && data != null){
+                            if (data != '' && data != null) {
                                 return data.substring(0, 15)
-                            }else{
+                            } else {
                                 return data;
                             }
                         }
