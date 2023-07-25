@@ -35,4 +35,6 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::post('/jurnal_closing_pemakaian', 'ApiController@jurnalClosingPemakaian')->name('jurnal-otomatis-closing-pemakaian');
         Route::post('/jurnal_closing_retur_jual', 'ApiController@jurnalClosingReturJual')->name('jurnal-otomatis-closing-retur-jual');
     });
+
+    require __DIR__ . '/penyusutan/penyusutan.php';
 });

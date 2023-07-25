@@ -4,11 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Master\Pelanggan;
 use App\Models\Master\Setting;
-use App\Penjualan;
 use App\PermintaanPenjualan;
 use App\Salesman;
 use App\Visit;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -137,12 +135,13 @@ class ReportingVisitController extends Controller
         //
     }
 
-    function select(Request $req)
+    public function select(Request $req)
     {
 
         switch ($req->param) {
             case 'sales_order_id':
                 return PermintaanPenjualan::select(DB::raw("id_permintaan_penjualan as id"), DB::raw("nama_permintaan_penjualan as text"), 'permintaan_penjualan.*')
+                    ->whereDoesntHave('visit')
                     ->where(function ($q) use ($req) {
                         $q->where(DB::raw("UPPER(nama_permintaan_penjualan)"), 'like', '%' . strtoupper($req->q) . '%');
                     })

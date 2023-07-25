@@ -310,7 +310,7 @@
                 $('#map').removeClass('hidden');
                 $("#google-map").prop('src',
                     `https://maps.google.com/maps?q=${lat},${long}&hl=id&z=14&amp;output=embed`)
-                appendMap();
+                appendMap(lat, long);
                 $('#latitude').val(lat);
                 $('#longitude').val(long);
             } else {

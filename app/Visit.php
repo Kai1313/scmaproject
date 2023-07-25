@@ -2,8 +2,8 @@
 
 namespace App;
 
-use DB;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Visit extends Model
 {
@@ -29,6 +29,8 @@ class Visit extends Model
         'progress_ind',
         'visit_type',
         'alasan_pembatalan',
+        'range_potensial',
+        'total',
     ];
 
     public static $progressIndicator = [
