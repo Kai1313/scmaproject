@@ -446,7 +446,7 @@
                 listCabang.forEach(function(cabang) {
                     let format = 'total_' + cabang.new_nama_cabang;
                     if (reportType.includes('detail') && reportType.includes('awal') == false) {
-                        body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" ><a href="' + ledgerRoute + '?id_akun=' + element.akun + '&cabang=' + cabang.id_cabang + '&startdate=' + element.start_date + '&enddate=' + element.end_date + '&type=detail" target="_blank">' + formatCurr(formatNumberAsFloatFromDB(element[format].toFixed(2))) + '</a></td>';
+                        body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" ><a href="' + ledgerRoute + '?kode_akun=' + element.kode_akun + '&cabang=' + cabang.id_cabang + '&startdate=' + element.start_date + '&enddate=' + element.end_date + '&type=detail" target="_blank">' + formatCurr(formatNumberAsFloatFromDB(element[format].toFixed(2))) + '</a></td>';
                     } else {
                         body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" >' + formatCurr(formatNumberAsFloatFromDB(element[format].toFixed(2))) + '</td>';
                     }

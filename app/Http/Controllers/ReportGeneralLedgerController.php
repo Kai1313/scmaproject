@@ -34,7 +34,7 @@ class ReportGeneralLedgerController extends Controller
         $cabang = ($request->has("cabang"))?$request->cabang:NULL;
         if ($request->has("kode_akun")) {
             $kode_akun = $request->kode_akun;
-            $getAkun = Akun::where("kode_akun", $kode_akun)->where("id_cabang", $id)->first();
+            $getAkun = Akun::where("kode_akun", $kode_akun)->where("id_cabang", $cabang)->first();
             $id_akun = ($getAkun)?$getAkun->id_akun:NULL;
         } else {
             $id_akun = ($request->has("id_akun"))?$request->id_akun:NULL;
