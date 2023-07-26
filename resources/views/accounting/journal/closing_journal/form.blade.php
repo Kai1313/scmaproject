@@ -134,6 +134,7 @@
                                     <div id="response7"></div><br>
                                     <div id="response8"></div><br>
                                     <div id="response9"></div><br>
+                                    <div id="response10"></div><br>
                                 </div>
                             </div>
                         </form>
@@ -184,6 +185,7 @@
     let routeUsage = "{{ Route('transaction-closing-journal-usage') }}"
     let routeSales = "{{ Route('transaction-closing-journal-sales') }}"
     let routeDepreciation = "{{ Route('transaction-closing-journal-depreciation') }}"
+    let routeClosingJournal = "{{ Route('transaction-closing-journal-closing-journal') }}"
     let routeSaldoTransfer = "{{ Route('transaction-closing-journal-saldo-transfer') }}"
     let piutang_dagang
     let hutang_dagang
@@ -263,6 +265,7 @@
             $("#response7").empty()
             $("#response8").empty()
             $("#response9").empty()
+            $("#response10").empty()
 
             // Start ajax chain
             save_data(routeClosingStore, param, "1")
@@ -331,7 +334,10 @@
                 save_data(routeDepreciation, param, "8")
                 break;
             case "8":
-                save_data(routeSaldoTransfer, param, "9")
+                save_data(routeClosingJournal, param, "9")
+                break;
+            case "9":
+                save_data(routeSaldoTransfer, param, "10")
                 break;
 
             default:
