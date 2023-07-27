@@ -391,7 +391,7 @@
                 </li>
             @endif
             @if (checkAccessMenu('transaksi'))
-                <li class="treeview {{ in_array(request()->segment(1), ['purchase_requisitions', 'uang_muka_pembelian', 'qc_penerimaan_barang', 'kirim_ke_cabang', 'terima_dari_cabang', 'uang_muka_penjualan', 'terima_dari_gudang', 'pemakaian']) ? 'active' : null }}"
+                <li class="treeview {{ in_array(request()->segment(1), ['purchase_requisitions', 'uang_muka_pembelian', 'qc_penerimaan_barang', 'kirim_ke_cabang', 'terima_dari_cabang', 'uang_muka_penjualan', 'terima_dari_gudang', 'pemakaian', 'penjualan']) ? 'active' : null }}"
                     data-alias="transaksi">
                     <a href="#"><i class="glyphicon glyphicon-list-alt"></i> <span>Transaksi</span>
                         <span class="pull-right-container">
@@ -651,7 +651,7 @@
                             </li>
                         @endif
                         @if (checkAccessMenu('penjualan_kepala'))
-                            <li class="treeview {{ in_array(request()->segment(1), ['uang_muka_penjualan']) ? 'active' : null }}"
+                            <li class="treeview {{ in_array(request()->segment(1), ['penjualan']) ? 'active' : null }}"
                                 data-alias="penjualan_kepala">
                                 <a href="#"><i class="glyphicon glyphicon-arrow-right"></i>
                                     <span>Penjualan</span>
@@ -661,13 +661,22 @@
                                 </a>
                                 <ul class="treeview-menu">
                                     <li data-alias="jadwal_kunjungan">
-                                        <a href="{{ route('pre_visit') }}">
+                                        <a href="{{ route('pre_visit') }}"
+                                            class="{{ menuActive(request()->url(), route('pre_visit')) > 0 ? 'active' : null }}">
                                             <i class="glyphicon glyphicon-option-vertical"></i>Jadwal Kunjungan
+
                                         </a>
                                     </li>
                                     <li data-alias="kunjungan">
-                                        <a href="{{ route('visit') }}">
+                                        <a href="{{ route('visit') }}"
+                                            class="{{ menuActive(request()->url(), route('visit')) > 0 ? 'active' : null }}">
                                             <i class="glyphicon glyphicon-option-vertical"></i>Kunjungan
+                                        </a>
+                                    </li>
+                                    <li data-alias="kunjungan">
+                                        <a href="{{ route('visit') }}"
+                                            class="{{ menuActive(request()->url(), route('kunjungan.progress-visit.index')) > 0 ? 'active' : null }}">
+                                            <i class="glyphicon glyphicon-option-vertical"></i>Progress Visit
                                         </a>
                                     </li>
                                     @if (checkAccessMenu('permintaan_penjualan'))

@@ -137,13 +137,19 @@ class ReportingVisitController extends Controller
 
     public function select(Request $req)
     {
-
         switch ($req->param) {
             case 'sales_order_id':
                 return PermintaanPenjualan::select(DB::raw("id_permintaan_penjualan as id"), DB::raw("nama_permintaan_penjualan as text"), 'permintaan_penjualan.*')
                     ->whereDoesntHave('visit')
                     ->where(function ($q) use ($req) {
                         $q->where(DB::raw("UPPER(nama_permintaan_penjualan)"), 'like', '%' . strtoupper($req->q) . '%');
+                    })
+                    ->paginate(10);
+                break;
+            case 'id_salesman':
+                return Salesman::select(DB::raw("id_salesman as id"), DB::raw("nama_salesman as text"), 'salesman.*')
+                    ->where(function ($q) use ($req) {
+                        $q->where(DB::raw("concat(UPPER(nama_salesman),' ',UPPER(kode_salesman))"), 'like', '%' . strtoupper($req->q) . '%');
                     })
                     ->paginate(10);
                 break;

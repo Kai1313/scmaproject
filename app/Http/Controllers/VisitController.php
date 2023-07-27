@@ -18,66 +18,56 @@ class VisitController extends Controller
 {
     public function index(Request $request)
     {
+        // dd(checkPenjualan(273, 1, '2022-05-25', '2022-05-25'));
         if (checkUserSession($request, 'pemakaian', 'show') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
 
         if ($request->ajax()) {
-            $data = DB::table('pemakaian_header')
-                ->select(
-                    'id_pemakaian',
-                    'kode_pemakaian',
-                    'tanggal',
-                    'g.nama_gudang',
-                    'c.nama_cabang',
-                    'user_created',
-                    'catatan',
-                    'is_qc',
-                    'void'
-                )
-                ->leftJoin('gudang as g', 'pemakaian_header.id_gudang', '=', 'g.id_gudang')
-                ->leftJoin('cabang as c', 'pemakaian_header.id_cabang', '=', 'c.id_cabang');
-            if (isset($request->c)) {
-                $data = $data->where('pemakaian_header.id_cabang', $request->c);
-            }
+            $data = Visit::where(function ($q) use ($request) {
+                if ($request->id_cabang != '') {
+                    $q->where('id_cabang', $request->id_cabang);
+                }
 
-            if ($request->show_void == 'false') {
-                $data = $data->where('pemakaian_header.void', '0');
-            }
+                if ($request->id_salesman != '') {
+                    $q->where('id_salesman', $request->id_salesman);
+                }
+            })->orderBy('created_at', 'desc');
 
-            $data = $data->orderBy('pemakaian_header.dt_created', 'desc');
+
+            // if ($request->show_void == 'false') {
+            //     $data = $data->where('pemakaian_header.void', '0');
+            // }
 
             $idUser = session()->get('user')['id_pengguna'];
             $idGrupUser = session()->get('user')['id_grup_pengguna'];
-            $filterUser = DB::table('pengguna')
-                ->where(function ($w) {
-                    $w->where('id_grup_pengguna', session()->get('user')['id_grup_pengguna'])->orWhere('id_grup_pengguna', 1);
-                })
-                ->where('status_pengguna', '1')->pluck('id_pengguna')->toArray();
-            $accessVoid = getSetting('Pemakaian Void');
-            $arrayAccessVoid = explode(',', $accessVoid);
+
+            // dd($idUser);
+            // $filterUser = DB::table('pengguna')
+            //     ->where(function ($w) {
+            //         $w->where('id_grup_pengguna', session()->get('user')['id_grup_pengguna'])->orWhere('id_grup_pengguna', 1);
+            //     })
+            //     ->where('status_pengguna', '1')->pluck('id_pengguna')->toArray();
+            // $accessVoid = getSetting('Pemakaian Void');
+            // $arrayAccessVoid = explode(',', $accessVoid);
 
             return Datatables::of($data)
                 ->addIndexColumn()
-                ->addColumn('action', function ($row) use ($filterUser, $idUser, $idGrupUser, $arrayAccessVoid) {
-                    if ($row->void == '1') {
+                ->addColumn('action', function ($row) use ($idUser) {
+                    if ($row->status == '0') {
                         $btn = '<label class="label label-default">Batal</label>';
                         $btn .= '<ul class="horizontal-list">';
-                        $btn .= '<li><a href="' . route('material_usage-view', $row->id_pemakaian) . '" class="btn btn-info btn-xs mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
+                        $btn .= '<li><a href="' . route('pre_visit-view', $row->id) . '" class="btn btn-info btn-xs mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
                         $btn .= '</ul>';
                         return $btn;
-                    } else {
+                    } elseif ($row->status == '1') {
                         $btn = '<ul class="horizontal-list">';
-                        $btn .= '<li><a href="' . route('material_usage-view', $row->id_pemakaian) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
-                        if (in_array($idUser, $filterUser) || $idUser == $row->user_created) {
-                            $btn .= '<li><a href="' . route('material_usage-entry', $row->id_pemakaian) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
+                        $btn .= '<li><a href="' . route('pre_visit-view', $row->id) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
+                        if ($idUser == $row->user_created) {
+                            $btn .= '<li><a href="' . route('pre_visit-entry', $row->id) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
+                            $btn .= '<li><a href="' . route('visit-entry', $row->id) . '" class="btn btn-success btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Buat Kunjungan</a></li>';
                         }
-
-                        if (in_array($idGrupUser, $arrayAccessVoid) || $idUser == $row->user_created) {
-                            $btn .= '<li><a href="' . route('material_usage-delete', $row->id_pemakaian) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Void</a></li>';
-                        }
-
                         $btn .= '</ul>';
                         return $btn;
                     }
@@ -87,9 +77,9 @@ class VisitController extends Controller
         }
 
         $cabang = session()->get('access_cabang');
-        return view('ops.materialUsage.index', [
+        return view('ops.visit.index', [
             'cabang' => $cabang,
-            "pageTitle" => "SCA OPS | Pemakaian | List",
+            "pageTitle" => "SCA OPS | Visit | List",
         ]);
     }
 
