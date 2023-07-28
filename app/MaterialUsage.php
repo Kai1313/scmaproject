@@ -27,6 +27,7 @@ class MaterialUsage extends Model
         'is_qc',
         'void',
         'void_user_ids',
+        'jenis_pemakaian',
     ];
 
     public function cabang()
