@@ -31,6 +31,9 @@ class Visit extends Model
         'alasan_pembatalan',
         'range_potensial',
         'total',
+        'proofment_1',
+        'proofment_2',
+        'permintaan_penjualan_id',
     ];
 
     public static $progressIndicator = [
@@ -42,17 +45,17 @@ class Visit extends Model
 
     public function getNamaPelangganAttribute()
     {
-        return $this->pelanggan->nama_pelanggan;
+        return $this->pelanggan ? $this->pelanggan->nama_pelanggan : '-';
     }
 
     public function getNamaSalesmanAttribute()
     {
-        return $this->salesman->nama_salesman;
+        return $this->salesman ? $this->salesman->nama_salesman : '-';
     }
 
     public function getNamaCabangAttribute()
     {
-        return $this->cabang->nama_cabang;
+        return $this->cabang ? $this->cabang->nama_cabang : '-';
     }
 
     public function salesman()
@@ -70,6 +73,11 @@ class Visit extends Model
         return $this->belongsTo(Models\Master\Pelanggan::class, 'id_pelanggan', 'id_pelanggan');
     }
 
+    public function sales_order()
+    {
+        return $this->belongsTo(PermintaanPenjualan::class, 'permintaan_penjualan_id', 'id_permintaan_penjualan');
+    }
+
     public static function createcode($id_cabang)
     {
         $branchCode = DB::table('cabang')->where('id_cabang', $id_cabang)->first();
@@ -82,5 +90,27 @@ class Visit extends Model
         }
 
         return $string . '.' . $nol . $check;
+    }
+
+    public function uploadfile($req, $data)
+    {
+        if ($req->image_path) {
+            $explode = explode(";base64,", $req->image_path);
+            $findExt = explode("image/", $explode[0]);
+
+            $ext = $findExt[1];
+            $name = uniqid();
+
+            $media = base64_decode($explode[1]);
+            $mainpath = $name . '.' . $ext;
+
+            $img = \Image::make($media)->fit(150);
+            $img->save('asset/' . $mainpath);
+
+            $data->path = $mainpath;
+            $data->save();
+        }
+
+        return ['status' => 'success'];
     }
 }

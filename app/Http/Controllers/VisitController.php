@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Yajra\DataTables\DataTables;
+use Yajra\DataTables\Facades\DataTables;
 
 class VisitController extends Controller
 {
@@ -33,8 +33,19 @@ class VisitController extends Controller
                 if ($request->id_salesman != '') {
                     $q->where('id_salesman', $request->id_salesman);
                 }
-            })->orderBy('created_at', 'desc');
 
+                if ($request->progress_ind != '') {
+                    if ($request->progress_ind == 0) {
+                        $q->whereNull('progress_ind');
+                    } else {
+                        $q->where('progress_ind', $request->progress_ind);
+                    }
+                }
+
+                if ($request->status != '') {
+                    $q->where('status', $request->status);
+                }
+            })->orderBy('created_at', 'desc');
 
             // if ($request->show_void == 'false') {
             //     $data = $data->where('pemakaian_header.void', '0');
@@ -52,9 +63,9 @@ class VisitController extends Controller
             // $accessVoid = getSetting('Pemakaian Void');
             // $arrayAccessVoid = explode(',', $accessVoid);
 
-            return Datatables::of($data)
+            return DataTables::eloquent($data)
                 ->addIndexColumn()
-                ->addColumn('action', function ($row) use ($idUser) {
+                ->addColumn('actions', function ($row) use ($idUser) {
                     if ($row->status == '0') {
                         $btn = '<label class="label label-default">Batal</label>';
                         $btn .= '<ul class="horizontal-list">';
@@ -72,7 +83,45 @@ class VisitController extends Controller
                         return $btn;
                     }
                 })
-                ->rawColumns(['action'])
+                ->addColumn('action', function ($data) {
+                    return view('ops.visit.action', compact('data'));
+                })
+                ->addColumn('nama_cabang', function ($data) {
+                    return $data->nama_cabang;
+                })
+                ->addColumn('nama_salesman', function ($data) {
+                    return $data->nama_salesman;
+                })
+                ->addColumn('nama_pelanggan', function ($data) {
+                    return $data->nama_pelanggan;
+                })
+                ->addColumn('detail', function ($data) {
+                    return view('ops.visit.detail', compact('data'));
+                })
+                ->addColumn('status', function ($data) {
+                    switch ($data->status) {
+                        case '0':
+                            return "<label class='label label-danger'>Batal Visit</label>";
+                            break;
+                        case '1':
+                            return "<label class='label label-warning'>Belum Visit</label>";
+                            break;
+                        case '2':
+                            return "<label class='label label-primary'>Sudah Visit</label>";
+                            break;
+                        default:
+                            # code...
+                            break;
+                    }
+                })
+                ->addColumn('status_report', function ($data) {
+                    if ($data->progress_ind == null) {
+                        return "<label class='label label-warning'>Belum Report</label>";
+                    } else {
+                        return "<label class='label label-primary'>Sudah Report</label>";
+                    }
+                })
+                ->rawColumns(['action', 'status', 'status_report'])
                 ->make(true);
         }
 
@@ -89,7 +138,7 @@ class VisitController extends Controller
         //     return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         // }
         // Setting::create([
-        //     "id_cabang" => 2,
+        //     "id_cabang" => 1,
         //     "code" => "Range Checkin Kunjungan",
         //     "description" => "Range Checkin Kunjungan",
         //     "tipe" => 1,
@@ -177,7 +226,7 @@ class VisitController extends Controller
     {
         try {
             $message = '';
-            $url = url('kunjungan/reporting');
+            $url = url('kunjungan.reporting.index');
             if ($req->param == 'set_location') {
                 $data = Pelanggan::findOrFail($req->pelanggan_id);
                 $data->latitude_pelanggan = $req->latitude;
@@ -193,14 +242,14 @@ class VisitController extends Controller
                 $data->status = 2;
                 $data->save();
                 $message = "Berhasil checkin";
-                $url = "$url/$data->id";
+                $url = route('kunjungan.reporting.show', [$req->id]);
             } else {
                 $data = Visit::findOrFail($req->id);
                 $data->visit_type = strtoupper($req->param);
                 $data->status = 2;
                 $data->save();
                 $message = "Berhasil mengupdate status visit";
-                $url = "$url/$data->id";
+                $url = route('kunjungan.reporting.show', [$req->id]);
             }
 
 

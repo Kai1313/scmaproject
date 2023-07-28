@@ -62,7 +62,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-3 filter-div">
+                    <div class="col-md-2 filter-div">
                         <label>Cabang</label>
                         <div class="form-group">
                             <select id="id_cabang" class="form-control select2">
@@ -73,11 +73,41 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-3 filter-div">
+                    <div class="col-md-2 filter-div">
                         <label>Sales</label>
                         <div class="form-group">
                             <select id="id_salesman" class="form-control select2">
                             </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2 filter-div">
+                        <label>Status</label>
+                        <div class="form-group">
+                            <select id="status" class="form-control select2">
+                                <option value="">Semua Status</option>
+                                <option value="1">Belum Visit</option>
+                                <option value="2">Sudah Visit</option>
+                                <option value="0">Batal Visit</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2 filter-div">
+                        <label>Progress Indicator</label>
+                        <div class="form-group">
+                            <select id="progress_ind" class="form-control select2">
+                                <option value="">Semua Status</option>
+                                <option value="0">Belum Report</option>
+                                @foreach (App\Visit::$progressIndicator as $i => $item)
+                                    <option value="{{ $i }}">{{ $item }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2 filter-div">
+                        <label class="d-block">&nbsp;</label>
+                        <div class="form-group">
+                            <button type="button" class="btn btn-info" onclick="table.ajax.reload()"><i
+                                    class="fa fa-search"></i> Cari</button>
                         </div>
                     </div>
                 </div>
@@ -89,12 +119,14 @@
                             <table class="table table-bordered data-table display responsive nowrap" width="100%">
                                 <thead>
                                     <tr>
+                                        <th>Action</th>
                                         <th>Kode Jadwal</th>
                                         <th>Tanggal</th>
                                         <th>Salesman</th>
                                         <th>Pelanggan</th>
+                                        <th>Status</th>
+                                        <th>Status Report</th>
                                         <th>Detail</th>
-                                        <th width="150px">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -102,6 +134,34 @@
                             </table>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal-gambar" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <label for="">Kode Visit <h5 class="visit_code"></h5></label>
+                        </div>
+                        <div class="col-md-6">
+                            <img id="gambar1" style="width: 100%"
+                                onerror="this.src='https://perpus.umri.ac.id/ckfinder/userfiles/images/no-image.png'"
+                                alt="">
+                        </div>
+                        <div class="col-md-6">
+                            <img id="gambar2" style="width: 100%"
+                                onerror="this.src='https://perpus.umri.ac.id/ckfinder/userfiles/images/no-image.png'"
+                                alt="">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary cancel-entry btn-flat"
+                        onclick="$('#modal-gambar').modal('toggle')">Batal</button>
                 </div>
             </div>
         </div>
@@ -126,16 +186,31 @@
         var table = $('.data-table').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route('visit') }}",
-            data: {
-                id_cabang: function() {
-                    return $('#id_cabang').val();
-                },
-                id_salesman: function() {
-                    return $('#id_salesman').val();
+            ajax: {
+                url: "{{ route('visit') }}",
+                data: {
+                    id_cabang: function() {
+                        return $('#id_cabang').val();
+                    },
+                    id_salesman: function() {
+                        return $('#id_salesman').val();
+                    },
+                    status: function() {
+                        return $('#status').val();
+                    },
+                    progress_ind: function() {
+                        return $('#progress_ind').val();
+                    },
+
                 },
             },
             columns: [{
+                data: 'action',
+                name: 'action',
+                className: 'text-center',
+                orderable: false,
+                searchable: false
+            }, {
                 data: 'visit_code',
                 name: 'visit_code'
             }, {
@@ -148,19 +223,26 @@
                 data: 'nama_pelanggan',
                 name: 'nama_pelanggan',
             }, {
-                data: 'detail',
-                name: 'detail',
-            }, {
-                data: 'action',
-                name: 'action',
-                className: 'text-center',
+                data: 'status',
+                name: 'status',
+                class: 'text-center',
                 orderable: false,
                 searchable: false
+            }, {
+                data: 'status_report',
+                name: 'status_report',
+                class: 'text-center',
+                orderable: false,
+                searchable: false
+            }, {
+                data: 'detail',
+                name: 'detail',
             }, ]
         });
 
         $("#id_salesman").select2({
             width: '100%',
+            allowClear: true,
             ajax: {
                 url: "{{ route('kunjungan.reporting.select') }}?param=id_salesman",
                 dataType: 'json',
@@ -187,5 +269,13 @@
             templateResult: formatRepoNormal,
             templateSelection: formatRepoNormalSelection
         });
+
+        function openModalBukti(kode, gambar1, gambar2) {
+            $('#gambar1').prop('src', gambar1);
+            $('#gambar2').prop('src', gambar2);
+            $('.visit_code').html(kode);
+
+            $('#modal-gambar').modal('toggle');
+        }
     </script>
 @endsection

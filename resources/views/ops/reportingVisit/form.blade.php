@@ -90,7 +90,7 @@
         }
 
         /* @media screen and (-webkit-min-device-pixel-ratio: 0) {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                } */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                } */
 
         .range-slider::-moz-range-progress {
             background-color: #43e5f7;
@@ -154,7 +154,7 @@
 
 @section('main-section')
     <div class="content container-fluid">
-        <form action="{{ route('kunjungan.reporting.store') }}" method="post" class="post-action">
+        <form id="form-report" class="post-action">
             <div class="col-sm-6">
                 <div class="box">
                     <div class="box-header">
@@ -232,7 +232,7 @@
                 </div>
             </div>
             <div class="col-sm-6">
-                <div class="box" id="form-report">
+                <div class="box">
                     <div class="box-header">
                         <h3 class="box-title">Catatan Kunjungan</h3>
                     </div>
@@ -241,8 +241,8 @@
                             <div class="col-md-12 parent">
                                 <div class="form-group">
                                     <label>Issue <span>*</span></label>
-                                    <input type="text" class="form-control required"
-                                        placeholder="ex:Pengembangan customer" id="visit_title">
+                                    <input type="text" class="form-control required" value="{{ $data->visit_title }}"
+                                        placeholder="ex:Pengembangan customer" id="visit_title" name="visit_title">
                                 </div>
                             </div>
                             <div class="col-md-12 parent">
@@ -252,7 +252,9 @@
                                         class="form-control select2 trigger-change required">
                                         <option value="">Pilih Progress</option>
                                         @foreach (App\Visit::$progressIndicator as $key => $item)
-                                            <option value="{{ $key }}">{{ $item }}</option>
+                                            <option {{ $data->progress_ind == $key ? 'selected' : '' }}
+                                                value="{{ $key }}">
+                                                {{ $item }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -260,15 +262,16 @@
                             <div class="col-md-12 sections section-2 parent">
                                 <div class="form-group">
                                     <label>Range Potensial <span>*</span></label>
-                                    <input type="range" value="0" min="0" max="100" step="1"
-                                        class="range-slider required">
-                                    <h4 class="slider">0</h4>
+                                    <input type="range" value="{{ $data->range_potensial }}" min="0"
+                                        max="100" step="1" class="range-slider required"
+                                        name="range_potensial">
+                                    <h4 class="slider">{{ $data->range_potensial }}</h4>
                                 </div>
                             </div>
                             <div class="col-md-12 sections section-3 parent">
                                 <div class="form-group">
                                     <label>Nomor Sales Order</label>
-                                    <select name="sales_order_id" id="sales_order_id" class="select2 required"></select>
+                                    <select name="sales_order_id" id="sales_order_id" class="select2"></select>
                                 </div>
                             </div>
                             <div class="col-sm-12 sections section-3 parent">
@@ -281,8 +284,9 @@
                                                 <option value="USD">USD</option>
                                             </select>
                                         </span>
-                                        <input type="text" name="total" placeholder="xxx,xxx,xxx" id="total"
-                                            class="form-control text-right required">
+                                        <input type="text" name="total" placeholder="xxx,xxx,xxx"
+                                            value="{{ number_format($data->total) }}" id="total"
+                                            class="form-control text-right ">
                                     </div>
                                 </div>
                             </div>
@@ -290,21 +294,21 @@
                                 <div class="form-group">
                                     <label>Catatan <span>*</span></label>
                                     <textarea name="visit_desc" id="visit_desc" class="form-control required"
-                                        placeholder="ex:pernah membeli di PT SCMA"></textarea>
+                                        placeholder="ex:pernah membeli di PT SCMA">{{ $data->visit_desc }}</textarea>
                                 </div>
                             </div>
                             <div class="col-sm-6 parent">
                                 <div class="form-group">
                                     <label>Gambar 1 <span>*</span></label>
-                                    <input type="file" class="dropify required"
+                                    <input type="file" id="proofment_1" class="dropify required"
                                         data-allowed-file-extensions="pdf png jpg" data-max-file-size-preview="3M">
                                 </div>
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <label>Gambar 2</label>
-                                    <input type="file" class="dropify" data-allowed-file-extensions="pdf png jpg"
-                                        data-max-file-size-preview="3M">
+                                    <input type="file" id="proofment_2" class="dropify"
+                                        data-allowed-file-extensions="pdf png jpg" data-max-file-size-preview="3M">
                                 </div>
                             </div>
                             <div class="col-sm-12">
@@ -452,6 +456,54 @@
             fps: 10,
             qrbox: 250
         });
+
+        let proofment = {
+            0: '{{ $data->proofment_1 }}',
+            1: '{{ $data->proofment_2 }}',
+        }
+        $(document).ready(function() {
+            @if ($data->progress_ind == 3)
+                var id_permintaan_penjualan =
+                    '{{ $data->sales_order ? $data->sales_order->id_permintaan_penjualan : '0' }}'
+                var dokumen_permintaan_penjualan =
+                    '{{ $data->sales_order ? $data->sales_order->nama_permintaan_penjualan : '0' }}'
+                var option = new Option(
+                    dokumen_permintaan_penjualan,
+                    id_permintaan_penjualan
+                );
+                $('#sales_order_id').append(option).trigger('change.select2');
+            @endif
+
+            @if ($data->proofment_1)
+                var url = '{{ $data->proofment_1 }}';
+                var imagenUrl = url;
+                var drEvent = $("#proofment_1").dropify({
+                    defaultFile: imagenUrl,
+                });
+                drEvent = drEvent.data('dropify');
+                drEvent.resetPreview();
+                drEvent.clearElement();
+                drEvent.settings.defaultFile = imagenUrl;
+                drEvent.destroy();
+                drEvent.init();
+            @endif
+
+            @if ($data->proofment_2)
+                var url = '{{ $data->proofment_2 }}';
+                var imagenUrl = url;
+                var drEvent = $("#proofment_2").dropify({
+                    defaultFile: imagenUrl,
+                });
+                drEvent = drEvent.data('dropify');
+                drEvent.resetPreview();
+                drEvent.clearElement();
+                drEvent.settings.defaultFile = imagenUrl;
+                drEvent.destroy();
+                drEvent.init();
+            @endif
+
+            $('#progress_ind').change();
+        })
 
         var range = '{{ $range ? $range->value2 : null }}';
 
@@ -926,17 +978,31 @@
 
         function validating() {
             var validation = 0;
-            $('#form-report .required').each(function() {
+            $('#form-report').find('.required').not('.dropify').each(function() {
                 var par = $(this).parents('.parent');
                 if (!$(par).hasClass('hidden')) {
                     if ($(this).val() == '' || $(this).val() == null) {
                         $(this).addClass('is-invalid');
                         $(par).find('.select2-container').addClass('is-invalid');
-                        $(par).find('.dropify-wrapper').addClass('is-invalid');
                         validation++;
                     }
                 }
             })
+
+            $('#form-report .dropify').each(function(i) {
+                var par = $(this).parents('.parent');
+                if ($(this).hasClass('required')) {
+                    if ($(this).val() == '' || $(this).val() == null) {
+                        console.log(proofment[`${i+1}`])
+                        if (proofment[`${i+1}`] == '' || proofment[`${i+1}`] == null) {
+                            $(par).find('.dropify-wrapper').addClass('is-invalid');
+                            validation++;
+                        }
+                    }
+                }
+
+            })
+
 
             return validation;
         }
@@ -947,7 +1013,20 @@
             if (validation != 0) {
                 return Swal.fire("Cek data anda lagi.", 'Pastikan semua data telah terinput', 'error')
             }
+            var form = new FormData();
 
+            var data = $("#form-report").serializeArray();
+
+            data.forEach(d => {
+                form.append(d.name, d.value);
+            });
+
+            $('.dropify').each(function(i) {
+                if ($(this)[0].files[0] != undefined) {
+                    form.append(`proofment_${i+1}`, $(this)[0].files[0]);
+                }
+            })
+            form.append('_method', "PATCH");
             Swal.fire({
                 title: 'Anda yakin ingin mngirim report visit anda?',
                 text: 'Aksi ini tidak bisa dikembalikan',
@@ -965,12 +1044,12 @@
                 if (result.isConfirmed) {
                     $('#cover-spin').show()
                     $.ajax({
-                        url: '{{ route('kunjungan.reporting.store') }}',
+                        url: '{{ route('kunjungan.reporting.update', [$data->id]) }}',
                         type: "post",
-                        data: {
-
-                        },
                         dataType: "JSON",
+                        data: form,
+                        processData: false,
+                        contentType: false,
                         success: function(data) {
                             $('#cover-spin').hide()
                             if (data.result) {
