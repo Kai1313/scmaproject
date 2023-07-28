@@ -39,6 +39,27 @@ class Visit extends Model
         '3' => 'Penawaran/Order',
     ];
 
+
+    public function getNamaPelangganAttribute()
+    {
+        return $this->pelanggan->nama_pelanggan;
+    }
+
+    public function getNamaSalesmanAttribute()
+    {
+        return $this->salesman->nama_salesman;
+    }
+
+    public function getNamaCabangAttribute()
+    {
+        return $this->cabang->nama_cabang;
+    }
+
+    public function salesman()
+    {
+        return $this->belongsTo(Salesman::class, 'id_salesman', 'id_salesman');
+    }
+
     public function cabang()
     {
         return $this->belongsTo(Cabang::class, 'id_cabang', 'id_cabang');
