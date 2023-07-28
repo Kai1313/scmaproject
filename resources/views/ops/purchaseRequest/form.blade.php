@@ -123,17 +123,18 @@
                         <div class="col-md-4">
                             <label>Tanggal <span>*</span></label>
                             <div class="form-group">
-                                <input type="text" name="purchase_request_date"
+                                <input type="date" name="purchase_request_date"
                                     value="{{ old('purchase_request_date', $data ? $data->purchase_request_date : date('Y-m-d')) }}"
-                                    class="form-control datepicker" data-validation="[NOTEMPTY]"
-                                    data-validation-message="Tanggal tidak boleh kosong">
+                                    class="form-control" data-validation="[NOTEMPTY]"
+                                    data-validation-message="Tanggal tidak boleh kosong" max="{{ date('Y-m-d') }}">
                             </div>
                             <label>Deadline <span>*</span></label>
                             <div class="form-group">
-                                <input type="text" name="purchase_request_estimation_date"
+                                <input type="date" name="purchase_request_estimation_date"
                                     value="{{ old('purchase_request_estimation_date', $data ? $data->purchase_request_estimation_date : date('Y-m-d')) }}"
-                                    class=" form-control datepicker" data-validation="[NOTEMPTY]"
-                                    data-validation-message="Tanggal deadline tidak boleh kosong">
+                                    class=" form-control" data-validation="[NOTEMPTY]"
+                                    data-validation-message="Tanggal deadline tidak boleh kosong"
+                                    min="{{ date('Y-m-d') }}">
                             </div>
                         </div>
                         <div class="col-md-4">
