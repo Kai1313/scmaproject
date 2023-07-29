@@ -93,12 +93,12 @@
                 <td valign="top" style="width:67%;">
                     <table class='table-subheader'>
                         <tr>
-                            <td width="70"><b>Cabang</b></td>
+                            <td width="70"><b>Cabang Asal</b></td>
                             <td width="5">:</td>
                             <td>{{ $data->cabang->nama_cabang }}</td>
                         </tr>
                         <tr>
-                            <td><b>Gudang</b></td>
+                            <td><b>Gudang Asal</b></td>
                             <td>:</td>
                             <td>{{ $data->gudang->nama_gudang }}</td>
                         </tr>

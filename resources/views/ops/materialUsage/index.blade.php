@@ -86,8 +86,8 @@
                             <tr>
                                 <th>Kode Pemakaian</th>
                                 <th>Tanggal</th>
-                                <th>Cabang</th>
-                                <th>Gudang</th>
+                                <th>Cabang Pemakaian</th>
+                                <th>Gudang Pemakaian</th>
                                 <th>Jenis Pemakaian</th>
                                 <th>QC</th>
                                 <th>Catatan</th>
