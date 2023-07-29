@@ -1,7 +1,9 @@
 <?php
 
+use App\Menu;
 use App\Models\User;
 use App\Models\UserToken;
+use App\PenjualanDetail;
 use Illuminate\Support\Facades\DB;
 
 function normalizeNumber($number = 0)
@@ -217,4 +219,33 @@ function getCabang()
         ->get();
 
     return $cabang;
+}
+
+
+function menuActive($url, $currentUrl)
+{
+    $suffix = Menu::$suffixUrl;
+
+    foreach ($suffix as  $value) {
+        $baseUrl = explode($value, $url);
+        if ($baseUrl > 1) {
+            if ($baseUrl[0] == $currentUrl) {
+                return 1;
+                break;
+            }
+        }
+    }
+
+    return 0;
+}
+
+function checkPenjualan($idBarang = null, $idCabang = null, $tanggalMin = null, $tanggalMax = null)
+{
+    $data = PenjualanDetail::where(function ($q) use ($idBarang, $tanggalMin, $tanggalMax) {
+        $q->where('id_barang', $idBarang);
+        $q->wherebetween('tanggal_penjualan', [$tanggalMin, $tanggalMax]);
+    })->whereHas('penjualan', function ($q) use ($idCabang) {
+        $q->where('id_cabang', $idCabang);
+    })->get();
+    dd($data);
 }

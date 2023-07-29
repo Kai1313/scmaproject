@@ -83,7 +83,7 @@
                 <div class="box-body">
                     <div class="row">
                         <div class="col-md-4">
-                            <label>Cabang <span>*</span></label>
+                            <label>Cabang Penerima<span>*</span></label>
                             <div class="form-group">
                                 <select name="id_cabang" class="form-control select2" data-validation="[NOTEMPTY]"
                                     data-validation-message="Cabang tidak boleh kosong">
@@ -95,7 +95,7 @@
                                     @endif
                                 </select>
                             </div>
-                            <label>Gudang <span>*</span></label>
+                            <label>Gudang Penerima <span>*</span></label>
                             <div class="form-group">
                                 <select name="id_gudang" class="form-control select2" data-validation="[NOTEMPTY]"
                                     data-validation-message="Gudang tidak boleh kosong">
@@ -147,7 +147,7 @@
                                     value="{{ old('kode_pindah_barang', $data ? $data->kode_pindah_barang : '') }}"
                                     class="form-control" readonly placeholder="Otomatis">
                             </div>
-                            <label>Dari Cabang <span>*</span></label>
+                            <label>Cabang Asal <span>*</span></label>
                             <div class="form-group">
                                 <input type="text" class="form-control" name="nama_cabang_asal" readonly
                                     value="{{ old('nama_cabang_asal', $data ? $data->cabang2->nama_cabang : '') }}">

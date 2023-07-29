@@ -92,7 +92,7 @@
                 <div class="box-body">
                     <div class="row">
                         <div class="col-md-4">
-                            <label>Cabang <span>*</span></label>
+                            <label>Cabang Asal <span>*</span></label>
                             <div class="form-group">
                                 <select name="id_cabang" class="form-control select2" data-validation="[NOTEMPTY]"
                                     data-validation-message="Cabang tidak boleh kosong">
@@ -104,7 +104,7 @@
                                     @endif
                                 </select>
                             </div>
-                            <label>Gudang <span>*</span></label>
+                            <label>Gudang Asal<span>*</span></label>
                             <div class="form-group">
                                 <select name="id_gudang" class="form-control select2" data-validation="[NOTEMPTY]"
                                     data-validation-message="Gudang tidak boleh kosong">

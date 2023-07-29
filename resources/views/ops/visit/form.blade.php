@@ -978,13 +978,6 @@
                             locationPelanggan.longitude = data.data.longitude;
                             if (data.result) {
                                 Swal.fire('Berhasil!', data.message, 'success').then((result) => {
-                                    if (data.url == null) {
-                                        appendMap(data.data.latitude, data.data.longitude);
-                                        cancelAction('set-cust-location');
-                                        $('.btn .set-cust-location').remove();
-                                    } else {
-                                        location.href = data.url;
-                                    }
 
                                     if (param == 'whatsapp') {
                                         window.open(
@@ -997,6 +990,15 @@
                                             `https://api.whatsapp.com/send?phone={{ $data->kontak_person_pelanggan }}`
                                         );
                                     }
+
+                                    if (data.url == null) {
+                                        appendMap(data.data.latitude, data.data.longitude);
+                                        cancelAction('set-cust-location');
+                                        $('.btn .set-cust-location').remove();
+                                    } else {
+                                        location.href = data.url;
+                                    }
+
 
                                 })
                             } else {

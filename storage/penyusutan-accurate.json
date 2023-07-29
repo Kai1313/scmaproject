@@ -1,0 +1,4312 @@
+[
+    {
+        "nama_aktiva": "APARTEMEN ONE ICONE",
+        "penyusutan_per_tahun": 240340910,
+        "penyusutan_per_bulan": 20028409,
+        "sisa_penyustan": 3965625010.05,
+        "nilai_perolehan": 4806818194,
+        "akumulasi_penyusutan": 841193183.95,
+        "depresiasi_per_tahun": 240340909.7,
+        "tanggal_pemakaian": "2019-06-30"
+    },
+    {
+        "nama_aktiva": "APARTEMEN ONE ICONE (SELISIH PPN YG TDK BISA DIKREDITKAN)",
+        "penyusutan_per_tahun": 1090908,
+        "penyusutan_per_bulan": 90909,
+        "sisa_penyustan": 19636352.1,
+        "nilai_perolehan": 21818169,
+        "akumulasi_penyusutan": 2181816.9,
+        "depresiasi_per_tahun": 1090908.45,
+        "tanggal_pemakaian": "2021-01-01"
+    },
+    {
+        "nama_aktiva": "APARTEMEN KEMAYORAN JA-21J",
+        "penyusutan_per_tahun": 73045455,
+        "penyusutan_per_bulan": 6087121,
+        "sisa_penyustan": 1314818183.7,
+        "nilai_perolehan": 1460909093,
+        "akumulasi_penyusutan": 146090909.3,
+        "depresiasi_per_tahun": 73045454.65,
+        "tanggal_pemakaian": "2021-01-01"
+    },
+    {
+        "nama_aktiva": "Bangunan (Green Sedayu Bizpark Cakung GS 5 No. 026 dan 028)",
+        "penyusutan_per_tahun": 258523346,
+        "penyusutan_per_bulan": 21543612,
+        "sisa_penyustan": 2747798106.86,
+        "nilai_perolehan": 5170466913.27,
+        "akumulasi_penyusutan": 2422668806.41,
+        "depresiasi_per_tahun": 305310900.76,
+        "tanggal_pemakaian": "2017-01-01"
+    },
+    {
+        "nama_aktiva": "RUKO PONDOK TJANDRA TF 70-71",
+        "penyusutan_per_tahun": 72967105,
+        "penyusutan_per_bulan": 6080592,
+        "sisa_penyustan": 729671048.5,
+        "nilai_perolehan": 1459342097,
+        "akumulasi_penyusutan": 729671048.5,
+        "depresiasi_per_tahun": 72967104.85,
+        "tanggal_pemakaian": "2012-12-24"
+    },
+    {
+        "nama_aktiva": "PERBAIKAN TALANG DAN RENOVASI",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 44342083.33,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 1927916.67,
+        "depresiasi_per_tahun": 1927916.67,
+        "tanggal_pemakaian": "2022-02-28"
+    },
+    {
+        "nama_aktiva": "RENOVASI LAINNYA, PERBAIKAN TALANG, RENOVASI P.SHANDI",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 196539310.4,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 6777217.6,
+        "depresiasi_per_tahun": 6777217.6,
+        "tanggal_pemakaian": "2022-04-30"
+    },
+    {
+        "nama_aktiva": "RENOVASI GUDANG B17-19",
+        "penyusutan_per_tahun": 13500000,
+        "penyusutan_per_bulan": 1125000,
+        "sisa_penyustan": 255375000,
+        "nilai_perolehan": 270000000,
+        "akumulasi_penyusutan": 14625000,
+        "depresiasi_per_tahun": 13500000,
+        "tanggal_pemakaian": "2021-12-13"
+    },
+    {
+        "nama_aktiva": "RENOVASI GUDANG B17-19",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 214687500,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 10312500,
+        "depresiasi_per_tahun": 10312500,
+        "tanggal_pemakaian": "2022-01-27"
+    },
+    {
+        "nama_aktiva": "RENOVASI GUDANG B17-19",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 214687500,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 10312500,
+        "depresiasi_per_tahun": 10312500,
+        "tanggal_pemakaian": "2022-01-28"
+    },
+    {
+        "nama_aktiva": "GUDANG B 12",
+        "penyusutan_per_tahun": 22326960,
+        "penyusutan_per_bulan": 1860580,
+        "sisa_penyustan": 256760040,
+        "nilai_perolehan": 446539200,
+        "akumulasi_penyusutan": 189779160,
+        "depresiasi_per_tahun": 22326960,
+        "tanggal_pemakaian": "2014-06-23"
+    },
+    {
+        "nama_aktiva": "GUDANG MEIKO C 27",
+        "penyusutan_per_tahun": 56041200,
+        "penyusutan_per_bulan": 4670100,
+        "sisa_penyustan": 714525300,
+        "nilai_perolehan": 1120824000,
+        "akumulasi_penyusutan": 406298700,
+        "depresiasi_per_tahun": 56041200,
+        "tanggal_pemakaian": "2015-09-30"
+    },
+    {
+        "nama_aktiva": "GUDANG MEIKO C01",
+        "penyusutan_per_tahun": 47242800,
+        "penyusutan_per_bulan": 3936900,
+        "sisa_penyustan": 606282600,
+        "nilai_perolehan": 944856000,
+        "akumulasi_penyusutan": 338573400,
+        "depresiasi_per_tahun": 47242800,
+        "tanggal_pemakaian": "2015-10-26"
+    },
+    {
+        "nama_aktiva": "GUDANG MEIKO C 03",
+        "penyusutan_per_tahun": 47242800,
+        "penyusutan_per_bulan": 3936900,
+        "sisa_penyustan": 610219500,
+        "nilai_perolehan": 944856000,
+        "akumulasi_penyusutan": 334636500,
+        "depresiasi_per_tahun": 47242800,
+        "tanggal_pemakaian": "2015-11-30"
+    },
+    {
+        "nama_aktiva": "GUDANG MEIKO C02",
+        "penyusutan_per_tahun": 47242800,
+        "penyusutan_per_bulan": 3936900,
+        "sisa_penyustan": 610219500,
+        "nilai_perolehan": 944856000,
+        "akumulasi_penyusutan": 334636500,
+        "depresiasi_per_tahun": 47242800,
+        "tanggal_pemakaian": "2015-11-30"
+    },
+    {
+        "nama_aktiva": "PENAMBAHAN AKTIVA MEIKO C01",
+        "penyusutan_per_tahun": 12546091,
+        "penyusutan_per_bulan": 1045508,
+        "sisa_penyustan": 163099181.7,
+        "nilai_perolehan": 250921818,
+        "akumulasi_penyusutan": 87822636.3,
+        "depresiasi_per_tahun": 12546090.9,
+        "tanggal_pemakaian": "2016-01-01"
+    },
+    {
+        "nama_aktiva": "PENAMBAHAN AKTIVA MEIKO C 02",
+        "penyusutan_per_tahun": 12546091,
+        "penyusutan_per_bulan": 1045508,
+        "sisa_penyustan": 163099181.7,
+        "nilai_perolehan": 250921818,
+        "akumulasi_penyusutan": 87822636.3,
+        "depresiasi_per_tahun": 12546090.9,
+        "tanggal_pemakaian": "2016-01-01"
+    },
+    {
+        "nama_aktiva": "PENAMBAHAN AKTIVA MEIKO C 03",
+        "penyusutan_per_tahun": 12546091,
+        "penyusutan_per_bulan": 1045508,
+        "sisa_penyustan": 163099182.35,
+        "nilai_perolehan": 250921819,
+        "akumulasi_penyusutan": 87822636.65,
+        "depresiasi_per_tahun": 12546090.95,
+        "tanggal_pemakaian": "2016-01-01"
+    },
+    {
+        "nama_aktiva": "PENGERJAAN TAMBAH KURANG PAK SHANDY\n5 DAN 6",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 68241479.47,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 1749781.53,
+        "depresiasi_per_tahun": 1749781.53,
+        "tanggal_pemakaian": "2022-07-07"
+    },
+    {
+        "nama_aktiva": "PERBAIKAN TALANG DAN RENOVASI LAINNYA",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 5857152.08,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 281347.92,
+        "depresiasi_per_tahun": 281347.92,
+        "tanggal_pemakaian": "2022-01-31"
+    },
+    {
+        "nama_aktiva": "RENOVASI LAINNYA",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 323881.25,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 12618.75,
+        "depresiasi_per_tahun": 12618.75,
+        "tanggal_pemakaian": "2022-03-31"
+    },
+    {
+        "nama_aktiva": "RENOVASI LAINNYA, RENOVASI P.SHANDI",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 164288542.71,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 4935707.29,
+        "depresiasi_per_tahun": 4935707.29,
+        "tanggal_pemakaian": "2022-05-31"
+    },
+    {
+        "nama_aktiva": "Mesin Absensi",
+        "penyusutan_per_tahun": 300000,
+        "penyusutan_per_bulan": 25000,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 2400000,
+        "akumulasi_penyusutan": 2400000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2000-01-01"
+    },
+    {
+        "nama_aktiva": "AC Window",
+        "penyusutan_per_tahun": 56250,
+        "penyusutan_per_bulan": 4688,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 450000,
+        "akumulasi_penyusutan": 450000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "1996-01-01"
+    },
+    {
+        "nama_aktiva": "AC  CHANGHONG",
+        "penyusutan_per_tahun": 453125,
+        "penyusutan_per_bulan": 37760,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 3625000,
+        "akumulasi_penyusutan": 3625000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-11-02"
+    },
+    {
+        "nama_aktiva": "AC",
+        "penyusutan_per_tahun": 948750,
+        "penyusutan_per_bulan": 79063,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 7590000,
+        "akumulasi_penyusutan": 7590000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2013-01-31"
+    },
+    {
+        "nama_aktiva": "AC ",
+        "penyusutan_per_tahun": 4318636,
+        "penyusutan_per_bulan": 359886,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 34549090.91,
+        "akumulasi_penyusutan": 34549090.91,
+        "depresiasi_per_tahun": 768624.49,
+        "tanggal_pemakaian": "2014-03-10"
+    },
+    {
+        "nama_aktiva": "AC ",
+        "penyusutan_per_tahun": 448750,
+        "penyusutan_per_bulan": 37396,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 3590000,
+        "akumulasi_penyusutan": 3590000,
+        "depresiasi_per_tahun": 439273.22,
+        "tanggal_pemakaian": "2014-12-13"
+    },
+    {
+        "nama_aktiva": "AC. CHANGHONG",
+        "penyusutan_per_tahun": 2676136,
+        "penyusutan_per_bulan": 223011,
+        "sisa_penyustan": 1190736.95,
+        "nilai_perolehan": 21409091,
+        "akumulasi_penyusutan": 20218354.05,
+        "depresiasi_per_tahun": 2063944.05,
+        "tanggal_pemakaian": "2015-06-05"
+    },
+    {
+        "nama_aktiva": "AC.MEDIA",
+        "penyusutan_per_tahun": 539773,
+        "penyusutan_per_bulan": 44981,
+        "sisa_penyustan": 576407.69,
+        "nilai_perolehan": 4318181.82,
+        "akumulasi_penyusutan": 3741774.13,
+        "depresiasi_per_tahun": 192135.9,
+        "tanggal_pemakaian": "2016-01-01"
+    },
+    {
+        "nama_aktiva": "AC Split Changhong 2 PK, S-C18QB",
+        "penyusutan_per_tahun": 1262500,
+        "penyusutan_per_bulan": 105208,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 5050000,
+        "akumulasi_penyusutan": 5050000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2015-05-01"
+    },
+    {
+        "nama_aktiva": "AC Split Standart Changhong 1,5 PK",
+        "penyusutan_per_tahun": 4875000,
+        "penyusutan_per_bulan": 406250,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 19500000,
+        "akumulasi_penyusutan": 19500000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2017-01-01"
+    },
+    {
+        "nama_aktiva": "AC Split Changhong 1 PK",
+        "penyusutan_per_tahun": 625000,
+        "penyusutan_per_bulan": 52083,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 2500000,
+        "akumulasi_penyusutan": 2500000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2017-01-01"
+    },
+    {
+        "nama_aktiva": "AC Changhong 1 PK",
+        "penyusutan_per_tahun": 625000,
+        "penyusutan_per_bulan": 52083,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 2500000,
+        "akumulasi_penyusutan": 2500000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2017-05-01"
+    },
+    {
+        "nama_aktiva": "AC Changhong 2 PK",
+        "penyusutan_per_tahun": 1087500,
+        "penyusutan_per_bulan": 90625,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 4350000,
+        "akumulasi_penyusutan": 4350000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2017-05-01"
+    },
+    {
+        "nama_aktiva": "AC 2PK",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 13860437.5,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 3198562.5,
+        "depresiasi_per_tahun": 3198562.5,
+        "tanggal_pemakaian": "2022-04-11"
+    },
+    {
+        "nama_aktiva": "AC 1 PK",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 2561812.5,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 591187.5,
+        "depresiasi_per_tahun": 591187.5,
+        "tanggal_pemakaian": "2022-04-11"
+    },
+    {
+        "nama_aktiva": "Alat Monitor Computer",
+        "penyusutan_per_tahun": 118750,
+        "penyusutan_per_bulan": 9896,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 950000,
+        "akumulasi_penyusutan": 950000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2000-01-01"
+    },
+    {
+        "nama_aktiva": "BELI 2 UNIT LED LG DAN MOUSE",
+        "penyusutan_per_tahun": 238375,
+        "penyusutan_per_bulan": 19865,
+        "sisa_penyustan": 527963.38,
+        "nilai_perolehan": 1907000,
+        "akumulasi_penyusutan": 1379036.62,
+        "depresiasi_per_tahun": 175987.79,
+        "tanggal_pemakaian": "2018-07-10"
+    },
+    {
+        "nama_aktiva": "MIYAKO COUNTERTOP (BLENDER)",
+        "penyusutan_per_tahun": 54975,
+        "penyusutan_per_bulan": 4581,
+        "sisa_penyustan": 155762.5,
+        "nilai_perolehan": 219900,
+        "akumulasi_penyusutan": 64137.5,
+        "depresiasi_per_tahun": 54975,
+        "tanggal_pemakaian": "2021-10-26"
+    },
+    {
+        "nama_aktiva": "BRANKAS",
+        "penyusutan_per_tahun": 655763,
+        "penyusutan_per_bulan": 54647,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 5246100,
+        "akumulasi_penyusutan": 5246100,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-10-25"
+    },
+    {
+        "nama_aktiva": "CCTV",
+        "penyusutan_per_tahun": 1451250,
+        "penyusutan_per_bulan": 120938,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 5805000,
+        "akumulasi_penyusutan": 5805000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2017-12-01"
+    },
+    {
+        "nama_aktiva": "CCTV",
+        "penyusutan_per_tahun": 8918750,
+        "penyusutan_per_bulan": 743229,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 35675000,
+        "akumulasi_penyusutan": 35675000,
+        "depresiasi_per_tahun": 371614.58,
+        "tanggal_pemakaian": "2018-01-26"
+    },
+    {
+        "nama_aktiva": "CCTV SPC",
+        "penyusutan_per_tahun": 487500,
+        "penyusutan_per_bulan": 40625,
+        "sisa_penyustan": 121875,
+        "nilai_perolehan": 1950000,
+        "akumulasi_penyusutan": 1828125,
+        "depresiasi_per_tahun": 243750,
+        "tanggal_pemakaian": "2019-07-01"
+    },
+    {
+        "nama_aktiva": "KAMERA CCTV OUTDOOR HIKVISION 2 MP",
+        "penyusutan_per_tahun": 60000,
+        "penyusutan_per_bulan": 5000,
+        "sisa_penyustan": 95000,
+        "nilai_perolehan": 240000,
+        "akumulasi_penyusutan": 145000,
+        "depresiasi_per_tahun": 60000,
+        "tanggal_pemakaian": "2020-08-06"
+    },
+    {
+        "nama_aktiva": "KAMERA CCTV OUTDOOR HIKVISION 2MP",
+        "penyusutan_per_tahun": 405000,
+        "penyusutan_per_bulan": 33750,
+        "sisa_penyustan": 641250,
+        "nilai_perolehan": 1620000,
+        "akumulasi_penyusutan": 978750,
+        "depresiasi_per_tahun": 405000,
+        "tanggal_pemakaian": "2020-08-06"
+    },
+    {
+        "nama_aktiva": "8 CH HDTVI HIKVISION",
+        "penyusutan_per_tahun": 418750,
+        "penyusutan_per_bulan": 34896,
+        "sisa_penyustan": 663020.83,
+        "nilai_perolehan": 1675000,
+        "akumulasi_penyusutan": 1011979.17,
+        "depresiasi_per_tahun": 418750,
+        "tanggal_pemakaian": "2020-08-06"
+    },
+    {
+        "nama_aktiva": "CCTV SPC BABYCAM",
+        "penyusutan_per_tahun": 96050,
+        "penyusutan_per_bulan": 8004,
+        "sisa_penyustan": 280145.83,
+        "nilai_perolehan": 384200,
+        "akumulasi_penyusutan": 104054.17,
+        "depresiasi_per_tahun": 96050,
+        "tanggal_pemakaian": "2021-11-27"
+    },
+    {
+        "nama_aktiva": "CCTV SPC KS u\/ pakuwon tower",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 264062.5,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 60937.5,
+        "depresiasi_per_tahun": 60937.5,
+        "tanggal_pemakaian": "2022-03-23"
+    },
+    {
+        "nama_aktiva": "CANON EOS MSO II + 15-45MM +TRIPOD KINGJOY VT 860",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 10278125,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 2371875,
+        "depresiasi_per_tahun": 2371875,
+        "tanggal_pemakaian": "2022-04-11"
+    },
+    {
+        "nama_aktiva": "CCTV + HDD + PERANGKAT CCTV",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 3332038.4,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 568884.6,
+        "depresiasi_per_tahun": 568884.6,
+        "tanggal_pemakaian": "2022-06-11"
+    },
+    {
+        "nama_aktiva": "camera hik DS-2CE16D0T",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 1030835.42,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 119864.58,
+        "depresiasi_per_tahun": 119864.58,
+        "tanggal_pemakaian": "2022-07-19"
+    },
+    {
+        "nama_aktiva": "CCTV KAMERA HIK DS-2 CE16DOT EXIPF (2.8MM)",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 260458.33,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 5541.67,
+        "depresiasi_per_tahun": 5541.67,
+        "tanggal_pemakaian": "2022-12-13"
+    },
+    {
+        "nama_aktiva": "1 Paket CCTV 16 CH Hikvision Resolusi 2 MP ",
+        "penyusutan_per_tahun": 4500000,
+        "penyusutan_per_bulan": 375000,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 18000000,
+        "akumulasi_penyusutan": 18000000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2017-04-01"
+    },
+    {
+        "nama_aktiva": "CPU 80 GB Inter Dual Core",
+        "penyusutan_per_tahun": 518750,
+        "penyusutan_per_bulan": 43229,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 2075000,
+        "akumulasi_penyusutan": 2075000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2009-07-01"
+    },
+    {
+        "nama_aktiva": "CPU + DVD RW",
+        "penyusutan_per_tahun": 701250,
+        "penyusutan_per_bulan": 58438,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 2805000,
+        "akumulasi_penyusutan": 2805000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2010-06-01"
+    },
+    {
+        "nama_aktiva": "CPU U\/ LAB (INCLUDE UPS & WINDOWS 10)",
+        "penyusutan_per_tahun": 1387500,
+        "penyusutan_per_bulan": 115625,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 5550000,
+        "akumulasi_penyusutan": 5550000,
+        "depresiasi_per_tahun": 231250,
+        "tanggal_pemakaian": "2018-05-09"
+    },
+    {
+        "nama_aktiva": "INTEL CORE i5 2400, MB BULDOZER H61, DDR3 4GB BULDOZER",
+        "penyusutan_per_tahun": 1082500,
+        "penyusutan_per_bulan": 90208,
+        "sisa_penyustan": 360833.33,
+        "nilai_perolehan": 4330000,
+        "akumulasi_penyusutan": 3969166.67,
+        "depresiasi_per_tahun": 541250,
+        "tanggal_pemakaian": "2019-09-11"
+    },
+    {
+        "nama_aktiva": "KEYBOARD,USB,HEAD PRINT,KABEL FLEKSIBEL",
+        "penyusutan_per_tahun": 243750,
+        "penyusutan_per_bulan": 20313,
+        "sisa_penyustan": 91406.25,
+        "nilai_perolehan": 975000,
+        "akumulasi_penyusutan": 883593.75,
+        "depresiasi_per_tahun": 121875,
+        "tanggal_pemakaian": "2019-10-10"
+    },
+    {
+        "nama_aktiva": "CPU 1",
+        "penyusutan_per_tahun": 563750,
+        "penyusutan_per_bulan": 46979,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 2255000,
+        "akumulasi_penyusutan": 2255000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2010-06-01"
+    },
+    {
+        "nama_aktiva": "CPU 2",
+        "penyusutan_per_tahun": 563750,
+        "penyusutan_per_bulan": 46979,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 2255000,
+        "akumulasi_penyusutan": 2255000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2010-07-01"
+    },
+    {
+        "nama_aktiva": "Dispenser Polytron",
+        "penyusutan_per_tahun": 494775,
+        "penyusutan_per_bulan": 41231,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 1979100,
+        "akumulasi_penyusutan": 1979100,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2017-04-01"
+    },
+    {
+        "nama_aktiva": "Exhaust Fan Panasonic ",
+        "penyusutan_per_tahun": 93646,
+        "penyusutan_per_bulan": 7804,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 374585,
+        "akumulasi_penyusutan": 374585,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2014-10-01"
+    },
+    {
+        "nama_aktiva": "Exhaust Fan Maspion",
+        "penyusutan_per_tahun": 153066,
+        "penyusutan_per_bulan": 12756,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 612264,
+        "akumulasi_penyusutan": 612264,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2015-06-01"
+    },
+    {
+        "nama_aktiva": "Exhaust Fan Maspion MV-16EX 8\" CEILING",
+        "penyusutan_per_tahun": 190000,
+        "penyusutan_per_bulan": 15833,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 760000,
+        "akumulasi_penyusutan": 760000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2017-03-01"
+    },
+    {
+        "nama_aktiva": "EKS HARDDISK",
+        "penyusutan_per_tahun": 180000,
+        "penyusutan_per_bulan": 15000,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 720000,
+        "akumulasi_penyusutan": 720000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2011-12-21"
+    },
+    {
+        "nama_aktiva": "eksternal hdd",
+        "penyusutan_per_tahun": 200000,
+        "penyusutan_per_bulan": 16667,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 800000,
+        "akumulasi_penyusutan": 800000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2013-05-18"
+    },
+    {
+        "nama_aktiva": "EKS HDD 3",
+        "penyusutan_per_tahun": 196250,
+        "penyusutan_per_bulan": 16354,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 785000,
+        "akumulasi_penyusutan": 785000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2017-05-01"
+    },
+    {
+        "nama_aktiva": "exhause fan dinding",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 799500,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 184500,
+        "depresiasi_per_tahun": 184500,
+        "tanggal_pemakaian": "2022-03-22"
+    },
+    {
+        "nama_aktiva": "EXHAUST FAN MASPION U\/ DINDING",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 331666.67,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 66333.33,
+        "depresiasi_per_tahun": 66333.33,
+        "tanggal_pemakaian": "2022-04-19"
+    },
+    {
+        "nama_aktiva": "Filling cabinet",
+        "penyusutan_per_tahun": 203125,
+        "penyusutan_per_bulan": 16927,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 1625000,
+        "akumulasi_penyusutan": 1625000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2011-05-12"
+    },
+    {
+        "nama_aktiva": "Filling cabinet",
+        "penyusutan_per_tahun": 892500,
+        "penyusutan_per_bulan": 74375,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 7140000,
+        "akumulasi_penyusutan": 7140000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2013-02-27"
+    },
+    {
+        "nama_aktiva": "Filling cabinet",
+        "penyusutan_per_tahun": 297500,
+        "penyusutan_per_bulan": 24792,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 2380000,
+        "akumulasi_penyusutan": 2380000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2013-02-19"
+    },
+    {
+        "nama_aktiva": "Filling cabinet",
+        "penyusutan_per_tahun": 148750,
+        "penyusutan_per_bulan": 12396,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 1190000,
+        "akumulasi_penyusutan": 1190000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2013-03-27"
+    },
+    {
+        "nama_aktiva": "FILLING CABINET 05",
+        "penyusutan_per_tahun": 168750,
+        "penyusutan_per_bulan": 14063,
+        "sisa_penyustan": 220248.41,
+        "nilai_perolehan": 1350000,
+        "akumulasi_penyusutan": 1129751.59,
+        "depresiasi_per_tahun": 73416.14,
+        "tanggal_pemakaian": "2016-09-01"
+    },
+    {
+        "nama_aktiva": "FILLING CABINET",
+        "penyusutan_per_tahun": 431705,
+        "penyusutan_per_bulan": 35975,
+        "sisa_penyustan": 648821.51,
+        "nilai_perolehan": 3453636,
+        "akumulasi_penyusutan": 2804814.49,
+        "depresiasi_per_tahun": 216273.84,
+        "tanggal_pemakaian": "2017-03-01"
+    },
+    {
+        "nama_aktiva": "FILLING CABINET UNTUK LAB",
+        "penyusutan_per_tahun": 533250,
+        "penyusutan_per_bulan": 44438,
+        "sisa_penyustan": 44437.5,
+        "nilai_perolehan": 2133000,
+        "akumulasi_penyusutan": 2088562.5,
+        "depresiasi_per_tahun": 266625,
+        "tanggal_pemakaian": "2019-03-12"
+    },
+    {
+        "nama_aktiva": "Sakana Flipchart Board 70x100cm",
+        "penyusutan_per_tahun": 205000,
+        "penyusutan_per_bulan": 17083,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 820000,
+        "akumulasi_penyusutan": 820000,
+        "depresiasi_per_tahun": 85416.67,
+        "tanggal_pemakaian": "2018-11-01"
+    },
+    {
+        "nama_aktiva": "FOGGING PHOENIX 1200 WATT",
+        "penyusutan_per_tahun": 900000,
+        "penyusutan_per_bulan": 75000,
+        "sisa_penyustan": 2100000,
+        "nilai_perolehan": 3600000,
+        "akumulasi_penyusutan": 1500000,
+        "depresiasi_per_tahun": 900000,
+        "tanggal_pemakaian": "2021-04-30"
+    },
+    {
+        "nama_aktiva": "IMAC 27\"",
+        "penyusutan_per_tahun": 9199750,
+        "penyusutan_per_bulan": 766646,
+        "sisa_penyustan": 24532666.67,
+        "nilai_perolehan": 36799000,
+        "akumulasi_penyusutan": 12266333.33,
+        "depresiasi_per_tahun": 9199750,
+        "tanggal_pemakaian": "2021-09-07"
+    },
+    {
+        "nama_aktiva": "Hand Mixer Maspion",
+        "penyusutan_per_tahun": 43750,
+        "penyusutan_per_bulan": 3646,
+        "sisa_penyustan": 120312.5,
+        "nilai_perolehan": 175000,
+        "akumulasi_penyusutan": 54687.5,
+        "depresiasi_per_tahun": 43750,
+        "tanggal_pemakaian": "2021-09-18"
+    },
+    {
+        "nama_aktiva": "Fire Safe Box 670x480x510mm",
+        "penyusutan_per_tahun": 1370250,
+        "penyusutan_per_bulan": 114188,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 5481000,
+        "akumulasi_penyusutan": 5481000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2017-07-01"
+    },
+    {
+        "nama_aktiva": "Finger Print",
+        "penyusutan_per_tahun": 625000,
+        "penyusutan_per_bulan": 52083,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 2500000,
+        "akumulasi_penyusutan": 2500000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2013-02-01"
+    },
+    {
+        "nama_aktiva": "Mesin Fax",
+        "penyusutan_per_tahun": 250000,
+        "penyusutan_per_bulan": 20833,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 1000000,
+        "akumulasi_penyusutan": 1000000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2009-04-01"
+    },
+    {
+        "nama_aktiva": "Groundtank 2000 ltr",
+        "penyusutan_per_tahun": 2375000,
+        "penyusutan_per_bulan": 197917,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 9500000,
+        "akumulasi_penyusutan": 9500000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2014-08-01"
+    },
+    {
+        "nama_aktiva": "hardisk eksternal 2.5\" WD MY passport new 2 TB blue (baru) ",
+        "penyusutan_per_tahun": 243750,
+        "penyusutan_per_bulan": 20313,
+        "sisa_penyustan": 690625,
+        "nilai_perolehan": 975000,
+        "akumulasi_penyusutan": 284375,
+        "depresiasi_per_tahun": 243750,
+        "tanggal_pemakaian": "2021-10-29"
+    },
+    {
+        "nama_aktiva": "HARD DISC",
+        "penyusutan_per_tahun": 93750,
+        "penyusutan_per_bulan": 7813,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 375000,
+        "akumulasi_penyusutan": 375000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2011-10-01"
+    },
+    {
+        "nama_aktiva": "HP",
+        "penyusutan_per_tahun": 49750,
+        "penyusutan_per_bulan": 4146,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 199000,
+        "akumulasi_penyusutan": 199000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-01-12"
+    },
+    {
+        "nama_aktiva": "HP",
+        "penyusutan_per_tahun": 35000,
+        "penyusutan_per_bulan": 2917,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 140000,
+        "akumulasi_penyusutan": 140000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-12-10"
+    },
+    {
+        "nama_aktiva": "HP",
+        "penyusutan_per_tahun": 35000,
+        "penyusutan_per_bulan": 2917,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 140000,
+        "akumulasi_penyusutan": 140000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-12-14"
+    },
+    {
+        "nama_aktiva": "HP OPPO REALME C2 (6PCS)",
+        "penyusutan_per_tahun": 2398500,
+        "penyusutan_per_bulan": 199875,
+        "sisa_penyustan": 899437.5,
+        "nilai_perolehan": 9594000,
+        "akumulasi_penyusutan": 8694562.5,
+        "depresiasi_per_tahun": 1199250,
+        "tanggal_pemakaian": "2019-09-24"
+    },
+    {
+        "nama_aktiva": "HP READMI 9C",
+        "penyusutan_per_tahun": 412250,
+        "penyusutan_per_bulan": 34354,
+        "sisa_penyustan": 858854.17,
+        "nilai_perolehan": 1649000,
+        "akumulasi_penyusutan": 790145.83,
+        "depresiasi_per_tahun": 412250,
+        "tanggal_pemakaian": "2021-02-01"
+    },
+    {
+        "nama_aktiva": "hp infinix hot 10s 4\/64 green",
+        "penyusutan_per_tahun": 418750,
+        "penyusutan_per_bulan": 34896,
+        "sisa_penyustan": 1186458.33,
+        "nilai_perolehan": 1675000,
+        "akumulasi_penyusutan": 488541.67,
+        "depresiasi_per_tahun": 418750,
+        "tanggal_pemakaian": "2021-10-22"
+    },
+    {
+        "nama_aktiva": "HP infinix hot 12 play 4\/64 blue",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 1494166.67,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 135833.33,
+        "depresiasi_per_tahun": 135833.33,
+        "tanggal_pemakaian": "2022-08-26"
+    },
+    {
+        "nama_aktiva": "HP INFINIX HOT 12 PLAY NFC 4\/64",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 1499062.5,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 99937.5,
+        "depresiasi_per_tahun": 99937.5,
+        "tanggal_pemakaian": "2022-10-03"
+    },
+    {
+        "nama_aktiva": "Beli handphone N1506",
+        "penyusutan_per_tahun": 112500,
+        "penyusutan_per_bulan": 9375,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 450000,
+        "akumulasi_penyusutan": 450000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2010-07-01"
+    },
+    {
+        "nama_aktiva": "handphone smart",
+        "penyusutan_per_tahun": 49750,
+        "penyusutan_per_bulan": 4146,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 199000,
+        "akumulasi_penyusutan": 199000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-03-01"
+    },
+    {
+        "nama_aktiva": "HP",
+        "penyusutan_per_tahun": 74750,
+        "penyusutan_per_bulan": 6229,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 299000,
+        "akumulasi_penyusutan": 299000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2013-03-01"
+    },
+    {
+        "nama_aktiva": "Handphone Smartfren Andromax A16C3H (A) untuk kantor",
+        "penyusutan_per_tahun": 24750,
+        "penyusutan_per_bulan": 2063,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 99000,
+        "akumulasi_penyusutan": 99000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2016-09-01"
+    },
+    {
+        "nama_aktiva": "Handphone Smartfren Andromax A16C3H (A) untuk Slamet",
+        "penyusutan_per_tahun": 127250,
+        "penyusutan_per_bulan": 10604,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 509000,
+        "akumulasi_penyusutan": 509000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2016-09-01"
+    },
+    {
+        "nama_aktiva": "Handphone Evercoss Winner Y Star-16GB-Hitam",
+        "penyusutan_per_tahun": 324750,
+        "penyusutan_per_bulan": 27063,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 1299000,
+        "akumulasi_penyusutan": 1299000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2017-06-01"
+    },
+    {
+        "nama_aktiva": "Handphone Xiaomi Redmi 5A 16GB 2GB RAM Blue",
+        "penyusutan_per_tahun": 287250,
+        "penyusutan_per_bulan": 23938,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 1149000,
+        "akumulasi_penyusutan": 1149000,
+        "depresiasi_per_tahun": 83781.25,
+        "tanggal_pemakaian": "2018-08-01"
+    },
+    {
+        "nama_aktiva": "Handphone Samsung A10s-32GB-Hitam",
+        "penyusutan_per_tahun": 421225,
+        "penyusutan_per_bulan": 35102,
+        "sisa_penyustan": 175510.42,
+        "nilai_perolehan": 1684900,
+        "akumulasi_penyusutan": 1509389.58,
+        "depresiasi_per_tahun": 210612.5,
+        "tanggal_pemakaian": "2019-11-01"
+    },
+    {
+        "nama_aktiva": "HARDISK 2 TB",
+        "penyusutan_per_tahun": 268750,
+        "penyusutan_per_bulan": 22396,
+        "sisa_penyustan": 425520.83,
+        "nilai_perolehan": 1075000,
+        "akumulasi_penyusutan": 649479.17,
+        "depresiasi_per_tahun": 268750,
+        "tanggal_pemakaian": "2020-08-06"
+    },
+    {
+        "nama_aktiva": "Ipad Pro MI 11inch wifi+cell 256Gb +apple pencil 2nd gen",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 17980375,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 2568625,
+        "depresiasi_per_tahun": 2568625,
+        "tanggal_pemakaian": "2022-07-05"
+    },
+    {
+        "nama_aktiva": "Kipas angin",
+        "penyusutan_per_tahun": 31250,
+        "penyusutan_per_bulan": 2604,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 250000,
+        "akumulasi_penyusutan": 250000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2011-08-14"
+    },
+    {
+        "nama_aktiva": "Kitchen Set Lantai 2",
+        "penyusutan_per_tahun": 1375000,
+        "penyusutan_per_bulan": 114583,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 5500000,
+        "akumulasi_penyusutan": 5500000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2017-05-01"
+    },
+    {
+        "nama_aktiva": "Kitchen Set Lantai 4",
+        "penyusutan_per_tahun": 1386000,
+        "penyusutan_per_bulan": 115500,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 5544000,
+        "akumulasi_penyusutan": 5544000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2017-05-01"
+    },
+    {
+        "nama_aktiva": "Kipas Angin Maspion MWF-41K 16\" Wall Fan",
+        "penyusutan_per_tahun": 94125,
+        "penyusutan_per_bulan": 7844,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 376500,
+        "akumulasi_penyusutan": 376500,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2017-01-01"
+    },
+    {
+        "nama_aktiva": "KOMPOR",
+        "penyusutan_per_tahun": 1355034,
+        "penyusutan_per_bulan": 112920,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 5420136,
+        "akumulasi_penyusutan": 5420136,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2016-03-31"
+    },
+    {
+        "nama_aktiva": "KURSI",
+        "penyusutan_per_tahun": 1417275,
+        "penyusutan_per_bulan": 118106,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 5669100,
+        "akumulasi_penyusutan": 5669100,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-03-30"
+    },
+    {
+        "nama_aktiva": "KURSI",
+        "penyusutan_per_tahun": 611591,
+        "penyusutan_per_bulan": 50966,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 2446363,
+        "akumulasi_penyusutan": 2446363,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2014-02-17"
+    },
+    {
+        "nama_aktiva": "KURSI",
+        "penyusutan_per_tahun": 1350000,
+        "penyusutan_per_bulan": 112500,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 5400000,
+        "akumulasi_penyusutan": 5400000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2014-02-24"
+    },
+    {
+        "nama_aktiva": "KURSI",
+        "penyusutan_per_tahun": 600000,
+        "penyusutan_per_bulan": 50000,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 2400000,
+        "akumulasi_penyusutan": 2400000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2014-02-24"
+    },
+    {
+        "nama_aktiva": "KURSI",
+        "penyusutan_per_tahun": 180000,
+        "penyusutan_per_bulan": 15000,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 720000,
+        "akumulasi_penyusutan": 720000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2014-09-03"
+    },
+    {
+        "nama_aktiva": "KURSI",
+        "penyusutan_per_tahun": 908864,
+        "penyusutan_per_bulan": 75739,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 3635455,
+        "akumulasi_penyusutan": 3635455,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2014-12-05"
+    },
+    {
+        "nama_aktiva": "KURSI",
+        "penyusutan_per_tahun": 89963,
+        "penyusutan_per_bulan": 7497,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 719700,
+        "akumulasi_penyusutan": 719700,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-06-09"
+    },
+    {
+        "nama_aktiva": "KURSI",
+        "penyusutan_per_tahun": 150000,
+        "penyusutan_per_bulan": 12500,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 1200000,
+        "akumulasi_penyusutan": 1200000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-10-09"
+    },
+    {
+        "nama_aktiva": "KURSI",
+        "penyusutan_per_tahun": 262500,
+        "penyusutan_per_bulan": 21875,
+        "sisa_penyustan": 373754.88,
+        "nilai_perolehan": 2100000,
+        "akumulasi_penyusutan": 1726245.12,
+        "depresiasi_per_tahun": 124584.96,
+        "tanggal_pemakaian": "2017-01-01"
+    },
+    {
+        "nama_aktiva": "KURSI MEETING JARING HITAM ",
+        "penyusutan_per_tahun": 1250000,
+        "penyusutan_per_bulan": 104167,
+        "sisa_penyustan": 208333.33,
+        "nilai_perolehan": 5000000,
+        "akumulasi_penyusutan": 4791666.67,
+        "depresiasi_per_tahun": 625000,
+        "tanggal_pemakaian": "2019-04-24"
+    },
+    {
+        "nama_aktiva": "KURSI HITAM MEETING",
+        "penyusutan_per_tahun": 750000,
+        "penyusutan_per_bulan": 62500,
+        "sisa_penyustan": 187500,
+        "nilai_perolehan": 3000000,
+        "akumulasi_penyusutan": 2812500,
+        "depresiasi_per_tahun": 375000,
+        "tanggal_pemakaian": "2019-06-20"
+    },
+    {
+        "nama_aktiva": "Bangku",
+        "penyusutan_per_tahun": 117000,
+        "penyusutan_per_bulan": 9750,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 468000,
+        "akumulasi_penyusutan": 468000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-04-01"
+    },
+    {
+        "nama_aktiva": "Kursi santai",
+        "penyusutan_per_tahun": 1574775,
+        "penyusutan_per_bulan": 131231,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 6299100,
+        "akumulasi_penyusutan": 6299100,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-09-01"
+    },
+    {
+        "nama_aktiva": "Kursi staff black",
+        "penyusutan_per_tahun": 686250,
+        "penyusutan_per_bulan": 57188,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 2745000,
+        "akumulasi_penyusutan": 2745000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-09-01"
+    },
+    {
+        "nama_aktiva": "Kursi Livorno Staff Chair Black",
+        "penyusutan_per_tahun": 3813409,
+        "penyusutan_per_bulan": 317784,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 15253635,
+        "akumulasi_penyusutan": 15253635,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2017-03-01"
+    },
+    {
+        "nama_aktiva": "Kursi Staff hitam Livorno Staff Chair Black",
+        "penyusutan_per_tahun": 544773,
+        "penyusutan_per_bulan": 45398,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 2179091,
+        "akumulasi_penyusutan": 2179091,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2017-03-01"
+    },
+    {
+        "nama_aktiva": "Kursi Saporo Lokal Merah",
+        "penyusutan_per_tahun": 1755000,
+        "penyusutan_per_bulan": 146250,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 7020000,
+        "akumulasi_penyusutan": 7020000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2017-03-01"
+    },
+    {
+        "nama_aktiva": "Seat Yolo Gang Chair (Kursi tunggu) lt dasar 1 set",
+        "penyusutan_per_tahun": 227046,
+        "penyusutan_per_bulan": 18920,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 908182,
+        "akumulasi_penyusutan": 908182,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2017-05-01"
+    },
+    {
+        "nama_aktiva": "KITCHEN SET MEIKO 1 B19",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 23062500,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 3937500,
+        "depresiasi_per_tahun": 3937500,
+        "tanggal_pemakaian": "2022-05-18"
+    },
+    {
+        "nama_aktiva": "Almari Arsip",
+        "penyusutan_per_tahun": 37500,
+        "penyusutan_per_bulan": 3125,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 150000,
+        "akumulasi_penyusutan": 150000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "1996-01-01"
+    },
+    {
+        "nama_aktiva": "LEMARI ARSIP",
+        "penyusutan_per_tahun": 6500000,
+        "penyusutan_per_bulan": 541667,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 26000000,
+        "akumulasi_penyusutan": 26000000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-08-19"
+    },
+    {
+        "nama_aktiva": "LEMARI ARSIP",
+        "penyusutan_per_tahun": 25500000,
+        "penyusutan_per_bulan": 2125000,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 102000000,
+        "akumulasi_penyusutan": 102000000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2013-12-02"
+    },
+    {
+        "nama_aktiva": "Lemari Arsip",
+        "penyusutan_per_tahun": 175711,
+        "penyusutan_per_bulan": 14643,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 1405687,
+        "akumulasi_penyusutan": 1405687,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2010-12-01"
+    },
+    {
+        "nama_aktiva": "LEMARI ARSIP",
+        "penyusutan_per_tahun": 3408864,
+        "penyusutan_per_bulan": 284072,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 13635454,
+        "akumulasi_penyusutan": 13635454,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2016-02-01"
+    },
+    {
+        "nama_aktiva": "LCD",
+        "penyusutan_per_tahun": 243750,
+        "penyusutan_per_bulan": 20313,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 975000,
+        "akumulasi_penyusutan": 975000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2010-10-01"
+    },
+    {
+        "nama_aktiva": "Lemari Rak 1 pintu ",
+        "penyusutan_per_tahun": 999546,
+        "penyusutan_per_bulan": 83295,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 3998182,
+        "akumulasi_penyusutan": 3998182,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2017-03-01"
+    },
+    {
+        "nama_aktiva": "Lemari kantor 2 pintu Sieben Credenza",
+        "penyusutan_per_tahun": 772500,
+        "penyusutan_per_bulan": 64375,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 3090000,
+        "akumulasi_penyusutan": 3090000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2017-03-01"
+    },
+    {
+        "nama_aktiva": "Lemari Meja Wastafel lt dasar",
+        "penyusutan_per_tahun": 375000,
+        "penyusutan_per_bulan": 31250,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 1500000,
+        "akumulasi_penyusutan": 1500000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2017-05-01"
+    },
+    {
+        "nama_aktiva": "Lemari Meja Wastafel lt 2-4",
+        "penyusutan_per_tahun": 1200000,
+        "penyusutan_per_bulan": 100000,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 4800000,
+        "akumulasi_penyusutan": 4800000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2017-05-01"
+    },
+    {
+        "nama_aktiva": "LOKER(KAYU)",
+        "penyusutan_per_tahun": 180000,
+        "penyusutan_per_bulan": 15000,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 720000,
+        "akumulasi_penyusutan": 720000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-06-07"
+    },
+    {
+        "nama_aktiva": "LOKER(KAYU)",
+        "penyusutan_per_tahun": 60000,
+        "penyusutan_per_bulan": 5000,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 240000,
+        "akumulasi_penyusutan": 240000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-05-13"
+    },
+    {
+        "nama_aktiva": "LOKER(KAYU)",
+        "penyusutan_per_tahun": 60000,
+        "penyusutan_per_bulan": 5000,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 240000,
+        "akumulasi_penyusutan": 240000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-08-25"
+    },
+    {
+        "nama_aktiva": "LOKER (KAYU)",
+        "penyusutan_per_tahun": 75000,
+        "penyusutan_per_bulan": 6250,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 300000,
+        "akumulasi_penyusutan": 300000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2016-02-01"
+    },
+    {
+        "nama_aktiva": "LOKER ",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 750000,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 50000,
+        "depresiasi_per_tahun": 50000,
+        "tanggal_pemakaian": "2022-09-23"
+    },
+    {
+        "nama_aktiva": "LOKER ",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 375000,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 25000,
+        "depresiasi_per_tahun": 25000,
+        "tanggal_pemakaian": "2022-09-27"
+    },
+    {
+        "nama_aktiva": "LCD PROYEKTOR",
+        "penyusutan_per_tahun": 875000,
+        "penyusutan_per_bulan": 72917,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 3500000,
+        "akumulasi_penyusutan": 3500000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2013-01-28"
+    },
+    {
+        "nama_aktiva": "LEMARI PENDINGIN",
+        "penyusutan_per_tahun": 1113409,
+        "penyusutan_per_bulan": 92784,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 4453636,
+        "akumulasi_penyusutan": 4453636,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2016-03-01"
+    },
+    {
+        "nama_aktiva": "LCD PROYEKTOR",
+        "penyusutan_per_tahun": 1025000,
+        "penyusutan_per_bulan": 85417,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 4100000,
+        "akumulasi_penyusutan": 4100000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2017-11-01"
+    },
+    {
+        "nama_aktiva": "Laptop Acer",
+        "penyusutan_per_tahun": 982500,
+        "penyusutan_per_bulan": 81875,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 3930000,
+        "akumulasi_penyusutan": 3930000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-10-01"
+    },
+    {
+        "nama_aktiva": "Lptop Lenovo \nIdeapad gaming 3-15IHU6-E2ID Black i5 1130H Win 10 (15.6\" IPS\/RTX 3050\/512GB SSD\/8GB)",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 11740625,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 2709375,
+        "depresiasi_per_tahun": 2709375,
+        "tanggal_pemakaian": "2022-03-25"
+    },
+    {
+        "nama_aktiva": "LAPTOP ACER SPIN3 SP313-51N-548H-i5",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 10250000,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 1750000,
+        "depresiasi_per_tahun": 1750000,
+        "tanggal_pemakaian": "2022-06-09"
+    },
+    {
+        "nama_aktiva": "Kipas angin maspion 18\" PW1809, sunter",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 479166.67,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 20833.33,
+        "depresiasi_per_tahun": 20833.33,
+        "tanggal_pemakaian": "2022-11-07"
+    },
+    {
+        "nama_aktiva": "Pesawat telpon sahitel u\/ Gudang Cakung",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 306666.67,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 13333.33,
+        "depresiasi_per_tahun": 13333.33,
+        "tanggal_pemakaian": "2022-11-08"
+    },
+    {
+        "nama_aktiva": "LAYAR PROYEKTOR",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 726041.67,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 123958.33,
+        "depresiasi_per_tahun": 123958.33,
+        "tanggal_pemakaian": "2022-06-14"
+    },
+    {
+        "nama_aktiva": "XIAOMI MI BAND 6 BLACK",
+        "penyusutan_per_tahun": 2342500,
+        "penyusutan_per_bulan": 195208,
+        "sisa_penyustan": 6832291.67,
+        "nilai_perolehan": 9370000,
+        "akumulasi_penyusutan": 2537708.33,
+        "depresiasi_per_tahun": 2342500,
+        "tanggal_pemakaian": "2021-11-26"
+    },
+    {
+        "nama_aktiva": "XIAOMI MI BAND 6 BLACK",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 1212750,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 404250,
+        "depresiasi_per_tahun": 404250,
+        "tanggal_pemakaian": "2022-01-15"
+    },
+    {
+        "nama_aktiva": "Mesin Fotocopy",
+        "penyusutan_per_tahun": 1000000,
+        "penyusutan_per_bulan": 83333,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 8000000,
+        "akumulasi_penyusutan": 8000000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2004-01-01"
+    },
+    {
+        "nama_aktiva": "MICROPIPETTE 100-1000UL VIT LAB V.1641008",
+        "penyusutan_per_tahun": 583750,
+        "penyusutan_per_bulan": 48646,
+        "sisa_penyustan": 72968.75,
+        "nilai_perolehan": 2335000,
+        "akumulasi_penyusutan": 2262031.25,
+        "depresiasi_per_tahun": 291875,
+        "tanggal_pemakaian": "2019-04-01"
+    },
+    {
+        "nama_aktiva": "Mesin Fax Panasonic",
+        "penyusutan_per_tahun": 250000,
+        "penyusutan_per_bulan": 20833,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 1000000,
+        "akumulasi_penyusutan": 1000000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2008-01-01"
+    },
+    {
+        "nama_aktiva": "Mesin Fax ",
+        "penyusutan_per_tahun": 481250,
+        "penyusutan_per_bulan": 40104,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 1925000,
+        "akumulasi_penyusutan": 1925000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-11-01"
+    },
+    {
+        "nama_aktiva": "Meja Kursi Kantor",
+        "penyusutan_per_tahun": 62500,
+        "penyusutan_per_bulan": 5208,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 250000,
+        "akumulasi_penyusutan": 250000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "1996-01-01"
+    },
+    {
+        "nama_aktiva": "MEJA",
+        "penyusutan_per_tahun": 522500,
+        "penyusutan_per_bulan": 43542,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 2090000,
+        "akumulasi_penyusutan": 2090000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-08-24"
+    },
+    {
+        "nama_aktiva": "MEJA",
+        "penyusutan_per_tahun": 212500,
+        "penyusutan_per_bulan": 17708,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 850000,
+        "akumulasi_penyusutan": 850000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2013-02-14"
+    },
+    {
+        "nama_aktiva": "MEJA",
+        "penyusutan_per_tahun": 1140000,
+        "penyusutan_per_bulan": 95000,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 4560000,
+        "akumulasi_penyusutan": 4560000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2014-02-07"
+    },
+    {
+        "nama_aktiva": "MEJA",
+        "penyusutan_per_tahun": 227955,
+        "penyusutan_per_bulan": 18996,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 911819,
+        "akumulasi_penyusutan": 911819,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2014-02-25"
+    },
+    {
+        "nama_aktiva": "MEJA",
+        "penyusutan_per_tahun": 357273,
+        "penyusutan_per_bulan": 29773,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 1429091,
+        "akumulasi_penyusutan": 1429091,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2014-07-22"
+    },
+    {
+        "nama_aktiva": "MEJA",
+        "penyusutan_per_tahun": 357273,
+        "penyusutan_per_bulan": 29773,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 1429091,
+        "akumulasi_penyusutan": 1429091,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2014-07-22"
+    },
+    {
+        "nama_aktiva": "MEJA",
+        "penyusutan_per_tahun": 1295455,
+        "penyusutan_per_bulan": 107955,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 5181818,
+        "akumulasi_penyusutan": 5181818,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2014-12-15"
+    },
+    {
+        "nama_aktiva": "MEJA ",
+        "penyusutan_per_tahun": 545228,
+        "penyusutan_per_bulan": 45436,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 2180910,
+        "akumulasi_penyusutan": 2180910,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2016-02-01"
+    },
+    {
+        "nama_aktiva": "MEJA",
+        "penyusutan_per_tahun": 545000,
+        "penyusutan_per_bulan": 45417,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 2180000,
+        "akumulasi_penyusutan": 2180000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2016-03-01"
+    },
+    {
+        "nama_aktiva": "MEJA KOMPUTER",
+        "penyusutan_per_tahun": 75000,
+        "penyusutan_per_bulan": 6250,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 300000,
+        "akumulasi_penyusutan": 300000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2010-11-01"
+    },
+    {
+        "nama_aktiva": "MEJA KANTOR LAB",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 4375000,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 875000,
+        "depresiasi_per_tahun": 875000,
+        "tanggal_pemakaian": "2022-05-11"
+    },
+    {
+        "nama_aktiva": "meja",
+        "penyusutan_per_tahun": 224750,
+        "penyusutan_per_bulan": 18729,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 899000,
+        "akumulasi_penyusutan": 899000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-03-01"
+    },
+    {
+        "nama_aktiva": "Meja staff",
+        "penyusutan_per_tahun": 944325,
+        "penyusutan_per_bulan": 78694,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 3777300,
+        "akumulasi_penyusutan": 3777300,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-09-01"
+    },
+    {
+        "nama_aktiva": "Meja Staff Persegi Panjang (Biasa)",
+        "penyusutan_per_tahun": 3885682,
+        "penyusutan_per_bulan": 323807,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 15542727,
+        "akumulasi_penyusutan": 15542727,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2017-03-01"
+    },
+    {
+        "nama_aktiva": "Meja Staff Lengkungan",
+        "penyusutan_per_tahun": 3181591,
+        "penyusutan_per_bulan": 265133,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 12726364,
+        "akumulasi_penyusutan": 12726364,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2017-03-01"
+    },
+    {
+        "nama_aktiva": "Meja Meeting Bundar",
+        "penyusutan_per_tahun": 2976818,
+        "penyusutan_per_bulan": 248068,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 11907273,
+        "akumulasi_penyusutan": 11907273,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2017-03-01"
+    },
+    {
+        "nama_aktiva": "Meja staff (dr surabaya) u\/ Pak eko & pak slamet",
+        "penyusutan_per_tahun": 2726818,
+        "penyusutan_per_bulan": 227235,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 10907273,
+        "akumulasi_penyusutan": 10907273,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2017-03-01"
+    },
+    {
+        "nama_aktiva": "Meja Nakas u\/ ruang meeting & lt 4",
+        "penyusutan_per_tahun": 775000,
+        "penyusutan_per_bulan": 64583,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 3100000,
+        "akumulasi_penyusutan": 3100000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2017-05-01"
+    },
+    {
+        "nama_aktiva": "Meja Penutup Mesin Sanyo",
+        "penyusutan_per_tahun": 475000,
+        "penyusutan_per_bulan": 39583,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 1900000,
+        "akumulasi_penyusutan": 1900000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2017-05-01"
+    },
+    {
+        "nama_aktiva": "Meja untuk Proyektor lantai 5",
+        "penyusutan_per_tahun": 500000,
+        "penyusutan_per_bulan": 41667,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 2000000,
+        "akumulasi_penyusutan": 2000000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2017-06-01"
+    },
+    {
+        "nama_aktiva": "Mesin Ketik",
+        "penyusutan_per_tahun": 62500,
+        "penyusutan_per_bulan": 5208,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 250000,
+        "akumulasi_penyusutan": 250000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "1996-01-01"
+    },
+    {
+        "nama_aktiva": "MESIN KETIK",
+        "penyusutan_per_tahun": 325000,
+        "penyusutan_per_bulan": 27083,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 1300000,
+        "akumulasi_penyusutan": 1300000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-08-21"
+    },
+    {
+        "nama_aktiva": "Mesin TIK",
+        "penyusutan_per_tahun": 332500,
+        "penyusutan_per_bulan": 27708,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 1330000,
+        "akumulasi_penyusutan": 1330000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2013-02-01"
+    },
+    {
+        "nama_aktiva": "MEMORI PC + MEMORI LAPTOP + MOUSE",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 923125,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 131875,
+        "depresiasi_per_tahun": 131875,
+        "tanggal_pemakaian": "2022-06-17"
+    },
+    {
+        "nama_aktiva": "TAPPING ACCES",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 13325000,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 2275000,
+        "depresiasi_per_tahun": 2275000,
+        "tanggal_pemakaian": "2022-05-21"
+    },
+    {
+        "nama_aktiva": "LAMPU KANTOR",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 50091607.18,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 8552225.62,
+        "depresiasi_per_tahun": 8552225.62,
+        "tanggal_pemakaian": "2022-05-25"
+    },
+    {
+        "nama_aktiva": "MONITOR LED",
+        "penyusutan_per_tahun": 250000,
+        "penyusutan_per_bulan": 20833,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 1000000,
+        "akumulasi_penyusutan": 1000000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2013-05-07"
+    },
+    {
+        "nama_aktiva": "MONITOR LED",
+        "penyusutan_per_tahun": 190000,
+        "penyusutan_per_bulan": 15833,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 760000,
+        "akumulasi_penyusutan": 760000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2014-05-25"
+    },
+    {
+        "nama_aktiva": "MONITOR LED",
+        "penyusutan_per_tahun": 193750,
+        "penyusutan_per_bulan": 16146,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 775000,
+        "akumulasi_penyusutan": 775000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2014-06-21"
+    },
+    {
+        "nama_aktiva": "Monitor LED LG 19\" M38",
+        "penyusutan_per_tahun": 221250,
+        "penyusutan_per_bulan": 18438,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 885000,
+        "akumulasi_penyusutan": 885000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2018-01-01"
+    },
+    {
+        "nama_aktiva": "NOTEBOOK",
+        "penyusutan_per_tahun": 1100000,
+        "penyusutan_per_bulan": 91667,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 4400000,
+        "akumulasi_penyusutan": 4400000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-05-29"
+    },
+    {
+        "nama_aktiva": "NOTE BOOK LENOVO",
+        "penyusutan_per_tahun": 1200000,
+        "penyusutan_per_bulan": 100000,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 4800000,
+        "akumulasi_penyusutan": 4800000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-10-17"
+    },
+    {
+        "nama_aktiva": "NOTEBOOK HP-14",
+        "penyusutan_per_tahun": 1231250,
+        "penyusutan_per_bulan": 102604,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 4925000,
+        "akumulasi_penyusutan": 4925000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2015-11-01"
+    },
+    {
+        "nama_aktiva": "NOTEBOOK LENOVO + OFFICE HOME (USER LAB)",
+        "penyusutan_per_tahun": 1587500,
+        "penyusutan_per_bulan": 132292,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 6350000,
+        "akumulasi_penyusutan": 6350000,
+        "depresiasi_per_tahun": 198437.5,
+        "tanggal_pemakaian": "2018-04-13"
+    },
+    {
+        "nama_aktiva": "OXONE COUNTER TOP OVEN",
+        "penyusutan_per_tahun": 199750,
+        "penyusutan_per_bulan": 16646,
+        "sisa_penyustan": 565958.33,
+        "nilai_perolehan": 799000,
+        "akumulasi_penyusutan": 233041.67,
+        "depresiasi_per_tahun": 199750,
+        "tanggal_pemakaian": "2021-10-26"
+    },
+    {
+        "nama_aktiva": "Pompa Air",
+        "penyusutan_per_tahun": 243750,
+        "penyusutan_per_bulan": 20313,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 1950000,
+        "akumulasi_penyusutan": 1950000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2010-07-01"
+    },
+    {
+        "nama_aktiva": "Pompa Grundfoss JP Basic 3",
+        "penyusutan_per_tahun": 494318,
+        "penyusutan_per_bulan": 41193,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 1977272.73,
+        "akumulasi_penyusutan": 1977272.73,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2014-10-01"
+    },
+    {
+        "nama_aktiva": "Pompa Grundfoss JD Basic 5",
+        "penyusutan_per_tahun": 943182,
+        "penyusutan_per_bulan": 78598,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 3772727.27,
+        "akumulasi_penyusutan": 3772727.27,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2014-10-01"
+    },
+    {
+        "nama_aktiva": "Pompa Groundfos JP Basic 3",
+        "penyusutan_per_tahun": 705000,
+        "penyusutan_per_bulan": 58750,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 2820000,
+        "akumulasi_penyusutan": 2820000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2017-03-01"
+    },
+    {
+        "nama_aktiva": "PABX",
+        "penyusutan_per_tahun": 1401250,
+        "penyusutan_per_bulan": 116771,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 5605000,
+        "akumulasi_penyusutan": 5605000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-10-03"
+    },
+    {
+        "nama_aktiva": "PABX",
+        "penyusutan_per_tahun": 837500,
+        "penyusutan_per_bulan": 69792,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 3350000,
+        "akumulasi_penyusutan": 3350000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2014-03-30"
+    },
+    {
+        "nama_aktiva": "PABX Panasonic KX-TES 824",
+        "penyusutan_per_tahun": 1225000,
+        "penyusutan_per_bulan": 102083,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 4900000,
+        "akumulasi_penyusutan": 4900000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2017-02-01"
+    },
+    {
+        "nama_aktiva": "Penghancur Kertas",
+        "penyusutan_per_tahun": 155625,
+        "penyusutan_per_bulan": 12969,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 1245000,
+        "akumulasi_penyusutan": 1245000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2011-05-12"
+    },
+    {
+        "nama_aktiva": "MESIN PENGHANCUR KERTAS",
+        "penyusutan_per_tahun": 108281,
+        "penyusutan_per_bulan": 9023,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 866250,
+        "akumulasi_penyusutan": 866250,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-11-21"
+    },
+    {
+        "nama_aktiva": "Penghancur Kertas-Paper Shredder Krisbow",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 1661625,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 237375,
+        "depresiasi_per_tahun": 237375,
+        "tanggal_pemakaian": "2022-07-15"
+    },
+    {
+        "nama_aktiva": "PINTU HARMONIKA KANTOR B-12",
+        "penyusutan_per_tahun": 2976591,
+        "penyusutan_per_bulan": 248049,
+        "sisa_penyustan": 15131003.79,
+        "nilai_perolehan": 23812727.27,
+        "akumulasi_penyusutan": 8681723.48,
+        "depresiasi_per_tahun": 2976590.91,
+        "tanggal_pemakaian": "2020-01-31"
+    },
+    {
+        "nama_aktiva": "Komputer 1",
+        "penyusutan_per_tahun": 262500,
+        "penyusutan_per_bulan": 21875,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 2100000,
+        "akumulasi_penyusutan": 2100000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "1996-01-01"
+    },
+    {
+        "nama_aktiva": "Komputer 2",
+        "penyusutan_per_tahun": 3265000,
+        "penyusutan_per_bulan": 272083,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 13060000,
+        "akumulasi_penyusutan": 13060000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2008-07-01"
+    },
+    {
+        "nama_aktiva": "Komputer 3",
+        "penyusutan_per_tahun": 1026250,
+        "penyusutan_per_bulan": 85521,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 4105000,
+        "akumulasi_penyusutan": 4105000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2010-01-01"
+    },
+    {
+        "nama_aktiva": "KOMPUTER 4",
+        "penyusutan_per_tahun": 1627500,
+        "penyusutan_per_bulan": 135625,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 6510000,
+        "akumulasi_penyusutan": 6510000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2010-11-01"
+    },
+    {
+        "nama_aktiva": "KOMPUTER 5",
+        "penyusutan_per_tahun": 2022500,
+        "penyusutan_per_bulan": 168542,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 8090000,
+        "akumulasi_penyusutan": 8090000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2011-09-01"
+    },
+    {
+        "nama_aktiva": "KOMPUTER",
+        "penyusutan_per_tahun": 1425000,
+        "penyusutan_per_bulan": 118750,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 5700000,
+        "akumulasi_penyusutan": 5700000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-05-29"
+    },
+    {
+        "nama_aktiva": "KOMPUTER",
+        "penyusutan_per_tahun": 1212500,
+        "penyusutan_per_bulan": 101042,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 4850000,
+        "akumulasi_penyusutan": 4850000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2013-01-28"
+    },
+    {
+        "nama_aktiva": "KOMPUTER",
+        "penyusutan_per_tahun": 2725000,
+        "penyusutan_per_bulan": 227083,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 10900000,
+        "akumulasi_penyusutan": 10900000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2014-02-26"
+    },
+    {
+        "nama_aktiva": "BELI KOMP U\/ SERVER PROGRAM MISCA",
+        "penyusutan_per_tahun": 2817500,
+        "penyusutan_per_bulan": 234792,
+        "sisa_penyustan": 704375,
+        "nilai_perolehan": 11270000,
+        "akumulasi_penyusutan": 10565625,
+        "depresiasi_per_tahun": 1408750,
+        "tanggal_pemakaian": "2019-06-21"
+    },
+    {
+        "nama_aktiva": "PC AIO ACER Aspire C22-1700 \/ CORE I5-1235U \/ MEM 8GB \/ SSD 512GB M2 \/ NO VGA \/ NO DVD \/ WIN 11 HOME \/ OHS 2021 \/ 21,5 INCH ",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 111404687.5,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 2370312.5,
+        "depresiasi_per_tahun": 2370312.5,
+        "tanggal_pemakaian": "2022-11-23"
+    },
+    {
+        "nama_aktiva": "Computer & CPU",
+        "penyusutan_per_tahun": 1061250,
+        "penyusutan_per_bulan": 88438,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 4245000,
+        "akumulasi_penyusutan": 4245000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2009-04-01"
+    },
+    {
+        "nama_aktiva": "COMPUTER LED LG",
+        "penyusutan_per_tahun": 210000,
+        "penyusutan_per_bulan": 17500,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 840000,
+        "akumulasi_penyusutan": 840000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2011-10-01"
+    },
+    {
+        "nama_aktiva": "Computer Acer M 1935 ",
+        "penyusutan_per_tahun": 3063750,
+        "penyusutan_per_bulan": 255313,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 12255000,
+        "akumulasi_penyusutan": 12255000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-10-01"
+    },
+    {
+        "nama_aktiva": "monitor led acer 16\"",
+        "penyusutan_per_tahun": 165000,
+        "penyusutan_per_bulan": 13750,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 660000,
+        "akumulasi_penyusutan": 660000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2013-08-01"
+    },
+    {
+        "nama_aktiva": "POINTER PROYEKTOR",
+        "penyusutan_per_tahun": 80000,
+        "penyusutan_per_bulan": 6667,
+        "sisa_penyustan": 173333.33,
+        "nilai_perolehan": 320000,
+        "akumulasi_penyusutan": 146666.67,
+        "depresiasi_per_tahun": 80000,
+        "tanggal_pemakaian": "2021-02-18"
+    },
+    {
+        "nama_aktiva": "Papan Tulis Whiteboard uk 120x90 gantung",
+        "penyusutan_per_tahun": 65000,
+        "penyusutan_per_bulan": 5417,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 260000,
+        "akumulasi_penyusutan": 260000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2017-04-01"
+    },
+    {
+        "nama_aktiva": "Papan Tulis Whiteboard uk 120x180 pakai kaki",
+        "penyusutan_per_tahun": 187500,
+        "penyusutan_per_bulan": 15625,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 750000,
+        "akumulasi_penyusutan": 750000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2017-04-01"
+    },
+    {
+        "nama_aktiva": "Papan Tulis Whiteboard uk 60x90 cm Gantung",
+        "penyusutan_per_tahun": 43750,
+        "penyusutan_per_bulan": 3646,
+        "sisa_penyustan": 20052.08,
+        "nilai_perolehan": 175000,
+        "akumulasi_penyusutan": 154947.92,
+        "depresiasi_per_tahun": 21875,
+        "tanggal_pemakaian": "2019-12-01"
+    },
+    {
+        "nama_aktiva": "Printer",
+        "penyusutan_per_tahun": 181250,
+        "penyusutan_per_bulan": 15104,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 1450000,
+        "akumulasi_penyusutan": 1450000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2001-03-01"
+    },
+    {
+        "nama_aktiva": "Printer Epson TX111",
+        "penyusutan_per_tahun": 193750,
+        "penyusutan_per_bulan": 16146,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 775000,
+        "akumulasi_penyusutan": 775000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2009-10-01"
+    },
+    {
+        "nama_aktiva": "Printer Epson TX111",
+        "penyusutan_per_tahun": 198750,
+        "penyusutan_per_bulan": 16563,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 795000,
+        "akumulasi_penyusutan": 795000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2011-08-01"
+    },
+    {
+        "nama_aktiva": "Printer Epson TX111",
+        "penyusutan_per_tahun": 212500,
+        "penyusutan_per_bulan": 17708,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 850000,
+        "akumulasi_penyusutan": 850000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2011-09-15"
+    },
+    {
+        "nama_aktiva": "printer Epson TX121",
+        "penyusutan_per_tahun": 225000,
+        "penyusutan_per_bulan": 18750,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 900000,
+        "akumulasi_penyusutan": 900000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2013-05-18"
+    },
+    {
+        "nama_aktiva": "PRINTER HP 2020",
+        "penyusutan_per_tahun": 252500,
+        "penyusutan_per_bulan": 21042,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 1010000,
+        "akumulasi_penyusutan": 1010000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2013-12-22"
+    },
+    {
+        "nama_aktiva": "PRINTER HP 2520",
+        "penyusutan_per_tahun": 337500,
+        "penyusutan_per_bulan": 28125,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 1350000,
+        "akumulasi_penyusutan": 1350000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2014-02-26"
+    },
+    {
+        "nama_aktiva": "PRINTER HP 1102 ",
+        "penyusutan_per_tahun": 362500,
+        "penyusutan_per_bulan": 30208,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 1450000,
+        "akumulasi_penyusutan": 1450000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2016-07-01"
+    },
+    {
+        "nama_aktiva": "PRINTER EPSON L 120",
+        "penyusutan_per_tahun": 659091,
+        "penyusutan_per_bulan": 54924,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 2636364,
+        "akumulasi_penyusutan": 2636364,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2017-09-01"
+    },
+    {
+        "nama_aktiva": "PRINTER EPSON LQ 310",
+        "penyusutan_per_tahun": 700000,
+        "penyusutan_per_bulan": 58333,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 2800000,
+        "akumulasi_penyusutan": 2800000,
+        "depresiasi_per_tahun": 116666.67,
+        "tanggal_pemakaian": "2018-05-11"
+    },
+    {
+        "nama_aktiva": "PRINTER EPSON L3110",
+        "penyusutan_per_tahun": 477273,
+        "penyusutan_per_bulan": 39773,
+        "sisa_penyustan": 39772.71,
+        "nilai_perolehan": 1909090,
+        "akumulasi_penyusutan": 1869317.29,
+        "depresiasi_per_tahun": 238636.25,
+        "tanggal_pemakaian": "2019-03-13"
+    },
+    {
+        "nama_aktiva": "PRINTER ZEBRA 61820 + RIBBON PRINTER",
+        "penyusutan_per_tahun": 748750,
+        "penyusutan_per_bulan": 62396,
+        "sisa_penyustan": 280781.25,
+        "nilai_perolehan": 2995000,
+        "akumulasi_penyusutan": 2714218.75,
+        "depresiasi_per_tahun": 374375,
+        "tanggal_pemakaian": "2019-09-21"
+    },
+    {
+        "nama_aktiva": "PRINTER THERMAL CENTRO",
+        "penyusutan_per_tahun": 80000,
+        "penyusutan_per_bulan": 6667,
+        "sisa_penyustan": 146666.67,
+        "nilai_perolehan": 320000,
+        "akumulasi_penyusutan": 173333.33,
+        "depresiasi_per_tahun": 80000,
+        "tanggal_pemakaian": "2020-10-27"
+    },
+    {
+        "nama_aktiva": "PRINTER THERMAL PORTABLE PANDA 58MM",
+        "penyusutan_per_tahun": 96500,
+        "penyusutan_per_bulan": 8042,
+        "sisa_penyustan": 193000,
+        "nilai_perolehan": 386000,
+        "akumulasi_penyusutan": 193000,
+        "depresiasi_per_tahun": 96500,
+        "tanggal_pemakaian": "2020-12-21"
+    },
+    {
+        "nama_aktiva": "MINI PORTABLE PRINTER THERMAL ",
+        "penyusutan_per_tahun": 111725,
+        "penyusutan_per_bulan": 9310,
+        "sisa_penyustan": 316554.17,
+        "nilai_perolehan": 446900,
+        "akumulasi_penyusutan": 130345.83,
+        "depresiasi_per_tahun": 111725,
+        "tanggal_pemakaian": "2021-10-26"
+    },
+    {
+        "nama_aktiva": "Printer Barcode Zebra GT-820",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 2375000,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 475000,
+        "depresiasi_per_tahun": 475000,
+        "tanggal_pemakaian": "2022-08-25"
+    },
+    {
+        "nama_aktiva": "Printer Epson LX 300",
+        "penyusutan_per_tahun": 187500,
+        "penyusutan_per_bulan": 15625,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 750000,
+        "akumulasi_penyusutan": 750000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2009-04-01"
+    },
+    {
+        "nama_aktiva": "Printer TX III",
+        "penyusutan_per_tahun": 175000,
+        "penyusutan_per_bulan": 14583,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 700000,
+        "akumulasi_penyusutan": 700000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2010-10-01"
+    },
+    {
+        "nama_aktiva": "Printer TX - 121 X",
+        "penyusutan_per_tahun": 197500,
+        "penyusutan_per_bulan": 16458,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 790000,
+        "akumulasi_penyusutan": 790000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-07-01"
+    },
+    {
+        "nama_aktiva": "Canon MP 287",
+        "penyusutan_per_tahun": 152500,
+        "penyusutan_per_bulan": 12708,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 610000,
+        "akumulasi_penyusutan": 610000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-10-01"
+    },
+    {
+        "nama_aktiva": "Canon G3010",
+        "penyusutan_per_tahun": 593750,
+        "penyusutan_per_bulan": 49479,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 2375000,
+        "akumulasi_penyusutan": 2375000,
+        "depresiasi_per_tahun": 296875,
+        "tanggal_pemakaian": "2019-01-01"
+    },
+    {
+        "nama_aktiva": "Printer Epson LX310",
+        "penyusutan_per_tahun": 550000,
+        "penyusutan_per_bulan": 45833,
+        "sisa_penyustan": 45833.33,
+        "nilai_perolehan": 2200000,
+        "akumulasi_penyusutan": 2154166.67,
+        "depresiasi_per_tahun": 275000,
+        "tanggal_pemakaian": "2019-03-01"
+    },
+    {
+        "nama_aktiva": "paper shredder S421",
+        "penyusutan_per_tahun": 499500,
+        "penyusutan_per_bulan": 41625,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 1998000,
+        "akumulasi_penyusutan": 1998000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2010-05-01"
+    },
+    {
+        "nama_aktiva": "PESAWAT TELP",
+        "penyusutan_per_tahun": 145000,
+        "penyusutan_per_bulan": 12083,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 580000,
+        "akumulasi_penyusutan": 580000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-10-02"
+    },
+    {
+        "nama_aktiva": "Pesawat telepon",
+        "penyusutan_per_tahun": 50000,
+        "penyusutan_per_bulan": 4167,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 200000,
+        "akumulasi_penyusutan": 200000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2013-02-01"
+    },
+    {
+        "nama_aktiva": "Sahitel Telephone, S75",
+        "penyusutan_per_tahun": 62500,
+        "penyusutan_per_bulan": 5208,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 250000,
+        "akumulasi_penyusutan": 250000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2015-05-01"
+    },
+    {
+        "nama_aktiva": "Telepon Panasonic KX-TS5O5",
+        "penyusutan_per_tahun": 75000,
+        "penyusutan_per_bulan": 6250,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 300000,
+        "akumulasi_penyusutan": 300000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2017-05-01"
+    },
+    {
+        "nama_aktiva": "Telepon S21",
+        "penyusutan_per_tahun": 21250,
+        "penyusutan_per_bulan": 1771,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 85000,
+        "akumulasi_penyusutan": 85000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2017-05-01"
+    },
+    {
+        "nama_aktiva": "Sahitel Telephone, S75",
+        "penyusutan_per_tahun": 62500,
+        "penyusutan_per_bulan": 5208,
+        "sisa_penyustan": 7812.5,
+        "nilai_perolehan": 250000,
+        "akumulasi_penyusutan": 242187.5,
+        "depresiasi_per_tahun": 31250,
+        "tanggal_pemakaian": "2019-04-01"
+    },
+    {
+        "nama_aktiva": "Telepon SH-21W",
+        "penyusutan_per_tahun": 25000,
+        "penyusutan_per_bulan": 2083,
+        "sisa_penyustan": 7291.67,
+        "nilai_perolehan": 100000,
+        "akumulasi_penyusutan": 92708.33,
+        "depresiasi_per_tahun": 12500,
+        "tanggal_pemakaian": "2019-08-01"
+    },
+    {
+        "nama_aktiva": "1 set Proyektor Acer X 1185, Layar Putih uk. 70x70, Breket Proyektor, Laser Pinter Targus 17AP",
+        "penyusutan_per_tahun": 1311250,
+        "penyusutan_per_bulan": 109271,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 5245000,
+        "akumulasi_penyusutan": 5245000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2017-02-01"
+    },
+    {
+        "nama_aktiva": "RASPBERRY PI 4GB",
+        "penyusutan_per_tahun": 301225,
+        "penyusutan_per_bulan": 25102,
+        "sisa_penyustan": 527143.75,
+        "nilai_perolehan": 1204900,
+        "akumulasi_penyusutan": 677756.25,
+        "depresiasi_per_tahun": 301225,
+        "tanggal_pemakaian": "2020-09-23"
+    },
+    {
+        "nama_aktiva": "RASPBERRY PI 4GB",
+        "penyusutan_per_tahun": 275125,
+        "penyusutan_per_bulan": 22927,
+        "sisa_penyustan": 527322.92,
+        "nilai_perolehan": 1100500,
+        "akumulasi_penyusutan": 573177.08,
+        "depresiasi_per_tahun": 275125,
+        "tanggal_pemakaian": "2020-12-10"
+    },
+    {
+        "nama_aktiva": "RACK TV",
+        "penyusutan_per_tahun": 1409091,
+        "penyusutan_per_bulan": 117424,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 5636364,
+        "akumulasi_penyusutan": 5636364,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2016-02-01"
+    },
+    {
+        "nama_aktiva": "PEMB RAK LABORATORIUM - INV KANTOR (JAKARTA)",
+        "penyusutan_per_tahun": 125000,
+        "penyusutan_per_bulan": 10417,
+        "sisa_penyustan": 135416.67,
+        "nilai_perolehan": 500000,
+        "akumulasi_penyusutan": 364583.33,
+        "depresiasi_per_tahun": 125000,
+        "tanggal_pemakaian": "2020-02-07"
+    },
+    {
+        "nama_aktiva": "CAMERA TITIK 56 DOT - 1 F",
+        "penyusutan_per_tahun": 587500,
+        "penyusutan_per_bulan": 48958,
+        "sisa_penyustan": 734375,
+        "nilai_perolehan": 2350000,
+        "akumulasi_penyusutan": 1615625,
+        "depresiasi_per_tahun": 587500,
+        "tanggal_pemakaian": "2020-04-08"
+    },
+    {
+        "nama_aktiva": "UPS ICA CE 600 ",
+        "penyusutan_per_tahun": 155000,
+        "penyusutan_per_bulan": 12917,
+        "sisa_penyustan": 232500,
+        "nilai_perolehan": 620000,
+        "akumulasi_penyusutan": 387500,
+        "depresiasi_per_tahun": 155000,
+        "tanggal_pemakaian": "2020-06-17"
+    },
+    {
+        "nama_aktiva": "KOMPUTER SERVER Server Dell T140\nXeon E-2124\/8GB\/1TB",
+        "penyusutan_per_tahun": 4500000,
+        "penyusutan_per_bulan": 375000,
+        "sisa_penyustan": 6750000,
+        "nilai_perolehan": 18000000,
+        "akumulasi_penyusutan": 11250000,
+        "depresiasi_per_tahun": 4500000,
+        "tanggal_pemakaian": "2020-06-20"
+    },
+    {
+        "nama_aktiva": "UBNT - UAP - AC - PRO - POE 48V + KABEL BOLDEN CAT 6 (REPEATER)",
+        "penyusutan_per_tahun": 975000,
+        "penyusutan_per_bulan": 81250,
+        "sisa_penyustan": 365625,
+        "nilai_perolehan": 3900000,
+        "akumulasi_penyusutan": 3534375,
+        "depresiasi_per_tahun": 487500,
+        "tanggal_pemakaian": "2019-09-27"
+    },
+    {
+        "nama_aktiva": "ROUTER MIKROTIK RB-450Gx4",
+        "penyusutan_per_tahun": 417500,
+        "penyusutan_per_bulan": 34792,
+        "sisa_penyustan": 69583.33,
+        "nilai_perolehan": 1670000,
+        "akumulasi_penyusutan": 1600416.67,
+        "depresiasi_per_tahun": 208750,
+        "tanggal_pemakaian": "2019-05-11"
+    },
+    {
+        "nama_aktiva": "SOFA KANTOR",
+        "penyusutan_per_tahun": 2652075,
+        "penyusutan_per_bulan": 221006,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 10608300,
+        "akumulasi_penyusutan": 10608300,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-09-06"
+    },
+    {
+        "nama_aktiva": "SOFA KANTOR",
+        "penyusutan_per_tahun": 1045227,
+        "penyusutan_per_bulan": 87102,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 4180909,
+        "akumulasi_penyusutan": 4180909,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2014-12-05"
+    },
+    {
+        "nama_aktiva": "SOFA KANTOR",
+        "penyusutan_per_tahun": 817955,
+        "penyusutan_per_bulan": 68163,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 3271818,
+        "akumulasi_penyusutan": 3271818,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2016-02-01"
+    },
+    {
+        "nama_aktiva": "SEPARATING FUNNEL-ALAT LAB ",
+        "penyusutan_per_tahun": 89625,
+        "penyusutan_per_bulan": 7469,
+        "sisa_penyustan": 33609.38,
+        "nilai_perolehan": 358500,
+        "akumulasi_penyusutan": 324890.63,
+        "depresiasi_per_tahun": 44812.5,
+        "tanggal_pemakaian": "2019-10-09"
+    },
+    {
+        "nama_aktiva": "SINGLE LINE",
+        "penyusutan_per_tahun": 187500,
+        "penyusutan_per_bulan": 15625,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 750000,
+        "akumulasi_penyusutan": 750000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2014-03-23"
+    },
+    {
+        "nama_aktiva": "OXONE SPECIALITY UTENSIL (PENGGILING PASTA)",
+        "penyusutan_per_tahun": 179750,
+        "penyusutan_per_bulan": 14979,
+        "sisa_penyustan": 509291.67,
+        "nilai_perolehan": 719000,
+        "akumulasi_penyusutan": 209708.33,
+        "depresiasi_per_tahun": 179750,
+        "tanggal_pemakaian": "2021-10-28"
+    },
+    {
+        "nama_aktiva": "TANDON PROFILTANK",
+        "penyusutan_per_tahun": 2625000,
+        "penyusutan_per_bulan": 218750,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 10500000,
+        "akumulasi_penyusutan": 10500000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2017-12-01"
+    },
+    {
+        "nama_aktiva": "TANGGA ALUMINIUM 1,75M",
+        "penyusutan_per_tahun": 125000,
+        "penyusutan_per_bulan": 10417,
+        "sisa_penyustan": 229166.67,
+        "nilai_perolehan": 500000,
+        "akumulasi_penyusutan": 270833.33,
+        "depresiasi_per_tahun": 125000,
+        "tanggal_pemakaian": "2020-11-06"
+    },
+    {
+        "nama_aktiva": "HP INVINIX HOT 10 4\/64",
+        "penyusutan_per_tahun": 403750,
+        "penyusutan_per_bulan": 33646,
+        "sisa_penyustan": 874791.67,
+        "nilai_perolehan": 1615000,
+        "akumulasi_penyusutan": 740208.33,
+        "depresiasi_per_tahun": 403750,
+        "tanggal_pemakaian": "2021-03-10"
+    },
+    {
+        "nama_aktiva": "THERMOMETER ",
+        "penyusutan_per_tahun": 140625,
+        "penyusutan_per_bulan": 11719,
+        "sisa_penyustan": 150169.37,
+        "nilai_perolehan": 1125000,
+        "akumulasi_penyusutan": 974830.63,
+        "depresiasi_per_tahun": 50056.46,
+        "tanggal_pemakaian": "2016-01-01"
+    },
+    {
+        "nama_aktiva": "CHARGER LAPTOP SONG VAIO",
+        "penyusutan_per_tahun": 72500,
+        "penyusutan_per_bulan": 6042,
+        "sisa_penyustan": 290000,
+        "nilai_perolehan": 290000,
+        "akumulasi_penyusutan": 0,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2018-09-01"
+    },
+    {
+        "nama_aktiva": "Telephone",
+        "penyusutan_per_tahun": 268750,
+        "penyusutan_per_bulan": 22396,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 2150000,
+        "akumulasi_penyusutan": 2150000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "1997-01-01"
+    },
+    {
+        "nama_aktiva": "Tabung pemadam ",
+        "penyusutan_per_tahun": 100250,
+        "penyusutan_per_bulan": 8354,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 802000,
+        "akumulasi_penyusutan": 802000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2011-09-07"
+    },
+    {
+        "nama_aktiva": "TP Link Router",
+        "penyusutan_per_tahun": 52500,
+        "penyusutan_per_bulan": 4375,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 210000,
+        "akumulasi_penyusutan": 210000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-10-01"
+    },
+    {
+        "nama_aktiva": "TP Link Router Model No. TL-WR84ON",
+        "penyusutan_per_tahun": 90000,
+        "penyusutan_per_bulan": 7500,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 360000,
+        "akumulasi_penyusutan": 360000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2017-03-01"
+    },
+    {
+        "nama_aktiva": "Tripod Screen Proyektor Merk D-Light 70\"",
+        "penyusutan_per_tahun": 140909,
+        "penyusutan_per_bulan": 11742,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 563636,
+        "akumulasi_penyusutan": 563636,
+        "depresiasi_per_tahun": 58712.08,
+        "tanggal_pemakaian": "2018-11-01"
+    },
+    {
+        "nama_aktiva": "Toren Stainless Steel \"Profil\" 1100 ltr",
+        "penyusutan_per_tahun": 650000,
+        "penyusutan_per_bulan": 54167,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 2600000,
+        "akumulasi_penyusutan": 2600000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2014-08-01"
+    },
+    {
+        "nama_aktiva": "TV LG ",
+        "penyusutan_per_tahun": 625000,
+        "penyusutan_per_bulan": 52083,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 2500000,
+        "akumulasi_penyusutan": 2500000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-11-02"
+    },
+    {
+        "nama_aktiva": "TV LED ",
+        "penyusutan_per_tahun": 1363182,
+        "penyusutan_per_bulan": 113599,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 5452728,
+        "akumulasi_penyusutan": 5452728,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2014-03-07"
+    },
+    {
+        "nama_aktiva": "TV",
+        "penyusutan_per_tahun": 2738091,
+        "penyusutan_per_bulan": 228174,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 10952364,
+        "akumulasi_penyusutan": 10952364,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2016-03-01"
+    },
+    {
+        "nama_aktiva": "ANDROID TV UNTUK CCTV",
+        "penyusutan_per_tahun": 151875,
+        "penyusutan_per_bulan": 12656,
+        "sisa_penyustan": 316406.25,
+        "nilai_perolehan": 607500,
+        "akumulasi_penyusutan": 291093.75,
+        "depresiasi_per_tahun": 151875,
+        "tanggal_pemakaian": "2021-01-16"
+    },
+    {
+        "nama_aktiva": "TCL LED TV 32D3000B 32 Inch",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 1536562.5,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 102437.5,
+        "depresiasi_per_tahun": 102437.5,
+        "tanggal_pemakaian": "2022-10-03"
+    },
+    {
+        "nama_aktiva": "TV",
+        "penyusutan_per_tahun": 1399750,
+        "penyusutan_per_bulan": 116646,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 5599000,
+        "akumulasi_penyusutan": 5599000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-04-01"
+    },
+    {
+        "nama_aktiva": "TV Sharp LED Black ",
+        "penyusutan_per_tahun": 569763,
+        "penyusutan_per_bulan": 47480,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 2279050,
+        "akumulasi_penyusutan": 2279050,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2017-03-01"
+    },
+    {
+        "nama_aktiva": "UPS",
+        "penyusutan_per_tahun": 220000,
+        "penyusutan_per_bulan": 18333,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 880000,
+        "akumulasi_penyusutan": 880000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2010-11-01"
+    },
+    {
+        "nama_aktiva": "UPS ICA CE 600",
+        "penyusutan_per_tahun": 140000,
+        "penyusutan_per_bulan": 11667,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 560000,
+        "akumulasi_penyusutan": 560000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-01-08"
+    },
+    {
+        "nama_aktiva": "UPS",
+        "penyusutan_per_tahun": 300000,
+        "penyusutan_per_bulan": 25000,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 1200000,
+        "akumulasi_penyusutan": 1200000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2014-02-07"
+    },
+    {
+        "nama_aktiva": "PSU,UPS ",
+        "penyusutan_per_tahun": 267750,
+        "penyusutan_per_bulan": 22313,
+        "sisa_penyustan": 290062.5,
+        "nilai_perolehan": 1071000,
+        "akumulasi_penyusutan": 780937.5,
+        "depresiasi_per_tahun": 267750,
+        "tanggal_pemakaian": "2020-01-18"
+    },
+    {
+        "nama_aktiva": "UPS prolink ",
+        "penyusutan_per_tahun": 96250,
+        "penyusutan_per_bulan": 8021,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 385000,
+        "akumulasi_penyusutan": 385000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2011-11-01"
+    },
+    {
+        "nama_aktiva": "UPS ICA 1200V",
+        "penyusutan_per_tahun": 196250,
+        "penyusutan_per_bulan": 16354,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 785000,
+        "akumulasi_penyusutan": 785000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2011-11-01"
+    },
+    {
+        "nama_aktiva": "AGITATOR 1",
+        "penyusutan_per_tahun": 387500,
+        "penyusutan_per_bulan": 32292,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 3100000,
+        "akumulasi_penyusutan": 3100000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2010-10-01"
+    },
+    {
+        "nama_aktiva": "AGITATOR 2",
+        "penyusutan_per_tahun": 387500,
+        "penyusutan_per_bulan": 32292,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 3100000,
+        "akumulasi_penyusutan": 3100000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2010-12-01"
+    },
+    {
+        "nama_aktiva": "AGITATOR",
+        "penyusutan_per_tahun": 750000,
+        "penyusutan_per_bulan": 62500,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 6000000,
+        "akumulasi_penyusutan": 6000000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2011-06-01"
+    },
+    {
+        "nama_aktiva": "AGITATOR",
+        "penyusutan_per_tahun": 50000,
+        "penyusutan_per_bulan": 4167,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 400000,
+        "akumulasi_penyusutan": 400000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-09-04"
+    },
+    {
+        "nama_aktiva": "AS",
+        "penyusutan_per_tahun": 1222159,
+        "penyusutan_per_bulan": 101847,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 9777273,
+        "akumulasi_penyusutan": 9777273,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-03-10"
+    },
+    {
+        "nama_aktiva": "Bak Plating Line Barrel Kecil (14 Bak, 3 Barrel)",
+        "penyusutan_per_tahun": 4375000,
+        "penyusutan_per_bulan": 364583,
+        "sisa_penyustan": 7094421.39,
+        "nilai_perolehan": 35000000,
+        "akumulasi_penyusutan": 27905578.61,
+        "depresiasi_per_tahun": 2364807.13,
+        "tanggal_pemakaian": "2017-06-01"
+    },
+    {
+        "nama_aktiva": "Bak Plating Line Barrel Kecil (14 Bak, 3 Barrel)",
+        "penyusutan_per_tahun": 4375000,
+        "penyusutan_per_bulan": 364583,
+        "sisa_penyustan": 7613525.39,
+        "nilai_perolehan": 35000000,
+        "akumulasi_penyusutan": 27386474.61,
+        "depresiasi_per_tahun": 2537841.8,
+        "tanggal_pemakaian": "2017-09-01"
+    },
+    {
+        "nama_aktiva": "Centrifugal PP FD-200\/220V\/180 CKE Hexos",
+        "penyusutan_per_tahun": 366563,
+        "penyusutan_per_bulan": 30547,
+        "sisa_penyustan": 536419.83,
+        "nilai_perolehan": 2932500,
+        "akumulasi_penyusutan": 2396080.17,
+        "depresiasi_per_tahun": 178806.61,
+        "tanggal_pemakaian": "2017-02-01"
+    },
+    {
+        "nama_aktiva": "CONDUCTIFITY",
+        "penyusutan_per_tahun": 1937500,
+        "penyusutan_per_bulan": 161458,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 15500000,
+        "akumulasi_penyusutan": 15500000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-04-01"
+    },
+    {
+        "nama_aktiva": "Conductivity SG7",
+        "penyusutan_per_tahun": 1437500,
+        "penyusutan_per_bulan": 119792,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 11500000,
+        "akumulasi_penyusutan": 11500000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-04-01"
+    },
+    {
+        "nama_aktiva": "Mesin Swan Compressor",
+        "penyusutan_per_tahun": 875000,
+        "penyusutan_per_bulan": 72917,
+        "sisa_penyustan": 1193939.21,
+        "nilai_perolehan": 7000000,
+        "akumulasi_penyusutan": 5806060.79,
+        "depresiasi_per_tahun": 397979.74,
+        "tanggal_pemakaian": "2016-11-01"
+    },
+    {
+        "nama_aktiva": "CONTRACTOR",
+        "penyusutan_per_tahun": 84250,
+        "penyusutan_per_bulan": 7021,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 674000,
+        "akumulasi_penyusutan": 674000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-11-08"
+    },
+    {
+        "nama_aktiva": "CAT WALK",
+        "penyusutan_per_tahun": 31250,
+        "penyusutan_per_bulan": 2604,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 250000,
+        "akumulasi_penyusutan": 250000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-12-10"
+    },
+    {
+        "nama_aktiva": "Elektrode Hamilton 1",
+        "penyusutan_per_tahun": 281250,
+        "penyusutan_per_bulan": 23438,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 2250000,
+        "akumulasi_penyusutan": 2250000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2010-06-01"
+    },
+    {
+        "nama_aktiva": "Elektrode Hamilton 2",
+        "penyusutan_per_tahun": 281250,
+        "penyusutan_per_bulan": 23438,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 2250000,
+        "akumulasi_penyusutan": 2250000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2010-11-01"
+    },
+    {
+        "nama_aktiva": "Electrode pH",
+        "penyusutan_per_tahun": 772727,
+        "penyusutan_per_bulan": 64394,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 6181818.18,
+        "akumulasi_penyusutan": 6181818.18,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2006-05-30"
+    },
+    {
+        "nama_aktiva": "ELEKTRODA PH WTW SENTIX 81",
+        "penyusutan_per_tahun": 975000,
+        "penyusutan_per_bulan": 81250,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 3900000,
+        "akumulasi_penyusutan": 3900000,
+        "depresiasi_per_tahun": 121875,
+        "tanggal_pemakaian": "2018-04-06"
+    },
+    {
+        "nama_aktiva": "EXHAUST FAN B17-19\nTT-RCF50 (Traftek Exhaust Roof Cone Fan 50\")",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 96750000,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 11250000,
+        "depresiasi_per_tahun": 11250000,
+        "tanggal_pemakaian": "2022-03-04"
+    },
+    {
+        "nama_aktiva": "Exhaust Dinding (TT - CF 50) dan Atap (TT - RCF 50)",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 72312500,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 16687500,
+        "depresiasi_per_tahun": 16687500,
+        "tanggal_pemakaian": "2022-04-12"
+    },
+    {
+        "nama_aktiva": "FORKLIFT",
+        "penyusutan_per_tahun": 38610383,
+        "penyusutan_per_bulan": 3217532,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 308883060,
+        "akumulasi_penyusutan": 308883060,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2011-01-24"
+    },
+    {
+        "nama_aktiva": "FORKLIFT",
+        "penyusutan_per_tahun": 34427263,
+        "penyusutan_per_bulan": 2868939,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 275418100,
+        "akumulasi_penyusutan": 275418100,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-01-05"
+    },
+    {
+        "nama_aktiva": "FORKLIFT LISTRIK MERK TOYOTA\nTYPE 8FBR15",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 362484375,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 3815625,
+        "depresiasi_per_tahun": 3815625,
+        "tanggal_pemakaian": "2022-11-25"
+    },
+    {
+        "nama_aktiva": "FORKLIFT SOLAR MERK TOYOTA \nTYPE FDZN25 ",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 277500000,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 0,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2022-12-19"
+    },
+    {
+        "nama_aktiva": "Fully transparent filter 1",
+        "penyusutan_per_tahun": 1071351,
+        "penyusutan_per_bulan": 89279,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 8570807.62,
+        "akumulasi_penyusutan": 8570807.62,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2009-01-01"
+    },
+    {
+        "nama_aktiva": "Fully transparent filter 2",
+        "penyusutan_per_tahun": 5861250,
+        "penyusutan_per_bulan": 488438,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 46890000,
+        "akumulasi_penyusutan": 46890000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2009-01-01"
+    },
+    {
+        "nama_aktiva": "High speed dewatering",
+        "penyusutan_per_tahun": 366084,
+        "penyusutan_per_bulan": 30507,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 2928669.41,
+        "akumulasi_penyusutan": 2928669.41,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2009-01-01"
+    },
+    {
+        "nama_aktiva": "Hand Pallet 2",
+        "penyusutan_per_tahun": 425000,
+        "penyusutan_per_bulan": 35417,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 3400000,
+        "akumulasi_penyusutan": 3400000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2005-01-01"
+    },
+    {
+        "nama_aktiva": "Hand Pallet 1",
+        "penyusutan_per_tahun": 425000,
+        "penyusutan_per_bulan": 35417,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 3400000,
+        "akumulasi_penyusutan": 3400000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2004-01-01"
+    },
+    {
+        "nama_aktiva": "HAND PALLET 3T 68X122 NYLON PRHPN3068",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 4237639.37,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 282509.29,
+        "depresiasi_per_tahun": 282509.29,
+        "tanggal_pemakaian": "2022-10-03"
+    },
+    {
+        "nama_aktiva": "HOT PLATE STIRER",
+        "penyusutan_per_tahun": 593750,
+        "penyusutan_per_bulan": 49479,
+        "sisa_penyustan": 1103713.99,
+        "nilai_perolehan": 4750000,
+        "akumulasi_penyusutan": 3646286.01,
+        "depresiasi_per_tahun": 367904.66,
+        "tanggal_pemakaian": "2017-12-01"
+    },
+    {
+        "nama_aktiva": "INVERTER ",
+        "penyusutan_per_tahun": 224738,
+        "penyusutan_per_bulan": 18728,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 1797900,
+        "akumulasi_penyusutan": 1797900,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-02-29"
+    },
+    {
+        "nama_aktiva": "KOMPRESOR",
+        "penyusutan_per_tahun": 545455,
+        "penyusutan_per_bulan": 45455,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 4363636,
+        "akumulasi_penyusutan": 4363636,
+        "depresiasi_per_tahun": 145618.77,
+        "tanggal_pemakaian": "2014-03-29"
+    },
+    {
+        "nama_aktiva": "KOMPRESSOR SWAN 1 HP ( pemb tgl 22\/09\/2020)",
+        "penyusutan_per_tahun": 806250,
+        "penyusutan_per_bulan": 67188,
+        "sisa_penyustan": 4703125,
+        "nilai_perolehan": 6450000,
+        "akumulasi_penyusutan": 1746875,
+        "depresiasi_per_tahun": 806250,
+        "tanggal_pemakaian": "2020-11-01"
+    },
+    {
+        "nama_aktiva": "KIPAS ANGIN 1",
+        "penyusutan_per_tahun": 400000,
+        "penyusutan_per_bulan": 33333,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 3200000,
+        "akumulasi_penyusutan": 3200000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2010-10-01"
+    },
+    {
+        "nama_aktiva": "KIPAS ANGIN 2",
+        "penyusutan_per_tahun": 162500,
+        "penyusutan_per_bulan": 13542,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 1300000,
+        "akumulasi_penyusutan": 1300000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2010-11-01"
+    },
+    {
+        "nama_aktiva": "KIPAS ANGIN MASPION PW 450",
+        "penyusutan_per_tahun": 61881,
+        "penyusutan_per_bulan": 5157,
+        "sisa_penyustan": 314559.84,
+        "nilai_perolehan": 495045,
+        "akumulasi_penyusutan": 180485.16,
+        "depresiasi_per_tahun": 61880.63,
+        "tanggal_pemakaian": "2020-01-27"
+    },
+    {
+        "nama_aktiva": "MEJA ANALIS, WASTAFEL, TIMBANGAN",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 32372916.67,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 5527083.33,
+        "depresiasi_per_tahun": 5527083.33,
+        "tanggal_pemakaian": "2022-05-18"
+    },
+    {
+        "nama_aktiva": "LOADING DOC",
+        "penyusutan_per_tahun": 7500000,
+        "penyusutan_per_bulan": 625000,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 60000000,
+        "akumulasi_penyusutan": 60000000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-04-23"
+    },
+    {
+        "nama_aktiva": "1 set lemari asam dan Meja Lab",
+        "penyusutan_per_tahun": 3750000,
+        "penyusutan_per_bulan": 312500,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 15000000,
+        "akumulasi_penyusutan": 15000000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2017-05-01"
+    },
+    {
+        "nama_aktiva": "MOTOR AGITATOR",
+        "penyusutan_per_tahun": 262500,
+        "penyusutan_per_bulan": 21875,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 2100000,
+        "akumulasi_penyusutan": 2100000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2011-06-01"
+    },
+    {
+        "nama_aktiva": "MAIN FRAME , CROSS BRESS",
+        "penyusutan_per_tahun": 210000,
+        "penyusutan_per_bulan": 17500,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 1680000,
+        "akumulasi_penyusutan": 1680000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-12-10"
+    },
+    {
+        "nama_aktiva": "MESIN JAHIT",
+        "penyusutan_per_tahun": 84375,
+        "penyusutan_per_bulan": 7031,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 675000,
+        "akumulasi_penyusutan": 675000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2011-07-04"
+    },
+    {
+        "nama_aktiva": "MIXER MOTOR",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 72187500,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 4812500,
+        "depresiasi_per_tahun": 4812500,
+        "tanggal_pemakaian": "2022-07-04"
+    },
+    {
+        "nama_aktiva": "MIXER ",
+        "penyusutan_per_tahun": 6562500,
+        "penyusutan_per_bulan": 546875,
+        "sisa_penyustan": 11420288.09,
+        "nilai_perolehan": 52500000,
+        "akumulasi_penyusutan": 41079711.91,
+        "depresiasi_per_tahun": 3806762.7,
+        "tanggal_pemakaian": "2017-08-31"
+    },
+    {
+        "nama_aktiva": "MXER OCEAN POWER 4",
+        "penyusutan_per_tahun": 8454600,
+        "penyusutan_per_bulan": 704550,
+        "sisa_penyustan": 26750882.81,
+        "nilai_perolehan": 67636800,
+        "akumulasi_penyusutan": 40885917.19,
+        "depresiasi_per_tahun": 8916960.94,
+        "tanggal_pemakaian": "2019-09-20"
+    },
+    {
+        "nama_aktiva": "MIXER MOTOR 10 HP",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 64796875,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 6703125,
+        "depresiasi_per_tahun": 6703125,
+        "tanggal_pemakaian": "2022-03-29"
+    },
+    {
+        "nama_aktiva": "Non Transparent  Filter",
+        "penyusutan_per_tahun": 3383949,
+        "penyusutan_per_bulan": 281996,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 27071595.28,
+        "akumulasi_penyusutan": 27071595.28,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2009-01-01"
+    },
+    {
+        "nama_aktiva": "Nickel Test Kit",
+        "penyusutan_per_tahun": 330625,
+        "penyusutan_per_bulan": 27552,
+        "sisa_penyustan": 588441.47,
+        "nilai_perolehan": 2645000,
+        "akumulasi_penyusutan": 2056558.53,
+        "depresiasi_per_tahun": 196147.16,
+        "tanggal_pemakaian": "2017-10-01"
+    },
+    {
+        "nama_aktiva": "Peredam ZT-04 RBF (L)",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 91221591.3,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 21051136.45,
+        "depresiasi_per_tahun": 21051136.45,
+        "tanggal_pemakaian": "2022-03-31"
+    },
+    {
+        "nama_aktiva": "PEREDAM PABRIK ZT-04 RB (L)",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 61079704.02,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 7102291.17,
+        "depresiasi_per_tahun": 7102291.17,
+        "tanggal_pemakaian": "2022-03-02"
+    },
+    {
+        "nama_aktiva": "PRESSURE GAUGE",
+        "penyusutan_per_tahun": 30049,
+        "penyusutan_per_bulan": 2504,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 240395.5,
+        "akumulasi_penyusutan": 240395.5,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2011-06-30"
+    },
+    {
+        "nama_aktiva": "WTW Sentix61 (PH elektrode )",
+        "penyusutan_per_tahun": 158180,
+        "penyusutan_per_bulan": 13182,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 1265438.4,
+        "akumulasi_penyusutan": 1265438.4,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2010-10-01"
+    },
+    {
+        "nama_aktiva": "WTW Sentix61 (PH elektrode )",
+        "penyusutan_per_tahun": 217887,
+        "penyusutan_per_bulan": 18157,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 1743098.4,
+        "akumulasi_penyusutan": 1743098.4,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2013-08-01"
+    },
+    {
+        "nama_aktiva": "WTW Sentix61 (PH elektrode )",
+        "penyusutan_per_tahun": 234000,
+        "penyusutan_per_bulan": 19500,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 1872000,
+        "akumulasi_penyusutan": 1872000,
+        "depresiasi_per_tahun": 145764.4,
+        "tanggal_pemakaian": "2014-08-01"
+    },
+    {
+        "nama_aktiva": "WTW Hand Held PH Meter 3110 set Sentix 61",
+        "penyusutan_per_tahun": 907785,
+        "penyusutan_per_bulan": 75649,
+        "sisa_penyustan": 242349.42,
+        "nilai_perolehan": 7262282.4,
+        "akumulasi_penyusutan": 7019932.98,
+        "depresiasi_per_tahun": 807831.4,
+        "tanggal_pemakaian": "2015-04-01"
+    },
+    {
+        "nama_aktiva": "Portable PH Meter Horiba Type PH-110-K",
+        "penyusutan_per_tahun": 1206250,
+        "penyusutan_per_bulan": 100521,
+        "sisa_penyustan": 2194573.98,
+        "nilai_perolehan": 9650000,
+        "akumulasi_penyusutan": 7455426.02,
+        "depresiasi_per_tahun": 731524.66,
+        "tanggal_pemakaian": "2017-11-01"
+    },
+    {
+        "nama_aktiva": "WTW Sentix61 (PH elektrode )",
+        "penyusutan_per_tahun": 267200,
+        "penyusutan_per_bulan": 22267,
+        "sisa_penyustan": 486126.56,
+        "nilai_perolehan": 2137600,
+        "akumulasi_penyusutan": 1651473.44,
+        "depresiasi_per_tahun": 162042.19,
+        "tanggal_pemakaian": "2017-11-01"
+    },
+    {
+        "nama_aktiva": "WTW Sentix61 (PH elektrode )",
+        "penyusutan_per_tahun": 298300,
+        "penyusutan_per_bulan": 24858,
+        "sisa_penyustan": 739341.21,
+        "nilai_perolehan": 2386400,
+        "akumulasi_penyusutan": 1647058.79,
+        "depresiasi_per_tahun": 246447.07,
+        "tanggal_pemakaian": "2018-12-01"
+    },
+    {
+        "nama_aktiva": "Pipette Support Rack, PP, W=213mm,L=114mm,H=222mm",
+        "penyusutan_per_tahun": 66400,
+        "penyusutan_per_bulan": 5533,
+        "sisa_penyustan": 115551.56,
+        "nilai_perolehan": 531200,
+        "akumulasi_penyusutan": 415648.44,
+        "depresiasi_per_tahun": 38517.19,
+        "tanggal_pemakaian": "2017-09-01"
+    },
+    {
+        "nama_aktiva": "PLATFORM STRUCTURE P.2000 X L.1500 X T.1200MM",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 9479166.67,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 520833.33,
+        "depresiasi_per_tahun": 520833.33,
+        "tanggal_pemakaian": "2022-07-28"
+    },
+    {
+        "nama_aktiva": "PLATFORM STRUCTURE P.2200 X L.1500 X T.1700MM",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 10427083.33,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 572916.67,
+        "depresiasi_per_tahun": 572916.67,
+        "tanggal_pemakaian": "2022-07-28"
+    },
+    {
+        "nama_aktiva": "PLATFORM STRUCTURE W 1.200x1.200xh.1.200mm\n (TANGGA MIXER)",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 9062500,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 937500,
+        "depresiasi_per_tahun": 937500,
+        "tanggal_pemakaian": "2022-03-29"
+    },
+    {
+        "nama_aktiva": "Probe PH Meter",
+        "penyusutan_per_tahun": 370000,
+        "penyusutan_per_bulan": 30833,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 2960000,
+        "akumulasi_penyusutan": 2960000,
+        "depresiasi_per_tahun": 329260.25,
+        "tanggal_pemakaian": "2014-11-07"
+    },
+    {
+        "nama_aktiva": "PORTAMES",
+        "penyusutan_per_tahun": 959375,
+        "penyusutan_per_bulan": 79948,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 7675000,
+        "akumulasi_penyusutan": 7675000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2011-02-26"
+    },
+    {
+        "nama_aktiva": "POMPA AIR",
+        "penyusutan_per_tahun": 75000,
+        "penyusutan_per_bulan": 6250,
+        "sisa_penyustan": 181933.59,
+        "nilai_perolehan": 600000,
+        "akumulasi_penyusutan": 418066.41,
+        "depresiasi_per_tahun": 60644.53,
+        "tanggal_pemakaian": "2018-11-13"
+    },
+    {
+        "nama_aktiva": "POMPA AIR",
+        "penyusutan_per_tahun": 297375,
+        "penyusutan_per_bulan": 24781,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 2379000,
+        "akumulasi_penyusutan": 2379000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2013-01-30"
+    },
+    {
+        "nama_aktiva": "POMPA AIR",
+        "penyusutan_per_tahun": 167500,
+        "penyusutan_per_bulan": 13958,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 1340000,
+        "akumulasi_penyusutan": 1340000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2013-03-01"
+    },
+    {
+        "nama_aktiva": "POMPA AIR",
+        "penyusutan_per_tahun": 246591,
+        "penyusutan_per_bulan": 20549,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 1972727,
+        "akumulasi_penyusutan": 1972727,
+        "depresiasi_per_tahun": 65831.82,
+        "tanggal_pemakaian": "2014-03-29"
+    },
+    {
+        "nama_aktiva": "POMPA AIR",
+        "penyusutan_per_tahun": 250000,
+        "penyusutan_per_bulan": 20833,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 2000000,
+        "akumulasi_penyusutan": 2000000,
+        "depresiasi_per_tahun": 111236.57,
+        "tanggal_pemakaian": "2014-06-14"
+    },
+    {
+        "nama_aktiva": "POMPA AIR",
+        "penyusutan_per_tahun": 170455,
+        "penyusutan_per_bulan": 14205,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 1363636.36,
+        "akumulasi_penyusutan": 1363636.36,
+        "depresiasi_per_tahun": 91011.74,
+        "tanggal_pemakaian": "2014-07-08"
+    },
+    {
+        "nama_aktiva": "POMPA AIR",
+        "penyusutan_per_tahun": 60227,
+        "penyusutan_per_bulan": 5019,
+        "sisa_penyustan": 90517.32,
+        "nilai_perolehan": 481818,
+        "akumulasi_penyusutan": 391300.68,
+        "depresiasi_per_tahun": 30172.44,
+        "tanggal_pemakaian": "2017-03-01"
+    },
+    {
+        "nama_aktiva": "POMPA AIR GRUNDFOS JP4-47",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 3925487.99,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 308746.25,
+        "depresiasi_per_tahun": 308746.25,
+        "tanggal_pemakaian": "2022-06-09"
+    },
+    {
+        "nama_aktiva": "Sellective Pallet Rack",
+        "penyusutan_per_tahun": 2337500,
+        "penyusutan_per_bulan": 194792,
+        "sisa_penyustan": 4160247.8,
+        "nilai_perolehan": 18700000,
+        "akumulasi_penyusutan": 14539752.2,
+        "depresiasi_per_tahun": 1386749.27,
+        "tanggal_pemakaian": "2017-10-01"
+    },
+    {
+        "nama_aktiva": "RODA CASTER",
+        "penyusutan_per_tahun": 56250,
+        "penyusutan_per_bulan": 4688,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 450000,
+        "akumulasi_penyusutan": 450000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-12-10"
+    },
+    {
+        "nama_aktiva": "RACK",
+        "penyusutan_per_tahun": 7772727,
+        "penyusutan_per_bulan": 647727,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 62181819,
+        "akumulasi_penyusutan": 62181819,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2010-10-01"
+    },
+    {
+        "nama_aktiva": "RACK",
+        "penyusutan_per_tahun": 11900000,
+        "penyusutan_per_bulan": 991667,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 95200000,
+        "akumulasi_penyusutan": 95200000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2013-01-31"
+    },
+    {
+        "nama_aktiva": "RACK 3",
+        "penyusutan_per_tahun": 19375000,
+        "penyusutan_per_bulan": 1614583,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 155000000,
+        "akumulasi_penyusutan": 155000000,
+        "depresiasi_per_tahun": 20690002.44,
+        "tanggal_pemakaian": "2015-01-01"
+    },
+    {
+        "nama_aktiva": "Rectifier 200 Amp, 0-15 Volt",
+        "penyusutan_per_tahun": 750000,
+        "penyusutan_per_bulan": 62500,
+        "sisa_penyustan": 867645.26,
+        "nilai_perolehan": 6000000,
+        "akumulasi_penyusutan": 5132354.74,
+        "depresiasi_per_tahun": 289215.09,
+        "tanggal_pemakaian": "2016-04-01"
+    },
+    {
+        "nama_aktiva": "SULFATE ACID TESTER",
+        "penyusutan_per_tahun": 1609944,
+        "penyusutan_per_bulan": 134162,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 12879552.5,
+        "akumulasi_penyusutan": 12879552.5,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2011-06-01"
+    },
+    {
+        "nama_aktiva": "Senter LedLenser T2 Tactical LED Torch Black Gift Box ",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 1268326.38,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 55144.63,
+        "depresiasi_per_tahun": 55144.63,
+        "tanggal_pemakaian": "2022-11-07"
+    },
+    {
+        "nama_aktiva": "Senter leadsensor T2 u\/ EN ",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 908077.5,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 60538.5,
+        "depresiasi_per_tahun": 60538.5,
+        "tanggal_pemakaian": "2022-09-19"
+    },
+    {
+        "nama_aktiva": "SPEAKER PASIF CRIMSON",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 881250,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 18750,
+        "depresiasi_per_tahun": 18750,
+        "tanggal_pemakaian": "2022-11-18"
+    },
+    {
+        "nama_aktiva": "Salt Spray Testing Machine 1",
+        "penyusutan_per_tahun": 592585,
+        "penyusutan_per_bulan": 49382,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 4740683.81,
+        "akumulasi_penyusutan": 4740683.81,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2006-08-01"
+    },
+    {
+        "nama_aktiva": "Salt Spray Testing Machine 2",
+        "penyusutan_per_tahun": 367288,
+        "penyusutan_per_bulan": 30607,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 2938300,
+        "akumulasi_penyusutan": 2938300,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2009-06-01"
+    },
+    {
+        "nama_aktiva": "Steker",
+        "penyusutan_per_tahun": 2625000,
+        "penyusutan_per_bulan": 218750,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 21000000,
+        "akumulasi_penyusutan": 21000000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2004-01-01"
+    },
+    {
+        "nama_aktiva": "Stacker Manual WRSD 1030",
+        "penyusutan_per_tahun": 1250000,
+        "penyusutan_per_bulan": 104167,
+        "sisa_penyustan": 2323608.4,
+        "nilai_perolehan": 10000000,
+        "akumulasi_penyusutan": 7676391.6,
+        "depresiasi_per_tahun": 774536.13,
+        "tanggal_pemakaian": "2017-12-01"
+    },
+    {
+        "nama_aktiva": "Timbangan 1",
+        "penyusutan_per_tahun": 375002,
+        "penyusutan_per_bulan": 31250,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 3000014.29,
+        "akumulasi_penyusutan": 3000014.29,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2004-01-01"
+    },
+    {
+        "nama_aktiva": "Timbangan 2",
+        "penyusutan_per_tahun": 781250,
+        "penyusutan_per_bulan": 65104,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 6250000,
+        "akumulasi_penyusutan": 6250000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2004-01-01"
+    },
+    {
+        "nama_aktiva": "Timbangan 3",
+        "penyusutan_per_tahun": 137500,
+        "penyusutan_per_bulan": 11458,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 1100000,
+        "akumulasi_penyusutan": 1100000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2006-03-26"
+    },
+    {
+        "nama_aktiva": "Timbangan 2 Ton",
+        "penyusutan_per_tahun": 1187500,
+        "penyusutan_per_bulan": 98958,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 9500000,
+        "akumulasi_penyusutan": 9500000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2008-06-01"
+    },
+    {
+        "nama_aktiva": "Timbangan 2200 Gram",
+        "penyusutan_per_tahun": 656250,
+        "penyusutan_per_bulan": 54688,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 5250000,
+        "akumulasi_penyusutan": 5250000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2008-06-01"
+    },
+    {
+        "nama_aktiva": "Timbangan 60 kg Quatro TMQ 1 Q 2 S\/N",
+        "penyusutan_per_tahun": 412500,
+        "penyusutan_per_bulan": 34375,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 3300000,
+        "akumulasi_penyusutan": 3300000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2008-08-01"
+    },
+    {
+        "nama_aktiva": "TIMBANGAN 4",
+        "penyusutan_per_tahun": 898864,
+        "penyusutan_per_bulan": 74905,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 7190909,
+        "akumulasi_penyusutan": 7190909,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2010-11-01"
+    },
+    {
+        "nama_aktiva": "TIMBANGAN",
+        "penyusutan_per_tahun": 500000,
+        "penyusutan_per_bulan": 41667,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 4000000,
+        "akumulasi_penyusutan": 4000000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2013-05-08"
+    },
+    {
+        "nama_aktiva": "TIMBANGAN YAMATA ",
+        "penyusutan_per_tahun": 1562500,
+        "penyusutan_per_bulan": 130208,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 12500000,
+        "akumulasi_penyusutan": 12500000,
+        "depresiasi_per_tahun": 1668548.58,
+        "tanggal_pemakaian": "2015-01-12"
+    },
+    {
+        "nama_aktiva": "TIMBANGAN FS-RA KAP : 300 GR",
+        "penyusutan_per_tahun": 862500,
+        "penyusutan_per_bulan": 71875,
+        "sisa_penyustan": 2304492.19,
+        "nilai_perolehan": 6900000,
+        "akumulasi_penyusutan": 4595507.81,
+        "depresiasi_per_tahun": 768164.06,
+        "tanggal_pemakaian": "2019-03-13"
+    },
+    {
+        "nama_aktiva": "Timbangan UWE",
+        "penyusutan_per_tahun": 187500,
+        "penyusutan_per_bulan": 15625,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 1500000,
+        "akumulasi_penyusutan": 1500000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2009-04-01"
+    },
+    {
+        "nama_aktiva": "Timbangan TM Alexa Kap.150kg X 0,02kg, platform 40 X 50 cm",
+        "penyusutan_per_tahun": 209375,
+        "penyusutan_per_bulan": 17448,
+        "sisa_penyustan": 419567.87,
+        "nilai_perolehan": 1675000,
+        "akumulasi_penyusutan": 1255432.13,
+        "depresiasi_per_tahun": 139855.96,
+        "tanggal_pemakaian": "2018-03-01"
+    },
+    {
+        "nama_aktiva": "Timbangan Analytical Balance Fujitsu kap 300g, ketelitian 0,001 gr",
+        "penyusutan_per_tahun": 893750,
+        "penyusutan_per_bulan": 74479,
+        "sisa_penyustan": 2073779.3,
+        "nilai_perolehan": 7150000,
+        "akumulasi_penyusutan": 5076220.7,
+        "depresiasi_per_tahun": 691259.77,
+        "tanggal_pemakaian": "2018-09-01"
+    },
+    {
+        "nama_aktiva": "TRIVALENT CHROMIUM COLORIMETER",
+        "penyusutan_per_tahun": 381481,
+        "penyusutan_per_bulan": 31790,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 3051850,
+        "akumulasi_penyusutan": 3051850,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2011-02-09"
+    },
+    {
+        "nama_aktiva": "Trivalent Chrome Colorimeter",
+        "penyusutan_per_tahun": 149038,
+        "penyusutan_per_bulan": 12420,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 1192300,
+        "akumulasi_penyusutan": 1192300,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2009-06-01"
+    },
+    {
+        "nama_aktiva": "TANGKI 1200 LTR",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 64687500,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 4312500,
+        "depresiasi_per_tahun": 4312500,
+        "tanggal_pemakaian": "2022-07-04"
+    },
+    {
+        "nama_aktiva": "TRACKER + KLEM SENG",
+        "penyusutan_per_tahun": 62500,
+        "penyusutan_per_bulan": 5208,
+        "sisa_penyustan": 250000,
+        "nilai_perolehan": 250000,
+        "akumulasi_penyusutan": 0,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2018-09-01"
+    },
+    {
+        "nama_aktiva": "TANGKI 1000 LITER",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 58453125,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 6046875,
+        "depresiasi_per_tahun": 6046875,
+        "tanggal_pemakaian": "2022-03-29"
+    },
+    {
+        "nama_aktiva": "Thickness Meter 1",
+        "penyusutan_per_tahun": 835022,
+        "penyusutan_per_bulan": 69585,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 6680176.61,
+        "akumulasi_penyusutan": 6680176.61,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2006-08-28"
+    },
+    {
+        "nama_aktiva": "Thickness Meter 2",
+        "penyusutan_per_tahun": 460963,
+        "penyusutan_per_bulan": 38414,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 3687700,
+        "akumulasi_penyusutan": 3687700,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2009-06-01"
+    },
+    {
+        "nama_aktiva": "TRAFO",
+        "penyusutan_per_tahun": 537500,
+        "penyusutan_per_bulan": 44792,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 4300000,
+        "akumulasi_penyusutan": 4300000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2011-08-05"
+    },
+    {
+        "nama_aktiva": "WTW SENTIX 8",
+        "penyusutan_per_tahun": 805000,
+        "penyusutan_per_bulan": 67083,
+        "sisa_penyustan": 434700,
+        "nilai_perolehan": 4025000,
+        "akumulasi_penyusutan": 3590300,
+        "depresiasi_per_tahun": 376740,
+        "tanggal_pemakaian": "2018-11-09"
+    },
+    {
+        "nama_aktiva": "LEMARI ASAM",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 43943750,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 3456250,
+        "depresiasi_per_tahun": 3456250,
+        "tanggal_pemakaian": "2022-05-24"
+    },
+    {
+        "nama_aktiva": "Motor Pagar 1 set merk DC MOTOR",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 10440127.66,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 821133.64,
+        "depresiasi_per_tahun": 821133.64,
+        "tanggal_pemakaian": "2022-06-11"
+    },
+    {
+        "nama_aktiva": "Avanza 2 buah",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 235181818,
+        "akumulasi_penyusutan": 0,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2013-08-31"
+    },
+    {
+        "nama_aktiva": "Avanza ",
+        "penyusutan_per_tahun": 14698864,
+        "penyusutan_per_bulan": 1224905,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 117590909,
+        "akumulasi_penyusutan": 117590909,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2013-09-11"
+    },
+    {
+        "nama_aktiva": "Avanza B 1741 UZN",
+        "penyusutan_per_tahun": 15661876,
+        "penyusutan_per_bulan": 1305156,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 125295009,
+        "akumulasi_penyusutan": 125295009,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2013-05-01"
+    },
+    {
+        "nama_aktiva": "Avanza B 2007 UOA",
+        "penyusutan_per_tahun": 21736781,
+        "penyusutan_per_bulan": 1811398,
+        "sisa_penyustan": 62663064.7,
+        "nilai_perolehan": 173894250,
+        "akumulasi_penyusutan": 111231185.3,
+        "depresiasi_per_tahun": 20887688.23,
+        "tanggal_pemakaian": "2019-06-01"
+    },
+    {
+        "nama_aktiva": "NEW AVANZA E 1.3 M\/T TH 2022",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 193958107.5,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 42619550.5,
+        "depresiasi_per_tahun": 42619550.5,
+        "tanggal_pemakaian": "2022-04-30"
+    },
+    {
+        "nama_aktiva": "Honda BRV 1,5 S MTCKD B 2219 UFD",
+        "penyusutan_per_tahun": 25396327,
+        "penyusutan_per_bulan": 2116361,
+        "sisa_penyustan": 39173337.6,
+        "nilai_perolehan": 203170612,
+        "akumulasi_penyusutan": 163997274.4,
+        "depresiasi_per_tahun": 13057779.2,
+        "tanggal_pemakaian": "2017-04-01"
+    },
+    {
+        "nama_aktiva": "Innova B 1518 UOQ",
+        "penyusutan_per_tahun": 28837500,
+        "penyusutan_per_bulan": 2403125,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 230700000,
+        "akumulasi_penyusutan": 230700000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-06-01"
+    },
+    {
+        "nama_aktiva": "Mobil Box Izusu",
+        "penyusutan_per_tahun": 13988159,
+        "penyusutan_per_bulan": 1165680,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 111905273,
+        "akumulasi_penyusutan": 111905273,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2004-01-01"
+    },
+    {
+        "nama_aktiva": "TOYOTA LAND CRUISER",
+        "penyusutan_per_tahun": 491810000,
+        "penyusutan_per_bulan": 40984167,
+        "sisa_penyustan": 1352477500,
+        "nilai_perolehan": 2459050000,
+        "akumulasi_penyusutan": 1106572500,
+        "depresiasi_per_tahun": 491810000,
+        "tanggal_pemakaian": "2020-09-16"
+    },
+    {
+        "nama_aktiva": "LAND ROVER",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 837500000,
+        "akumulasi_penyusutan": 0,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2015-04-01"
+    },
+    {
+        "nama_aktiva": "Luxio",
+        "penyusutan_per_tahun": 17399481,
+        "penyusutan_per_bulan": 1449957,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 139195846.69,
+        "akumulasi_penyusutan": 139195846.69,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2011-03-15"
+    },
+    {
+        "nama_aktiva": "Mitsubishi L300 B 9379 UCO",
+        "penyusutan_per_tahun": 20033489,
+        "penyusutan_per_bulan": 1669457,
+        "sisa_penyustan": 5348295.85,
+        "nilai_perolehan": 160267909,
+        "akumulasi_penyusutan": 154919613.15,
+        "depresiasi_per_tahun": 17827652.84,
+        "tanggal_pemakaian": "2015-04-01"
+    },
+    {
+        "nama_aktiva": "Mercy C 280",
+        "penyusutan_per_tahun": 93125000,
+        "penyusutan_per_bulan": 7760417,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 745000000,
+        "akumulasi_penyusutan": 745000000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2008-09-01"
+    },
+    {
+        "nama_aktiva": "MERCY CLS",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 2225000000,
+        "akumulasi_penyusutan": 0,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-05-28"
+    },
+    {
+        "nama_aktiva": "Pick Up L 300",
+        "penyusutan_per_tahun": 11051136,
+        "penyusutan_per_bulan": 920928,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 88409091,
+        "akumulasi_penyusutan": 88409091,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2008-03-01"
+    },
+    {
+        "nama_aktiva": "Revo",
+        "penyusutan_per_tahun": 7856250,
+        "penyusutan_per_bulan": 654688,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 62850000,
+        "akumulasi_penyusutan": 12570000,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2011-03-28"
+    },
+    {
+        "nama_aktiva": "REVO FIT ",
+        "penyusutan_per_tahun": 3425046,
+        "penyusutan_per_bulan": 285420,
+        "sisa_penyustan": 7706352.38,
+        "nilai_perolehan": 13700182,
+        "akumulasi_penyusutan": 5993829.62,
+        "depresiasi_per_tahun": 3425045.5,
+        "tanggal_pemakaian": "2021-03-29"
+    },
+    {
+        "nama_aktiva": "TOYOTA RAIZE AUTO 2000 TH 2022",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 247337805,
+        "nilai_perolehan": 0,
+        "akumulasi_penyusutan": 60799245,
+        "depresiasi_per_tahun": 60799245,
+        "tanggal_pemakaian": "2022-03-31"
+    },
+    {
+        "nama_aktiva": "Sepeda Motor Honda Supra Fit",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 0,
+        "nilai_perolehan": 8000000,
+        "akumulasi_penyusutan": 0,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2009-04-01"
+    },
+    {
+        "nama_aktiva": "TANAH PONDOK TJANDRA",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 281567000,
+        "nilai_perolehan": 281567000,
+        "akumulasi_penyusutan": 0,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2012-01-04"
+    },
+    {
+        "nama_aktiva": "TANAH GUDANG B 12",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 465220800,
+        "nilai_perolehan": 465220800,
+        "akumulasi_penyusutan": 0,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2014-07-03"
+    },
+    {
+        "nama_aktiva": "TANAH GUDANG C27-28",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 316824000,
+        "nilai_perolehan": 316824000,
+        "akumulasi_penyusutan": 0,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2015-09-30"
+    },
+    {
+        "nama_aktiva": "TANAH GUDANG C01",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 243144000,
+        "nilai_perolehan": 243144000,
+        "akumulasi_penyusutan": 0,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2015-10-26"
+    },
+    {
+        "nama_aktiva": "TANAH GUDANG C03",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 243144000,
+        "nilai_perolehan": 243144000,
+        "akumulasi_penyusutan": 0,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2015-11-30"
+    },
+    {
+        "nama_aktiva": "TANAH GUDANG C02",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 243144000,
+        "nilai_perolehan": 243144000,
+        "akumulasi_penyusutan": 0,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2015-11-30"
+    },
+    {
+        "nama_aktiva": "Tanah (Green Sedayu Bizpark Cakung GS 5 No. 026 dan 028)",
+        "penyusutan_per_tahun": 0,
+        "penyusutan_per_bulan": 0,
+        "sisa_penyustan": 791424000,
+        "nilai_perolehan": 791424000,
+        "akumulasi_penyusutan": 0,
+        "depresiasi_per_tahun": 0,
+        "tanggal_pemakaian": "2017-01-01"
+    }
+]

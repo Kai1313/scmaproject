@@ -496,10 +496,10 @@ class ApiController extends Controller
             $catatan_me = 'Journal Otomatis Penjualan - ' . $id_transaksi . ' - ' . $nama_pelanggan;
 
             $array_inventory = [];
-            foreach($detail_inventory as $detail_inv){
-                if(isset($array_inventory[$detail_inv['id_barang']])){
+            foreach ($detail_inventory as $detail_inv) {
+                if (isset($array_inventory[$detail_inv['id_barang']])) {
                     $array_inventory[$detail_inv['id_barang']]['total'] += $detail_inv['total'];
-                }else{
+                } else {
                     $array_inventory[$detail_inv['id_barang']] = [
                         'id_barang' => $detail_inv['id_barang'],
                         'nama_barang' => $detail_inv['nama_barang'],
@@ -607,22 +607,22 @@ class ApiController extends Controller
 
             foreach ($array_inventory as $d_inv) {
                 $barang = Barang::find($d_inv['id_barang']);
-                if($id_cabang == 1){
+                if ($id_cabang == 1) {
                     $akun_penjualan_barang = $barang->id_akun_penjualan;
-                }else{
+                } else {
                     $format_akun = 'id_akun_penjualan' . $id_cabang;
                     $akun_penjualan_barang = $barang->$format_akun;
                 }
 
-                if($akun_penjualan_barang == null){
+                if ($akun_penjualan_barang == null) {
                     DB::rollback();
                     return response()->json([
                         "result" => false,
                         "message" => "Error when store Jurnal data on table detail. Akun Penjualan Barang " . $barang->kode_barang . ' - ' . $barang->nama_barang . ' can not null.',
                     ]);
-                }else{
+                } else {
                     $data_akun_penjualan_barang = Akun::find($akun_penjualan_barang);
-                    if(empty($data_akun_penjualan_barang)){
+                    if (empty($data_akun_penjualan_barang)) {
                         DB::rollback();
                         return response()->json([
                             "result" => false,
@@ -1341,22 +1341,22 @@ class ApiController extends Controller
 
             foreach ($detail_inventory as $d_inv) {
                 $barang = Barang::find($d_inv['id_barang']);
-                if($id_cabang == 1){
+                if ($id_cabang == 1) {
                     $akun_retur_penjualan_barang = $barang->id_akun_retur_penjualan;
-                }else{
+                } else {
                     $format_akun = 'id_akun_retur_penjualan' . $id_cabang;
                     $akun_retur_penjualan_barang = $barang->$format_akun;
                 }
 
-                if($akun_retur_penjualan_barang == null){
+                if ($akun_retur_penjualan_barang == null) {
                     DB::rollback();
                     return response()->json([
                         "result" => false,
                         "message" => "Error when store Jurnal data on table detail. Akun Retur Penjualan Barang " . $barang->kode_barang . ' - ' . $barang->nama_barang . ' can not null.',
                     ]);
-                }else{
+                } else {
                     $data_akun_penjualan_barang = Akun::find($akun_retur_penjualan_barang);
-                    if(empty($data_akun_penjualan_barang)){
+                    if (empty($data_akun_penjualan_barang)) {
                         DB::rollback();
                         return response()->json([
                             "result" => false,
@@ -1994,7 +1994,6 @@ class ApiController extends Controller
                 "code" => 200,
                 "message" => "Successfully void Jurnal data",
             ], 200);
-
         } catch (\Exception $e) {
             DB::rollback();
             Log::info("Error when void Jurnal data");
@@ -2540,7 +2539,6 @@ class ApiController extends Controller
         ];
 
         return $data;
-
     }
 
     public function productionResults($production_id, $total_supplies, $biaya_listrik, $biaya_operator)
@@ -3316,7 +3314,9 @@ class ApiController extends Controller
                     ->insert(
                         DB::table('tTotalPenjualanInfo')
                             ->selectRaw("{$stokHeader->id} as stok_minimal_hitung_id,id_barang,nama_barang,total_jual,total_jual_per_bulan,plus_persen,per_bulan_plus_persen,avg_prorate,pemakaian_per_barang_jadi")
-                            ->get()->map(function ($item) {return (array) $item;})->toArray()
+                            ->get()->map(function ($item) {
+                                return (array) $item;
+                            })->toArray()
                     );
             }
         } catch (\Exception $e) {
@@ -3329,8 +3329,14 @@ class ApiController extends Controller
     private function getSalesWithProrate($id_barang, $id_cabang, $value)
     {
         $childsub = \DB::table('bom_detail AS bd')
-            ->select('b.id_barang', 'b.keterangan_bom', 'brg.nama_barang', \DB::raw('SUM(bd.jumlah_bom_detail) AS total_pemakaian'),
-                'b.jumlah_bom', \DB::raw('(SUM(bd.jumlah_bom_detail)/b.jumlah_bom) AS prorate'))
+            ->select(
+                'b.id_barang',
+                'b.keterangan_bom',
+                'brg.nama_barang',
+                \DB::raw('SUM(bd.jumlah_bom_detail) AS total_pemakaian'),
+                'b.jumlah_bom',
+                \DB::raw('(SUM(bd.jumlah_bom_detail)/b.jumlah_bom) AS prorate')
+            )
             ->join('bom AS b', 'bd.id_bom', '=', 'b.id_bom')
             ->join('barang AS brg', 'brg.id_barang', '=', 'b.id_barang')
             ->whereRaw('bd.id_barang = ' . $id_barang . ' AND b.status_bom = 1')
@@ -3342,9 +3348,13 @@ class ApiController extends Controller
             return;
         }
         $stokMin = session('stokMin');
+
         $jual = \DB::table('penjualan AS p')
-            ->select('brg.nama_barang', \DB::raw('SUM(if(pd.id_satuan_barang != 6,pd.jumlah_penjualan_detail * pd.sg_penjualan_detail,pd.jumlah_penjualan_detail)) AS total_jual'),
-                \DB::raw('(SUM(if(pd.id_satuan_barang != 6,pd.jumlah_penjualan_detail * pd.sg_penjualan_detail,pd.jumlah_penjualan_detail))/' . intval($stokMin['Stok Min Range']) . ') AS total_jual_per_bulan'))
+            ->select(
+                'brg.nama_barang',
+                \DB::raw('SUM(if(pd.id_satuan_barang != 6,pd.jumlah_penjualan_detail * pd.sg_penjualan_detail,pd.jumlah_penjualan_detail)) AS total_jual'),
+                \DB::raw('(SUM(if(pd.id_satuan_barang != 6,pd.jumlah_penjualan_detail * pd.sg_penjualan_detail,pd.jumlah_penjualan_detail))/' . intval($stokMin['Stok Min Range']) . ') AS total_jual_per_bulan')
+            )
             ->join('penjualan_detail AS pd', 'pd.id_penjualan', '=', 'p.id_penjualan')
             ->join('barang AS brg', 'brg.id_barang', '=', 'pd.id_barang')
             ->where('pd.id_barang', $id_barang)

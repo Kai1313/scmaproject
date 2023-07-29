@@ -81,7 +81,7 @@
                                 <th>Tanggal</th>
                                 <th>Kode Pindah Cabang</th>
                                 <th>Kode Referensi</th>
-                                <th>Gudang</th>
+                                <th>Gudang Penerima</th>
                                 <th>Cabang Asal</th>
                                 <th>Jasa Pengiriman</th>
                                 <th>Status</th>

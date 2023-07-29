@@ -2,8 +2,8 @@
 
 namespace App;
 
-use DB;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Visit extends Model
 {
@@ -29,6 +29,11 @@ class Visit extends Model
         'progress_ind',
         'visit_type',
         'alasan_pembatalan',
+        'range_potensial',
+        'total',
+        'proofment_1',
+        'proofment_2',
+        'permintaan_penjualan_id',
     ];
 
     public static $progressIndicator = [
@@ -36,6 +41,27 @@ class Visit extends Model
         '2' => 'Potensial',
         '3' => 'Penawaran/Order',
     ];
+
+
+    public function getNamaPelangganAttribute()
+    {
+        return $this->pelanggan ? $this->pelanggan->nama_pelanggan : '-';
+    }
+
+    public function getNamaSalesmanAttribute()
+    {
+        return $this->salesman ? $this->salesman->nama_salesman : '-';
+    }
+
+    public function getNamaCabangAttribute()
+    {
+        return $this->cabang ? $this->cabang->nama_cabang : '-';
+    }
+
+    public function salesman()
+    {
+        return $this->belongsTo(Salesman::class, 'id_salesman', 'id_salesman');
+    }
 
     public function cabang()
     {
@@ -45,6 +71,11 @@ class Visit extends Model
     public function pelanggan()
     {
         return $this->belongsTo(Models\Master\Pelanggan::class, 'id_pelanggan', 'id_pelanggan');
+    }
+
+    public function sales_order()
+    {
+        return $this->belongsTo(PermintaanPenjualan::class, 'permintaan_penjualan_id', 'id_permintaan_penjualan');
     }
 
     public static function createcode($id_cabang)
@@ -59,5 +90,27 @@ class Visit extends Model
         }
 
         return $string . '.' . $nol . $check;
+    }
+
+    public function uploadfile($req, $data)
+    {
+        if ($req->image_path) {
+            $explode = explode(";base64,", $req->image_path);
+            $findExt = explode("image/", $explode[0]);
+
+            $ext = $findExt[1];
+            $name = uniqid();
+
+            $media = base64_decode($explode[1]);
+            $mainpath = $name . '.' . $ext;
+
+            $img = \Image::make($media)->fit(150);
+            $img->save('asset/' . $mainpath);
+
+            $data->path = $mainpath;
+            $data->save();
+        }
+
+        return ['status' => 'success'];
     }
 }

@@ -4,15 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\Master\Pelanggan;
 use App\Models\Master\Setting;
-use App\Penjualan;
 use App\PermintaanPenjualan;
 use App\Salesman;
 use App\Visit;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use Yajra\DataTables\Facades\DataTables;
+use Str;
 
 class ReportingVisitController extends Controller
 {
@@ -122,8 +122,91 @@ class ReportingVisitController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $req, $id)
     {
+        return DB::transaction(function () use ($req, $id) {
+
+            try {
+                $data = Visit::find($id);
+                Log::info("Berhasil update reporting visit", $data->toArray());
+                $file = $req->file('proofment_1');
+                if ($file != null) {
+                    $path = 'asset/visit';
+                    $id = Str::uuid($req->id . '1')->toString();
+                    $name = $id . '.' . $file->getClientOriginalExtension();
+                    $foto = $path . '/' . $name;
+                    if (is_file($foto)) {
+                        unlink($foto);
+                    }
+
+                    if (!file_exists($path)) {
+                        $oldmask = umask(0);
+                        mkdir($path, 0777, true);
+                        umask($oldmask);
+                    }
+
+
+                    $img = \Image::make(file_get_contents($file))
+                        ->encode($file->getClientOriginalExtension(), 12)
+                        ->fit(150);
+                    $img->save($foto);
+                    $proofment_1 = url('/') . '/' .  $foto;
+                } else {
+                    $proofment_1 = $data->proofment_1;
+                }
+
+                $file = $req->file('proofment_2');
+                if ($file != null) {
+                    $path = 'asset/visit';
+                    $id = Str::uuid($req->id . '2')->toString();
+                    $name = $id . '.' . $file->getClientOriginalExtension();
+                    $foto = $path . '/' . $name;
+                    if (is_file($foto)) {
+                        unlink($foto);
+                    }
+
+                    if (!file_exists($path)) {
+                        $oldmask = umask(0);
+                        mkdir($path, 0777, true);
+                        umask($oldmask);
+                    }
+
+
+                    $img = \Image::make(file_get_contents($file))
+                        ->encode($file->getClientOriginalExtension(), 12)
+                        ->fit(500);
+                    $img->save($foto);
+                    $proofment_2 = url('/') . '/' . $foto;
+                } else {
+                    $proofment_2 = $data->proofment_2;
+                }
+
+                $data->update([
+                    "visit_title" => request('visit_title'),
+                    "visit_desc" => request('visit_desc'),
+                    "progress_ind" => request('progress_ind'),
+                    "range_potensial" => request('range_potensial'),
+                    "proofment_1" => $proofment_1,
+                    "proofment_2" => $proofment_2,
+                    "permintaan_penjualan_id" => request('sales_order_id'),
+                    "total" => filter_var(request('total'), FILTER_SANITIZE_NUMBER_FLOAT) * 1,
+                ]);
+
+                return response()->json([
+                    "result" => true,
+                    "data" => $data,
+                    'url' => route('visit'),
+                    "message" => "Berhiasil mensubmit report",
+                ], 200);
+            } catch (\Throwable $th) {
+                DB::rollBack();
+                return response()->json([
+                    "result" => true,
+                    "data" => $req->only(['latitude', 'longitude']),
+                    "message" => $th->getMessage(),
+                ], 500);
+            }
+        });
     }
 
     /**
@@ -134,17 +217,23 @@ class ReportingVisitController extends Controller
      */
     public function destroy($id)
     {
-        //
     }
 
-    function select(Request $req)
+    public function select(Request $req)
     {
-
         switch ($req->param) {
             case 'sales_order_id':
                 return PermintaanPenjualan::select(DB::raw("id_permintaan_penjualan as id"), DB::raw("nama_permintaan_penjualan as text"), 'permintaan_penjualan.*')
+                    ->whereDoesntHave('visit')
                     ->where(function ($q) use ($req) {
                         $q->where(DB::raw("UPPER(nama_permintaan_penjualan)"), 'like', '%' . strtoupper($req->q) . '%');
+                    })
+                    ->paginate(10);
+                break;
+            case 'id_salesman':
+                return Salesman::select(DB::raw("id_salesman as id"), DB::raw("nama_salesman as text"), 'salesman.*')
+                    ->where(function ($q) use ($req) {
+                        $q->where(DB::raw("concat(UPPER(nama_salesman),' ',UPPER(kode_salesman))"), 'like', '%' . strtoupper($req->q) . '%');
                     })
                     ->paginate(10);
                 break;

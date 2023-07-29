@@ -26,6 +26,7 @@ class StokMinHistoryController extends Controller
             ->where('id_barang', $request->id)
             ->where('id_cabang', $request->id_cabang)
             ->orderBy('id', 'DESC')->first();
+
         $sumStok = \DB::table('master_qr_code')
             ->where('id_barang', $request->id)->value(\DB::raw('sum(sisa_master_qr_code) as stok_aktif'));
         $barang = Barang::find($request->id);
@@ -45,5 +46,4 @@ class StokMinHistoryController extends Controller
         ];
         return Excel::download(new ReportStokMinHistoryExport('report_ops.stokMinHistory.excel', $array), 'StokMinHistory.xlsx');
     }
-
 }

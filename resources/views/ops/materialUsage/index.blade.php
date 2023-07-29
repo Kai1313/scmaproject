@@ -86,9 +86,10 @@
                             <tr>
                                 <th>Kode Pemakaian</th>
                                 <th>Tanggal</th>
-                                <th>Cabang</th>
-                                <th>Gudang</th>
-                                <th>Jenis</th>
+                                <th>Cabang Pemakaian</th>
+                                <th>Gudang Pemakaian</th>
+                                <th>Jenis Pemakaian</th>
+                                <th>QC</th>
                                 <th>Catatan</th>
                                 <th width="150px">Action</th>
                             </tr>
@@ -132,10 +133,13 @@
                 data: 'nama_gudang',
                 name: 'g.nama_gudang',
             }, {
+                data: 'keterangan_jenis_pemakaian',
+                name: 'keterangan_jenis_pemakaian',
+            }, {
                 data: 'is_qc',
                 name: 'is_qc',
                 render: function(data) {
-                    return data == 1 ? 'QC' : ''
+                    return data == 1 ? '<i class="fa fa-check" aria-hidden="true"></i>' : ''
                 }
             }, {
                 data: 'catatan',

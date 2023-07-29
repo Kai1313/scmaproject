@@ -27,7 +27,12 @@ class MaterialUsageController extends Controller
                     'user_created',
                     'catatan',
                     'is_qc',
-                    'void'
+                    'void',
+                    DB::raw('(case
+                        when jenis_pemakaian = 1 then "Penjualan"
+                        when jenis_pemakaian = 2 then "Keperluan Lab"
+                        when jenis_pemakaian = 3 then "Produksi"
+                        else "" end) as keterangan_jenis_pemakaian')
                 )
                 ->leftJoin('gudang as g', 'pemakaian_header.id_gudang', '=', 'g.id_gudang')
                 ->leftJoin('cabang as c', 'pemakaian_header.id_cabang', '=', 'c.id_cabang');
@@ -53,6 +58,10 @@ class MaterialUsageController extends Controller
 
             return Datatables::of($data)
                 ->addIndexColumn()
+                ->filterColumn('keterangan_jenis_pemakaian', function ($row, $keyword) {
+                    $keywords = trim($keyword);
+                    $row->whereRaw("(case when jenis_pemakaian = 1 then 'Penjualan' when jenis_pemakaian = 2 then 'Keperluan Lab' when jenis_pemakaian = 3 then 'Produksi' else '' end) like ?", ["%{$keywords}%"]);
+                })
                 ->addColumn('action', function ($row) use ($filterUser, $idUser, $idGrupUser, $arrayAccessVoid) {
                     if ($row->void == '1') {
                         $btn = '<label class="label label-default">Batal</label>';

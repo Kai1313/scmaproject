@@ -130,28 +130,34 @@ Route::prefix('pemakaian')->group(function () {
     Route::get('/reload-timbangan', 'MaterialUsageController@reloadWeight')->name('material_usage-reload-weight');
 });
 
-Route::prefix('jadwal_kunjungan')->group(function () {
-    Route::get('/index/{user_id?}', 'ScheduleVisitController@index')->name('pre_visit');
-    Route::get('/entry/{id?}', 'ScheduleVisitController@entry')->name('pre_visit-entry');
-    Route::get('/append-map', 'ScheduleVisitController@appendMap')->name('append-map');
-    Route::post('/save_entry/{id}', 'ScheduleVisitController@saveEntry')->name('pre_visit-save-entry');
-    Route::get('/view/{id}', 'ScheduleVisitController@viewData')->name('pre_visit-view');
-    Route::get('/delete/{id}', 'ScheduleVisitController@destroy')->name('pre_visit-delete');
-});
+Route::prefix('penjualan')->group(function () {
+    Route::prefix('jadwal_kunjungan')->group(function () {
+        Route::get('/index/{user_id?}', 'ScheduleVisitController@index')->name('pre_visit');
+        Route::get('/entry/{id?}', 'ScheduleVisitController@entry')->name('pre_visit-entry');
+        Route::get('/append-map', 'ScheduleVisitController@appendMap')->name('append-map');
+        Route::post('/save_entry/{id}', 'ScheduleVisitController@saveEntry')->name('pre_visit-save-entry');
+        Route::get('/view/{id}', 'ScheduleVisitController@viewData')->name('pre_visit-view');
+        Route::get('/delete/{id}', 'ScheduleVisitController@destroy')->name('pre_visit-delete');
+    });
 
-Route::prefix('kunjungan')->group(function () {
-    Route::get('/index/{user_id?}', 'VisitController@index')->name('visit');
-    Route::get('/entry/{id?}', 'VisitController@entry')->name('visit-entry');
-    Route::post('/save_entry/{id}', 'VisitController@saveEntry')->name('visit-save-entry');
-    Route::get('/view/{id}', 'VisitController@viewData')->name('visit-view');
-    Route::post('/cancel-visit', 'VisitController@cancelVisit')->name('cancel-visit');
-    Route::post('/update-visit', 'VisitController@updateVisit')->name('update-visit');
-    Route::get('/delete/{id}', 'VisitController@destroy')->name('visit-delete');
-    Route::resource('reporting', 'ReportingVisitController', [
-        'as' => 'kunjungan'
-    ]);
-    Route::prefix('/reporting')->group(function () {
-        Route::get('/select-reporting-visit', 'ReportingVisitController@select')->name('kunjungan.reporting.select');
+    Route::prefix('kunjungan')->group(function () {
+        Route::get('/index/{user_id?}', 'VisitController@index')->name('visit');
+        Route::get('/entry/{id?}', 'VisitController@entry')->name('visit-entry');
+        Route::post('/save_entry/{id}', 'VisitController@saveEntry')->name('visit-save-entry');
+        Route::get('/view/{id}', 'VisitController@viewData')->name('visit-view');
+        Route::post('/cancel-visit', 'VisitController@cancelVisit')->name('cancel-visit');
+        Route::post('/update-visit', 'VisitController@updateVisit')->name('update-visit');
+        Route::get('/delete/{id}', 'VisitController@destroy')->name('visit-delete');
+        Route::resource('reporting', 'ReportingVisitController', [
+            'as' => 'kunjungan'
+        ]);
+        Route::prefix('/reporting')->group(function () {
+            Route::get('/select-reporting-visit', 'ReportingVisitController@select')->name('kunjungan.reporting.select');
+        });
+
+        Route::resource('progress-visit', 'ReportingVisitController', [
+            'as' => 'kunjungan'
+        ]);
     });
 });
 

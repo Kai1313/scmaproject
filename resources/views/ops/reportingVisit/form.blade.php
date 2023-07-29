@@ -6,6 +6,7 @@
     <link rel="stylesheet"
         href="{{ asset('assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/bower_components/select2/dist/css/select2.min.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/dropify@0.2.2/dist/css/dropify.min.css" rel="stylesheet">
     <style>
         ul.horizontal-list {
             min-width: 200px;
@@ -89,38 +90,7 @@
         }
 
         /* @media screen and (-webkit-min-device-pixel-ratio: 0) {
-                                                                                                                                                                                                                                                                                                                                    .range-slider {
-                                                                                                                                                                                                                                                                                                                                        overflow: hidden;
-                                                                                                                                                                                                                                                                                                                                        height: 40px;
-                                                                                                                                                                                                                                                                                                                                        -webkit-appearance: none;
-                                                                                                                                                                                                                                                                                                                                        background-color: #ddd;
-                                                                                                                                                                                                                                                                                                                                    }
-
-                                                                                                                                                                                                                                                                                                                                    .range-slider::-webkit-slider-runnable-track {
-                                                                                                                                                                                                                                                                                                                                        height: 40px;
-                                                                                                                                                                                                                                                                                                                                        -webkit-appearance: none;
-                                                                                                                                                                                                                                                                                                                                        color: #444;
-                                                                                                                                                                                                                                                                                                                                        margin-top: -1px;
-                                                                                                                                                                                                                                                                                                                                        transition: box-shadow 0.2s ease-in-out;
-                                                                                                                                                                                                                                                                                                                                    }
-
-                                                                                                                                                                                                                                                                                                                                    .range-slider::-webkit-slider-thumb {
-                                                                                                                                                                                                                                                                                                                                        width: 40px;
-                                                                                                                                                                                                                                                                                                                                        -webkit-appearance: none;
-                                                                                                                                                                                                                                                                                                                                        height: 40px;
-                                                                                                                                                                                                                                                                                                                                        cursor: ew-resize;
-                                                                                                                                                                                                                                                                                                                                        background: #fff;
-                                                                                                                                                                                                                                                                                                                                        box-shadow: -340px 0 0 320px #1597ff, inset 0 0 0 40px #1597ff;
-                                                                                                                                                                                                                                                                                                                                        border-radius: 50%;
-                                                                                                                                                                                                                                                                                                                                        transition: box-shadow 0.2s ease-in-out;
-                                                                                                                                                                                                                                                                                                                                        position: relative;
-                                                                                                                                                                                                                                                                                                                                    }
-
-                                                                                                                                                                                                                                                                                                                                    .range-slider:active::-webkit-slider-thumb {
-                                                                                                                                                                                                                                                                                                                                        background: #fff;
-                                                                                                                                                                                                                                                                                                                                        box-shadow: -340px 0 0 320px #1597ff, inset 0 0 0 3px #1597ff;
-                                                                                                                                                                                                                                                                                                                                    }
-                                                                                                                                                                                                                                                                                                                                } */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                } */
 
         .range-slider::-moz-range-progress {
             background-color: #43e5f7;
@@ -157,6 +127,14 @@
             content: "%";
             padding-left: 1px;
         }
+
+        p.dropify-infos-message {
+            font-size: 12px !important;
+        }
+
+        .is-invalid {
+            border: 1px solid red !important;
+        }
     </style>
 @endsection
 
@@ -176,7 +154,7 @@
 
 @section('main-section')
     <div class="content container-fluid">
-        <form action="{{ route('kunjungan.reporting.store') }}" method="post" class="post-action">
+        <form id="form-report" class="post-action">
             <div class="col-sm-6">
                 <div class="box">
                     <div class="box-header">
@@ -260,39 +238,43 @@
                     </div>
                     <div class="box-body">
                         <div class="row">
-                            <div class="col-md-12">
+                            <div class="col-md-12 parent">
                                 <div class="form-group">
                                     <label>Issue <span>*</span></label>
-                                    <input type="text" class="form-control" placeholder="ex:Pengembangan customer"
-                                        id="visit_title">
+                                    <input type="text" class="form-control required" value="{{ $data->visit_title }}"
+                                        placeholder="ex:Pengembangan customer" id="visit_title" name="visit_title">
                                 </div>
                             </div>
-                            <div class="col-md-12">
+                            <div class="col-md-12 parent">
                                 <div class="form-group">
                                     <label>Progress Indicator <span>*</span></label>
-                                    <select name="progress_ind" class="form-control select2 trigger-change">
+                                    <select name="progress_ind" id="progress_ind"
+                                        class="form-control select2 trigger-change required">
                                         <option value="">Pilih Progress</option>
                                         @foreach (App\Visit::$progressIndicator as $key => $item)
-                                            <option value="{{ $key }}">{{ $item }}</option>
+                                            <option {{ $data->progress_ind == $key ? 'selected' : '' }}
+                                                value="{{ $key }}">
+                                                {{ $item }}</option>
                                         @endforeach
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-12 section-2">
+                            <div class="col-md-12 sections section-2 parent">
                                 <div class="form-group">
                                     <label>Range Potensial <span>*</span></label>
-                                    <input type="range" value="0" min="0" max="100" step="1"
-                                        class="range-slider">
-                                    <h4 class="slider">0</h4>
+                                    <input type="range" value="{{ $data->range_potensial }}" min="0"
+                                        max="100" step="1" class="range-slider required"
+                                        name="range_potensial">
+                                    <h4 class="slider">{{ $data->range_potensial }}</h4>
                                 </div>
                             </div>
-                            <div class="col-md-12 section-3">
+                            <div class="col-md-12 sections section-3 parent">
                                 <div class="form-group">
                                     <label>Nomor Sales Order</label>
                                     <select name="sales_order_id" id="sales_order_id" class="select2"></select>
                                 </div>
                             </div>
-                            <div class="col-sm-12 section-3">
+                            <div class="col-sm-12 sections section-3 parent">
                                 <div class="form-group">
                                     <label>Total Order</label>
                                     <div class="input-group">
@@ -302,16 +284,36 @@
                                                 <option value="USD">USD</option>
                                             </select>
                                         </span>
-                                        <input type="text" name="total" placeholder="xxx,xxx,xxx" id="total"
-                                            class="form-control text-right">
+                                        <input type="text" name="total" placeholder="xxx,xxx,xxx"
+                                            value="{{ number_format($data->total) }}" id="total"
+                                            class="form-control text-right ">
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-12">
+                            <div class="col-md-12 parent">
                                 <div class="form-group">
                                     <label>Catatan <span>*</span></label>
-                                    <textarea name="visit_desc" id="visit_desc" class="form-control" placeholder="ex:pernah membeli di PT SCMA"></textarea>
+                                    <textarea name="visit_desc" id="visit_desc" class="form-control required"
+                                        placeholder="ex:pernah membeli di PT SCMA">{{ $data->visit_desc }}</textarea>
                                 </div>
+                            </div>
+                            <div class="col-sm-6 parent">
+                                <div class="form-group">
+                                    <label>Gambar 1 <span>*</span></label>
+                                    <input type="file" id="proofment_1" class="dropify required"
+                                        data-allowed-file-extensions="pdf png jpg" data-max-file-size-preview="3M">
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label>Gambar 2</label>
+                                    <input type="file" id="proofment_2" class="dropify"
+                                        data-allowed-file-extensions="pdf png jpg" data-max-file-size-preview="3M">
+                                </div>
+                            </div>
+                            <div class="col-sm-12">
+                                <button type="button" class="btn btn-primary w-full mb-3" onclick="sendReport()">SEND
+                                    REPORT</button>
                             </div>
                         </div>
                     </div>
@@ -437,10 +439,13 @@
     <script src="{{ asset('js/html5-qrcode.min.js') }}"></script>
     <script src="{{ asset('js/custom.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery-maskmoney@3.0.2/dist/jquery.maskMoney.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/accounting-js@1.1.1/dist/accounting.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dropify@0.2.2/dist/js/dropify.min.js"></script>
 @endsection
 
 @section('externalScripts')
     <script>
+        $('.sections').addClass('hidden');
         let branch = {!! json_encode($cabang) !!}
         let timbangan = '';
         let details = [];
@@ -451,6 +456,54 @@
             fps: 10,
             qrbox: 250
         });
+
+        let proofment = {
+            0: '{{ $data->proofment_1 }}',
+            1: '{{ $data->proofment_2 }}',
+        }
+        $(document).ready(function() {
+            @if ($data->progress_ind == 3)
+                var id_permintaan_penjualan =
+                    '{{ $data->sales_order ? $data->sales_order->id_permintaan_penjualan : '0' }}'
+                var dokumen_permintaan_penjualan =
+                    '{{ $data->sales_order ? $data->sales_order->nama_permintaan_penjualan : '0' }}'
+                var option = new Option(
+                    dokumen_permintaan_penjualan,
+                    id_permintaan_penjualan
+                );
+                $('#sales_order_id').append(option).trigger('change.select2');
+            @endif
+
+            @if ($data->proofment_1)
+                var url = '{{ $data->proofment_1 }}';
+                var imagenUrl = url;
+                var drEvent = $("#proofment_1").dropify({
+                    defaultFile: imagenUrl,
+                });
+                drEvent = drEvent.data('dropify');
+                drEvent.resetPreview();
+                drEvent.clearElement();
+                drEvent.settings.defaultFile = imagenUrl;
+                drEvent.destroy();
+                drEvent.init();
+            @endif
+
+            @if ($data->proofment_2)
+                var url = '{{ $data->proofment_2 }}';
+                var imagenUrl = url;
+                var drEvent = $("#proofment_2").dropify({
+                    defaultFile: imagenUrl,
+                });
+                drEvent = drEvent.data('dropify');
+                drEvent.resetPreview();
+                drEvent.clearElement();
+                drEvent.settings.defaultFile = imagenUrl;
+                drEvent.destroy();
+                drEvent.init();
+            @endif
+
+            $('#progress_ind').change();
+        })
 
         var range = '{{ $range ? $range->value2 : null }}';
 
@@ -465,6 +518,15 @@
             defaultZero: true,
             allowZero: true,
         })
+
+        $('.dropify').dropify({
+            messages: {
+                'default': '',
+                'replace': 'Drag and drop or click to replace',
+                'remove': 'Remove',
+                'error': 'Oops.'
+            }
+        });
 
         $(function() {
             var rangePercent = $('[type="range"]').val();
@@ -582,16 +644,6 @@
                 '</tr></tfoot>'
             );
         }
-
-        $('[name="id_cabang"]').select2({
-            data: [{
-                'id': '',
-                'text': 'Pilih Cabang'
-            }, ...branch]
-        }).on('select2:select', function(e) {
-            let dataselect = e.params.data
-            getGudang(dataselect)
-        });
 
         function getGudang(data) {
             $('[name="id_gudang"]').empty()
@@ -887,8 +939,12 @@
             templateSelection: formatRepoNormalSelection
         });
 
-        $('#district_id').on('select2:select', function(event) {
-            $('#village_id').val(null).trigger('change.select2');
+        $('#sales_order_id').on('select2:select', function(event) {
+            console.log(event);
+            var data = event.params.data;
+            $('#total').val(formatNumber(data.mtotal_permintaan_penjualan, {
+                precision: 0,
+            }));
         })
 
         function formatRepoNormalSelection(repo) {
@@ -902,6 +958,116 @@
             // scrolling can be used
             var markup = $('<span  data-name=' + repo.name + ' value=' + repo.id + '>' + repo.text + '</span>');
             return markup;
+        }
+
+        $('#progress_ind').change(function() {
+            $('.sections').addClass('hidden');
+            $(`.section-${$(this).val()}`).removeClass('hidden');
+        })
+
+        $('input,textarea').keyup(function() {
+            $(this).removeClass('is-invalid');
+        })
+
+        $('select').change(function() {
+            var par = $(this).parents('.parent');
+            par
+            $(par).find('.select2-container').removeClass('is-invalid');
+        })
+
+
+        function validating() {
+            var validation = 0;
+            $('#form-report').find('.required').not('.dropify').each(function() {
+                var par = $(this).parents('.parent');
+                if (!$(par).hasClass('hidden')) {
+                    if ($(this).val() == '' || $(this).val() == null) {
+                        $(this).addClass('is-invalid');
+                        $(par).find('.select2-container').addClass('is-invalid');
+                        validation++;
+                    }
+                }
+            })
+
+            $('#form-report .dropify').each(function(i) {
+                var par = $(this).parents('.parent');
+                if ($(this).hasClass('required')) {
+                    if ($(this).val() == '' || $(this).val() == null) {
+                        console.log(proofment[`${i+1}`])
+                        if (proofment[`${i+1}`] == '' || proofment[`${i+1}`] == null) {
+                            $(par).find('.dropify-wrapper').addClass('is-invalid');
+                            validation++;
+                        }
+                    }
+                }
+
+            })
+
+
+            return validation;
+        }
+
+        function sendReport() {
+            var validation = validating();
+
+            if (validation != 0) {
+                return Swal.fire("Cek data anda lagi.", 'Pastikan semua data telah terinput', 'error')
+            }
+            var form = new FormData();
+
+            var data = $("#form-report").serializeArray();
+
+            data.forEach(d => {
+                form.append(d.name, d.value);
+            });
+
+            $('.dropify').each(function(i) {
+                if ($(this)[0].files[0] != undefined) {
+                    form.append(`proofment_${i+1}`, $(this)[0].files[0]);
+                }
+            })
+            form.append('_method', "PATCH");
+            Swal.fire({
+                title: 'Anda yakin ingin mngirim report visit anda?',
+                text: 'Aksi ini tidak bisa dikembalikan',
+                icon: 'info',
+                showDenyButton: true,
+                confirmButtonText: 'Yes',
+                denyButtonText: 'No',
+                reverseButtons: true,
+                customClass: {
+                    actions: 'my-actions',
+                    confirmButton: 'order-1',
+                    denyButton: 'order-3',
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $('#cover-spin').show()
+                    $.ajax({
+                        url: '{{ route('kunjungan.reporting.update', [$data->id]) }}',
+                        type: "post",
+                        dataType: "JSON",
+                        data: form,
+                        processData: false,
+                        contentType: false,
+                        success: function(data) {
+                            $('#cover-spin').hide()
+                            if (data.result) {
+                                Swal.fire('Berhasil!', data.message, 'success').then((result) => {
+                                    location.href = data.url;
+                                })
+                            } else {
+                                Swal.fire("Gagal Proses Data.", data.message, 'error')
+                            }
+                        },
+                        error: function(data) {
+                            $('#cover-spin').hide()
+                            Swal.fire("Gagal Proses Data.", data.responseJSON.message, 'error')
+                        }
+                    })
+                }
+
+            })
         }
     </script>
 @endsection
