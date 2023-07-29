@@ -143,7 +143,7 @@
                             <label>Jenis Pemakaian <span>*</span></label>
                             <div class="form-group">
                                 <select name="jenis_pemakaian" class="form-control select2" data-validation="[NOTEMPTY]"
-                                    data-validation-message="Tanggal tidak boleh kosong">
+                                    data-validation-message="Jenis pemakaian tidak boleh kosong">
                                     <option value="">Pilih Jenis Pemakaian</option>
                                     <option value="1" {{ $data && $data->jenis_pemakaian == 1 ? 'selected' : '' }}>
                                         Penjualan</option>
