@@ -445,7 +445,7 @@ class ReportBalanceController extends Controller
             ) as jurnal'), 'master_akun.id_akun', '=', 'jurnal.id_akun')
             ->where('isshown', 1)
             ->where('tipe_akun', 0)
-            ->groupBy('new_header1', 'new_header2', 'new_header3', 'master_akun.id_akun')
+            ->groupBy('new_header1', 'new_header2', 'new_header3', 'master_akun.kode_akun')
             ->get()->toArray();
 
             if($urutan_cabang == 1){
@@ -653,7 +653,7 @@ class ReportBalanceController extends Controller
             ) as jurnal'), 'master_akun.id_akun', '=', 'jurnal.id_akun')
             ->where('isshown', 1)
             ->where('tipe_akun', 0)
-            ->groupBy('new_header1', 'new_header2', 'new_header3', 'master_akun.id_akun')
+            ->groupBy('new_header1', 'new_header2', 'new_header3', 'master_akun.kode_akun')
             ->get()->toArray();
 
             if($urutan_cabang == 1){
@@ -1043,6 +1043,7 @@ class ReportBalanceController extends Controller
                         $array_item = [
                             'header' => $newHeader4,
                             'akun' => $item['id_akun'],
+                            'kode_akun' => $item['kode_akun'],
                             'start_date' => $start_date,
                             'end_date' => $end_date,
                         ];

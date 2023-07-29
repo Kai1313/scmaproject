@@ -90,7 +90,11 @@ class PurchaseRequestController extends Controller
                 ->editColumn('approval_status', function ($row) {
                     return '<label class="' . $this->arrayStatus[$row->approval_status]['class'] . '">' . $this->arrayStatus[$row->approval_status]['text'] . '</label>';
                 })
-                ->rawColumns(['action', 'approval_status'])
+                ->filterColumn('closed', function ($row, $keyword) {
+                    $keywords = trim($keyword);
+                    $row->whereRaw("prd.closed like ?", ["%{$keywords}%"]);
+                })
+                ->rawColumns(['action', 'approval_status', 'closed'])
                 ->make(true);
         }
 

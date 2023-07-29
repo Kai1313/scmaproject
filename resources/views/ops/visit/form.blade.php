@@ -70,6 +70,11 @@
         select[readonly].select2-hidden-accessible+.select2-container .select2-selection__clear {
             display: none;
         }
+
+        .disabled {
+            background: white;
+            opacity: 0.5;
+        }
     </style>
 @endsection
 
@@ -90,72 +95,159 @@
 @section('main-section')
     <div class="content container-fluid">
         <form action="{{ route('pre_visit-save-entry', $data ? $data->id : 0) }}" method="post" class="post-action">
-            <div class="box">
-                <div class="box-header">
-                    <h3 class="box-title">{{ $data ? 'Ubah' : 'Tambah' }} Kunjungan</h3>
-                    <a href="{{ route('pre_visit') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right">
-                        <span class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali
-                    </a>
-                </div>
-                <div class="box-body">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <label>Kode Kunjungan</label>
-                            <div class="form-group">
-                                <input type="text" name="visit_code"
-                                    value="{{ old('visit_code', $data ? $data->visit_code : '') }}" class="form-control"
-                                    readonly placeholder="Otomatis">
-                            </div>
-                            <label>Tanggal <span>*</span></label>
-                            <div class="form-group">
-                                <input type="text" name="visit_date"
-                                    value="{{ old('visit_date', $data ? $data->visit_date : date('Y-m-d')) }}"
-                                    class="form-control datepicker" data-validation="[NOTEMPTY]"
-                                    data-validation-message="Tanggal tidak boleh kosong">
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Cabang <span>*</span></label>
-                                <select name="id_cabang" class="form-control select2" data-validation="[NOTEMPTY]"
-                                    data-validation-message="Cabang tidak boleh kosong" {{ $data ? 'readonly' : '' }}>
-                                    <option value="">Pilih Cabang</option>
-                                    @if ($data && $data->id_cabang)
-                                        <option value="{{ $data->id_cabang }}" selected>
-                                            {{ $data->cabang->kode_cabang }} - {{ $data->cabang->nama_cabang }}
-                                        </option>
-                                    @endif
-                                </select>
-                            </div>
-                            <label>Salesman <span>*</span></label>
-                            <div class="form-group">
-                                <select name="id_salesman" class="form-control select2 trigger-change">
-                                    @foreach ($salesman as $item)
-                                        <option value="{{ $item->id_salesman }}">{{ $item->nama_salesman }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
+            <div class="col-sm-6">
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title">{{ $data ? 'Ubah' : 'Tambah' }} Jadwal Kunjungan</h3>
+                        <a href="{{ route('pre_visit') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right">
+                            <span class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali
+                        </a>
+                    </div>
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-md-12" id="map">
 
-                        <div class="col-md-4">
-                            <label>Pelanggan <span>*</span></label>
-                            <div class="form-group">
-                                <select name="id_pelanggan" class="form-control select2 trigger-change">
-                                    @foreach ($pelanggan as $item)
-                                        <option value="{{ $item->id_pelanggan }}">{{ $item->nama_pelanggan }}</option>
-                                    @endforeach
-                                </select>
                             </div>
-                            <label>Catatan</label>
-                            <div class="form-group">
-                                <textarea name="pre_visit_desc" class="form-control" rows="3">{{ old('pre_visit_desc', $data ? $data->pre_visit_desc : '') }}</textarea>
+                            <div class="col-md-6">
+                                <label>Kode Kunjungan</label>
+                                <div class="form-group">
+                                    <input type="text" name="visit_code"
+                                        value="{{ old('visit_code', $data ? $data->visit_code : '') }}" class="form-control"
+                                        readonly placeholder="Otomatis">
+                                </div>
+
                             </div>
+                            <div class="col-sm-6 disabled">
+                                <label>Tanggal <span>*</span></label>
+                                <div class="form-group">
+                                    <input readonly type="text" name="visit_date"
+                                        value="{{ old('visit_date', $data ? $data->visit_date : date('Y-m-d')) }}"
+                                        class="form-control datepicker" data-validation="[NOTEMPTY]"
+                                        data-validation-message="Tanggal tidak boleh kosong">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Cabang <span>*</span></label>
+                                    <select name="id_cabang" class="form-control select2" data-validation="[NOTEMPTY]"
+                                        data-validation-message="Cabang tidak boleh kosong" {{ $data ? 'readonly' : '' }}>
+                                        <option value="">Pilih Cabang</option>
+                                        @if ($data && $data->id_cabang)
+                                            <option value="{{ $data->id_cabang }}" selected>
+                                                {{ $data->cabang->kode_cabang }} - {{ $data->cabang->nama_cabang }}
+                                            </option>
+                                        @endif
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6 disabled">
+                                <label>Salesman <span>*</span></label>
+                                <div class="form-group">
+                                    <select name="id_salesman" class="form-control select2 trigger-change">
+                                        @foreach ($salesman as $item)
+                                            <option {{ $data->id_salesman == $item->id_salesman ? 'selected' : '' }}
+                                                value="{{ $item->id_salesman }}">{{ $item->nama_salesman }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <label>Pelanggan</label>
+                                <div class="form-group">
+                                    <input type="text" class="form-control" readonly id="pelanggan"
+                                        value="{{ $data->pelanggan->nama_pelanggan }}">
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <label>Catatan</label>
+                                <div class="form-group">
+                                    <textarea name="pre_visit_desc" readonly class="form-control" rows="3">{{ old('pre_visit_desc', $data ? $data->pre_visit_desc : '') }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 main-menu" id="main-menu">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <button type="button" class="btn btn-primary w-full mb-3" onclick="checkin()">CHECK IN</button>
+                    </div>
+                    <div class="col-sm-12">
+                        <button type="button" class="btn btn-success w-full mb-3" onclick="updateVisit('whatsapp')">FOLLOW
+                            UP BY WA</button>
+                    </div>
+                    <div class="col-sm-12">
+                        <button type="button" class="btn btn-warning w-full mb-3"
+                            onclick="location.href = '{{ route('pre_visit-entry', [$data->id]) }}'">UBAH JADWAL</button>
+                    </div>
+                    <div class="col-sm-12">
+                        <button type="button" class="btn btn-danger w-full mb-3" onclick="cancelAction('main')">CANCEL
+                            VISIT</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 hidden main-menu" id="checkin">
+                <div class="row">
+                    <div class="col-sm-12 checkin disabled">
+                        <button type="button" class="btn btn-checkin btn-primary w-full mb-3"
+                            onclick="updateVisit('checkin')">SUBMIT
+                            LOCATION</button>
+                    </div>
+                    <div class="col-sm-12">
+                        <button type="button" class="btn btn-danger w-full mb-3"
+                            onclick="cancelAction('checkin')">CANCEL</button>
+                    </div>
+                    <div class="col-sm-12">
+                        <hr>
+                    </div>
+                    <div class="col-sm-12">
+                        <i>Jarak : <span class="jarak">Tidak Diketahui</span></i>
+                        <button type="button" class="btn btn-warning w-full mb-3" onclick="refreshLocation()">REFRESH
+                            LOCATION</button>
+                    </div>
+                    @if ($data->pelanggan->latitude_pelanggan != null or $data->pelanggan->longitude_pelanggan == null)
+                        <div class="col-sm-12">
+                            <button type="button" class="btn btn-success w-full mb-3 set-cust-location"
+                                onclick="setCustLocation()">SET CUST
+                                LOCATION</button>
+                        </div>
+                    @endif
+                </div>
+            </div>
+            <div class="col-sm-6 hidden main-menu" id="set-cust-location">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Latitude</label>
+                        <div class="form-group">
+                            <input type="text" name="latitude" id="latitude" class="form-control">
+                            <a href="javascript:;" onclick="setLocationNow()">Tentukan lokasi
+                                ini sebagai titik kordinat.</a>
                         </div>
                     </div>
-                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                    <button class="btn btn-primary btn-flat pull-right" type="submit">
-                        <i class="glyphicon glyphicon-floppy-saved"></i> Simpan Data
-                    </button>
+                    <div class="col-md-6">
+                        <label>Longitude</label>
+                        <div class="form-group">
+                            <input type="text" name="longitude" id="longitude" class="form-control">
+                            <a href="javascript:;" onclick="window.open('https://www.google.com/maps')">Lihat di google
+                                maps</a>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <button type="button" class="btn btn-primary w-full mb-3"
+                            onclick="updateVisit('set_location')">SUBMIT SET CUST
+                            LOCATION</button>
+                    </div>
+                    <div class="col-sm-12">
+                        <button type="button" class="btn btn-danger w-full mb-3"
+                            onclick="cancelAction('set-cust-location')">CANCEL</button>
+                    </div>
+                    <div class="col-sm-12">
+                        <hr>
+                    </div>
                 </div>
             </div>
         </form>
@@ -170,8 +262,8 @@
                         <div id="reader"></div>
                         <div class="form-group">
                             <div class="input-group">
-                                <input type="text" name="search-qrcode" class="form-control" placeholder="Scan QRCode"
-                                    autocomplete="off">
+                                <input type="text" name="search-qrcode" class="form-control"
+                                    placeholder="Scan QRCode" autocomplete="off">
                                 <div class="input-group-btn">
                                     <button class="btn btn-info btn-search btn-flat" type="button">
                                         <i class="fa fa-search"></i>
@@ -241,6 +333,29 @@
                 </div>
             </div>
         </div>
+
+        <div class="modal fade" id="modal-reason-cancel" role="dialog" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-md" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label for="">Alasan Pembatalan</label>
+                                <textarea class="form-control" name="alasan_pembatalan" id="alasan_pembatalan" data-validation="[NOTEMPTY]"
+                                    data-validation-message="Alasan Pembatalan Tidak Boleh Kosong"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary cancel-entry btn-flat">Batal</button>
+
+                        <button type="button" class="btn btn-primary btn-flat" onclick="cancelData()">Konfirmasi
+                            Pembatalan</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 @endsection
 
@@ -260,7 +375,7 @@
     <script>
         let branch = {!! json_encode($cabang) !!}
         let timbangan = '';
-        let details = {!! $data ? $data->formatdetail : '[]' !!};
+        let details = [];
         let detailSelect = []
         let count = details.length
         let statusModal = 'create'
@@ -268,6 +383,15 @@
             fps: 10,
             qrbox: 250
         });
+
+        var range = '{{ $range ? $range->value2 : null }}';
+
+        let locationPelanggan = {
+            latitude: '{{ $data->pelanggan->latitude_pelanggan }}' * 1,
+            longitude: '{{ $data->pelanggan->longitude_pelanggan }}' * 1,
+        };
+
+        let locationUser = {};
 
         $('.datepicker').datepicker({
             format: 'yyyy-mm-dd',
@@ -346,6 +470,11 @@
                 sumDetail()
             }
         });
+
+        $(document).ready(function() {
+            appendMap('{{ $data->pelanggan->latitude_pelanggan }}',
+                '{{ $data->pelanggan->longitude_pelanggan }}');
+        })
 
         function sumDetail() {
             let totalJumlah = 0;
@@ -434,51 +563,6 @@
                 }
             })
         }
-
-        $('.add-entry').click(function() {
-            detailSelect = []
-            $('#modalEntry').find('input,select,textarea').each(function(i, v) {
-                $(v).val('').trigger('change')
-                $(v).removeClass('error-field')
-            })
-
-            $('#alertWeight').text('').hide()
-            $('#max-jumlah').text('')
-            $('#max-jumlah-zak').text('')
-            statusModal = 'create'
-            count += 1
-            $('#modalEntry').find('[name="index"]').val(count)
-            $('#modalEntry').modal({
-                backdrop: 'static',
-                keyboard: false
-            })
-
-            $('#message-stok').text('').hide()
-            $('#alertZak').text('').hide()
-            $('#label-timbangan').html('Timbangan')
-            $('#label-berat').html('Berat Barang')
-            $('#label-jumlah-zak').html('Jumlah Zak')
-            $('[name="jumlah_zak"]').val(0)
-            $('[name="weight_zak"]').val(0)
-            $('.result-form').hide()
-            html5QrcodeScanner.render(onScanSuccess, onScanError);
-        })
-
-        $('#modalEntry').on('input', '[name="jumlah_zak"]', function() {
-            let weightWrapper = $('[name="wrapper_weight"]').val()
-            let jumlahZak = normalizeNumber($(this).val() ? $(this).val() : '0')
-            let weightZak = jumlahZak * weightWrapper
-            if (jumlahZak > detailSelect.jumlah_zak) {
-                $('#alertZak').text('Jumlah melebihi maksimal').show()
-                $(this).addClass('error-field')
-            } else {
-                $('#alertZak').text('').hide()
-                $(this).removeClass('error-field')
-            }
-
-            $('[name="jumlah_zak"]').val(jumlahZak)
-            $('[name="weight_zak"]').val(weightZak)
-        })
 
         $('.save-entry').click(function() {
             let modal = $('#modalEntry')
@@ -673,6 +757,273 @@
 
         function onScanError(errorMessage) {
             toastr.error(JSON.strignify(errorMessage))
+        }
+
+        function appendMap(latitude, longitude) {
+            $.ajax({
+                url: '{{ route('append-map') }}',
+                data: {
+                    latitude: latitude,
+                    longitude: longitude,
+                },
+                success: function(response) {
+                    $('#map').html(response);
+                }
+            });
+        }
+
+        function openReasonCancelModal() {
+            $("#modal-reason-cancel").modal('toggle');
+        }
+
+        function cancelAction(param) {
+            $('.main-menu').addClass('hidden');
+            switch (param) {
+                case 'main':
+                    $('#main-menu').removeClass('hidden');
+                    openReasonCancelModal();
+                    break;
+                case 'checkin':
+                    $('#main-menu').removeClass('hidden');
+                    break;
+                case 'set-cust-location':
+                    $('#checkin').removeClass('hidden');
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        function checkin() {
+            btnLocation('ok');
+            $('.main-menu').addClass('hidden');
+            $('#checkin').removeClass('hidden');
+            $('.checkin').addClass('disabled');
+            $('.jarak').html('Tidak Diketahui');
+        }
+
+        function setCustLocation() {
+            $('.main-menu').addClass('hidden');
+            $('#set-cust-location').removeClass('hidden');
+        }
+
+        function cancelData() {
+
+            if ($('#alasan_pembatalan').val() == null) {
+                Swal.fire("Gagal Menyimpan Data. ", valid.message, 'error')
+                return false
+            }
+
+            Swal.fire({
+                title: 'Anda Yakin Ingin Membatalkan Visit Ini?',
+                text: 'Aksi ini tidak bisa dikembalikan.',
+                icon: 'info',
+                showDenyButton: true,
+                confirmButtonText: 'Yes',
+                denyButtonText: 'No',
+                reverseButtons: true,
+                customClass: {
+                    actions: 'my-actions',
+                    confirmButton: 'order-1',
+                    denyButton: 'order-3',
+                }
+            }).then((result) => {
+                $('#cover-spin').show()
+                $.ajax({
+                    url: '{{ route('cancel-visit') }}',
+                    type: "post",
+                    data: {
+                        alasan_pembatalan: function() {
+                            return $('#alasan_pembatalan').val();
+                        },
+                        id: '{{ $data->id }}'
+                    },
+                    dataType: "JSON",
+                    success: function(data) {
+                        $('#cover-spin').hide()
+                        if (data.result) {
+                            Swal.fire('Berhasil!', data.message, 'success').then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.href = data.url;
+                                }
+                            })
+                        } else {
+                            Swal.fire("Gagal Proses Data.", data.message, 'error')
+                        }
+                    },
+                    error: function(data) {
+                        $('#cover-spin').hide()
+                        Swal.fire("Gagal Proses Data.", data.responseJSON.message, 'error')
+                    }
+                })
+            })
+        }
+
+
+        function distance(lat1, lon1, lat2, lon2, unit) {
+            if ((lat1 === lat2) && (lon1 === lon2)) {
+                return 0;
+            } else {
+                var theta = lon1 - lon2;
+                var dist = Math.sin(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(
+                    lat2)) * Math.cos(deg2rad(theta));
+                dist = Math.acos(dist);
+                dist = rad2deg(dist);
+                var miles = dist * 60 * 1.1515;
+                unit = unit.toUpperCase();
+                if (unit === "K") {
+                    return (miles * 1.609344);
+                } else if (unit === "N") {
+                    return (miles * 0.8684);
+                } else {
+                    return miles;
+                }
+            }
+        }
+
+        function deg2rad(deg) {
+            return deg * (Math.PI / 180);
+        }
+
+        function rad2deg(rad) {
+            return rad * (180 / Math.PI);
+        }
+
+        function refreshLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition);
+            } else {
+                x.innerHTML = "Geolocation is not supported by this browser.";
+            }
+        }
+
+        function showPosition(position) {
+
+            var dis = distance(
+                locationPelanggan.latitude,
+                locationPelanggan.longitude,
+                position.coords.latitude,
+                position.coords.longitude,
+                'K'
+            );
+
+            dis = dis * 1000
+            console.info(locationPelanggan.latitude, locationPelanggan.longitude);
+            console.info(position.coords.latitude, position.coords.longitude);
+            locationUser = position.coords;
+            if (range == null) {
+                $('.jarak').html(`Cabang ini belum disetting untuk range checkin nya.`);
+                return true;
+            }
+
+            if (dis <= range) {
+                btnLocation('ok');
+            } else {
+                btnLocation('error');
+            }
+
+            $('.jarak').html(`${Math.round(dis)} Meter`);
+        }
+
+        function btnLocation(param) {
+            $('.btn-checkin').removeClass('btn-danger');
+            $('.btn-checkin').removeClass('btn-primary');
+            if (param == 'error') {
+                $('.btn-checkin').addClass('btn-danger');
+                $('.btn-checkin').html('<i class="fa fa-exclamation-triangle"></i>&nbsp;&nbsp;OUT OF RANGE');
+                $('.checkin').addClass('disabled');
+            } else {
+                $('.btn-checkin').addClass('btn-primary');
+                $('.btn-checkin').text('SUBMIT LOCATION');
+                $('.checkin').removeClass('disabled');
+            }
+        }
+
+        function updateVisit(param) {
+            Swal.fire({
+                title: 'Anda yakin ingin menentukan titik lokasi ini?',
+                icon: 'info',
+                showDenyButton: true,
+                confirmButtonText: 'Yes',
+                denyButtonText: 'No',
+                reverseButtons: true,
+                customClass: {
+                    actions: 'my-actions',
+                    confirmButton: 'order-1',
+                    denyButton: 'order-3',
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $('#cover-spin').show()
+                    $.ajax({
+                        url: '{{ route('update-visit') }}',
+                        type: "post",
+                        data: {
+                            latitude: function() {
+                                return $('#latitude').val();
+                            },
+                            longitude: function() {
+                                return $('#longitude').val();
+                            },
+                            param: param,
+                            latitude_visit: locationUser.latitude,
+                            longitude_visit: locationUser.longitude,
+                            id: '{{ $data->id }}',
+                            pelanggan_id: '{{ $data->id_pelanggan }}',
+                        },
+                        dataType: "JSON",
+                        success: function(data) {
+                            $('#cover-spin').hide()
+                            locationPelanggan.latitude = data.data.latitude;
+                            locationPelanggan.longitude = data.data.longitude;
+                            if (data.result) {
+                                Swal.fire('Berhasil!', data.message, 'success').then((result) => {
+
+                                    if (param == 'whatsapp') {
+                                        window.open(
+                                            `https://api.whatsapp.com/send?phone={{ $data->kontak_person_pelanggan }}`
+                                        );
+                                    }
+
+                                    if (param == 'telepon') {
+                                        window.open(
+                                            `https://api.whatsapp.com/send?phone={{ $data->kontak_person_pelanggan }}`
+                                        );
+                                    }
+
+                                    if (data.url == null) {
+                                        appendMap(data.data.latitude, data.data.longitude);
+                                        cancelAction('set-cust-location');
+                                        $('.btn .set-cust-location').remove();
+                                    } else {
+                                        location.href = data.url;
+                                    }
+
+
+                                })
+                            } else {
+                                Swal.fire("Gagal Proses Data.", data.message, 'error')
+                            }
+                        },
+                        error: function(data) {
+                            $('#cover-spin').hide()
+                            Swal.fire("Gagal Proses Data.", data.responseJSON.message, 'error')
+                        }
+                    })
+                }
+
+            })
+        }
+
+        function setLocationNow() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(setCurrentLocation);
+            }
+        }
+
+        function setCurrentLocation(geo) {
+            $('#latitude').val(geo.coords.latitude)
+            $('#longitude').val(geo.coords.longitude)
         }
     </script>
 @endsection

@@ -125,26 +125,39 @@
                                     @endif
                                 </select>
                             </div>
-                        </div>
-                        <div class="col-md-4">
                             <label>Kode Pemakaian</label>
                             <div class="form-group">
                                 <input type="text" name="kode_pemakaian"
                                     value="{{ old('kode_pemakaian', $data ? $data->kode_pemakaian : '') }}"
                                     class="form-control" readonly placeholder="Otomatis">
                             </div>
+                        </div>
+                        <div class="col-md-4">
                             <label>Tanggal <span>*</span></label>
                             <div class="form-group">
-                                <input type="text" name="tanggal"
+                                <input type="date" name="tanggal"
                                     value="{{ old('tanggal', $data ? $data->tanggal : date('Y-m-d')) }}"
-                                    class="form-control datepicker" data-validation="[NOTEMPTY]"
+                                    class="form-control" data-validation="[NOTEMPTY]"
                                     data-validation-message="Tanggal tidak boleh kosong">
+                            </div>
+                            <label>Jenis Pemakaian <span>*</span></label>
+                            <div class="form-group">
+                                <select name="jenis_pemakaian" class="form-control select2" data-validation="[NOTEMPTY]"
+                                    data-validation-message="Tanggal tidak boleh kosong">
+                                    <option value="">Pilih Jenis Pemakaian</option>
+                                    <option value="1" {{ $data && $data->jenis_pemakaian == 1 ? 'selected' : '' }}>
+                                        Penjualan</option>
+                                    <option value="2" {{ $data && $data->jenis_pemakaian == 2 ? 'selected' : '' }}>
+                                        Keperluan Lab</option>
+                                    <option value="3" {{ $data && $data->jenis_pemakaian == 3 ? 'selected' : '' }}>
+                                        Produksi</option>
+                                </select>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <label>Catatan</label>
                             <div class="form-group">
-                                <textarea name="catatan" class="form-control" rows="3">{{ old('catatan', $data ? $data->catatan : '') }}</textarea>
+                                <textarea name="catatan" class="form-control" rows="2.5">{{ old('catatan', $data ? $data->catatan : '') }}</textarea>
                             </div>
                             @if ($accessQc == '1')
                                 <label>QC</label>

@@ -27,7 +27,7 @@ class ScheduleVisitController extends Controller
                     'p.alamat_pelanggan',
                     'v.pre_visit_desc',
                     'v.status',
-                    'v.user_created',
+                    'v.user_created'
                 )
                 ->whereIn('status', ['0', '1'])
                 ->leftJoin('salesman as s', 's.id_salesman', '=', 'v.id_salesman')
@@ -69,7 +69,6 @@ class ScheduleVisitController extends Controller
                         $btn .= '</ul>';
                         return $btn;
                     }
-
                 })
                 ->rawColumns(['action'])
                 ->make(true);
@@ -191,4 +190,10 @@ class ScheduleVisitController extends Controller
         }
     }
 
+    public function appendMap(Request $req)
+    {
+        return view('ops.scheduleVisit.map', [
+            'req' => $req,
+        ]);
+    }
 }

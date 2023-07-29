@@ -2,88 +2,133 @@
 
 namespace App\Http\Controllers;
 
+use App\MaterialUsage;
+use App\Models\Master\Pelanggan;
+use App\Models\Master\Setting;
+use App\Pengguna;
 use App\Visit;
-use DB;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Log;
-use Yajra\DataTables\DataTables;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Yajra\DataTables\Facades\DataTables;
 
 class VisitController extends Controller
 {
     public function index(Request $request)
     {
+        // dd(checkPenjualan(273, 1, '2022-05-25', '2022-05-25'));
         if (checkUserSession($request, 'pemakaian', 'show') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
+
         if ($request->ajax()) {
-            $data = DB::table('pemakaian_header')
-                ->select(
-                    'id_pemakaian',
-                    'kode_pemakaian',
-                    'tanggal',
-                    'g.nama_gudang',
-                    'c.nama_cabang',
-                    'user_created',
-                    'catatan',
-                    'is_qc',
-                    'void'
-                )
-                ->leftJoin('gudang as g', 'pemakaian_header.id_gudang', '=', 'g.id_gudang')
-                ->leftJoin('cabang as c', 'pemakaian_header.id_cabang', '=', 'c.id_cabang');
-            if (isset($request->c)) {
-                $data = $data->where('pemakaian_header.id_cabang', $request->c);
-            }
+            $data = Visit::where(function ($q) use ($request) {
+                if ($request->id_cabang != '') {
+                    $q->where('id_cabang', $request->id_cabang);
+                }
 
-            if ($request->show_void == 'false') {
-                $data = $data->where('pemakaian_header.void', '0');
-            }
+                if ($request->id_salesman != '') {
+                    $q->where('id_salesman', $request->id_salesman);
+                }
 
-            $data = $data->orderBy('pemakaian_header.dt_created', 'desc');
+                if ($request->progress_ind != '') {
+                    if ($request->progress_ind == 0) {
+                        $q->whereNull('progress_ind');
+                    } else {
+                        $q->where('progress_ind', $request->progress_ind);
+                    }
+                }
+
+                if ($request->status != '') {
+                    $q->where('status', $request->status);
+                }
+            })->orderBy('created_at', 'desc');
+
+            // if ($request->show_void == 'false') {
+            //     $data = $data->where('pemakaian_header.void', '0');
+            // }
 
             $idUser = session()->get('user')['id_pengguna'];
             $idGrupUser = session()->get('user')['id_grup_pengguna'];
-            $filterUser = DB::table('pengguna')
-                ->where(function ($w) {
-                    $w->where('id_grup_pengguna', session()->get('user')['id_grup_pengguna'])->orWhere('id_grup_pengguna', 1);
-                })
-                ->where('status_pengguna', '1')->pluck('id_pengguna')->toArray();
-            $accessVoid = getSetting('Pemakaian Void');
-            $arrayAccessVoid = explode(',', $accessVoid);
 
-            return Datatables::of($data)
+            // dd($idUser);
+            // $filterUser = DB::table('pengguna')
+            //     ->where(function ($w) {
+            //         $w->where('id_grup_pengguna', session()->get('user')['id_grup_pengguna'])->orWhere('id_grup_pengguna', 1);
+            //     })
+            //     ->where('status_pengguna', '1')->pluck('id_pengguna')->toArray();
+            // $accessVoid = getSetting('Pemakaian Void');
+            // $arrayAccessVoid = explode(',', $accessVoid);
+
+            return DataTables::eloquent($data)
                 ->addIndexColumn()
-                ->addColumn('action', function ($row) use ($filterUser, $idUser, $idGrupUser, $arrayAccessVoid) {
-                    if ($row->void == '1') {
+                ->addColumn('actions', function ($row) use ($idUser) {
+                    if ($row->status == '0') {
                         $btn = '<label class="label label-default">Batal</label>';
                         $btn .= '<ul class="horizontal-list">';
-                        $btn .= '<li><a href="' . route('material_usage-view', $row->id_pemakaian) . '" class="btn btn-info btn-xs mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
+                        $btn .= '<li><a href="' . route('pre_visit-view', $row->id) . '" class="btn btn-info btn-xs mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
                         $btn .= '</ul>';
                         return $btn;
-                    } else {
+                    } elseif ($row->status == '1') {
                         $btn = '<ul class="horizontal-list">';
-                        $btn .= '<li><a href="' . route('material_usage-view', $row->id_pemakaian) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
-                        if (in_array($idUser, $filterUser) || $idUser == $row->user_created) {
-                            $btn .= '<li><a href="' . route('material_usage-entry', $row->id_pemakaian) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
+                        $btn .= '<li><a href="' . route('pre_visit-view', $row->id) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
+                        if ($idUser == $row->user_created) {
+                            $btn .= '<li><a href="' . route('pre_visit-entry', $row->id) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
+                            $btn .= '<li><a href="' . route('visit-entry', $row->id) . '" class="btn btn-success btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Buat Kunjungan</a></li>';
                         }
-
-                        if (in_array($idGrupUser, $arrayAccessVoid) || $idUser == $row->user_created) {
-                            $btn .= '<li><a href="' . route('material_usage-delete', $row->id_pemakaian) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Void</a></li>';
-                        }
-
                         $btn .= '</ul>';
                         return $btn;
                     }
-
                 })
-                ->rawColumns(['action'])
+                ->addColumn('action', function ($data) {
+                    return view('ops.visit.action', compact('data'));
+                })
+                ->addColumn('nama_cabang', function ($data) {
+                    return $data->nama_cabang;
+                })
+                ->addColumn('nama_salesman', function ($data) {
+                    return $data->nama_salesman;
+                })
+                ->addColumn('nama_pelanggan', function ($data) {
+                    return $data->nama_pelanggan;
+                })
+                ->addColumn('detail', function ($data) {
+                    return view('ops.visit.detail', compact('data'));
+                })
+                ->addColumn('status', function ($data) {
+                    switch ($data->status) {
+                        case '0':
+                            return "<label class='label label-danger'>Batal Visit</label>";
+                            break;
+                        case '1':
+                            return "<label class='label label-warning'>Belum Visit</label>";
+                            break;
+                        case '2':
+                            return "<label class='label label-primary'>Sudah Visit</label>";
+                            break;
+                        default:
+                            # code...
+                            break;
+                    }
+                })
+                ->addColumn('status_report', function ($data) {
+                    if ($data->progress_ind == null) {
+                        return "<label class='label label-warning'>Belum Report</label>";
+                    } else {
+                        return "<label class='label label-primary'>Sudah Report</label>";
+                    }
+                })
+                ->rawColumns(['action', 'status', 'status_report'])
                 ->make(true);
         }
 
         $cabang = session()->get('access_cabang');
-        return view('ops.materialUsage.index', [
+        return view('ops.visit.index', [
             'cabang' => $cabang,
-            "pageTitle" => "SCA OPS | Pemakaian | List",
+            "pageTitle" => "SCA OPS | Visit | List",
         ]);
     }
 
@@ -92,8 +137,24 @@ class VisitController extends Controller
         // if (checkAccessMenu('pemakaian', $id == 0 ? 'create' : 'edit') == false) {
         //     return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         // }
+        // Setting::create([
+        //     "id_cabang" => 1,
+        //     "code" => "Range Checkin Kunjungan",
+        //     "description" => "Range Checkin Kunjungan",
+        //     "tipe" => 1,
+        //     "value1" => "",
+        //     "value2" => "100",
+        //     "user_created" => 1,
+        //     "dt_created" => now(),
+        //     "user_modified" => 1,
+        //     "dt_modified" => now(),
+        // ]);
 
         $data = Visit::find($id);
+
+        $range = Setting::where('code', 'Range Checkin Kunjungan')
+            ->where('id_cabang', $data->id_cabang)
+            ->first();
         $pelanggan = DB::table('pelanggan')->get();
         $salesman = DB::table('salesman')->get();
         $cabang = session()->get('access_cabang');
@@ -102,56 +163,9 @@ class VisitController extends Controller
             'cabang' => $cabang,
             'salesman' => $salesman,
             'pelanggan' => $pelanggan,
+            'range' => $range,
             "pageTitle" => "SCA OPS | Kunjungan | " . ($id == 0 ? 'Create' : 'Edit'),
         ]);
-    }
-
-    public function saveEntry(Request $request, $id = 0)
-    {
-        $data = MaterialUsage::find($id);
-        try {
-            DB::beginTransaction();
-            if (!$data) {
-                $data = new MaterialUsage;
-            }
-
-            $data->fill($request->except('is_qc'));
-            if ($id == 0) {
-                $data->kode_pemakaian = MaterialUsage::createcode($request->id_cabang);
-                $data->user_created = session()->get('user')['id_pengguna'];
-                $data->is_qc = isset($request->is_qc) ? $request->is_qc : 0;
-            } else {
-                $data->user_modified = session()->get('user')['id_pengguna'];
-            }
-
-            $data->save();
-
-            $checkStock = $data->checkStockDetails($request->details);
-            if ($checkStock['result'] == false) {
-                DB::rollback();
-                return response()->json([
-                    "result" => $checkStock['result'],
-                    "message" => $checkStock['message'],
-                ], 500);
-            }
-
-            $data->savedetails($request->details);
-
-            DB::commit();
-            return response()->json([
-                "result" => true,
-                "message" => "Data berhasil disimpan",
-                "redirect" => route('material_usage-entry', $data->id_pemakaian),
-            ], 200);
-        } catch (\Exception $e) {
-            DB::rollback();
-            Log::error("Error when save material usage");
-            Log::error($e);
-            return response()->json([
-                "result" => false,
-                "message" => "Data gagal tersimpan",
-            ], 500);
-        }
     }
 
     public function viewData($id)
@@ -204,6 +218,77 @@ class VisitController extends Controller
             return response()->json([
                 "result" => false,
                 "message" => "Data gagal dibatalkan",
+            ], 500);
+        }
+    }
+
+    public function updateVisit(Request $req): JsonResponse
+    {
+        try {
+            $message = '';
+            $url = url('kunjungan.reporting.index');
+            if ($req->param == 'set_location') {
+                $data = Pelanggan::findOrFail($req->pelanggan_id);
+                $data->latitude_pelanggan = $req->latitude;
+                $data->longitude_pelanggan = $req->longitude;
+                $data->save();
+                $message = "Data lokasi pelanggan berhasil ditentukan";
+                $url = null;
+            } elseif ($req->param == 'checkin') {
+                $data = Visit::findOrFail($req->id);
+                $data->latitude_visit = $req->latitude_visit;
+                $data->longitude_visit = $req->longitude_visit;
+                $data->visit_type = 'LOKASI';
+                $data->status = 2;
+                $data->save();
+                $message = "Berhasil checkin";
+                $url = route('kunjungan.reporting.show', [$req->id]);
+            } else {
+                $data = Visit::findOrFail($req->id);
+                $data->visit_type = strtoupper($req->param);
+                $data->status = 2;
+                $data->save();
+                $message = "Berhasil mengupdate status visit";
+                $url = route('kunjungan.reporting.show', [$req->id]);
+            }
+
+
+
+            Log::info("Berhasil update status visit", $data->toArray());
+            return response()->json([
+                "result" => true,
+                "data" => $req->only(['latitude', 'longitude']),
+                'url' => $url,
+                "message" => $message,
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "result" => true,
+                "data" => $req->only(['latitude', 'longitude']),
+                "message" => $th->getMessage(),
+            ], 500);
+        }
+    }
+
+    function cancelVisit(Request $req): JsonResponse
+    {
+        try {
+            $message = 'Berhasil membatalkan visit';
+            $url = url('jadwal_kunjungan/index');
+            $data = Visit::findOrFail($req->id);
+            $data->alasan_pembatalan = $req->alasan_pembatalan;
+            $data->status = 0;
+            $data->save();
+            return response()->json([
+                "result" => true,
+                'url' => $url,
+                "message" => $message,
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "result" => true,
+                "data" => $req->only(['latitude', 'longitude']),
+                "message" => $th->getMessage(),
             ], 500);
         }
     }

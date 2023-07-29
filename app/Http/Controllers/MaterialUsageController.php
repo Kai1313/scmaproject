@@ -27,7 +27,12 @@ class MaterialUsageController extends Controller
                     'user_created',
                     'catatan',
                     'is_qc',
-                    'void'
+                    'void',
+                    DB::raw('(case
+                        when jenis_pemakaian = 1 then "Penjualan"
+                        when jenis_pemakaian = 2 then "Keperluan Lab"
+                        when jenis_pemakaian = 3 then "Produksi"
+                        else "" end) as keterangan_jenis_pemakaian')
                 )
                 ->leftJoin('gudang as g', 'pemakaian_header.id_gudang', '=', 'g.id_gudang')
                 ->leftJoin('cabang as c', 'pemakaian_header.id_cabang', '=', 'c.id_cabang');
@@ -53,6 +58,10 @@ class MaterialUsageController extends Controller
 
             return Datatables::of($data)
                 ->addIndexColumn()
+                ->filterColumn('keterangan_jenis_pemakaian', function ($row, $keyword) {
+                    $keywords = trim($keyword);
+                    $row->whereRaw("(case when jenis_pemakaian = 1 then 'Penjualan' when jenis_pemakaian = 2 then 'Keperluan Lab' when jenis_pemakaian = 3 then 'Produksi' else '' end) like ?", ["%{$keywords}%"]);
+                })
                 ->addColumn('action', function ($row) use ($filterUser, $idUser, $idGrupUser, $arrayAccessVoid) {
                     if ($row->void == '1') {
                         $btn = '<label class="label label-default">Batal</label>';
@@ -228,22 +237,27 @@ class MaterialUsageController extends Controller
                 'master_wrapper.weight as wrapper_weight',
                 'id_wrapper_zak',
                 'weight_zak',
-                'zak as jumlah_zak'
+                'zak as jumlah_zak',
+                'mqc.status_qc_qr_code'
             )
             ->leftJoin('barang', 'mqc.id_barang', '=', 'barang.id_barang')
             ->leftJoin('satuan_barang as sb', 'mqc.id_satuan_barang', '=', 'sb.id_satuan_barang')
             ->leftJoin('master_wrapper', 'mqc.id_wrapper_zak', '=', 'master_wrapper.id_wrapper')
             ->where('mqc.id_cabang', $idCabang)
             ->where('mqc.id_gudang', $idGudang);
-        if ($isQc == 0) {
-            $data = $data->where('mqc.status_qc_qr_code', 1);
-        }
 
         $data = $data->where('kode_batang_master_qr_code', $qrcode)
             ->where('sisa_master_qr_code', '>', 0)->first();
         if (!$data) {
             return response()->json([
                 'message' => 'Barang tidak ditemukan',
+                'status' => 'error',
+            ], 500);
+        }
+
+        if ($isQc == 0 && $data->status_qc_qr_code == 0) {
+            return response()->json([
+                'message' => 'Barang belum di QC',
                 'status' => 'error',
             ], 500);
         }

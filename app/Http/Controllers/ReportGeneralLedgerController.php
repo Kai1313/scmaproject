@@ -32,7 +32,13 @@ class ReportGeneralLedgerController extends Controller
 
         // Check get parameter
         $cabang = ($request->has("cabang"))?$request->cabang:NULL;
-        $id_akun = ($request->has("id_akun"))?$request->id_akun:NULL;
+        if ($request->has("kode_akun")) {
+            $kode_akun = $request->kode_akun;
+            $getAkun = Akun::where("kode_akun", $kode_akun)->where("id_cabang", $cabang)->first();
+            $id_akun = ($getAkun)?$getAkun->id_akun:NULL;
+        } else {
+            $id_akun = ($request->has("id_akun"))?$request->id_akun:NULL;
+        }
         $startdate = ($request->has("startdate"))?$request->startdate:NULL;
         $enddate = ($request->has("enddate"))?$request->enddate:NULL;
         $type = ($request->has("type"))?$request->type:NULL;
@@ -252,8 +258,8 @@ class ReportGeneralLedgerController extends Controller
                     $kredit = ($data_saldo_ledgers)?$data_saldo_ledgers->kredit:0;
                     $saldo_awal = ($saldo_debet - $saldo_kredit) + ($debet - $kredit);
                     $saldo_akhir = $saldo_awal + $value->debet - $value->kredit;
-                    $value["saldo_awal"] = $saldo_awal;
-                    $value["saldo_akhir"] = $saldo_akhir;
+                    $value["saldo_awal"] = round($saldo_awal, 2);
+                    $value["saldo_akhir"] = round($saldo_akhir, 2);
                 }
                 else {
                     if ($saldo_awal_current != $value->id_akun) {
@@ -286,7 +292,7 @@ class ReportGeneralLedgerController extends Controller
                             "debet"=>$saldo_awal_debet,
                             "kredit"=>$saldo_awal_kredit,
                             "tanggal_jurnal"=>$saldo_date,
-                            "saldo_balance"=>$saldo_balance
+                            "saldo_balance"=>round($saldo_balance, 2)
                         ];
                     }
                     $saldo_balance = $saldo_balance + $value->debet - $value->kredit;
@@ -302,7 +308,7 @@ class ReportGeneralLedgerController extends Controller
                         "debet"=>$value->debet,
                         "kredit"=>$value->kredit,
                         "tanggal_jurnal"=>$value->tanggal_jurnal,
-                        "saldo_balance"=>$saldo_balance
+                        "saldo_balance"=>round($saldo_balance, 2)
                     ];
                 }
             }
