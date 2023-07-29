@@ -56,7 +56,7 @@
             <div class="box-header">
                 <div class="row">
                     <div class="col-md-4">
-                        <label>Cabang</label>
+                        <label>Cabang Penerima</label>
                         <div class="form-group">
                             <select name="id_cabang" class="form-control select2">
                                 @foreach ($cabang as $branch)
@@ -81,7 +81,7 @@
                                 <th>Tanggal</th>
                                 <th>Kode Pindah Cabang</th>
                                 <th>Kode Referensi</th>
-                                <th>Gudang</th>
+                                <th>Gudang Penerima</th>
                                 <th>Cabang Asal</th>
                                 <th>Jasa Pengiriman</th>
                                 <th>Status</th>

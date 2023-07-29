@@ -42,13 +42,13 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="row">
-                            <label class="col-md-4">Cabang</label>
+                            <label class="col-md-4">Cabang Asal</label>
                             <div class="col-md-8">
                                 : {{ $data->cabang->kode_cabang }} - {{ $data->cabang->nama_cabang }}
                             </div>
                         </div>
                         <div class="row">
-                            <label class="col-md-4">Gudang</label>
+                            <label class="col-md-4">Gudang Asal</label>
                             <div class="col-md-8">
                                 : {{ $data->gudang->nama_gudang }}
                             </div>

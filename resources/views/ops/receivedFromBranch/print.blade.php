@@ -148,12 +148,12 @@
             <td valign="top" style="width:67%;">
                 <table class='kiri' style="width:100%;">
                     <tr>
-                        <td width="100"><b>Cabang</b></td>
+                        <td width="100"><b>Cabang Penerima</b></td>
                         <td width="5">:</td>
                         <td>{{ $data->cabang->nama_cabang }}</td>
                     </tr>
                     <tr>
-                        <td><b>Gudang</b></td>
+                        <td><b>Gudang Penerima</b></td>
                         <td>:</td>
                         <td>{{ $data->gudang->nama_gudang }}</td>
                     </tr>
@@ -163,7 +163,7 @@
                         <td>{{ $data->tanggal_pindah_barang }}</td>
                     </tr>
                     <tr>
-                        <td><b>Dari Cabang</b></td>
+                        <td><b>Cabang Asal</b></td>
                         <td>:</td>
                         <td>{{ $data->cabang2->nama_cabang }}</td>
                     </tr>

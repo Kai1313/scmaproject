@@ -139,7 +139,7 @@
                             </div>
                         @endif
                         <div class="col-md-4">
-                            <label>Cabang</label>
+                            <label>Cabang Penerima</label>
                             <div class="form-group">
                                 <input type="text" name="nama_cabang"
                                     value="{{ old('nama_cabang', $data ? $data->cabang->nama_cabang : '') }}"
@@ -151,7 +151,7 @@
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <label>Gudang</label>
+                            <label>Gudang Penerima</label>
                             <div class="form-group">
                                 <input type="text" name="nama_gudang"
                                     value="{{ old('nama_gudang', $data ? $data->gudang->nama_gudang : '') }}"
