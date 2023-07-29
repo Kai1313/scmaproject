@@ -137,7 +137,13 @@
                                 <div class="form-group">
                                     <select name="id_salesman" class="form-control select2 trigger-change">
                                         @foreach ($salesman as $item)
-                                            <option value="{{ $item->id_salesman }}">{{ $item->nama_salesman }}</option>
+                                            @if ($data != null)
+                                                <option {{ $data->id_salesman == $item->id_salesman ? 'selected' : '' }}
+                                                    value="{{ $item->id_salesman }}">{{ $item->nama_salesman }}</option>
+                                            @else
+                                                <option value="{{ $item->id_salesman }}">{{ $item->nama_salesman }}
+                                                </option>
+                                            @endif
                                         @endforeach
                                     </select>
                                 </div>
@@ -150,10 +156,18 @@
                                 <div class="form-group">
                                     <select name="id_pelanggan" class="form-control select2 trigger-change"
                                         id="id_pelanggan">
+                                        <option value="">Pilih pelanggan</option>
                                         @foreach ($pelanggan as $item)
-                                            <option data-latitude="{{ $item->latitude_pelanggan }}"
-                                                data-longitude="{{ $item->longitude_pelanggan }}"
-                                                value="{{ $item->id_pelanggan }}">{{ $item->nama_pelanggan }}</option>
+                                            @if ($data != null)
+                                                <option {{ $data->id_pelanggan == $item->id_pelanggan ? 'selected' : '' }}
+                                                    data-latitude="{{ $item->latitude_pelanggan }}"
+                                                    data-longitude="{{ $item->longitude_pelanggan }}"
+                                                    value="{{ $item->id_pelanggan }}">{{ $item->nama_pelanggan }}</option>
+                                            @else
+                                                <option data-latitude="{{ $item->latitude_pelanggan }}"
+                                                    data-longitude="{{ $item->longitude_pelanggan }}"
+                                                    value="{{ $item->id_pelanggan }}">{{ $item->nama_pelanggan }}</option>
+                                            @endif
                                         @endforeach
                                     </select>
                                 </div>
@@ -161,13 +175,17 @@
                             <div class="col-md-6">
                                 <label>Latitude</label>
                                 <div class="form-group">
-                                    <input type="text" readonly name="latitude" id="latitude" class="form-control">
+                                    <input type="text"
+                                        value="{{ old('latitude', $data ? $data->pelanggan->latitude_pelanggan : '') }}"
+                                        readonly name="latitude" id="latitude" class="form-control">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <label>Longitude</label>
                                 <div class="form-group">
-                                    <input type="text" readonly name="longitude" id="longitude" class="form-control">
+                                    <input type="text" readonly
+                                        value="{{ old('longitude', $data ? $data->pelanggan->longitude_pelanggan : '') }}"
+                                        name="longitude" id="longitude" class="form-control">
                                 </div>
                             </div>
                             <div class="col-md-12">
@@ -289,7 +307,7 @@
     <script>
         let branch = {!! json_encode($cabang) !!}
         let timbangan = '';
-        let details = {!! $data ? $data->formatdetail : '[]' !!};
+        let details = [];
         let detailSelect = []
         let count = details.length
         let statusModal = 'create'
@@ -297,6 +315,10 @@
             fps: 10,
             qrbox: 250
         });
+
+        $(document).ready(function() {
+            $('#id_pelanggan').change();
+        })
 
         $('.datepicker').datepicker({
             format: 'yyyy-mm-dd',
@@ -726,8 +748,8 @@
             $.ajax({
                 url: '{{ route('append-map') }}',
                 data: {
-                    latitude: latitude,
-                    longitude: longitude,
+                    latitude: latitude * 1,
+                    longitude: longitude * 1,
                 },
                 success: function(response) {
                     $('#map').html(response);
