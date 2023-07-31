@@ -660,25 +660,6 @@
                                     </span>
                                 </a>
                                 <ul class="treeview-menu">
-                                    <li data-alias="jadwal_kunjungan">
-                                        <a href="{{ route('pre_visit') }}"
-                                            class="{{ menuActive(request()->url(), route('pre_visit')) > 0 ? 'active' : null }}">
-                                            <i class="glyphicon glyphicon-option-vertical"></i>Jadwal Visit
-
-                                        </a>
-                                    </li>
-                                    <li data-alias="kunjungan">
-                                        <a href="{{ route('visit') }}"
-                                            class="{{ menuActive(request()->url(), route('visit')) > 0 ? 'active' : null }}">
-                                            <i class="glyphicon glyphicon-option-vertical"></i>Visit
-                                        </a>
-                                    </li>
-                                    <li data-alias="kunjungan">
-                                        <a href="{{ route('visit.progress-visit.index') }}"
-                                            class="{{ menuActive(request()->url(), route('visit.progress-visit.index')) > 0 ? 'active' : null }}">
-                                            <i class="glyphicon glyphicon-option-vertical"></i>Progress Visit
-                                        </a>
-                                    </li>
                                     @if (checkAccessMenu('permintaan_penjualan'))
                                         <li data-alias="permintaan_penjualan">
                                             <a href="{{ env('OLD_URL_ROOT') }}#permintaan_penjualan">
@@ -1219,6 +1200,34 @@
                     </ul>
                 </li>
             @endif
+            <li class="treeview" style="height: auto;">
+                <a href="#"><i class="fa fa-users"></i> <span>Marketing Tools</span>
+                    <span class="pull-right-container">
+                        <i class="fa fa-angle-left pull-right"></i>
+                    </span>
+                </a>
+                <ul class="treeview-menu" style="display: none;">
+                    <li data-alias="jadwal_kunjungan">
+                        <a href="{{ route('pre_visit') }}"
+                            class="{{ menuActive(request()->url(), route('pre_visit')) > 0 ? 'active' : null }}">
+                            <i class="glyphicon glyphicon-option-vertical"></i>Jadwal Visit
+
+                        </a>
+                    </li>
+                    <li data-alias="kunjungan">
+                        <a href="{{ route('visit') }}"
+                            class="{{ menuActive(request()->url(), route('visit')) > 0 ? 'active' : null }}">
+                            <i class="glyphicon glyphicon-option-vertical"></i>Visit
+                        </a>
+                    </li>
+                    <li data-alias="kunjungan">
+                        <a href="{{ route('visit.progress-visit.index') }}"
+                            class="{{ menuActive(request()->url(), route('visit.progress-visit.index')) > 0 ? 'active' : null }}">
+                            <i class="glyphicon glyphicon-option-vertical"></i>Progress Visit
+                        </a>
+                    </li>
+                </ul>
+            </li>
             <li class="header">ACCOUNTING</li>
             <li class="treeview {{ request()->segment(1) == 'master' ? 'active' : null }}">
                 <a href="#"><i class="fa fa-link"></i> <span>Master</span>
