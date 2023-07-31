@@ -26,7 +26,6 @@ function checkUserSession($request, $alias_menu, $type)
 {
 
     $user_id = $request->user_id;
-    dd($user_id);
     if ($user_id != '' && session()->has('token') == false || session()->has('token') == true) {
         if (session()->has('token') == true) {
             $user_id = session()->get('user')->id_pengguna;
