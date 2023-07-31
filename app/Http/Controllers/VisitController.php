@@ -226,7 +226,7 @@ class VisitController extends Controller
     {
         try {
             $message = '';
-            $url = url('kunjungan.reporting.index');
+            $url = url('visit.reporting.index');
             if ($req->param == 'set_location') {
                 $data = Pelanggan::findOrFail($req->pelanggan_id);
                 $data->latitude_pelanggan = $req->latitude;
@@ -242,14 +242,14 @@ class VisitController extends Controller
                 $data->status = 2;
                 $data->save();
                 $message = "Berhasil checkin";
-                $url = route('kunjungan.reporting.show', [$req->id]);
+                $url = route('visit.reporting.show', [$req->id]);
             } else {
                 $data = Visit::findOrFail($req->id);
                 $data->visit_type = strtoupper($req->param);
                 $data->status = 2;
                 $data->save();
                 $message = "Berhasil mengupdate status visit";
-                $url = route('kunjungan.reporting.show', [$req->id]);
+                $url = route('visit.reporting.show', [$req->id]);
             }
 
 
