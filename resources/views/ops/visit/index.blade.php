@@ -244,7 +244,7 @@
             width: '100%',
             allowClear: true,
             ajax: {
-                url: "{{ route('kunjungan.reporting.select') }}?param=id_salesman",
+                url: "{{ route('visit.reporting.select') }}?param=id_salesman",
                 dataType: 'json',
                 data: function(params) {
                     return {

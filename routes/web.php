@@ -131,16 +131,16 @@ Route::prefix('pemakaian')->group(function () {
 });
 
 Route::prefix('penjualan')->group(function () {
-    Route::prefix('jadwal_kunjungan')->group(function () {
+    Route::prefix('pre_visit')->group(function () {
         Route::get('/index/{user_id?}', 'ScheduleVisitController@index')->name('pre_visit');
-        Route::get('/entry/{id?}', 'ScheduleVisitController@entry')->name('pre_visit-entry');
+        Route::get('/entry/{id?}', 'ScheduleVisitConftroller@entry')->name('pre_visit-entry');
         Route::get('/append-map', 'ScheduleVisitController@appendMap')->name('append-map');
         Route::post('/save_entry/{id}', 'ScheduleVisitController@saveEntry')->name('pre_visit-save-entry');
         Route::get('/view/{id}', 'ScheduleVisitController@viewData')->name('pre_visit-view');
         Route::get('/delete/{id}', 'ScheduleVisitController@destroy')->name('pre_visit-delete');
     });
 
-    Route::prefix('kunjungan')->group(function () {
+    Route::prefix('visit')->group(function () {
         Route::get('/index/{user_id?}', 'VisitController@index')->name('visit');
         Route::get('/entry/{id?}', 'VisitController@entry')->name('visit-entry');
         Route::post('/save_entry/{id}', 'VisitController@saveEntry')->name('visit-save-entry');
@@ -149,14 +149,14 @@ Route::prefix('penjualan')->group(function () {
         Route::post('/update-visit', 'VisitController@updateVisit')->name('update-visit');
         Route::get('/delete/{id}', 'VisitController@destroy')->name('visit-delete');
         Route::resource('reporting', 'ReportingVisitController', [
-            'as' => 'kunjungan'
+            'as' => 'visit'
         ]);
         Route::prefix('/reporting')->group(function () {
-            Route::get('/select-reporting-visit', 'ReportingVisitController@select')->name('kunjungan.reporting.select');
+            Route::get('/select-reporting-visit', 'ReportingVisitController@select')->name('visit.reporting.select');
         });
 
         Route::resource('progress-visit', 'ReportingVisitController', [
-            'as' => 'kunjungan'
+            'as' => 'visit'
         ]);
     });
 });
