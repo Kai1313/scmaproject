@@ -674,8 +674,8 @@
                                         </a>
                                     </li>
                                     <li data-alias="kunjungan">
-                                        <a href="{{ route('visit') }}"
-                                            class="{{ menuActive(request()->url(), route('kunjungan.progress-visit.index')) > 0 ? 'active' : null }}">
+                                        <a href="{{ route('visit.progress-visit.index') }}"
+                                            class="{{ menuActive(request()->url(), route('visit.progress-visit.index')) > 0 ? 'active' : null }}">
                                             <i class="glyphicon glyphicon-option-vertical"></i>Progress Visit
                                         </a>
                                     </li>

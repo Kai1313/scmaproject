@@ -12,7 +12,7 @@
         @endif
         @if ($data->status == 2)
             <li role="presentation" class="text-warning"><a role="menuitem" tabindex="-1"
-                    href="{{ route('kunjungan.progress-visit.show', [$data->id]) }}">
+                    href="{{ route('visit.progress-visit.show', [$data->id]) }}">
                     <i class="fa fa-edit dropdown-icon"></i>Report Visit</a>
             </li>
         @endif

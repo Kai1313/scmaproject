@@ -90,7 +90,7 @@
         }
 
         /* @media screen and (-webkit-min-device-pixel-ratio: 0) {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                } */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        } */
 
         .range-slider::-moz-range-progress {
             background-color: #43e5f7;
@@ -913,7 +913,7 @@
         $("#sales_order_id").select2({
             width: '100%',
             ajax: {
-                url: "{{ route('kunjungan.reporting.select') }}?param=sales_order_id",
+                url: "{{ route('visit.reporting.select') }}?param=sales_order_id",
                 dataType: 'json',
                 data: function(params) {
                     return {
@@ -1044,7 +1044,7 @@
                 if (result.isConfirmed) {
                     $('#cover-spin').show()
                     $.ajax({
-                        url: '{{ route('kunjungan.reporting.update', [$data->id]) }}',
+                        url: '{{ route('visit.reporting.update', [$data->id]) }}',
                         type: "post",
                         dataType: "JSON",
                         data: form,
