@@ -1200,14 +1200,14 @@
                     </ul>
                 </li>
             @endif
-            <li class="treeview {{ in_array(request()->segment(1), ['marketing-tool']) ? 'menu-open' : null }}"
+            <li class="treeview {{ in_array(request()->segment(1), ['marketing-tool']) ? 'active' : null }}"
                 style="height: auto;">
                 <a href="#"><i class="fa fa-users"></i> <span>Marketing Tools</span>
                     <span class="pull-right-container">
                         <i class="fa fa-angle-left pull-right"></i>
                     </span>
                 </a>
-                <ul class="treeview-menu" style="display: none;">
+                <ul class="treeview-menu">
                     <li data-alias="jadwal_kunjungan"
                         class="{{ menuActive(request()->url(), route('pre_visit')) > 0 ? 'active' : null }}">
                         <a href="{{ route('pre_visit') }}"
