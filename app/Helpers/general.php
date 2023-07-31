@@ -32,7 +32,6 @@ function checkUserSession($request, $alias_menu, $type)
             $user_id = session()->get('user')->id_pengguna;
         }
 
-        dd($user_id);
         $user = User::where('id_pengguna', $user_id)->first();
         $token = UserToken::where('id_pengguna', $user_id)->where('status_token_pengguna', 1)->whereRaw("waktu_habis_token_pengguna > STR_TO_DATE(?, '%Y-%m-%d %H:%i:%s')", \Carbon\Carbon::now()->format('Y-m-d H:i:s'))->first();
 
