@@ -1200,7 +1200,7 @@
                     </ul>
                 </li>
             @endif
-            <li class="treeview" style="height: auto;">
+            <li class="treeview {{ in_array(request()->segment(1), ['marketing-tool']]) ? 'active' : null }}" style="height: auto;">
                 <a href="#"><i class="fa fa-users"></i> <span>Marketing Tools</span>
                     <span class="pull-right-container">
                         <i class="fa fa-angle-left pull-right"></i>
