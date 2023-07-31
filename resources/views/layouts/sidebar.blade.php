@@ -1224,9 +1224,9 @@
                         </a>
                     </li>
                     <li data-alias="kunjungan"
-                        class="{{ menuActive(request()->url(), route('visit.progress-visit.index')) > 0 ? 'active' : null }}">
-                        <a href="{{ route('visit.progress-visit.index') }}"
-                            class="{{ menuActive(request()->url(), route('visit.progress-visit.index')) > 0 ? 'active' : null }}">
+                        class="{{ menuActive(request()->url(), route('progress_visit')) > 0 ? 'active' : null }}">
+                        <a href="{{ route('progress_visit') }}"
+                            class="{{ menuActive(request()->url(), route('progress_visit')) > 0 ? 'active' : null }}">
                             <i class="glyphicon glyphicon-option-vertical"></i>Progress Visit
                         </a>
                     </li>
