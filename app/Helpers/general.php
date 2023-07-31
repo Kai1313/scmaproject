@@ -249,3 +249,22 @@ function checkPenjualan($idBarang = null, $idCabang = null, $tanggalMin = null, 
     })->get();
     dd($data);
 }
+
+function startOfMonth($format = 'd/m/Y')
+{
+    return Carbon\carbon::now()->startOfMonth()->format($format);
+}
+
+function endOfMonth($format = 'd/m/Y')
+{
+    return Carbon\carbon::now()->endOfMonth()->format($format);
+}
+
+function dateStore($param)
+{
+    if ($param != null) {
+        return \carbon\carbon::parse(str_replace('/', '-', $param))->format('Y-m-d');
+    } else {
+        return \carbon\carbon::now()->format('Y-m-d');
+    }
+}

@@ -25,6 +25,7 @@ class VisitController extends Controller
 
 
         if ($request->ajax()) {
+
             $data = Visit::where(function ($q) use ($request) {
                 if ($request->id_cabang != '') {
                     $q->where('id_cabang', $request->id_cabang);
@@ -40,6 +41,10 @@ class VisitController extends Controller
                     } else {
                         $q->where('progress_ind', $request->progress_ind);
                     }
+                }
+
+                if ($request->daterangepicker != '') {
+                    $q->whereBetween('visit_date', [dateStore(explode(' - ', $request->daterangepicker)[0]), dateStore(explode(' - ', $request->daterangepicker)[1])]);
                 }
 
                 if ($request->status != '') {
@@ -251,8 +256,6 @@ class VisitController extends Controller
                 $message = "Berhasil mengupdate status visit";
                 $url = route('visit.reporting.show', [$req->id]);
             }
-
-
 
             Log::info("Berhasil update status visit", $data->toArray());
             return response()->json([

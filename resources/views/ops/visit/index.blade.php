@@ -3,6 +3,8 @@
     <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables-responsive/css/responsive.dataTables.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/bower_components/select2/dist/css/select2.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
     <style>
         ul.horizontal-list {
             min-width: 200px;
@@ -104,6 +106,13 @@
                         </div>
                     </div>
                     <div class="col-md-2 filter-div">
+                        <label>Range Tanggal</label>
+                        <div class="form-group">
+                            <input type="text" id="daterangepicker" class="form-control"
+                                value="{{ startOfMonth('d/m/Y') }} - {{ endOfMonth('d/m/Y') }}" />
+                        </div>
+                    </div>
+                    <div class="col-md-2 filter-div">
                         <label class="d-block">&nbsp;</label>
                         <div class="form-group">
                             <button type="button" class="btn btn-info" onclick="table.ajax.reload()"><i
@@ -175,12 +184,20 @@
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/custom.js') }}"></script>
     <script src="{{ asset('js/filter-button.js') }}"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 @endsection
 
 @section('externalScripts')
     <script>
         $('.select2').select2({
             width: '100%'
+        });
+
+        $('#daterangepicker').daterangepicker({
+            locale: {
+                format: 'DD/MM/YYYY'
+            }
         });
 
         var table = $('.data-table').DataTable({
@@ -200,6 +217,9 @@
                     },
                     progress_ind: function() {
                         return $('#progress_ind').val();
+                    },
+                    daterangepicker: function() {
+                        return $('#daterangepicker').val();
                     },
 
                 },
