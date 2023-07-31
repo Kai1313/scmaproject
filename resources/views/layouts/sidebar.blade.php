@@ -1207,20 +1207,23 @@
                     </span>
                 </a>
                 <ul class="treeview-menu" style="display: none;">
-                    <li data-alias="jadwal_kunjungan">
+                    <li data-alias="jadwal_kunjungan"
+                        class="{{ menuActive(request()->url(), route('pre_visit')) > 0 ? 'active' : null }}">
                         <a href="{{ route('pre_visit') }}"
                             class="{{ menuActive(request()->url(), route('pre_visit')) > 0 ? 'active' : null }}">
                             <i class="glyphicon glyphicon-option-vertical"></i>Jadwal Visit
 
                         </a>
                     </li>
-                    <li data-alias="kunjungan">
+                    <li data-alias="kunjungan"
+                        class="{{ menuActive(request()->url(), route('visit')) > 0 ? 'active' : null }}">
                         <a href="{{ route('visit') }}"
                             class="{{ menuActive(request()->url(), route('visit')) > 0 ? 'active' : null }}">
                             <i class="glyphicon glyphicon-option-vertical"></i>Visit
                         </a>
                     </li>
-                    <li data-alias="kunjungan">
+                    <li data-alias="kunjungan"
+                        class="{{ menuActive(request()->url(), route('visit.progress-visit.index')) > 0 ? 'active' : null }}">
                         <a href="{{ route('visit.progress-visit.index') }}"
                             class="{{ menuActive(request()->url(), route('visit.progress-visit.index')) > 0 ? 'active' : null }}">
                             <i class="glyphicon glyphicon-option-vertical"></i>Progress Visit
