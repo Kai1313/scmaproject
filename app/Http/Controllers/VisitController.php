@@ -23,7 +23,6 @@ class VisitController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-
         if ($request->ajax()) {
 
             $data = Visit::where(function ($q) use ($request) {
