@@ -130,7 +130,7 @@ Route::prefix('pemakaian')->group(function () {
     Route::get('/reload-timbangan', 'MaterialUsageController@reloadWeight')->name('material_usage-reload-weight');
 });
 
-Route::prefix('penjualan')->group(function () {
+Route::prefix('marketing-tool')->group(function () {
     Route::prefix('pre_visit')->group(function () {
         Route::get('/index/{user_id?}', 'ScheduleVisitController@index')->name('pre_visit');
         Route::get('/entry/{id?}', 'ScheduleVisitController@entry')->name('pre_visit-entry');
