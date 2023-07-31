@@ -663,14 +663,14 @@
                                     <li data-alias="jadwal_kunjungan">
                                         <a href="{{ route('pre_visit') }}"
                                             class="{{ menuActive(request()->url(), route('pre_visit')) > 0 ? 'active' : null }}">
-                                            <i class="glyphicon glyphicon-option-vertical"></i>Jadwal Kunjungan
+                                            <i class="glyphicon glyphicon-option-vertical"></i>Jadwal Visit
 
                                         </a>
                                     </li>
                                     <li data-alias="kunjungan">
                                         <a href="{{ route('visit') }}"
                                             class="{{ menuActive(request()->url(), route('visit')) > 0 ? 'active' : null }}">
-                                            <i class="glyphicon glyphicon-option-vertical"></i>Kunjungan
+                                            <i class="glyphicon glyphicon-option-vertical"></i>Visit
                                         </a>
                                     </li>
                                     <li data-alias="kunjungan">

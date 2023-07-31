@@ -12,9 +12,9 @@ class ScheduleVisitController extends Controller
 {
     public function index(Request $request)
     {
-        if (checkUserSession($request, 'pre_visit', 'show') == false) {
-            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
-        }
+        // if (checkUserSession($request, 'pre_visit', 'show') == false) {
+        //     return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+        // }
 
         if ($request->ajax()) {
             $data = DB::table('visit as v')
