@@ -154,11 +154,13 @@ Route::prefix('marketing-tool')->group(function () {
         Route::prefix('/reporting')->group(function () {
             Route::get('/select-reporting-visit', 'ReportingVisitController@select')->name('visit.reporting.select');
         });
-
-        Route::resource('progress-visit', 'ReportingVisitController', [
-            'as' => 'visit'
-        ]);
     });
+
+    Route::resource('progress-visit', 'ReportingVisitController', [
+        'as' => 'visit'
+    ])->except(['index']);
+
+    Route::get('/progress-visit/index/{user_id?}', 'ProgressVisitController@index')->name('progress_visit');
 });
 
 
