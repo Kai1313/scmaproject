@@ -11,6 +11,7 @@ class Menu extends Model
     public static $suffixUrl = [
         '/index',
         '/create',
+        '/entry',
         '/show',
         '/form',
         '/list',
