@@ -19,10 +19,9 @@ class VisitController extends Controller
     public function index(Request $request)
     {
         // dd(checkPenjualan(273, 1, '2022-05-25', '2022-05-25'));
-        if (checkUserSession($request, 'pemakaian', 'show') == false) {
+        if (checkUserSession($request, 'visit', 'show') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
-
 
         if ($request->ajax()) {
 

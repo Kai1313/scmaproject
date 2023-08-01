@@ -40,7 +40,7 @@
 @section('header')
     <section class="content-header">
         <h1>
-            Jadwal Kunjungan
+            Jadwal Kunjungan1
             <small></small>
         </h1>
         <ol class="breadcrumb">
