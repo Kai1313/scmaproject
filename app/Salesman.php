@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Salesman extends Model
 {
     protected $table = 'salesman';
-    protected $primaryKey = 'id_pengguna';
+    protected $primaryKey = 'id_salesman';
     public $timestamps = false;
 
     protected $fillable = [
@@ -21,5 +21,6 @@ class Salesman extends Model
         'user_salesman',
         'date_salesman',
         'id_cabang',
+        'pengguna_id',
     ];
 }
