@@ -1,4 +1,4 @@
-var triggerFilter = false;
+var triggerFilter = true;
 
 (function () {
     triggerButtonFilter();
