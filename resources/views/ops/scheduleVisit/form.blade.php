@@ -318,6 +318,7 @@
 
         $(document).ready(function() {
             $('#id_pelanggan').change();
+            {{ dd(Auth::user()->salesman) }}
             @if (Auth::user()->salesman)
                 $('#id_salesman').val('{{ Auth::user()->salesman->id_salesman }}').trigger('change.select2')
             @endif
