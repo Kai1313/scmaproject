@@ -66,7 +66,7 @@
                         </div>
                     </div>
                     <div class="col-md-8">
-                        <label> &nbsp</label>
+                        <label>&nbsp</label>
                         <div class="form-group">
                             <a href="{{ route('pre_visit-entry') }}"
                                 class="btn btn-success pull-right btn-flat btn-sm mr-1">
