@@ -135,7 +135,7 @@
                             <div class="col-md-6">
                                 <label>Salesman <span>*</span></label>
                                 <div class="form-group">
-                                    <select name="id_salesman" class="form-control select2 trigger-change">
+                                    <select name="id_salesman" id="id_salesman" class="form-control select2 trigger-change">
                                         @foreach ($salesman as $item)
                                             @if ($data != null)
                                                 <option {{ $data->id_salesman == $item->id_salesman ? 'selected' : '' }}
@@ -318,6 +318,9 @@
 
         $(document).ready(function() {
             $('#id_pelanggan').change();
+            @if (Auth::user()->salesman)
+                $('#id_salesman').val('{{ Auth::user()->salesman->id_salesman }}').trigger('change.select2')
+            @endif
         })
 
         $('.datepicker').datepicker({
