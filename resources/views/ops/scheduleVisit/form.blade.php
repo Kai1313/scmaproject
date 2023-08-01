@@ -318,9 +318,9 @@
 
         $(document).ready(function() {
             $('#id_pelanggan').change();
-            {{ dd(session()->get('user')->salesman) }}
             @if (session()->get('user')->salesman)
-                $('#id_salesman').val('{{ Auth::user()->salesman->id_salesman }}').trigger('change.select2')
+                $('#id_salesman').val('{{ session()->get('user')->salesman->id_salesman }}').trigger(
+                    'change.select2')
             @endif
         })
 
