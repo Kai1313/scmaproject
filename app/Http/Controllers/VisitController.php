@@ -141,18 +141,31 @@ class VisitController extends Controller
         // if (checkAccessMenu('pemakaian', $id == 0 ? 'create' : 'edit') == false) {
         //     return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         // }
-        // Setting::create([
-        //     "id_cabang" => 1,
-        //     "code" => "Range Checkin Kunjungan",
-        //     "description" => "Range Checkin Kunjungan",
-        //     "tipe" => 1,
-        //     "value1" => "",
-        //     "value2" => "100",
-        //     "user_created" => 1,
-        //     "dt_created" => now(),
-        //     "user_modified" => 1,
-        //     "dt_modified" => now(),
-        // ]);
+        Setting::create([
+            "id_cabang" => 1,
+            "code" => "Range Checkin Kunjungan",
+            "description" => "Range Checkin Kunjungan",
+            "tipe" => 1,
+            "value1" => "",
+            "value2" => "100",
+            "user_created" => 1,
+            "dt_created" => now(),
+            "user_modified" => 1,
+            "dt_modified" => now(),
+        ]);
+
+        Setting::create([
+            "id_cabang" => 2,
+            "code" => "Range Checkin Kunjungan",
+            "description" => "Range Checkin Kunjungan",
+            "tipe" => 1,
+            "value1" => "",
+            "value2" => "100",
+            "user_created" => 1,
+            "dt_created" => now(),
+            "user_modified" => 1,
+            "dt_modified" => now(),
+        ]);
 
         $data = Visit::find($id);
 
