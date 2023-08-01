@@ -12,6 +12,5 @@ class ProgressVisitController extends Controller
         if (checkUserSession($request, 'progress_visit', 'show') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
-        dd(phpinfo());
     }
 }
