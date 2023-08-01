@@ -44,6 +44,6 @@ class User extends Authenticatable
 
     function salesman()
     {
-        return $this->hasOne(Salesman::class, 'id_pengguna', 'pengguna_id');
+        return $this->belongsTo(Salesman::class, 'id_pengguna', 'pengguna_id');
     }
 }
