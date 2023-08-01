@@ -23,4 +23,10 @@ class Salesman extends Model
         'id_cabang',
         'pengguna_id',
     ];
+
+
+    public function visit()
+    {
+        return $this->hasMany(Visit::class, 'id_salesman', 'id_salesman');
+    }
 }
