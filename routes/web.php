@@ -156,11 +156,8 @@ Route::prefix('marketing-tool')->group(function () {
         });
     });
 
-    Route::resource('progress-visit', 'ReportingVisitController', [
-        'as' => 'visit'
-    ])->except(['index']);
-
     Route::get('/progress-visit/index/{user_id?}', 'ProgressVisitController@index')->name('progress_visit');
+    Route::get('/progress-visit/generate-visualisasi-data/{user_id?}', 'ProgressVisitController@generateVisualisasiData')->name('generate-visualisasi-data-visit');
 });
 
 
