@@ -98,8 +98,8 @@
             <div class="col-sm-6">
                 <div class="box">
                     <div class="box-header">
-                        <h3 class="box-title">{{ $data ? 'Ubah' : 'Tambah' }} Jadwal Kunjungan</h3>
-                        <a href="{{ route('pre_visit') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right">
+                        <h3 class="box-title">Detail Visit</h3>
+                        <a href="{{ route('visit') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right">
                             <span class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali
                         </a>
                     </div>
