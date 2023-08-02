@@ -11,7 +11,6 @@
 |
  */
 
-use App\Http\Controllers\ReportingVisitController;
 use Illuminate\Support\Facades\Route;
 
 //tes firebase
@@ -149,18 +148,17 @@ Route::prefix('marketing-tool')->group(function () {
         Route::post('/update-visit', 'VisitController@updateVisit')->name('update-visit');
         Route::get('/delete/{id}', 'VisitController@destroy')->name('visit-delete');
         Route::resource('reporting', 'ReportingVisitController', [
-            'as' => 'visit'
+            'as' => 'visit',
         ]);
         Route::prefix('/reporting')->group(function () {
             Route::get('/select-reporting-visit', 'ReportingVisitController@select')->name('visit.reporting.select');
         });
     });
 
+    Route::get('/progress-visit/index/show/{show}', 'ProgressVisitController@show')->name('visit.progress-visit.show');
     Route::get('/progress-visit/index/{user_id?}', 'ProgressVisitController@index')->name('progress_visit');
     Route::get('/progress-visit/generate-visualisasi-data/{user_id?}', 'ProgressVisitController@generateVisualisasiData')->name('generate-visualisasi-data-visit');
 });
-
-
 
 Route::get('kirim_ke_gudang/print/{id}', 'SendToWarehouseController@print')->name('send_to_warehouse-print');
 Route::get('stok_minimal/excel/{id}/{id_cabang}', 'StokMinHistoryController@getExcel')->name('stok_minimal-excel');
