@@ -3243,7 +3243,7 @@ class ApiController extends Controller
         $setting['penj_sampai'] = $today->toDateString();
         $setting['penj_dari'] = $today->subMonths(intval($setting['Stok Min Range']))->toDateString();
         session(['stokMin' => $setting]);
-        // \DB::unprepared(\DB::raw("DROP TEMPORARY TABLE IF EXISTS tTotalPenjualanInfo"));
+        \DB::unprepared(\DB::raw("DROP TEMPORARY TABLE IF EXISTS tTotalPenjualanInfo"));
         \DB::insert(\DB::raw("CREATE TEMPORARY TABLE tTotalPenjualanInfo(id_barang int(11) NOT NULL,nama_barang varchar(200), total_jual decimal(15,6),
         total_jual_per_bulan decimal(15,6),plus_persen decimal(15,6),per_bulan_plus_persen decimal(15,6),avg_prorate double,
         pemakaian_per_barang_jadi double)"));
@@ -3344,6 +3344,8 @@ class ApiController extends Controller
         $child = \DB::table(\DB::raw("({$childsub->toSql()}) as a"))
             ->select('a.*', \DB::raw('AVG(a.prorate) AS avg_prorate'))
             ->groupBy('a.id_barang')->get();
+
+        dd($child);
         if (empty($child)) {
             return;
         }
