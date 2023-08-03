@@ -3341,6 +3341,8 @@ class ApiController extends Controller
             ->join('barang AS brg', 'brg.id_barang', '=', 'b.id_barang')
             ->where(DB::raw("bd.id_barang = $id_barang and b.status_bom = 1"))
             ->groupBy('bd.id_barang', 'b.id_bom');
+
+        dd($childsub);
         $child = \DB::table(\DB::raw("({$childsub->toSql()}) as a"))
             ->select('a.*', \DB::raw('AVG(a.prorate) AS avg_prorate'))
             ->groupBy('a.id_barang')->get();
