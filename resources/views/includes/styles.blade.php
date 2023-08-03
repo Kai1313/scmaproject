@@ -102,4 +102,8 @@
             background-position: 0 0;
         }
     }
+
+    .mr-3 {
+        margin-right: 1rem;
+    }
 </style>

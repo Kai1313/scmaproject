@@ -174,11 +174,17 @@
             <div class="col-sm-6 main-menu" id="main-menu">
                 <div class="row">
                     <div class="col-sm-12">
-                        <button type="button" class="btn btn-primary w-full mb-3" onclick="checkin()">CHECK IN</button>
+                        <button type="button" class="btn btn-primary w-full mb-3" onclick="checkin()"><i
+                                class="mr-3 fa fa-map"></i>CHECK IN</button>
                     </div>
                     <div class="col-sm-12">
-                        <button type="button" class="btn btn-success w-full mb-3" onclick="updateVisit('whatsapp')">FOLLOW
-                            UP BY WA</button>
+                        <button type="button" class="btn btn-success w-full mb-3" onclick="updateVisit('whatsapp')">
+                            <i class="mr-3 fa fa-whatsapp"></i>FOLLOW UP BY WA
+                        </button>
+                    </div>
+                    <div class="col-sm-12">
+                        <button type="button" class="btn btn-default w-full mb-3" onclick="updateVisit('telepon')">
+                            <i class="mr-3 fa fa-phone"></i>FOLLOW UP BY TELEPON</button>
                     </div>
                     <div class="col-sm-12">
                         <button type="button" class="btn btn-warning w-full mb-3"
@@ -981,13 +987,13 @@
 
                                     if (param == 'whatsapp') {
                                         window.open(
-                                            `https://api.whatsapp.com/send?phone={{ $data->kontak_person_pelanggan }}`
+                                            `https://api.whatsapp.com/send?phone={{ $data->pelanggan->telepon1_pelanggan }}`
                                         );
                                     }
 
                                     if (param == 'telepon') {
                                         window.open(
-                                            `https://api.whatsapp.com/send?phone={{ $data->kontak_person_pelanggan }}`
+                                            `tel:{{ $data->pelanggan->telepon1_pelanggan }}`
                                         );
                                     }
 
