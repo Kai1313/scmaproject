@@ -81,6 +81,7 @@ class ProgressVisitController extends Controller
         $metode = [
             'LOKASI',
             'WHATSAPP',
+            'TELEPON',
             'BATAL',
             'BELUM VISIT',
         ];
