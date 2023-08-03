@@ -3236,6 +3236,8 @@ class ApiController extends Controller
         $setting = Setting::where("id_cabang", $id_cabang)->where("code", 'like', "Stok Min %")->select('code', 'value1', 'value2')->get()->toArray();
         $settingValue1 = array_column($setting, 'value1', 'code');
         $setting = array_column($setting, 'value2', 'code');
+
+        dd($settingValue1);
         $settingBrgArr = json_decode($settingValue1['Stok Min Khusus'], true);
         $settingBrgArr = array_column($settingBrgArr, 'stokMin', 'id_barang');
         $today = Carbon::today();
