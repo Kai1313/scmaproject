@@ -2454,7 +2454,7 @@ class ClosingJournalController extends Controller
                 $saldo_balance->bulan = $nextMonth;
                 $saldo_balance->tahun = $nextYear;
                 $saldo_balance->debet = ($saldoAkhir > 0)?$saldoAkhir:0;//$saldo_debet;
-                $saldo_balance->credit = ($saldoAkhir > 0)?0:$saldoAkhir;//$saldo_kredit;
+                $saldo_balance->credit = ($saldoAkhir > 0)?0:floatval(abs($saldoAkhir));//$saldo_kredit;
                 if (!$saldo_balance->save()) {
                     // Revert post closing
                     DB::rollback();
