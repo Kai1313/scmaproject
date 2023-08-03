@@ -2445,6 +2445,7 @@ class ClosingJournalController extends Controller
                 // Log::info("saldo debet ".$debet." saldo kredit ".$kredit);
                 $saldo_debet = $saldo_debet + $debet + (isset($data_ledgers->debet) ? $data_ledgers->debet : 0) ;
                 $saldo_kredit = $saldo_kredit + $kredit + (isset($data_ledgers->kredit) ? $data_ledgers->kredit : 0);
+                $saldoAkhir = (float) $saldo_debet - (float) $saldo_kredit;
 
                 // Insert into saldo balance
                 $saldo_balance = new SaldoBalance;
@@ -2452,8 +2453,8 @@ class ClosingJournalController extends Controller
                 $saldo_balance->id_akun = $akun->id_akun;
                 $saldo_balance->bulan = $nextMonth;
                 $saldo_balance->tahun = $nextYear;
-                $saldo_balance->debet = $saldo_debet;
-                $saldo_balance->credit = $saldo_kredit;
+                $saldo_balance->debet = ($saldoAkhir > 0)?$saldoAkhir:0;//$saldo_debet;
+                $saldo_balance->credit = ($saldoAkhir > 0)?0:$saldoAkhir;//$saldo_kredit;
                 if (!$saldo_balance->save()) {
                     // Revert post closing
                     DB::rollback();
