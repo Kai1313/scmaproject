@@ -28,7 +28,7 @@ class ApiController extends Controller
 
         $user = User::where('id_pengguna', $user_id)->first();
         $token = UserToken::where('id_pengguna', $user_id)->where('status_token_pengguna', 1)->whereRaw("waktu_habis_token_pengguna > STR_TO_DATE(?, '%Y-%m-%d %H:%i:%s')", Carbon::now()->format('Y-m-d H:i:s'))->first();
-
+        dd($token);
         if ($token) {
             $token = $user->createToken('Token Passport User ' . Carbon::now()->format('Y-m-d H:i:s') . '[' . $user->id_pengguna . '] ' . $user->nama_pengguna)->accessToken;
             return response()->json([
