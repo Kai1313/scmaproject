@@ -3237,7 +3237,6 @@ class ApiController extends Controller
         $settingValue1 = array_column($setting, 'value1', 'code');
         $setting = array_column($setting, 'value2', 'code');
 
-        dd($settingValue1);
         $settingBrgArr = json_decode($settingValue1['Stok Min Khusus'], true);
         $settingBrgArr = array_column($settingBrgArr, 'stokMin', 'id_barang');
         $today = Carbon::today();
