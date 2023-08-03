@@ -374,4 +374,12 @@ class ProgressVisitController extends Controller
 
         return response()->json($data);
     }
+
+    function getData(Request $req)
+    {
+
+        $data = Visit::with(['salesman', 'pelanggan', 'cabang', 'sales_order'])->find($req->id);
+
+        return response()->json($data);
+    }
 }

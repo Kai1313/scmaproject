@@ -145,7 +145,7 @@
                     <div class="col-md-2 filter-div">
                         <label>Cabang</label>
                         <div class="form-group">
-                            <select id="id_cabang" class="form-control select2">
+                            <select id="id_cabang_filter" class="form-control select2">
                                 <option value="">Semua Cabang</option>
                                 @foreach ($cabang as $branch)
                                     <option value="{{ $branch['id'] }}">{{ $branch['text'] }}</option>
@@ -235,6 +235,127 @@
 
         </div>
     </div>
+
+    <div class="modal fade" id="modal-visit" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12" id="map">
+
+                        </div>
+                        <div class="col-md-12">
+                            <h3>Detail Kunjungan</h3>
+                            <hr>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>Kode Kunjungan</label>
+                            <p id="visit_code"></p>
+                        </div>
+                        <div class="col-sm-6 disabled">
+                            <label>Tanggal</label>
+                            <div class="form-group">
+                                <p id="visit_date"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6 disabled">
+                            <label>Cabang</label>
+                            <div class="form-group ">
+                                <p id="id_cabang"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6 disabled">
+                            <label>Salesman</label>
+                            <div class="form-group">
+                                <p id="id_salesman"></p>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>Pelanggan</label>
+                            <div class="form-group">
+                                <p id="id_pelanggan"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label>Status Kunjungan</label>
+                            <div class="form-group">
+                                <p id="status"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label>Tipe Kunjungan</label>
+                            <div class="form-group">
+                                <p id="visit_type"></p>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 ">
+                            <label>Catatan Jadwal Kunjungan</label>
+                            <div class="form-group">
+                                <p id="pre_visit_desc"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-12 report_kunjungan">
+                            <h3>Report Kunjungan</h3>
+                            <hr>
+                        </div>
+                        <div class="col-md-6 report_kunjungan">
+                            <label>Issued</label>
+                            <div class="form-group">
+                                <p id="visit_title"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6 report_kunjungan">
+                            <label>Progress Indicator</label>
+                            <div class="form-group">
+                                <p id="progress_indicator"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6 report_kunjungan progress_indicator progress_indicator-2">
+                            <label>Potensial Meter (%)</label>
+                            <div class="form-group">
+                                <p id="range_potensial"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6 report_kunjungan progress_indicator progress_indicator-3">
+                            <label>Sales Order</label>
+                            <div class="form-group">
+                                <p id="sales_order"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6 report_kunjungan progress_indicator progress_indicator-3">
+                            <label>Perkiraan Pendapatan</label>
+                            <div class="form-group">
+                                <p id="total"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-12 report_kunjungan">
+                            <label>Catatan Report</label>
+                            <div class="form-group">
+                                <p id="visit_desc"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6 report_kunjungan">
+                            <img id="gambar1" style="width: 100%"
+                                onerror="this.src='https://perpus.umri.ac.id/ckfinder/userfiles/images/no-image.png'"
+                                alt="">
+                        </div>
+                        <div class="col-md-6 report_kunjungan">
+                            <img id="gambar2" style="width: 100%"
+                                onerror="this.src='https://perpus.umri.ac.id/ckfinder/userfiles/images/no-image.png'"
+                                alt="">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary cancel-entry btn-flat"
+                        onclick="$('#modal-visit').modal('toggle')">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 @section('addedScripts')
     <script src="{{ asset('assets/bower_components/datatables.net/js/jquery.dataTables.min.js') }}"></script>
@@ -256,7 +377,9 @@
     <script>
         var dataCalendar = [];
         var calendar;
-        $('.select2').select2();
+        $('.select2').select2({
+            width: '100%'
+        });
         $('#daterangepicker').daterangepicker({
             locale: {
                 format: 'DD/MM/YYYY'
@@ -320,7 +443,7 @@
                         return $("#daterangepicker").val();
                     },
                     id_cabang: function() {
-                        return $("#id_cabang").val();
+                        return $("#id_cabang_filter").val();
                     },
                     visualisasi_data: function() {
                         return $("#visualisasi_data").val();
@@ -346,6 +469,7 @@
                         'perbandingan-nilai-order-visit',
                         res.perbandingan_nilai_sales_order_visit
                     );
+
                     res.timeline.forEach(d => {
                         switch (d.status * 1) {
                             case 0:
@@ -361,6 +485,7 @@
                                 break;
                         }
                         dataCalendar.push({
+                            id: `${d.id}`,
                             title: `Visit ke ${d.pelanggan.nama_pelanggan}`,
                             pelanggan: d.pelanggan.nama_pelanggan,
                             marketing: d.salesman.nama_salesman,
@@ -370,7 +495,7 @@
                         }, )
                     });
                     setTimeout(() => {
-                        $.CalendarPage.init()
+                        $.CalendarPage.init();
                     }, 3000);
 
                 },
@@ -381,13 +506,116 @@
         }
     </script>
     <script>
+        function appendMap(latitude, longitude) {
+            $.ajax({
+                url: '{{ route('append-map') }}',
+                data: {
+                    latitude: latitude,
+                    longitude: longitude,
+                },
+                success: function(response) {
+                    $('#map').html(response);
+                }
+            });
+        }
+
+        function formatNumberAsFloatFromDB(num) {
+            num = String(num);
+            num = parseFloat(num).toFixed(2);
+            num = num.replace('.', ',');
+
+            return num;
+        }
+
+        function formatCurr(num) {
+            num = String(num);
+
+            num = num.split('.').join("");;
+            num = num.replace(/,/g, '.');
+            num = parseFloat(num).toFixed(2)
+            num = num.toString().replace(/\,/gi, "");
+            num += '';
+            x = num.split('.');
+            x1 = x[0];
+            x2 = x.length > 1 ? ',' + x[1] : ',00';
+            var rgx = /(\d+)(\d{3})/;
+            while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + '.' + '$2');
+            }
+            return x1 + x2;
+        }
+
+        function formatNumberAsFloat(num) {
+            num = String(num);
+            num = num.replace(',', '.');
+
+            return num;
+        }
+
+        function modalOpen(id) {
+            $.ajax({
+                url: "{{ route('get-data-progress-visit') }}",
+                type: "get",
+                data: {
+                    id: id
+                },
+                dataType: "JSON",
+                success: function(data) {
+                    $("#modal-visit").modal('toggle')
+                    $('#gambar1').prop('src', data.proofment_1);
+                    $('#gambar2').prop('src', data.proofment_2);
+                    $('.select2').select2()
+                    var temp_key = Object.keys(data);
+                    var temp_value = data;
+                    for (var i = 0; i < temp_key.length; i++) {
+                        var key = temp_key[i];
+                        if ($('#' + key).length != 0) {
+                            $('#' + key).html(temp_value[key])
+                        }
+                    }
+
+                    $("#id_salesman").html(data.salesman.nama_salesman);
+                    $("#id_cabang").html(data.cabang.nama_cabang);
+                    $("#id_pelanggan").html(data.pelanggan.nama_pelanggan);
+
+                    if (data.status == 2) {
+                        if (data.progress_ind == 1) {
+                            $('#progress_indicator').html('Perkenalan');
+                        } else if (data.progress_ind == 2) {
+                            $('#progress_indicator').html('Potensial');
+                        } else if (data.progress_ind == 3) {
+                            $('#progress_indicator').html('Penawaran/Order');
+                            $('#sales_order').html(data.sales_order.nama_permintaan_penjualan)
+                        }
+                        $('.report_kunjungan').removeClass('hidden');
+
+                        $('.progress_indicator').addClass('hidden');
+                        $(`.progress_indicator-${data.progress_ind}`).removeClass('hidden');
+                        $('#total').html(formatCurr(formatNumberAsFloatFromDB(data.total)))
+                    } else {
+                        $('.report_kunjungan').addClass('hidden');
+                    }
+                    console.log(data.status)
+                    if (data.status == '0') {
+                        $('#status').html('Batal')
+                    }
+                    if (data.status == '1') {
+                        $('#status').html('Belum Kunjungan')
+                    }
+
+                    if (data.status == '2') {
+                        $('#status').html('Sudah Kunjungan')
+                    }
+                    appendMap(data.latitude_visit, data.longitude_visit);
+                }
+            })
+        }
+
         ! function($) {
 
             var CalendarPage = function() {};
 
             CalendarPage.prototype.init = function() {
-
-                    console.log(Date());
                     //checking if plugin is available
                     if ($.isFunction($.fn.fullCalendar)) {
                         /* initialize the calendar */
@@ -418,10 +646,9 @@
                                 element.find('.fc-title').html(html);
                                 element.addClass(`d-flex ${copiedEventObject.color} py-1`);
 
-                                // element.find(".fc-title").click(function() {
-                                //     location.href = '/' +
-                                //         copiedEventObject.slug;
-                                // });
+                                element.find(".fc-title").click(function() {
+                                    modalOpen(copiedEventObject.id);
+                                });
                             },
                             drop: function(date,
                                 allDay) { // this function is called when something is dropped
