@@ -3345,7 +3345,6 @@ class ApiController extends Controller
             ->select('a.*', \DB::raw('AVG(a.prorate) AS avg_prorate'))
             ->groupBy('a.id_barang')->get();
 
-        dd($child);
         if (empty($child)) {
             return;
         }
