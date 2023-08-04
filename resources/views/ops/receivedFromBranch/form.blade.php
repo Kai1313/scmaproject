@@ -51,6 +51,21 @@
         .handle-number-4 {
             text-align: right;
         }
+
+        select[readonly].select2-hidden-accessible+.select2-container {
+            pointer-events: none;
+            touch-action: none;
+        }
+
+        select[readonly].select2-hidden-accessible+.select2-container .select2-selection {
+            background: #eee;
+            box-shadow: none;
+        }
+
+        select[readonly].select2-hidden-accessible+.select2-container .select2-selection__arrow,
+        select[readonly].select2-hidden-accessible+.select2-container .select2-selection__clear {
+            display: none;
+        }
     </style>
 @endsection
 
@@ -83,10 +98,10 @@
                 <div class="box-body">
                     <div class="row">
                         <div class="col-md-4">
-                            <label>Cabang Penerima<span>*</span></label>
+                            <label>Cabang Penerima <span>*</span></label>
                             <div class="form-group">
                                 <select name="id_cabang" class="form-control select2" data-validation="[NOTEMPTY]"
-                                    data-validation-message="Cabang tidak boleh kosong">
+                                    data-validation-message="Cabang tidak boleh kosong" {{ $data ? 'readonly' : '' }}>
                                     <option value="">Pilih Cabang</option>
                                     @if ($data && $data->id_cabang)
                                         <option value="{{ $data->id_cabang }}" selected>
@@ -98,7 +113,7 @@
                             <label>Gudang Penerima <span>*</span></label>
                             <div class="form-group">
                                 <select name="id_gudang" class="form-control select2" data-validation="[NOTEMPTY]"
-                                    data-validation-message="Gudang tidak boleh kosong">
+                                    data-validation-message="Gudang tidak boleh kosong" {{ $data ? 'readonly' : '' }}>
                                     <option value="">Pilih Gudang</option>
                                     @if ($data && $data->id_gudang)
                                         <option value="{{ $data->id_gudang }}" selected>
