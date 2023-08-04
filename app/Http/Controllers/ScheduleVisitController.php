@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Master\Setting;
+use App\Penjualan;
 use App\Visit;
 use DB;
 use Illuminate\Http\Request;
@@ -108,6 +110,27 @@ class ScheduleVisitController extends Controller
             if (!$data) {
                 $data = new Visit;
             }
+
+            // $checkCustomer = Penjualan::where('id_pelanggan', $request->id_pelanggan)->orderBy('tanggal_penjualan', 'DESC')->first();
+            // if ($checkCustomer) {
+
+            //     // $maxTanggalPenjualan = Setting::where('code', 'Tanggal Penjualan')
+            //     //     ->where('id_cabang', $request->id_cabang)
+            //     //     ->first();
+
+            //     // if ($maxTanggalPenjualan->tanggal_penjualan < $maxTanggalPenjualan->value2) {
+            //     //     return response()->json([
+            //     //         "result" => false,
+            //     //         "message" => "Setting Tanggal Penjualan belum di buat untuk id_cabang $request->id_cabang",
+            //     //     ], 500);
+            //     // }
+
+            //     if ($checkCustomer->tanggal_penjualan) {
+            //         # code...
+            //     }
+            // } else {
+            //     $data->status_pelanggan = 'NEW';
+            // }
 
             $data->fill($request->all());
             if ($id == 0) {
