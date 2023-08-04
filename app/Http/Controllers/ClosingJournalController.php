@@ -575,7 +575,7 @@ class ClosingJournalController extends Controller
                 ->where('jurnal_header.id_transaksi', $sumber_produksi->nama_produksi)
                 ->where('jurnal_header.jenis_jurnal', 'ME')
                 ->where('jurnal_header.void', 0)
-                ->where('id_transaksi', 'Pembulatan')
+                ->where('jurnal_detail.id_transaksi', 'Pembulatan')
                 ->join('jurnal_header', 'jurnal_header.id_jurnal', 'jurnal_detail.id_jurnal')
                 ->first();
 
