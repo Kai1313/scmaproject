@@ -456,60 +456,128 @@ class ClosingJournalController extends Controller
                 $sumber_produksi = Production::where('id_produksi', $produksi->nomor_referensi_produksi)->first();
 
                 $jurnal_header = JurnalHeader::where('id_transaksi', $sumber_produksi->nama_produksi)->where('jenis_jurnal', 'ME')->where('void', 0)->first();
-                $jurnal_biaya_listrik = JurnalDetail::where('id_jurnal', $jurnal_header->id_jurnal)->where('id_transaksi', 'Biaya Listrik')->first();
-                $keterangan_listrik = substr($jurnal_biaya_listrik->keterangan, 0, strpos($jurnal_biaya_listrik->keterangan, "WPH"));
-
-                // update jurnal detail biaya
-                $update_jurnal_listrik = JurnalDetail::where('id_jurnal', $jurnal_header->id_jurnal)->where('id_transaksi', 'Biaya Listrik')->update([
-                    'credit' => $data_hpp_biaya['listrik'],
-                    'keterangan' => $keterangan_listrik . 'WPH ' . round($biaya_produksi['listrik'], 2)
-                ]);
-                if ($update_jurnal_listrik == false) {
-                    DB::rollback();
-                     // Revert post closing
-                    $check = Closing::where("month", $month)->where("year", $year)->first();
-                    if ($check) {
-                        $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                // $jurnal_biaya_listrik = JurnalDetail::where('id_jurnal', $jurnal_header->id_jurnal)->where('id_transaksi', 'Biaya Listrik')->first();
+                $jurnal_biaya_listrik = JurnalDetail::select("jurnal_detail.keterangan", "jurnal_detail.id_jurnal")
+                ->where('jurnal_header.id_transaksi', $sumber_produksi->nama_produksi)
+                ->where('jurnal_header.jenis_jurnal', 'ME')
+                ->where('jurnal_header.void', 0)
+                ->where('jurnal_detail.id_transaksi', 'Biaya Listrik')
+                ->join('jurnal_header', 'jurnal_header.id_jurnal', 'jurnal_detail.id_jurnal')
+                ->first();
+                if ($jurnal_biaya_listrik) {
+                    $keterangan_listrik = substr($jurnal_biaya_listrik->keterangan, 0, strpos($jurnal_biaya_listrik->keterangan, "WPH"));
+                    // update jurnal detail biaya
+                    $update_jurnal_listrik = JurnalDetail::where('id_jurnal', $jurnal_biaya_listrik->id_jurnal)->where('id_transaksi', 'Biaya Listrik')->update([
+                        'credit' => $data_hpp_biaya['listrik'],
+                        'keterangan' => $keterangan_listrik . 'WPH ' . round($biaya_produksi['listrik'], 2)
+                    ]);
+                    if ($update_jurnal_listrik == 0) {
+                        DB::rollback();
+                         // Revert post closing
+                        $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
+                        if ($check) {
+                            $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
+                        }
+                        Log::error("Error when updating journal detail on update jurnal biaya listrik hpp produksi");
+                        return response()->json([
+                            "result" => false,
+                            "message" => "Error when updating journal detail on update jurnal biaya listrik hpp produksi. Kode Produksi ".$sumber_produksi->nama_produksi,
+                        ]);
                     }
-                    Log::error("Error when updating journal detail on update jurnal biaya listrik hpp produksi");
-                    return FALSE;
+                }
+                else {
+                    DB::rollback();
+                    // Revert post closing
+                    $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
+                    if ($check) {
+                        $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
+                    }
+                    return response()->json([
+                        "result" => false,
+                        "message" => "Error when get journal detail on update jurnal biaya listrik hpp produksi. Kode Produksi ".$sumber_produksi->nama_produksi,
+                    ]);
                 }
 
-                $jurnal_biaya_operator = JurnalDetail::where('id_jurnal', $jurnal_header->id_jurnal)->where('id_transaksi', 'Biaya Operator')->first();
-                $keterangan_operator = substr($jurnal_biaya_operator->keterangan, 0, strpos($jurnal_biaya_operator->keterangan, "GPM"));
-                $update_jurnal_operator = JurnalDetail::where('id_jurnal', $jurnal_header->id_jurnal)->where('id_transaksi', 'Biaya Operator')->update([
-                    'credit' => $data_hpp_biaya['tenaga'],
-                    'keterangan' => $keterangan_operator . 'GPM ' . round($biaya_produksi['gaji'], 2)
-                ]);
-                if ($update_jurnal_operator == false) {
-                    DB::rollback();
-                    $check = Closing::where("month", $month)->where("year", $year)->first();
-                    if ($check) {
-                        $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                // $jurnal_biaya_operator = JurnalDetail::where('id_jurnal', $jurnal_header->id_jurnal)->where('id_transaksi', 'Biaya Operator')->first();
+                $jurnal_biaya_operator = JurnalDetail::select("jurnal_detail.keterangan", "jurnal_detail.id_jurnal")
+                ->where('jurnal_header.id_transaksi', $sumber_produksi->nama_produksi)
+                ->where('jurnal_header.jenis_jurnal', 'ME')
+                ->where('jurnal_header.void', 0)
+                ->where('jurnal_detail.id_transaksi', 'Biaya Operator')
+                ->join('jurnal_header', 'jurnal_header.id_jurnal', 'jurnal_detail.id_jurnal')
+                ->first();
+                if ($jurnal_biaya_operator) {
+                    $keterangan_operator = substr($jurnal_biaya_operator->keterangan, 0, strpos($jurnal_biaya_operator->keterangan, "GPM"));
+                    $update_jurnal_operator = JurnalDetail::where('id_jurnal', $jurnal_header->id_jurnal)->where('id_transaksi', 'Biaya Operator')->update([
+                        'credit' => $data_hpp_biaya['tenaga'],
+                        'keterangan' => $keterangan_operator . 'GPM ' . round($biaya_produksi['gaji'], 2)
+                    ]);
+                    if ($update_jurnal_operator == 0) {
+                        DB::rollback();
+                         // Revert post closing
+                        $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
+                        if ($check) {
+                            $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
+                        }
+                        Log::error("Error when updating journal detail on update jurnal biaya operator hpp produksi");
+                        return response()->json([
+                            "result" => false,
+                            "message" => "Error when updating journal detail on update jurnal biaya operator hpp produksi. Kode Produksi ".$sumber_produksi->nama_produksi,
+                        ]);
                     }
-                    Log::error("Error when updating journal detail on update jurnal biaya operator hpp produksi");
-                    return FALSE;
                 }
-
+                else {
+                    DB::rollback();
+                    // Revert post closing
+                    $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
+                    if ($check) {
+                        $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
+                    }
+                    return response()->json([
+                        "result" => false,
+                        "message" => "Error when get journal detail on update jurnal biaya operator hpp produksi. Kode Produksi ".$sumber_produksi->nama_produksi,
+                    ]);
+                }
 
                 foreach($data_hpp_kredit_hasil as $kredit_hasil){
-                    $update_jurnal_hasil = JurnalDetail::where('id_jurnal', $jurnal_header->id_jurnal)->where('id_transaksi', $kredit_hasil['id_barang'])->update([
+                    $update_jurnal_hasil = JurnalDetail::select("jurnal_detail.*")
+                    ->where('jurnal_header.id_transaksi', $sumber_produksi->nama_produksi)
+                    ->where('jurnal_header.jenis_jurnal', 'ME')
+                    ->where('jurnal_header.void', 0)
+                    ->where('jurnal_detail.id_transaksi', $kredit_hasil['id_barang'])
+                    ->join('jurnal_header', 'jurnal_header.id_jurnal', 'jurnal_detail.id_jurnal')
+                    ->update([
                         'debet' => $kredit_hasil['value']
                     ]);
-                    if ($update_jurnal_hasil == false) {
+                    if ($update_jurnal_hasil == 0) {
                         DB::rollback();
-                        $check = Closing::where("month", $month)->where("year", $year)->first();
+                        $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
                         if ($check) {
-                            $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                            $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
                         }
                         Log::error("Error when updating journal detail on update jurnal hasil produksi " . $sumber_produksi->nama_produksi . " barang " . $kredit_hasil['id_barang'] . " hpp produksi");
-                        return FALSE;
+                        return response()->json([
+                            "result" => false,
+                            "message" => "Error when updating journal detail on update jurnal hasil produksi " . $sumber_produksi->nama_produksi . " barang " . $kredit_hasil['id_barang'] . " hpp produksi",
+                        ]);
                     }
                 }
 
 
-                $jurnal_detail = JurnalDetail::where('id_jurnal', $jurnal_header->id_jurnal)->orderBy('index', 'ASC')->get();
-                $jurnal_pembulatan = JurnalDetail::where('id_jurnal', $jurnal_header->id_jurnal)->where('id_transaksi', 'Pembulatan')->first();
+                $jurnal_detail = JurnalDetail::select("jurnal_detail.*")
+                ->where('jurnal_header.id_transaksi', $sumber_produksi->nama_produksi)
+                ->where('jurnal_header.jenis_jurnal', 'ME')
+                ->where('jurnal_header.void', 0)
+                ->join('jurnal_header', 'jurnal_header.id_jurnal', 'jurnal_detail.id_jurnal')
+                ->orderBy('index', 'ASC')
+                ->get();
+                $jurnal_pembulatan = JurnalDetail::select("jurnal_detail.*")
+                ->where('jurnal_header.id_transaksi', $sumber_produksi->nama_produksi)
+                ->where('jurnal_header.jenis_jurnal', 'ME')
+                ->where('jurnal_header.void', 0)
+                ->where('id_transaksi', 'Pembulatan')
+                ->join('jurnal_header', 'jurnal_header.id_jurnal', 'jurnal_detail.id_jurnal')
+                ->first();
 
                 $sum_credit_jurnal = 0;
                 $sum_debet_jurnal = 0;
@@ -547,12 +615,15 @@ class ClosingJournalController extends Controller
 
                         if (!$detail->save()) {
                             DB::rollback();
-                            $check = Closing::where("month", $month)->where("year", $year)->first();
+                            $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
                             if ($check) {
-                                $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                                $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
                             }
                             Log::error("Error when storing journal detail on store jurnal pembulatan hpp produksi");
-                            return FALSE;
+                            return response()->json([
+                                "result" => false,
+                                "message" => "Error when storing journal detail on store jurnal pembulatan hpp produksi. Kode Produksi ".$sumber_produksi->nama_produksi,
+                            ]);
                         }
                     }else{
                         if($selisih > 0){
@@ -569,12 +640,15 @@ class ClosingJournalController extends Controller
 
                         if ($update_jurnal_pembulatan == false) {
                             DB::rollback();
-                            $check = Closing::where("month", $month)->where("year", $year)->first();
+                            $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
                             if ($check) {
-                                $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                                $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
                             }
                             Log::error("Error when update journal detail on update jurnal pembulatan hpp produksi");
-                            return FALSE;
+                            return response()->json([
+                                "result" => false,
+                                "message" => "Error when update journal detail on update jurnal pembulatan hpp produksi ".$sumber_produksi->nama_produksi,
+                            ]);
                         }
                     }
                 }
@@ -649,9 +723,9 @@ class ClosingJournalController extends Controller
                 // dd($header);
                 if (!$header->save()) {
                     DB::rollback();
-                    $check = Closing::where("month", $month)->where("year", $year)->first();
+                    $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
                     if ($check) {
-                        $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                        $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
                     }
                     return response()->json([
                         "result" => false,
@@ -684,9 +758,9 @@ class ClosingJournalController extends Controller
                     // Log::info(json_encode($detail));
                     if (!$detail->save()) {
                         DB::rollback();
-                        $check = Closing::where("month", $month)->where("year", $year)->first();
+                        $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
                         if ($check) {
-                            $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                            $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
                         }
                         return response()->json([
                             "result" => false,
@@ -718,9 +792,9 @@ class ClosingJournalController extends Controller
                     // Log::info(json_encode($detail));
                     if (!$detail->save()) {
                         DB::rollback();
-                        $check = Closing::where("month", $month)->where("year", $year)->first();
+                        $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
                         if ($check) {
-                            $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                            $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
                         }
                         return response()->json([
                             "result" => false,
@@ -752,12 +826,15 @@ class ClosingJournalController extends Controller
 
                     if (!$detail->save()) {
                         DB::rollback();
-                        $check = Closing::where("month", $month)->where("year", $year)->first();
+                        $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
                         if ($check) {
-                            $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                            $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
                         }
                         Log::error("Error when storing journal detail on table detail");
-                        return FALSE;
+                        return response()->json([
+                            "result" => false,
+                            "message" => "Error when storing journal detail on table detail",
+                        ]);
                     }
                 }
             }
@@ -772,9 +849,9 @@ class ClosingJournalController extends Controller
             DB::rollback();
             $month = $request->month;
             $year = $request->year;
-            $check = Closing::where("month", $month)->where("year", $year)->first();
+            $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
             if ($check) {
-                $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
             }
             $message = "Error when closing journal Hpp Production";
             Log::error($message);
@@ -1131,9 +1208,9 @@ class ClosingJournalController extends Controller
             // dd($hpp_account);
             if (!$hpp_account) {
                 // Revert post closing
-                $check = Closing::where("month", $month)->where("year", $year)->first();
+                $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
                 if ($check) {
-                    $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                    $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
                 }
                 return response()->json([
                     "result" => FALSE,
@@ -1208,9 +1285,9 @@ class ClosingJournalController extends Controller
                 if (!$header->save()) {
                     // Revert post closing
                     DB::rollback();
-                    $check = Closing::where("month", $month)->where("year", $year)->first();
+                    $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
                     if ($check) {
-                        $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                        $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
                     }
                     return response()->json([
                         "result" => false,
@@ -1282,9 +1359,9 @@ class ClosingJournalController extends Controller
                 if (!$detail->save()) {
                     DB::rollback();
                     // Revert post closing
-                    $check = Closing::where("month", $month)->where("year", $year)->first();
+                    $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
                     if ($check) {
-                        $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                        $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
                     }
                     return response()->json([
                         "result" => false,
@@ -1336,9 +1413,9 @@ class ClosingJournalController extends Controller
             // dd($hpp_account);
             if (!$hpp_account) {
                 // Revert post closing
-                $check = Closing::where("month", $month)->where("year", $year)->first();
+                $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
                 if ($check) {
-                    $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                    $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
                 }
                 
                 return response()->json([
@@ -1422,9 +1499,9 @@ class ClosingJournalController extends Controller
                 // dd($header);
                 if (!$header->save()) {
                     DB::rollback();
-                    $check = Closing::where("month", $month)->where("year", $year)->first();
+                    $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
                     if ($check) {
-                        $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                        $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
                     }
                     return response()->json([
                         "result" => false,
@@ -1441,9 +1518,9 @@ class ClosingJournalController extends Controller
 
                     if (!$barang) {
                         DB::rollback();
-                        $check = Closing::where("month", $month)->where("year", $year)->first();
+                        $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
                         if ($check) {
-                            $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                            $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
                         }
                         return response()->json([
                             "result" => false,
@@ -1467,9 +1544,9 @@ class ClosingJournalController extends Controller
 
                     if (!$detail->save()) {
                         DB::rollback();
-                        $check = Closing::where("month", $month)->where("year", $year)->first();
+                        $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
                         if ($check) {
-                            $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                            $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
                         }
                         return response()->json([
                             "result" => false,
@@ -1498,9 +1575,9 @@ class ClosingJournalController extends Controller
                 // dd(json_encode($detail));
                 if (!$detail->save()) {
                     DB::rollback();
-                    $check = Closing::where("month", $month)->where("year", $year)->first();
+                    $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
                     if ($check) {
-                        $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                        $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
                     }
                     return response()->json([
                         "result" => false,
@@ -1519,9 +1596,9 @@ class ClosingJournalController extends Controller
             DB::rollback();
             $month = $request->month;
             $year = $request->year;
-            $check = Closing::where("month", $month)->where("year", $year)->first();
+            $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
             if ($check) {
-                $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
             }
             Log::error($message);
             Log::error($e);
@@ -1549,9 +1626,9 @@ class ClosingJournalController extends Controller
             // dd($hpp_account);
             if (!$hpp_account) {
                 // Revert post closing
-                $check = Closing::where("month", $month)->where("year", $year)->first();
+                $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
                 if ($check) {
-                    $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                    $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
                 }
                 
                 return response()->json([
@@ -1637,9 +1714,9 @@ class ClosingJournalController extends Controller
 
                 if (!$header->save()) {
                     DB::rollback();
-                    $check = Closing::where("month", $month)->where("year", $year)->first();
+                    $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
                     if ($check) {
-                        $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                        $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
                     }
                     return response()->json([
                         "result" => false,
@@ -1656,9 +1733,9 @@ class ClosingJournalController extends Controller
 
                     if (!$barang) {
                         DB::rollback();
-                        $check = Closing::where("month", $month)->where("year", $year)->first();
+                        $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
                         if ($check) {
-                            $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                            $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
                         }
                         return response()->json([
                             "result" => false,
@@ -1683,9 +1760,9 @@ class ClosingJournalController extends Controller
 
                     if (!$detail->save()) {
                         DB::rollback();
-                        $check = Closing::where("month", $month)->where("year", $year)->first();
+                        $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
                         if ($check) {
-                            $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                            $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
                         }
                         return response()->json([
                             "result" => false,
@@ -1712,9 +1789,9 @@ class ClosingJournalController extends Controller
                 // dd(json_encode($detail));
                 if (!$detail->save()) {
                     DB::rollback();
-                    $check = Closing::where("month", $month)->where("year", $year)->first();
+                    $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
                     if ($check) {
-                        $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                        $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
                     }
                     return response()->json([
                         "result" => false,
@@ -1734,9 +1811,9 @@ class ClosingJournalController extends Controller
             DB::rollback();
             $month = $request->month;
             $year = $request->year;
-            $check = Closing::where("month", $month)->where("year", $year)->first();
+            $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
             if ($check) {
-                $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
             }
             Log::error($message);
             Log::error($e);
@@ -1762,6 +1839,11 @@ class ClosingJournalController extends Controller
             $hpp_account = Setting::where("id_cabang", $id_cabang)->where("code", "HPP Penjualan")->first();
             // dd($hpp_account);
             if (!$hpp_account) {
+                // Revert post closing
+                $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
+                if ($check) {
+                    $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
+                }
                 return response()->json([
                     "result" => FALSE,
                     "message" => "Akun HPP Penjualan tidak ditemukan"
@@ -1837,9 +1919,9 @@ class ClosingJournalController extends Controller
                 // dd($header);
                 if (!$header->save()) {
                     DB::rollback();
-                    $check = Closing::where("month", $month)->where("year", $year)->first();
+                    $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
                     if ($check) {
-                        $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                        $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
                     }
                     return response()->json([
                         "result" => false,
@@ -1880,9 +1962,9 @@ class ClosingJournalController extends Controller
                     // Log::info(json_encode($detail));
                     if (!$detail->save()) {
                         DB::rollback();
-                        $check = Closing::where("month", $month)->where("year", $year)->first();
+                        $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
                         if ($check) {
-                            $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                            $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
                         }
                         return response()->json([
                             "result" => false,
@@ -1912,9 +1994,9 @@ class ClosingJournalController extends Controller
                         $data_akun_penjualan_barang = Akun::find($akun_hpp_penjualan);
                         if(empty($data_akun_penjualan_barang)){
                             DB::rollback();
-                            $check = Closing::where("month", $month)->where("year", $year)->first();
+                            $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
                             if ($check) {
-                                $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                                $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
                             }
                             return response()->json([
                                 "result" => false,
@@ -1939,9 +2021,9 @@ class ClosingJournalController extends Controller
                     // dd(json_encode($detail));
                     if (!$detail->save()) {
                         DB::rollback();
-                        $check = Closing::where("month", $month)->where("year", $year)->first();
+                        $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
                         if ($check) {
-                            $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                            $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
                         }
                         return response()->json([
                             "result" => false,
@@ -1964,9 +2046,9 @@ class ClosingJournalController extends Controller
             DB::rollback();
             $month = $request->month;
             $year = $request->year;
-            $check = Closing::where("month", $month)->where("year", $year)->first();
+            $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
             if ($check) {
-                $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
             }
             $message = "Error when closing journal penjualan";
             Log::error($message);
@@ -2039,9 +2121,9 @@ class ClosingJournalController extends Controller
                 // dd($header);
                 if (!$header->save()) {
                     DB::rollback();
-                    $check = Closing::where("month", $month)->where("year", $year)->first();
+                    $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
                     if ($check) {
-                        $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                        $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
                     }
                     return response()->json([
                         "result" => false,
@@ -2067,9 +2149,9 @@ class ClosingJournalController extends Controller
                     // Log::info(json_encode($detail));
                     if (!$detail->save()) {
                         DB::rollback();
-                        $check = Closing::where("month", $month)->where("year", $year)->first();
+                        $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
                         if ($check) {
-                            $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                            $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
                         }
                         return response()->json([
                             "result" => false,
@@ -2094,9 +2176,9 @@ class ClosingJournalController extends Controller
                     // dd(json_encode($detail));
                     if (!$detail->save()) {
                         DB::rollback();
-                        $check = Closing::where("month", $month)->where("year", $year)->first();
+                        $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
                         if ($check) {
-                            $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                            $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
                         }
                         return response()->json([
                             "result" => false,
@@ -2121,6 +2203,15 @@ class ClosingJournalController extends Controller
             }
         }
         catch (\Exception $e) {
+            DB::rollback();
+            // Revert post closing
+            $month = $request->month;
+            $year = $request->year;
+            $id_cabang = $request->id_cabang;
+            $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
+            if ($check) {
+                $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
+            }
             $message = "Error when closing journal penyusutan";
             Log::error($message);
             Log::error($e);
@@ -2152,9 +2243,9 @@ class ClosingJournalController extends Controller
             // Log::info(json_encode($profitloss_account));
             if (!$closing_account || !$profitloss_account) {
                 // Revert post closing
-                $check = Closing::where("month", $month)->where("year", $year)->first();
+                $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
                 if ($check) {
-                    $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                    $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
                 }
                 return response()->json([
                     "result" => FALSE,
@@ -2480,9 +2571,9 @@ class ClosingJournalController extends Controller
                 if (!$saldo_balance->save()) {
                     // Revert post closing
                     DB::rollback();
-                    $check = Closing::where("month", $month)->where("year", $year)->first();
+                    $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
                     if ($check) {
-                        $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                        $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
                     }
                     return response()->json([
                         "result" => false,
