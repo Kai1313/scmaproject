@@ -61,6 +61,21 @@
                 width: 100%;
             }
         }
+
+        select[readonly].select2-hidden-accessible+.select2-container {
+            pointer-events: none;
+            touch-action: none;
+        }
+
+        select[readonly].select2-hidden-accessible+.select2-container .select2-selection {
+            background: #eee;
+            box-shadow: none;
+        }
+
+        select[readonly].select2-hidden-accessible+.select2-container .select2-selection__arrow,
+        select[readonly].select2-hidden-accessible+.select2-container .select2-selection__clear {
+            display: none;
+        }
     </style>
 @endsection
 
@@ -95,7 +110,7 @@
                             <label>Cabang Asal <span>*</span></label>
                             <div class="form-group">
                                 <select name="id_cabang" class="form-control select2" data-validation="[NOTEMPTY]"
-                                    data-validation-message="Cabang tidak boleh kosong">
+                                    data-validation-message="Cabang tidak boleh kosong" {{ $data ? 'readonly' : '' }}>
                                     <option value="">Pilih Cabang</option>
                                     @if ($data && $data->id_cabang)
                                         <option value="{{ $data->id_cabang }}" selected>
@@ -107,7 +122,7 @@
                             <label>Gudang Asal<span>*</span></label>
                             <div class="form-group">
                                 <select name="id_gudang" class="form-control select2" data-validation="[NOTEMPTY]"
-                                    data-validation-message="Gudang tidak boleh kosong">
+                                    data-validation-message="Gudang tidak boleh kosong" {{ $data ? 'readonly' : '' }}>
                                     <option value="">Pilih Gudang</option>
                                     @if ($data && $data->id_gudang)
                                         <option value="{{ $data->id_gudang }}" selected>
@@ -147,7 +162,8 @@
                             <label>Cabang Tujuan<span>*</span></label>
                             <div class="form-group">
                                 <select name="id_cabang2" class="form-control select2" data-validation="[NOTEMPTY]"
-                                    data-validation-message="Cabang tujuan tidak boleh kosong">
+                                    data-validation-message="Cabang tujuan tidak boleh kosong"
+                                    {{ $data ? 'readonly' : '' }}>
                                     <option value="">Pilih Cabang Tujuan</option>
                                     @if ($data && $data->id_cabang2)
                                         <option value="{{ $data->id_cabang2 }}" selected>
