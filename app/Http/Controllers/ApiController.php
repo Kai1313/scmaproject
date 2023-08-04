@@ -28,7 +28,6 @@ class ApiController extends Controller
 
         $user = User::where('id_pengguna', $user_id)->first();
         $token = UserToken::where('id_pengguna', $user_id)->where('status_token_pengguna', 1)->whereRaw("waktu_habis_token_pengguna > STR_TO_DATE(?, '%Y-%m-%d %H:%i:%s')", Carbon::now()->format('Y-m-d H:i:s'))->first();
-
         if ($token) {
             $token = $user->createToken('Token Passport User ' . Carbon::now()->format('Y-m-d H:i:s') . '[' . $user->id_pengguna . '] ' . $user->nama_pengguna)->accessToken;
             return response()->json([
@@ -3237,13 +3236,14 @@ class ApiController extends Controller
         $setting = Setting::where("id_cabang", $id_cabang)->where("code", 'like', "Stok Min %")->select('code', 'value1', 'value2')->get()->toArray();
         $settingValue1 = array_column($setting, 'value1', 'code');
         $setting = array_column($setting, 'value2', 'code');
+
         $settingBrgArr = json_decode($settingValue1['Stok Min Khusus'], true);
         $settingBrgArr = array_column($settingBrgArr, 'stokMin', 'id_barang');
         $today = Carbon::today();
         $setting['penj_sampai'] = $today->toDateString();
         $setting['penj_dari'] = $today->subMonths(intval($setting['Stok Min Range']))->toDateString();
         session(['stokMin' => $setting]);
-        // \DB::unprepared(\DB::raw("DROP TEMPORARY TABLE IF EXISTS tTotalPenjualanInfo"));
+        \DB::unprepared(\DB::raw("DROP TEMPORARY TABLE IF EXISTS tTotalPenjualanInfo"));
         \DB::insert(\DB::raw("CREATE TEMPORARY TABLE tTotalPenjualanInfo(id_barang int(11) NOT NULL,nama_barang varchar(200), total_jual decimal(15,6),
         total_jual_per_bulan decimal(15,6),plus_persen decimal(15,6),per_bulan_plus_persen decimal(15,6),avg_prorate double,
         pemakaian_per_barang_jadi double)"));
@@ -3339,10 +3339,11 @@ class ApiController extends Controller
             )
             ->join('bom AS b', 'bd.id_bom', '=', 'b.id_bom')
             ->join('barang AS brg', 'brg.id_barang', '=', 'b.id_barang')
-            ->whereRaw('bd.id_barang = ' . $id_barang . ' AND b.status_bom = 1')
+            ->whereRaw("bd.id_barang = $id_barang and b.status_bom = 1")
             ->groupBy('bd.id_barang', 'b.id_bom');
+
         $child = \DB::table(\DB::raw("({$childsub->toSql()}) as a"))
-            ->select('a.*', \DB::raw('AVG(a.prorate) AS avg_prorate'))
+            // ->select('a.*', \DB::raw('AVG(a.prorate) AS avg_prorate'))
             ->groupBy('a.id_barang')->get();
         if (empty($child)) {
             return;
