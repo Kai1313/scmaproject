@@ -40,6 +40,8 @@
                 <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Tgl Faktur</th>
                 <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Jatuh Tempo</th>
                 <th style="border: #000000 solid thin;width:200px;text-align:center;font-weight:bold;">Nilai Faktur</th>
+                <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Total Pembayaran
+                </th>
                 <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Hutang</th>
                 <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Umur</th>
             </tr>
@@ -54,6 +56,7 @@
                     <td style="border: #000000 solid thin;">{{ $data->top }}</td>
                     <td style="border: #000000 solid thin;text-align:right;">
                         {{ number_format($data->mtotal_pembelian, 2) }}</td>
+                    <td style="border: #000000 solid thin;text-align:right;">{{ number_format($data->bayar, 2) }}</td>
                     <td style="border: #000000 solid thin;text-align:right;">{{ number_format($data->sisa, 2) }}</td>
                     <td style="border: #000000 solid thin;">{{ $data->aging }}</td>
                 </tr>

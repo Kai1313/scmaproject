@@ -90,7 +90,8 @@
                                 <th>Tgl Faktur</th>
                                 <th>Jatuh Tempo</th>
                                 <th>Nilai Faktur</th>
-                                <th>Piutang</th>
+                                <th>Total Pembayaran</th>
+                                <th>Sisa Piutang</th>
                                 <th>Umur</th>
                             </tr>
                         </thead>
@@ -131,6 +132,7 @@
                         var xxxx = $('.dtrg-end th');
                         $.each(xxxx, function(index, value) {
                             var ccccc = $(value).text().split(" | ");
+                            console.log(value)
                             $(value).parent().html(
                                 "<td colspan='3' style='text-align: left;background-color: #B9B9B9'><b>" +
                                 ccccc[0] +
@@ -138,6 +140,7 @@
                                 ccccc[1] +
                                 "</b></td><td style='text-align: right;background-color: #B9B9B9'><b>" +
                                 ccccc[2] +
+                                `</b></td><td style='text-align: right;background-color: #B9B9B9'>${ccccc[3]}</td>` +
                                 "</b></td><td style='text-align: right;background-color: #B9B9B9'></td>"
                             );
                         });
@@ -154,6 +157,14 @@
                             .reduce(function(a, b) {
                                 return a + b * 1;
                             }, 0);
+
+                        var bayar = rows
+                            .data()
+                            .pluck('bayar')
+                            .reduce(function(a, b) {
+                                return a + b * 1;
+                            }, 0);
+
                         var hutang = rows
                             .data()
                             .pluck('sisa')
@@ -162,6 +173,7 @@
                             }, 0);
                         return '' + ' | ' + $.fn.dataTable.render.number('.',
                             ',', 0, '').display(nilaiFaktur) + ' | ' + $.fn.dataTable.render.number('.',
+                            ',', 0, '').display(bayar) + ' | ' + $.fn.dataTable.render.number('.',
                             ',', 0, '').display(hutang);
                     },
                     dataSrc: 'kode_pelanggan'
@@ -192,6 +204,13 @@
                 }, {
                     data: 'mtotal_penjualan',
                     name: 'mtotal_penjualan',
+                    render: function(data) {
+                        return data ? formatNumber(data, 2) : 0
+                    },
+                    className: 'text-right'
+                }, {
+                    data: 'bayar',
+                    name: 'bayar',
                     render: function(data) {
                         return data ? formatNumber(data, 2) : 0
                     },
