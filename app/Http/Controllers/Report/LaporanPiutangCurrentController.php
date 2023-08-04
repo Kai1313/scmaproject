@@ -21,14 +21,14 @@ class LaporanPiutangCurrentController extends Controller
         if ($request->ajax()) {
             return $this->getData($request, 'datatable');
         }
-
         return view('report_ops.laporanPiutangCurrent.index', [
             "pageTitle" => "SCA OPS | Laporan Piutang Saat Ini | List",
             'typeReport' => ['Rekap', 'Detail'],
         ]);
     }
 
-    public function print(Request $request) {
+    public function print(Request $request)
+    {
         if (checkAccessMenu('laporan_piutang_current', 'print') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
@@ -134,7 +134,8 @@ class LaporanPiutangCurrentController extends Controller
             'a.total as mtotal_penjualan',
             DB::raw('a.total-ifnull(p.total,0) as sisa'),
             DB::raw('ifnull(p.Total,0) as bayar'),
-            DB::raw('DATEDIFF("' . $date . '",DATE(DATE_ADD(p2.tanggal_penjualan, INTERVAL p2.tempo_hari_penjualan DAY))) as aging'))
+            DB::raw('DATEDIFF("' . $date . '",DATE(DATE_ADD(p2.tanggal_penjualan, INTERVAL p2.tempo_hari_penjualan DAY))) as aging')
+        )
             ->leftJoinSub($joinJurnal, 'p', function ($join) {
                 $join->on('a.id_transaksi', '=', 'p.id_transaksi');
             })

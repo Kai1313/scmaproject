@@ -90,6 +90,7 @@
                                 <th>Tgl Faktur</th>
                                 <th>Jatuh Tempo</th>
                                 <th>Nilai Faktur</th>
+                                <th>Total Pembayaran</th>
                                 <th>Hutang</th>
                                 <th>Umur</th>
                             </tr>
@@ -138,6 +139,7 @@
                                 ccccc[1] +
                                 "</b></td><td style='text-align: right;background-color: #B9B9B9'><b>" +
                                 ccccc[2] +
+                                `</b></td><td style='text-align: right;background-color: #B9B9B9'>${ccccc[3]}</td>` +
                                 "</b></td><td style='text-align: right;background-color: #B9B9B9'></td>"
                             );
                         });
@@ -154,6 +156,14 @@
                             .reduce(function(a, b) {
                                 return a + b * 1;
                             }, 0);
+
+                        var bayar = rows
+                            .data()
+                            .pluck('bayar')
+                            .reduce(function(a, b) {
+                                return a + b * 1;
+                            }, 0);
+
                         var hutang = rows
                             .data()
                             .pluck('sisa')
@@ -162,6 +172,7 @@
                             }, 0);
                         return '' + ' | ' + $.fn.dataTable.render.number('.',
                             ',', 0, '').display(nilaiFaktur) + ' | ' + $.fn.dataTable.render.number('.',
+                            ',', 0, '').display(bayar) + ' | ' + $.fn.dataTable.render.number('.',
                             ',', 0, '').display(hutang);
                     },
                     dataSrc: 'kode_pemasok'
@@ -192,6 +203,13 @@
                 }, {
                     data: 'mtotal_pembelian',
                     name: 'mtotal_pembelian',
+                    render: function(data) {
+                        return data ? formatNumber(data, 2) : 0
+                    },
+                    className: 'text-right'
+                }, {
+                    data: 'bayar',
+                    name: 'bayar',
                     render: function(data) {
                         return data ? formatNumber(data, 2) : 0
                     },
