@@ -13,6 +13,7 @@ use App\Models\Accounting\SaldoBalance;
 use App\Models\Accounting\TrxSaldo;
 use App\Models\Master\Akun;
 use App\Barang;
+use App\MasterQrCode;
 use App\Models\Master\Cabang;
 use App\Models\Master\Pelanggan;
 use App\Models\Master\Pemasok;
@@ -358,14 +359,15 @@ class ClosingJournalController extends Controller
         $beban_produksi = ProductionCost::where('id_produksi', $id_produksi)->first();
 
         $tenaga = ($beban_produksi->tenaga_kerja_beban_produksi * $beban_produksi->listrik_beban_produksi) * $data_biaya['gaji'];
-        $listrik = $beban_produksi->kwh_beban_produksi * $data_biaya['listik'];
+        $listrik = $beban_produksi->kwh_beban_produksi * $data_biaya['listrik'];
 
-        $produksi_detail = ProductionDetail::join('barang', 'barang.id_barang', 'produksi_detail.id_barang')->where('id_produksi', $id_produksi)->groupBy('id_barang')->get();
+        $produksi_detail = ProductionDetail::join('barang', 'barang.id_barang', 'produksi_detail.id_barang')->where('id_produksi', $id_produksi)->groupBy('barang.id_barang')->get();
+
 
         $kredit_produksi = [];
 
         foreach($produksi_detail as $detail){
-            $qr_barang = ProductionDetail::join('master_qr_code', 'master_qr_code.kode_batang_master_qr_code', 'produksi_detail.kode_batang_produksi_detail')->where('id_produksi', $id_produksi)->where('id_barang', $detail->id_barang)->get();
+            $qr_barang = ProductionDetail::join('master_qr_code', 'master_qr_code.kode_batang_master_qr_code', 'produksi_detail.kode_batang_produksi_detail')->where('produksi_detail.id_produksi', $id_produksi)->where('produksi_detail.id_barang', $detail->id_barang)->get();
             $sum_jumlah_master_qr_code = 0;
 
             foreach($qr_barang as $data){
@@ -374,33 +376,40 @@ class ClosingJournalController extends Controller
 
             if($sum_jumlah_master_qr_code > 0){
                 foreach($qr_barang as $data){
-                    DB::table("master_qr_code")
-                        ->where('id_barang', $data->id_barang)
+                    $checkQR = MasterQrCode::where('id_barang', $data->id_barang)->where('kode_batang_master_qr_code', $data->kode_batang_produksi_detail)->first();
+
+                    if(($checkQR->listrik2_master_qr_code != null && $checkQR->listrik2_master_qr_code != 0) || ($checkQR->pegawai2_master_qr_code != null && $checkQR->pegawai2_master_qr_code != 0)){
+                        MasterQrCode::where('id_barang', $data->id_barang)
                         ->where('kode_batang_master_qr_code', $data->kode_batang_produksi_detail)
                         ->update([
-                            'listrik_master_qr_code' => $listrik/$sum_jumlah_master_qr_code,
-                            'pegawai_master_qr_code' => $tenaga/$sum_jumlah_master_qr_code,
+                            'listrik_master_qr_code' => DB::raw('listrik2_master_qr_code'),
+                            'pegawai_master_qr_code' => DB::raw('pegawai2_master_qr_code'),
                         ]);
+                    }
+
+                    MasterQrCode::where('id_barang', $data->id_barang)
+                    ->where('kode_batang_master_qr_code', $data->kode_batang_produksi_detail)
+                    ->update([
+                        'listrik2_master_qr_code' => DB::raw('listrik_master_qr_code'),
+                        'pegawai2_master_qr_code' => DB::raw('pegawai_master_qr_code'),
+                        'listrik_master_qr_code' => round($listrik/$sum_jumlah_master_qr_code, 2),
+                        'pegawai_master_qr_code' => round($tenaga/$sum_jumlah_master_qr_code, 2),
+                    ]);
                 }
             }
 
-            $qr_barang_updated = ProductionDetail::join('master_qr_code', 'master_qr_code.kode_batang_master_qr_code', 'produksi_detail.kode_batang_produksi_detail')->where('id_produksi', $id_produksi)->where('id_barang', $detail->id_barang)
+            $qr_barang_updated = ProductionDetail::join('master_qr_code', 'master_qr_code.kode_batang_master_qr_code', 'produksi_detail.kode_batang_produksi_detail')->where('produksi_detail.id_produksi', $id_produksi)->where('produksi_detail.id_barang', $detail->id_barang)
                     ->selectRaw('ROUND(
                                 (jumlah_master_qr_code * produksi_master_qr_code) +
                                 (jumlah_master_qr_code * listrik_master_qr_code) +
-                                (jumlah_master_qr_code * pegawai_master_qr_code)
+                                (jumlah_master_qr_code * pegawai_master_qr_code),
                             2) as jumlah, kode_batang_master_qr_code')
                     ->groupBy('kode_batang_master_qr_code')
-                    ->first();
+                    ->get();
 
             $sum_kredit_detail = 0;
 
            foreach($qr_barang_updated as $data_qr){
-                ProductionDetail::where('kode_batang_produksi_detail', $data_qr->kode_batang_master_qr_code)
-                    ->update([
-                        'kredit_produksi_detail' => $data_qr->jumlah
-                    ]);
-
                 $sum_kredit_detail += $data_qr->jumlah;
            }
 
@@ -436,7 +445,7 @@ class ClosingJournalController extends Controller
 
             $biaya_produksi = $this->getProductionCost($end_date, $id_cabang);
 
-            $data_produksi = Production::whereRaw("MONTH(tanggal_produksi)", $month)->whereRaw('YEAR(tanggal_produksi)', $year)->where('id_jenis_transaksi', 17)->get();
+            $data_produksi = Production::whereMonth("tanggal_produksi", $month)->whereYear('tanggal_produksi', $year)->where('id_jenis_transaksi', 17)->where('id_cabang', $id_cabang)->get();
 
             DB::beginTransaction();
             foreach($data_produksi as $produksi){
@@ -444,14 +453,18 @@ class ClosingJournalController extends Controller
                 $data_hpp_biaya = $data_hpp['biaya'];
                 $data_hpp_kredit_hasil = $data_hpp['kredit_produksi'];
 
-                $sumber_produksi = Production::where('nomor_referensi_produksi', $produksi->id_produksi)->first();
+                $sumber_produksi = Production::where('id_produksi', $produksi->nomor_referensi_produksi)->first();
 
                 $jurnal_header = JurnalHeader::where('id_transaksi', $sumber_produksi->nama_produksi)->where('jenis_jurnal', 'ME')->where('void', 0)->first();
+                $jurnal_biaya_listrik = JurnalDetail::where('id_jurnal', $jurnal_header->id_jurnal)->where('id_transaksi', 'Biaya Listrik')->first();
+                $keterangan_listrik = substr($jurnal_biaya_listrik->keterangan, 0, strpos($jurnal_biaya_listrik->keterangan, "WPH"));
 
                 // update jurnal detail biaya
-                $jurnal_biaya_listrik = JurnalDetail::where('id_jurnal', $jurnal_header->id_jurnal)->where('id_transaksi', 'Biaya Listrik')->first();
-                $jurnal_biaya_listrik->credit = $data_hpp_biaya['listrik'];
-                if (!$jurnal_biaya_listrik->save()) {
+                $update_jurnal_listrik = JurnalDetail::where('id_jurnal', $jurnal_header->id_jurnal)->where('id_transaksi', 'Biaya Listrik')->update([
+                    'credit' => $data_hpp_biaya['listrik'],
+                    'keterangan' => $keterangan_listrik . 'WPH ' . round($biaya_produksi['listrik'], 2)
+                ]);
+                if ($update_jurnal_listrik == false) {
                     DB::rollback();
                      // Revert post closing
                     $check = Closing::where("month", $month)->where("year", $year)->first();
@@ -463,8 +476,12 @@ class ClosingJournalController extends Controller
                 }
 
                 $jurnal_biaya_operator = JurnalDetail::where('id_jurnal', $jurnal_header->id_jurnal)->where('id_transaksi', 'Biaya Operator')->first();
-                $jurnal_biaya_operator->credit = $data_hpp_biaya['tenaga'];
-                if (!$jurnal_biaya_operator->save()) {
+                $keterangan_operator = substr($jurnal_biaya_operator->keterangan, 0, strpos($jurnal_biaya_operator->keterangan, "GPM"));
+                $update_jurnal_operator = JurnalDetail::where('id_jurnal', $jurnal_header->id_jurnal)->where('id_transaksi', 'Biaya Operator')->update([
+                    'credit' => $data_hpp_biaya['tenaga'],
+                    'keterangan' => $keterangan_operator . 'GPM ' . round($biaya_produksi['gaji'], 2)
+                ]);
+                if ($update_jurnal_operator == false) {
                     DB::rollback();
                     $check = Closing::where("month", $month)->where("year", $year)->first();
                     if ($check) {
@@ -476,15 +493,16 @@ class ClosingJournalController extends Controller
 
 
                 foreach($data_hpp_kredit_hasil as $kredit_hasil){
-                    $jurnal_hasil_produksi = JurnalDetail::where('id_jurnal', $jurnal_header->id_jurnal)->where('id_transaksi', $kredit_hasil['id_barang'])->first();
-                    $jurnal_hasil_produksi->debet = $kredit_hasil->value;
-                    if (!$jurnal_hasil_produksi->save()) {
+                    $update_jurnal_hasil = JurnalDetail::where('id_jurnal', $jurnal_header->id_jurnal)->where('id_transaksi', $kredit_hasil['id_barang'])->update([
+                        'debet' => $kredit_hasil['value']
+                    ]);
+                    if ($update_jurnal_hasil == false) {
                         DB::rollback();
                         $check = Closing::where("month", $month)->where("year", $year)->first();
                         if ($check) {
                             $delete = Closing::where("month", $month)->where("year", $year)->delete();
                         }
-                        Log::error("Error when updating journal detail on update jurnal hasil produksi " . $sumber_produksi->nama_produksi . " barang " . $kredit_hasil->id_barang . " hpp produksi");
+                        Log::error("Error when updating journal detail on update jurnal hasil produksi " . $sumber_produksi->nama_produksi . " barang " . $kredit_hasil['id_barang'] . " hpp produksi");
                         return FALSE;
                     }
                 }
@@ -538,14 +556,18 @@ class ClosingJournalController extends Controller
                         }
                     }else{
                         if($selisih > 0){
-                            $jurnal_pembulatan->debet = floatval($selisih);
-                            $jurnal_pembulatan->credit = 0;
+                            $update_jurnal_pembulatan = JurnalDetail::where('id_jurnal', $jurnal_header->id_jurnal)->where('id_transaksi', 'Pembulatan')->update([
+                                'debet' => floatval($selisih),
+                                'credit' => 0
+                            ]);
                         }else{
-                            $jurnal_pembulatan->debet = 0;
-                            $jurnal_pembulatan->credit = floatval(abs($selisih));
+                            $update_jurnal_pembulatan = JurnalDetail::where('id_jurnal', $jurnal_header->id_jurnal)->where('id_transaksi', 'Pembulatan')->update([
+                                'debet' => 0,
+                                'credit' => floatval(abs($selisih))
+                            ]);
                         }
 
-                        if (!$jurnal_pembulatan->save()) {
+                        if ($update_jurnal_pembulatan == false) {
                             DB::rollback();
                             $check = Closing::where("month", $month)->where("year", $year)->first();
                             if ($check) {
