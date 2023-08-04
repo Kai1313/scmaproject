@@ -3345,7 +3345,6 @@ class ApiController extends Controller
         $child = \DB::table(\DB::raw("({$childsub->toSql()}) as a"))
             // ->select('a.*', \DB::raw('AVG(a.prorate) AS avg_prorate'))
             ->groupBy('a.id_barang')->get();
-        dd($child);
         if (empty($child)) {
             return;
         }
@@ -3362,6 +3361,7 @@ class ApiController extends Controller
             ->where('pd.id_barang', $id_barang)
             ->where('p.id_cabang', $id_cabang)
             ->whereRaw('p.tanggal_penjualan BETWEEN "' . $stokMin['penj_dari'] . '" AND "' . $stokMin['penj_sampai'] . '"')->get()->toArray();
+
         if (!empty($jual[0]->total_jual)) {
             $persen = floatval($jual[0]->total_jual_per_bulan) * (floatval($stokMin['Stok Min Persen']) / 100);
             $plusPersen = floatval($jual[0]->total_jual_per_bulan) + $persen;

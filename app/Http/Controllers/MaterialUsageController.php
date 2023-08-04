@@ -246,11 +246,17 @@ class MaterialUsageController extends Controller
             ->where('mqc.id_cabang', $idCabang)
             ->where('mqc.id_gudang', $idGudang);
 
-        $data = $data->where('kode_batang_master_qr_code', $qrcode)
-            ->where('sisa_master_qr_code', '>', 0)->first();
+        $data = $data->where('kode_batang_master_qr_code', $qrcode)->first();
         if (!$data) {
             return response()->json([
                 'message' => 'Barang tidak ditemukan',
+                'status' => 'error',
+            ], 500);
+        }
+
+        if ($data->sisa_master_qr_code == 0) {
+            return response()->json([
+                'message' => 'Barang sudah habis',
                 'status' => 'error',
             ], 500);
         }
