@@ -588,6 +588,7 @@ class ClosingJournalController extends Controller
                         $sum_debet_jurnal += $detail->debet;
                         $index = $detail->index;
                     }
+                    $index++;
                 }
 
                 if($sum_credit_jurnal !=  $sum_debet_jurnal){
@@ -638,7 +639,7 @@ class ClosingJournalController extends Controller
                             ]);
                         }
 
-                        if ($update_jurnal_pembulatan == false) {
+                        if ($update_jurnal_pembulatan == 0) {
                             DB::rollback();
                             $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
                             if ($check) {
@@ -2270,13 +2271,13 @@ class ClosingJournalController extends Controller
 
             // Get all journal based on tipe laba rugi, void 0, between startdate - enddate
             $data_ledgers = JurnalDetail::join("jurnal_header", "jurnal_header.id_jurnal", "jurnal_detail.id_jurnal")
-                ->join("master_akun", "master_akun.id_akun", "jurnal_detail.id_akun")
-                ->where("jurnal_header.void", "0")
-                ->where("master_akun.tipe_akun", "1")
-                ->where("master_akun.id_cabang", $id_cabang)
-                ->whereRaw("((jurnal_header.id_transaksi <> 'Closing 1 $noteDate' AND jurnal_header.id_transaksi <> 'Closing 2 $noteDate') OR jurnal_header.id_transaksi IS NULL)")
-                ->whereBetween("jurnal_header.tanggal_jurnal", [$start_date, $end_date])
-                ->selectRaw("jurnal_header.id_jurnal, master_akun.id_cabang, master_akun.id_akun, master_akun.kode_akun, master_akun.nama_akun, IFNULL(SUM(jurnal_detail.debet), 0) as debet, IFNULL(SUM(jurnal_detail.credit), 0) as kredit")->groupBy("jurnal_detail.id_akun")->get();
+            ->join("master_akun", "master_akun.id_akun", "jurnal_detail.id_akun")
+            ->where("jurnal_header.void", "0")
+            ->where("master_akun.tipe_akun", "1")
+            ->where("master_akun.id_cabang", $id_cabang)
+            ->whereRaw("((jurnal_header.id_transaksi <> 'Closing 1 $noteDate' AND jurnal_header.id_transaksi <> 'Closing 2 $noteDate') OR jurnal_header.id_transaksi IS NULL)")
+            ->whereBetween("jurnal_header.tanggal_jurnal", [$start_date, $end_date])
+            ->selectRaw("jurnal_header.id_jurnal, master_akun.id_cabang, master_akun.id_akun, master_akun.kode_akun, master_akun.nama_akun, IFNULL(SUM(jurnal_detail.debet), 0) as debet, IFNULL(SUM(jurnal_detail.credit), 0) as kredit")->groupBy("jurnal_detail.id_akun")->get();
             // Log::info(count($data_ledgers));
             // Create closing step 1
             $header = new JurnalHeader();
@@ -2307,8 +2308,14 @@ class ClosingJournalController extends Controller
             $closingSum = 0;
             $i = 0;
             foreach ($data_ledgers as $key => $value) {
+                // Get saldo balance if exist
+                $saldoBalance = SaldoBalance::where("id_cabang", $id_cabang)->where("bulan", $month)->where("tahun", $year)->where("id_akun", $value->id_akun)->first();
+                $balanceDebet = ($saldoBalance)?$saldoBalance->debet:0;
+                $balanceKredit = ($saldoBalance)?$saldoBalance->credit:0;
+                $sumBalance = $balanceDebet - $balanceKredit;
+
                 // Calculate sum
-                $sum = $value->debet - $value->kredit;
+                $sum = $sumBalance + $value->debet - $value->kredit;
                 // Log::info("closing sum ".$closingSum." debet ".$value->debet." kredit ".$value->kredit);
                 $closingSum = (float)$closingSum + (float)$sum;
                 $detail = new JurnalDetail();
