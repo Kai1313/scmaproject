@@ -301,7 +301,7 @@
                                 <div class="form-group">
                                     <label>Gambar 1 <span>*</span></label>
                                     <input type="file" id="proofment_1" class="dropify required"
-                                        data-allowed-file-extensions="pdf png jpg" data-max-file-size-preview="3M">
+                                        data-allowed-file-extensions="pdf png jpg jpeg" data-max-file-size-preview="3M">
                                 </div>
                             </div>
                             <div class="col-sm-6">

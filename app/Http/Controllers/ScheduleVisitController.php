@@ -111,7 +111,12 @@ class ScheduleVisitController extends Controller
                 $data = new Visit;
             }
 
+            // $maxTanggalPenjualan = Setting::where('code', 'Tanggal Penjualan')
+            //     ->where('id_cabang', $request->id_cabang)
+            //     ->first();
+
             // $checkCustomer = Penjualan::where('id_pelanggan', $request->id_pelanggan)->orderBy('tanggal_penjualan', 'DESC')->first();
+            // dd($request->all());
             // if ($checkCustomer) {
 
             //     // $maxTanggalPenjualan = Setting::where('code', 'Tanggal Penjualan')
