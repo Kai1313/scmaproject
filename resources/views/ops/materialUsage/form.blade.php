@@ -102,7 +102,7 @@
                     <div class="row">
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label>Cabang Pemakaian<span>*</span></label>
+                                <label>Cabang Pemakaian <span>*</span></label>
                                 <select name="id_cabang" class="form-control select2" data-validation="[NOTEMPTY]"
                                     data-validation-message="Cabang tidak boleh kosong" {{ $data ? 'readonly' : '' }}>
                                     <option value="">Pilih Cabang</option>
