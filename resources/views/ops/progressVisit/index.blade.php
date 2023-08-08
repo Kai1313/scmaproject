@@ -169,7 +169,7 @@
                         <label>Marketing</label>
                         <div class="form-group">
                             <select id="id_salesman_filter" class="form-control select2" multiple onchange="filter()">
-                                @foreach (App\Salesman::get() as $i => $item)
+                                @foreach (App\Salesman::where('nama_salesman', '!=', 'TANPA SALES')->get() as $i => $item)
                                     <option value="{{ $item->id_salesman }}" {{ $i < 5 ? 'selected' : '' }}>
                                         {{ $item->nama_salesman }}</option>
                                 @endforeach
