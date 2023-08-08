@@ -215,13 +215,13 @@
                         <button type="button" class="btn btn-warning w-full mb-3" onclick="refreshLocation()">REFRESH
                             LOCATION</button>
                     </div>
-                    @if ($data->pelanggan->latitude_pelanggan != null or $data->pelanggan->longitude_pelanggan == null)
-                        <div class="col-sm-12">
-                            <button type="button" class="btn btn-success w-full mb-3 set-cust-location"
-                                onclick="setCustLocation()">SET CUST
-                                LOCATION</button>
-                        </div>
-                    @endif
+                    {{-- @if ($data->pelanggan->latitude_pelanggan != null or $data->pelanggan->longitude_pelanggan == null) --}}
+                    <div class="col-sm-12">
+                        <button type="button" class="btn btn-success w-full mb-3 set-cust-location"
+                            onclick="setCustLocation()">SET CUST
+                            LOCATION</button>
+                    </div>
+                    {{-- @endif --}}
                 </div>
             </div>
             <div class="col-sm-6 hidden main-menu" id="set-cust-location">
