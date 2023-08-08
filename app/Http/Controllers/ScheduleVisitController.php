@@ -111,31 +111,36 @@ class ScheduleVisitController extends Controller
                 $data = new Visit;
             }
 
-            // $maxTanggalPenjualan = Setting::where('code', 'Tanggal Penjualan')
-            //     ->where('id_cabang', $request->id_cabang)
-            //     ->first();
+            $maxTanggalPenjualan = Setting::where('code', 'Treshold Customer Old')
+                ->where('id_cabang', $request->id_cabang)
+                ->first();
 
-            // $checkCustomer = Penjualan::where('id_pelanggan', $request->id_pelanggan)->orderBy('tanggal_penjualan', 'DESC')->first();
-            // dd($request->all());
-            // if ($checkCustomer) {
+            $checkCustomer = Penjualan::where('id_pelanggan', $request->id_pelanggan)->orderBy('tanggal_penjualan', 'DESC')->first();
+            if ($checkCustomer) {
+                if (!$maxTanggalPenjualan) {
+                    $maxTanggalPenjualan = Setting::create([
+                        "id_cabang" => $request->id_cabang,
+                        "code" => 'Treshold Customer Old',
+                        "description" => 'Treshold Customer Old',
+                        "tipe" => 1,
+                        "value1" => "",
+                        "value2" => "24",
+                        "user_created" => 1,
+                        "dt_created" => now(),
+                        "user_modified" => 1,
+                        "dt_modified" => now(),
+                    ]);
+                }
 
-            //     // $maxTanggalPenjualan = Setting::where('code', 'Tanggal Penjualan')
-            //     //     ->where('id_cabang', $request->id_cabang)
-            //     //     ->first();
-
-            //     // if ($maxTanggalPenjualan->tanggal_penjualan < $maxTanggalPenjualan->value2) {
-            //     //     return response()->json([
-            //     //         "result" => false,
-            //     //         "message" => "Setting Tanggal Penjualan belum di buat untuk id_cabang $request->id_cabang",
-            //     //     ], 500);
-            //     // }
-
-            //     if ($checkCustomer->tanggal_penjualan) {
-            //         # code...
-            //     }
-            // } else {
-            //     $data->status_pelanggan = 'NEW';
-            // }
+                if ($maxTanggalPenjualan->value2 < $maxTanggalPenjualan->value2) {
+                    return response()->json([
+                        "result" => false,
+                        "message" => "Setting Treshold Customer Old belum di buat untuk id_cabang $request->id_cabang",
+                    ], 500);
+                }
+            } else {
+                $data->status_pelanggan = 'NEW';
+            }
 
             $data->fill($request->all());
             if ($id == 0) {
