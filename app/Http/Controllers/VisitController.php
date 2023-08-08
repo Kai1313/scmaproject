@@ -298,12 +298,14 @@ class VisitController extends Controller
             $data->alasan_pembatalan = $req->alasan_pembatalan;
             $data->status = 0;
             $data->save();
+            Log::info("Berhasil cancel visit", $req->all());
             return response()->json([
                 "result" => true,
                 'url' => $url,
                 "message" => $message,
             ], 200);
         } catch (\Throwable $th) {
+            Log::error($th->getMessage(), $th->getTrace());
             return response()->json([
                 "result" => true,
                 "data" => $req->only(['latitude', 'longitude']),
