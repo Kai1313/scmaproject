@@ -219,10 +219,10 @@ class ReportProfitAndLossController extends Controller
                 SUM(IFNULL(total_summary, 0)) as total
             ')
             ->leftJoin(DB::raw('(
-                SELECT id_akun, (total) AS total_summary
+                SELECT id_akun, sum(total) AS total_summary
                 FROM
                     (
-                    SELECT id_akun, ( credit - debet ) AS total
+                    SELECT id_akun, sum( credit - debet ) AS total
                     FROM
                         jurnal_header a
                         INNER JOIN jurnal_detail b ON a.id_jurnal = b.id_jurnal
@@ -231,10 +231,10 @@ class ReportProfitAndLossController extends Controller
                         AND YEAR ( tanggal_jurnal ) = ' . $tahun . '
                         AND MONTH ( tanggal_jurnal ) = ' . $bulan . '
                         AND a.id_cabang = ' . $id_cabang . '
-                        AND (a.id_transaksi NOT LIKE "Closing 1%" OR a.id_transaksi NOT LIKE "Closing 2%" OR a.id_transaksi IS NULL)
+                        AND ((a.id_transaksi NOT LIKE "Closing 1%" AND a.id_transaksi NOT LIKE "Closing 2%") OR a.id_transaksi IS NULL)
                     GROUP BY id_akun
                     UNION ALL
-                    SELECT id_akun, ( credit - debet ) AS total
+                    SELECT id_akun, sum( credit - debet ) AS total
                     FROM
                         saldo_balance sb
                     WHERE
@@ -278,10 +278,10 @@ class ReportProfitAndLossController extends Controller
 
             $data = Akun::selectRaw($select_query)
             ->leftJoin(DB::raw('(
-                SELECT id_akun, (total) AS total_summary
+                SELECT id_akun, sum(total) AS total_summary
                 FROM
                     (
-                    SELECT id_akun, ( credit - debet ) AS total
+                    SELECT id_akun, sum( credit - debet ) AS total
                     FROM
                         jurnal_header a
                         INNER JOIN jurnal_detail b ON a.id_jurnal = b.id_jurnal
@@ -290,10 +290,10 @@ class ReportProfitAndLossController extends Controller
                         AND YEAR ( tanggal_jurnal ) = ' . $tahun . '
                         AND MONTH ( tanggal_jurnal ) = ' . $bulan . '
                         AND a.id_cabang = ' . $cabang->id_cabang . '
-                        AND (a.id_transaksi NOT LIKE "Closing 1%" OR a.id_transaksi NOT LIKE "Closing 2%" OR a.id_transaksi IS NULL)
+                        AND ((a.id_transaksi NOT LIKE "Closing 1%" AND a.id_transaksi NOT LIKE "Closing 2%") OR a.id_transaksi IS NULL)
                     GROUP BY id_akun
                     UNION ALL
-                    SELECT id_akun, ( credit - debet ) AS total
+                    SELECT id_akun, sum( credit - debet ) AS total
                     FROM
                         saldo_balance sb
                     WHERE
@@ -355,10 +355,10 @@ class ReportProfitAndLossController extends Controller
                 master_akun.id_akun
             ')
             ->leftJoin(DB::raw('(
-                SELECT id_akun, (total) AS total_summary
+                SELECT id_akun, sum(total) AS total_summary
                 FROM
                     (
-                    SELECT id_akun, ( credit - debet ) AS total
+                    SELECT id_akun, sum( credit - debet ) AS total
                     FROM
                         jurnal_header a
                         INNER JOIN jurnal_detail b ON a.id_jurnal = b.id_jurnal
@@ -367,10 +367,10 @@ class ReportProfitAndLossController extends Controller
                         AND YEAR ( tanggal_jurnal ) = ' . $tahun . '
                         AND MONTH ( tanggal_jurnal ) = ' . $bulan . '
                         AND a.id_cabang = ' . $id_cabang . '
-                        AND (a.id_transaksi NOT LIKE "Closing 1%" OR a.id_transaksi NOT LIKE "Closing 2%" OR a.id_transaksi IS NULL)
+                        AND ((a.id_transaksi NOT LIKE "Closing 1%" AND a.id_transaksi NOT LIKE "Closing 2%") OR a.id_transaksi IS NULL)
                     GROUP BY id_akun
                     UNION ALL
-                    SELECT id_akun, ( credit - debet ) AS total
+                    SELECT id_akun, sum( credit - debet ) AS total
                     FROM
                         saldo_balance sb
                     WHERE
@@ -419,10 +419,10 @@ class ReportProfitAndLossController extends Controller
 
             $data = Akun::selectRaw($select_query)
             ->leftJoin(DB::raw('(
-                SELECT id_akun, (total) AS total_summary
+                SELECT id_akun, sum(total) AS total_summary
                 FROM
                     (
-                    SELECT id_akun, ( credit - debet ) AS total
+                    SELECT id_akun, sum( credit - debet ) AS total
                     FROM
                         jurnal_header a
                         INNER JOIN jurnal_detail b ON a.id_jurnal = b.id_jurnal
@@ -431,10 +431,10 @@ class ReportProfitAndLossController extends Controller
                         AND YEAR ( tanggal_jurnal ) = ' . $tahun . '
                         AND MONTH ( tanggal_jurnal ) = ' . $bulan . '
                         AND a.id_cabang =  ' . $cabang->id_cabang . '
-                        AND (a.id_transaksi NOT LIKE "Closing 1%" OR a.id_transaksi NOT LIKE "Closing 2%" OR a.id_transaksi IS NULL)
+                        AND ((a.id_transaksi NOT LIKE "Closing 1%" AND a.id_transaksi NOT LIKE "Closing 2%") OR a.id_transaksi IS NULL)
                     GROUP BY id_akun
                     UNION ALL
-                    SELECT id_akun, ( credit - debet ) AS total
+                    SELECT id_akun, sum( credit - debet ) AS total
                     FROM
                         saldo_balance sb
                     WHERE
