@@ -2496,6 +2496,7 @@ class ApiController extends Controller
         $beban_listrik = round($data_production_cost->kwh_beban_produksi, 2);
         $beban_pegawai = round(($data_production_cost->tenaga_kerja_beban_produksi * $data_production_cost->listrik_beban_produksi), 2);
         $jumlah_pegawai = round(($data_production_cost->tenaga_kerja_beban_produksi), 2);
+        $listrik_pegawai = round($data_production_cost->listrik_beban_produksi, 2);
         $daya_mesin = round($data_production_cost->daya, 2);
 
         // cari nominal biaya listrik dan gaji dari table setting
@@ -2531,7 +2532,7 @@ class ApiController extends Controller
             'kwh_listrik' => $beban_listrik,
             'daya_mesin' => $daya_mesin,
             'biaya_operator' => $biaya_operator,
-            'tenaga_kerja' => $beban_pegawai,
+            'tenaga_kerja' => $listrik_pegawai,
             'jumlah_pegawai' => $jumlah_pegawai,
             'nominal_listrik' => $nominal_listrik,
             'nominal_gaji' => $nominal_gaji,
