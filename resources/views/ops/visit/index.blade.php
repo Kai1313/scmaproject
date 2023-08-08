@@ -280,6 +280,16 @@
             }, ]
         });
 
+        $(document).ready(function() {
+            @if (session()->get('user')->salesman)
+                var option = new Option('{{ session()->get('user')->salesman->nama_salesman }}',
+                    '{{ session()->get('user')->salesman->id_salesman }}', true)
+                $('#id_salesman').append(option).trigger('change.select2');
+                table.ajax.reload();
+            @endif
+
+        })
+
         $("#id_salesman").select2({
             width: '100%',
             allowClear: true,
