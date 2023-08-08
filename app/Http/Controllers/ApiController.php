@@ -2617,103 +2617,21 @@ class ApiController extends Controller
         return $data;
     }
 
-    public function journalHpp(Request $request)
-    {
-        try {
-            DB::beginTransaction();
-            $no_transaksi = $request->no_transaksi;
-            $id_cabang = $request->id_cabang;
-            $void = $request->void;
+    public function journalHpp(Request $request){
+        DB::beginTransaction();
+        $no_transaksi = $request->no_transaksi;
+        $id_cabang = $request->id_cabang;
+        $void = $request->void;
 
-            $data_produksi = DB::table('produksi')->where('nama_produksi', $no_transaksi)->first();
+        $data_produksi = DB::table('produksi')->where('nama_produksi', $no_transaksi)->first();
 
-            if (empty($data_produksi)) {
-                DB::rollBack();
-                return response()->json([
-                    "result" => false,
-                    "code" => 400,
-                    "message" => "Error when store Jurnal Hpp data. Please re-check no_transaksi, Produksi " . $no_transaksi . " not found ",
-                ], 400);
-            }
-
-            $id_produksi = $data_produksi->id_produksi;
-
-            // tahap 1
-            $data_production_supplies = $this->productionSupplies($id_produksi);
-
-            if ($data_production_supplies == false) {
-                DB::rollBack();
-                return response()->json([
-                    "result" => false,
-                    "code" => 400,
-                    "message" => "Error when store Jurnal Hpp data. Data Produksi " . $no_transaksi . " not found ",
-                ], 400);
-            }
-
-            // tahap 2 dan 3
-            $data_production_cost = $this->productionCost($id_produksi, $id_cabang);
-
-            if ($data_production_cost == false) {
-                DB::rollBack();
-                return response()->json([
-                    "result" => false,
-                    "code" => 400,
-                    "message" => "Error when store Jurnal Hpp data. Data Beban Produksi " . $no_transaksi . " not found ",
-                ], 400);
-            }
-
-            $total_supplies = $data_production_supplies['total_supplies'];
-            $biaya_listrik = $data_production_cost['biaya_listrik'];
-            $biaya_operator = $data_production_cost['biaya_operator'];
-
-            // tahap 4
-            $data_production_results = $this->productionResults($id_produksi, $total_supplies, $biaya_listrik, $biaya_operator);
-
-            // init data jurnal
-            $data_production = DB::table('produksi')->where('id_produksi', $id_produksi)->first();
-
-            $id_transaksi = $data_production->nama_produksi;
-            $data_pemakaian = $data_production_supplies['data_supplies'];
-            $data_hasil = $data_production_results['data_results'];
-            $user_data = Auth::guard('api')->user();
-
-            if (count($data_hasil) < 1) {
-                DB::rollBack();
-                return response()->json([
-                    "result" => false,
-                    "code" => 400,
-                    "message" => "Error when store Jurnal Hpp data. Data Hasil Produksi empty",
-                ], 400);
-            }
-
-            $data = [
-                'id_transaksi' => $id_transaksi,
-                'cabang' => $id_cabang,
-                'data_pemakaian' => $data_pemakaian,
-                'biaya_listrik' => $biaya_listrik,
-                'biaya_operator' => $biaya_operator,
-                'data_hasil' => $data_hasil,
-                'user_data' => $user_data,
-                'void' => $void,
-            ];
-
-            // tahap 5
-            $store_data = $this->storeHppJournal($data);
-            if ($store_data) {
-                return response()->json([
-                    "result" => true,
-                    "code" => 200,
-                    "message" => "Successfully stored Jurnal Hpp data",
-                ], 200);
-            } else {
-                return response()->json([
-                    "result" => false,
-                    "code" => 400,
-                    "message" => "Error when store Jurnal Hpp data",
-                ], 400);
-            }
-        } catch (\Throwable $th) {
-            dd(json_encode($th));
+        if(empty($data_produksi)){
+            DB::rollBack();
+            return response()->json([
+                "result" => false,
+                "code" => 400,
+                "message" => "Error when store Jurnal Hpp data. Please re-check no_transaksi, Produksi " . $no_transaksi . " not found ",
+            ], 400);
         }
 
         $id_produksi = $data_produksi->id_produksi;
@@ -2721,7 +2639,7 @@ class ApiController extends Controller
         // tahap 1
         $data_production_supplies = $this->productionSupplies($id_produksi);
 
-        if ($data_production_supplies == false) {
+        if($data_production_supplies == false){
             DB::rollBack();
             return response()->json([
                 "result" => false,
@@ -2733,7 +2651,7 @@ class ApiController extends Controller
         // tahap 2 dan 3
         $data_production_cost = $this->productionCost($id_produksi, $id_cabang);
 
-        if ($data_production_cost == false) {
+        if($data_production_cost == false){
             DB::rollBack();
             return response()->json([
                 "result" => false,
@@ -2765,7 +2683,7 @@ class ApiController extends Controller
         $tanggal_hasil_produksi = $data_production_results['tanggal_hasil_produksi'];
         $user_data = Auth::guard('api')->user();
 
-        if (count($data_hasil) < 1) {
+        if(count($data_hasil) < 1){
             DB::rollBack();
             return response()->json([
                 "result" => false,
@@ -2790,19 +2708,19 @@ class ApiController extends Controller
             'user_data' => $user_data,
             'void' => $void,
             'note' => $id_transaksi . ' ==> ' . $id_transaksi_hasil_produksi,
-            'tanggal_hasil_produksi' => $tanggal_hasil_produksi,
+            'tanggal_hasil_produksi' => $tanggal_hasil_produksi
         ];
 
         // tahap 5
-        $store_data = $this->storeHppJournal($data);
+        $store_data =  $this->storeHppJournal($data);
 
-        if ($store_data) {
+        if($store_data){
             return response()->json([
                 "result" => true,
                 "code" => 200,
                 "message" => "Successfully stored Jurnal Hpp data",
             ], 200);
-        } else {
+        }else{
             return response()->json([
                 "result" => false,
                 "code" => 400,
