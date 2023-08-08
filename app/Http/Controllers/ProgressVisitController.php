@@ -243,6 +243,10 @@ class ProgressVisitController extends Controller
             ],
             'legend' => [
                 'reversed' => true,
+                'itemStyle' => [
+                    'fontSize' => '12px',
+                    'fontFamily' => 'Verdana, sans-serif',
+                ],
             ],
             'colors' => [
                 '#ff0808',
