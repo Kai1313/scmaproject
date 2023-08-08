@@ -49,6 +49,10 @@ class VisitController extends Controller
                 if ($request->status != '') {
                     $q->where('status', $request->status);
                 }
+
+                if ($request->status_pelanggan != '') {
+                    $q->where('status_pelanggan', $request->status_pelanggan);
+                }
             })->orderBy('created_at', 'desc');
 
             // if ($request->show_void == 'false') {
