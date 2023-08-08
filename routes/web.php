@@ -158,6 +158,7 @@ Route::prefix('marketing-tool')->group(function () {
     Route::get('/progress-visit/index/show/{show}', 'ProgressVisitController@show')->name('visit.progress-visit.show');
     Route::get('/progress-visit/index/{user_id?}', 'ProgressVisitController@index')->name('progress_visit');
     Route::get('/progress-visit/generate-visualisasi-data/{user_id?}', 'ProgressVisitController@generateVisualisasiData')->name('generate-visualisasi-data-visit');
+    Route::get('/progress-visit/get-calendar/{user_id?}', 'ProgressVisitController@getCalendar')->name('get-calendar-visit');
     Route::get('/progress-visit/get-data/{user_id?}', 'ProgressVisitController@getData')->name('get-data-progress-visit');
 });
 

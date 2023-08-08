@@ -42,6 +42,12 @@ class Visit extends Model
         '3' => 'Penawaran/Order',
     ];
 
+    public static $kategoriPelanggan = [
+        'EXISTING' => 'EXISTING',
+        'NEW' => 'NEW',
+        'OLD' => 'OLD',
+    ];
+
 
     public function getNamaPelangganAttribute()
     {

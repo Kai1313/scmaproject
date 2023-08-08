@@ -29,50 +29,14 @@ class ProgressVisitController extends Controller
         //Set Up Awal
         $dateAwal = dateStore(explode(' - ', $req->daterangepicker)[0]);
         $dateAkhir = dateStore(explode(' - ', $req->daterangepicker)[1]);
-
-        $marketing = Salesman::all();
+        $idSalesman = explode(',', $req->id_salesman);
+        $marketing = Salesman::whereIn('id_salesman', $idSalesman)->get();
 
         $data['perbandingan_perencanaan_visit'] = [];
         $data['perbandingan_metode_visit_ke_pelanggan'] = [];
         $data['perbandingan_progress_visit_ke_pelanggan'] = [];
         $data['perbandingan_nilai_sales_order_visit'] = [];
-
-        //Perbandingan Perencanaan Visit
-        $data['perbandingan_perencanaan_visit']['chart'] = ['type' => 'column'];
-        $data['perbandingan_perencanaan_visit']['title'] = [
-            'text' => "Perbandingan perencanaan visit tanggal $dateAwal - $dateAkhir",
-            'style' => [
-                'fontSize' => '12px',
-                'fontFamily' => 'Verdana, sans-serif',
-            ],
-        ];
-        $data['perbandingan_perencanaan_visit']['xAxis'] = [
-            'type' => 'category',
-            'labels' => [
-                'autoRotation' => [-45, -90],
-                'style' => [
-                    'fontSize' => '12px',
-                    'fontFamily' => 'Verdana, sans-serif',
-                ]
-            ],
-        ];
-        $data['perbandingan_perencanaan_visit']['yAxis'] = [
-            'min' => 0,
-            'title' => [
-                'text' => 'Jumlah Visit',
-                'style' => [
-                    'fontSize' => '12px',
-                    'fontFamily' => 'Verdana, sans-serif',
-                ],
-            ],
-        ];
-        $data['perbandingan_perencanaan_visit']['legend'] = [
-            'enabled' => false
-        ];
-        $data['perbandingan_perencanaan_visit']['tooltip'] = [
-            "pointFormat" => "Jumlah Visit: <b>{point.y:.1f}</b>",
-            "style" => ["fontSize" => "12px"],
-        ];
+        $data['perbandingan_kategori_pelanggan'] = [];
 
         $tempMarketing = [];
         $tempTotalMarketing = [];
@@ -86,14 +50,29 @@ class ProgressVisitController extends Controller
             'BELUM VISIT',
         ];
 
+        $perbandinganVisit = [
+            'Batal Visit',
+            'Realisasi Visit',
+            'Perencanaan Visit',
+        ];
+
+        $kategoriPelanggan = [
+            'EXISTING CUSTOMER',
+            'OLD CUSTOMER',
+            'NEW CUSTOMER',
+        ];
+
         $progress = [
             1,
             2,
             3,
         ];
 
+        $tempSeriesPerbandinganVisit = [];
         foreach ($marketing as $key => $value) {
             $jumlahJadwalVisit = $value->visit->whereBetween('visit_date', [$dateAwal, $dateAkhir])->count();
+            $jumlahBatalJadwalVisit = $value->visit->whereBetween('visit_date', [$dateAwal, $dateAkhir])->where('status', '0')->count();
+            $jumlahRealisasiVisit = $value->visit->whereBetween('visit_date', [$dateAwal, $dateAkhir])->where('status', '2')->count();
             $nilaiSalesOrder = $value->visit
                 ->whereBetween('visit_date', [$dateAwal, $dateAkhir])
                 ->where('progress_ind', 3)
@@ -105,8 +84,30 @@ class ProgressVisitController extends Controller
             $tempTotalMarketing[$key][] = $nilaiSalesOrder;
 
             $namaMarketing[] = $value->nama_salesman;
+
+            $tempSeriesPerbandinganVisit[] = [$jumlahBatalJadwalVisit, $jumlahRealisasiVisit, $jumlahJadwalVisit];
         }
 
+        // cari perbandingan visit per sales
+        $seriesPerbandinganVisit = [];
+        foreach ($perbandinganVisit as $i => $d) {
+
+            $tempSeriesPerbandinganVisit = [];
+            foreach ($marketing as $key => $value) {
+                if ($d == 'Batal Visit') {
+                    $temp = $value->visit->whereBetween('visit_date', [$dateAwal, $dateAkhir])->where('status', '0')->count();
+                } elseif ($d == 'Realisasi Visit') {
+                    $temp = $value->visit->whereBetween('visit_date', [$dateAwal, $dateAkhir])->where('status', '2')->count();
+                } elseif ($d == 'Perencanaan Visit') {
+                    $temp = $value->visit->whereBetween('visit_date', [$dateAwal, $dateAkhir])->count();
+                }
+                $tempSeriesPerbandinganVisit[] = $temp;
+            }
+            $seriesPerbandinganVisit[] = [
+                'name' => $d,
+                'data' => $tempSeriesPerbandinganVisit,
+            ];
+        }
         // cari metode per pelanggan
         $metodeTemp = [];
         foreach ($metode as $i => $d) {
@@ -161,6 +162,30 @@ class ProgressVisitController extends Controller
                 }
             }
         }
+        // cari kategori pelanggan
+        $kategoriPelangganTemp = [];
+        foreach ($kategoriPelanggan as $i => $d) {
+            $kategoriPelangganTemp[] = [
+                'name' => $d,
+                'data' => [],
+            ];
+
+            foreach ($marketing as $key => $value) {
+                $count = $value->visit
+                    ->whereBetween('visit_date', [$dateAwal, $dateAkhir])
+                    ->where('status_pelanggan', $d)
+                    ->filter(function ($d) {
+                        if (request('id_cabang') != '') {
+                            return $d->id_cabang == request('id_cabang');
+                        }
+
+                        return true;
+                    })
+                    ->count();
+
+                $kategoriPelangganTemp[$i]['data'][] = $count;
+            }
+        }
         // cari progress per pelanggan
         $progressTemp = [];
         foreach ($progress as $i => $d) {
@@ -181,34 +206,74 @@ class ProgressVisitController extends Controller
         }
 
 
-        $data['perbandingan_perencanaan_visit']['series'] = [
-            [
-                'name' => 'Perbandingan Perencanaan Visit',
-                'colorByPoint' => true,
-                'groupPadding' => 0,
-                'data' => $tempMarketing,
-                'dataLabels' => [
-                    'enabled' => true,
-                    'rotation' => -90,
-                    'color' => '#FFFFFF',
-                    'align' => 'right',
-                    'format' => '{point.y}',
-                    'y' => 10,
+        //Perbandingan Perencanaan Visit
+        $data['perbandingan_perencanaan_visit'] = [
+            'chart' => [
+                'type' => 'bar',
+            ],
+            'title' => [
+                'text' => "Perbandingan jadwal visit dengan realisasi visit tanggal $dateAwal - $dateAkhir",
+                'style' => [
+                    'fontSize' => '12px',
+                    'fontFamily' => 'Verdana, sans-serif',
+                ],
+            ],
+            'xAxis' => [
+                'categories' => $namaMarketing,
+                'labels' => [
+                    'autoRotation' => [-45, -90],
+                    'style' => [
+                        'fontSize' => '12px',
+                        'fontFamily' => 'Verdana, sans-serif',
+                    ]
+                ],
+            ],
+            'yAxis' => [
+                'min' => 0,
+                'title' => [
+                    'text' => 'Perbandingan dan realisasi',
                     'style' => [
                         'fontSize' => '12px',
                         'fontFamily' => 'Verdana, sans-serif',
                     ],
                 ],
-            ]
+            ],
+            'tooltip' => [
+                "style" => ["fontSize" => "12px"],
+            ],
+            'legend' => [
+                'reversed' => true,
+            ],
+            'colors' => [
+                '#ff0808',
+                '#08ddff',
+                '#00ff7e',
+            ],
+            'plotOptions' => [
+                'column' => [
+                    'colorByPoint' => true,
+                ],
+                'series' => [
+                    'stacking' => 'normal',
+                    'dataLabels' => [
+                        'enabled' => true,
+                        'style' => [
+                            'fontSize' => '12px',
+                            'fontFamily' => 'Verdana, sans-serif',
+                        ],
+                    ],
+                ],
+            ],
+            'series' => $seriesPerbandinganVisit
         ];
         //Perbandingan realisasi Visit
 
         $data['perbandingan_metode_visit_ke_pelanggan'] = [
             'chart' => [
-                'type' => 'column',
+                'type' => 'bar',
             ],
             'title' => [
-                'text' => "Perbandingan metode visit ke pelanggan tanggal $dateAwal - $dateAkhir",
+                'text' => "Metode visit ke pelanggan tanggal $dateAwal - $dateAkhir",
                 'style' => [
                     'fontSize' => '12px',
                     'fontFamily' => 'Verdana, sans-serif',
@@ -241,6 +306,7 @@ class ProgressVisitController extends Controller
                     ],
                 ],
             ],
+
             'legend' => [
                 'enabled' => true,
                 'itemStyle' => [
@@ -258,10 +324,10 @@ class ProgressVisitController extends Controller
         // cari progress visit per pelanggan
         $data['perbandingan_progress_visit_ke_pelanggan'] = [
             'chart' => [
-                'type' => 'column',
+                'type' => 'bar',
             ],
             'title' => [
-                'text' => "Perbandingan progress visit ke pelanggan tanggal $dateAwal - $dateAkhir",
+                'text' => "Progress visit ke pelanggan tanggal $dateAwal - $dateAkhir",
                 'style' => [
                     'fontSize' => '12px',
                     'fontFamily' => 'Verdana, sans-serif',
@@ -311,10 +377,10 @@ class ProgressVisitController extends Controller
         // cari nilai sales order per pelanggan
         $data['perbandingan_nilai_sales_order_visit'] = [
             'chart' => [
-                'type' => 'column',
+                'type' => 'bar',
             ],
             'title' => [
-                'text' => "Perbandingan nilai sales order tanggal $dateAwal - $dateAkhir",
+                'text' => "Nilai sales order tanggal $dateAwal - $dateAkhir",
                 'style' => [
                     'fontSize' => '12px',
                     'fontFamily' => 'Verdana, sans-serif',
@@ -360,17 +426,72 @@ class ProgressVisitController extends Controller
                 ],
             ],
         ];
+        //Perbandingan realisasi Visit
+        $data['perbandingan_kategori_pelanggan'] = [
+            'chart' => [
+                'type' => 'bar',
+            ],
+            'title' => [
+                'text' => "Perbandingan kategori pelanggan tanggal $dateAwal - $dateAkhir",
+                'style' => [
+                    'fontSize' => '12px',
+                    'fontFamily' => 'Verdana, sans-serif',
+                ],
+            ],
+            'xAxis' => [
+                'categories' => $namaMarketing,
+                'crosshair' => true,
+                'accessibility' => [
+                    'description' => 'Jumlah Progress Visit',
+                ],
+                'labels' => [
+                    'autoRotation' => [
+                        0 => -45,
+                        1 => -90,
+                    ],
+                    'style' => [
+                        'fontSize' => '12px',
+                        'fontFamily' => 'Verdana, sans-serif',
+                    ],
+                ],
+            ],
+            'yAxis' => [
+                'min' => 0,
+                'title' => [
+                    'text' => 'Jumlah Kategori Pelanggan',
+                    'style' => [
+                        'fontSize' => '12px',
+                        'fontFamily' => 'Verdana, sans-serif',
+                    ],
+                ],
+            ],
 
-        $data['timeline'] = Visit::select('id', 'id_salesman', 'visit_date', 'id_pelanggan', 'status')
-            ->where(function ($q) {
-                if (request('id_cabang') != '') {
-                    $q->where('id_cabang', request('id_cabang'));
-                }
-            })
-            ->orderBy('visit_date', 'DESC')
-            ->with(['pelanggan', 'salesman'])
-            ->take(1000)
-            ->get();
+            'legend' => [
+                'enabled' => true,
+                'itemStyle' => [
+                    'fontSize' => '12px',
+                    'fontFamily' => 'Verdana, sans-serif',
+                ],
+            ],
+            'tooltip' => [
+                'style' => [
+                    'fontSize' => '12px',
+                ],
+            ],
+            'series' => $kategoriPelangganTemp,
+        ];
+
+        // $data['timeline'] = Visit::select('id', 'id_salesman', 'visit_date', 'id_pelanggan', 'status')
+        //     ->whereIn('id_salesman', $idSalesman)
+        //     ->where(function ($q) {
+        //         if (request('id_cabang') != '') {
+        //             $q->where('id_cabang', request('id_cabang'));
+        //         }
+        //     })
+        //     ->orderBy('visit_date', 'DESC')
+        //     ->with(['pelanggan', 'salesman'])
+        //     ->take(1000)
+        //     ->get();
 
         return response()->json($data);
     }
@@ -381,5 +502,24 @@ class ProgressVisitController extends Controller
         $data = Visit::with(['salesman', 'pelanggan', 'cabang', 'sales_order'])->find($req->id);
 
         return response()->json($data);
+    }
+
+    function getCalendar(Request $req)
+    {
+        $idSalesman = explode(',', $req->id_salesman);
+
+        $data = Visit::select('id', 'id_salesman', 'visit_date', 'id_pelanggan', 'status')
+            ->whereIn('id_salesman', $idSalesman)
+            ->where(function ($q) {
+                if (request('id_cabang') != '') {
+                    $q->where('id_cabang', request('id_cabang'));
+                }
+            })
+            ->orderBy('visit_date', 'DESC')
+            ->with(['pelanggan', 'salesman'])
+            ->take(1000)
+            ->get();
+
+        return view('ops.progressVisit.calendar', compact('data'));
     }
 }

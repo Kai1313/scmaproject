@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Master\Setting;
 use App\Penjualan;
 use App\Visit;
+use Carbon\Carbon;
 use DB;
 use Illuminate\Http\Request;
 use Log;
@@ -105,63 +106,75 @@ class ScheduleVisitController extends Controller
     public function saveEntry(Request $request, $id = 0)
     {
         $data = Visit::find($id);
-        try {
-            DB::beginTransaction();
-            if (!$data) {
-                $data = new Visit;
-            }
-
-            // $maxTanggalPenjualan = Setting::where('code', 'Tanggal Penjualan')
-            //     ->where('id_cabang', $request->id_cabang)
-            //     ->first();
-
-            // $checkCustomer = Penjualan::where('id_pelanggan', $request->id_pelanggan)->orderBy('tanggal_penjualan', 'DESC')->first();
-            // dd($request->all());
-            // if ($checkCustomer) {
-
-            //     // $maxTanggalPenjualan = Setting::where('code', 'Tanggal Penjualan')
-            //     //     ->where('id_cabang', $request->id_cabang)
-            //     //     ->first();
-
-            //     // if ($maxTanggalPenjualan->tanggal_penjualan < $maxTanggalPenjualan->value2) {
-            //     //     return response()->json([
-            //     //         "result" => false,
-            //     //         "message" => "Setting Tanggal Penjualan belum di buat untuk id_cabang $request->id_cabang",
-            //     //     ], 500);
-            //     // }
-
-            //     if ($checkCustomer->tanggal_penjualan) {
-            //         # code...
-            //     }
-            // } else {
-            //     $data->status_pelanggan = 'NEW';
-            // }
-
-            $data->fill($request->all());
-            if ($id == 0) {
-                $data->visit_code = Visit::createcode($request->id_cabang);
-                $data->user_created = session()->get('user')['id_pengguna'];
-            } else {
-                $data->user_modified = session()->get('user')['id_pengguna'];
-            }
-
-            $data->save();
-
-            DB::commit();
-            return response()->json([
-                "result" => true,
-                "message" => "Data berhasil disimpan",
-                "redirect" => route('pre_visit-entry', $data->id_pemakaian),
-            ], 200);
-        } catch (\Exception $e) {
-            DB::rollback();
-            Log::error("Error when save jadwal kunjungan");
-            Log::error($e);
-            return response()->json([
-                "result" => false,
-                "message" => "Data gagal tersimpan",
-            ], 500);
+        // try {
+        DB::beginTransaction();
+        if (!$data) {
+            $data = new Visit;
         }
+
+        $checkCustomer = Penjualan::where('id_pelanggan', $request->id_pelanggan)->orderBy('tanggal_penjualan', 'DESC')->first();
+
+        if ($checkCustomer) {
+
+            $maxTanggalPenjualan = Setting::where('code', 'Treshold Customer Old')
+                ->where('id_cabang', $request->id_cabang)
+                ->first();
+
+            if (!$maxTanggalPenjualan) {
+                $maxTanggalPenjualan = Setting::create([
+                    "id_cabang" => $request->id_cabang,
+                    "code" => 'Treshold Customer Old',
+                    "description" => 'Treshold Customer Old',
+                    "tipe" => 1,
+                    "value1" => "",
+                    "value2" => "24",
+                    "user_created" => 1,
+                    "dt_created" => now(),
+                    "user_modified" => 1,
+                    "dt_modified" => now(),
+                ]);
+            }
+            $this_month = Carbon::now();
+
+            $start_month = Carbon::parse($checkCustomer->tanggal_penjualan);
+
+            $diff = $start_month->diffInMonths($this_month);
+
+            if ($diff >= $maxTanggalPenjualan->value2) {
+                $data->status_pelanggan = 'OLD CUSTOMER';
+            } else {
+                $data->status_pelanggan = 'EXISTING CUSTOMER';
+            }
+        } else {
+            $data->status_pelanggan = 'NEW CUSTOMER';
+        }
+
+        $data->fill($request->all());
+        if ($id == 0) {
+            $data->visit_code = Visit::createcode($request->id_cabang);
+            $data->user_created = session()->get('user')['id_pengguna'];
+        } else {
+            $data->user_modified = session()->get('user')['id_pengguna'];
+        }
+
+        $data->save();
+
+        DB::commit();
+        return response()->json([
+            "result" => true,
+            "message" => "Data berhasil disimpan",
+            "redirect" => route('pre_visit-entry', $data->id_pemakaian),
+        ], 200);
+        // } catch (\Exception $e) {
+        //     DB::rollback();
+        //     Log::error("Error when save jadwal kunjungan");
+        //     Log::error($e);
+        //     return response()->json([
+        //         "result" => false,
+        //         "message" => "Data gagal tersimpan",
+        //         'trace' => $e->getTrace(),
+        //     ], 500);
+        // }
     }
 
     public function viewData($id)

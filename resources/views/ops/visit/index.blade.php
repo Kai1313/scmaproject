@@ -106,6 +106,17 @@
                         </div>
                     </div>
                     <div class="col-md-2 filter-div">
+                        <label>Kategori Pelanggan</label>
+                        <div class="form-group">
+                            <select id="status_pelanggan" class="form-control select2">
+                                <option value="">Semua Kategori Pelanggan</option>
+                                @foreach (App\Visit::$kategoriPelanggan as $i => $item)
+                                    <option value="{{ $i }}">{{ $item }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2 filter-div">
                         <label>Range Tanggal</label>
                         <div class="form-group">
                             <input type="text" id="daterangepicker" class="form-control"
@@ -133,6 +144,7 @@
                                         <th>Tanggal</th>
                                         <th>Salesman</th>
                                         <th>Pelanggan</th>
+                                        <th>Kategori Pelanggan</th>
                                         <th>Status</th>
                                         <th>Status Report</th>
                                         <th>Detail</th>
@@ -221,7 +233,9 @@
                     daterangepicker: function() {
                         return $('#daterangepicker').val();
                     },
-
+                    status_pelanggan: function() {
+                        return $('#status_pelanggan').val();
+                    },
                 },
             },
             columns: [{
@@ -242,6 +256,12 @@
             }, {
                 data: 'nama_pelanggan',
                 name: 'nama_pelanggan',
+            }, {
+                data: 'status_pelanggan',
+                name: 'status_pelanggan',
+                class: 'text-center',
+                orderable: false,
+                searchable: false
             }, {
                 data: 'status',
                 name: 'status',
