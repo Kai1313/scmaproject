@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Report;
 
 use App\Exports\ReportLaporanPiutangCurrentExport;
 use App\Http\Controllers\Controller;
+use App\Models\Accounting\JurnalHeader;
 use DB;
 use Excel;
 use Illuminate\Http\Request;
@@ -110,8 +111,7 @@ class LaporanPiutangCurrentController extends Controller
         $idPelanggan = $request->id_pelanggan;
         $idCabang = explode(',', $request->id_cabang);
 
-        $joinJurnal = DB::table('jurnal_header as jh')
-            ->select('jd.id_transaksi', DB::raw('ifnull(sum(jd.credit-jd.debet),0) as Total'))
+        $joinJurnal = JurnalHeader::select('jd.id_transaksi', DB::raw('ifnull(sum(jd.credit-jd.debet),0) as Total'))
             ->leftJoin('jurnal_detail AS jd', function ($join) {
                 $join->on('jh.id_jurnal', '=', 'jd.id_jurnal')
                     ->on(DB::Raw("ifnull(jd.id_transaksi,'')"), '<>', DB::Raw("''"));
@@ -121,6 +121,8 @@ class LaporanPiutangCurrentController extends Controller
             ->where('jh.tanggal_jurnal', '<=', $date)
             ->whereIn('st.tipe_transaksi', ['Penjualan', 'Retur Penjualan'])
             ->groupBy('jd.id_transaksi');
+
+        $joinJurnal->with('saldo_transaksi');
         if ($idPelanggan != 'all') {
             $joinJurnal->where('st.id_pelanggan', $idPelanggan);
         }
@@ -152,8 +154,17 @@ class LaporanPiutangCurrentController extends Controller
         }
 
         if ($type == 'datatable') {
-            return Datatables::of($data)
-                ->toJson();
+            $datatable = Datatables::of($data);
+
+            $datatable->addColumn('saldo_transaksi', function ($data) {
+                if ($data->saldo_transaksi) {
+                    $holding = $data->saldo_transaksi->id_transaksi;
+                    return $holding;
+                } else {
+                    return '';
+                }
+            });
+            return $datatable->rawColumns(['saldo_transaksi'])->make(true);
         }
 
         $data = $data->get();
