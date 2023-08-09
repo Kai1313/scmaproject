@@ -121,6 +121,7 @@ class LaporanPiutangCurrentController extends Controller
             ->where('jh.tanggal_jurnal', '<=', $date)
             ->whereIn('st.tipe_transaksi', ['Penjualan', 'Retur Penjualan'])
             ->groupBy('jd.id_transaksi');
+        dd($joinJurnal);
         if ($idPelanggan != 'all') {
             $joinJurnal->where('st.id_pelanggan', $idPelanggan);
         }
