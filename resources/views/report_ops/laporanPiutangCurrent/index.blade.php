@@ -180,51 +180,51 @@
                 },
                 columns: [{
                     data: 'kode_pelanggan',
-                    name: 'kode_pelanggan',
+                    name: 'pe.kode_pelanggan',
                     visible: false
                 }, {
                     data: 'nama_pelanggan',
-                    name: 'nama_pelanggan',
+                    name: 'pe.nama_pelanggan',
                     visible: false
                 }, {
                     data: 'id_transaksi',
-                    name: 'id_transaksi',
+                    name: 'a.id_transaksi',
                 }, {
                     data: 'tanggal_penjualan',
-                    name: 'tanggal_penjualan',
+                    name: 'p2.tanggal_penjualan',
                     render: function(data) {
                         return data ? formatDate(data) : ''
                     },
                 }, {
                     data: 'top',
-                    name: 'top',
+                    name: 'p2.top',
                     render: function(data) {
                         return data ? formatDate(data) : ''
                     },
                 }, {
                     data: 'mtotal_penjualan',
-                    name: 'mtotal_penjualan',
+                    name: 'a.total',
                     render: function(data) {
                         return data ? formatNumber(data, 2) : 0
                     },
                     className: 'text-right'
                 }, {
                     data: 'bayar',
-                    name: 'bayar',
+                    name: 'a.bayar',
                     render: function(data) {
                         return data ? formatNumber(data, 2) : 0
                     },
                     className: 'text-right'
                 }, {
                     data: 'sisa',
-                    name: 'sisa',
+                    name: 'a.sisa',
                     render: function(data) {
                         return data ? formatNumber(data, 2) : 0
                     },
                     className: 'text-right'
                 }, {
                     data: 'aging',
-                    name: 'aging',
+                    name: 'p2.tempo_hari_penjualan',
                     className: 'text-right'
                 }, ]
             });
