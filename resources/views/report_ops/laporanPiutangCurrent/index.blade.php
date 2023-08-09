@@ -127,6 +127,7 @@
                 processing: true,
                 serverSide: true,
                 dom: 'lrt',
+                paging: false,
                 ajax: defaultUrlIndex + param,
                 fnDrawCallback: function(oSettings) {
                     setTimeout(function() {
