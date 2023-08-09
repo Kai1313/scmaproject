@@ -113,12 +113,12 @@ class LaporanPiutangCurrentController extends Controller
 
         $joinJurnal = JurnalHeader::select('jd.id_transaksi', DB::raw('ifnull(sum(jd.credit-jd.debet),0) as Total'))
             ->leftJoin('jurnal_detail AS jd', function ($join) {
-                $join->on('jh.id_jurnal', '=', 'jd.id_jurnal')
+                $join->on('jurnal_header.id_jurnal', '=', 'jd.id_jurnal')
                     ->on(DB::Raw("ifnull(jd.id_transaksi,'')"), '<>', DB::Raw("''"));
             })
             ->leftJoin('saldo_transaksi AS st', 'st.id_transaksi', 'jd.id_transaksi')
-            ->where('jh.void', 0)
-            ->where('jh.tanggal_jurnal', '<=', $date)
+            ->where('jurnal_header.void', 0)
+            ->where('jurnal_header.tanggal_jurnal', '<=', $date)
             ->whereIn('st.tipe_transaksi', ['Penjualan', 'Retur Penjualan'])
             ->groupBy('jd.id_transaksi');
 
