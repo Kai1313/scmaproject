@@ -231,7 +231,7 @@ class ReportProfitAndLossController extends Controller
                         AND YEAR ( tanggal_jurnal ) = ' . $tahun . '
                         AND MONTH ( tanggal_jurnal ) = ' . $bulan . '
                         AND a.id_cabang = ' . $id_cabang . '
-                        AND (a.id_transaksi NOT LIKE "Closing%" OR a.id_transaksi IS NULL)
+                        AND ((a.id_transaksi NOT LIKE "Closing 1%" AND a.id_transaksi NOT LIKE "Closing 2%") OR a.id_transaksi IS NULL)
                     GROUP BY id_akun
                     UNION ALL
                     SELECT id_akun, sum( credit - debet ) AS total
@@ -290,7 +290,7 @@ class ReportProfitAndLossController extends Controller
                         AND YEAR ( tanggal_jurnal ) = ' . $tahun . '
                         AND MONTH ( tanggal_jurnal ) = ' . $bulan . '
                         AND a.id_cabang = ' . $cabang->id_cabang . '
-                        AND (a.id_transaksi NOT LIKE "Closing%" OR a.id_transaksi IS NULL)
+                        AND ((a.id_transaksi NOT LIKE "Closing 1%" AND a.id_transaksi NOT LIKE "Closing 2%") OR a.id_transaksi IS NULL)
                     GROUP BY id_akun
                     UNION ALL
                     SELECT id_akun, sum( credit - debet ) AS total
@@ -367,7 +367,7 @@ class ReportProfitAndLossController extends Controller
                         AND YEAR ( tanggal_jurnal ) = ' . $tahun . '
                         AND MONTH ( tanggal_jurnal ) = ' . $bulan . '
                         AND a.id_cabang = ' . $id_cabang . '
-                        AND (a.id_transaksi NOT LIKE "Closing%" OR a.id_transaksi IS NULL)
+                        AND ((a.id_transaksi NOT LIKE "Closing 1%" AND a.id_transaksi NOT LIKE "Closing 2%") OR a.id_transaksi IS NULL)
                     GROUP BY id_akun
                     UNION ALL
                     SELECT id_akun, sum( credit - debet ) AS total
@@ -431,7 +431,7 @@ class ReportProfitAndLossController extends Controller
                         AND YEAR ( tanggal_jurnal ) = ' . $tahun . '
                         AND MONTH ( tanggal_jurnal ) = ' . $bulan . '
                         AND a.id_cabang =  ' . $cabang->id_cabang . '
-                        AND (a.id_transaksi NOT LIKE "Closing%" OR a.id_transaksi IS NULL)
+                        AND ((a.id_transaksi NOT LIKE "Closing 1%" AND a.id_transaksi NOT LIKE "Closing 2%") OR a.id_transaksi IS NULL)
                     GROUP BY id_akun
                     UNION ALL
                     SELECT id_akun, sum( credit - debet ) AS total
