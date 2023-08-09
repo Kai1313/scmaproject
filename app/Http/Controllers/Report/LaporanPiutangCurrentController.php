@@ -133,7 +133,7 @@ class LaporanPiutangCurrentController extends Controller
             DB::raw('DATE_ADD(p2.tanggal_penjualan, INTERVAL p2.tempo_hari_penjualan DAY) as top'),
             'a.total as mtotal_penjualan',
             DB::raw('a.total-ifnull(p.total,0) as sisa'),
-            DB::raw('ifnull(p.Total,0) as bayar'),
+            DB::raw('ifnull(a.bayar,0) as bayar'),
             DB::raw('DATEDIFF("' . $date . '",DATE(DATE_ADD(p2.tanggal_penjualan, INTERVAL p2.tempo_hari_penjualan DAY))) as aging')
         )
             ->leftJoinSub($joinJurnal, 'p', function ($join) {
