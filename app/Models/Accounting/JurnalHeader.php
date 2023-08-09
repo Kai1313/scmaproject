@@ -10,4 +10,9 @@ class JurnalHeader extends Model
     protected $primaryKey = 'id_jurnal';
     const CREATED_AT = 'dt_created';
     const UPDATED_AT = 'dt_modified';
+
+    function jurnalDetails()
+    {
+        return $this->hasMany(JurnalDetail::class, 'id_jurnal', 'id_jurnal');
+    }
 }

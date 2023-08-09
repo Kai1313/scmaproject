@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Accounting\JurnalHeader;
 use App\Models\Master\Setting;
 use App\Penjualan;
 use App\Visit;
