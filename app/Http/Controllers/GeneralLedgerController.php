@@ -224,10 +224,27 @@ class GeneralLedgerController extends Controller
                     }
                 }
             }
-
+            // Check kode jurnal
+            $check = JurnalHeader::where("id_jurnal", "!=", $header->id_jurnal)->where("kode_jurnal", $header->kode_jurnal)->get();
+            Log::info("checking");
+            Log::info(count($check));
+            if (count($check) > 0) {
+                Log::info("Jurnal header update kode jurnal");
+                Log::info(count($check));
+                Log::info(json_encode($check));
+                $newHeader = JurnalHeader::find($header->id_jurnal);
+                $newHeader->kode_jurnal = $this->generateJournalCode($cabangID, $journalType, $slipID);
+                if (!$newHeader->save()) {
+                    DB::rollback();
+                    return response()->json([
+                        "result" => false,
+                        "message" => "Error when store Jurnal data update kode jurnal on table header",
+                    ]);
+                }
+            }
             DB::commit();
             return response()->json([
-                "result" => true,
+                "result" => false,
                 "message" => "Successfully stored Jurnal data",
             ]);
         } catch (\Exception $e) {
