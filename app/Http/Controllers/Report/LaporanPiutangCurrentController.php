@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Report;
 
 use App\Exports\ReportLaporanPiutangCurrentExport;
 use App\Http\Controllers\Controller;
-use App\Models\Accounting\JurnalHeader;
 use DB;
 use Excel;
 use Illuminate\Http\Request;
@@ -111,18 +110,17 @@ class LaporanPiutangCurrentController extends Controller
         $idPelanggan = $request->id_pelanggan;
         $idCabang = explode(',', $request->id_cabang);
 
-        $joinJurnal = JurnalHeader::select('jd.id_transaksi', DB::raw('ifnull(sum(jd.credit-jd.debet),0) as Total'))
+        $joinJurnal = DB::table('jurnal_header as jh')
+            ->select('jd.id_transaksi', DB::raw('ifnull(sum(jd.credit-jd.debet),0) as Total'))
             ->leftJoin('jurnal_detail AS jd', function ($join) {
-                $join->on('jurnal_header.id_jurnal', '=', 'jd.id_jurnal')
+                $join->on('jh.id_jurnal', '=', 'jd.id_jurnal')
                     ->on(DB::Raw("ifnull(jd.id_transaksi,'')"), '<>', DB::Raw("''"));
             })
             ->leftJoin('saldo_transaksi AS st', 'st.id_transaksi', 'jd.id_transaksi')
-            ->where('jurnal_header.void', 0)
-            ->where('jurnal_header.tanggal_jurnal', '<=', $date)
+            ->where('jh.void', 0)
+            ->where('jh.tanggal_jurnal', '<=', $date)
             ->whereIn('st.tipe_transaksi', ['Penjualan', 'Retur Penjualan'])
             ->groupBy('jd.id_transaksi');
-
-        $joinJurnal->with('saldo_transaksi');
         if ($idPelanggan != 'all') {
             $joinJurnal->where('st.id_pelanggan', $idPelanggan);
         }
@@ -154,17 +152,8 @@ class LaporanPiutangCurrentController extends Controller
         }
 
         if ($type == 'datatable') {
-            $datatable = Datatables::of($data);
-
-            $datatable->addColumn('saldo_transaksi', function ($data) {
-                if ($data->saldo_transaksi) {
-                    $holding = $data->saldo_transaksi->id_transaksi;
-                    return $holding;
-                } else {
-                    return '';
-                }
-            });
-            return $datatable->rawColumns(['saldo_transaksi'])->make(true);
+            return Datatables::of($data)
+                ->toJson();
         }
 
         $data = $data->get();
