@@ -145,6 +145,7 @@ class LaporanPiutangCurrentController extends Controller
             ->where(DB::raw('a.total-ifnull(p.total,0)'), '<>', 0)
             ->whereIn('a.tipe_transaksi', ['Penjualan', 'Retur Penjualan'])
             ->whereIn('p2.id_cabang', $idCabang)
+            ->where('a.sisa', '>', 0)
             ->orderBy('pe.nama_pelanggan', 'asc');
         if ($idPelanggan != 'all') {
             $data->where('a.id_pelanggan', $idPelanggan);
