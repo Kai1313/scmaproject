@@ -244,7 +244,7 @@ class GeneralLedgerController extends Controller
             }
             DB::commit();
             return response()->json([
-                "result" => false,
+                "result" => true,
                 "message" => "Successfully stored Jurnal data",
             ]);
         } catch (\Exception $e) {
