@@ -134,7 +134,8 @@ class LaporanPiutangCurrentController extends Controller
             'a.total as mtotal_penjualan',
             DB::raw('a.sisa as sisa'),
             DB::raw('ifnull(a.bayar,0) as bayar'),
-            DB::raw('DATEDIFF("' . $date . '",DATE(DATE_ADD(p2.tanggal_penjualan, INTERVAL p2.tempo_hari_penjualan DAY))) as aging')
+            DB::raw('DATEDIFF("' . $date . '",DATE(DATE_ADD(p2.tanggal_penjualan, INTERVAL p2.tempo_hari_penjualan DAY))) as aging'),
+            'a.tanggal'
         )
             ->leftJoinSub($joinJurnal, 'p', function ($join) {
                 $join->on('a.id_transaksi', '=', 'p.id_transaksi');
@@ -146,7 +147,7 @@ class LaporanPiutangCurrentController extends Controller
             ->whereIn('a.tipe_transaksi', ['Penjualan', 'Retur Penjualan'])
             ->whereIn('p2.id_cabang', $idCabang)
             ->where('a.sisa', '>', 0)
-            ->orderBy('pe.nama_pelanggan', 'asc');
+            ->orderBy('pe.nama_pelanggan', 'asc')->orderBy('p2.tanggal_penjualan','asc');
         if ($idPelanggan != 'all') {
             $data->where('a.id_pelanggan', $idPelanggan);
         }
