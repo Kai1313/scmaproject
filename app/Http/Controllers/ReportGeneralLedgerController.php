@@ -161,6 +161,7 @@ class ReportGeneralLedgerController extends Controller
             $data_ledgers = JurnalDetail::join("jurnal_header", "jurnal_header.id_jurnal", "jurnal_detail.id_jurnal")
                 ->join("master_akun", "master_akun.id_akun", "jurnal_detail.id_akun")
                 ->where("jurnal_header.void", "0")
+                ->whereRaw('((jurnal_header.id_transaksi NOT LIKE "Closing 1%" AND jurnal_header.id_transaksi NOT LIKE "Closing 2%") OR jurnal_header.id_transaksi IS NULL)')
                 ->where("master_akun.id_cabang", $id_cabang)
                 ->whereBetween("jurnal_header.tanggal_jurnal", [$start_date, $end_date]);
             if ($type == "recap") {
@@ -349,6 +350,7 @@ class ReportGeneralLedgerController extends Controller
             $data_ledgers = JurnalDetail::join("jurnal_header", "jurnal_header.id_jurnal", "jurnal_detail.id_jurnal")
                 ->join("master_akun", "master_akun.id_akun", "jurnal_detail.id_akun")
                 ->where("jurnal_header.void", "0")
+                ->whereRaw('((jurnal_header.id_transaksi NOT LIKE "Closing 1%" AND jurnal_header.id_transaksi NOT LIKE "Closing 2%") OR jurnal_header.id_transaksi IS NULL)')
                 ->whereBetween("jurnal_header.tanggal_jurnal", [$start_date, $end_date]);
             if ($type == "recap") {
                 $data_ledgers = $data_ledgers->selectRaw("master_akun.id_cabang, master_akun.id_akun, master_akun.kode_akun, master_akun.nama_akun, SUM(jurnal_detail.debet) as debet, SUM(jurnal_detail.credit) as kredit")->groupBy("jurnal_detail.id_akun");
@@ -500,6 +502,7 @@ class ReportGeneralLedgerController extends Controller
             $data_ledgers = JurnalDetail::join("jurnal_header", "jurnal_header.id_jurnal", "jurnal_detail.id_jurnal")
                 ->join("master_akun", "master_akun.id_akun", "jurnal_detail.id_akun")
                 ->where("jurnal_header.void", "0")
+                ->whereRaw('((jurnal_header.id_transaksi NOT LIKE "Closing 1%" AND jurnal_header.id_transaksi NOT LIKE "Closing 2%") OR jurnal_header.id_transaksi IS NULL)')
                 ->whereBetween("jurnal_header.tanggal_jurnal", [$start_date, $end_date]);
             if ($type == "recap") {
                 $data_ledgers = $data_ledgers->selectRaw("master_akun.id_cabang, master_akun.id_akun, master_akun.kode_akun, master_akun.nama_akun, SUM(jurnal_detail.debet) as debet, SUM(jurnal_detail.credit) as kredit")->groupBy("jurnal_detail.id_akun");
