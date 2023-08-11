@@ -2166,22 +2166,22 @@ class ClosingJournalController extends Controller
                         ]);
                     }
 
-                    $detail = new JurnalDetail();
-                    $detail->id_jurnal = $header->id_jurnal;
-                    $detail->index = $index2;
+                    $detail2 = new JurnalDetail();
+                    $detail2->id_jurnal = $header->id_jurnal;
+                    $detail2->index = $index2;
                     if(strtoupper($cabang->nama_cabang) == 'GEDANGAN'){
-                        $detail->id_akun = $asset->id_akun_biaya;
+                        $detail2->id_akun = $asset->id_akun_biaya;
                     }else if(strtoupper($cabang->nama_cabang) == 'JAKARTA'){
-                        $detail->id_akun = $asset->id_akun_biaya2;
+                        $detail2->id_akun = $asset->id_akun_biaya2;
                     }
-                    $detail->keterangan = "Penyusutan ". $asset->nama_barang;
+                    $detail2->keterangan = "Penyusutan ". $asset->nama_barang;
                     // $detail->id_transaksi = $id_transaksi;
-                    $detail->debet = 0;
-                    $detail->credit = $asset->susut;
-                    $detail->dt_created = $end_date;
-                    $detail->dt_modified = $end_date;
+                    $detail2->debet = 0;
+                    $detail2->credit = $asset->susut;
+                    $detail2->dt_created = $end_date;
+                    $detail2->dt_modified = $end_date;
                     // dd(json_encode($detail));
-                    if (!$detail->save()) {
+                    if (!$detail2->save()) {
                         DB::rollback();
                         $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
                         if ($check) {
