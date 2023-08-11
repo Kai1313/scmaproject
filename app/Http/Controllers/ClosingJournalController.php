@@ -2136,7 +2136,6 @@ class ClosingJournalController extends Controller
                     ]);
                 }
                 $index = 1;
-                $index2 = 1;
                 foreach ($data_asset as $asset) {
                     // Store detail
                     $detail = new JurnalDetail();
@@ -2168,7 +2167,7 @@ class ClosingJournalController extends Controller
 
                     $detail2 = new JurnalDetail();
                     $detail2->id_jurnal = $header->id_jurnal;
-                    $detail2->index = $index2;
+                    $detail2->index = $index + 1;
                     if(strtoupper($cabang->nama_cabang) == 'GEDANGAN'){
                         $detail2->id_akun = $asset->id_akun_biaya;
                     }else if(strtoupper($cabang->nama_cabang) == 'JAKARTA'){
@@ -2193,7 +2192,6 @@ class ClosingJournalController extends Controller
                         ]);
                     }
                     $index ++;
-                    $index2 ++;
                     // Log::info(json_encode($grouped_out));
                     // dd(json_encode($grouped_out));
 
