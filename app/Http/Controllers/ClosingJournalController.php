@@ -2104,6 +2104,8 @@ class ClosingJournalController extends Controller
                 JurnalDetail::where('id_jurnal', $jurnal->id_jurnal)->delete();
             }
             JurnalHeader::where('id_transaksi', "Jurnal Penyusutan")->where('tanggal_jurnal', $end_date)->delete();
+            Log::info("data asset");
+            Log::info(count($data_asset));
 
             // dd($data_header);
             if(count($data_asset) > 0){
@@ -2120,6 +2122,8 @@ class ClosingJournalController extends Controller
                 $header->dt_modified = $end_date;
                 $header->kode_jurnal = $this->generateJournalCode($id_cabang, $journal_type);
                 // dd($header);
+                Log::info("jurnaling");
+                Log::info($header->kode_jurnal);
                 if (!$header->save()) {
                     DB::rollback();
                     $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
