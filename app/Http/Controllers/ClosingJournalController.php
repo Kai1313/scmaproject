@@ -2165,9 +2165,11 @@ class ClosingJournalController extends Controller
                         ]);
                     }
 
+                    $index++;
+
                     $detail2 = new JurnalDetail();
                     $detail2->id_jurnal = $header->id_jurnal;
-                    $detail2->index = $index + 1;
+                    $detail2->index = $index;
                     if(strtoupper($cabang->nama_cabang) == 'GEDANGAN'){
                         $detail2->id_akun = $asset->id_akun_biaya;
                     }else if(strtoupper($cabang->nama_cabang) == 'JAKARTA'){
