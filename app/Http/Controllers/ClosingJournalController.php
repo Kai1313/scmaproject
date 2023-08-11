@@ -2131,11 +2131,13 @@ class ClosingJournalController extends Controller
                         "message" => "Error when store Jurnal data on table header",
                     ]);
                 }
+                $index = 1;
+                $index2 = 1;
                 foreach ($data_asset as $asset) {
                     // Store detail
                     $detail = new JurnalDetail();
                     $detail->id_jurnal = $header->id_jurnal;
-                    $detail->index = 1;
+                    $detail->index = $index;
                     if(strtoupper($cabang->nama_cabang) == 'GEDANGAN'){
                         $detail->id_akun = $asset->id_akun;
                     }else if(strtoupper($cabang->nama_cabang) == 'JAKARTA'){
@@ -2162,7 +2164,7 @@ class ClosingJournalController extends Controller
 
                     $detail = new JurnalDetail();
                     $detail->id_jurnal = $header->id_jurnal;
-                    $detail->index = 2;
+                    $detail->index = $index2;
                     if(strtoupper($cabang->nama_cabang) == 'GEDANGAN'){
                         $detail->id_akun = $asset->id_akun_biaya;
                     }else if(strtoupper($cabang->nama_cabang) == 'JAKARTA'){
@@ -2186,6 +2188,8 @@ class ClosingJournalController extends Controller
                             "message" => "Error when store Jurnal data on table detail",
                         ]);
                     }
+                    $index ++;
+                    $index2 ++;
                     // Log::info(json_encode($grouped_out));
                     // dd(json_encode($grouped_out));
 
