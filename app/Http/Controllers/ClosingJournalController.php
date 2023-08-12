@@ -2075,7 +2075,8 @@ class ClosingJournalController extends Controller
             $status = 1;
             $asset_account = Setting::where("id_cabang", $id_cabang)->where("code", "Kategori Asset")->first();
             $cabang = Cabang::find($id_cabang);
-            // dd($hpp_account);
+            Log::info("akun penyusutan");
+            Log::info($hpp_account);
             if (!$asset_account) {
                 return response()->json([
                     "result" => FALSE,
@@ -2096,7 +2097,7 @@ class ClosingJournalController extends Controller
                             ->groupBy('barang.id_barang')
                             ->select(DB::raw('SUM(master_qr_code_detail.value) as susut'), 'barang.id_barang', 'barang.nama_barang', 'barang.id_akun', 'barang.id_akun2', 'barang.id_akun_biaya', 'barang.id_akun_biaya2')
                             ->get();
-
+            Log::info(json_encode($data_asset));
             DB::beginTransaction();
             $jurnal_header = JurnalHeader::where('id_transaksi', "Jurnal Penyusutan")->where('tanggal_jurnal', $end_date)->get();
 
