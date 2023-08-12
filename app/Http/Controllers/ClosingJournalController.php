@@ -2143,9 +2143,9 @@ class ClosingJournalController extends Controller
                     $detail->id_jurnal = $header->id_jurnal;
                     $detail->index = $index;
                     if(strtoupper($cabang->nama_cabang) == 'GEDANGAN'){
-                        $detail->id_akun = $asset->id_akun;
+                        $detail->id_akun = $asset->id_akun_biaya;
                     }else if(strtoupper($cabang->nama_cabang) == 'JAKARTA'){
-                        $detail->id_akun = $asset->id_akun2;
+                        $detail->id_akun = $asset->id_akun_biaya2;
                     }
                     $detail->keterangan = "Biaya Penyusutan " . $asset->nama_barang;
                     // $detail->id_transaksi = $id_transaksi;
@@ -2172,9 +2172,9 @@ class ClosingJournalController extends Controller
                     $detail2->id_jurnal = $header->id_jurnal;
                     $detail2->index = $index;
                     if(strtoupper($cabang->nama_cabang) == 'GEDANGAN'){
-                        $detail2->id_akun = $asset->id_akun_biaya;
+                        $detail2->id_akun = $asset->id_akun;
                     }else if(strtoupper($cabang->nama_cabang) == 'JAKARTA'){
-                        $detail2->id_akun = $asset->id_akun_biaya2;
+                        $detail2->id_akun = $asset->id_akun2;
                     }
                     $detail2->keterangan = "Penyusutan ". $asset->nama_barang;
                     // $detail->id_transaksi = $id_transaksi;
