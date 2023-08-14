@@ -1122,7 +1122,7 @@ class AdjustmentLedgerController extends Controller
     {
         try {
             // Get first part of code
-            $explode = explode("-", $code);
+            $explode = explode("-", str_replace("Closing ", "", $code));
             switch ($explode[0]) {
                 case 'KR':
                     // Stock Correction
