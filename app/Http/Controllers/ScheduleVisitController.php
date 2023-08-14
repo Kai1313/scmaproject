@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Accounting\JurnalHeader;
 use App\Models\Master\Setting;
 use App\Penjualan;
 use App\Visit;
@@ -36,23 +35,13 @@ class ScheduleVisitController extends Controller
                 ->whereIn('status', ['0', '1'])
                 ->leftJoin('salesman as s', 's.id_salesman', '=', 'v.id_salesman')
                 ->leftJoin('pelanggan as p', 'p.id_pelanggan', '=', 'v.id_pelanggan');
-
-            // if ($request->show_void == 'false') {
-            //     $data = $data->where('pemakaian_header.void', '0');
-            // }
+            if (isset($request->c)) {
+                $data = $data->where('v.id_cabang', $request->c);
+            }
 
             $data = $data->orderBy('v.created_at', 'desc');
             $idUser = session()->get('user')['id_pengguna'];
             $idGrupUser = session()->get('user')['id_grup_pengguna'];
-
-            // dd($idUser);
-            // $filterUser = DB::table('pengguna')
-            //     ->where(function ($w) {
-            //         $w->where('id_grup_pengguna', session()->get('user')['id_grup_pengguna'])->orWhere('id_grup_pengguna', 1);
-            //     })
-            //     ->where('status_pengguna', '1')->pluck('id_pengguna')->toArray();
-            // $accessVoid = getSetting('Pemakaian Void');
-            // $arrayAccessVoid = explode(',', $accessVoid);
 
             return Datatables::of($data)
                 ->addIndexColumn()
@@ -116,7 +105,6 @@ class ScheduleVisitController extends Controller
         $checkCustomer = Penjualan::where('id_pelanggan', $request->id_pelanggan)->orderBy('tanggal_penjualan', 'DESC')->first();
 
         if ($checkCustomer) {
-
             $maxTanggalPenjualan = Setting::where('code', 'Treshold Customer Old')
                 ->where('id_cabang', $request->id_cabang)
                 ->first();
@@ -136,11 +124,8 @@ class ScheduleVisitController extends Controller
                 ]);
             }
             $this_month = Carbon::now();
-
             $start_month = Carbon::parse($checkCustomer->tanggal_penjualan);
-
             $diff = $start_month->diffInMonths($this_month);
-
             if ($diff >= $maxTanggalPenjualan->value2) {
                 $data->status_pelanggan = 'OLD CUSTOMER';
             } else {
@@ -164,7 +149,7 @@ class ScheduleVisitController extends Controller
         return response()->json([
             "result" => true,
             "message" => "Data berhasil disimpan",
-            "redirect" => route('pre_visit-entry', $data->id_pemakaian),
+            "redirect" => route('pre_visit'),
         ], 200);
         // } catch (\Exception $e) {
         //     DB::rollback();
@@ -186,7 +171,7 @@ class ScheduleVisitController extends Controller
 
         $data = Visit::find($id);
         $accessQC = getSetting('Pemakaian QC');
-        return view('ops.materialUsage.detail', [
+        return view('ops.scheduleVisit.detail', [
             'data' => $data,
             "pageTitle" => "SCA OPS | Pemakaian | Detail",
             'accessQc' => in_array(session()->get('user')['id_grup_pengguna'], explode(',', $accessQC)) ? '1' : '0',

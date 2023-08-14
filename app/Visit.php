@@ -43,11 +43,10 @@ class Visit extends Model
     ];
 
     public static $kategoriPelanggan = [
-        'EXISTING' => 'EXISTING',
-        'NEW' => 'NEW',
-        'OLD' => 'OLD',
+        'EXISTING CUSTOMER' => 'EXISTING CUSTOMER',
+        'NEW CUSTOMER' => 'NEW CUSTOMER',
+        'OLD CUSTOMER' => 'OLD CUSTOMER',
     ];
-
 
     public function getNamaPelangganAttribute()
     {

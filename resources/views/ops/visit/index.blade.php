@@ -139,7 +139,7 @@
                             <table class="table table-bordered data-table display responsive nowrap" width="100%">
                                 <thead>
                                     <tr>
-                                        <th>Action</th>
+                                        <th style="width:30px;">Action</th>
                                         <th>Kode Jadwal</th>
                                         <th>Tanggal</th>
                                         <th>Salesman</th>
@@ -147,7 +147,7 @@
                                         <th>Kategori Pelanggan</th>
                                         <th>Status</th>
                                         <th>Status Report</th>
-                                        <th>Detail</th>
+                                        <th style="width:300px;">Detail</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -215,6 +215,8 @@
         var table = $('.data-table').DataTable({
             processing: true,
             serverSide: true,
+            pageLength: 50,
+            "ordering": false,
             ajax: {
                 url: "{{ route('visit') }}",
                 data: {
@@ -242,8 +244,6 @@
                 data: 'action',
                 name: 'action',
                 className: 'text-center',
-                orderable: false,
-                searchable: false
             }, {
                 data: 'visit_code',
                 name: 'visit_code'
@@ -251,33 +251,28 @@
                 data: 'visit_date',
                 name: 'visit_date'
             }, {
-                data: 'nama_salesman',
-                name: 'nama_salesman',
+                data: 'salesman.nama_salesman',
+                name: 'salesman.nama_salesman',
             }, {
-                data: 'nama_pelanggan',
-                name: 'nama_pelanggan',
+                data: 'pelanggan.nama_pelanggan',
+                name: 'pelanggan.nama_pelanggan',
             }, {
                 data: 'status_pelanggan',
                 name: 'status_pelanggan',
                 class: 'text-center',
-                orderable: false,
-                searchable: false
             }, {
                 data: 'status',
                 name: 'status',
                 class: 'text-center',
-                orderable: false,
-                searchable: false
             }, {
-                data: 'status_report',
-                name: 'status_report',
+                data: 'progress_ind',
+                name: 'progress_ind',
                 class: 'text-center',
-                orderable: false,
-                searchable: false
             }, {
                 data: 'detail',
                 name: 'detail',
-            }, ]
+                className: 'limit-text'
+            }],
         });
 
         $(document).ready(function() {

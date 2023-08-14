@@ -5,11 +5,9 @@ namespace App\Http\Controllers;
 use App\MaterialUsage;
 use App\Models\Master\Pelanggan;
 use App\Models\Master\Setting;
-use App\Pengguna;
 use App\Visit;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
@@ -18,95 +16,53 @@ class VisitController extends Controller
 {
     public function index(Request $request)
     {
-        // dd(checkPenjualan(273, 1, '2022-05-25', '2022-05-25'));
         if (checkUserSession($request, 'visit', 'show') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
         if ($request->ajax()) {
+            $data = Visit::with(['salesman', 'cabang', 'pelanggan']);
+            if ($request->id_cabang != '') {
+                $data = $data->where('id_cabang', $request->id_cabang);
+            }
 
-            $data = Visit::where(function ($q) use ($request) {
-                if ($request->id_cabang != '') {
-                    $q->where('id_cabang', $request->id_cabang);
+            if ($request->id_salesman != '') {
+                $data = $data->where('id_salesman', $request->id_salesman);
+            }
+
+            if ($request->progress_ind != '') {
+                if ($request->progress_ind == 0) {
+                    $data = $data->whereNull('progress_ind');
+                } else {
+                    $data = $data->where('progress_ind', $request->progress_ind);
                 }
+            }
 
-                if ($request->id_salesman != '') {
-                    $q->where('id_salesman', $request->id_salesman);
-                }
+            if ($request->daterangepicker != '') {
+                $data = $data->whereBetween('visit_date', [dateStore(explode(' - ', $request->daterangepicker)[0]), dateStore(explode(' - ', $request->daterangepicker)[1])]);
+            }
 
-                if ($request->progress_ind != '') {
-                    if ($request->progress_ind == 0) {
-                        $q->whereNull('progress_ind');
-                    } else {
-                        $q->where('progress_ind', $request->progress_ind);
-                    }
-                }
+            if ($request->status != '') {
+                $data = $data->where('status', $request->status);
+            }
 
-                if ($request->daterangepicker != '') {
-                    $q->whereBetween('visit_date', [dateStore(explode(' - ', $request->daterangepicker)[0]), dateStore(explode(' - ', $request->daterangepicker)[1])]);
-                }
+            if ($request->status_pelanggan != '') {
+                $data = $data->where('status_pelanggan', $request->status_pelanggan);
+            }
 
-                if ($request->status != '') {
-                    $q->where('status', $request->status);
-                }
-
-                if ($request->status_pelanggan != '') {
-                    $q->where('status_pelanggan', $request->status_pelanggan);
-                }
-            })->orderBy('created_at', 'desc');
-
-            // if ($request->show_void == 'false') {
-            //     $data = $data->where('pemakaian_header.void', '0');
-            // }
+            $data = $data->orderBy('created_at', 'desc');
 
             $idUser = session()->get('user')['id_pengguna'];
             $idGrupUser = session()->get('user')['id_grup_pengguna'];
 
-            // dd($idUser);
-            // $filterUser = DB::table('pengguna')
-            //     ->where(function ($w) {
-            //         $w->where('id_grup_pengguna', session()->get('user')['id_grup_pengguna'])->orWhere('id_grup_pengguna', 1);
-            //     })
-            //     ->where('status_pengguna', '1')->pluck('id_pengguna')->toArray();
-            // $accessVoid = getSetting('Pemakaian Void');
-            // $arrayAccessVoid = explode(',', $accessVoid);
-
             return DataTables::eloquent($data)
-                ->addIndexColumn()
-                ->addColumn('actions', function ($row) use ($idUser) {
-                    if ($row->status == '0') {
-                        $btn = '<label class="label label-default">Batal</label>';
-                        $btn .= '<ul class="horizontal-list">';
-                        $btn .= '<li><a href="' . route('pre_visit-view', $row->id) . '" class="btn btn-info btn-xs mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
-                        $btn .= '</ul>';
-                        return $btn;
-                    } elseif ($row->status == '1') {
-                        $btn = '<ul class="horizontal-list">';
-                        $btn .= '<li><a href="' . route('pre_visit-view', $row->id) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
-                        if ($idUser == $row->user_created) {
-                            $btn .= '<li><a href="' . route('pre_visit-entry', $row->id) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
-                            $btn .= '<li><a href="' . route('visit-entry', $row->id) . '" class="btn btn-success btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Buat Kunjungan</a></li>';
-                        }
-                        $btn .= '</ul>';
-                        return $btn;
-                    }
-                })
                 ->addColumn('action', function ($data) {
                     return view('ops.visit.action', compact('data'));
-                })
-                ->addColumn('nama_cabang', function ($data) {
-                    return $data->nama_cabang;
-                })
-                ->addColumn('nama_salesman', function ($data) {
-                    return $data->nama_salesman;
-                })
-                ->addColumn('nama_pelanggan', function ($data) {
-                    return $data->nama_pelanggan;
                 })
                 ->addColumn('detail', function ($data) {
                     return view('ops.visit.detail', compact('data'));
                 })
-                ->addColumn('status', function ($data) {
+                ->editColumn('status', function ($data) {
                     switch ($data->status) {
                         case '0':
                             return "<label class='label label-danger'>Batal Visit</label>";
@@ -118,18 +74,18 @@ class VisitController extends Controller
                             return "<label class='label label-primary'>Sudah Visit</label>";
                             break;
                         default:
-                            # code...
+                            return '';
                             break;
                     }
                 })
-                ->addColumn('status_report', function ($data) {
+                ->editColumn('progress_ind', function ($data) {
                     if ($data->progress_ind == null) {
                         return "<label class='label label-warning'>Belum Report</label>";
                     } else {
                         return "<label class='label label-primary'>Sudah Report</label>";
                     }
                 })
-                ->rawColumns(['action', 'status', 'status_report'])
+                ->rawColumns(['action', 'status', 'progress_ind', 'detail'])
                 ->make(true);
         }
 
@@ -289,7 +245,7 @@ class VisitController extends Controller
         }
     }
 
-    function cancelVisit(Request $req): JsonResponse
+    public function cancelVisit(Request $req): JsonResponse
     {
         try {
             $message = 'Berhasil membatalkan visit';

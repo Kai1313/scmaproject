@@ -22,7 +22,7 @@
         </h1>
         <ol class="breadcrumb">
             <li><a href="#"><i class="fa fa-dashboard"></i> Dashboard</a></li>
-            <li><a href="{{ route('material_usage') }}">Pemakaian</a></li>
+            <li><a href="{{ route('material_usage') }}">Jadwal Kunjungan</a></li>
             <li class="active">Detail</li>
         </ol>
     </section>
@@ -51,12 +51,12 @@
                                 : {{ $data->cabang->kode_cabang }} - {{ $data->cabang->nama_cabang }}
                             </div>
                         </div>
-                        <div class="row">
+                        {{-- <div class="row">
                             <label class="col-md-4">Gudang</label>
                             <div class="col-md-8">
                                 : {{ $data->gudang->nama_gudang }}
                             </div>
-                        </div>
+                        </div> --}}
                         <div class="row">
                             <label class="col-md-4">Tanggal</label>
                             <div class="col-md-8">

@@ -1,11 +1,12 @@
-<table style="width: 300px">
+<table>
     <tr>
-        <td style="min-width: 175px">Issue</td>
+        <td style="width: 175px">Issue</td>
         <td>{{ $data->visit_title != '' ? $data->visit_title : '-' }}</td>
     </tr>
     <tr>
         <td>Deskripsi</td>
-        <td>{{ $data->visit_desc != '' ? $data->visit_desc : '-' }}</td>
+        <td>{{ $data->visit_desc != '' ? $data->visit_desc : '-' }}
+        </td>
     </tr>
     @if ($data->status == '0')
         <tr>
