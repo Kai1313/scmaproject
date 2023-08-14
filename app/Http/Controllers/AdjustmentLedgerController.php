@@ -279,7 +279,6 @@ class AdjustmentLedgerController extends Controller
             "data_jurnal_detail" => $data_jurnal_detail,
             "shortcutLink" => $shortcutLink
         ];
-        dd($data);
 
         return view('accounting.journal.adjusting_journal.detail', $data);
     }
@@ -1120,19 +1119,15 @@ class AdjustmentLedgerController extends Controller
 
     public function getShortcutLink($code)
     {
-        // Log::info($code);
         try {
             // Get first part of code
             $code = str_replace("Closing ", "", $code);
             $explode = explode("-", $code);
-            // Log::info($explode[0]);
             switch ($explode[0]) {
                 case 'KR':
                     // Stock Correction
                     $getId = StockCorrectionHeader::where("nama_koreksi_stok", $code)->first();
-                    // Log::info($getId);
                     $shortcutLink = ($getId)?"https://test2.scasda.my.id/development/v2/v2/#koreksi_stok&data_master=$getId->id_koreksi_stok":NULL;
-                    // Log::info($shortcutLink);
                     break;
                 
                 default:
