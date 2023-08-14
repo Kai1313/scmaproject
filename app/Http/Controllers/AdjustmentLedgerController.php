@@ -648,7 +648,7 @@ class AdjustmentLedgerController extends Controller
             });
         }
 
-        // $filtered_data = $data_general_ledger_table->get();
+        $filtered_data = $data_general_ledger_table->get();
 
         if ($sort[0]['column']) {
             if (!is_array($sort)) {
@@ -675,7 +675,7 @@ class AdjustmentLedgerController extends Controller
         // pagination
         if ($current_page) {
             $page = $current_page;
-            $limit_data = $data_general_ledger_table->count();
+            $limit_data = $limit;
 
             if ($limit) {
                 $limit_data = $limit;
@@ -691,7 +691,7 @@ class AdjustmentLedgerController extends Controller
         $dataTable = $data_general_ledger_table->get();
         $table['draw'] = $draw;
         $table['recordsTotal'] = count($dataTable);
-        $table['recordsFiltered'] = count($dataTable);
+        $table['recordsFiltered'] = count($filtered_data);
         $table['data'] = $dataTable;
 
         return json_encode($table);
