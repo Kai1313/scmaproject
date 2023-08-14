@@ -1134,6 +1134,8 @@ class AdjustmentLedgerController extends Controller
                     $shortcutLink = NULL;
                     break;
             }
+
+            return $shortcutLink;
         } catch (\Exception $e) {
             Log::error("Error when get reference shortcut link");
             return NULL;
