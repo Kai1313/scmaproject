@@ -195,7 +195,7 @@
                                 <td>{{ $detail->nama_akun }}</td>
                                 <td>
                                     @if ($shortcutLink)
-                                        <a href="{{ $shortcutLink }}">
+                                        <a href="{{ $shortcutLink }}" target="blank__">
                                             {!! $detail->keterangan !!}
                                         </a>
                                     @else
