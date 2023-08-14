@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Accounting\JurnalDetail;
 use App\Models\Accounting\JurnalHeader;
 use App\Models\Accounting\Periode;
+use App\Models\Accounting\StockCorrectionHeader;
 use App\Models\Accounting\TrxSaldo;
 use App\Models\Master\Akun;
 use App\Models\Master\Cabang;
@@ -269,11 +270,16 @@ class AdjustmentLedgerController extends Controller
             $value->keterangan = $notes;
         }
 
+        // Get shortcut link
+        $shortcutLink = $this->getShortcutLink($data_jurnal_header->id_transaksi);
+
         $data = [
             "pageTitle" => "SCA Accounting | Transaksi Jurnal Umum | Detail",
             "data_jurnal_header" => $data_jurnal_header,
             "data_jurnal_detail" => $data_jurnal_detail,
+            "shortcutLink" => $shortcutLink
         ];
+        dd($data);
 
         return view('accounting.journal.adjusting_journal.detail', $data);
     }
@@ -1109,6 +1115,28 @@ class AdjustmentLedgerController extends Controller
                 "result" => FALSE,
                 "message" => $message
             ]);
+        }
+    }
+
+    public function getShortcutLink($code)
+    {
+        try {
+            // Get first part of code
+            $explode = explode("-", $code);
+            switch ($explode[0]) {
+                case 'KR':
+                    // Stock Correction
+                    $getId = StockCorrectionHeader::where("nama_koreksi_stok", $code)->first();
+                    $shortcutLink = ($getId)?"https://test2.scasda.my.id/development/v2/v2/#koreksi_stok&data_master=$getId->id_koreksi_stok":NULL;
+                    break;
+                
+                default:
+                    $shortcutLink = NULL;
+                    break;
+            }
+        } catch (\Exception $e) {
+            Log::error("Error when get reference shortcut link");
+            return NULL;
         }
     }
 }
