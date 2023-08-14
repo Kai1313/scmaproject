@@ -2075,7 +2075,8 @@ class ClosingJournalController extends Controller
             $status = 1;
             $asset_account = Setting::where("id_cabang", $id_cabang)->where("code", "Kategori Asset")->first();
             $cabang = Cabang::find($id_cabang);
-            // dd($hpp_account);
+            Log::info("akun penyusutan");
+            Log::info($hpp_account);
             if (!$asset_account) {
                 return response()->json([
                     "result" => FALSE,
@@ -2096,7 +2097,7 @@ class ClosingJournalController extends Controller
                             ->groupBy('barang.id_barang')
                             ->select(DB::raw('SUM(master_qr_code_detail.value) as susut'), 'barang.id_barang', 'barang.nama_barang', 'barang.id_akun', 'barang.id_akun2', 'barang.id_akun_biaya', 'barang.id_akun_biaya2')
                             ->get();
-
+            Log::info(json_encode($data_asset));
             DB::beginTransaction();
             $jurnal_header = JurnalHeader::where('id_transaksi', "Jurnal Penyusutan")->where('tanggal_jurnal', $end_date)->get();
 
@@ -2104,6 +2105,8 @@ class ClosingJournalController extends Controller
                 JurnalDetail::where('id_jurnal', $jurnal->id_jurnal)->delete();
             }
             JurnalHeader::where('id_transaksi', "Jurnal Penyusutan")->where('tanggal_jurnal', $end_date)->delete();
+            Log::info("data asset");
+            Log::info(count($data_asset));
 
             // dd($data_header);
             if(count($data_asset) > 0){
@@ -2120,6 +2123,8 @@ class ClosingJournalController extends Controller
                 $header->dt_modified = $end_date;
                 $header->kode_jurnal = $this->generateJournalCode($id_cabang, $journal_type);
                 // dd($header);
+                Log::info("jurnaling");
+                Log::info($header->kode_jurnal);
                 if (!$header->save()) {
                     DB::rollback();
                     $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
@@ -2131,15 +2136,16 @@ class ClosingJournalController extends Controller
                         "message" => "Error when store Jurnal data on table header",
                     ]);
                 }
+                $index = 1;
                 foreach ($data_asset as $asset) {
                     // Store detail
                     $detail = new JurnalDetail();
                     $detail->id_jurnal = $header->id_jurnal;
-                    $detail->index = 1;
+                    $detail->index = $index;
                     if(strtoupper($cabang->nama_cabang) == 'GEDANGAN'){
-                        $detail->id_akun = $asset->id_akun;
+                        $detail->id_akun = $asset->id_akun_biaya;
                     }else if(strtoupper($cabang->nama_cabang) == 'JAKARTA'){
-                        $detail->id_akun = $asset->id_akun2;
+                        $detail->id_akun = $asset->id_akun_biaya2;
                     }
                     $detail->keterangan = "Biaya Penyusutan " . $asset->nama_barang;
                     // $detail->id_transaksi = $id_transaksi;
@@ -2160,22 +2166,24 @@ class ClosingJournalController extends Controller
                         ]);
                     }
 
-                    $detail = new JurnalDetail();
-                    $detail->id_jurnal = $header->id_jurnal;
-                    $detail->index = 2;
+                    $index++;
+
+                    $detail2 = new JurnalDetail();
+                    $detail2->id_jurnal = $header->id_jurnal;
+                    $detail2->index = $index;
                     if(strtoupper($cabang->nama_cabang) == 'GEDANGAN'){
-                        $detail->id_akun = $asset->id_akun_biaya;
+                        $detail2->id_akun = $asset->id_akun;
                     }else if(strtoupper($cabang->nama_cabang) == 'JAKARTA'){
-                        $detail->id_akun = $asset->id_akun_biaya2;
+                        $detail2->id_akun = $asset->id_akun2;
                     }
-                    $detail->keterangan = "Penyusutan ". $asset->nama_barang;
+                    $detail2->keterangan = "Penyusutan ". $asset->nama_barang;
                     // $detail->id_transaksi = $id_transaksi;
-                    $detail->debet = 0;
-                    $detail->credit = $asset->susut;
-                    $detail->dt_created = $end_date;
-                    $detail->dt_modified = $end_date;
+                    $detail2->debet = 0;
+                    $detail2->credit = $asset->susut;
+                    $detail2->dt_created = $end_date;
+                    $detail2->dt_modified = $end_date;
                     // dd(json_encode($detail));
-                    if (!$detail->save()) {
+                    if (!$detail2->save()) {
                         DB::rollback();
                         $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
                         if ($check) {
@@ -2186,6 +2194,7 @@ class ClosingJournalController extends Controller
                             "message" => "Error when store Jurnal data on table detail",
                         ]);
                     }
+                    $index ++;
                     // Log::info(json_encode($grouped_out));
                     // dd(json_encode($grouped_out));
 

@@ -613,6 +613,7 @@
         // On change cabang
         $("#cabang_input").on("change", function() {
             getSetting($(this).val())
+            getCoa()
         })
 
         // Remove detail
