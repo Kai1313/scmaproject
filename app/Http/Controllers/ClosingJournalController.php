@@ -2078,8 +2078,8 @@ class ClosingJournalController extends Controller
             $status = 1;
             $asset_account = Setting::where("id_cabang", $id_cabang)->where("code", "Kategori Asset")->first();
             $cabang = Cabang::find($id_cabang);
-            Log::info("akun penyusutan");
-            Log::info($hpp_account);
+            // Log::info("akun penyusutan");
+            // Log::info($hpp_account);
             if (!$asset_account) {
                 return response()->json([
                     "result" => FALSE,
