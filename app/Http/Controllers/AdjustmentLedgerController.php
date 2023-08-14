@@ -688,11 +688,11 @@ class AdjustmentLedgerController extends Controller
 
             $data_general_ledger_table->skip($offset)->take($limit_data);
         }
-
+        $dataTable = $data_general_ledger_table->get();
         $table['draw'] = $draw;
-        $table['recordsTotal'] = $data_general_ledger_table->count();
-        $table['recordsFiltered'] = $filtered_data->count();
-        $table['data'] = $data_general_ledger_table->get();
+        $table['recordsTotal'] = count($dataTable);
+        $table['recordsFiltered'] = count($filtered_data);
+        $table['data'] = $dataTable;
 
         return json_encode($table);
     }
