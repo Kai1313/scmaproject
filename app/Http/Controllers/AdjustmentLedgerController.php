@@ -648,7 +648,7 @@ class AdjustmentLedgerController extends Controller
             });
         }
 
-        $filtered_data = $data_general_ledger_table->get();
+        // $filtered_data = $data_general_ledger_table->get();
 
         if ($sort[0]['column']) {
             if (!is_array($sort)) {
@@ -691,7 +691,7 @@ class AdjustmentLedgerController extends Controller
         $dataTable = $data_general_ledger_table->get();
         $table['draw'] = $draw;
         $table['recordsTotal'] = count($dataTable);
-        $table['recordsFiltered'] = count($filtered_data);
+        $table['recordsFiltered'] = count($dataTable);
         $table['data'] = $dataTable;
 
         return json_encode($table);
