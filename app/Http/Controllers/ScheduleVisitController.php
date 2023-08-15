@@ -45,7 +45,7 @@ class ScheduleVisitController extends Controller
 
             return Datatables::of($data)
                 ->addIndexColumn()
-                ->addColumn('action', function ($row) use ($idUser) {
+                ->addColumn('action', function ($row) use ($idUser, $idGrupUser) {
                     if ($row->status == '0') {
                         $btn = '<label class="label label-default">Batal</label>';
                         $btn .= '<ul class="horizontal-list">';
@@ -59,6 +59,11 @@ class ScheduleVisitController extends Controller
                             $btn .= '<li><a href="' . route('pre_visit-entry', $row->id) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
                             $btn .= '<li><a href="' . route('visit-entry', $row->id) . '" class="btn btn-success btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Buat Kunjungan</a></li>';
                         }
+
+                        if ($idGrupUser == '1') {
+                            $btn .= '<li><a href="' . route('pre_visit-void', $row->id) . '" class="btn btn-danger btn-xs mr-1 mb-1 btn-destroy"><i class="glyphicon glyphicon-trash"></i> Batal</a></li>';
+                        }
+
                         $btn .= '</ul>';
                         return $btn;
                     }
@@ -178,13 +183,13 @@ class ScheduleVisitController extends Controller
         ]);
     }
 
-    public function destroy($id)
+    public function void($id)
     {
-        if (checkAccessMenu('pemakaian', 'delete') == false) {
+        if (checkAccessMenu('pre_visit', 'delete') == false) {
             return response()->json(['message' => 'Tidak mempunyai akses'], 500);
         }
 
-        $data = MaterialUsage::find($id);
+        $data = Visit::find($id);
         if (!$data) {
             return response()->json([
                 "result" => false,
@@ -194,21 +199,18 @@ class ScheduleVisitController extends Controller
 
         try {
             DB::beginTransaction();
-            $data->void = 1;
-            $data->void_user_id = session()->get('user')['id_pengguna'];
+            $data->status = 3;
             $data->save();
-
-            $data->voidDetails();
 
             DB::commit();
             return response()->json([
                 "result" => true,
                 "message" => "Data berhasil dibatalkan",
-                "redirect" => route('material_usage'),
+                "redirect" => route('pre_visit'),
             ], 200);
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error("Error when void pemakaian");
+            Log::error("Error when void visit");
             Log::error($e);
             return response()->json([
                 "result" => false,

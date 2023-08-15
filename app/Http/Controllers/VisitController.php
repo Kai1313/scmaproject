@@ -21,7 +21,7 @@ class VisitController extends Controller
         }
 
         if ($request->ajax()) {
-            $data = Visit::with(['salesman', 'cabang', 'pelanggan']);
+            $data = Visit::with(['salesman', 'cabang', 'pelanggan'])->where('status', '!=', 3);
             if ($request->id_cabang != '') {
                 $data = $data->where('id_cabang', $request->id_cabang);
             }

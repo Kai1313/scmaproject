@@ -137,6 +137,7 @@ Route::prefix('marketing-tool')->group(function () {
         Route::post('/save_entry/{id}', 'ScheduleVisitController@saveEntry')->name('pre_visit-save-entry');
         Route::get('/view/{id}', 'ScheduleVisitController@viewData')->name('pre_visit-view');
         Route::get('/delete/{id}', 'ScheduleVisitController@destroy')->name('pre_visit-delete');
+        Route::get('/void/{id}', 'ScheduleVisitController@void')->name('pre_visit-void');
     });
 
     Route::prefix('visit')->group(function () {

@@ -313,7 +313,11 @@ class MoveBranch extends Model
                     DB::table('kartu_stok')
                         ->where('id_jenis_transaksi', $idJenisTransaksi)
                         ->where('kode_batang_kartu_stok', $data->qr_code)
-                        ->update(['status_kartu_stok' => 1]);
+                        ->update([
+                            'status_kartu_stok' => 1,
+                            'kode_kartu_stok' => $this->kode_pindah_barang,
+                            'tanggal_kartu_stok' => $this->tanggal_pindah_barang,
+                        ]);
                 }
             }
         }

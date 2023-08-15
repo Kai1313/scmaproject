@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 class ProgressVisitController extends Controller
 {
 
-    function index(Request $request)
+    public function index(Request $request)
     {
         if (checkUserSession($request, 'progress_visit', 'show') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
@@ -17,14 +17,13 @@ class ProgressVisitController extends Controller
 
         $cabang = session()->get('access_cabang');
 
-
         return view('ops.progressVisit.index', [
             "pageTitle" => "SCA OPS | Progress Visit | index",
             'cabang' => $cabang,
         ]);
     }
 
-    function generateVisualisasiData(Request $req)
+    public function generateVisualisasiData(Request $req)
     {
         //Set Up Awal
         $dateAwal = dateStore(explode(' - ', $req->daterangepicker)[0]);
@@ -70,7 +69,7 @@ class ProgressVisitController extends Controller
 
         $tempSeriesPerbandinganVisit = [];
         foreach ($marketing as $key => $value) {
-            $jumlahJadwalVisit = $value->visit->whereBetween('visit_date', [$dateAwal, $dateAkhir])->count();
+            $jumlahJadwalVisit = $value->visit->whereBetween('visit_date', [$dateAwal, $dateAkhir])->where('status', '!=', '3')->count();
             $jumlahBatalJadwalVisit = $value->visit->whereBetween('visit_date', [$dateAwal, $dateAkhir])->where('status', '0')->count();
             $jumlahRealisasiVisit = $value->visit->whereBetween('visit_date', [$dateAwal, $dateAkhir])->where('status', '2')->count();
             $nilaiSalesOrder = $value->visit
@@ -99,7 +98,7 @@ class ProgressVisitController extends Controller
                 } elseif ($d == 'Realisasi Visit') {
                     $temp = $value->visit->whereBetween('visit_date', [$dateAwal, $dateAkhir])->where('status', '2')->count();
                 } elseif ($d == 'Perencanaan Visit') {
-                    $temp = $value->visit->whereBetween('visit_date', [$dateAwal, $dateAkhir])->count();
+                    $temp = $value->visit->whereBetween('visit_date', [$dateAwal, $dateAkhir])->where('status', '!=', '3')->count();
                 }
                 $tempSeriesPerbandinganVisit[] = $temp;
             }
@@ -174,6 +173,7 @@ class ProgressVisitController extends Controller
                 $count = $value->visit
                     ->whereBetween('visit_date', [$dateAwal, $dateAkhir])
                     ->where('status_pelanggan', $d)
+                    ->where('status', '!=', '3')
                     ->filter(function ($d) {
                         if (request('id_cabang') != '') {
                             return $d->id_cabang == request('id_cabang');
@@ -205,7 +205,6 @@ class ProgressVisitController extends Controller
             }
         }
 
-
         //Perbandingan Perencanaan Visit
         $data['perbandingan_perencanaan_visit'] = [
             'chart' => [
@@ -225,7 +224,7 @@ class ProgressVisitController extends Controller
                     'style' => [
                         'fontSize' => '12px',
                         'fontFamily' => 'Verdana, sans-serif',
-                    ]
+                    ],
                 ],
             ],
             'yAxis' => [
@@ -268,7 +267,7 @@ class ProgressVisitController extends Controller
                     ],
                 ],
             ],
-            'series' => $seriesPerbandinganVisit
+            'series' => $seriesPerbandinganVisit,
         ];
         //Perbandingan realisasi Visit
 
@@ -376,7 +375,7 @@ class ProgressVisitController extends Controller
                     'fontSize' => '12px',
                 ],
             ],
-            'series' => $progressTemp
+            'series' => $progressTemp,
         ];
         // cari nilai sales order per pelanggan
         $data['perbandingan_nilai_sales_order_visit'] = [
@@ -500,7 +499,7 @@ class ProgressVisitController extends Controller
         return response()->json($data);
     }
 
-    function getData(Request $req)
+    public function getData(Request $req)
     {
 
         $data = Visit::with(['salesman', 'pelanggan', 'cabang', 'sales_order'])->find($req->id);
@@ -508,11 +507,12 @@ class ProgressVisitController extends Controller
         return response()->json($data);
     }
 
-    function getCalendar(Request $req)
+    public function getCalendar(Request $req)
     {
         $idSalesman = explode(',', $req->id_salesman);
 
         $data = Visit::select('id', 'id_salesman', 'visit_date', 'id_pelanggan', 'status')
+            ->where('status', '!=', '3')
             ->whereIn('id_salesman', $idSalesman)
             ->where(function ($q) {
                 if (request('id_cabang') != '') {
