@@ -719,7 +719,7 @@ class GeneralLedgerController extends Controller
         // pagination
         if ($current_page) {
             $page = $current_page;
-            $limit_data = $data_general_ledger_table->count();
+            $limit_data = $limit;
 
             if ($limit) {
                 $limit_data = $limit;

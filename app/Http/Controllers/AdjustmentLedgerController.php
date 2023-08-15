@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Accounting\JurnalDetail;
 use App\Models\Accounting\JurnalHeader;
 use App\Models\Accounting\Periode;
+use App\Models\Accounting\StockCorrectionHeader;
 use App\Models\Accounting\TrxSaldo;
 use App\Models\Master\Akun;
 use App\Models\Master\Cabang;
@@ -269,10 +270,14 @@ class AdjustmentLedgerController extends Controller
             $value->keterangan = $notes;
         }
 
+        // Get shortcut link
+        $shortcutLink = $this->getShortcutLink($data_jurnal_header->id_transaksi);
+
         $data = [
             "pageTitle" => "SCA Accounting | Transaksi Jurnal Umum | Detail",
             "data_jurnal_header" => $data_jurnal_header,
             "data_jurnal_detail" => $data_jurnal_detail,
+            "shortcutLink" => $shortcutLink
         ];
 
         return view('accounting.journal.adjusting_journal.detail', $data);
@@ -675,7 +680,7 @@ class AdjustmentLedgerController extends Controller
         // pagination
         if ($current_page) {
             $page = $current_page;
-            $limit_data = $data_general_ledger_table->count();
+            $limit_data = $limit;
 
             if ($limit) {
                 $limit_data = $limit;
@@ -688,11 +693,11 @@ class AdjustmentLedgerController extends Controller
 
             $data_general_ledger_table->skip($offset)->take($limit_data);
         }
-
+        $dataTable = $data_general_ledger_table->get();
         $table['draw'] = $draw;
-        $table['recordsTotal'] = $data_general_ledger_table->count();
-        $table['recordsFiltered'] = $filtered_data->count();
-        $table['data'] = $data_general_ledger_table->get();
+        $table['recordsTotal'] = count($dataTable);
+        $table['recordsFiltered'] = count($filtered_data);
+        $table['data'] = $dataTable;
 
         return json_encode($table);
     }
@@ -1109,6 +1114,31 @@ class AdjustmentLedgerController extends Controller
                 "result" => FALSE,
                 "message" => $message
             ]);
+        }
+    }
+
+    public function getShortcutLink($code)
+    {
+        try {
+            // Get first part of code
+            $code = str_replace("Closing ", "", $code);
+            $explode = explode("-", $code);
+            switch ($explode[0]) {
+                case 'KR':
+                    // Stock Correction
+                    $getId = StockCorrectionHeader::where("nama_koreksi_stok", $code)->first();
+                    $shortcutLink = ($getId)?"https://test2.scasda.my.id/development/v2/v2/#koreksi_stok&data_master=$getId->id_koreksi_stok":NULL;
+                    break;
+                
+                default:
+                    $shortcutLink = NULL;
+                    break;
+            }
+
+            return $shortcutLink;
+        } catch (\Exception $e) {
+            Log::error("Error when get reference shortcut link");
+            return NULL;
         }
     }
 }

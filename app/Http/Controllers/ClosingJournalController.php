@@ -1196,7 +1196,6 @@ class ClosingJournalController extends Controller
     public function stockCorrection(Request $request)
     {
         try {
-            // dd('aaaa');
             // Init data
             $id_cabang = $request->id_cabang;
             $journal_type = "ME";
@@ -1223,20 +1222,23 @@ class ClosingJournalController extends Controller
             $data_header = StockCorrectionHeader::where("status_koreksi_stok", $status)->where("id_cabang", $id_cabang)->whereBetween("tanggal_koreksi_stok", [$start_date, $end_date])->get();
             // dd(count($data_header));
             // dd(json_encode($data_header));
-            $details = [];
             DB::beginTransaction();
             foreach ($data_header as $key => $header) {
                 $id_transaksi = $header->nama_koreksi_stok;
+                $details = [];
                 // Delete detail and header existing first
-                JurnalDetail::where("id_transaksi", $id_transaksi)->where("keterangan", "Koreksi Stok ".$id_transaksi)->delete();
-                JurnalHeader::where("id_transaksi", "Closing ".$id_transaksi)->where("catatan", "Koreksi Stok")->delete();
+                // JurnalDetail::where("id_transaksi", $id_transaksi)->where("keterangan", "Koreksi Stok ".$id_transaksi)->delete();
+                // JurnalHeader::where("id_transaksi", "Closing ".$id_transaksi)->where("catatan", "Koreksi Stok")->delete();
+                $getHeaderDelete = JurnalDetail::join("jurnal_header", "jurnal_header.id_jurnal", "jurnal_detail.id_jurnal")
+                ->where("jurnal_header.id_transaksi", "Closing ".$id_transaksi)
+                ->delete();
                 // get koreksi stok detail
-                // $data_detail = StockCorrectionDetail::select("id_koreksi_stok_detail", "id_barang", DB::raw("SUM(debit_koreksi_stok_detail) as debet"), DB::raw("SUM(kredit_koreksi_stok_detail) as kredit"))->where("id_koreksi_stok", $header->id_koreksi_stok)->groupBy("id_barang")->get();
                 $data_detail = StockCorrectionDetail::selectRaw("koreksi_stok_detail.id_koreksi_stok_detail, koreksi_stok_detail.id_koreksi_stok, koreksi_stok_detail.id_barang, koreksi_stok_detail.debit_koreksi_stok_detail as debet, koreksi_stok_detail.kredit_koreksi_stok_detail as kredit, koreksi_stok_detail.kode_batang_koreksi_stok_detail, koreksi_stok_detail.kode_batang_lama_koreksi_stok_detail,
                 ks.beli_master_qr_code as debet_beli, ks.biaya_beli_master_qr_code as debet_biaya_beli, ks.produksi_master_qr_code as debet_produksi, ks.listrik_master_qr_code as debet_listrik, ks.pegawai_master_qr_code as debet_pegawai,
-                ksl.beli_master_qr_code as kredit_beli, ksl.biaya_beli_master_qr_code as kredit_biaya_beli, ksl.produksi_master_qr_code as kredit_produksi, ksl.listrik_master_qr_code as kredit_listrik, ksl.pegawai_master_qr_code as kredit_pegawai")
-                ->leftJoin("master_qr_code as ks", "ks.kode_batang_master_qr_code", "koreksi_stok_detail.kode_batang_koreksi_stok_detail")
-                ->leftJoin("master_qr_code as ksl", "ksl.kode_batang_lama_master_qr_code", "koreksi_stok_detail.kode_batang_lama_koreksi_stok_detail")
+                ks.beli_master_qr_code as kredit_beli, ks.biaya_beli_master_qr_code as kredit_biaya_beli, ks.produksi_master_qr_code as kredit_produksi, ks.listrik_master_qr_code as kredit_listrik, ks.pegawai_master_qr_code as kredit_pegawai")
+                ->join('master_qr_code as ks', function ($join) {
+                    $join->on('ks.kode_batang_master_qr_code', '=', DB::raw('CASE WHEN kode_batang_lama_koreksi_stok_detail = "" THEN kode_batang_koreksi_stok_detail ELSE kode_batang_lama_koreksi_stok_detail END'));
+                })
                 ->where("koreksi_stok_detail.id_koreksi_stok", $header->id_koreksi_stok)
                 // ->where("koreksi_stok_detail.id_koreksi_stok", "296")
                 ->groupBy("koreksi_stok_detail.id_koreksi_stok_detail")->get();
@@ -1256,6 +1258,7 @@ class ClosingJournalController extends Controller
                 }
                 // dd(json_encode($details));
                 // Grouping and sum the same barang
+                $grouped = [];
                 $grouped = array_reduce($details, function($result, $in) {
                     $product = $in['barang'];
                     $sum = $in['sum'];
@@ -1274,7 +1277,7 @@ class ClosingJournalController extends Controller
                 $header->id_cabang = $id_cabang;
                 $header->jenis_jurnal = $journal_type;
                 $header->id_transaksi = 'Closing ' . $id_transaksi;
-                $header->catatan = "Koreksi Stok";
+                $header->catatan = "Koreksi Stok ".$id_transaksi;
                 $header->void = 0;
                 $header->tanggal_jurnal = $end_date;
                 $header->user_created = NULL;
@@ -1306,9 +1309,9 @@ class ClosingJournalController extends Controller
                     if (!$barang) {
                         DB::rollback();
                         // Revert post closing
-                        $check = Closing::where("month", $month)->where("year", $year)->first();
+                        $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
                         if ($check) {
-                            $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                            $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
                         }
                         return response()->json([
                             "result" => false,
@@ -1320,10 +1323,10 @@ class ClosingJournalController extends Controller
                     $detail->id_jurnal = $header->id_jurnal;
                     $detail->index = $i + 1;
                     $detail->id_akun = $barang->id_akun;
-                    $detail->keterangan = "Koreksi Stok ".$id_transaksi;
+                    $detail->keterangan = "Koreksi Stok ".$id_transaksi." ".$barang->nama_barang;
                     $detail->id_transaksi = $id_transaksi;
-                    $detail->debet = ($out > 0)?$out:0;
-                    $detail->credit = ($out > 0)?0:$out;
+                    $detail->debet = ($out > 0)?0:abs($out);
+                    $detail->credit = ($out > 0)?$out:0;
                     $detail->user_created = NULL;
                     $detail->user_modified = NULL;
                     $detail->dt_created = $end_date;
@@ -1332,9 +1335,9 @@ class ClosingJournalController extends Controller
                     if (!$detail->save()) {
                         DB::rollback();
                         // Revert post closing
-                        $check = Closing::where("month", $month)->where("year", $year)->first();
+                        $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
                         if ($check) {
-                            $delete = Closing::where("month", $month)->where("year", $year)->delete();
+                            $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
                         }
                         return response()->json([
                             "result" => false,
@@ -1351,7 +1354,7 @@ class ClosingJournalController extends Controller
                 $detail->keterangan = "Koreksi Stok ".$id_transaksi;
                 $detail->id_transaksi = $id_transaksi;
                 $detail->debet = ($sum_val > 0)?$sum_val:0;
-                $detail->credit = ($sum_val > 0)?0:$sum_val;
+                $detail->credit = ($sum_val > 0)?0:abs($sum_val);
                 $detail->user_created = NULL;
                 $detail->user_modified = NULL;
                 $detail->dt_created = $end_date;
@@ -2075,8 +2078,8 @@ class ClosingJournalController extends Controller
             $status = 1;
             $asset_account = Setting::where("id_cabang", $id_cabang)->where("code", "Kategori Asset")->first();
             $cabang = Cabang::find($id_cabang);
-            Log::info("akun penyusutan");
-            Log::info($hpp_account);
+            // Log::info("akun penyusutan");
+            // Log::info($hpp_account);
             if (!$asset_account) {
                 return response()->json([
                     "result" => FALSE,
