@@ -1127,7 +1127,7 @@ class AdjustmentLedgerController extends Controller
                 case 'KR':
                     // Stock Correction
                     $getId = StockCorrectionHeader::where("nama_koreksi_stok", $code)->first();
-                    $shortcutLink = ($getId)?"https://test2.scasda.my.id/development/v2/v2/#koreksi_stok&data_master=$getId->id_koreksi_stok":NULL;
+                    $shortcutLink = ($getId)?"https://vps.scasda.my.id/v2/#koreksi_stok&data_master=$getId->id_koreksi_stok":NULL;
                     break;
                 
                 default:
