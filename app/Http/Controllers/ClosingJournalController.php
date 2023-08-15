@@ -319,8 +319,8 @@ class ClosingJournalController extends Controller
         $get_akun_pembulatan = Setting::where("id_cabang", $id_cabang)->where("code", "Pembulatan")->first();
 
         $biaya_listrik = JurnalHeader::join('jurnal_detail', 'jurnal_detail.id_jurnal', 'jurnal_header.id_jurnal')
-                        ->whereRaw('MONTH(tanggal_jurnal) = ' . $param_bulan)
-                        ->whereRaw('YEAR(tanggal_jurnal) = ' . $param_tahun)
+                        ->whereYear('tanggal_jurnal', $param_tahun)
+                        ->whereMonth('tanggal_jurnal', $param_bulan)
                         ->where('jurnal_header.void', 0)
                         ->whereNull('jurnal_header.id_transaksi')
                         ->where('jurnal_detail.id_akun', $get_akun_biaya_listrik->value2)
@@ -328,8 +328,8 @@ class ClosingJournalController extends Controller
                         ->first();
 
         $biaya_operator = JurnalHeader::join('jurnal_detail', 'jurnal_detail.id_jurnal', 'jurnal_header.id_jurnal')
-                        ->whereRaw('MONTH(tanggal_jurnal) = ' . $param_bulan)
-                        ->whereRaw('YEAR(tanggal_jurnal) = ' . $param_tahun)
+                        ->whereYear('tanggal_jurnal', $param_tahun)
+                        ->whereMonth('tanggal_jurnal', $param_bulan)
                         ->where('jurnal_header.void', 0)
                         ->whereNull('jurnal_header.id_transaksi')
                         ->where('jurnal_detail.id_akun', $get_akun_biaya_operator->value2)
@@ -337,11 +337,13 @@ class ClosingJournalController extends Controller
                         ->first();
 
         $data_beban_produksi = ProductionCost::join('produksi', 'produksi.id_produksi', 'beban_produksi.id_produksi')
-            ->whereRaw('MONTH(tanggal_produksi) = ' . $param_bulan)
-            ->whereRaw('YEAR(tanggal_produksi) = ' . $param_tahun)
+            ->whereYear('tanggal_produksi', $param_tahun)
+            ->whereMonth('tanggal_produksi', $param_bulan)
+            ->where('id_cabang', $id_cabang)
             ->selectRaw('SUM(beban_produksi.tenaga_kerja_beban_produksi * beban_produksi.listrik_beban_produksi) as tenaga,
                 SUM(beban_produksi.kwh_beban_produksi) as listrik')
             ->first();
+
         $data_beban_produksi->listrik = ((int)$data_beban_produksi->listrik > 0)?$data_beban_produksi->listrik:0;
         $data_beban_produksi->tenaga = ((int)$data_beban_produksi->tenaga > 0)?$data_beban_produksi->tenaga:0;
         $avg_listrik = ($biaya_listrik->total_listrik && $data_beban_produksi->listrik)?$biaya_listrik->total_listrik / $data_beban_produksi->listrik:0;
@@ -665,8 +667,8 @@ class ClosingJournalController extends Controller
             $get_akun_biaya_operator = Setting::where("id_cabang", $id_cabang)->where("code", "Biaya Operator")->first();
 
             $sum_biaya_listrik_manual = JurnalHeader::join('jurnal_detail', 'jurnal_detail.id_jurnal', 'jurnal_header.id_jurnal')
-                                            ->whereRaw('MONTH(tanggal_jurnal)', $month)
-                                            ->whereRaw('YEAR(tanggal_jurnal)', $year)
+                                            ->whereMonth('tanggal_jurnal', $month)
+                                            ->whereYear('tanggal_jurnal', $year)
                                             ->where('void', 0)
                                             ->whereNull('jurnal_header.id_transaksi')
                                             ->where('jurnal_detail.id_akun', $get_akun_biaya_listrik->value2)
@@ -674,8 +676,8 @@ class ClosingJournalController extends Controller
                                             ->first();
 
             $sum_biaya_operator_manual = JurnalHeader::join('jurnal_detail', 'jurnal_detail.id_jurnal', 'jurnal_header.id_jurnal')
-                                            ->whereRaw('MONTH(tanggal_jurnal)', $month)
-                                            ->whereRaw('YEAR(tanggal_jurnal)', $year)
+                                            ->whereMonth('tanggal_jurnal', $month)
+                                            ->whereYear('tanggal_jurnal', $year)
                                             ->where('void', 0)
                                             ->whereNull('jurnal_header.id_transaksi')
                                             ->where('jurnal_detail.id_akun', $get_akun_biaya_operator->value2)
@@ -683,8 +685,8 @@ class ClosingJournalController extends Controller
                                             ->first();
 
             $sum_biaya_listrik_otomatis = JurnalHeader::join('jurnal_detail', 'jurnal_detail.id_jurnal', 'jurnal_header.id_jurnal')
-                                            ->whereRaw('MONTH(tanggal_jurnal)', $month)
-                                            ->whereRaw('YEAR(tanggal_jurnal)', $year)
+                                            ->whereMonth('tanggal_jurnal', $month)
+                                            ->whereYear('tanggal_jurnal', $year)
                                             ->where('void', 0)
                                             ->whereNotNull('jurnal_header.id_transaksi')
                                             ->whereRaw('jurnal_header.id_transaksi NOT LIKE "%Closing%"')
@@ -694,8 +696,8 @@ class ClosingJournalController extends Controller
                                             ->first();
 
             $sum_biaya_operator_otomatis = JurnalHeader::join('jurnal_detail', 'jurnal_detail.id_jurnal', 'jurnal_header.id_jurnal')
-                                            ->whereRaw('MONTH(tanggal_jurnal)', $month)
-                                            ->whereRaw('YEAR(tanggal_jurnal)', $year)
+                                            ->whereMonth('tanggal_jurnal', $month)
+                                            ->whereYear('tanggal_jurnal', $year)
                                             ->where('void', 0)
                                             ->whereNotNull('jurnal_header.id_transaksi')
                                             ->whereRaw('jurnal_header.id_transaksi NOT LIKE "%Closing%"')
@@ -737,12 +739,12 @@ class ClosingJournalController extends Controller
 
                 $sum_selisih_debet = 0;
                 $sum_selisih_credit = 0;
-                $index = 0;
+                $index = 1;
 
                 if($selisih_listrik != 0){
                     $detail = new JurnalDetail();
                     $detail->id_jurnal = $header->id_jurnal;
-                    $detail->index = $index + 1;
+                    $detail->index = $index;
                     $detail->id_akun = $get_akun_biaya_listrik->value2;
                     $detail->keterangan = "Selisih Produksi Biaya Listrik ". date('Y m', strtotime($end_date));
                     if($selisih_listrik > 0){
@@ -771,12 +773,13 @@ class ClosingJournalController extends Controller
 
                     $sum_selisih_debet += $detail->debet;
                     $sum_selisih_credit += $detail->credit;
+                    $index++;
                 }
 
                 if($selisih_tenaga != 0){
                     $detail = new JurnalDetail();
                     $detail->id_jurnal = $header->id_jurnal;
-                    $detail->index = $index + 1;
+                    $detail->index = $index;
                     $detail->id_akun = $get_akun_biaya_operator->value2;
                     $detail->keterangan = "Selisih Produksi Biaya Pegawai " . date('Y m', strtotime($end_date));
                     if($selisih_tenaga > 0){
@@ -805,9 +808,12 @@ class ClosingJournalController extends Controller
 
                     $sum_selisih_debet += $detail->debet;
                     $sum_selisih_credit += $detail->credit;
+                    $index++;
                 }
 
                 if($sum_selisih_debet != $sum_selisih_credit){
+                    $get_akun_pembulatan = Setting::where("id_cabang", $id_cabang)->where("code", "Pembulatan")->first();
+
                     $selisih_pembulatan = $sum_selisih_credit - $sum_selisih_debet;
                     // Detail Biaya Listrik
                     $detail = new JurnalDetail();
@@ -2140,7 +2146,15 @@ class ClosingJournalController extends Controller
                     ]);
                 }
                 $index = 1;
+                $total_asset = count($data_asset);
+                $keterangan = "Penyusutan ";
                 foreach ($data_asset as $asset) {
+                    if($index == $total_asset){
+                        $keterangan .=  $asset->nama_barang;
+                    }else{
+                        $keterangan .=  $asset->nama_barang . ', ';
+                    }
+
                     // Store detail
                     $detail = new JurnalDetail();
                     $detail->id_jurnal = $header->id_jurnal;
@@ -2201,6 +2215,20 @@ class ClosingJournalController extends Controller
                     // Log::info(json_encode($grouped_out));
                     // dd(json_encode($grouped_out));
 
+                }
+
+                $header->catatan = $keterangan;
+
+                if (!$header->save()) {
+                    DB::rollback();
+                    $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
+                    if ($check) {
+                        $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
+                    }
+                    return response()->json([
+                        "result" => false,
+                        "message" => "Error when store Jurnal data on table header",
+                    ]);
                 }
                 DB::commit();
                 return response()->json([
