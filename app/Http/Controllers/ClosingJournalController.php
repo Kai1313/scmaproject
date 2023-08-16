@@ -712,10 +712,25 @@ class ClosingJournalController extends Controller
                                             ->selectRaw('ROUND(SUM(credit-debet), 2) as value')
                                             ->first();
 
+            Log::debug('testing selisih');
+            Log::debug(json_encode($sum_biaya_listrik_manual));
+            Log::debug(json_encode($sum_biaya_operator_manual));
+            Log::debug(json_encode($sum_biaya_listrik_otomatis));
+            Log::debug(json_encode($sum_biaya_operator_otomatis));
+            Log::debug('-----------------------------------');
+
             $selisih_listrik = $sum_biaya_listrik_otomatis->value - $sum_biaya_listrik_manual->value;
             $selisih_tenaga = $sum_biaya_operator_otomatis->value - $sum_biaya_operator_manual->value;
 
+            Log::debug('selisih----');
+            Log::debug('listrik : ' . $selisih_listrik);
+            Log::debug('tenaga : ' . $selisih_tenaga);
+
             if($selisih_listrik != 0 || $selisih_tenaga != 0){
+                Log::debug('mulai buat header selisih');
+                Log::debug('listrik : ' . $selisih_listrik);
+                Log::debug('tenaga : ' . $selisih_tenaga);
+                Log::debug('-----');
                 // Create journal memorial
                 // Store Header
                 $header = new JurnalHeader();
