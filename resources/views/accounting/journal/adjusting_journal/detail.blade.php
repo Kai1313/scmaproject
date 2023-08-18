@@ -195,11 +195,11 @@
                                 <td>{{ $detail->nama_akun }}</td>
                                 <td>
                                     @if ($shortcutLink)
-                                        <a href="{{ $shortcutLink }}" target="blank__">
-                                            {!! $detail->keterangan !!}
-                                        </a>
-                                    @else
+                                    <a href="{{ $shortcutLink }}" target="blank__">
                                         {!! $detail->keterangan !!}
+                                    </a>
+                                    @else
+                                    {!! $detail->keterangan !!}
                                     @endif
                                 </td>
                                 <td style="text-align: right">{{ number_format($detail->debet, 2,",",".") }}</td>
@@ -231,7 +231,11 @@
 <script>
     $(function() {
         $('#detail_table').dataTable({
-            "scrollX": true
+            "scrollX": true,
+            "lengthMenu": [
+                [100, 50, 25, 10, -1],
+                [100, 50, 25, 10, "All"]
+            ]
         })
     })
 </script>

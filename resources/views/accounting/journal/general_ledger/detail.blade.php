@@ -234,7 +234,11 @@
 <script>
     $(function() {
         $('#detail_table').dataTable({
-            "scrollX": true
+            "scrollX": true,
+            "lengthMenu": [
+                [100, 50, 25, 10, -1],
+                [100, 50, 25, 10, "All"]
+            ]
         })
     })
 </script>
