@@ -72,7 +72,7 @@ class PurchaseRequest extends Model
             ->leftJoin('master_qr_code', function ($kartuStok) use ($gudang) {
                 $kartuStok->on('purchase_request_detail.id_barang', '=', 'master_qr_code.id_barang')
                     ->whereIn('master_qr_code.id_gudang', $gudang);
-            })->groupBy('id_barang')->orderBy('index', 'asc');
+            })->groupBy('id_barang', 'notes')->orderBy('index', 'asc');
     }
 
     public function savedetails($details)

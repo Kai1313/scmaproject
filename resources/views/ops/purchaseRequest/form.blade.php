@@ -217,9 +217,9 @@
                             <input type="text" name="qty" class="form-control validate handle-number-4"
                                 autocomplete="off">
                         </div>
-                        <label>Catatan</label>
+                        <label>Catatan <span>*</span></label>
                         <div class="form-group">
-                            <textarea name="notes" class="form-control" rows="5"></textarea>
+                            <textarea name="notes" class="form-control validate" rows="5"></textarea>
                         </div>
                         <input type="hidden" name="stok">
                         <input type="hidden" name="closed" value="0">
@@ -265,6 +265,7 @@
         }
 
         $('[name="details"]').val(JSON.stringify(details))
+        console.log(details)
 
         var resDataTable = $('#table-detail').DataTable({
             paging: false,
@@ -385,7 +386,6 @@
                     $('#cover-spin').hide()
                 },
                 error: function(error) {
-                    console.log(error)
                     $('#cover-spin').hide()
                 }
             })
@@ -438,7 +438,6 @@
             }
 
             $('[name="details"]').val(JSON.stringify(details))
-            console.log(details)
 
             statusModal = ''
             detailSelect = []
@@ -522,19 +521,21 @@
         function validatorModal(id = 0) {
             let message = 'Lengkapi inputan yang diperlukan'
             let valid = true
+
             $('#modalEntry').find('.validate').each(function(i, v) {
                 if ($(v).val() == '') {
                     valid = false
                 }
-
-                if ($(v).prop('name') == 'id_barang') {
-                    let findItem = details.filter(p => p.id_barang == $(v).val())
-                    if (findItem.length > 0 && findItem[0].id_barang == id && statusModal == 'create') {
-                        message = "Barang sudah ada"
-                        valid = false
-                    }
-                }
             })
+
+            let id_barang = $('#modalEntry').find('[name="id_barang"]').val();
+            let notes = $('#modalEntry').find('[name="notes"]').val();
+
+            let findItem = details.filter(p => p.id_barang == id_barang && p.notes == notes)
+            if (findItem.length > 0 && findItem[0].id_barang == id && statusModal == 'create') {
+                message = "Barang sudah ada"
+                valid = false
+            }
 
             return {
                 'status': valid,
