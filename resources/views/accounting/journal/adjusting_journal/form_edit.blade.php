@@ -234,6 +234,7 @@
                                     </select>
                                 </div>
                             </div>
+                            <input type="hidden" id="transaction_date" value="">
                             <div class="col-md-6">
                                 <div class="form-group transaction-filter" id="customer_transaction_select">
                                     <label>Customer</label>
@@ -801,6 +802,11 @@
             }
         })
 
+        $('#transaction_date').val($('#tanggal').val());
+        $('#tanggal').on('change', function(){
+            $('#transaction_date').val($(this).val());
+        })
+
         // Transaction table add transaction
         $("#btn-add-transaction").on("click", function() {
             let trx_type = $("#transaction_type").val()
@@ -1287,7 +1293,7 @@
             case "penjualan":
                 $("#table_jual").DataTable().destroy()
                 let get_penjualan_url = "{{ route('transaction-general-ledger-populate-transaction') }}"
-                get_penjualan_url += '?transaction_type=' + $("#transaction_type").val() + '&customer=' + $("#customer_transaction").val()
+                get_penjualan_url += '?transaction_type=' + $("#transaction_type").val() + '&customer=' + $("#customer_transaction").val() + '&transaction_date=' + $("#transaction_date").val()
                 $('#table_jual').DataTable({
                     processing: true,
                     serverSide: true,
@@ -1403,7 +1409,7 @@
             case "retur_penjualan":
                 $("#table_retur_jual").DataTable().destroy()
                 let get_retur_penjualan_url = "{{ route('transaction-general-ledger-populate-transaction') }}"
-                get_retur_penjualan_url += '?transaction_type=' + $("#transaction_type").val() + '&customer=' + $("#customer_transaction").val()
+                get_retur_penjualan_url += '?transaction_type=' + $("#transaction_type").val() + '&customer=' + $("#customer_transaction").val() + '&transaction_date=' + $("#transaction_date").val()
                 $('#table_retur_jual').DataTable({
                     processing: true,
                     serverSide: true,
@@ -1519,7 +1525,7 @@
             case "pembelian":
                 $("#table_beli").DataTable().destroy()
                 let get_pembelian_url = "{{ route('transaction-general-ledger-populate-transaction') }}"
-                get_pembelian_url += '?transaction_type=' + $("#transaction_type").val() + '&supplier=' + $("#supplier_transaction").val()
+                get_pembelian_url += '?transaction_type=' + $("#transaction_type").val() + '&supplier=' + $("#supplier_transaction").val() + '&transaction_date=' + $("#transaction_date").val()
                 $('#table_beli').DataTable({
                     processing: true,
                     serverSide: true,
@@ -1635,7 +1641,7 @@
             case "uang_muka_pembelian":
                 $("#table_uang_muka_beli").DataTable().destroy()
                 let get_uang_muka_pembelian_url = "{{ route('transaction-general-ledger-populate-transaction') }}"
-                get_uang_muka_pembelian_url += '?transaction_type=' + $("#transaction_type").val() + '&supplier=' + $("#supplier_transaction").val()
+                get_uang_muka_pembelian_url += '?transaction_type=' + $("#transaction_type").val() + '&supplier=' + $("#supplier_transaction").val() + '&transaction_date=' + $("#transaction_date").val()
                 $('#table_uang_muka_beli').DataTable({
                     processing: true,
                     serverSide: true,
@@ -1733,7 +1739,7 @@
             case "retur_pembelian":
                 $("#table_retur_beli").DataTable().destroy()
                 let get_retur_pembelian_url = "{{ route('transaction-general-ledger-populate-transaction') }}"
-                get_retur_pembelian_url += '?transaction_type=' + $("#transaction_type").val() + '&supplier=' + $("#supplier_transaction").val()
+                get_retur_pembelian_url += '?transaction_type=' + $("#transaction_type").val() + '&supplier=' + $("#supplier_transaction").val() + '&transaction_date=' + $("#transaction_date").val()
                 $('#table_retur_beli').DataTable({
                     processing: true,
                     serverSide: true,
@@ -1849,7 +1855,7 @@
             case "piutang_giro":
                 $("#table_piutang_giro").DataTable().destroy()
                 let get_piutang_giro_url = "{{ route('transaction-general-ledger-populate-transaction') }}"
-                get_piutang_giro_url += '?transaction_type=' + $("#transaction_type").val() + '&supplier=' + $("#supplier_transaction").val() + '&slip='
+                get_piutang_giro_url += '?transaction_type=' + $("#transaction_type").val() + '&supplier=' + $("#supplier_transaction").val() + '&transaction_date=' + $("#transaction_date").val() + '&slip='
                 $('#table_piutang_giro').DataTable({
                     processing: true,
                     serverSide: true,
@@ -1924,7 +1930,7 @@
             case "hutang_giro":
                 $("#table_hutang_giro").DataTable().destroy()
                 let get_hutang_giro_url = "{{ route('transaction-general-ledger-populate-transaction') }}"
-                get_hutang_giro_url += '?transaction_type=' + $("#transaction_type").val() + '&supplier=' + $("#supplier_transaction").val() + '&slip='
+                get_hutang_giro_url += '?transaction_type=' + $("#transaction_type").val() + '&supplier=' + $("#supplier_transaction").val() + '&transaction_date=' + $("#transaction_date").val() + '&slip='
                 $('#table_hutang_giro').DataTable({
                     processing: true,
                     serverSide: true,
@@ -1999,7 +2005,7 @@
             case "piutang_giro_tolak":
                 $("#table_piutang_giro_tolak").DataTable().destroy()
                 let get_piutang_giro_tolak_url = "{{ route('transaction-general-ledger-populate-transaction') }}"
-                get_piutang_giro_tolak_url += '?transaction_type=' + $("#transaction_type").val() + '&supplier=' + $("#supplier_transaction").val() + '&slip='
+                get_piutang_giro_tolak_url += '?transaction_type=' + $("#transaction_type").val() + '&supplier=' + $("#supplier_transaction").val() + '&transaction_date=' + $("#transaction_date").val() + '&slip='
                 $('#table_piutang_giro_tolak').DataTable({
                     processing: true,
                     serverSide: true,
@@ -2074,7 +2080,7 @@
             case "hutang_giro_tolak":
                 $("#table_hutang_giro_tolak").DataTable().destroy()
                 let get_hutang_giro_tolak_url = "{{ route('transaction-general-ledger-populate-transaction') }}"
-                get_hutang_giro_tolak_url += '?transaction_type=' + $("#transaction_type").val() + '&supplier=' + $("#supplier_transaction").val() + '&slip='
+                get_hutang_giro_tolak_url += '?transaction_type=' + $("#transaction_type").val() + '&supplier=' + $("#supplier_transaction").val() + '&transaction_date=' + $("#transaction_date").val() + '&slip='
                 $('#table_hutang_giro_tolak').DataTable({
                     processing: true,
                     serverSide: true,

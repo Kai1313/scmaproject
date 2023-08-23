@@ -935,6 +935,7 @@ class GeneralLedgerController extends Controller
             }
             $customer = $request->customer;
             $supplier = $request->supplier;
+            $date = date('Y-m-d', strtotime($request->transaction_date));
             $offset = $request->start;
             $limit = $request->length;
             $keyword = $request->search['value'];
@@ -951,7 +952,8 @@ class GeneralLedgerController extends Controller
             $current_page = $offset / $limit + 1;
             $data_saldo = TrxSaldo::leftJoin("pelanggan", "pelanggan.id_pelanggan", "saldo_transaksi.id_pelanggan")
                 ->leftJoin("pemasok", "pemasok.id_pemasok", "saldo_transaksi.id_pemasok")
-                ->where("tipe_transaksi", ucwords($type))->where("sisa", "<>", 0);
+                ->where("tipe_transaksi", ucwords($type))->where("sisa", "<>", 0)
+                ->where('tanggal', '<=', $date);
             if ($customer != "") {
                 $data_saldo = $data_saldo->where("saldo_transaksi.id_pelanggan", $customer);
             }
