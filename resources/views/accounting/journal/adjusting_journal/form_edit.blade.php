@@ -641,6 +641,8 @@
             $("#debet").val(formatCurr(detail[0]["debet"]))
             $("#kredit").val(formatCurr(detail[0]["kredit"]))
             $("#edit_id").val(detail[0]["guid"])
+
+            $("#akun_detail").focus();
         })
 
         // Open Transaction Modal
