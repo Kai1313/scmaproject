@@ -309,6 +309,7 @@
         let branch = {!! json_encode($cabang) !!}
         let timbangan = {!! $timbangan !!}
         let details = {!! $data ? $data->formatdetail : '[]' !!};
+        let rmDetails = []
         let detailSelect = []
         let count = details.length
         let statusModal = 'create'
@@ -372,18 +373,18 @@
                 name: 'index',
                 searchable: false,
                 render: function(data, type, row, meta) {
-                    let btn = ''
+                    let btn = '<ul class="horizontal-list">'
                     if (!row.hasOwnProperty('id_pemakaian')) {
-                        btn += '<ul class="horizontal-list">';
-                        // btn +=
-                        //     '<li><a href="javascript:void(0)" data-index="' + data +
-                        //     '" class="btn btn-warning btn-xs mr-1 mb-1 edit-entry"><i class="glyphicon glyphicon-pencil"></i></a></li>';
                         btn +=
                             '<li><a href="javascript:void(0)" data-index="' + data +
                             '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1 delete-entry"><i class="glyphicon glyphicon-trash"></i></a></li>';
-                        btn += '</ul>';
-                    }
 
+                    } else {
+                        btn +=
+                            '<li><a href="javascript:void(0)" data-index="' + data +
+                            '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1 delete-entry"><i class="glyphicon glyphicon-trash"></i> void</a></li>';
+                    }
+                    btn += '</ul>';
                     return btn;
                 }
             }, ],
@@ -590,6 +591,9 @@
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
+                    rmDetails.push(details[index])
+                    $('[name="detele_details"]').val(JSON.stringify(rmDetails))
+
                     details.splice(index, 1)
                     count -= 1
 

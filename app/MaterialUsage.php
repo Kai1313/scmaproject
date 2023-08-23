@@ -184,6 +184,29 @@ class MaterialUsage extends Model
         return ['status' => 'success'];
     }
 
+    public function rmdetails($details)
+    {
+        $detail = json_decode($details);
+        foreach ($detail as $data) {
+
+            $master = MasterQrCode::where('kode_batang_master_qr_code', $data->kode_batang)->first();
+            if ($master) {
+                $master->sisa_master_qr_code = $master->sisa_master_qr_code + $data->jumlah;
+                $master->zak = ($master->zak ? $master->zak : 0) + $data->jumlah_zak;
+                $master->weight_zak = ($master->weight_zak ? $master->weight_zak : 0) + $data->tare;
+                $master->save();
+            }
+
+            DB::table('kartu_stok')->where('kode_kartu_stok', $this->kode_pemakaian)
+                ->where('kode_batang_kartu_stok', $data->kode_batang)
+                ->where('id_jenis_transaksi', 25)->delete();
+
+            $delete = MaterialUsageDetail::where('id_pemakaian', $data->id_pemakaian)->where('index', $data->index)->delete();
+        }
+
+        return ['status' => 'success'];
+    }
+
     public function voidDetails()
     {
         foreach ($this->details as $detail) {

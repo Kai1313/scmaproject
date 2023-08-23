@@ -146,6 +146,7 @@ class MaterialUsageController extends Controller
             }
 
             $data->savedetails($request->details);
+            $data->rmdetails($request->detele_details);
 
             DB::commit();
             return response()->json([
