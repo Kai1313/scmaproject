@@ -615,6 +615,7 @@
         $("#cabang_input").on("change", function() {
             getSetting($(this).val())
             getCoa()
+            getSlip()
         })
 
         // Remove detail
@@ -624,6 +625,8 @@
                 return item['guid'] != guid
             })
             populate_detail(details)
+
+            checkDetails()
         })
 
         // Edit detail
@@ -1052,6 +1055,7 @@
                     alert("Nothing to add")
                     break;
             }
+            checkDetails()
             $("#modal-transaction").modal("hide")
         })
     })
@@ -1198,6 +1202,8 @@
         guid++
         detail_clear()
         populate_detail(details)
+
+        checkDetails()
     }
 
     function detail_clear() {
@@ -2210,6 +2216,24 @@
                 }
             }
         })
+    }
+
+    function checkDetails() {
+        console.log("isi detail "+details.length)
+        if (details.length > 0) {
+            // Disable Select2 input and add readonly class
+            $("#cabang_input").prop("disabled", true)
+
+            // Trigger a Select2 update to reflect the disabled state
+            $("#cabang_input").trigger("change.select2");
+        }
+        else {
+            // Enable Select2 input and remove readonly class
+            $("#cabang_input").prop("disabled", false)
+
+            // Trigger a Select2 update to reflect the editable state
+            $("#cabang_input").trigger("change.select2");
+        }
     }
 </script>
 @endsection
