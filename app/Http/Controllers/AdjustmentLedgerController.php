@@ -524,6 +524,18 @@ class AdjustmentLedgerController extends Controller
 
             // Store New Detail
             foreach ($detailData as $key => $data) {
+                // Check if detail master akun has differenct cabang with header
+                $checkAkun = Akun::find($data["akun"]);
+                if ($checkAkun) {
+                    if ($checkAkun->id_cabang != $cabangID) {
+                        DB::rollback();
+                    return response()->json([
+                        "result" => false,
+                        "message" => "Error when store Jurnal data on table detail. Detail has different cabang on the account ".$checkAkun->nama_akun,
+                    ]);
+                    }
+                }
+                
                 //Store Detail
                 $debet = str_replace('.', '', $data['debet']);
                 $debet = str_replace(',', '.', $debet);
