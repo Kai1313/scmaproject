@@ -81,7 +81,7 @@
             </div>
             <div class="box-body">
                 <div class="table-responsive" id="target-table" style="display:none;">
-                    <table class="table table-bordered data-table display responsive nowrap" width="100%">
+                    <table class="table table-bordered data-table display nowrap" width="100%">
                         <thead>
                             <tr>
                                 <th>Kode Pelanggan</th>
@@ -92,6 +92,7 @@
                                 <th>Nilai Faktur</th>
                                 <th>Total Pembayaran</th>
                                 <th>Sisa Piutang</th>
+                                <th>Tanggal Bayar</th>
                                 <th>Umur</th>
                             </tr>
                         </thead>
@@ -134,7 +135,6 @@
                         var xxxx = $('.dtrg-end th');
                         $.each(xxxx, function(index, value) {
                             var ccccc = $(value).text().split(" | ");
-                            console.log(value)
                             $(value).parent().html(
                                 "<td colspan='3' style='text-align: left;background-color: #B9B9B9'><b>" +
                                 ccccc[0] +
@@ -143,7 +143,7 @@
                                 "</b></td><td style='text-align: right;background-color: #B9B9B9'><b>" +
                                 ccccc[2] +
                                 `</b></td><td style='text-align: right;background-color: #B9B9B9'>${ccccc[3]}</td>` +
-                                "</b></td><td style='text-align: right;background-color: #B9B9B9'></td>"
+                                "</b></td><td style='text-align: right;background-color: #B9B9B9'></td><td style='text-align: right;background-color: #B9B9B9'></td>"
                             );
                         });
                     }, 100);
@@ -224,6 +224,22 @@
                         return data ? formatNumber(data, 2) : 0
                     },
                     className: 'text-right'
+                }, {
+                    data: 'tanggal_jurnal',
+                    name: 'tanggal_jurnal',
+                    render: function(data) {
+                        console.log(data)
+                        let html = ''
+                        if (data) {
+                            let split = data.split(" | ");
+
+                            for (let i = 0; i < split.length; i++) {
+                                html += split[i] + '<br>'
+                            }
+                        }
+
+                        return html
+                    }
                 }, {
                     data: 'aging',
                     name: 'aging',

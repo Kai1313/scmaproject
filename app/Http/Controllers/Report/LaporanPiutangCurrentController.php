@@ -27,8 +27,7 @@ class LaporanPiutangCurrentController extends Controller
         ]);
     }
 
-    public function print(Request $request)
-    {
+    public function print(Request $request) {
         if (checkAccessMenu('laporan_piutang_current', 'print') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
@@ -111,7 +110,7 @@ class LaporanPiutangCurrentController extends Controller
         $idCabang = explode(',', $request->id_cabang);
 
         $joinJurnal = DB::table('jurnal_header as jh')
-            ->select('jd.id_transaksi', DB::raw('ifnull(sum(jd.credit-jd.debet),0) as Total'))
+            ->select('jd.id_transaksi', DB::raw('ifnull(sum(jd.credit-jd.debet),0) as Total'), DB::raw('GROUP_CONCAT(concat(jh.tanggal_jurnal," ",kode_jurnal," Rp ",jd.credit) SEPARATOR " | ") as tanggal_jurnal'))
             ->leftJoin('jurnal_detail AS jd', function ($join) {
                 $join->on('jh.id_jurnal', '=', 'jd.id_jurnal')
                     ->on(DB::Raw("ifnull(jd.id_transaksi,'')"), '<>', DB::Raw("''"));
@@ -135,7 +134,8 @@ class LaporanPiutangCurrentController extends Controller
             DB::raw('a.sisa as sisa'),
             DB::raw('ifnull(a.bayar,0) as bayar'),
             DB::raw('DATEDIFF("' . $date . '",DATE(DATE_ADD(p2.tanggal_penjualan, INTERVAL p2.tempo_hari_penjualan DAY))) as aging'),
-            'a.tanggal'
+            'a.tanggal',
+            'p.tanggal_jurnal'
         )
             ->leftJoinSub($joinJurnal, 'p', function ($join) {
                 $join->on('a.id_transaksi', '=', 'p.id_transaksi');
@@ -146,8 +146,8 @@ class LaporanPiutangCurrentController extends Controller
             ->where(DB::raw('a.total-ifnull(p.total,0)'), '<>', 0)
             ->whereIn('a.tipe_transaksi', ['Penjualan', 'Retur Penjualan'])
             ->whereIn('p2.id_cabang', $idCabang)
-            ->where('a.sisa', '>', 0)
-            ->orderBy('pe.nama_pelanggan', 'asc')->orderBy('p2.tanggal_penjualan','asc');
+        // ->where('a.sisa', '>', 0)
+            ->orderBy('pe.nama_pelanggan', 'asc')->orderBy('p2.tanggal_penjualan', 'asc');
         if ($idPelanggan != 'all') {
             $data->where('a.id_pelanggan', $idPelanggan);
         }

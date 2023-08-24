@@ -356,3 +356,24 @@ Route::prefix('report')->group(function () {
 });
 
 Route::get('/dummyAjax', 'ClosingJournalController@dummyAjax')->name('dummy-ajax');
+
+Route::get('tes-data', function () {
+    $newQuery = \App\SaldoTransaksi::with(['pelanggan', 'penjualan'])->get();
+    $array = [];
+    foreach ($newQuery as $value) {
+        $array[] = [
+            'id_transaksi' => $value->id_transaksi,
+            'kode_pelanggan' => $value->pelanggan ? $value->pelanggan->kode_pelanggan : null,
+            'nama_pelanggan' => $value->pelanggan ? $value->pelanggan->nama_pelanggan : null,
+            'tanggal_jurnal' => $value->jurnal_detail ? $value->jurnal_detail->jurnal_header : null,
+            'tanggal_penjualan' => $value->tanggal,
+            'aging' => $value->aging,
+            'top' => $value->penjualan ? $value->penjualan->tempo_hari_penjualan : null,
+            'bayar' => $value->bayar,
+            'mtotal_penjualan' => '',
+            'sisa' => $value->sisa,
+            'tanggal' => $value->tanggal,
+        ];
+    }
+    return $array;
+});
