@@ -502,7 +502,7 @@ class ApiController extends Controller
                     $array_inventory[$detail_inv['id_barang']] = [
                         'id_barang' => $detail_inv['id_barang'],
                         'nama_barang' => $detail_inv['nama_barang'],
-                        'total' => $detail_inv['total']
+                        'total' => $detail_inv['total'],
                     ];
                 }
             }
@@ -2617,7 +2617,8 @@ class ApiController extends Controller
         return $data;
     }
 
-    public function journalHpp(Request $request){
+    public function journalHpp(Request $request)
+    {
         DB::beginTransaction();
         $no_transaksi = $request->no_transaksi;
         $id_cabang = $request->id_cabang;
@@ -2625,7 +2626,7 @@ class ApiController extends Controller
 
         $data_produksi = DB::table('produksi')->where('nama_produksi', $no_transaksi)->first();
 
-        if(empty($data_produksi)){
+        if (empty($data_produksi)) {
             DB::rollBack();
             return response()->json([
                 "result" => false,
@@ -2639,7 +2640,7 @@ class ApiController extends Controller
         // tahap 1
         $data_production_supplies = $this->productionSupplies($id_produksi);
 
-        if($data_production_supplies == false){
+        if ($data_production_supplies == false) {
             DB::rollBack();
             return response()->json([
                 "result" => false,
@@ -2651,7 +2652,7 @@ class ApiController extends Controller
         // tahap 2 dan 3
         $data_production_cost = $this->productionCost($id_produksi, $id_cabang);
 
-        if($data_production_cost == false){
+        if ($data_production_cost == false) {
             DB::rollBack();
             return response()->json([
                 "result" => false,
@@ -2683,7 +2684,7 @@ class ApiController extends Controller
         $tanggal_hasil_produksi = $data_production_results['tanggal_hasil_produksi'];
         $user_data = Auth::guard('api')->user();
 
-        if(count($data_hasil) < 1){
+        if (count($data_hasil) < 1) {
             DB::rollBack();
             return response()->json([
                 "result" => false,
@@ -2708,19 +2709,19 @@ class ApiController extends Controller
             'user_data' => $user_data,
             'void' => $void,
             'note' => $id_transaksi . ' ==> ' . $id_transaksi_hasil_produksi,
-            'tanggal_hasil_produksi' => $tanggal_hasil_produksi
+            'tanggal_hasil_produksi' => $tanggal_hasil_produksi,
         ];
 
         // tahap 5
-        $store_data =  $this->storeHppJournal($data);
+        $store_data = $this->storeHppJournal($data);
 
-        if($store_data){
+        if ($store_data) {
             return response()->json([
                 "result" => true,
                 "code" => 200,
                 "message" => "Successfully stored Jurnal Hpp data",
             ], 200);
-        }else{
+        } else {
             return response()->json([
                 "result" => false,
                 "code" => 400,
@@ -3234,8 +3235,8 @@ class ApiController extends Controller
                         DB::table('tTotalPenjualanInfo')
                             ->selectRaw("{$stokHeader->id} as stok_minimal_hitung_id,id_barang,nama_barang,total_jual,total_jual_per_bulan,plus_persen,per_bulan_plus_persen,avg_prorate,pemakaian_per_barang_jadi")
                             ->get()->map(function ($item) {
-                                return (array) $item;
-                            })->toArray()
+                            return (array) $item;
+                        })->toArray()
                     );
             }
         } catch (\Exception $e) {
@@ -3262,7 +3263,7 @@ class ApiController extends Controller
             ->groupBy('bd.id_barang', 'b.id_bom');
 
         $child = \DB::table(\DB::raw("({$childsub->toSql()}) as a"))
-            // ->select('a.*', \DB::raw('AVG(a.prorate) AS avg_prorate'))
+        // ->select('a.*', \DB::raw('AVG(a.prorate) AS avg_prorate'))
             ->groupBy('a.id_barang')->get();
         if (empty($child)) {
             return;
@@ -3301,7 +3302,7 @@ class ApiController extends Controller
             if (strpos(strtolower($itemChild->keterangan_bom), 'blending') || $itemChild->id_barang == $id_barang) {
                 continue;
             }
-            $new_val = $value * floatval($itemChild->avg_prorate);
+            $new_val = $value * floatval($itemChild->prorate);
             self::getSalesWithProrate($itemChild->id_barang, $id_cabang, $new_val);
         }
     }
