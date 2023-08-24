@@ -267,6 +267,7 @@
                                     </select>
                                 </div>
                             </div>
+                            <input type="hidden" id="transaction_date" value="">
                             <div class="col-md-6">
                                 <div class="form-group transaction-filter" id="customer_transaction_select">
                                     <label>Customer</label>
@@ -636,6 +637,7 @@
         $("#cabang_input").on("change", function() {
             getSetting($(this).val())
             getCoa()
+            getSlip()
         })
 
         // Remove detail
@@ -645,6 +647,8 @@
                 return item['guid'] != guid
             })
             populate_detail(details)
+
+            checkDetails()
         })
 
         // Edit detail
@@ -662,6 +666,8 @@
             $("#debet").val(formatCurr(detail[0]["debet"]))
             $("#kredit").val(formatCurr(detail[0]["kredit"]))
             $("#edit_id").val(detail[0]["guid"])
+
+            $("#akun_detail").focus();
         })
 
         // Generate button
@@ -730,6 +736,8 @@
                     }
                 }
             }
+
+            checkDetails()
         })
 
         // Open Transaction Modal
@@ -865,6 +873,11 @@
                     $(".transaction-filter").hide()
                     break;
             }
+        })
+
+        $('#transaction_date').val($('#tanggal').val());
+        $('#tanggal').on('change', function(){
+            $('#transaction_date').val($(this).val());
         })
 
         // Transaction table add transaction
@@ -1065,6 +1078,7 @@
                     alert("Nothing to add")
                     break;
             }
+            checkDetails()
             $("#modal-transaction").modal("hide")
         })
     })
@@ -1253,6 +1267,8 @@
         guid++
         detail_clear()
         populate_detail(details)
+
+        checkDetails()
     }
 
     function detail_clear() {
@@ -1353,7 +1369,7 @@
             case "penjualan":
                 $("#table_jual").DataTable().destroy()
                 let get_penjualan_url = "{{ route('transaction-general-ledger-populate-transaction') }}"
-                get_penjualan_url += '?transaction_type=' + $("#transaction_type").val() + '&customer=' + $("#customer_transaction").val()
+                get_penjualan_url += '?transaction_type=' + $("#transaction_type").val() + '&transaction_date=' + $("#transaction_date").val() + '&transaction_date=' + $("#transaction_date").val()
                 $('#table_jual').DataTable({
                     processing: true,
                     serverSide: true,
@@ -1469,7 +1485,7 @@
             case "retur_penjualan":
                 $("#table_retur_jual").DataTable().destroy()
                 let get_retur_penjualan_url = "{{ route('transaction-general-ledger-populate-transaction') }}"
-                get_retur_penjualan_url += '?transaction_type=' + $("#transaction_type").val() + '&customer=' + $("#customer_transaction").val()
+                get_retur_penjualan_url += '?transaction_type=' + $("#transaction_type").val() + '&customer=' + $("#customer_transaction").val() + '&transaction_date=' + $("#transaction_date").val()
                 $('#table_retur_jual').DataTable({
                     processing: true,
                     serverSide: true,
@@ -1585,7 +1601,7 @@
             case "pembelian":
                 $("#table_beli").DataTable().destroy()
                 let get_pembelian_url = "{{ route('transaction-general-ledger-populate-transaction') }}"
-                get_pembelian_url += '?transaction_type=' + $("#transaction_type").val() + '&supplier=' + $("#supplier_transaction").val()
+                get_pembelian_url += '?transaction_type=' + $("#transaction_type").val() + '&supplier=' + $("#supplier_transaction").val() + '&transaction_date=' + $("#transaction_date").val()
                 $('#table_beli').DataTable({
                     processing: true,
                     serverSide: true,
@@ -1702,7 +1718,7 @@
             case "uang_muka_pembelian":
                 $("#table_uang_muka_beli").DataTable().destroy()
                 let get_uang_muka_pembelian_url = "{{ route('transaction-general-ledger-populate-transaction') }}"
-                get_uang_muka_pembelian_url += '?transaction_type=' + $("#transaction_type").val() + '&supplier=' + $("#supplier_transaction").val()
+                get_uang_muka_pembelian_url += '?transaction_type=' + $("#transaction_type").val() + '&supplier=' + $("#supplier_transaction").val() + '&transaction_date=' + $("#transaction_date").val()
                 $('#table_uang_muka_beli').DataTable({
                     processing: true,
                     serverSide: true,
@@ -1800,7 +1816,7 @@
             case "retur_pembelian":
                 $("#table_retur_beli").DataTable().destroy()
                 let get_retur_pembelian_url = "{{ route('transaction-general-ledger-populate-transaction') }}"
-                get_retur_pembelian_url += '?transaction_type=' + $("#transaction_type").val() + '&supplier=' + $("#supplier_transaction").val()
+                get_retur_pembelian_url += '?transaction_type=' + $("#transaction_type").val() + '&supplier=' + $("#supplier_transaction").val() + '&transaction_date=' + $("#transaction_date").val()
                 $('#table_retur_beli').DataTable({
                     processing: true,
                     serverSide: true,
@@ -1916,7 +1932,7 @@
             case "piutang_giro":
                 $("#table_piutang_giro").DataTable().destroy()
                 let get_piutang_giro_url = "{{ route('transaction-general-ledger-populate-transaction') }}"
-                get_piutang_giro_url += '?transaction_type=' + $("#transaction_type").val() + '&supplier=' + $("#supplier_transaction").val() + '&slip=' + $("#slip").val()
+                get_piutang_giro_url += '?transaction_type=' + $("#transaction_type").val() + '&supplier=' + $("#supplier_transaction").val() + '&slip=' + $("#slip").val() + '&transaction_date=' + $("#transaction_date").val()
                 $('#table_piutang_giro').DataTable({
                     processing: true,
                     serverSide: true,
@@ -1991,7 +2007,7 @@
             case "hutang_giro":
                 $("#table_hutang_giro").DataTable().destroy()
                 let get_hutang_giro_url = "{{ route('transaction-general-ledger-populate-transaction') }}"
-                get_hutang_giro_url += '?transaction_type=' + $("#transaction_type").val() + '&supplier=' + $("#supplier_transaction").val() + '&slip=' + $("#slip").val()
+                get_hutang_giro_url += '?transaction_type=' + $("#transaction_type").val() + '&supplier=' + $("#supplier_transaction").val() + '&slip=' + $("#slip").val() + '&transaction_date=' + $("#transaction_date").val()
                 $('#table_hutang_giro').DataTable({
                     processing: true,
                     serverSide: true,
@@ -2109,6 +2125,24 @@
         num = num.replace('.', ',');
         
         return num;
+    }
+
+    function checkDetails() {
+        // console.log("isi detail "+details.length)
+        if (details.length > 0) {
+            // Disable Select2 input and add readonly class
+            $("#cabang_input").prop("disabled", true)
+
+            // Trigger a Select2 update to reflect the disabled state
+            $("#cabang_input").trigger("change.select2");
+        }
+        else {
+            // Enable Select2 input and remove readonly class
+            $("#cabang_input").prop("disabled", false)
+
+            // Trigger a Select2 update to reflect the editable state
+            $("#cabang_input").trigger("change.select2");
+        }
     }
 </script>
 @endsection
