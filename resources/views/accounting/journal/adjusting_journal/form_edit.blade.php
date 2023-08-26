@@ -467,6 +467,7 @@
 @section('externalScripts')
 <script>
     let save_route = "{{ route('transaction-adjustment-ledger-update') }}"
+    let token_route = "{{ route('refresh-token') }}"
     let data_route = "{{ route('transaction-adjustment-ledger') }}"
     let coa_by_cabang_route = "{{ route('master-coa-get-by-cabang', ':id') }}"
     let slip_by_cabang_route = "{{ route('master-slip-get-by-cabang', ':id') }}"
@@ -1060,6 +1061,8 @@
 
     function save_data() {
         let header = []
+        let token = $("[name='_token']").val()
+        console.log(token)
         header.push({
             id_jurnal: $("#id_jurnal").val(),
             cabang: $("#cabang_input").val(),
@@ -1075,7 +1078,7 @@
             type: "POST",
             url: save_route,
             data: {
-                "_token": "{{ csrf_token() }}",
+                "_token": token,
                 "header": header,
                 "detail": details
             },
@@ -1093,6 +1096,25 @@
             },
             error: function(data) {
                 Swal.fire("Sorry, Can't save data. ", data.responseJSON.message, 'error')
+            }
+        })
+    }
+
+    function getToken() {
+        console.log("generate new token")
+        $.ajax({
+            type: "GET",
+            url: token_route,
+            success: function(data) {
+                if (data.result) {
+                    $("[name='_token']").val(data.token)
+                } else {
+                    Swal.fire("Sorry, something wrong, call administrator.", 'error')
+                }
+
+            },
+            error: function(data) {
+                Swal.fire("Sorry, something wrong, call administrator.", 'error')
             }
         })
     }

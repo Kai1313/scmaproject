@@ -228,3 +228,10 @@ Route::prefix('report')->group(function(){
 });
 
 Route::get('/dummyAjax', 'ClosingJournalController@dummyAjax')->name('dummy-ajax');
+Route::get('/refresh-token', function() {
+    $data = [
+        "result" => true,
+        "token" => csrf_token()
+    ];
+    return $data;
+})->name('refresh-token');
