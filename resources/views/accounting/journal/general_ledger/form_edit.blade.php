@@ -558,7 +558,8 @@
             },
         }
     }
-    var details = JSON.parse('<?php echo $jurnal_detail ?>')
+    // var details = JSON.parse('<?php echo $jurnal_detail ?>')
+    var details = JSON.parse(<?php echo json_encode($jurnal_detail); ?>);
     var guid = '<?php echo $jurnal_detail_count ?>'
     var current_slip = '<?php echo $jurnal_header->id_slip ?>'
     var current_slip_giro = '<?php echo $jurnal_header->id_slip2 ?>'
