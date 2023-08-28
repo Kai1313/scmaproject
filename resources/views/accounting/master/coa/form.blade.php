@@ -360,7 +360,7 @@
                         `<option value="${akun.id_akun}" data-nama="${akun.nama_akun}" data-kode="${akun.kode_akun}">${akun.kode_akun} - ${akun.nama_akun}</option>`;
                 });
 
-                $('#akun_detail').append(option_akun);
+                $('#parent').append(option_akun);
             }
         })
     }
