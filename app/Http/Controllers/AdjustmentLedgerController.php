@@ -55,12 +55,14 @@ class AdjustmentLedgerController extends Controller
         $data_cabang = getCabang();
         $data_pelanggan = Pelanggan::all();
         $data_pemasok = Pemasok::all();
+        $userSession = $request->session()->get('user');
 
         $data = [
             "pageTitle" => "SCA Accounting | Transaksi Jurnal Penyesuaian | Create",
             "data_cabang" => $data_cabang,
             "data_pelanggan" => $data_pelanggan,
             "data_pemasok" => $data_pemasok,
+            "user_id" => $userSession->id_pengguna
         ];
 
         Log::debug(json_encode($request->session()->get('user')));
@@ -89,11 +91,18 @@ class AdjustmentLedgerController extends Controller
             }
 
             // Init data
+            $userData = $request->session()->get('user');
+            if (!$userData) {
+                Log::info("session expired");
+                if (checkUserSession($request, 'adjustment_ledger', 'create') == false) {
+                    return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+                }
+                $userData = $request->session()->get('user');
+            }
             $journalDate = date('Y-m-d', strtotime($request->header[0]["tanggal"]));
             $journalType = "ME";
             $cabangID = $request->header[0]["cabang"];
             $noteHeader = $request->header[0]["notes"];
-            $userData = $request->session()->get('user');
             $userRecord = $userData->id_pengguna;
             $userModified = $userData->id_pengguna;
             $dateRecord = date('Y-m-d');
@@ -362,6 +371,7 @@ class AdjustmentLedgerController extends Controller
         $data_cabang = getCabang();
         $data_pelanggan = Pelanggan::all();
         $data_pemasok = Pemasok::all();
+        $userSession = $request->session()->get('user');
         $jurnal_header = JurnalHeader::find($id);
         $jurnal_detail = JurnalDetail::where("id_jurnal", $id)->get();
         $details = [];
@@ -391,6 +401,7 @@ class AdjustmentLedgerController extends Controller
             "jurnal_header" => $jurnal_header,
             "jurnal_detail" => json_encode($details),
             "jurnal_detail_count" => count($details),
+            "user_id" => $userSession->id_pengguna
         ];
         // dd($data);
 
@@ -441,12 +452,19 @@ class AdjustmentLedgerController extends Controller
             }
 
             // Init data
+            $userData = $request->session()->get('user');
+            if (!$userData) {
+                Log::info("session expired");
+                if (checkUserSession($request, 'adjustment_ledger', 'edit') == false) {
+                    return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+                }
+                $userData = $request->session()->get('user');
+            }
             $journalDate = date('Y-m-d', strtotime($request->header[0]["tanggal"]));
             $journalID = $request->header[0]["id_jurnal"];
             $journalType = "ME";
             $cabangID = $request->header[0]["cabang"];
             $noteHeader = $request->header[0]["notes"];
-            $userData = $request->session()->get('user');
             $userModified = $userData->id_pengguna;
             $dateModified = date('Y-m-d');
             $detailData = $request->detail;

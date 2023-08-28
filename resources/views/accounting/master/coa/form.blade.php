@@ -39,7 +39,7 @@
                             <div class="col-xs-6">
                                 <div class="form-group">
                                     <label>Cabang</label>
-                                    <select name="cabang" class="form-control select2" style="width: 100%;">
+                                    <select name="cabang" id="cabang" class="form-control select2" style="width: 100%;">
                                         @foreach ($data_cabang as $cabang)
                                             <option value="{{ $cabang->id_cabang }}" {{ isset($akun->id_cabang)?(($akun->id_cabang == $cabang->id_cabang)?'selected':''):'' }}>{{ $cabang->kode_cabang.' - '.$cabang->nama_cabang }}</option>
                                         @endforeach
@@ -63,11 +63,11 @@
                                 </div>
                                 <div class="form-group">
                                     <label>Parent</label>
-                                    <select name="parent" class="form-control select2" style="width: 100%;">
+                                    <select name="parent" id="parent" class="form-control select2" style="width: 100%;">
                                         <option value="">Tanpa Parent</option>
-                                        @foreach ($data_akun as $akuns)
+                                        {{-- @foreach ($data_akun as $akuns)
                                             <option value="{{ $akuns->id_akun }}" {{ (isset($akun->id_parent)?(($akun->id_parent == $akuns->id_akun)?'selected':''):'') }}>{{ $akuns->kode_akun.' - '.$akuns->nama_akun }}</option>
-                                        @endforeach
+                                        @endforeach --}}
                                     </select>
                                 </div>
                                 <div class="form-group">
@@ -132,6 +132,7 @@
 
 @section('externalScripts')
     <script>
+        let coa_by_cabang_route = "{{ route('master-coa-get-by-cabang', ':id') }}"
         var validateCoa = {
             submit: {
                 settings: {
@@ -171,6 +172,8 @@
         $(function () {
             $.validate(validateCoa)
 
+            getCoa()
+
             $('.select2').select2()
 
             $("#header1").select2({
@@ -207,6 +210,10 @@
             get_header2(header2)
             get_header3(header3)
 
+            // On change cabang
+            $("#cabang").on("change", function() {
+                getCoa()
+            })
         })
 
         function store_akun() {
@@ -335,5 +342,27 @@
                 }
             })
         }
+
+        function getCoa() {
+        let id_cabang = $("#cabang").val()
+        let current_coa_route = coa_by_cabang_route.replace(':id', id_cabang);
+
+        $.getJSON(current_coa_route, function(data) {
+            if (data.result) {
+                $('#parent').html('');
+
+                let data_akun = data.data;
+                let option_akun = '';
+
+                option_akun += `<option value="">Tanpa Parent</option>`;
+                data_akun.forEach(akun => {
+                    option_akun +=
+                        `<option value="${akun.id_akun}" data-nama="${akun.nama_akun}" data-kode="${akun.kode_akun}">${akun.kode_akun} - ${akun.nama_akun}</option>`;
+                });
+
+                $('#akun_detail').append(option_akun);
+            }
+        })
+    }
     </script>
 @endsection

@@ -1105,7 +1105,8 @@
             data: {
                 "_token": token,
                 "header": header,
-                "detail": details
+                "detail": details,
+                "user_id": '{{ $user_id }}'
             },
             success: function(data) {
                 if (data.result) {

@@ -58,7 +58,8 @@ class GeneralLedgerController extends Controller
         $data_pemasok = Pemasok::all();
         $piutang_dagang = Setting::where("code", "Piutang Dagang")->where("id_cabang", "1")->first();
         $hutang_dagang = Setting::where("code", "Hutang Dagang")->where("id_cabang", "1")->first();
-        // dd(json_encode($piutang_dagang));
+        $userSession = $request->session()->get('user');
+        // dd($userSession);
 
         $data = [
             "pageTitle" => "SCA Accounting | Transaksi Jurnal Umum | Create",
@@ -67,8 +68,8 @@ class GeneralLedgerController extends Controller
             "data_pemasok" => $data_pemasok,
             "piutang_dagang" => $piutang_dagang,
             "hutang_dagang" => $hutang_dagang,
+            "user_id" => $userSession->id_pengguna
         ];
-
         Log::debug(json_encode($request->session()->get('user')));
 
         return view('accounting.journal.general_ledger.form', $data);
@@ -96,6 +97,14 @@ class GeneralLedgerController extends Controller
             }
 
             // Init data
+            $userData = $request->session()->get('user');
+            if (!$userData) {
+                Log::info("session expired");
+                if (checkUserSession($request, 'general_ledger', 'create') == false) {
+                    return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+                }
+                $userData = $request->session()->get('user');
+            }
             $journalDate = date('Y-m-d', strtotime($request->header[0]["tanggal"]));
             $giroNo = ($request->header[0]["nomor_giro"]) ? $request->header[0]["nomor_giro"] : null;
             $giroDate = ($request->header[0]["tanggal_giro"]) ? date('Y-m-d', strtotime($request->header[0]["tanggal_giro"])) : null;
@@ -105,7 +114,6 @@ class GeneralLedgerController extends Controller
             $journalType = $request->header[0]["jenis"];
             $cabangID = $request->header[0]["cabang"];
             $noteHeader = $request->header[0]["notes"];
-            $userData = $request->session()->get('user');
             $userRecord = $userData->id_pengguna;
             $userModified = $userData->id_pengguna;
             $dateRecord = date('Y-m-d h:i:s');
@@ -395,6 +403,7 @@ class GeneralLedgerController extends Controller
         $data_cabang = getCabang();
         $data_pelanggan = Pelanggan::all();
         $data_pemasok = Pemasok::all();
+        $userSession = $request->session()->get('user');
         $jurnal_header = JurnalHeader::find($id);
         $jurnal_detail = JurnalDetail::where("id_jurnal", $id)->get();
         $details = [];
@@ -423,6 +432,7 @@ class GeneralLedgerController extends Controller
             "jurnal_header" => $jurnal_header,
             "jurnal_detail" => json_encode($details),
             "jurnal_detail_count" => count($details),
+            "user_id" => $userSession->id_pengguna
         ];
         // dd($details);
         // Check periode close
@@ -471,6 +481,14 @@ class GeneralLedgerController extends Controller
             }
 
             // Init data
+            $userData = $request->session()->get('user');
+            if (!$userData) {
+                Log::info("session expired");
+                if (checkUserSession($request, 'general_ledger', 'edit') == false) {
+                    return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+                }
+                $userData = $request->session()->get('user');
+            }
             $journalDate = date('Y-m-d', strtotime($request->header[0]["tanggal"]));
             $giroNo = ($request->header[0]["nomor_giro"]) ? $request->header[0]["nomor_giro"] : null;
             $giroDate = ($request->header[0]["tanggal_giro"]) ? date('Y-m-d', strtotime($request->header[0]["tanggal_giro"])) : null;
@@ -481,7 +499,6 @@ class GeneralLedgerController extends Controller
             $journalType = $request->header[0]["jenis"];
             $cabangID = $request->header[0]["cabang"];
             $noteHeader = $request->header[0]["notes"];
-            $userData = $request->session()->get('user');
             $userModified = $userData->id_pengguna;
             $dateModified = date('Y-m-d h:i:s');
             $detailData = $request->detail;
