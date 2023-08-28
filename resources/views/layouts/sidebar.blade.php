@@ -1200,38 +1200,45 @@
                     </ul>
                 </li>
             @endif
-            <li class="treeview {{ in_array(request()->segment(1), ['marketing-tool']) ? 'active' : null }}"
-                style="height: auto;">
-                <a href="#"><i class="fa fa-users"></i> <span>Marketing Tools</span>
-                    <span class="pull-right-container">
-                        <i class="fa fa-angle-left pull-right"></i>
-                    </span>
-                </a>
-                <ul class="treeview-menu">
-                    <li data-alias="jadwal_kunjungan"
-                        class="{{ menuActive(request()->url(), route('pre_visit')) > 0 ? 'active' : null }}">
-                        <a href="{{ route('pre_visit') }}"
-                            class="{{ menuActive(request()->url(), route('pre_visit')) > 0 ? 'active' : null }}">
-                            <i class="glyphicon glyphicon-option-vertical"></i>Jadwal Visit
-
-                        </a>
-                    </li>
-                    <li data-alias="kunjungan"
-                        class="{{ menuActive(request()->url(), route('visit')) > 0 ? 'active' : null }}">
-                        <a href="{{ route('visit') }}"
-                            class="{{ menuActive(request()->url(), route('visit')) > 0 ? 'active' : null }}">
-                            <i class="glyphicon glyphicon-option-vertical"></i>Visit
-                        </a>
-                    </li>
-                    <li data-alias="kunjungan"
-                        class="{{ menuActive(request()->url(), route('progress_visit')) > 0 ? 'active' : null }}">
-                        <a href="{{ route('progress_visit') }}"
-                            class="{{ menuActive(request()->url(), route('progress_visit')) > 0 ? 'active' : null }}">
-                            <i class="glyphicon glyphicon-option-vertical"></i>Progress Visit
-                        </a>
-                    </li>
-                </ul>
-            </li>
+            @if (checkAccessMenu('marketing_tools'))
+                <li class="treeview {{ in_array(request()->segment(1), ['marketing-tool']) ? 'active' : null }}"
+                    style="height: auto;">
+                    <a href="#"><i class="fa fa-users"></i> <span>Marketing Tools</span>
+                        <span class="pull-right-container">
+                            <i class="fa fa-angle-left pull-right"></i>
+                        </span>
+                    </a>
+                    <ul class="treeview-menu">
+                        @if (checkAccessMenu('marketing-tool/pre_visit'))
+                            <li data-alias="jadwal_kunjungan"
+                                class="{{ menuActive(request()->url(), route('pre_visit')) > 0 ? 'active' : null }}">
+                                <a href="{{ route('pre_visit') }}"
+                                    class="{{ menuActive(request()->url(), route('pre_visit')) > 0 ? 'active' : null }}">
+                                    <i class="glyphicon glyphicon-option-vertical"></i>Jadwal Visit
+                                </a>
+                            </li>
+                        @endif
+                        @if (checkAccessMenu('marketing-tool/visit'))
+                            <li data-alias="kunjungan"
+                                class="{{ menuActive(request()->url(), route('visit')) > 0 ? 'active' : null }}">
+                                <a href="{{ route('visit') }}"
+                                    class="{{ menuActive(request()->url(), route('visit')) > 0 ? 'active' : null }}">
+                                    <i class="glyphicon glyphicon-option-vertical"></i>Visit
+                                </a>
+                            </li>
+                        @endif
+                        @if (checkAccessMenu('marketing-tool/progress-visit'))
+                            <li data-alias="kunjungan"
+                                class="{{ menuActive(request()->url(), route('progress_visit')) > 0 ? 'active' : null }}">
+                                <a href="{{ route('progress_visit') }}"
+                                    class="{{ menuActive(request()->url(), route('progress_visit')) > 0 ? 'active' : null }}">
+                                    <i class="glyphicon glyphicon-option-vertical"></i>Progress Visit
+                                </a>
+                            </li>
+                        @endif
+                    </ul>
+                </li>
+            @endif
             <li class="header">ACCOUNTING</li>
             <li class="treeview {{ request()->segment(1) == 'master' ? 'active' : null }}">
                 <a href="#"><i class="fa fa-link"></i> <span>Master</span>

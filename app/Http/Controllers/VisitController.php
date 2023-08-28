@@ -16,7 +16,7 @@ class VisitController extends Controller
 {
     public function index(Request $request)
     {
-        if (checkUserSession($request, 'visit', 'show') == false) {
+        if (checkUserSession($request, 'marketing-tool/visit', 'show') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
@@ -147,7 +147,7 @@ class VisitController extends Controller
 
     public function viewData($id)
     {
-        if (checkAccessMenu('pemakaian', 'show') == false) {
+        if (checkAccessMenu('marketing-tool/visit', 'show') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
@@ -162,7 +162,7 @@ class VisitController extends Controller
 
     public function destroy($id)
     {
-        if (checkAccessMenu('pemakaian', 'delete') == false) {
+        if (checkAccessMenu('marketing-tool/visit', 'delete') == false) {
             return response()->json(['message' => 'Tidak mempunyai akses'], 500);
         }
 

@@ -11,7 +11,7 @@ class ProgressVisitController extends Controller
 
     public function index(Request $request)
     {
-        if (checkUserSession($request, 'progress_visit', 'show') == false) {
+        if (checkUserSession($request, 'marketing-tool/progress-visit', 'show') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
