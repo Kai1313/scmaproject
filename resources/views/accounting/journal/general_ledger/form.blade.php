@@ -1394,7 +1394,7 @@
             case "penjualan":
                 $("#table_jual").DataTable().destroy()
                 let get_penjualan_url = "{{ route('transaction-general-ledger-populate-transaction') }}"
-                get_penjualan_url += '?transaction_type=' + $("#transaction_type").val() + '&transaction_date=' + $("#transaction_date").val() + '&transaction_date=' + $("#transaction_date").val()
+                get_penjualan_url += '?transaction_type=' + $("#transaction_type").val() + '&customer=' + $("#customer_transaction").val() + '&transaction_date=' + $("#transaction_date").val() + '&transaction_date=' + $("#transaction_date").val()
                 $('#table_jual').DataTable({
                     processing: true,
                     serverSide: true,
