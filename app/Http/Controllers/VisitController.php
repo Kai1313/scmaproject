@@ -71,7 +71,13 @@ class VisitController extends Controller
                             return "<label class='label label-warning'>Belum Visit</label>";
                             break;
                         case '2':
-                            return "<label class='label label-primary'>Sudah Visit</label>";
+                            $html = '';
+                            if ($data->visit_type == 'LOKASI') {
+                                $html .= "<label class='label label-primary'>Sudah Visit " . $data->visit_type . "</label>";
+                            } else {
+                                $html .= "<label class='label label-success'>Sudah Visit " . $data->visit_type . "</label>";
+                            }
+                            return $html;
                             break;
                         default:
                             return '';
