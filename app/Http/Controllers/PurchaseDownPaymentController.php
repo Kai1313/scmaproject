@@ -160,38 +160,26 @@ class PurchaseDownPaymentController extends Controller
                 ], 500);
             }
 
-            $resultJurnalUangMukaPembelian = (new ApiController)->journalUangMukaPembelian(new Request([
-                "no_transaksi" => $data->kode_uang_muka_pembelian,
-                "tanggal" => $data->tanggal,
-                "slip" => null,
-                "cabang" => $data->id_cabang,
-                "pemasok" => $data->purchaseOrder->id_pemasok,
-                "void" => $data->void,
-                "user" => session()->get('user')['id_pengguna'],
-                "total" => $data->konversi_nominal,
-                "uang_muka" => $data->konversi_nominal,
-                "ppn" => 0,
-            ]));
+            // $resultJurnalUangMukaPembelian = (new ApiController)->journalUangMukaPembelian(new Request([
+            //     "no_transaksi" => $data->kode_uang_muka_pembelian,
+            //     "tanggal" => $data->tanggal,
+            //     "slip" => null,
+            //     "cabang" => $data->id_cabang,
+            //     "pemasok" => $data->purchaseOrder->id_pemasok,
+            //     "void" => $data->void,
+            //     "user" => session()->get('user')['id_pengguna'],
+            //     "total" => $data->konversi_nominal,
+            //     "uang_muka" => $data->konversi_nominal,
+            //     "ppn" => 0,
+            // ]));
 
-            if ($resultJurnalUangMukaPembelian->getData()->result == false) {
-                DB::rollback();
-                Log::error($resultJurnalUangMukaPembelian->getData()->message);
-                Log::error($resultJurnalUangMukaPembelian);
-                return response()->json([
-                    "result" => false,
-                    "message" => $resultJurnalUangMukaPembelian->getData()->message,
-                ], 500);
-            }
-
-            // $resApi = $this->callApiJournal($data);
-            // $convertResApi = (array) json_decode($resApi);
-            // if ($convertResApi['result'] == false) {
+            // if ($resultJurnalUangMukaPembelian->getData()->result == false) {
             //     DB::rollback();
-            //     Log::error($convertResApi['message']);
-            //     Log::error($convertResApi);
+            //     Log::error($resultJurnalUangMukaPembelian->getData()->message);
+            //     Log::error($resultJurnalUangMukaPembelian);
             //     return response()->json([
             //         "result" => false,
-            //         "message" => $convertResApi['message'],
+            //         "message" => $resultJurnalUangMukaPembelian->getData()->message,
             //     ], 500);
             // }
 
@@ -350,59 +338,4 @@ class PurchaseDownPaymentController extends Controller
             'nama_mata_uang' => $countDataPo->nama_mata_uang,
         ], 200);
     }
-
-    // public function callApiJournal($data)
-    // {
-    //     try {
-    //         $date = date('Y-m-d H:i:s');
-    //         $findToken = DB::table('token_pengguna')->where('id_pengguna', session()->get('user')['id_pengguna'])
-    //             ->where('status_token_pengguna', '1')
-    //             ->where('waktu_habis_token_pengguna', '>=', $date)
-    //             ->where('nama2_token_pengguna', '!=', null)
-    //             ->orderBy('date_token_pengguna', 'desc')->first();
-    //         $token = $findToken->nama2_token_pengguna;
-    //         if ($token) {
-    //             $ch = curl_init();
-    //             curl_setopt($ch, CURLOPT_URL, route('jurnal-otomatis-uangmuka-pembelian'));
-    //             curl_setopt($ch, CURLOPT_POST, 1);
-    //             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    //             curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-    //                 'Accept: application/json',
-    //                 'Authorization: Bearer ' . $token,
-    //             ));
-    //             curl_setopt($ch, CURLOPT_POSTFIELDS,
-    //                 http_build_query(
-    //                     array(
-    //                         "no_transaksi" => $data->kode_uang_muka_pembelian,
-    //                         "tanggal" => $data->tanggal,
-    //                         "slip" => '',
-    //                         "cabang" => $data->id_cabang,
-    //                         "pemasok" => $data->purchaseOrder->id_pemasok,
-    //                         "void" => $data->void,
-    //                         "user" => session()->get('user')['id_pengguna'],
-    //                         "total" => $data->nominal,
-    //                         "uang_muka" => $data->nominal,
-    //                         "ppn" => 0,
-    //                     )
-    //                 )
-    //             );
-    //             $newData = curl_exec($ch);
-    //             curl_close($ch);
-    //             return $newData;
-    //         } else {
-    //             Log::error("Error when token tidak ditemukan");
-    //             return response()->json([
-    //                 "result" => false,
-    //                 "message" => "Token tidak ditemukan",
-    //             ], 500);
-    //         }
-    //     } catch (\Exception $th) {
-    //         Log::error("Error when gagal purchase down payment");
-    //         Log::error($th);
-    //         return response()->json([
-    //             "result" => false,
-    //             "message" => "Data gagal tersimpan",
-    //         ], 500);
-    //     }
-    // }
 }
