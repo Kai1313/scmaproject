@@ -28,7 +28,7 @@ class MaterialUsageController extends Controller
         ]);
     }
 
-    function print(Request $request) {
+    public function print(Request $request) {
         if (checkAccessMenu('laporan_pemakaian', 'print') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
@@ -137,7 +137,9 @@ class MaterialUsageController extends Controller
                     'b.nama_barang',
                     'pd.jumlah',
                     'pd.jumlah_zak',
-                    'pd.weight_zak'
+                    'pd.weight_zak',
+                    'ph.catatan as catatan_header',
+                    'pd.catatan as catatan_detail'
                 )
                     ->leftJoin('pemakaian_header as ph', 'pd.id_pemakaian', 'ph.id_pemakaian')
                     ->leftJoin('cabang as c', 'ph.id_cabang', 'c.id_cabang')

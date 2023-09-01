@@ -86,6 +86,8 @@
                     <th>Jumlah</th>
                     <th>Jumlah Zak</th>
                     <th>Berat Zak</th>
+                    <th>Catatan Header</th>
+                    <th>Catatan Detail</th>
                 </tr>
             </thead>
             <tbody>
@@ -100,6 +102,8 @@
                         <td class="number">{{ $data->jumlah }}</td>
                         <td class="number">{{ $data->jumlah_zak }}</td>
                         <td class="number">{{ $data->weight_zak }}</td>
+                        <th>{{ $data->catatan_header }}</th>
+                        <th>{{ $data->catatan_detail }}</th>
                     </tr>
                 @endforeach
             </tbody>

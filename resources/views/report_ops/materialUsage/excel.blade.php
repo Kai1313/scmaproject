@@ -96,6 +96,12 @@
                     </th>
                     <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Berat Zak
                     </th>
+                    <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Catatan
+                        Header
+                    </th>
+                    <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Catatan
+                        Detail
+                    </th>
                 </tr>
             </thead>
             <tbody>
@@ -110,6 +116,8 @@
                         <td style="border: #000000 solid thin;text-align:right;">{{ $data->jumlah }}</td>
                         <td style="border: #000000 solid thin;text-align:right;">{{ $data->jumlah_zak }}</td>
                         <td style="border: #000000 solid thin;text-align:right;">{{ $data->weight_zak }}</td>
+                        <td style="border: #000000 solid thin;">{{ $data->catatan_header }}</td>
+                        <td style="border: #000000 solid thin;">{{ $data->catatan_detail }}</td>
                     </tr>
                 @endforeach
             </tbody>

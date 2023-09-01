@@ -108,6 +108,8 @@
                                 <th>Jumlah</th>
                                 <th>Jumlah Zak</th>
                                 <th>Berat Zak</th>
+                                <th>Catatan Header</th>
+                                <th>Catatan Detail</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -219,7 +221,13 @@
                                 return data ? formatNumber(data, 4) : 0
                             },
                             className: 'text-right'
-                        }, ]
+                        }, {
+                            data: 'catatan_header',
+                            name: 'ph.catatan',
+                        }, {
+                            data: 'catatan_detail',
+                            name: 'pd.catatan',
+                        }]
                     });
                     break;
                 default:
