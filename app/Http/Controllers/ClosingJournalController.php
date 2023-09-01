@@ -2099,10 +2099,7 @@ class ClosingJournalController extends Controller
             $journal_type = "ME";
             $month = $request->month;
             $year = $request->year;
-            $start_date = date("Y-m-d", strtotime("$year-$month-1"));
             $end_date = date("Y-m-t", strtotime("$year-$month-1"));
-            $void = 0;
-            $status = 1;
             $asset_account = Setting::where("id_cabang", $id_cabang)->where("code", "Kategori Asset")->first();
             $cabang = Cabang::find($id_cabang);
             // Log::info("akun penyusutan");
