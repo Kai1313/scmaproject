@@ -2129,12 +2129,12 @@ class ClosingJournalController extends Controller
                             ->get();
             Log::info(json_encode($data_asset));
             DB::beginTransaction();
-            $jurnal_header = JurnalHeader::where('id_transaksi', "Jurnal Penyusutan")->where('tanggal_jurnal', $end_date)->get();
+            $jurnal_header = JurnalHeader::where('id_transaksi', "Jurnal Penyusutan")->where('tanggal_jurnal', $end_date)->where('id_cabang', $id_cabang)->get();
 
             foreach($jurnal_header as $jurnal){
                 JurnalDetail::where('id_jurnal', $jurnal->id_jurnal)->delete();
             }
-            JurnalHeader::where('id_transaksi', "Jurnal Penyusutan")->where('tanggal_jurnal', $end_date)->delete();
+            JurnalHeader::where('id_transaksi', "Jurnal Penyusutan")->where('tanggal_jurnal', $end_date)->where('id_cabang', $id_cabang)->delete();
             Log::info("data asset");
             Log::info(count($data_asset));
 
