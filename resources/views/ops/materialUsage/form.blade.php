@@ -150,7 +150,7 @@
                                     <option value="2" {{ $data && $data->jenis_pemakaian == 2 ? 'selected' : '' }}>
                                         Keperluan Lab</option>
                                     <option value="3" {{ $data && $data->jenis_pemakaian == 3 ? 'selected' : '' }}>
-                                        Produksi</option>
+                                        Kerugian lain</option>
                                 </select>
                             </div>
                         </div>
