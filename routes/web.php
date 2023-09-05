@@ -163,6 +163,7 @@ Route::prefix('marketing-tool')->group(function () {
     Route::get('/progress-visit/get-data/{user_id?}', 'ProgressVisitController@getData')->name('get-data-progress-visit');
 });
 
+Route::get('kirim_ke_gudang/print2/{id}', 'SendToWarehouseController@print2')->name('send_to_warehouse-print2');
 Route::get('kirim_ke_gudang/print/{id}', 'SendToWarehouseController@print')->name('send_to_warehouse-print');
 Route::get('stok_minimal/excel/{id}/{id_cabang}', 'StokMinHistoryController@getExcel')->name('stok_minimal-excel');
 

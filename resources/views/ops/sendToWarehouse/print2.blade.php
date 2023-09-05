@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Surat jalan pindah cabang {{ $data->kode_pindah_barang }}</title>
+    <title>Surat jalan pindah gudang {{ $data->kode_pindah_barang }}</title>
     <style type="text/css">
         .table {
             border-collapse: collapse;
@@ -122,13 +122,6 @@
                             <td>:</td>
                             <td>{{ $data->kode_pindah_barang }}</td>
                         </tr>
-                        @if ($data->id_produksi && $data->produksi)
-                            <tr>
-                                <td><b>Kode Produksi</b></td>
-                                <td>:</td>
-                                <td>{{ $data->produksi->nama_produksi }}</td>
-                            </tr>
-                        @endif
                     </table>
                 </td>
             </tr>
@@ -138,23 +131,26 @@
         <table class="table">
             <tr>
                 <th width="15">No</th>
-                <th width="60">Kode</th>
                 <th>Nama Barang</th>
                 <th width="50">Satuan</th>
                 <th width="50">Qty</th>
                 <th width="70">Batch</th>
                 <th width="70">Kadaluarsa</th>
+                <th width="60">Keterangan</th>
             </tr>
-            @foreach ($data->formatdetail as $key => $detail)
+            @foreach ($data->formatDetailGroupBy as $key => $detail)
                 <tr>
                     <td class="text-center">{{ $key + 1 }}</td>
-                    <td>{{ $detail->qr_code }}</td>
                     <td>{{ $detail->nama_barang }}</td>
                     <td class="text-center">{{ $detail->nama_satuan_barang }}</td>
                     <td class="text-right">{{ formatNumber($detail->qty) }}</td>
                     <td class="text-center">{{ $detail->batch }}</td>
                     <td>
                         {{ $detail->tanggal_kadaluarsa == '0000-00-00' ? '' : $detail->tanggal_kadaluarsa }}
+                    </td>
+                    <td class="text-center">
+                        {{ $detail->count_data }}
+                        {{ isset($arraySatuan[$detail->id_barang2]) ? $arraySatuan[$detail->id_barang2] : '' }}
                     </td>
                 </tr>
             @endforeach
