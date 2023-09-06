@@ -366,6 +366,17 @@
             paging: false,
             data: details,
             ordering: false,
+            drawCallback: function() {
+                var allData = this.api().column(0).data().toArray();
+                var toFindDuplicates = allData => allData.filter((item, index) => allData.indexOf(item) !==
+                    index)
+                var duplicateElementa = toFindDuplicates(allData);
+                var indexs = []
+                for (let i = 0; i < duplicateElementa.length; i++) {
+                    let indexDuplicate = allData.indexOf(duplicateElementa[i])
+                    $($('#table-detail tbody tr:eq(' + indexDuplicate + ')')).css('color', 'red')
+                }
+            },
             columns: [{
                     data: 'qr_code',
                     name: 'qr_code'
