@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\MoveBranch;
+use App\MoveBranchDetail;
 use DB;
 use Illuminate\Http\Request;
 use Log;
@@ -102,6 +103,12 @@ class SendToBranchController extends Controller
         }
 
         $data = MoveBranch::find($id);
+        $qrcodeReceived = [];
+        $dataReceived = MoveBranch::where('id_pindah_barang2', $id)->first();
+        if ($dataReceived) {
+            $qrcodeReceived = MoveBranchDetail::where('id_pindah_barang', $dataReceived->id_pindah_barang)->pluck('qr_code')->toArray();
+        }
+
         $cabang = session()->get('access_cabang');
         $allCabang = DB::table('cabang')->select('id_cabang as id', 'nama_cabang as text')->where('status_cabang', 1)->get();
         return view('ops.sendToBranch.form', [
@@ -109,6 +116,7 @@ class SendToBranchController extends Controller
             'cabang' => $cabang,
             'allCabang' => $allCabang,
             "pageTitle" => "SCA OPS | Kirim Ke Cabang | " . ($id == 0 ? 'Create' : 'Edit'),
+            'qrcodeReceived' => $qrcodeReceived,
         ]);
     }
 

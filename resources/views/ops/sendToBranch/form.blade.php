@@ -358,6 +358,7 @@
         let deleteDetails = []
         let detailSelect = []
         let statusModal = 'create'
+        let qrcodeReceived = {!! json_encode($qrcodeReceived) !!}
 
         $('[name="details"]').val(JSON.stringify(details))
 
@@ -427,7 +428,7 @@
                     searchable: false,
                     render: function(data, type, row, meta) {
                         let btn = '<ul class="horizontal-list">';
-                        if (row.accept_qr_code == null) {
+                        if (!qrcodeReceived.includes(row.qr_code)) {
                             btn +=
                                 '<li><a href="javascript:void(0)" class="btn btn-danger btn-xs mr-1 mb-1 delete-entry"><i class="glyphicon glyphicon-trash"></i></a></li>';
                         }
