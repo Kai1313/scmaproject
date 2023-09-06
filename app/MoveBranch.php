@@ -134,7 +134,7 @@ class MoveBranch extends Model
                 'pindah_barang_detail.tanggal_kadaluarsa',
                 'pindah_barang_detail.zak',
                 'pindah_barang_detail.weight_zak',
-                'pindah_barang_detail.id_wrapper_zak',
+                'pindah_barang_detail.id_wrapper_zak'
                 // 'pbd.qr_code as accept_qr_code'
             )
             ->leftJoin('barang', 'pindah_barang_detail.id_barang', '=', 'barang.id_barang')
