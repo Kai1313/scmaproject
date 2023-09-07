@@ -173,7 +173,7 @@ class ReportGeneralLedgerController extends Controller
             if ($id_cabang != "all") {
                 $data_ledgers = $data_ledgers->where("jurnal_header.id_cabang", $id_cabang);
             }
-            if ($coa != "") {
+            if ($coa != "" && $coa != "all") {
                 $data_ledgers = $data_ledgers->where("jurnal_detail.id_akun", $coa);
             }
             if (isset($keyword)) {

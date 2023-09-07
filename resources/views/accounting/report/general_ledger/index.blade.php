@@ -350,28 +350,6 @@
 
     })
 
-    function save_data(route, param, step) {
-        $.ajax({
-            type: "GET",
-            url: route + param,
-        }).done(function(data) {
-            console.log("ajax response " + step)
-            console.log(data)
-            let res = '<span><i class="fa fa-check-circle" style="color: green;"></i>' + data.message + '</span>'
-            let fail = '<span><i class="fa fa-times-circle" style="color: red;"></i> Proses jurnal closing Koreksi Stok gagal. ' + data.message + '</span>'
-            if (data.result) {
-                console.log("succeed")
-                $("#response" + step).append(res)
-                steps(step, param)
-            } else {
-                console.log("ajax response false " + step)
-                $("#response" + step).append(fail)
-                myButton.disabled = false
-                myButton.innerHTML = "Submit"
-            }
-        })
-    }
-
     function checkType(type) {
         if (type == "recap") {
             getCoa()
@@ -384,6 +362,7 @@
 
     function view(param, type) {
         let route = "{{ Route('report-general-ledger-populate') }}"
+        let coa = $("#coa").val()
         if (type == "recap") {
             $("#table_detail_div").hide()
             $("#table_recap_div").show()
@@ -574,6 +553,7 @@
                         searchable: false,
                         orderable: false,
                         className: 'text-right',
+                        visible: (coa != 'all')?true:false,
                         render: function(data, type, row) {
                             return formatCurr(formatNumberAsFloatFromDB(data))
                         }
@@ -621,31 +601,6 @@
         })
     }
 
-    function steps(step, param) {
-        switch (step) {
-            case "1":
-                save_data(routeProduction, param, "2")
-                break;
-            case "2":
-                save_data(routeInventoryTransfer, param, "3")
-                break;
-            case "3":
-                save_data(routeStockCorrection, param, "4")
-                break;
-            case "4":
-                save_data(routeSales, param, "5")
-                break;
-            case "5":
-                save_data(routeDepreciation, param, "6")
-                break;
-
-            default:
-                myButton.disabled = false
-                myButton.innerHTML = "Submit"
-                break;
-        }
-    }
-
     function getCoa() {
         let id_cabang = $("#cabang_input").val()
         let current_coa_route = coa_by_cabang_route.replace(':id', id_cabang);
@@ -658,6 +613,7 @@
                 let option_akun = '';
 
                 option_akun += `<option value="">Pilih Akun</option>`;
+                option_akun += `<option value="all">All</option>`;
                 data_akun.forEach(akun => {
                     option_akun +=
                         `<option value="${akun.id_akun}" data-nama="${akun.nama_akun}" data-kode="${akun.kode_akun}">${akun.kode_akun} - ${akun.nama_akun}</option>`;
