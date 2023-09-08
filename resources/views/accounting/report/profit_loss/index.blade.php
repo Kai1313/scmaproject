@@ -345,14 +345,17 @@
             dataType: "JSON",
             success: function(data) {
                 if (data.result) {
-                    let data_coa = data.data;
+                    let data_coa = data.data.data;
+                    let data_total = data.data.total;
                     let list_cabang = null;
                     let route_general_ledger = "{{ route('report-general-ledger') }}";
                     if ($('#cabang_input').val() == '') {
                         data_coa = data.data.data;
+                        data_total = data.data.total;
                         list_cabang = data.data.cabang;
                     }
                     body_coa = '';
+                    body_total = '';
                     if (jQuery.isEmptyObject(data_coa) == false) {
                         console.log(data_coa);
                         if (list_cabang == null) {
@@ -360,6 +363,7 @@
                             $('#head_row').html('');
                             $('#head_row').html(html_thead);
                             getTreetable(data_coa, null, 13, report_type, route_general_ledger);
+                            getTotal(data_total);
                         } else {
                             let html_thead = '<th style="background-color: #ffffff;" width="40%"><span id="header_table">Laba Rugi ' + monthNames[month - 1] + ' ' + year + '</span></th>';
                             list_cabang.forEach(function(cabang) {
@@ -369,9 +373,11 @@
                             $('#head_row').html('');
                             $('#head_row').html(html_thead);
 
-                            getTreetableConsolidation(data_coa, null, 13, list_cabang, report_type, route_general_ledger);
+                            getTreetableConsolidation(data_coa, null, 13, list_cabang, report_type, route_general_ledger, data_total);
+                            getTotalConsolidation(data_total, list_cabang);
                         }
                         $('#coa_table').html(body_coa);
+                        $('#coa_table').append(body_total);
                         $('#table_balance_recap').treetable({
                             expandable: true
                         }).treetable('expandAll');
@@ -506,6 +512,27 @@
                 body_coa += '</tr>';
             }
         });
+    }
+
+    function getTotal(total) {
+        body_total += '<tr><td><b style="font-size:13px">LABA(RUGI) BERSIH</b></td></td>'
+
+        body_total += '<td class="text-right"><b style="font-size:13px">' + formatCurr(formatNumberAsFloatFromDB(total['grand_total'].toFixed(2))) + '</b></td>';
+
+        body_total += '</tr>';
+    }
+
+    function getTotalConsolidation(total, cabang) {
+        body_total += '<tr><td><b style="font-size:13px">LABA(RUGI) BERSIH</b></td></td>'
+        cabang.forEach(function(cabang) {
+            let format = 'grand_total_' + cabang.new_nama_cabang;
+
+            body_total += '<td class="text-right"><b style="font-size:13px">' + formatCurr(formatNumberAsFloatFromDB(total[format].toFixed(2))) + '</b></td>';
+        });
+
+        body_total += '<td class="text-right"><b style="font-size:13px">' + formatCurr(formatNumberAsFloatFromDB(total['grand_total'].toFixed(2))) + '</b></td>';
+
+        body_total += '</tr>';
     }
 
     function formatCurr(num) {

@@ -187,22 +187,30 @@ class ReportProfitAndLossController extends Controller
     {
         if($id_cabang == null){
             if ($type == 'recap') {
+                Log::debug('recap cabang null');
                 $data_balance = $this->getSummaryBalanceKonsolidasi($tahun, $bulan);
             } else if ($type == 'detail') {
+                Log::debug('detail cabang null');
                 $data_balance = $this->getDetailBalanceKonsolidasi($tahun, $bulan);
             } else if($type == 'awal') {
+                Log::debug('awal cabang null');
                 $data_balance = $this->getInitBalanceKonsolidasi($tahun, $bulan);
             }else{
+                Log::debug('else cabang null');
                 $data_balance = $this->getInitDetailBalanceKonsolidasi($tahun, $bulan);
             }
         }else{
             if ($type == 'recap') {
+                Log::debug('recap cabang ada');
                 $data_balance = $this->getSummaryBalance($id_cabang, $tahun, $bulan);
             } else if ($type == 'detail') {
+                Log::debug('detail cabang ada');
                 $data_balance = $this->getDetailBalance($id_cabang, $tahun, $bulan);
             } else if($type == 'awal') {
+                Log::debug('awal cabang ada');
                 $data_balance = $this->getInitBalance($id_cabang, $tahun, $bulan);
             }else{
+                Log::debug('else cabang ada');
                 $data_balance = $this->getInitDetailBalance($id_cabang, $tahun, $bulan);
             }
         }
@@ -251,13 +259,23 @@ class ReportProfitAndLossController extends Controller
             ->groupBy('new_header1', 'new_header2', 'new_header3')
             ->get();
 
+        $total = [];
+    
+        $total['grand_total'] = 0;
+
         $summary_data = [
-            'transaction_data' => $data
+            'transaction_data' => $data,
+            'total' => $total
         ];
 
         $data = $this->getMapSummary($summary_data);
 
-        return (object) $data;
+        $data = [
+            'data' => (Object) $data['map'],
+            'total' => $data['total']
+        ];
+
+        return $data;
     }
 
     private function getSummaryBalanceKonsolidasi($tahun, $bulan)
@@ -327,16 +345,26 @@ class ReportProfitAndLossController extends Controller
             $data_konsolidasi[$i]['total_all'] = $total_konsolidasi[$i]['total_all'];
         }
 
+        $total = [];
+
+        foreach($data_cabang as $cabang){
+            $total['grand_total_' . $cabang->new_nama_cabang] = 0;
+        }
+
+        $total['grand_total'] = 0;
+
         $summary_data = [
             'transaction_data' => $data_konsolidasi,
-            'list_cabang' => $data_cabang
+            'list_cabang' => $data_cabang,
+            'total' => $total
         ];
 
         $map_konsolidasi = $this->getMapSummaryKonsolidasi($summary_data);
 
         // Convert the hash map to an array
         $data = [
-            'data' => $map_konsolidasi,
+            'data' => $map_konsolidasi['map'],
+            'total' => $map_konsolidasi['total'],
             'cabang' => $data_cabang
         ];
 
@@ -387,15 +415,25 @@ class ReportProfitAndLossController extends Controller
             ->groupBy('new_header1', 'new_header2', 'new_header3', 'master_akun.id_akun')
             ->get();
 
+        $total = [];
+    
+        $total['grand_total'] = 0;
+            
         $detail_data = [
             'transaction_data' => $data,
             'period' => $tahun . '-' . $bulan,
-            'id_cabang' => $id_cabang
+            'id_cabang' => $id_cabang,
+            'total' => $total
         ];
 
         $data = $this->getMapDetail($detail_data);
 
-        return (object) $data;
+        $data = [
+            'data' => (Object) $data['map'],
+            'total' => $data['total']
+        ];
+
+        return $data;
     }
 
     private function getDetailBalanceKonsolidasi($tahun, $bulan)
@@ -468,17 +506,27 @@ class ReportProfitAndLossController extends Controller
             $data_konsolidasi[$i]['total_all'] = $total_konsolidasi[$i]['total_all'];
         }
 
+        $total = [];
+
+        foreach($data_cabang as $cabang){
+            $total['grand_total_' . $cabang->new_nama_cabang] = 0;
+        }
+
+        $total['grand_total'] = 0;
+
         $detail_data = [
             'transaction_data' => $data_konsolidasi,
             'period' => $tahun . '-' . $bulan,
-            'list_cabang' => $data_cabang
+            'list_cabang' => $data_cabang,
+            'total' => $total
         ];
 
         $map_konsolidasi = $this->getMapDetailKonsolidasi($detail_data);
 
         // Convert the hash map to an array
         $data = [
-            'data' => $map_konsolidasi,
+            'data' => $map_konsolidasi['map'],
+            'total' => $map_konsolidasi['total'],
             'cabang' => $data_cabang
         ];
 
@@ -695,6 +743,7 @@ class ReportProfitAndLossController extends Controller
 
     private function getMapSummary($summary_data){
         $data = $summary_data['transaction_data'];
+        $total = $summary_data['total'];
 
         // Initialize a hash map to keep track of parent-child relationships
         $map = [];
@@ -746,6 +795,7 @@ class ReportProfitAndLossController extends Controller
                     $map[$newHeader1]['children'][$newHeader2]['total'] += $item['total'];
                 }
                 $map[$newHeader1]['total'] += $item['total'];
+                $total['grand_total'] += $item['total'];
             } else {
                 // Add new_header3 as a child of new_header1
                 if (!empty($newHeader3)) {
@@ -754,12 +804,13 @@ class ReportProfitAndLossController extends Controller
                         'total' => $item['total']
                     ];
                     $map[$newHeader1]['total'] += $item['total'];
+                    $total['grand_total'] += $item['total'];
                 }
             }
         }
 
         // Convert the hash map to an array
-        $data = array_values($map);
+        $data = ['map' => array_values($map), 'total' => $total];
 
         return $data;
     }
@@ -767,6 +818,7 @@ class ReportProfitAndLossController extends Controller
     private function getMapSummaryKonsolidasi($summary_data){
         $data_konsolidasi = $summary_data['transaction_data'];
         $list_cabang = $summary_data['list_cabang'];
+        $total = $summary_data['total'];
         // Initialize a hash map to keep track of parent-child relationships
         $map = [];
 
@@ -842,9 +894,11 @@ class ReportProfitAndLossController extends Controller
 
                 foreach($list_cabang as $cabang){
                     $map[$newHeader1]['total_' . $cabang->new_nama_cabang] +=  $item['total_' . $cabang->new_nama_cabang];
+                    $total['grand_total_' . $cabang->new_nama_cabang] += $item['total_' . $cabang->new_nama_cabang];
                 }
 
                 $map[$newHeader1]['total_all'] += $item['total_all'];
+                $total['grand_total'] += $item['total_all'];
 
             } else {
                 // Add new_header3 as a child of new_header1
@@ -855,13 +909,15 @@ class ReportProfitAndLossController extends Controller
 
                     foreach($list_cabang as $cabang){
                         $map[$newHeader1]['children'][]['total_' . $cabang->new_nama_cabang] +=  $item['total_' . $cabang->new_nama_cabang];
+                        $total['grand_total_' . $cabang->new_nama_cabang] += $item['total_' . $cabang->new_nama_cabang];
                     }
                     $map[$newHeader1]['total_all'] += $item['total_all'];
+                    $total['grand_total'] += $item['total_all'];
                 }
             }
         }
 
-        $data = (object) array_values($map);
+        $data = ['map' => (object) array_values($map), 'total' => $total];
 
         return $data;
     }
@@ -871,6 +927,7 @@ class ReportProfitAndLossController extends Controller
         $start_date = date('Y-m-d', strtotime($detail_data['period'] . '-1'));
         $end_date = date('Y-m-t', strtotime($detail_data['period'] . '-1'));
         $id_cabang = $detail_data['id_cabang'];
+        $total = $detail_data['total'];
 
         // Initialize a hash map to keep track of parent-child relationships
         $map = [];
@@ -949,6 +1006,7 @@ class ReportProfitAndLossController extends Controller
                     }
                 }
                 $map[$newHeader1]['total'] += $item['total'];
+                $total['grand_total'] += $item['total'];
             } else {
                 // maybe never execute
                 // Add new_header4 as a child of new_header1
@@ -958,12 +1016,13 @@ class ReportProfitAndLossController extends Controller
                         'total' => $item['total']
                     ];
                     $map[$newHeader1]['total'] += $item['total'];
+                    $total['grand_total'] += $item['total'];
                 }
             }
         }
 
         // Convert the hash map to an array
-        $data = array_values($map);
+        $data = ['map' => array_values($map), 'total' => $total];
 
         return $data;
     }
@@ -973,6 +1032,7 @@ class ReportProfitAndLossController extends Controller
         $start_date = date('Y-m-d', strtotime($detail_data['period'] . '-1'));
         $end_date = date('Y-m-t', strtotime($detail_data['period'] . '-1'));
         $list_cabang = $detail_data['list_cabang'];
+        $total = $detail_data['total'];
 
         // Initialize a hash map to keep track of parent-child relationships
         $map = [];
@@ -1096,9 +1156,11 @@ class ReportProfitAndLossController extends Controller
 
                 foreach($list_cabang as $cabang){
                     $map[$newHeader1]['total_' . $cabang->new_nama_cabang] +=  $item['total_' . $cabang->new_nama_cabang];
+                    $total['grand_total_' . $cabang->new_nama_cabang] += $item['total_' . $cabang->new_nama_cabang];
                 }
 
                 $map[$newHeader1]['total_all'] += $item['total_all'];
+                $total['grand_total'] += $item['total_all'];
             } else {
                 // maybe never execute
                 // Add new_header4 as a child of new_header1
@@ -1117,14 +1179,18 @@ class ReportProfitAndLossController extends Controller
 
                     foreach($list_cabang as $cabang){
                         $map[$newHeader1]['total_' . $cabang->new_nama_cabang] +=  $item['total_' . $cabang->new_nama_cabang];
+                        $total['grand_total_' . $cabang->new_nama_cabang] += $item['total_' . $cabang->new_nama_cabang];
                     }
 
                     $map[$newHeader1]['total_all'] += $item['total_all'];
+                    $total['grand_total'] += $item['total_all'];
                 }
             }
         }
 
-        $data = (object) array_values($map);
+        Log::debug($total);
+
+        $data = ['map' => (object) array_values($map), 'total' => $total];
 
         return $data;
     }
