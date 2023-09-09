@@ -28,11 +28,7 @@ class MaterialUsageController extends Controller
                     'catatan',
                     'is_qc',
                     'void',
-                    DB::raw('(case
-                        when jenis_pemakaian = 1 then "Penjualan"
-                        when jenis_pemakaian = 2 then "Keperluan Lab"
-                        when jenis_pemakaian = 3 then "Produksi"
-                        else "" end) as keterangan_jenis_pemakaian')
+                    'jenis_pemakaian'
                 )
                 ->leftJoin('gudang as g', 'pemakaian_header.id_gudang', '=', 'g.id_gudang')
                 ->leftJoin('cabang as c', 'pemakaian_header.id_cabang', '=', 'c.id_cabang');
@@ -107,12 +103,14 @@ class MaterialUsageController extends Controller
         $cabang = session()->get('access_cabang');
         $timbangan = DB::table('konfigurasi')->select('id_konfigurasi as id', 'nama_konfigurasi as text', 'keterangan_konfigurasi as value')
             ->where('id_kategori_konfigurasi', 5)->get();
+        $types = DB::table('setting')->where('id_cabang', 1)->where('code', 'like', 'HPP Pemakaian %')->get();
         return view('ops.materialUsage.form', [
             'data' => $data,
             'cabang' => $cabang,
             "pageTitle" => "SCA OPS | Pemakaian | " . ($id == 0 ? 'Create' : 'Edit'),
             "timbangan" => $timbangan,
             'accessQc' => in_array(session()->get('user')['id_grup_pengguna'], explode(',', $accessQC)) ? '1' : '0',
+            'types' => $types,
         ]);
     }
 

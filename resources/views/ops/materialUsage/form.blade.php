@@ -145,12 +145,14 @@
                                 <select name="jenis_pemakaian" class="form-control select2" data-validation="[NOTEMPTY]"
                                     data-validation-message="Jenis pemakaian tidak boleh kosong">
                                     <option value="">Pilih Jenis Pemakaian</option>
-                                    <option value="1" {{ $data && $data->jenis_pemakaian == 1 ? 'selected' : '' }}>
-                                        Penjualan</option>
-                                    <option value="2" {{ $data && $data->jenis_pemakaian == 2 ? 'selected' : '' }}>
-                                        Keperluan Lab</option>
-                                    <option value="3" {{ $data && $data->jenis_pemakaian == 3 ? 'selected' : '' }}>
-                                        Kerugian lain</option>
+                                    @foreach ($types as $dType)
+                                        @php
+                                            $val = str_replace('HPP Pemakaian ', '', $dType->code);
+                                        @endphp
+                                        <option value="{{ $val }}"
+                                            {{ $data && $data->jenis_pemakaian == $val ? 'selected' : '' }}>
+                                            {{ $val }}</option>
+                                    @endforeach
                                 </select>
                             </div>
                         </div>

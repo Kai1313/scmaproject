@@ -133,8 +133,8 @@
                 data: 'nama_gudang',
                 name: 'g.nama_gudang',
             }, {
-                data: 'keterangan_jenis_pemakaian',
-                name: 'keterangan_jenis_pemakaian',
+                data: 'jenis_pemakaian',
+                name: 'jenis_pemakaian',
             }, {
                 data: 'is_qc',
                 name: 'is_qc',
