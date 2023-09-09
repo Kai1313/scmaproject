@@ -453,7 +453,7 @@ class ReportProfitAndLossController extends Controller
                 SUM(IFNULL(total_summary, 0)) as total_' . $format_nama .',
                 kode_akun,
                 nama_akun,
-                master_akun.id_akun';
+                master_akun.id_akun, master_akun.posisi_debet';
 
             $data = Akun::selectRaw($select_query)
             ->leftJoin(DB::raw('(
@@ -488,6 +488,9 @@ class ReportProfitAndLossController extends Controller
             ->groupBy('new_header1', 'new_header2', 'new_header3', 'master_akun.kode_akun')
             ->get()->toArray();
 
+            Log::info("data query");
+            Log::info($data);
+
             if($urutan_cabang == 1){
                 $data_konsolidasi = $data;
                 for($i = 0; $i < count($data_konsolidasi); $i++){
@@ -500,6 +503,9 @@ class ReportProfitAndLossController extends Controller
                 }
             }
             $urutan_cabang++;
+            
+            Log::info("data konsol");
+            Log::info($data_konsolidasi);
         }
 
         for($i = 0; $i < count($data_konsolidasi); $i++){
@@ -507,6 +513,8 @@ class ReportProfitAndLossController extends Controller
         }
 
         $total = [];
+        Log::info("data end");
+        Log::info($data_konsolidasi);
 
         foreach($data_cabang as $cabang){
             $total['grand_total_' . $cabang->new_nama_cabang] = 0;
@@ -522,6 +530,8 @@ class ReportProfitAndLossController extends Controller
         ];
 
         $map_konsolidasi = $this->getMapDetailKonsolidasi($detail_data);
+        Log::info("data map");
+        Log::info($map_konsolidasi);
 
         // Convert the hash map to an array
         $data = [
@@ -1106,6 +1116,7 @@ class ReportProfitAndLossController extends Controller
                             'header' => $newHeader4,
                             'akun' => $item['id_akun'],
                             'kode_akun' => $item['kode_akun'],
+                            'posisi_debet' => $item['posisi_debet'],
                             'start_date' => $start_date,
                             'end_date' => $end_date,
                         ];

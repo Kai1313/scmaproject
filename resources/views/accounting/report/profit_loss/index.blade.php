@@ -357,7 +357,8 @@
                     body_coa = '';
                     body_total = '';
                     if (jQuery.isEmptyObject(data_coa) == false) {
-                        console.log(data_coa);
+                        console.log("data from");
+                        // console.log(data_coa);
                         if (list_cabang == null) {
                             let html_thead = '<th style="background-color: #ffffff;" width="40%"><span id="header_table">Laba Rugi ' + monthNames[month - 1] + ' ' + year + '</span></th><th style="background-color: #ffffff;" width="70%">Total</th>';
                             $('#head_row').html('');
@@ -452,7 +453,10 @@
                 listCabang.forEach(function(cabang) {
                     let format = 'total_' + cabang.new_nama_cabang;
                     if (reportType.includes('detail') && reportType.includes('awal') == false) {
-                        body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" ><a href="' + ledgerRoute + '?kode_akun=' + element.kode_akun + '&cabang=' + cabang.id_cabang + '&startdate=' + element.start_date + '&enddate=' + element.end_date + '&type=detail" target="_blank">' + formatCurr(formatNumberAsFloatFromDB(element[format].toFixed(2))) + '</a></td>';
+                        let nom = element[format].toFixed(2)
+                        let pos = element["posisi_debet"]
+                        let newNom = (pos)?nom*-1:nom;
+                        body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" ><a href="' + ledgerRoute + '?kode_akun=' + element.kode_akun + '&cabang=' + cabang.id_cabang + '&startdate=' + element.start_date + '&enddate=' + element.end_date + '&type=detail" target="_blank">' + formatCurr(formatNumberAsFloatFromDB(newNom)) + '</a></td>';
                     } else {
                         body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" >' + formatCurr(formatNumberAsFloatFromDB(element[format].toFixed(2))) + '</td>';
                     }
