@@ -1653,20 +1653,20 @@ class ClosingJournalController extends Controller
             $void = 0;
             $status = 1;
 
-            $hpp_account = Setting::where("id_cabang", $id_cabang)->where("code", "HPP Pemakaian")->first();
-            // dd($hpp_account);
-            if (!$hpp_account) {
-                // Revert post closing
-                $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
-                if ($check) {
-                    $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
-                }
+            // $hpp_account = Setting::where("id_cabang", $id_cabang)->where("code", "HPP Pemakaian")->first();
+            // // dd($hpp_account);
+            // if (!$hpp_account) {
+            //     // Revert post closing
+            //     $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
+            //     if ($check) {
+            //         $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
+            //     }
                 
-                return response()->json([
-                    "result" => FALSE,
-                    "message" => "Jurnal Closing Pemakaian Gagal. Akun Pemakaian tidak ditemukan"
-                ]);
-            }
+            //     return response()->json([
+            //         "result" => FALSE,
+            //         "message" => "Jurnal Closing Pemakaian Gagal. Akun Pemakaian tidak ditemukan"
+            //     ]);
+            // }
 
             DB::beginTransaction();
 
@@ -1675,6 +1675,22 @@ class ClosingJournalController extends Controller
             // dd($data_header);
             
             foreach ($data_header as $key => $header) {
+                $hpp_account_pemakaian = Setting::where("id_cabang", $id_cabang)->where("code", "HPP Pemakaian ".$header->jenis_pemakaian)->first();
+                $hpp_account = ($hpp_account_pemakaian)?$hpp_account_pemakaian:Setting::where("id_cabang", $id_cabang)->where("code", "HPP Pemakaian")->first();;
+                Log::info("account pemakaian");
+                Log::info($hpp_account);
+                if (!$hpp_account) {
+                    // Revert post closing
+                    $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
+                    if ($check) {
+                        $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
+                    }
+                    
+                    return response()->json([
+                        "result" => FALSE,
+                        "message" => "Jurnal Closing Pemakaian Gagal. Akun Pemakaian tidak ditemukan"
+                    ]);
+                }
                 $id_transaksi = $header->kode_pemakaian;
 
                 // Delete detail and header existing first
