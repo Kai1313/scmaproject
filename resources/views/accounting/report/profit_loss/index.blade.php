@@ -455,7 +455,7 @@
                     if (reportType.includes('detail') && reportType.includes('awal') == false) {
                         let nom = element[format].toFixed(2)
                         let pos = element["posisi_debet"]
-                        let newNom = (pos)?nom*-1:nom;
+                        let newNom = (pos != 0)?nom*-1:nom;
                         body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" ><a href="' + ledgerRoute + '?kode_akun=' + element.kode_akun + '&cabang=' + cabang.id_cabang + '&startdate=' + element.start_date + '&enddate=' + element.end_date + '&type=detail" target="_blank">' + formatCurr(formatNumberAsFloatFromDB(newNom)) + '</a></td>';
                     } else {
                         body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" >' + formatCurr(formatNumberAsFloatFromDB(element[format].toFixed(2))) + '</td>';
