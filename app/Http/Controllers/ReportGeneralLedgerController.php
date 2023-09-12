@@ -265,7 +265,7 @@ class ReportGeneralLedgerController extends Controller
                 else {
                     Log::info("posisi debet");
                     Log::info($value->posisi_debet);
-                    $posisi = $value->posisi_debet;
+                    $posisi = ($value->posisi_debet)?$value->posisi_debet:1;
                     if ($saldo_awal_current != $value->id_akun) {
                         $saldo_awal_current = $value->id_akun;
                         $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")->where("id_akun", $value->id_akun)->where("id_cabang", $value->id_cabang)->where("bulan", $month)->where("tahun", $year)->first();
@@ -283,7 +283,7 @@ class ReportGeneralLedgerController extends Controller
                         $kredit = ($data_saldo_ledgers)?$data_saldo_ledgers->kredit:0;
                         $saldo_awal_debet = $saldo_debet + $debet;
                         $saldo_awal_kredit = $saldo_kredit + $kredit;
-                        $saldo_balance = ($value->posisi_debet != 0) ? $saldo_awal_debet - $saldo_awal_kredit : $saldo_awal_kredit - $saldo_awal_debet;
+                        $saldo_balance = ($posisi != 0) ? $saldo_awal_debet - $saldo_awal_kredit : $saldo_awal_kredit - $saldo_awal_debet;
                         $result_detail[] = (object)[
                             "id_jurnal"=>$value->id_jurnal,
                             "id_cabang"=>$value->id_cabang,
@@ -299,7 +299,7 @@ class ReportGeneralLedgerController extends Controller
                             "saldo_balance"=>round($saldo_balance, 2)
                         ];
                     }
-                    $saldo_balance = ($value->posisi_debet != 0) ? $saldo_balance + $value->debet - $value->kredit : $saldo_balance + $value->kredit - $value->debet;
+                    $saldo_balance = ($posisi != 0) ? $saldo_balance + $value->debet - $value->kredit : $saldo_balance + $value->kredit - $value->debet;
                     $result_detail[] = (object)[
                         "id_jurnal"=>$value->id_jurnal,
                         "id_cabang"=>$value->id_cabang,
