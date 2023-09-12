@@ -455,7 +455,7 @@
                     if (reportType.includes('detail') && reportType.includes('awal') == false) {
                         let nom = element[format].toFixed(2)
                         let pos = element["posisi_debet"]
-                        let newNom = (pos)?nom*-1:nom;
+                        let newNom = (pos) ? nom * -1 : nom;
                         body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" ><a href="' + ledgerRoute + '?kode_akun=' + element.kode_akun + '&cabang=' + cabang.id_cabang + '&startdate=' + element.start_date + '&enddate=' + element.end_date + '&type=detail" target="_blank">' + formatCurr(formatNumberAsFloatFromDB(newNom)) + '</a></td>';
                     } else {
                         body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" >' + formatCurr(formatNumberAsFloatFromDB(element[format].toFixed(2))) + '</td>';
@@ -500,7 +500,12 @@
                 if (reportType.includes("detail") && reportType.includes('awal') == false) {
                     body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" ><a href="' + ledgerRoute + '?id_akun=' + element.akun + '&cabang=' + element.id_cabang + '&startdate=' + element.start_date + '&enddate=' + element.end_date + '&type=detail" target="_blank">' + formatCurr(formatNumberAsFloatFromDB(element.total.toFixed(2))) + '</a></td>';
                 } else {
-                    body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" >' + formatCurr(formatNumberAsFloatFromDB(element.total.toFixed(2))) + '</td>';
+                    if (element.total.toFixed(2) < 0) {
+                        fontColor = '#FA0202'
+                    } else {
+                        fontColor = '#000000'
+                    }
+                    body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px; color: ' + fontColor + '" >' + formatCurr(formatNumberAsFloatFromDB(element.total.toFixed(2))) + '</td>';
                 }
             }
             body_coa += '</tr>';
@@ -511,8 +516,13 @@
                 } else {
                     body_coa += '<tr data-tt-id="total-' + element.header + '" data-tt-parent-id="' + parent + '">';
                 }
+                if (element.total.toFixed(2) < 0) {
+                    fontColor = '#FA0202'
+                } else {
+                    fontColor = '#000000'
+                }
                 body_coa += '<td><b style="font-size:' + fontSize + 'px">Total ' + element.header + ' (Rp)</b></td>';
-                body_coa += '<td class="text-right"><b style="font-size:' + fontSize + 'px">' + formatCurr(formatNumberAsFloatFromDB(element.total.toFixed(2))) + '</b></td>';
+                body_coa += '<td class="text-right"><b style="font-size:' + fontSize + 'px; color: ' + fontColor + '" >' + formatCurr(formatNumberAsFloatFromDB(element.total.toFixed(2))) + '</b></td>';
                 body_coa += '</tr>';
             }
         });
