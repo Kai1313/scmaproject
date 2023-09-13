@@ -569,22 +569,38 @@ class ApiController extends Controller
             $check_balance_debit = 0;
             $check_balance_credit = 0;
 
-            $jurnal_detail_me = [
-                [
-                    'akun' => $akun_piutang_dagang,
-                    'debet' => round(($total + $uang_muka), 2),
-                    'credit' => 0,
-                    'keterangan' => 'Jurnal Otomatis Penjualan ' . $id_transaksi . ' - ' . $nama_pelanggan,
-                    'id_transaksi' => null,
-                ],
-                [
-                    'akun' => $akun_ppn_keluaran,
-                    'debet' => 0,
-                    'credit' => $nominal_ppn,
-                    'keterangan' => 'Jurnal Otomatis PPN Keluaran - ' . $id_transaksi . ' - ' . $nama_pelanggan,
-                    'id_transaksi' => null,
-                ],
-            ];
+            $jurnal_detail_me = [];
+
+            // cari biaya
+            $penjualan = DB::table('penjualan')->where('nama_penjualan', $id_transaksi)->first();
+
+            if(empty($penjualan)){
+                return response()->json([
+                    "result" => false,
+                    "code" => 400,
+                    "message" => "Error transaksi penjualan tidak ditemukan",
+                ], 400);
+            }
+
+            $biaya_penjualan = DB::table('penjualan_detail2')->join('master_biaya', 'master_biaya.id_biaya', 'penjualan_detail2.id_biaya')
+            ->where('id_penjualan', $penjualan->id_penjualan)
+            ->select('penjualan_detail2.*', 'master_biaya.id_akun_biaya')
+            ->get();
+            $total_biaya = 0;
+
+            if(count($biaya_penjualan) > 0){
+               foreach($biaya_penjualan as $biaya){
+                    $total_biaya += round(floatval($biaya->total), 2);
+
+                    array_push($jurnal_detail_me, [
+                        'akun' => $biaya->id_akun_biaya,
+                        'debet' => 0,
+                        'credit' => $biaya->total,
+                        'keterangan' => 'Jurnal Otomatis Biaya Penjualan - ' . $id_transaksi . ' - ' . $biaya->catatan,
+                        'id_transaksi' => null,
+                    ]);
+                }
+            }
 
             if(isset($uang_muka) && $uang_muka > 0){
                 array_push($jurnal_detail_me, [
@@ -639,6 +655,22 @@ class ApiController extends Controller
                 ]);
             }
 
+            array_push($jurnal_detail_me,
+                [
+                    'akun' => $akun_ppn_keluaran,
+                    'debet' => 0,
+                    'credit' => $nominal_ppn,
+                    'keterangan' => 'Jurnal Otomatis PPN Keluaran - ' . $id_transaksi . ' - ' . $nama_pelanggan,
+                    'id_transaksi' => null,
+                ],
+                [
+                    'akun' => $akun_piutang_dagang,
+                    'debet' => round(($total + $uang_muka + $total_biaya), 2),
+                    'credit' => 0,
+                    'keterangan' => 'Jurnal Otomatis Penjualan ' . $id_transaksi . ' - ' . $nama_pelanggan,
+                    'id_transaksi' => null,
+                ]
+            );
             // Find Header data and delete detail
             $header_me = JurnalHeader::where("id_transaksi", $id_transaksi)->where('jenis_jurnal', 'ME')->where('void', 0)->first();
 
