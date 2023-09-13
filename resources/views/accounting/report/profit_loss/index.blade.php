@@ -452,17 +452,26 @@
                 body_coa += '<td style="font-size:' + fontSize + 'px">' + element.header + ' (Rp)</td>';
                 listCabang.forEach(function(cabang) {
                     let format = 'total_' + cabang.new_nama_cabang;
-                    if (reportType.includes('detail') && reportType.includes('awal') == false) {
-                        let nom = element[format].toFixed(2)
-                        let pos = element["posisi_debet"]
-                        let newNom = (pos != 0)?nom*-1:nom;
-                        body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" ><a href="' + ledgerRoute + '?kode_akun=' + element.kode_akun + '&cabang=' + cabang.id_cabang + '&startdate=' + element.start_date + '&enddate=' + element.end_date + '&type=detail" target="_blank">' + formatCurr(formatNumberAsFloatFromDB(newNom)) + '</a></td>';
+                    if (element[format].toFixed(2) < 0) {
+                        fontColor = '#FA0202'
                     } else {
-                        body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" >' + formatCurr(formatNumberAsFloatFromDB(element[format].toFixed(2))) + '</td>';
+                        fontColor = '#000000'
+                    }
+
+                    if (reportType.includes('detail') && reportType.includes('awal') == false) {
+                        body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px; color: ' + fontColor + '" ><a href="' + ledgerRoute + '?kode_akun=' + element.kode_akun + '&cabang=' + cabang.id_cabang + '&startdate=' + element.start_date + '&enddate=' + element.end_date + '&type=detail" target="_blank">' + formatCurr(formatNumberAsFloatFromDB(element[format].toFixed(2))) + '</a></td>';
+                    } else {
+                        body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px; color: ' + fontColor + '" >' + formatCurr(formatNumberAsFloatFromDB(element[format].toFixed(2))) + '</td>';
                     }
                 });
 
-                body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" >' + formatCurr(formatNumberAsFloatFromDB(element['total_all'].toFixed(2))) + '</td>';
+                if (element['total_all'].toFixed(2) < 0) {
+                    fontColor = '#FA0202'
+                } else {
+                    fontColor = '#000000'
+                }
+
+                body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px; color: ' + fontColor + '" >' + formatCurr(formatNumberAsFloatFromDB(element['total_all'].toFixed(2))) + '</td>';
             }
             body_coa += '</tr>';
             if (typeof(element.children) != "undefined") {
@@ -475,10 +484,22 @@
                 body_coa += '<td><b style="font-size:' + fontSize + 'px">Total ' + element.header + ' (Rp)</b></td>';
                 listCabang.forEach(function(cabang) {
                     let format = 'total_' + cabang.new_nama_cabang;
-                    body_coa += '<td class="text-right"><b style="font-size:' + fontSize + 'px">' + formatCurr(formatNumberAsFloatFromDB(element[format].toFixed(2))) + '</b></td>';
+                    if (element[format].toFixed(2) < 0) {
+                        fontColor = '#FA0202'
+                    } else {
+                        fontColor = '#000000'
+                    }
+
+                    body_coa += '<td class="text-right"><b style="font-size:' + fontSize + 'px; color: ' + fontColor + '" >' + formatCurr(formatNumberAsFloatFromDB(element[format].toFixed(2))) + '</b></td>';
                 });
 
-                body_coa += '<td class="text-right"><b style="font-size:' + fontSize + 'px">' + formatCurr(formatNumberAsFloatFromDB(element['total_all'].toFixed(2))) + '</b></td>';
+                if (element['total_all'].toFixed(2) < 0) {
+                    fontColor = '#FA0202'
+                } else {
+                    fontColor = '#000000'
+                }
+
+                body_coa += '<td class="text-right"><b style="font-size:' + fontSize + 'px; color: ' + fontColor + '" >' + formatCurr(formatNumberAsFloatFromDB(element['total_all'].toFixed(2))) + '</b></td>';
                 body_coa += '</tr>';
             }
         });
