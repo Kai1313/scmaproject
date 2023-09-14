@@ -489,6 +489,7 @@ class ApiController extends Controller
             $id_cabang = $request->cabang;
             $id_slip = $request->slip;
             $detail_inventory = array_values($request->detail);
+            $biaya_penjualan = array_values($request->biaya);
 
             $data_pelanggan = DB::table("pelanggan")->where('id_pelanggan', $id_pelanggan)->first();
             $nama_pelanggan = $data_pelanggan->nama_pelanggan;
@@ -582,21 +583,17 @@ class ApiController extends Controller
                 ], 400);
             }
 
-            $biaya_penjualan = DB::table('penjualan_detail2')->join('master_biaya', 'master_biaya.id_biaya', 'penjualan_detail2.id_biaya')
-            ->where('id_penjualan', $penjualan->id_penjualan)
-            ->select('penjualan_detail2.*', 'master_biaya.id_akun_biaya')
-            ->get();
             $total_biaya = 0;
 
             if(count($biaya_penjualan) > 0){
                foreach($biaya_penjualan as $biaya){
-                    $total_biaya += round(floatval($biaya->total), 2);
+                    $total_biaya += round(floatval($biaya['total']), 2);
 
                     array_push($jurnal_detail_me, [
-                        'akun' => $biaya->id_akun_biaya,
+                        'akun' => $biaya['akun'],
                         'debet' => 0,
-                        'credit' => $biaya->total,
-                        'keterangan' => 'Jurnal Otomatis Biaya Penjualan - ' . $id_transaksi . ' - ' . $biaya->catatan,
+                        'credit' => $biaya['total'],
+                        'keterangan' => 'Jurnal Otomatis Biaya Penjualan - ' . $id_transaksi . ' - ' . date('d M Y', strtotime($biaya['tanggal'])) . ' ' . $biaya['catatan'],
                         'id_transaksi' => null,
                     ]);
                 }
