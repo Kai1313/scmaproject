@@ -12,7 +12,7 @@ class QualityControl extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'id_cabang', 'id_pembelian', 'id_barang', 'id_satuan_barang', 'jumlah_pembelian_detail', 'tanggal_qc', 'status_qc', 'reeason', 'sg_pembelian_detail', 'be_pembelian_detail', 'ph_pembelian_detail', 'warna_pembelian_detail', 'keterangan_pembelian_detail', 'bentuk_pembelian_detail',
+        'id_cabang', 'id_pembelian', 'id_barang', 'id_satuan_barang', 'jumlah_pembelian_detail', 'tanggal_qc', 'status_qc', 'reeason', 'sg_pembelian_detail', 'be_pembelian_detail', 'ph_pembelian_detail', 'warna_pembelian_detail', 'keterangan_pembelian_detail', 'bentuk_pembelian_detail', 'approval_date', 'approval_reason', 'approval_user_id', 'path', 'path2',
     ];
 
     public function cabang()
@@ -32,7 +32,7 @@ class QualityControl extends Model
 
     public function satuan()
     {
-        return $this->belongsTo(Satuan::class, 'id_satuan_barang');
+        return $this->belongsTo(SatuanBarang::class, 'id_satuan_barang');
     }
 
     public function updatePembelianDetail()
@@ -57,8 +57,31 @@ class QualityControl extends Model
             'warna_master_qr_code' => $this->warna_pembelian_detail,
             'bentuk_master_qr_code' => $this->bentuk_pembelian_detail,
             'keterangan_master_qr_code' => $this->keterangan_pembelian_detail,
+            'status_qc_qr_code' => $this->status_qc,
         ]);
 
         return true;
+    }
+
+    public function uploadfile($req, $data)
+    {
+        if ($req->image_path) {
+            $explode = explode(";base64,", $req->image_path);
+            $findExt = explode("image/", $explode[0]);
+
+            $ext = $findExt[1];
+            $name = uniqid();
+
+            $media = base64_decode($explode[1]);
+            $mainpath = $name . '.' . $ext;
+
+            $img = \Image::make($media)->fit(150);
+            $img->save('asset/' . $mainpath);
+
+            $data->path = $mainpath;
+            $data->save();
+        }
+
+        return ['status' => 'success'];
     }
 }

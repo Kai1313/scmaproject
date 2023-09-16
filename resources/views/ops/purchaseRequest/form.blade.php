@@ -70,23 +70,6 @@
 
 @section('main-section')
     <div class="content container-fluid">
-        @if (session()->has('success'))
-            <div class="alert alert-success">
-                <ul>
-                    <li>{!! session()->get('success') !!}</li>
-                </ul>
-            </div>
-        @endif
-        @if (count($errors) > 0)
-            <div class="alert alert-danger">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
         <form action="{{ route('purchase-request-save-entry', $data ? $data->purchase_request_id : 0) }}" method="post"
             class="post-action">
             <div class="box">
@@ -104,22 +87,22 @@
                                 <select name="id_cabang" class="form-control select2" data-validation="[NOTEMPTY]"
                                     data-validation-message="Cabang tidak boleh kosong">
                                     <option value="">Pilih Cabang</option>
-                                    @foreach ($cabang as $branch)
-                                        <option value="{{ $branch->id_cabang }}"
-                                            {{ old('id_cabang', $data ? $data->id_cabang : '') == $branch->id_cabang ? 'selected' : '' }}>
-                                            {{ $branch->nama_cabang }}</option>
-                                    @endforeach
+                                    @if ($data && $data->id_cabang)
+                                        <option value="{{ $data->id_cabang }}" selected>
+                                            {{ $data->cabang->kode_cabang }} - {{ $data->cabang->nama_cabang }}
+                                        </option>
+                                    @endif
                                 </select>
                             </div>
 
                             <label>Gudang <span>*</span></label>
                             <div class="form-group">
-                                <select name="id_gudang" class="form-control" data-validation="[NOTEMPTY]"
+                                <select name="id_gudang" class="form-control select2" data-validation="[NOTEMPTY]"
                                     data-validation-message="Gudang tidak boleh kosong">
                                     <option value="">Pilih Gudang</option>
                                     @if ($data && $data->id_gudang)
                                         <option value="{{ $data->id_gudang }}" selected>
-                                            {{ $data->gudang->nama_gudang }}
+                                            {{ $data->gudang->kode_gudang }} - {{ $data->gudang->nama_gudang }}
                                         </option>
                                     @endif
                                 </select>
@@ -140,17 +123,18 @@
                         <div class="col-md-4">
                             <label>Tanggal <span>*</span></label>
                             <div class="form-group">
-                                <input type="text" name="purchase_request_date"
+                                <input type="date" name="purchase_request_date"
                                     value="{{ old('purchase_request_date', $data ? $data->purchase_request_date : date('Y-m-d')) }}"
-                                    class="form-control datepicker" data-validation="[NOTEMPTY]"
-                                    data-validation-message="Tanggal tidak boleh kosong">
+                                    class="form-control" data-validation="[NOTEMPTY]"
+                                    data-validation-message="Tanggal tidak boleh kosong" max="{{ date('Y-m-d') }}">
                             </div>
-                            <label>Estimasi <span>*</span></label>
+                            <label>Deadline <span>*</span></label>
                             <div class="form-group">
-                                <input type="text" name="purchase_request_estimation_date"
+                                <input type="date" name="purchase_request_estimation_date"
                                     value="{{ old('purchase_request_estimation_date', $data ? $data->purchase_request_estimation_date : date('Y-m-d')) }}"
-                                    class=" form-control datepicker" data-validation="[NOTEMPTY]"
-                                    data-validation-message="Tanggal estimasi tidak boleh kosong">
+                                    class=" form-control" data-validation="[NOTEMPTY]"
+                                    data-validation-message="Tanggal deadline tidak boleh kosong"
+                                    min="{{ date('Y-m-d') }}">
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -169,31 +153,28 @@
                 </div>
             </div>
             <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">Detil Permintaan Barang</h3>
+                    @if (!$data || $data->approval_status == 0)
+                        <button class="btn btn-info add-entry btn-flat pull-right btn-sm" type="button">
+                            <i class="glyphicon glyphicon-plus"></i> Tambah Barang
+                        </button>
+                    @endif
+                </div>
                 <div class="box-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h4>Detil Permintaan Barang</h4>
-                        </div>
-                        <div class="col-md-6">
-                            @if (!$data || $data->approval_status == 0)
-                                <button class="btn btn-info add-entry btn-flat pull-right" type="button">
-                                    <i class="glyphicon glyphicon-plus"></i> Tambah Barang
-                                </button>
-                            @endif
-                        </div>
-                    </div>
                     <div class="table-responsive">
-                        <input type="hidden" name="details" value="{{ $data ? json_encode($data->formatdetail) : '[]' }}">
+                        <input type="hidden" name="details" value="">
                         <table id="table-detail" class="table table-bordered data-table display responsive nowrap"
                             width="100%">
                             <thead>
                                 <tr>
                                     <th>Kode Barang</th>
                                     <th>Nama Barang</th>
-                                    <th>Satuan</th>
                                     <th>Jumlah</th>
+                                    <th>Satuan</th>
                                     <th>Catatan</th>
                                     <th>Stok</th>
+                                    {{-- <th>Status</th> --}}
                                     <th style="width:150px;">Action</th>
                                 </tr>
                             </thead>
@@ -213,8 +194,6 @@
             <div class="modal-dialog modal-sm" role="document">
                 <div class="modal-content">
                     <div class="modal-body">
-                        <div class="alert alert-danger" style="display:none;" id="alertModal">
-                        </div>
                         <input type="hidden" name="index" value="0">
                         <label>Nama Barang <span>*</span></label>
                         <div class="form-group">
@@ -235,13 +214,16 @@
                         </div>
                         <label>Jumlah <span>*</span></label>
                         <div class="form-group">
-                            <input type="text" name="qty" class="form-control validate handle-number-4">
+                            <input type="text" name="qty" class="form-control validate handle-number-4"
+                                autocomplete="off">
                         </div>
-                        <label>Catatan</label>
+                        <label>Catatan <span>*</span></label>
                         <div class="form-group">
-                            <textarea name="notes" class="form-control" rows="5"></textarea>
+                            <textarea name="notes" class="form-control validate" rows="5"></textarea>
                         </div>
                         <input type="hidden" name="stok">
+                        <input type="hidden" name="closed" value="0">
+                        <input type="hidden" name="old_index">
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary cancel-entry btn-flat">Batal</button>
@@ -266,6 +248,7 @@
 
 @section('externalScripts')
     <script>
+        let branch = {!! json_encode($cabang) !!}
         let details = {!! $data ? $data->formatdetail : '[]' !!};
         let detailSelect = []
         let count = details.length
@@ -275,101 +258,80 @@
             format: 'yyyy-mm-dd',
         });
 
+        $('.select2').select2()
+
+        for (let i = 0; i < details.length; i++) {
+            details[i].index = i + 1
+        }
+
+        $('[name="details"]').val(JSON.stringify(details))
+        console.log(details)
+
         var resDataTable = $('#table-detail').DataTable({
+            paging: false,
             data: details,
             ordering: false,
             columns: [{
-                    data: 'kode_barang',
-                    name: 'kode_barang'
+                data: 'kode_barang',
+                name: 'kode_barang'
+            }, {
+                data: 'nama_barang',
+                name: 'nama_barang'
+            }, {
+                data: 'qty',
+                name: 'qty',
+                render: function(data) {
+                    return formatNumber(data, 4)
                 },
-                {
-                    data: 'nama_barang',
-                    name: 'nama_barang'
+                className: 'text-right'
+            }, {
+                data: 'nama_satuan_barang',
+                name: 'nama_satuan_barang'
+            }, {
+                data: 'notes',
+                name: 'notes'
+            }, {
+                data: 'stok',
+                name: 'stok',
+                render: function(data) {
+                    return formatNumber(data, 4)
                 },
-                {
-                    data: 'nama_satuan_barang',
-                    name: 'nama_satuan_barang'
-                },
-                {
-                    data: 'qty',
-                    name: 'qty',
-                    render: $.fn.dataTable.render.number('.', ',', 4),
-                    className: 'text-right'
-                },
-                {
-                    data: 'notes',
-                    name: 'notes'
-                },
-                {
-                    data: 'stok',
-                    name: 'stok',
-                    render: $.fn.dataTable.render.number('.', ',', 4),
-                    className: 'text-right'
-                },
-                {
-                    data: 'index',
-                    className: 'text-center',
-                    name: 'index',
-                    searchable: false,
-                    render: function(data, type, row, meta) {
-                        let btn = '<ul class="horizontal-list">';
-                        btn +=
-                            '<li><a href="javascript:void(0)" data-index="' + data +
-                            '" class="btn btn-warning btn-xs mr-1 mb-1 edit-entry"><i class="glyphicon glyphicon-pencil"></i></a></li>';
-                        btn +=
-                            '<li><a href="javascript:void(0)" data-index="' + data +
-                            '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1 delete-entry"><i class="glyphicon glyphicon-trash"></i></a></li>';
-                        btn += '</ul>';
-                        return btn;
-                    }
-                },
-            ]
+                className: 'text-right'
+            }, {
+                data: 'index',
+                className: 'text-center',
+                name: 'index',
+                searchable: false,
+                render: function(data, type, row, meta) {
+                    let btn = '<ul class="horizontal-list">';
+                    btn +=
+                        '<li><a href="javascript:void(0)" class="btn btn-warning btn-xs mr-1 mb-1 edit-entry"><i class="glyphicon glyphicon-pencil"></i></a></li>';
+                    btn +=
+                        '<li><a href="javascript:void(0)" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1 delete-entry"><i class="glyphicon glyphicon-trash"></i></a></li>';
+                    btn += '</ul>';
+                    return btn;
+                }
+            }]
         });
-
-        if ($('[name="id_cabang"]').val() == '') {
-            $('[name="id_gudang"]').prop('disabled', true)
-        }
 
         $('.tag-qty').each(function(i, v) {
             let num = $(v).text()
-            $(this).text(formatNumber(num))
+            $(this).text(formatNumber(num, 4))
         })
 
-        $('[name="id_cabang"]').change(function() {
-            let self = $('[name="id_gudang"]')
-            if ($('[name="id_cabang"]').val() == '') {
-                self.val('').prop('disabled', true).trigger('change')
-            } else {
-                self.val('').prop('disabled', false).trigger('change')
-            }
-        })
-
-        $('[name="id_cabang"]').select2().on('select2:select', function(e) {
+        $('[name="id_cabang"]').select2({
+            data: branch
+        }).on('select2:select', function(e) {
             let dataselect = e.params.data
-            getGudang(dataselect.id)
+            getGudang(dataselect)
         });
 
-        function getGudang(idCabang) {
-            $('#cover-spin').show()
-            $.ajax({
-                url: '{{ route('purchase-request-auto-werehouse') }}',
-                data: {
-                    cabang: idCabang
-                },
-                success: function(res) {
-                    $('[name="id_gudang"]').empty()
-                    $('[name="id_gudang"]').select2({
-                        data: [{
-                            'id': "",
-                            'text': 'Pilih Gudang'
-                        }, ...res.data]
-                    })
-                    $('#cover-spin').hide()
-                },
-                error: function(error) {
-                    console.log(error)
-                    $('#cover-spin').hide()
-                }
+        function getGudang(data) {
+            $('[name="id_gudang"]').select2({
+                data: [{
+                    'id': "",
+                    'text': 'Pilih Gudang'
+                }, ...data.gudang]
             })
         }
 
@@ -409,7 +371,8 @@
                         data: res.satuan
                     }).on('select2:select', function(e) {
                         let dataselect = e.params.data
-                        $('#modalEntry').find('[name="nama_satuan_barang"]').val(dataselect.text)
+                        $('#modalEntry').find('[name="nama_satuan_barang"]').val(dataselect
+                            .text)
                     });
 
                     if (res.satuan.length > 0) {
@@ -417,12 +380,12 @@
                         $('#modalEntry').find('[name="nama_satuan_barang"]').val(res.satuan[0].text)
                     }
 
-                    $('#message-stok').text(res.stok + ' ' + res.satuan_stok)
+                    $('#message-stok').text(formatNumber(res.stok, 4) + ' ' + res.satuan_stok)
                     $('#modalEntry').find('[name="stok"]').val(res.stok)
+                    $('#modalEntry').find('[name="closed"]').val(0)
                     $('#cover-spin').hide()
                 },
                 error: function(error) {
-                    console.log(error)
                     $('#cover-spin').hide()
                 }
             })
@@ -434,7 +397,6 @@
                 $(v).val('').trigger('change')
             })
 
-            $('#alertModal').text('').hide()
             statusModal = 'create'
             count += 1
             $('#modalEntry').find('[name="index"]').val(count)
@@ -456,12 +418,9 @@
             let modal = $('#modalEntry')
             let valid = validatorModal(modal.find('[name="id_barang"]').val())
             if (!valid.status) {
-                $('#alertModal').text(valid.message).show()
+                Swal.fire("Gagal tambah data. ", valid.message, 'error')
                 return false
-            } else {
-                $('#alertModal').text('').hide()
             }
-
 
             modal.find('input,select,textarea').each(function(i, v) {
                 if ($(v).hasClass('handle-number-4')) {
@@ -501,18 +460,18 @@
             })
             $('#message-stok').text('')
 
-            $('#alertModal').text('').hide()
             $('#modalEntry').modal({
                 backdrop: 'static',
                 keyboard: false
             })
-            let index = $(this).data('index')
+            let index = $(this).parents('tr').index()
             statusModal = 'edit'
-            detailSelect = details[index - 1]
+            detailSelect = details[index]
             for (select in detailSelect) {
                 if (['id_barang', 'id_satuan_barang'].includes(select)) {
                     let nameSelect = (select == 'id_barang') ? 'nama_barang' : 'nama_satuan_barang';
-                    $('[name="' + select + '"]').append('<option value="' + detailSelect[select] + '" selected>' +
+                    $('[name="' + select + '"]').append('<option value="' + detailSelect[select] +
+                        '" selected>' +
                         detailSelect[nameSelect] + '</option>')
                 }
 
@@ -546,7 +505,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     details.splice(index, 1)
-                    count -= 1
+                    count = details.length
 
                     for (let i = 0; i < details.length; i++) {
                         details[i].index = i + 1
@@ -554,6 +513,7 @@
 
                     resDataTable.clear().rows.add(details).draw()
                     $('[name="details"]').val(JSON.stringify(details))
+                    console.log(details)
                 }
             })
         })
@@ -561,19 +521,21 @@
         function validatorModal(id = 0) {
             let message = 'Lengkapi inputan yang diperlukan'
             let valid = true
+
             $('#modalEntry').find('.validate').each(function(i, v) {
                 if ($(v).val() == '') {
                     valid = false
                 }
-
-                if ($(v).prop('name') == 'id_barang') {
-                    let findItem = details.filter(p => p.id_barang == $(v).val())
-                    if (findItem.length > 0 && findItem[0].id_barang == id && statusModal == 'create') {
-                        message = "Barang sudah ada"
-                        valid = false
-                    }
-                }
             })
+
+            let id_barang = $('#modalEntry').find('[name="id_barang"]').val();
+            let notes = $('#modalEntry').find('[name="notes"]').val();
+
+            let findItem = details.filter(p => p.id_barang == id_barang && p.notes == notes)
+            if (findItem.length > 0 && findItem[0].id_barang == id && statusModal == 'create') {
+                message = "Barang sudah ada"
+                valid = false
+            }
 
             return {
                 'status': valid,

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Salesman;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -40,4 +41,9 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    function salesman()
+    {
+        return $this->belongsTo(Salesman::class, 'id_pengguna', 'pengguna_id');
+    }
 }

@@ -60,8 +60,7 @@
                         <div class="form-group">
                             <select name="id_cabang" class="form-control select2">
                                 @foreach ($cabang as $branch)
-                                    <option value="{{ $branch->id_cabang }}">{{ $branch->kode_cabang }} -
-                                        {{ $branch->nama_cabang }}
+                                    <option value="{{ $branch['id'] }}">{{ $branch['text'] }}
                                     </option>
                                 @endforeach
                             </select>
@@ -91,10 +90,11 @@
                                 <th>Estimasi</th>
                                 <th>Gudang</th>
                                 <th>Pemohon</th>
-                                <th>Catatan</th>
                                 <th>Status</th>
                                 <th>Otorisasi</th>
                                 <th>Tanggal Otorisasi</th>
+                                <th>Jumlah Terpakai</th>
+                                <th>Catatan</th>
                                 <th width="150px">Action</th>
                             </tr>
                         </thead>
@@ -126,32 +126,35 @@
                 '[name="show_void"]').is(':checked'),
             columns: [{
                 data: 'purchase_request_code',
-                name: 'purchase_request_code'
+                name: 'prh.purchase_request_code'
             }, {
                 data: 'purchase_request_date',
-                name: 'purchase_request_date'
+                name: 'prh.purchase_request_date'
             }, {
                 data: 'purchase_request_estimation_date',
-                name: 'purchase_request_estimation_date',
+                name: 'prh.purchase_request_estimation_date',
             }, {
                 data: 'nama_gudang',
-                name: 'nama_gudang',
+                name: 'gudang.nama_gudang',
             }, {
                 data: 'user',
-                name: 'user',
-            }, {
-                data: 'catatan',
-                name: 'catatan'
+                name: 'user.nama_pengguna',
             }, {
                 data: 'approval_status',
-                name: 'approval_status',
+                name: 'prh.approval_status',
                 className: 'text-center'
             }, {
                 data: 'approval_user',
-                name: 'approval_user',
+                name: 'approval.nama_pengguna',
             }, {
                 data: 'approval_date',
-                name: 'approval_date',
+                name: 'prh.approval_date',
+            }, {
+                data: 'closed',
+                name: 'closed'
+            }, {
+                data: 'catatan',
+                name: 'prh.catatan'
             }, {
                 data: 'action',
                 name: 'action',

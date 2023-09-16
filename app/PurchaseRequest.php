@@ -41,57 +41,78 @@ class PurchaseRequest extends Model
     public function formatdetail()
     {
         $arrayCabang = [
-            '1' => [1, 2, 3, 4],
-            '2' => [5, 7, 8],
+            '1' => [1],
+            '2' => [5],
         ];
 
         $gudang = $arrayCabang[$this->id_cabang];
-
         return $this->hasMany(PurchaseRequestDetail::class, 'purchase_request_id')
-            ->select('index', 'purchase_request_detail.id_barang', 'nama_barang', 'kode_barang', 'purchase_request_detail.id_satuan_barang', 'nama_satuan_barang', 'qty', 'notes',
-                DB::raw('(case when sum(debit_kartu_stok) - sum(kredit_kartu_stok) > 0 then sum(debit_kartu_stok) - sum(kredit_kartu_stok) else 0 end) as stok'))
+            ->select(
+                'index as old_index',
+                'index',
+                'purchase_request_detail.id_barang',
+                'nama_barang',
+                'kode_barang',
+                'purchase_request_detail.id_satuan_barang',
+                'nama_satuan_barang',
+                'qty',
+                'notes',
+                'approval_notes',
+                'approval_status',
+                'closed',
+                DB::raw('(case when closed = 0 then "Open" else "Closed" end) as status_data'),
+                DB::raw('(case
+                    when sum(sisa_master_qr_code) > 0 and barang.id_kategori_barang <> 7
+                    then sum(sisa_master_qr_code)
+                    else 0
+                end) as stok')
+            )
             ->leftJoin('barang', 'purchase_request_detail.id_barang', '=', 'barang.id_barang')
             ->leftJoin('satuan_barang', 'purchase_request_detail.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
-            ->leftJoin('kartu_stok', function ($kartuStok) use ($gudang) {
-                $kartuStok->on('purchase_request_detail.id_barang', '=', 'kartu_stok.id_barang')
-                    ->whereIn('kartu_stok.id_gudang', $gudang);
-            })->groupBy('id_barang');
+            ->leftJoin('master_qr_code', function ($kartuStok) use ($gudang) {
+                $kartuStok->on('purchase_request_detail.id_barang', '=', 'master_qr_code.id_barang')
+                    ->whereIn('master_qr_code.id_gudang', $gudang);
+            })->groupBy('id_barang', 'notes')->orderBy('index', 'asc');
     }
 
     public function savedetails($details)
     {
         $detail = json_decode($details);
-        $ids = array_column($detail, 'index');
-
-        DB::table('purchase_request_detail')
-            ->where('purchase_request_id', $this->purchase_request_id)
-            ->whereNotIn('index', $ids)->delete();
-
+        $array = [];
         foreach ($detail as $data) {
-            $check = DB::table('purchase_request_detail')
-                ->where('purchase_request_id', $this->purchase_request_id)
-                ->where('index', $data->index)->first();
-            if ($check) {
-                DB::table('purchase_request_detail')
+            if ($data->old_index != '') {
+                $check = DB::table('purchase_request_detail')
                     ->where('purchase_request_id', $this->purchase_request_id)
-                    ->where('index', $data->index)
-                    ->update([
-                        'id_barang' => $data->id_barang,
-                        'id_satuan_barang' => $data->id_satuan_barang,
-                        'qty' => normalizeNumber($data->qty),
-                        'notes' => $data->notes,
-                    ]);
+                    ->where('index', $data->old_index)->first();
+                if ($check) {
+                    $check->index = $data->index;
+                    $check->id_barang = $data->id_barang;
+                    $check->id_satuan_barang = $data->id_satuan_barang;
+                    $check->qty = $data->qty;
+                    $check->notes = $data->notes;
+                    $array[] = $check;
+                }
             } else {
-                DB::table('purchase_request_detail')->insert([
-                    'index' => $data->index,
-                    'id_barang' => $data->id_barang,
-                    'id_satuan_barang' => $data->id_satuan_barang,
-                    'qty' => normalizeNumber($data->qty),
-                    'notes' => $data->notes,
-                    'purchase_request_id' => $this->purchase_request_id,
-                    'closed' => '0',
-                ]);
+                $data->purchase_request_id = $this->purchase_request_id;
+                $array[] = $data;
             }
+        }
+
+        DB::table('purchase_request_detail')->where('purchase_request_id', $this->purchase_request_id)->delete();
+        foreach ($array as $a) {
+            DB::table('purchase_request_detail')->insert([
+                'purchase_request_id' => $a->purchase_request_id,
+                'index' => $a->index,
+                'id_barang' => $a->id_barang,
+                'id_satuan_barang' => $a->id_satuan_barang,
+                'qty' => $a->qty,
+                'notes' => $a->notes,
+                'approval_status' => isset($a->approval_status) ? $a->approval_status : 0,
+                'approval_user_id' => isset($a->approval_user_id) ? $a->approval_user_id : null,
+                'approval_date' => isset($a->approval_date) ? $a->approval_date : null,
+                'closed' => $a->closed,
+                'approval_notes' => isset($a->approval_notes) ? $a->approval_notes : null,
+            ]);
         }
 
         return ['status' => 'success'];
@@ -109,5 +130,29 @@ class PurchaseRequest extends Model
         }
 
         return $string . '.' . $nol . $check;
+    }
+
+    public function saveStatusDetail()
+    {
+        $detail = DB::table('purchase_request_detail')
+            ->where('purchase_request_id', $this->purchase_request_id)->get();
+
+        foreach ($detail as $data) {
+            $check = DB::table('purchase_request_detail')
+                ->where('purchase_request_id', $this->purchase_request_id)
+                ->where('index', $data->index)->first();
+            if ($check) {
+                DB::table('purchase_request_detail')
+                    ->where('purchase_request_id', $this->purchase_request_id)
+                    ->where('index', $data->index)
+                    ->update([
+                        'approval_status' => $this->approval_status,
+                        'approval_user_id' => $this->approval_user_id,
+                        'approval_date' => $this->approval_date,
+                    ]);
+            }
+        }
+
+        return ['status' => 'success'];
     }
 }

@@ -10,6 +10,7 @@ use App\Models\Master\Akun;
 use App\Models\Master\Cabang;
 use App\Models\Master\Setting;
 use App\Models\Master\Slip;
+use App\Models\Transaction\StokMinimalHitung;
 use App\Models\User;
 use App\Models\UserToken;
 use App\TransactionBalance;
@@ -27,7 +28,6 @@ class ApiController extends Controller
 
         $user = User::where('id_pengguna', $user_id)->first();
         $token = UserToken::where('id_pengguna', $user_id)->where('status_token_pengguna', 1)->whereRaw("waktu_habis_token_pengguna > STR_TO_DATE(?, '%Y-%m-%d %H:%i:%s')", Carbon::now()->format('Y-m-d H:i:s'))->first();
-
         if ($token) {
             $token = $user->createToken('Token Passport User ' . Carbon::now()->format('Y-m-d H:i:s') . '[' . $user->id_pengguna . '] ' . $user->nama_pengguna)->accessToken;
             return response()->json([
@@ -280,7 +280,7 @@ class ApiController extends Controller
 
             $data_slip = Slip::find($id_slip);
 
-            if(empty($data_slip)){
+            if (empty($data_slip)) {
                 $data_akun_hutang_dagang = DB::table('setting')->where('code', 'Hutang Dagang')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
                 if (empty($data_akun_hutang_dagang)) {
                     return response()->json([
@@ -288,21 +288,21 @@ class ApiController extends Controller
                         "code" => 400,
                         "message" => "Error, please use slip Kas Keluar, Bank Keluar, or set up Hutang Dagang setting first",
                     ], 400);
-                }else{
+                } else {
                     $data_akun = Akun::find($data_akun_hutang_dagang->value2);
-                    if(empty($data_akun)){
+                    if (empty($data_akun)) {
                         return response()->json([
                             "result" => false,
                             "code" => 400,
                             "message" => "Error, can not find id_akun in Hutang Dagang setting",
                         ], 400);
-                    }else{
+                    } else {
                         $jurnal_type = 'ME';
                         $jurnal_type_detail = 'Memorial';
                         $akun_slip = $data_akun->id_akun;
                     }
                 }
-            }else{
+            } else {
                 if ($data_slip->jenis_slip == 0) {
                     $jurnal_type = 'KK';
                     $jurnal_type_detail = 'Kas Keluar';
@@ -453,7 +453,7 @@ class ApiController extends Controller
                 return response()->json([
                     "result" => false,
                     "code" => 400,
-                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance. credit: " . $check_balance_credit . ", debet : " . $check_balance_debit
+                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance. credit: " . $check_balance_credit . ", debet : " . $check_balance_debit,
                 ], 400);
             }
 
@@ -496,14 +496,14 @@ class ApiController extends Controller
             $catatan_me = 'Journal Otomatis Penjualan - ' . $id_transaksi . ' - ' . $nama_pelanggan;
 
             $array_inventory = [];
-            foreach($detail_inventory as $detail_inv){
-                if(isset($array_inventory[$detail_inv['id_barang']])){
+            foreach ($detail_inventory as $detail_inv) {
+                if (isset($array_inventory[$detail_inv['id_barang']])) {
                     $array_inventory[$detail_inv['id_barang']]['total'] += $detail_inv['total'];
-                }else{
+                } else {
                     $array_inventory[$detail_inv['id_barang']] = [
                         'id_barang' => $detail_inv['id_barang'],
                         'nama_barang' => $detail_inv['nama_barang'],
-                        'total' => $detail_inv['total']
+                        'total' => $detail_inv['total'],
                     ];
                 }
             }
@@ -599,7 +599,7 @@ class ApiController extends Controller
                 }
             }
 
-            if(isset($uang_muka) && $uang_muka > 0){
+            if (isset($uang_muka) && $uang_muka > 0) {
                 array_push($jurnal_detail_me, [
                     'akun' => $akun_uang_muka_penjualan,
                     'debet' => $uang_muka,
@@ -608,7 +608,7 @@ class ApiController extends Controller
                     'id_transaksi' => null,
                 ]);
 
-                array_push($jurnal_detail_me,[
+                array_push($jurnal_detail_me, [
                     'akun' => $akun_piutang_dagang,
                     'debet' => 0,
                     'credit' => $uang_muka,
@@ -619,22 +619,22 @@ class ApiController extends Controller
 
             foreach ($array_inventory as $d_inv) {
                 $barang = Barang::find($d_inv['id_barang']);
-                if($id_cabang == 1){
+                if ($id_cabang == 1) {
                     $akun_penjualan_barang = $barang->id_akun_penjualan;
-                }else{
+                } else {
                     $format_akun = 'id_akun_penjualan' . $id_cabang;
                     $akun_penjualan_barang = $barang->$format_akun;
                 }
 
-                if($akun_penjualan_barang == null){
+                if ($akun_penjualan_barang == null) {
                     DB::rollback();
                     return response()->json([
                         "result" => false,
                         "message" => "Error when store Jurnal data on table detail. Akun Penjualan Barang " . $barang->kode_barang . ' - ' . $barang->nama_barang . ' can not null.',
                     ]);
-                }else{
+                } else {
                     $data_akun_penjualan_barang = Akun::find($akun_penjualan_barang);
-                    if(empty($data_akun_penjualan_barang)){
+                    if (empty($data_akun_penjualan_barang)) {
                         DB::rollback();
                         return response()->json([
                             "result" => false,
@@ -748,7 +748,7 @@ class ApiController extends Controller
                 return response()->json([
                     "result" => false,
                     "code" => 400,
-                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance. credit: " . $check_balance_credit . ", debet : " . $check_balance_debit
+                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance. credit: " . $check_balance_credit . ", debet : " . $check_balance_debit,
                 ], 400);
             }
 
@@ -972,7 +972,7 @@ class ApiController extends Controller
             $nominal_ppn = round(floatval($request->ppn), 2);
             $discount = round(floatval($request->discount), 2);
 
-            if(isset($discount) && $discount > 0){
+            if (isset($discount) && $discount > 0) {
                 $data_akun_potongan_pembelian = DB::table('setting')->where('code', 'Potongan Pembelian')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
                 if (empty($data_akun_potongan_pembelian)) {
                     return response()->json([
@@ -1006,7 +1006,7 @@ class ApiController extends Controller
                 ],
             ];
 
-            if(isset($discount) && $discount > 0){
+            if (isset($discount) && $discount > 0) {
                 array_push($jurnal_detail_me, [
                     'akun' => $akun_potongan_pembelian,
                     'debet' => 0,
@@ -1016,7 +1016,7 @@ class ApiController extends Controller
                 ]);
             }
 
-            if(isset($uang_muka) && $uang_muka > 0){
+            if (isset($uang_muka) && $uang_muka > 0) {
                 array_push($jurnal_detail_me, [
                     'akun' => $akun_uang_muka_pembelian,
                     'debet' => 0,
@@ -1369,22 +1369,22 @@ class ApiController extends Controller
 
             foreach ($detail_inventory as $d_inv) {
                 $barang = Barang::find($d_inv['id_barang']);
-                if($id_cabang == 1){
+                if ($id_cabang == 1) {
                     $akun_retur_penjualan_barang = $barang->id_akun_retur_penjualan;
-                }else{
+                } else {
                     $format_akun = 'id_akun_retur_penjualan' . $id_cabang;
                     $akun_retur_penjualan_barang = $barang->$format_akun;
                 }
 
-                if($akun_retur_penjualan_barang == null){
+                if ($akun_retur_penjualan_barang == null) {
                     DB::rollback();
                     return response()->json([
                         "result" => false,
                         "message" => "Error when store Jurnal data on table detail. Akun Retur Penjualan Barang " . $barang->kode_barang . ' - ' . $barang->nama_barang . ' can not null.',
                     ]);
-                }else{
+                } else {
                     $data_akun_penjualan_barang = Akun::find($akun_retur_penjualan_barang);
-                    if(empty($data_akun_penjualan_barang)){
+                    if (empty($data_akun_penjualan_barang)) {
                         DB::rollback();
                         return response()->json([
                             "result" => false,
@@ -1963,7 +1963,8 @@ class ApiController extends Controller
         }
     }
 
-    public function voidJournalOtomatis(Request $request){
+    public function voidJournalOtomatis(Request $request)
+    {
         try {
             // init data
             // header
@@ -1974,28 +1975,28 @@ class ApiController extends Controller
             $header_me = JurnalHeader::where("id_transaksi", $id_transaksi)->where('jenis_jurnal', 'ME')->where('void', 0)->first();
             $header_pelunasan = JurnalHeader::where("id_transaksi", $id_transaksi)->where('jenis_jurnal', '<>', 'ME')->where('void', 0)->first();
 
-            if(empty($header_me)){
+            if (empty($header_me)) {
                 DB::rollback();
                 return response()->json([
                     "result" => false,
                     "code" => 400,
-                    "message" => "Error when void Jurnal data. Journal Memorial transaction " . $id_transaksi . " not found"
+                    "message" => "Error when void Jurnal data. Journal Memorial transaction " . $id_transaksi . " not found",
                 ], 400);
             }
 
-            if(!empty($header_pelunasan)){
+            if (!empty($header_pelunasan)) {
                 $header_pelunasan = JurnalDetail::join('jurnal_header', 'jurnal_header.id_jurnal', 'jurnal_detail.id_jurnal')
-                                    ->where("jurnal_detail.id_transaksi", $id_transaksi)
-                                    ->where('jurnal_header.jenis_jurnal', '<>', 'ME')
-                                    ->where('jurnal_header.void', 0)
-                                    ->first();
+                    ->where("jurnal_detail.id_transaksi", $id_transaksi)
+                    ->where('jurnal_header.jenis_jurnal', '<>', 'ME')
+                    ->where('jurnal_header.void', 0)
+                    ->first();
 
-                if(!empty($header_pelunasan)){
+                if (!empty($header_pelunasan)) {
                     DB::rollback();
                     return response()->json([
                         "result" => false,
                         "code" => 400,
-                        "message" => "Error when void Jurnal data. Transaction " . $id_transaksi . " already paid"
+                        "message" => "Error when void Jurnal data. Transaction " . $id_transaksi . " already paid",
                     ], 400);
                 }
             }
@@ -2011,7 +2012,7 @@ class ApiController extends Controller
                 return response()->json([
                     "result" => false,
                     "code" => 400,
-                    "message" => "Error when void Jurnal data on table header"
+                    "message" => "Error when void Jurnal data on table header",
                 ], 400);
             }
 
@@ -2021,7 +2022,6 @@ class ApiController extends Controller
                 "code" => 200,
                 "message" => "Successfully void Jurnal data",
             ], 200);
-
         } catch (\Exception $e) {
             DB::rollback();
             Log::info("Error when void Jurnal data");
@@ -2030,7 +2030,7 @@ class ApiController extends Controller
                 "result" => false,
                 "code" => 400,
                 "message" => "Error when void Jurnal data",
-                "exception" => $e
+                "exception" => $e,
             ], 400);
         }
     }
@@ -2178,8 +2178,11 @@ class ApiController extends Controller
 
     public function transactionBalance(Request $req)
     {
-        //param : tipe_transaksi,id_transaksi,tanggal,ref_id,catatan,target(supplier/customer),dpp,ppn,uang_muka,biaya,payment_status
-        $data = TransactionBalance::where('id_transaksi', $req->id_transaksi)->where('tipe_transaksi', $req->tipe_transaksi)->first();
+        //param : tipe_transaksi,id_transaksi,tanggal,ref_id,catatan,target(supplier/customer),dpp,ppn,uang_muka,biaya,payment_status,discount,branch_id
+        $data = TransactionBalance::where('id_cabang', $req->id_cabang)
+            ->where('id_transaksi', $req->id_transaksi)
+            ->where('tipe_transaksi', $req->tipe_transaksi)
+            ->first();
         try {
             DB::beginTransaction();
 
@@ -2196,6 +2199,8 @@ class ApiController extends Controller
                 'uang_muka' => handleNull($req->uang_muka),
                 'biaya' => handleNull($req->biaya),
                 'total' => $total,
+                'discount' => isset($req->discount) ? handleNull($req->discount) : 0,
+                'id_cabang' => $req->id_cabang,
             ];
 
             $newTipePembayaran = $req->tipe_pembayaran;
@@ -2209,18 +2214,9 @@ class ApiController extends Controller
                 $array['bayar'] = $payment;
                 $array['sisa'] = $remaining;
             } else {
-                $oldTipePembayaran = $data->tipe_pembayaran;
-                $payment = $newTipePembayaran == '1' ? $total : ($oldTipePembayaran == $newTipePembayaran ? $data->bayar : 0);
+                $payment = $data->bayar;
                 $remaining = $newTipePembayaran == '1' ? 0 : ($total - $payment);
-                if ($oldTipePembayaran == $newTipePembayaran) {
-                    $array['sisa'] = $remaining;
-                    if ($newTipePembayaran == '1') {
-                        $array['bayar'] = $payment;
-                    }
-                } else {
-                    $array['bayar'] = $payment;
-                    $array['sisa'] = $remaining;
-                }
+                $array['sisa'] = $remaining;
             }
 
             $data->fill($array);
@@ -2248,11 +2244,11 @@ class ApiController extends Controller
             $pemakaian = $data['data_pemakaian']; // Diisi dengan data pemakaian
             $hasil_produksi = $data['data_hasil']; // Diisi dengan data hasil produksi
             $biaya_listrik = $data['biaya_listrik']; // Diisi dengan data biaya listrik
-            $biaya_operator =  $data['biaya_operator']; // Diisi dengan data biaya operator
+            $biaya_operator = $data['biaya_operator']; // Diisi dengan data biaya operator
             $kwh_listrik = $data['kwh_listrik']; // Diisi dengan data biaya listrik
             $daya_mesin = $data['daya_mesin']; // Diisi dengan data daya mesin
-            $tenaga_kerja =  $data['tenaga_kerja']; // Diisi dengan data biaya operator
-            $jumlah_pegawai =  $data['jumlah_pegawai']; // Diisi dengan data biaya operator
+            $tenaga_kerja = $data['tenaga_kerja']; // Diisi dengan data biaya operator
+            $jumlah_pegawai = $data['jumlah_pegawai']; // Diisi dengan data biaya operator
             $nominal_listrik = $data['nominal_listrik']; // Diisi dengan data nominal listrik (setting)
             $nominal_gaji = $data['nominal_gaji']; // Diisi dengan data nominal gaji (setting)
             $journalDate = date('Y-m-d', strtotime($data['tanggal_hasil_produksi']));
@@ -2273,7 +2269,7 @@ class ApiController extends Controller
 
             $jurnal_header = JurnalHeader::where("id_transaksi", $id_transaksi)->first();
 
-            if(!empty($jurnal_header) && $void == 1){
+            if (!empty($jurnal_header) && $void == 1) {
                 $jurnal_header->void = $void;
                 $jurnal_header->user_void = $userRecord;
                 $jurnal_header->dt_void = date('Y-m-d h:i:s');
@@ -2281,9 +2277,9 @@ class ApiController extends Controller
                 if (!$jurnal_header->save()) {
                     DB::rollback();
                     Log::error("Error when update journal header on storeHppJournal");
-                    return FALSE;
+                    return false;
                 }
-            }else{
+            } else {
                 // Posting jurnal
                 // Header
                 $header = ($jurnal_header) ? $jurnal_header : new JurnalHeader;
@@ -2295,7 +2291,7 @@ class ApiController extends Controller
                 $header->tanggal_jurnal = $journalDate;
                 $header->user_created = $userRecord;
                 $header->user_modified = $userModified;
-                if(empty($jurnal_header)){
+                if (empty($jurnal_header)) {
                     $header->dt_created = $dateRecord;
                 }
                 $header->dt_modified = $dateRecord;
@@ -2303,10 +2299,10 @@ class ApiController extends Controller
                 if (!$header->save()) {
                     DB::rollback();
                     Log::error("Error when storing journal header on storeHppJournal");
-                    return FALSE;
+                    return false;
                 }
 
-                if(!empty($jurnal_header)){
+                if (!empty($jurnal_header)) {
                     JurnalDetail::where('id_jurnal', $jurnal_header->id_jurnal)->delete();
                 }
 
@@ -2320,8 +2316,8 @@ class ApiController extends Controller
                     $detail->id_jurnal = $header->id_jurnal;
                     $detail->index = $index;
                     $detail->id_akun = $val['akun'];
-                    $detail->keterangan = "PBH - ". $val['notes'];
-                    $detail->id_transaksi = NULL;
+                    $detail->keterangan = "PBH - " . $val['notes'];
+                    $detail->id_transaksi = null;
                     $detail->debet = floatval($val['debet']);
                     $detail->credit = floatval($val['kredit']);
                     $detail->user_created = $userRecord;
@@ -2332,7 +2328,7 @@ class ApiController extends Controller
                     if (!$detail->save()) {
                         DB::rollback();
                         Log::error("Error when storing journal detail on storeHppJournal");
-                        return FALSE;
+                        return false;
                     }
                     $total_debet += $detail->debet;
                     $total_credit += $detail->credit;
@@ -2344,7 +2340,7 @@ class ApiController extends Controller
                 $detail->id_jurnal = $header->id_jurnal;
                 $detail->index = $index;
                 $detail->id_akun = $get_akun_biaya_listrik->value2;
-                $detail->keterangan = "Biaya Listrik - " . $daya_mesin . ' Watt - ' . $kwh_listrik . ' kWh - WPH '. $nominal_listrik;
+                $detail->keterangan = "Biaya Listrik - " . $daya_mesin . ' Watt - ' . $kwh_listrik . ' kWh - WPH ' . $nominal_listrik;
                 $detail->id_transaksi = "Biaya Listrik";
                 $detail->debet = 0;
                 $detail->credit = floatval($biaya_listrik);
@@ -2356,12 +2352,11 @@ class ApiController extends Controller
                 if (!$detail->save()) {
                     DB::rollback();
                     Log::error("Error when storing journal detail on storeHppJournal");
-                    return FALSE;
+                    return false;
                 }
                 $total_debet += $detail->debet;
                 $total_credit += $detail->credit;
                 $index++;
-
 
                 // Detail Biaya Operator
                 $detail = new JurnalDetail();
@@ -2380,7 +2375,7 @@ class ApiController extends Controller
                 if (!$detail->save()) {
                     DB::rollback();
                     Log::error("Error when storing journal detail on storeHppJournal");
-                    return FALSE;
+                    return false;
                 }
                 $total_debet += $detail->debet;
                 $total_credit += $detail->credit;
@@ -2392,7 +2387,7 @@ class ApiController extends Controller
                     $detail->id_jurnal = $header->id_jurnal;
                     $detail->index = $index;
                     $detail->id_akun = $val['akun'];
-                    $detail->keterangan = "HP - ". $val['notes'];
+                    $detail->keterangan = "HP - " . $val['notes'];
                     $detail->id_transaksi = $val['id_barang'];
                     $detail->debet = floatval($val['debet']);
                     $detail->credit = floatval($val['kredit']);
@@ -2404,7 +2399,7 @@ class ApiController extends Controller
                     if (!$detail->save()) {
                         DB::rollback();
                         Log::error("Error when storing journal detail on storeHppJournal");
-                        return FALSE;
+                        return false;
                     }
                     $total_debet += $detail->debet;
                     $total_credit += $detail->credit;
@@ -2412,7 +2407,7 @@ class ApiController extends Controller
                 }
 
                 // pembulatan
-                if($total_debet != $total_credit){
+                if ($total_debet != $total_credit) {
                     $selisih = $total_credit - $total_debet;
                     // Detail Biaya Listrik
                     $detail = new JurnalDetail();
@@ -2421,10 +2416,10 @@ class ApiController extends Controller
                     $detail->id_akun = $get_akun_pembulatan->value2;
                     $detail->keterangan = "Pembulatan Produksi";
                     $detail->id_transaksi = "Pembulatan";
-                    if($selisih > 0){
+                    if ($selisih > 0) {
                         $detail->debet = floatval($selisih);
                         $detail->credit = 0;
-                    }else{
+                    } else {
                         $detail->debet = 0;
                         $detail->credit = floatval(abs($selisih));
                     }
@@ -2436,31 +2431,31 @@ class ApiController extends Controller
                     if (!$detail->save()) {
                         DB::rollback();
                         Log::error("Error when storing journal detail on storeHppJournal");
-                        return FALSE;
+                        return false;
                     }
                 }
             }
 
             DB::commit();
-            return TRUE;
-        }
-        catch (\Exception $e) {
+            return true;
+        } catch (\Exception $e) {
             DB::rollback();
             $message = "Error when storing HPP Journal";
             Log::error($message);
             Log::error($e);
-            return FALSE;
+            return false;
         }
     }
 
-    public function productionSupplies($production_id){
+    public function productionSupplies($production_id)
+    {
         // cari data produksi input
         $data_production_supplies = DB::table("produksi_detail")
-                                    ->join('produksi', 'produksi.id_produksi', 'produksi_detail.id_produksi')
-                                    ->join('barang', 'barang.id_barang', 'produksi_detail.id_barang')
-                                    ->join('master_qr_code', 'master_qr_code.kode_batang_master_qr_code', 'produksi_detail.kode_batang_lama_produksi_detail')
-                                    ->leftJoin('satuan_barang', 'satuan_barang.id_satuan_barang', 'produksi_detail.id_satuan_barang')
-                                    ->selectRaw('produksi_detail.id_barang,
+            ->join('produksi', 'produksi.id_produksi', 'produksi_detail.id_produksi')
+            ->join('barang', 'barang.id_barang', 'produksi_detail.id_barang')
+            ->join('master_qr_code', 'master_qr_code.kode_batang_master_qr_code', 'produksi_detail.kode_batang_lama_produksi_detail')
+            ->leftJoin('satuan_barang', 'satuan_barang.id_satuan_barang', 'produksi_detail.id_satuan_barang')
+            ->selectRaw('produksi_detail.id_barang,
                                     barang.nama_barang,
                                     produksi.nama_produksi,
                                     IFNULL(satuan_barang.nama_satuan_barang, "") as nama_satuan,
@@ -2471,12 +2466,12 @@ class ApiController extends Controller
                                     ROUND(IFNULL(SUM(produksi_detail.kredit_produksi_detail * master_qr_code.listrik_master_qr_code), 0), 2) as listrik,
                                     ROUND(IFNULL(SUM(produksi_detail.kredit_produksi_detail * master_qr_code.pegawai_master_qr_code), 0), 2) as pegawai,
                                     barang.id_akun as id_akun')
-                                    ->where('produksi_detail.id_produksi', $production_id)
-                                    ->groupBy('produksi_detail.id_barang')
-                                    ->orderBy('produksi_detail.id_barang', 'ASC')
-                                    ->get();
+            ->where('produksi_detail.id_produksi', $production_id)
+            ->groupBy('produksi_detail.id_barang')
+            ->orderBy('produksi_detail.id_barang', 'ASC')
+            ->get();
 
-        if(count($data_production_supplies) < 1){
+        if (count($data_production_supplies) < 1) {
             return false;
         }
 
@@ -2485,7 +2480,7 @@ class ApiController extends Controller
         $total_supplies = 0;
 
         // input persediaan dan jumlahkan total persediaan
-        foreach($data_production_supplies as $production){
+        foreach ($data_production_supplies as $production) {
             $total = ($production->beli + $production->biaya + $production->produksi + $production->listrik + $production->pegawai);
             $total_supplies += $total;
 
@@ -2500,14 +2495,15 @@ class ApiController extends Controller
         // data yang direturn
         $data = [
             'data_supplies' => $data_supplies,
-            'total_supplies' => $total_supplies
+            'total_supplies' => $total_supplies,
         ];
         return $data;
     }
 
-    public function productionCost($production_id, $id_cabang){
+    public function productionCost($production_id, $id_cabang)
+    {
         $hasil_produksi = DB::table('produksi')->where('nomor_referensi_produksi', $production_id)->first();
-        if(empty($hasil_produksi)){
+        if (empty($hasil_produksi)) {
             return false;
         }
 
@@ -2515,14 +2511,13 @@ class ApiController extends Controller
 
         // cari beban produksi dari produksi yang diinput
         $data_production_cost = DB::table("beban_produksi")
-                                ->join('produksi', 'produksi.id_produksi', 'beban_produksi.id_produksi')
-                                ->join('master_mesin', 'master_mesin.id_mesin', 'produksi.id_mesin')
-                                ->where('beban_produksi.id_produksi', $id_hasil_produksi)
-                                ->select('beban_produksi.id_produksi', 'beban_produksi.kwh_beban_produksi', 'beban_produksi.tenaga_kerja_beban_produksi', 'beban_produksi.listrik_beban_produksi', 'master_mesin.daya')
-                                ->first();
+            ->join('produksi', 'produksi.id_produksi', 'beban_produksi.id_produksi')
+            ->join('master_mesin', 'master_mesin.id_mesin', 'produksi.id_mesin')
+            ->where('beban_produksi.id_produksi', $id_hasil_produksi)
+            ->select('beban_produksi.id_produksi', 'beban_produksi.kwh_beban_produksi', 'beban_produksi.tenaga_kerja_beban_produksi', 'beban_produksi.listrik_beban_produksi', 'master_mesin.daya')
+            ->first();
 
-
-        if(empty($data_production_cost)){
+        if (empty($data_production_cost)) {
             return false;
         }
 
@@ -2535,16 +2530,16 @@ class ApiController extends Controller
 
         // cari nominal biaya listrik dan gaji dari table setting
         $setting_nominal_listrik = DB::table('setting')
-                                    ->where('code', 'Nominal Biaya Listrik')
-                                    ->where('tipe', 1)
-                                    ->where('id_cabang', $id_cabang)
-                                    ->first();
+            ->where('code', 'Nominal Biaya Listrik')
+            ->where('tipe', 1)
+            ->where('id_cabang', $id_cabang)
+            ->first();
 
         $setting_nominal_gaji = DB::table('setting')
-                                    ->where('code', 'Nominal Biaya Gaji')
-                                    ->where('tipe', 1)
-                                    ->where('id_cabang', $id_cabang)
-                                    ->first();
+            ->where('code', 'Nominal Biaya Gaji')
+            ->where('tipe', 1)
+            ->where('id_cabang', $id_cabang)
+            ->first();
 
         // init nominal listrik dan gaji
         $nominal_listrik = $setting_nominal_listrik->value2;
@@ -2569,71 +2564,69 @@ class ApiController extends Controller
             'tenaga_kerja' => $listrik_pegawai,
             'jumlah_pegawai' => $jumlah_pegawai,
             'nominal_listrik' => $nominal_listrik,
-            'nominal_gaji' => $nominal_gaji
+            'nominal_gaji' => $nominal_gaji,
         ];
 
         return $data;
-
     }
 
-    public function productionResults($production_id, $total_supplies, $biaya_listrik, $biaya_operator){
+    public function productionResults($production_id, $total_supplies, $biaya_listrik, $biaya_operator)
+    {
         // cari hasil produksi dari input produksi yang berlangsung
         $data_production_results = DB::table("produksi_detail")
-                                    ->join('produksi', 'produksi.id_produksi', 'produksi_detail.id_produksi')
-                                    ->join('barang', 'barang.id_barang', 'produksi_detail.id_barang')
-                                    ->join('master_qr_code', 'master_qr_code.kode_batang_master_qr_code', 'produksi_detail.kode_batang_produksi_detail')
-                                    ->select('produksi_detail.*', 'produksi.nama_produksi', 'produksi.tanggal_produksi')
-                                    ->where('produksi.nomor_referensi_produksi', $production_id)
-                                    ->orderBy('produksi_detail.id_barang', 'ASC')
-                                    ->get();
+            ->join('produksi', 'produksi.id_produksi', 'produksi_detail.id_produksi')
+            ->join('barang', 'barang.id_barang', 'produksi_detail.id_barang')
+            ->join('master_qr_code', 'master_qr_code.kode_batang_master_qr_code', 'produksi_detail.kode_batang_produksi_detail')
+            ->select('produksi_detail.*', 'produksi.nama_produksi', 'produksi.tanggal_produksi')
+            ->where('produksi.nomor_referensi_produksi', $production_id)
+            ->orderBy('produksi_detail.id_barang', 'ASC')
+            ->get();
 
         // hitung total kredit hasil produksi
         $total_kredit_produksi = 0;
 
-        foreach($data_production_results as $production){
+        foreach ($data_production_results as $production) {
             $total_kredit_produksi += $production->debit_produksi_detail;
         }
 
         // hitung harga produksi, listrik dan pegawai
-        $harga_produksi = round(($total_supplies/$total_kredit_produksi), 2);
-        $harga_listrik = round(($biaya_listrik/$total_kredit_produksi), 2);
-        $harga_pegawai = round(($biaya_operator/$total_kredit_produksi), 2);
+        $harga_produksi = round(($total_supplies / $total_kredit_produksi), 2);
+        $harga_listrik = round(($biaya_listrik / $total_kredit_produksi), 2);
+        $harga_pegawai = round(($biaya_operator / $total_kredit_produksi), 2);
 
         // update beban biaya dari tiap produksi detail
-        foreach($data_production_results as $production){
+        foreach ($data_production_results as $production) {
             DB::table("master_qr_code")
-            ->where('id_barang', $production->id_barang)
-            ->where('kode_batang_master_qr_code', $production->kode_batang_produksi_detail)
-            ->update([
-                'produksi_master_qr_code' => $harga_produksi,
-                'listrik_master_qr_code' => $harga_listrik,
-                'pegawai_master_qr_code' => $harga_pegawai,
-            ]);
+                ->where('id_barang', $production->id_barang)
+                ->where('kode_batang_master_qr_code', $production->kode_batang_produksi_detail)
+                ->update([
+                    'produksi_master_qr_code' => $harga_produksi,
+                    'listrik_master_qr_code' => $harga_listrik,
+                    'pegawai_master_qr_code' => $harga_pegawai,
+                ]);
         }
-
 
         // cari total hasil produksi detail
         $data_production_results_groupby_barang = DB::table("produksi_detail")
-                                                ->join('produksi', 'produksi.id_produksi', 'produksi_detail.id_produksi')
-                                                ->join('barang', 'barang.id_barang', 'produksi_detail.id_barang')
-                                                ->join('master_qr_code', 'master_qr_code.kode_batang_master_qr_code', 'produksi_detail.kode_batang_produksi_detail')
-                                                ->leftJoin('satuan_barang', 'satuan_barang.id_satuan_barang', 'produksi_detail.id_satuan_barang')
-                                                ->selectRaw('produksi_detail.id_barang,
+            ->join('produksi', 'produksi.id_produksi', 'produksi_detail.id_produksi')
+            ->join('barang', 'barang.id_barang', 'produksi_detail.id_barang')
+            ->join('master_qr_code', 'master_qr_code.kode_batang_master_qr_code', 'produksi_detail.kode_batang_produksi_detail')
+            ->leftJoin('satuan_barang', 'satuan_barang.id_satuan_barang', 'produksi_detail.id_satuan_barang')
+            ->selectRaw('produksi_detail.id_barang,
                                                 produksi.nama_produksi,
                                                 barang.nama_barang,
                                                 IFNULL(satuan_barang.nama_satuan_barang, "") as nama_satuan,
                                                 ROUND(SUM(debit_produksi_detail),2) as debit_produksi,
                                                 barang.id_akun,
                                                 ROUND(SUM(ROUND(master_qr_code.listrik_master_qr_code * produksi_detail.debit_produksi_detail, 2) + ROUND(master_qr_code.pegawai_master_qr_code * produksi_detail.debit_produksi_detail, 2) + ROUND(master_qr_code.produksi_master_qr_code * produksi_detail.debit_produksi_detail, 2)), 2) as total')
-                                                ->where('produksi.nomor_referensi_produksi', $production_id)
-                                                ->groupBy('produksi_detail.id_barang')
-                                                ->orderBy('produksi_detail.id_barang', 'ASC')
-                                                ->get();
+            ->where('produksi.nomor_referensi_produksi', $production_id)
+            ->groupBy('produksi_detail.id_barang')
+            ->orderBy('produksi_detail.id_barang', 'ASC')
+            ->get();
 
         $data_results = [];
 
-
-        foreach($data_production_results_groupby_barang as $production){
+        foreach ($data_production_results_groupby_barang as $production) {
             array_push($data_results, [
                 'akun' => $production->id_akun,
                 'notes' => $production->nama_barang . ' - ' . $production->debit_produksi . ' ' . $production->nama_satuan,
@@ -2647,13 +2640,14 @@ class ApiController extends Controller
         $data = [
             'data_results' => $data_results,
             'nama_hasil_produksi' => $data_production_results[0]->nama_produksi,
-            'tanggal_hasil_produksi' => $data_production_results[0]->tanggal_produksi
+            'tanggal_hasil_produksi' => $data_production_results[0]->tanggal_produksi,
         ];
 
         return $data;
     }
 
-    public function journalHpp(Request $request){
+    public function journalHpp(Request $request)
+    {
         DB::beginTransaction();
         $no_transaksi = $request->no_transaksi;
         $id_cabang = $request->id_cabang;
@@ -2661,7 +2655,7 @@ class ApiController extends Controller
 
         $data_produksi = DB::table('produksi')->where('nama_produksi', $no_transaksi)->first();
 
-        if(empty($data_produksi)){
+        if (empty($data_produksi)) {
             DB::rollBack();
             return response()->json([
                 "result" => false,
@@ -2675,7 +2669,7 @@ class ApiController extends Controller
         // tahap 1
         $data_production_supplies = $this->productionSupplies($id_produksi);
 
-        if($data_production_supplies == false){
+        if ($data_production_supplies == false) {
             DB::rollBack();
             return response()->json([
                 "result" => false,
@@ -2687,7 +2681,7 @@ class ApiController extends Controller
         // tahap 2 dan 3
         $data_production_cost = $this->productionCost($id_produksi, $id_cabang);
 
-        if($data_production_cost == false){
+        if ($data_production_cost == false) {
             DB::rollBack();
             return response()->json([
                 "result" => false,
@@ -2719,7 +2713,7 @@ class ApiController extends Controller
         $tanggal_hasil_produksi = $data_production_results['tanggal_hasil_produksi'];
         $user_data = Auth::guard('api')->user();
 
-        if(count($data_hasil) < 1){
+        if (count($data_hasil) < 1) {
             DB::rollBack();
             return response()->json([
                 "result" => false,
@@ -2744,19 +2738,19 @@ class ApiController extends Controller
             'user_data' => $user_data,
             'void' => $void,
             'note' => $id_transaksi . ' ==> ' . $id_transaksi_hasil_produksi,
-            'tanggal_hasil_produksi' => $tanggal_hasil_produksi
+            'tanggal_hasil_produksi' => $tanggal_hasil_produksi,
         ];
 
         // tahap 5
-        $store_data =  $this->storeHppJournal($data);
+        $store_data = $this->storeHppJournal($data);
 
-        if($store_data){
+        if ($store_data) {
             return response()->json([
                 "result" => true,
                 "code" => 200,
                 "message" => "Successfully stored Jurnal Hpp data",
             ], 200);
-        }else{
+        } else {
             return response()->json([
                 "result" => false,
                 "code" => 400,
@@ -2783,7 +2777,7 @@ class ApiController extends Controller
 
         $data_results = [];
 
-        foreach($data_pemakaian as $pemakaian){
+        foreach ($data_pemakaian as $pemakaian) {
             array_push($data_results, [
                 'nama_transaksi' => $pemakaian->kode_pemakaian,
                 'akun' => $pemakaian->id_akun,
@@ -2811,20 +2805,20 @@ class ApiController extends Controller
         $data = [
             'cabang' => $id_cabang,
             'data_hasil' => $data_hasil,
-            'user_data' => $user_data
+            'user_data' => $user_data,
         ];
 
         // dd($data);
 
-        $store_data =  $this->storeClosingJournalPemakaian($data);
+        $store_data = $this->storeClosingJournalPemakaian($data);
 
-        if($store_data){
+        if ($store_data) {
             return response()->json([
                 "result" => true,
                 "code" => 200,
                 "message" => "Successfully stored Jurnal Closing Pemakaian data",
             ], 200);
-        }else{
+        } else {
             return response()->json([
                 "result" => false,
                 "code" => 400,
@@ -2835,7 +2829,7 @@ class ApiController extends Controller
 
     public function storeClosingJournalPemakaian($data)
     {
-        try{
+        try {
             // Init Data
             $hasil = $data['data_hasil']; // Diisi dengan data hasil
             $journalDate = date('Y-m-d');
@@ -2853,7 +2847,7 @@ class ApiController extends Controller
             $header = new JurnalHeader();
             $header->id_cabang = $cabangID;
             $header->jenis_jurnal = $journalType;
-            $header->id_transaksi = NULL;
+            $header->id_transaksi = null;
             $header->catatan = $noteHeader;
             $header->void = 0;
             $header->tanggal_jurnal = $journalDate;
@@ -2865,7 +2859,7 @@ class ApiController extends Controller
             if (!$header->save()) {
                 DB::rollback();
                 Log::error("Error when storing journal header.");
-                return FALSE;
+                return false;
             }
 
             Log::debug($header);
@@ -2893,7 +2887,7 @@ class ApiController extends Controller
                 if (!$detail->save()) {
                     DB::rollback();
                     Log::error("Error when storing journal detail.");
-                    return FALSE;
+                    return false;
                 }
                 Log::debug($detail);
 
@@ -2903,20 +2897,20 @@ class ApiController extends Controller
                 $index++;
             }
 
-            $list_transaksi = substr_replace($list_transaksi,"",-1);
+            $list_transaksi = substr_replace($list_transaksi, "", -1);
             $list_transaksi = explode(';', $list_transaksi);
             $list_transaksi = array_unique($list_transaksi);
 
             $transaksi = '';
             foreach ($list_transaksi as $key => $value) {
                 $transaksi .= $value;
-                if($key < count($list_transaksi) - 1){
+                if ($key < count($list_transaksi) - 1) {
                     $transaksi .= ', ';
                 }
             }
 
             // pembulatan
-            if($total_debet != $total_credit){
+            if ($total_debet != $total_credit) {
                 $selisih = $total_credit - $total_debet;
 
                 $detail = new JurnalDetail();
@@ -2926,10 +2920,10 @@ class ApiController extends Controller
                 // $detail->id_akun = $get_akun_hpp_pemakaian->value2;
                 $detail->keterangan = "Pembulatan Pemakaian Barang " . $transaksi;
                 $detail->id_transaksi = "Pembulatan";
-                if($selisih > 0){
+                if ($selisih > 0) {
                     $detail->debet = floatval($selisih);
                     $detail->credit = 0;
-                }else{
+                } else {
                     $detail->debet = 0;
                     $detail->credit = floatval(abs($selisih));
                 }
@@ -2941,19 +2935,19 @@ class ApiController extends Controller
                 if (!$detail->save()) {
                     DB::rollback();
                     Log::error("Error when storing journal detail pembulatan.");
-                    return FALSE;
+                    return false;
                 }
                 Log::debug($detail);
             }
 
             DB::commit();
-            return TRUE;
+            return true;
         } catch (\Exception $e) {
             DB::rollback();
             $message = "Error when storing Journal Closing Pemakaian";
             Log::error($message);
             Log::error($e);
-            return FALSE;
+            return false;
         }
     }
 
@@ -2975,13 +2969,13 @@ class ApiController extends Controller
 
         $data_results = [];
 
-        foreach($data_retur_jual as $retur_jual){
+        foreach ($data_retur_jual as $retur_jual) {
             array_push($data_results, [
                 'nama_transaksi' => $retur_jual->nama_retur_penjualan_detail,
                 'akun' => $retur_jual->id_akun,
                 'notes' => $retur_jual->id_barang,
                 'debet' => round($retur_jual->total, 2),
-                'kredit' => 0
+                'kredit' => 0,
             ]);
         }
 
@@ -3003,20 +2997,20 @@ class ApiController extends Controller
         $data = [
             'cabang' => $id_cabang,
             'data_hasil' => $data_hasil,
-            'user_data' => $user_data
+            'user_data' => $user_data,
         ];
 
         // dd($data);
 
-        $store_data =  $this->storeClosingJournalReturJual($data);
+        $store_data = $this->storeClosingJournalReturJual($data);
 
-        if($store_data){
+        if ($store_data) {
             return response()->json([
                 "result" => true,
                 "code" => 200,
                 "message" => "Successfully stored Jurnal Closing Retur Jual data",
             ], 200);
-        }else{
+        } else {
             return response()->json([
                 "result" => false,
                 "code" => 400,
@@ -3027,7 +3021,7 @@ class ApiController extends Controller
 
     public function storeClosingJournalReturJual($data)
     {
-        try{
+        try {
             // Init Data
             $hasil = $data['data_hasil']; // Diisi dengan data hasil
             $journalDate = date('Y-m-d');
@@ -3045,7 +3039,7 @@ class ApiController extends Controller
             $header = new JurnalHeader();
             $header->id_cabang = $cabangID;
             $header->jenis_jurnal = $journalType;
-            $header->id_transaksi = NULL;
+            $header->id_transaksi = null;
             $header->catatan = $noteHeader;
             $header->void = 0;
             $header->tanggal_jurnal = $journalDate;
@@ -3057,7 +3051,7 @@ class ApiController extends Controller
             if (!$header->save()) {
                 DB::rollback();
                 Log::error("Error when storing journal header.");
-                return FALSE;
+                return false;
             }
 
             Log::debug($header);
@@ -3085,7 +3079,7 @@ class ApiController extends Controller
                 if (!$detail->save()) {
                     DB::rollback();
                     Log::error("Error when storing journal detail.");
-                    return FALSE;
+                    return false;
                 }
                 Log::debug($detail);
 
@@ -3095,20 +3089,20 @@ class ApiController extends Controller
                 $index++;
             }
 
-            $list_transaksi = substr_replace($list_transaksi,"",-1);
+            $list_transaksi = substr_replace($list_transaksi, "", -1);
             $list_transaksi = explode(';', $list_transaksi);
             $list_transaksi = array_unique($list_transaksi);
 
             $transaksi = '';
             foreach ($list_transaksi as $key => $value) {
                 $transaksi .= $value;
-                if($key < count($list_transaksi) - 1){
+                if ($key < count($list_transaksi) - 1) {
                     $transaksi .= ', ';
                 }
             }
 
             // pembulatan
-            if($total_debet != $total_credit){
+            if ($total_debet != $total_credit) {
                 $selisih = $total_credit - $total_debet;
 
                 $detail = new JurnalDetail();
@@ -3118,10 +3112,10 @@ class ApiController extends Controller
                 // $detail->id_akun = $get_akun_hpp_retur_jual->value2;
                 $detail->keterangan = "Pembulatan Persediaan jurnal penjualan " . $transaksi;
                 $detail->id_transaksi = "Pembulatan";
-                if($selisih > 0){
+                if ($selisih > 0) {
                     $detail->debet = floatval($selisih);
                     $detail->credit = 0;
-                }else{
+                } else {
                     $detail->debet = 0;
                     $detail->credit = floatval(abs($selisih));
                 }
@@ -3133,19 +3127,212 @@ class ApiController extends Controller
                 if (!$detail->save()) {
                     DB::rollback();
                     Log::error("Error when storing journal detail pembulatan.");
-                    return FALSE;
+                    return false;
                 }
                 Log::debug($detail);
             }
 
             DB::commit();
-            return TRUE;
+            return true;
         } catch (\Exception $e) {
             DB::rollback();
             $message = "Error when storing Journal Closing Retur Jual";
             Log::error($message);
             Log::error($e);
-            return FALSE;
+            return false;
+        }
+    }
+
+    public function storeFcmToken(Request $request)
+    {
+        $siscaToken = $request->token;
+        $fcmToken = $request->fcm_token;
+
+        if ($siscaToken == '' || $fcmToken == '') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Pastikan parameter yang dibutuhkan harus lengkap',
+            ], 500);
+        }
+        try {
+            $dataToken = \App\Models\UserToken::where('nama_token_pengguna', $siscaToken)->first();
+            if (!$dataToken) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Token sisca tidak ditemukan',
+                ], 500);
+            }
+
+            $dataToken->fcm_token = $fcmToken;
+            $dataToken->save();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'FCM token berhasil disimpan',
+            ], 200);
+        } catch (\Exception $th) {
+            Log::error($th);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'FCM token gagal disimpan',
+            ], 500);
+        }
+    }
+
+    public function stokmin(Request $request)
+    {
+        $id_cabang = $request->id_cabang;
+        $setting = Setting::where("id_cabang", $id_cabang)->where("code", 'like', "Stok Min %")->select('code', 'value1', 'value2')->get()->toArray();
+        $settingValue1 = array_column($setting, 'value1', 'code');
+        $setting = array_column($setting, 'value2', 'code');
+
+        $settingBrgArr = json_decode($settingValue1['Stok Min Khusus'], true);
+        $settingBrgArr = array_column($settingBrgArr, 'stokMin', 'id_barang');
+        $today = Carbon::today();
+        $setting['penj_sampai'] = $today->toDateString();
+        $setting['penj_dari'] = $today->subMonths(intval($setting['Stok Min Range']))->toDateString();
+        session(['stokMin' => $setting]);
+        \DB::unprepared(\DB::raw("DROP TEMPORARY TABLE IF EXISTS tTotalPenjualanInfo"));
+        \DB::insert(\DB::raw("CREATE TEMPORARY TABLE tTotalPenjualanInfo(id_barang int(11) NOT NULL,nama_barang varchar(200), total_jual decimal(15,6),
+        total_jual_per_bulan decimal(15,6),plus_persen decimal(15,6),per_bulan_plus_persen decimal(15,6),avg_prorate double,
+        pemakaian_per_barang_jadi double)"));
+        self::getSalesWithProrate($request->id, $id_cabang, 1);
+        $debug = false;
+        if (!empty($request->debug) && $request->debug == true) {
+            $debug = \DB::table('tTotalPenjualanInfo AS ttp')->get();
+        }
+        $total = \DB::table('tTotalPenjualanInfo AS ttp')
+            ->select(\DB::raw('SUM(ttp.pemakaian_per_barang_jadi)'))->value('total');
+        $barang = \App\Barang::find($request->id);
+        if ($barang->keterangan_barang == '1') {
+            $total *= floatval($setting['Stok Min Import']);
+        } else {
+            $total *= floatval($setting['Stok Min Lokal']);
+        }
+        $respon = [
+            'total' => round($total, 4),
+        ];
+        $setting['Stok Min Khusus'] = null;
+        $setting['stok_min_hitung'] = $respon['total'];
+        if (array_key_exists($request->id, $settingBrgArr)) {
+            $setting['Stok Min Khusus'] = $settingBrgArr[$request->id];
+            if ($respon['total'] < $setting['Stok Min Khusus']) {
+                $respon['total'] = $setting['Stok Min Khusus'];
+            }
+        }
+        if ($debug !== false) {
+            $respon['debug'] = $debug;
+        }
+        self::storeStokMinHitung($setting, $request->id, $id_cabang, $respon['total']);
+        return response()->json($respon);
+    }
+
+    private function storeStokMinHitung($setting, $id_barang, $id_cabang, $jumlah)
+    {
+        $bulan = date('m');
+        $tahun = date('Y');
+        try {
+            StokMinimalHitung::updateOrInsert(
+                [
+                    'bulan' => $bulan,
+                    'tahun' => $tahun,
+                    'id_barang' => $id_barang,
+                    'id_cabang' => $id_cabang,
+                ],
+                [
+                    'jumlah' => $jumlah,
+                    'range' => $setting['Stok Min Range'],
+                    'persen' => $setting['Stok Min Persen'],
+                    'lokal' => $setting['Stok Min Lokal'],
+                    'import' => $setting['Stok Min Import'],
+                    'stok_min_khusus' => $setting['Stok Min Khusus'],
+                    'stok_min_hitung' => $setting['stok_min_hitung'],
+                    'penj_dari' => $setting['penj_dari'],
+                    'penj_sampai' => $setting['penj_sampai'],
+                ]
+            );
+            $stokHeader = DB::table('stok_minimal_hitung')->where([
+                'bulan' => $bulan,
+                'tahun' => $tahun,
+                'id_barang' => $id_barang,
+                'id_cabang' => $id_cabang,
+            ])->first();
+            if (!empty($stokHeader)) {
+                DB::table('stok_minimal_hitung_detil')->where('stok_minimal_hitung_id', $stokHeader->id)->delete();
+                DB::table('stok_minimal_hitung_detil')
+                    ->insert(
+                        DB::table('tTotalPenjualanInfo')
+                            ->selectRaw("{$stokHeader->id} as stok_minimal_hitung_id,id_barang,nama_barang,total_jual,total_jual_per_bulan,plus_persen,per_bulan_plus_persen,avg_prorate,pemakaian_per_barang_jadi")
+                            ->get()->map(function ($item) {
+                            return (array) $item;
+                        })->toArray()
+                    );
+            }
+        } catch (\Exception $e) {
+            $message = "Error when storing stok minimal hitung";
+            Log::error($message);
+            Log::error($e);
+        }
+    }
+
+    private function getSalesWithProrate($id_barang, $id_cabang, $value)
+    {
+        $childsub = \DB::table('bom_detail AS bd')
+            ->select(
+                'b.id_barang',
+                'b.keterangan_bom',
+                'brg.nama_barang',
+                \DB::raw('SUM(bd.jumlah_bom_detail) AS total_pemakaian'),
+                'b.jumlah_bom',
+                \DB::raw('(SUM(bd.jumlah_bom_detail)/b.jumlah_bom) AS prorate')
+            )
+            ->join('bom AS b', 'bd.id_bom', '=', 'b.id_bom')
+            ->join('barang AS brg', 'brg.id_barang', '=', 'b.id_barang')
+            ->whereRaw("bd.id_barang = $id_barang and b.status_bom = 1")
+            ->groupBy('bd.id_barang', 'b.id_bom');
+
+        $child = \DB::table(\DB::raw("({$childsub->toSql()}) as a"))
+        // ->select('a.*', \DB::raw('AVG(a.prorate) AS avg_prorate'))
+            ->groupBy('a.id_barang')->get();
+        if (empty($child)) {
+            return;
+        }
+        $stokMin = session('stokMin');
+
+        $jual = \DB::table('penjualan AS p')
+            ->select(
+                'brg.nama_barang',
+                \DB::raw('SUM(if(pd.id_satuan_barang != 6,pd.jumlah_penjualan_detail * pd.sg_penjualan_detail,pd.jumlah_penjualan_detail)) AS total_jual'),
+                \DB::raw('(SUM(if(pd.id_satuan_barang != 6,pd.jumlah_penjualan_detail * pd.sg_penjualan_detail,pd.jumlah_penjualan_detail))/' . intval($stokMin['Stok Min Range']) . ') AS total_jual_per_bulan')
+            )
+            ->join('penjualan_detail AS pd', 'pd.id_penjualan', '=', 'p.id_penjualan')
+            ->join('barang AS brg', 'brg.id_barang', '=', 'pd.id_barang')
+            ->where('pd.id_barang', $id_barang)
+            ->where('p.id_cabang', $id_cabang)
+            ->whereRaw('p.tanggal_penjualan BETWEEN "' . $stokMin['penj_dari'] . '" AND "' . $stokMin['penj_sampai'] . '"')->get()->toArray();
+
+        if (!empty($jual[0]->total_jual)) {
+            $persen = floatval($jual[0]->total_jual_per_bulan) * (floatval($stokMin['Stok Min Persen']) / 100);
+            $plusPersen = floatval($jual[0]->total_jual_per_bulan) + $persen;
+            $pemakaian = $plusPersen * $value;
+            \DB::table('tTotalPenjualanInfo')->insert([
+                "id_barang" => $id_barang,
+                "nama_barang" => $jual[0]->nama_barang,
+                "total_jual" => $jual[0]->total_jual,
+                "total_jual_per_bulan" => $jual[0]->total_jual_per_bulan,
+                "plus_persen" => $persen,
+                "per_bulan_plus_persen" => $plusPersen,
+                "avg_prorate" => $value,
+                "pemakaian_per_barang_jadi" => $pemakaian,
+            ]);
+        }
+
+        foreach ($child as $itemChild) {
+            if (strpos(strtolower($itemChild->keterangan_bom), 'blending') || $itemChild->id_barang == $id_barang) {
+                continue;
+            }
+            $new_val = $value * floatval($itemChild->prorate);
+            self::getSalesWithProrate($itemChild->id_barang, $id_cabang, $new_val);
         }
     }
 }

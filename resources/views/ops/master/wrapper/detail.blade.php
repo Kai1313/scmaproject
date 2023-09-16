@@ -55,7 +55,7 @@
                     <label class="col-md-3">Gambar</label>
                     <div class="col-md-9">
                         @if ($data->path)
-                            <img src="{{ env('FTP_GET_FILE') . $data->path2 }}" alt=""
+                            <img src="{{ asset('asset/' . $data->path) }}" alt=""
                                 style="width:100px;border-radius:15px;">
                         @endif
                     </div>

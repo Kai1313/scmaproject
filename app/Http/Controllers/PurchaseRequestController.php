@@ -6,6 +6,7 @@ use App\PurchaseRequest;
 use DB;
 use Illuminate\Http\Request;
 use Log;
+use PDF;
 use Yajra\DataTables\DataTables;
 
 class PurchaseRequestController extends Controller
@@ -25,23 +26,25 @@ class PurchaseRequestController extends Controller
         if ($request->ajax()) {
             $data = DB::table('purchase_request_header as prh')
                 ->select(
-                    'purchase_request_id',
-                    'purchase_request_code',
-                    'purchase_request_date',
-                    'purchase_request_estimation_date',
+                    'prh.purchase_request_id',
+                    'prh.purchase_request_code',
+                    'prh.purchase_request_date',
+                    'prh.purchase_request_estimation_date',
                     'nama_gudang',
                     'user.nama_pengguna as user',
                     'catatan',
-                    'approval_status',
+                    'prh.approval_status',
                     'approval.nama_pengguna as approval_user',
-                    'approval_date',
+                    'prh.approval_date',
                     'dt_created as created_at',
                     'prh.void',
-                    'purchase_request_user_id'
+                    'purchase_request_user_id',
+                    DB::raw('concat(sum(prd.closed)," dari ",count(prd.closed)," Barang") as closed')
                 )
                 ->leftJoin('gudang', 'prh.id_gudang', '=', 'gudang.id_gudang')
                 ->leftJoin('pengguna as user', 'prh.purchase_request_user_id', '=', 'user.id_pengguna')
-                ->leftJoin('pengguna as approval', 'prh.approval_user_id', '=', 'approval.id_pengguna');
+                ->leftJoin('pengguna as approval', 'prh.approval_user_id', '=', 'approval.id_pengguna')
+                ->leftJoin('purchase_request_detail as prd', 'prh.purchase_request_id', 'prd.purchase_request_id');
 
             if (isset($request->c)) {
                 $data = $data->where('prh.id_cabang', $request->c);
@@ -51,43 +54,51 @@ class PurchaseRequestController extends Controller
                 $data = $data->where('prh.void', '0');
             }
 
-            $data = $data->orderBy('prh.dt_created', 'desc');
+            $data = $data->groupBy('prh.purchase_request_id')->orderBy('prh.dt_created', 'desc');
+            $access = DB::table('setting')->where('id_cabang', $request->c)->where('code', 'PR Approval')->first();
+            $arrayAccess = explode(',', $access->value1);
+
+            $idUser = session()->get('user')['id_pengguna'];
+            $filterUser = DB::table('pengguna')
+                ->where(function ($w) {
+                    $w->where('id_grup_pengguna', session()->get('user')['id_grup_pengguna'])->orWhere('id_grup_pengguna', 1);
+                })
+                ->where('status_pengguna', '1')->pluck('id_pengguna')->toArray();
 
             return Datatables::of($data)
                 ->addIndexColumn()
-                ->addColumn('action', function ($row) {
-                    if ($row->void == '1') {
-                        $btn = '<label class="label label-default">Batal</label>';
-                    } else {
-                        $btn = '<ul class="horizontal-list">';
+                ->addColumn('action', function ($row) use ($arrayAccess, $filterUser, $idUser) {
+                    $btn = '<ul class="horizontal-list">';
+                    if ($row->void == '0') {
                         $btn .= '<li><a href="' . route('purchase-request-view', $row->purchase_request_id) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
                         if ($row->approval_status == 0) {
-                            if (session()->get('user')['id_grup_pengguna'] == 1) {
-                                $btn .= '<li><a href="' . route('purchase-request-change-status', [$row->purchase_request_id, 'approval']) . '" class="btn btn-success btn-xs mr-1 mb-1 btn-change-status" data-param="menyetujui"><i class="glyphicon glyphicon-check"></i> Approval</a></li>';
-                                $btn .= '<li><a href="' . route('purchase-request-change-status', [$row->purchase_request_id, 'reject']) . '" class="btn btn-default btn-xs mr-1 mb-1 btn-change-status" data-param="menolak"><i class="fa fa-times"></i> Reject</a></li>';
-                            }
+                            // if (in_array(session()->get('user')['id_grup_pengguna'], $arrayAccess)) {
+                            //     $btn .= '<li><a href="' . route('purchase-request-change-status', [$row->purchase_request_id, 'approval']) . '" class="btn btn-success btn-xs mr-1 mb-1 btn-change-status" data-param="menyetujui"><i class="glyphicon glyphicon-check"></i> Approval</a></li>';
+                            //     $btn .= '<li><a href="' . route('purchase-request-change-status', [$row->purchase_request_id, 'reject']) . '" class="btn btn-default btn-xs mr-1 mb-1 btn-change-status" data-param="menolak"><i class="fa fa-times"></i> Reject</a></li>';
+                            // }
 
-                            if (session()->get('user')['id_grup_pengguna'] == $row->purchase_request_user_id) {
+                            if (in_array($idUser, $filterUser) || $idUser == $row->purchase_request_user_id) {
                                 $btn .= '<li><a href="' . route('purchase-request-entry', $row->purchase_request_id) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
                                 $btn .= '<li><a href="' . route('purchase-request-delete', $row->purchase_request_id) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Void</a></li>';
                             }
                         }
-
-                        $btn .= '</ul>';
                     }
 
+                    $btn .= '</ul>';
                     return $btn;
                 })
                 ->editColumn('approval_status', function ($row) {
                     return '<label class="' . $this->arrayStatus[$row->approval_status]['class'] . '">' . $this->arrayStatus[$row->approval_status]['text'] . '</label>';
                 })
-                ->rawColumns(['action', 'approval_status'])
+                ->filterColumn('closed', function ($row, $keyword) {
+                    $keywords = trim($keyword);
+                    $row->whereRaw("prd.closed like ?", ["%{$keywords}%"]);
+                })
+                ->rawColumns(['action', 'approval_status', 'closed'])
                 ->make(true);
-
         }
 
-        $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
-
+        $cabang = session()->get('access_cabang');
         return view('ops.purchaseRequest.index', [
             'cabang' => $cabang,
             "pageTitle" => "SCA OPS | Permintaan Pembelian | List",
@@ -101,8 +112,7 @@ class PurchaseRequestController extends Controller
         }
 
         $data = PurchaseRequest::find($id);
-        $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
-
+        $cabang = session()->get('access_cabang');
         return view('ops.purchaseRequest.form', [
             'data' => $data,
             'cabang' => $cabang,
@@ -134,19 +144,24 @@ class PurchaseRequestController extends Controller
             $data->save();
             $data->savedetails($request->details);
 
-            $userSendWa = DB::table('pengguna')
-                ->select('nama_pengguna', 'telepon1_pengguna')
-                ->whereIn('id_grup_pengguna', [7, 13])
-                ->where('status_pengguna', 1)->get();
-            $settingMessage = DB::table('setting')->where('code', 'Pesan Permintaan Beli')->first();
-            $strParam = [
-                '[[pembuat]]' => $data->pengguna->nama_pengguna,
-                '[[code]]' => $data->purchase_request_code,
-                '[[date]]' => date('d/m/Y'),
-            ];
-            foreach ($userSendWa as $user) {
-                $messageText = replaceMessage($strParam, $settingMessage->value1);
-                $this->sendToWa($user->telepon1_pengguna, $messageText);
+            if ($id == 0) {
+                $access = DB::table('setting')->where('id_cabang', $request->id_cabang)->where('code', 'PR Send WA')->first();
+                if ($access && $access->value1 == '1') {
+                    $userSendWa = DB::table('pengguna')
+                        ->select('nama_pengguna', 'telepon1_pengguna')
+                        ->whereIn('id_grup_pengguna', [7, 13])
+                        ->where('status_pengguna', 1)->get();
+                    $settingMessage = DB::table('setting')->where('code', 'Pesan Permintaan Beli')->first();
+                    $strParam = [
+                        '[[pembuat]]' => $data->pengguna->nama_pengguna,
+                        '[[code]]' => $data->purchase_request_code,
+                        '[[date]]' => date('d/m/Y'),
+                    ];
+                    foreach ($userSendWa as $user) {
+                        $messageText = replaceMessage($strParam, $settingMessage->value1);
+                        $this->sendToWa($user->telepon1_pengguna, $messageText);
+                    }
+                }
             }
 
             DB::commit();
@@ -173,9 +188,15 @@ class PurchaseRequestController extends Controller
         }
 
         $data = PurchaseRequest::find($id);
+        $access = DB::table('setting')->where('id_cabang', $data->id_cabang)->where('code', 'PR Approval')->value('value1');
+        $arrayAccess = explode(',', $access);
+        $idUser = session()->get('user')['id_grup_pengguna'];
+
         return view('ops.purchaseRequest.detail', [
             'data' => $data,
             'status' => $this->arrayStatus,
+            'arrayAccess' => $arrayAccess,
+            'idUser' => $idUser,
             "pageTitle" => "SCA OPS | Permintaan Pembelian | Detail",
         ]);
     }
@@ -235,7 +256,7 @@ class PurchaseRequestController extends Controller
         $search = $request->search;
         $datas = DB::table('barang')->select('id_barang as id', 'nama_barang as text', 'kode_barang')
             ->where('status_barang', 1)
-            ->where('nama_barang', 'like', '%' . $search . '%')->limit(10)->get();
+            ->where('nama_barang', 'like', '%' . $search . '%')->orderBy('nama_barang', 'asc')->get();
 
         return response()->json([
             'result' => true,
@@ -251,24 +272,27 @@ class PurchaseRequestController extends Controller
         $satuan = DB::table('isi_satuan_barang')->select('satuan_barang.id_satuan_barang as id', 'nama_satuan_barang as text')
             ->leftJoin('satuan_barang', 'isi_satuan_barang.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
             ->where('id_barang', $item)
-            ->where('status_satuan_barang', 1)->get();
+            ->where('status_satuan_barang', 1)
+            ->where('satuan_jual_isi_satuan_barang', 1)
+            ->where('satuan_wadah_isi_satuan_barang', 0)->get();
 
         $messageStock = '0';
         $messageSatuanStok = '';
         if ($cabang) {
             $arrayCabang = [
-                '1' => [1, 2, 3, 4],
-                '2' => [5, 7, 8],
+                '1' => [1],
+                '2' => [5],
             ];
 
-            $gudang = $arrayCabang[$cabang];
-            $stok = DB::table('kartu_stok')->select(DB::raw('sum(debit_kartu_stok) - sum(kredit_kartu_stok) as stok'), 'satuan_barang.nama_satuan_barang')
-                ->leftJoin('barang', 'kartu_stok.id_barang', '=', 'barang.id_barang')
-                ->leftJoin('isi_satuan_barang', 'kartu_stok.id_barang', '=', 'isi_satuan_barang.id_barang')
-                ->leftJoin('satuan_barang', 'isi_satuan_barang.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
-                ->where('satuan_jual_isi_satuan_barang', 1)
-                ->where('kartu_stok.id_barang', $item)
-                ->whereIn('id_gudang', $arrayCabang[$cabang])->groupBy('kartu_stok.id_barang')->first();
+            $stok = DB::table('master_qr_code')->select(DB::raw('(case
+                    when sum(sisa_master_qr_code) > 0 and barang.id_kategori_barang <> 7
+                    then sum(sisa_master_qr_code)
+                    else 0
+                end) as stok'), 'nama_satuan_barang')
+                ->join('barang', 'master_qr_code.id_barang', 'barang.id_barang')
+                ->join('satuan_barang', 'master_qr_code.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
+                ->where('master_qr_code.id_barang', $item)->whereIn('master_qr_code.id_gudang', $arrayCabang[$cabang])
+                ->groupBy('master_qr_code.id_barang')->first();
             if ($stok) {
                 $messageStock = $stok->stok;
                 $messageSatuanStok = $stok->nama_satuan_barang;
@@ -305,21 +329,25 @@ class PurchaseRequestController extends Controller
             $data->approval_user_id = session()->get('user')['id_pengguna'];
             $data->approval_date = date('Y-m-d H:i:s');
             $data->save();
+            $data->saveStatusDetail();
 
-            $userSendWa = DB::table('pengguna')
-                ->select('nama_pengguna', 'telepon1_pengguna')
-                ->whereIn('id_grup_pengguna', [7])
-                ->where('status_pengguna', 1)->get();
-            $settingMessage = DB::table('setting')->where('code', 'Pesan Persetujuan Beli')->first();
-            $strParam = [
-                '[[pembuat]]' => $data->pengguna->nama_pengguna,
-                '[[code]]' => $data->purchase_request_code,
-                '[[date]]' => date('d/m/Y'),
-                '[[status]]' => $type == 'approval' ? 'disetujui' : 'ditolak',
-            ];
-            foreach ($userSendWa as $user) {
-                $messageText = replaceMessage($strParam, $settingMessage->value1);
-                $this->sendToWa($user->telepon1_pengguna, $messageText);
+            $access = DB::table('setting')->where('id_cabang', $data->id_cabang)->where('code', 'PR Send WA')->first();
+            if ($access && $access->value1 == '1') {
+                $userSendWa = DB::table('pengguna')
+                    ->select('nama_pengguna', 'telepon1_pengguna')
+                    ->whereIn('id_grup_pengguna', [7])
+                    ->where('status_pengguna', 1)->get();
+                $settingMessage = DB::table('setting')->where('code', 'Pesan Persetujuan Beli')->first();
+                $strParam = [
+                    '[[pembuat]]' => $data->pengguna->nama_pengguna,
+                    '[[code]]' => $data->purchase_request_code,
+                    '[[date]]' => date('d/m/Y'),
+                    '[[status]]' => $type == 'approval' ? 'disetujui' : 'ditolak',
+                ];
+                foreach ($userSendWa as $user) {
+                    $messageText = replaceMessage($strParam, $settingMessage->value1);
+                    $this->sendToWa($user->telepon1_pengguna, $messageText);
+                }
             }
 
             DB::commit();
@@ -346,11 +374,10 @@ class PurchaseRequestController extends Controller
         }
 
         $data = PurchaseRequest::find($id);
-        return view('ops.purchaseRequest.print', [
-            'data' => $data,
-            'arrayStatus' => $this->arrayStatus,
-            "pageTitle" => "SCA OPS | Permintaan Pembelian | Cetak",
-        ]);
+
+        $pdf = PDF::loadView('ops.purchaseRequest.print', ['data' => $data, 'arrayStatus' => $this->arrayStatus]);
+        $pdf->setPaper('a5', 'landscape');
+        return $pdf->stream('Bukti permintaan pembelian ' . $data->purchase_request_code . '.pdf');
     }
 
     public function sendToWa($targetNumber, $message)
@@ -376,5 +403,118 @@ class PurchaseRequestController extends Controller
         curl_close($ch);
 
         return ['status' => 'true'];
+    }
+
+    public function changeStatusDetail(Request $request)
+    {
+        $index = $request->index;
+        $purchaseRequestId = $request->purchase_request_id;
+        $approvalNotes = $request->approval_notes;
+        $approvalStatus = $request->approval_status;
+        $qty = $request->qty;
+
+        $check = DB::table('purchase_request_detail')->where('purchase_request_id', $purchaseRequestId)
+            ->where('index', $index)->first();
+
+        if (!$check) {
+            return response()->json([
+                'result' => 'error',
+                'message' => 'Data tidak ditemukan',
+            ], 500);
+        }
+
+        if ($check->approval_status != 0) {
+            return response()->json([
+                'result' => 'error',
+                'message' => 'Status data sudah diubah menjadi ' . ($check->approval_status == '1' ? 'disetujui' : 'ditolak'),
+            ], 500);
+        }
+
+        try {
+            DB::beginTransaction();
+            DB::table('purchase_request_detail')->where('purchase_request_id', $purchaseRequestId)
+                ->where('index', $index)->update([
+                'approval_status' => $approvalStatus,
+                'approval_user_id' => session()->get('user')['id_pengguna'],
+                'approval_date' => date('Y-m-d H:i:s'),
+                'qty' => $qty,
+                'approval_notes' => $approvalNotes,
+            ]);
+
+            $checkParent = $this->checkStatusParent($purchaseRequestId);
+            if ($checkParent['result'] == false) {
+                DB::rollback();
+                return response()->json([
+                    "result" => false,
+                    "message" => "Data gagal diperbarui",
+                ], 500);
+            }
+
+            DB::commit();
+            return response()->json([
+                "result" => true,
+                "message" => "Data berhasil diperbarui",
+                "redirect" => route('purchase-request-view', $purchaseRequestId),
+            ], 200);
+        } catch (\Exception $th) {
+            DB::rollback();
+            Log::error($th);
+            return response()->json([
+                "result" => false,
+                "message" => "Data gagal diperbarui",
+            ], 500);
+        }
+    }
+
+    public function checkStatusParent($id)
+    {
+        $parent = PurchaseRequest::where('purchase_request_id', $id)->first();
+        if (!$parent) {
+            return [
+                "result" => false,
+                "message" => "Data parent tidak ditemukan",
+            ];
+        }
+
+        $countApproval = 0;
+        $countReject = 0;
+        $totalRow = count($parent->details);
+        foreach ($parent->details as $detail) {
+            if ($detail->approval_status == '1') {
+                $countApproval++;
+            }
+
+            if ($detail->approval_status == '2') {
+                $countReject++;
+            }
+        }
+
+        if (($countApproval + $countReject) == $totalRow) {
+            $parent->approval_status = ($countApproval > 0) ? 1 : 2;
+            $parent->approval_user_id = session()->get('user')['id_pengguna'];
+            $parent->approval_date = date('Y-m-d H:i:s');
+            $parent->save();
+
+            $access = DB::table('setting')->where('id_cabang', $parent->id_cabang)->where('code', 'PR Send WA')->first();
+            if ($access && $access->value1 == '1') {
+                $userSendWa = DB::table('pengguna')
+                    ->select('nama_pengguna', 'telepon1_pengguna')
+                    ->whereIn('id_grup_pengguna', [7])
+                    ->where('status_pengguna', 1)->get();
+                $settingMessage = DB::table('setting')->where('code', 'Pesan Persetujuan Beli')->first();
+                $strParam = [
+                    '[[pembuat]]' => $parent->pengguna->nama_pengguna,
+                    '[[code]]' => $parent->purchase_request_code,
+                    '[[date]]' => date('d/m/Y'),
+                    '[[status]]' => $parent->approval_status == '1' ? 'disetujui' : 'ditolak',
+                ];
+                foreach ($userSendWa as $user) {
+                    $messageText = replaceMessage($strParam, $settingMessage->value1);
+                    $this->sendToWa($user->telepon1_pengguna, $messageText);
+                }
+            }
+        }
+
+        return ['result' => true];
     }
 }

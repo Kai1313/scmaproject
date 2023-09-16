@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\MoveBranch;
+use App\MoveBranchDetail;
 use DB;
 use Illuminate\Http\Request;
 use Log;
+use PDF;
 use Yajra\DataTables\DataTables;
 
 class SendToBranchController extends Controller
@@ -17,30 +19,56 @@ class SendToBranchController extends Controller
         }
 
         if ($request->ajax()) {
-            $data = DB::table('pindah_barang')
-                ->select('id_pindah_barang', 'type', 'nama_gudang', 'tanggal_pindah_barang', 'kode_pindah_barang', 'nama_cabang', 'status_pindah_barang', 'keterangan_pindah_barang', 'transporter', 'void')
-                ->leftJoin('gudang', 'pindah_barang.id_gudang', '=', 'gudang.id_gudang')
-                ->leftJoin('cabang', 'pindah_barang.id_cabang_tujuan', '=', 'cabang.id_cabang')
-                ->where('type', 0);
+            $data = DB::table('pindah_barang as pb')
+                ->select(
+                    'pb.id_pindah_barang',
+                    'pb.type',
+                    'nama_gudang',
+                    'pb.tanggal_pindah_barang',
+                    'pb.kode_pindah_barang',
+                    'nama_cabang',
+                    'pb.status_pindah_barang',
+                    'pb.keterangan_pindah_barang',
+                    'pb.transporter',
+                    'pb.user_created',
+                    'pb.void',
+                    'pb2.kode_pindah_barang as ref_code'
+                )
+                ->leftJoin('gudang', 'pb.id_gudang', '=', 'gudang.id_gudang')
+                ->leftJoin('cabang', 'pb.id_cabang2', '=', 'cabang.id_cabang')
+                ->leftJoin('pindah_barang as pb2', 'pb.id_pindah_barang', 'pb2.id_pindah_barang2')
+                ->where('pb.id_jenis_transaksi', 21)
+                ->where('pb.type', 0);
             if (isset($request->c)) {
-                $data = $data->where('pindah_barang.id_cabang', $request->c);
+                $data = $data->where('pb.id_cabang', $request->c);
             }
 
             if ($request->show_void == 'false') {
-                $data = $data->where('pindah_barang.void', '0');
+                $data = $data->where('pb.void', '0');
             }
 
-            $data = $data->orderBy('pindah_barang.kode_pindah_barang', 'desc');
+            $data = $data->orderBy('pb.kode_pindah_barang', 'desc');
+
+            $idUser = session()->get('user')['id_pengguna'];
+            $filterUser = DB::table('pengguna')
+                ->where(function ($w) {
+                    $w->where('id_grup_pengguna', session()->get('user')['id_grup_pengguna'])->orWhere('id_grup_pengguna', 1);
+                })
+                ->where('status_pengguna', '1')->pluck('id_pengguna')->toArray();
+
             return Datatables::of($data)
                 ->addIndexColumn()
-                ->addColumn('action', function ($row) {
+                ->addColumn('action', function ($row) use ($filterUser, $idUser) {
                     $btn = '<ul class="horizontal-list">';
                     $btn .= '<li><a href="' . route('send_to_branch-view', $row->id_pindah_barang) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
-                    if ($row->status_pindah_barang == 0 && $row->void == 0) {
+                    if ($row->status_pindah_barang == 0 && $row->void == 0 && (in_array($idUser, $filterUser) || $idUser == $row->user_created)) {
                         $btn .= '<li><a href="' . route('send_to_branch-entry', $row->id_pindah_barang) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
-                        $btn .= '<li><a href="' . route('send_to_branch-delete', $row->id_pindah_barang) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Void</a></li>';
+                        if ($row->ref_code == null) {
+                            $btn .= '<li><a href="' . route('send_to_branch-delete', $row->id_pindah_barang) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Void</a></li>';
+                        }
                     }
 
+                    $btn .= '<li><a href="' . route('send_to_branch-print-data', $row->id_pindah_barang) . '" class="btn btn-default btn-xs mr-1 mb-1" target="_blank"><i class="glyphicon glyphicon-print"></i> Cetak</a></li>';
                     $btn .= '</ul>';
                     return $btn;
                 })
@@ -61,7 +89,7 @@ class SendToBranchController extends Controller
                 ->make(true);
         }
 
-        $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
+        $cabang = session()->get('access_cabang');
         return view('ops.sendToBranch.index', [
             'cabang' => $cabang,
             "pageTitle" => "SCA OPS | Kirim Ke Cabang | List",
@@ -75,11 +103,20 @@ class SendToBranchController extends Controller
         }
 
         $data = MoveBranch::find($id);
-        $cabang = DB::table('cabang')->select('nama_cabang as text', 'id_cabang as id')->where('status_cabang', 1)->get();
+        $qrcodeReceived = [];
+        $dataReceived = MoveBranch::where('id_pindah_barang2', $id)->first();
+        if ($dataReceived) {
+            $qrcodeReceived = MoveBranchDetail::where('id_pindah_barang', $dataReceived->id_pindah_barang)->pluck('qr_code')->toArray();
+        }
+
+        $cabang = session()->get('access_cabang');
+        $allCabang = DB::table('cabang')->select('id_cabang as id', 'nama_cabang as text')->where('status_cabang', 1)->get();
         return view('ops.sendToBranch.form', [
             'data' => $data,
             'cabang' => $cabang,
+            'allCabang' => $allCabang,
             "pageTitle" => "SCA OPS | Kirim Ke Cabang | " . ($id == 0 ? 'Create' : 'Edit'),
+            'qrcodeReceived' => $qrcodeReceived,
         ]);
     }
 
@@ -94,7 +131,7 @@ class SendToBranchController extends Controller
             DB::beginTransaction();
             $data->fill($request->all());
             if ($id == 0) {
-                $data->kode_pindah_barang = MoveBranch::createcode($request->id_cabang);
+                $data->kode_pindah_barang = MoveBranch::createcodeCabang($request->id_cabang);
                 $data->status_pindah_barang = 0;
                 $data->type = 0;
                 $data->user_created = session()->get('user')['id_pengguna'];
@@ -103,12 +140,16 @@ class SendToBranchController extends Controller
             }
 
             $data->save();
+            if (isset($request->detele_details)) {
+                $data->removedetails($request->detele_details, 'out');
+            }
+
             $data->saveDetails($request->details, 'out');
             DB::commit();
             return response()->json([
                 "result" => true,
                 "message" => "Data berhasil disimpan",
-                "redirect" => route('send_to_branch'),
+                "redirect" => route('send_to_branch-entry', $data->id_pindah_barang),
             ], 200);
         } catch (\Exception $e) {
             DB::rollback();
@@ -130,7 +171,7 @@ class SendToBranchController extends Controller
         $data = MoveBranch::where('type', 0)->where('id_pindah_barang', $id)->first();
         return view('ops.sendToBranch.detail', [
             'data' => $data,
-            "pageTitle" => "SCA OPS | kirim Ke Cabang | Lihat",
+            "pageTitle" => "SCA OPS | Kirim Ke Cabang | Lihat",
         ]);
     }
 
@@ -187,7 +228,7 @@ class SendToBranchController extends Controller
                 'mqc.id_satuan_barang',
                 'nama_satuan_barang',
                 'kode_batang_master_qr_code as qr_code',
-                'jumlah_master_qr_code as qty',
+                'sisa_master_qr_code as qty',
                 'sg_master_qr_code as sg',
                 'be_master_qr_code as be',
                 'ph_master_qr_code as ph',
@@ -197,11 +238,16 @@ class SendToBranchController extends Controller
                 'id_rak',
                 'sisa_master_qr_code',
                 'tanggal_expired_master_qr_code as tanggal_kadaluarsa',
-                'batch_master_qr_code as batch'
+                'batch_master_qr_code as batch',
+                'zak',
+                'id_wrapper_zak',
+                'weight_zak',
+                'mqc.status_qc_qr_code'
             )
             ->leftJoin('barang', 'mqc.id_barang', '=', 'barang.id_barang')
             ->leftJoin('satuan_barang', 'mqc.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
             ->where('id_cabang', $idCabang)->where('mqc.id_gudang', $idGudang)
+        // ->where('mqc.status_qc_qr_code', 1)
             ->where('mqc.kode_batang_master_qr_code', $qrcode)
             ->first();
 
@@ -214,6 +260,9 @@ class SendToBranchController extends Controller
         } else if ($data && $data->sisa_master_qr_code <= 0) {
             $status = 500;
             $message = "Barang sudah habis";
+        } else if ($data && $data->status_qc_qr_code != '1') {
+            $status = 500;
+            $message = 'Barang belum di QC';
         } else {
             $message = '';
             $status = 200;
@@ -224,5 +273,29 @@ class SendToBranchController extends Controller
             'data' => $data,
             'message' => $message,
         ], $status);
+    }
+
+    public function printData($id)
+    {
+        if (checkAccessMenu('kirim_ke_cabang', 'print') == false) {
+            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+        }
+
+        $dataSatuan = DB::table('isi_satuan_barang')->select(DB::raw('distinct(isi_satuan_barang.id_satuan_barang)'), 'id_barang', 'nama_satuan_barang')
+            ->leftJoin('satuan_barang', 'isi_satuan_barang.id_satuan_barang', 'satuan_barang.id_satuan_barang')
+            ->where('satuan_wadah_isi_satuan_barang', '1')->get();
+        $arraySatuan = [];
+        foreach ($dataSatuan as $satuan) {
+            $arraySatuan[$satuan->id_barang] = $satuan->nama_satuan_barang;
+        }
+
+        $data = MoveBranch::where('id_jenis_transaksi', 21)->where('id_pindah_barang', $id)->first();
+        if (!$data) {
+            return 'data tidak ditemukan';
+        }
+
+        $pdf = PDF::loadView('ops.sendToBranch.print', ['data' => $data, 'arraySatuan' => $arraySatuan]);
+        $pdf->setPaper('a5', 'landscape');
+        return $pdf->stream('Surat jalan pindah cabang ' . $data->kode_pindah_barang . '.pdf');
     }
 }

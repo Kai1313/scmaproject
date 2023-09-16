@@ -32,24 +32,25 @@
         <div class="box">
             <div class="box-header">
                 <h3 class="box-title">{{ $data ? 'Ubah' : 'Tambah' }} Pembungkus</h3>
-                <a href="{{ route('master-wrapper') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right"><span
-                        class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali</a>
+                <a href="{{ route('master-wrapper') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right">
+                    <span class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali
+                </a>
             </div>
             <div class="box-body">
                 <form action="{{ route('master-wrapper-save-entry', $data ? $data->id_wrapper : 0) }}" method="post"
                     enctype="multipart/form-data" class="post-action">
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-group">
                                 <label>Cabang <span>*</span></label>
                                 <select name="id_cabang" class="form-control select2" data-validation="[NOTEMPTY]"
                                     data-validation-message="Cabang tidak boleh kosong">
                                     <option value="">Pilih Cabang</option>
-                                    @foreach ($cabang as $branch)
-                                        <option value="{{ $branch->id_cabang }}"
-                                            {{ old('id_cabang', $data ? $data->id_cabang : '') == $branch->id_cabang ? 'selected' : '' }}>
-                                            {{ $branch->nama_cabang }}</option>
-                                    @endforeach
+                                    @if ($data && $data->id_cabang)
+                                        <option value="{{ $data->id_cabang }}" selected>
+                                            {{ $data->cabang->kode_cabang }} - {{ $data->cabang->nama_cabang }}
+                                        </option>
+                                    @endif
                                 </select>
                             </div>
                             <div class="form-group">
@@ -60,6 +61,20 @@
                                     data-validation-message="nama pembungkus tidak boleh kosong">
                             </div>
                             <div class="form-group">
+                                <label>Kategori Pembungkus <span>*</span></label>
+                                <select name="id_kategori_wrapper" class="form-control select2">
+                                    <option value="">Pilih Kategori Pembungkus</option>
+                                    <option value="1" {{ old('id_kategori_wrapper') == '1' ? 'selected' : '' }}>
+                                        Palet
+                                    </option>
+                                    <option value="2" {{ old('id_kategori_wrapper') == '2' ? 'selected' : '' }}>
+                                        Wadah
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
                                 <label>Berat <span>*</span></label>
                                 <div class="input-group">
                                     <input type="text" name="weight" class="form-control handle-number-4"
@@ -68,32 +83,31 @@
                                     <span class="input-group-addon">KG</span>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-md-6">
                             <div class="form-group">
                                 <label>Catatan</label>
                                 <textarea name="catatan" class="form-control" rows="4">{{ old('catatan', $data ? $data->catatan : '') }}</textarea>
                             </div>
+                        </div>
+                        <div class="col-md-4">
                             <div class="form-group">
                                 <label>Gambar</label>
+                                <input id="f_image" type="file" class="form-control" name="file_upload"
+                                    accept=".png,.jpeg,.jpg">
+                                <input type="hidden" name="image_path">
                                 <br>
                                 @if ($data && $data->path)
-                                    <a href="{{ env('FTP_GET_FILE') . $data->path }}" target="_blank">
-                                        <img src="{{ env('FTP_GET_FILE') . $data->path2 }}" alt="" width="100"
+                                    <a href="{{ asset('asset/' . $data->path) }}" target="_blank">
+                                        <img src="{{ asset('asset/' . $data->path) }}" alt="" width="100"
                                             id="uploadPreview1" style="margin:10px 10px 10px 0px;border-radius:5px;">
                                     </a>
                                 @else
                                     <img alt="" width="100" id="uploadPreview1">
                                 @endif
-                                <br>
-                                <input id="f_image" type="file" class="form-control" name="file_upload"
-                                    accept=".png,.jpeg,.jpg">
-                                <input type="hidden" name="image_path">
                             </div>
                         </div>
                     </div>
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                    <button class="btn btn-primary btn-flat pull-right" type="submit">
+                    <button class="btn btn-primary btn-flat pull-right btn-sm" type="submit">
                         <i class="glyphicon glyphicon-floppy-saved"></i> Simpan Data
                     </button>
                 </form>
@@ -111,6 +125,11 @@
 
 @section('externalScripts')
     <script>
+        let branch = {!! json_encode($cabang) !!}
+        $('[name="id_cabang"]').select2({
+            data: branch
+        })
+
         $('.select2').select2()
 
         $('[name="file_upload"]').change(function() {

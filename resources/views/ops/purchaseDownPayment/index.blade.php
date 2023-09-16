@@ -60,8 +60,7 @@
                         <div class="form-group">
                             <select name="id_cabang" class="form-control select2">
                                 @foreach ($cabang as $branch)
-                                    <option value="{{ $branch->id_cabang }}">{{ $branch->kode_cabang }} -
-                                        {{ $branch->nama_cabang }}
+                                    <option value="{{ $branch['id'] }}">{{ $branch['text'] }}
                                     </option>
                                 @endforeach
                             </select>
@@ -93,7 +92,8 @@
                                 <th>Mata Uang</th>
                                 <th>Rate</th>
                                 <th>Nominal</th>
-                                <th>Total</th>
+                                <th>Konversi Rupiah</th>
+                                <th>Total Tagihan</th>
                                 <th>Catatan</th>
                                 <th width="150px">Action</th>
                             </tr>
@@ -126,37 +126,50 @@
                 '[name="show_void"]').is(':checked'),
             columns: [{
                 data: 'kode_uang_muka_pembelian',
-                name: 'kode_uang_muka_pembelian'
+                name: 'ump.kode_uang_muka_pembelian'
             }, {
                 data: 'tanggal',
-                name: 'tanggal'
+                name: 'ump.tanggal'
             }, {
                 data: 'nama_permintaan_pembelian',
-                name: 'nama_permintaan_pembelian',
+                name: 'pp.nama_permintaan_pembelian',
             }, {
                 data: 'nama_pemasok',
-                name: 'nama_pemasok',
+                name: 'p.nama_pemasok',
             }, {
                 data: 'nama_mata_uang',
-                name: 'nama_mata_uang',
+                name: 'mu.nama_mata_uang',
             }, {
                 data: 'rate',
-                name: 'rate',
-                render: $.fn.dataTable.render.number('.', ',', 2),
+                name: 'ump.rate',
+                render: function(data) {
+                    return data ? formatNumber(data, 4) : 0
+                },
                 className: 'text-right'
             }, {
                 data: 'nominal',
-                name: 'nominal',
-                render: $.fn.dataTable.render.number('.', ',', 2),
+                name: 'ump.nominal',
+                render: function(data) {
+                    return data ? formatNumber(data, 4) : 0
+                },
+                className: 'text-right'
+            }, {
+                data: 'konversi_nominal',
+                name: 'ump.konversi_nominal',
+                render: function(data) {
+                    return data ? formatNumber(data, 4) : 0
+                },
                 className: 'text-right'
             }, {
                 data: 'total',
-                name: 'total',
-                render: $.fn.dataTable.render.number('.', ',', 2),
+                name: 'ump.total',
+                render: function(data) {
+                    return data ? formatNumber(data, 4) : 0
+                },
                 className: 'text-right'
             }, {
                 data: 'catatan',
-                name: 'catatan',
+                name: 'ump.catatan',
             }, {
                 data: 'action',
                 name: 'action',

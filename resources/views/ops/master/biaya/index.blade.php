@@ -48,9 +48,7 @@
                         <div class="form-group">
                             <select name="id_cabang" class="form-control select2">
                                 @foreach ($cabang as $branch)
-                                    <option value="{{ $branch->id_cabang }}">{{ $branch->kode_cabang }} -
-                                        {{ $branch->nama_cabang }}
-                                    </option>
+                                    <option value="{{ $branch['id'] }}">{{ $branch['text'] }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -104,29 +102,31 @@
             ajax: "{{ route('master-biaya') }}?c=" + $('[name="id_cabang"]').val(),
             columns: [{
                 data: 'nama_biaya',
-                name: 'nama_biaya'
+                name: 'mb.nama_biaya'
             }, {
                 data: 'akun_biaya',
                 name: 'ma.nama_akun'
             }, {
                 data: 'isppn',
-                name: 'isppn',
+                name: 'mb.isppn',
                 className: 'text-center'
             }, {
                 data: 'ispph',
-                name: 'ispph',
+                name: 'mb.ispph',
                 className: 'text-center'
             }, {
                 data: 'value_pph',
-                name: 'value_pph',
-                render: $.fn.dataTable.render.number('.', ',', 2),
+                name: 'mb.value_pph',
+                render: function(data) {
+                    return data ? formatNumber(data, 2) : 0
+                },
                 className: 'text-right'
             }, {
                 data: 'akun_pph',
                 name: 'man.nama_akun'
             }, {
                 data: 'aktif',
-                name: 'aktif',
+                name: 'mb.aktif',
                 className: 'text-center'
             }, {
                 data: 'action',

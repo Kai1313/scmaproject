@@ -56,13 +56,11 @@
             <div class="box-header">
                 <div class="row">
                     <div class="col-md-4">
-                        <label>Cabang</label>
+                        <label>Cabang Penerima</label>
                         <div class="form-group">
                             <select name="id_cabang" class="form-control select2">
                                 @foreach ($cabang as $branch)
-                                    <option value="{{ $branch->id_cabang }}">{{ $branch->kode_cabang }} -
-                                        {{ $branch->nama_cabang }}
-                                    </option>
+                                    <option value="{{ $branch['id'] }}">{{ $branch['text'] }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -81,12 +79,13 @@
                         <thead>
                             <tr>
                                 <th>Tanggal</th>
-                                <th>Kode Pindah Gudang</th>
-                                <th>Gudang</th>
+                                <th>Kode Pindah Cabang</th>
+                                <th>Kode Referensi</th>
+                                <th>Gudang Penerima</th>
                                 <th>Cabang Asal</th>
-                                <th>Keterangan</th>
                                 <th>Jasa Pengiriman</th>
                                 <th>Status</th>
+                                <th>Keterangan</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -117,25 +116,28 @@
             ajax: "{{ route('received_from_branch') }}?c=" + $('[name="id_cabang"]').val(),
             columns: [{
                 data: 'tanggal_pindah_barang',
-                name: 'tanggal_pindah_barang'
+                name: 'pb.tanggal_pindah_barang'
             }, {
                 data: 'kode_pindah_barang',
-                name: 'kode_pindah_barang'
+                name: 'pb.kode_pindah_barang'
+            }, {
+                data: 'ref_code',
+                name: 'pb2.kode_pindah_barang'
             }, {
                 data: 'nama_gudang',
-                name: 'nama_gudang'
+                name: 'gudang.nama_gudang'
             }, {
                 data: 'nama_cabang',
-                name: 'nama_cabang',
-            }, {
-                data: 'keterangan_pindah_barang',
-                name: 'keterangan_pindah_barang',
+                name: 'cabang.nama_cabang',
             }, {
                 data: 'transporter',
-                name: 'transporter',
+                name: 'pb.transporter',
             }, {
                 data: 'status_pindah_barang',
-                name: 'status_pindah_barang',
+                name: 'pb.status_pindah_barang',
+            }, {
+                data: 'keterangan_pindah_barang',
+                name: 'pb.keterangan_pindah_barang',
             }, {
                 data: 'action',
                 name: 'action',

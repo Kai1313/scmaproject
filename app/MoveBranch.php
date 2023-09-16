@@ -18,12 +18,14 @@ class MoveBranch extends Model
     protected $fillable = [
         'id_pindah_barang',
         'id_pindah_barang2',
+        'id_jenis_transaksi',
         'type',
         'id_cabang',
         'id_gudang',
         'tanggal_pindah_barang',
         'kode_pindah_barang',
-        'id_cabang_tujuan',
+        'id_cabang2',
+        'id_gudang2',
         'nomor_polisi',
         'transporter',
         'keterangan_pindah_barang',
@@ -34,7 +36,7 @@ class MoveBranch extends Model
         'dt_modified',
         'void',
         'void_user_id',
-        'id_cabang_asal',
+        'id_produksi',
     ];
 
     public function cabang()
@@ -52,14 +54,14 @@ class MoveBranch extends Model
         return $this->belongsTo(MoveBranch::class, 'id_pindah_barang2', 'id_pindah_barang');
     }
 
-    public function destinationBranch()
+    public function cabang2()
     {
-        return $this->belongsTo(Cabang::class, 'id_cabang_tujuan');
+        return $this->belongsTo(Cabang::class, 'id_cabang2');
     }
 
-    public function originBranch()
+    public function gudang2()
     {
-        return $this->belongsTo(Cabang::class, 'id_cabang_asal');
+        return $this->belongsTo(Gudang::class, 'id_gudang2');
     }
 
     public function details()
@@ -72,7 +74,12 @@ class MoveBranch extends Model
         return $this->hasMany(MoveBranchDetail::class, 'id_pindah_barang')->select('qr_code');
     }
 
-    public function formatdetail()
+    public function produksi()
+    {
+        return $this->belongsTo(Production::class, 'id_produksi');
+    }
+
+    public function formatDetailGroupBy()
     {
         return $this->hasMany(MoveBranchDetail::class, 'id_pindah_barang')
             ->select(
@@ -81,7 +88,7 @@ class MoveBranch extends Model
                 'pindah_barang_detail.id_barang',
                 'id_pindah_barang_detail',
                 'pindah_barang_detail.id_satuan_barang',
-                'qty',
+                DB::raw('sum(qty) as qty'),
                 'keterangan',
                 'qr_code',
                 'nama_barang',
@@ -90,14 +97,77 @@ class MoveBranch extends Model
                 'sg',
                 'warna',
                 'status_diterima',
+                DB::raw('(case when status_diterima = 1 then "Diterima" else "Belum diterima" end) as status_akhir'),
                 'batch',
-                'tanggal_kadaluarsa'
+                'tanggal_kadaluarsa',
+                'zak',
+                'weight_zak',
+                'id_wrapper_zak',
+                'pindah_barang_detail.id_barang as id_barang2',
+                DB::raw('count(*) as count_data')
             )
             ->leftJoin('barang', 'pindah_barang_detail.id_barang', '=', 'barang.id_barang')
-            ->leftJoin('satuan_barang', 'pindah_barang_detail.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang');
+            ->leftJoin('satuan_barang', 'pindah_barang_detail.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
+            ->groupBy(['nama_barang', 'batch']);
     }
 
-    public static function createcode($id_cabang)
+    public function formatdetail()
+    {
+        return $this->hasMany(MoveBranchDetail::class, 'id_pindah_barang')
+            ->select(
+                'pindah_barang_detail.be',
+                'pindah_barang_detail.bentuk',
+                'pindah_barang_detail.id_barang',
+                'pindah_barang_detail.id_pindah_barang_detail',
+                'pindah_barang_detail.id_satuan_barang',
+                'pindah_barang_detail.qty',
+                'pindah_barang_detail.keterangan',
+                'pindah_barang_detail.qr_code',
+                'nama_barang',
+                'nama_satuan_barang',
+                'pindah_barang_detail.ph',
+                'pindah_barang_detail.sg',
+                'pindah_barang_detail.warna',
+                DB::raw('(case when pindah_barang_detail.status_diterima = 1 then "Diterima" else "Belum diterima" end) as status_akhir'),
+                'pindah_barang_detail.status_diterima',
+                'pindah_barang_detail.batch',
+                'pindah_barang_detail.tanggal_kadaluarsa',
+                'pindah_barang_detail.zak',
+                'pindah_barang_detail.weight_zak',
+                'pindah_barang_detail.id_wrapper_zak'
+                // 'pbd.qr_code as accept_qr_code'
+            )
+            ->leftJoin('barang', 'pindah_barang_detail.id_barang', '=', 'barang.id_barang')
+            ->leftJoin('satuan_barang', 'pindah_barang_detail.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
+            ->leftJoin('pindah_barang as pb', 'pindah_barang_detail.id_pindah_barang', 'pb.id_pindah_barang');
+        // ->leftJoin('pindah_barang as pb2', 'pb.id_pindah_barang', 'pb2.id_pindah_barang2');
+        // ->leftJoin('pindah_barang_detail as pbd', function ($jo) {
+        //     $jo->on('pindah_barang_detail.qr_code', 'pbd.qr_code')->on('pbd.id_pindah_barang', 'pb2.id_pindah_barang');
+        // });
+    }
+
+    public function notReceivedDetail()
+    {
+        return $this->hasMany(MoveBranchDetail::class, 'id_pindah_barang')
+            ->select(
+                'pindah_barang_detail.id_barang',
+                'pindah_barang_detail.id_pindah_barang_detail',
+                'pindah_barang_detail.id_satuan_barang',
+                'pindah_barang_detail.qty',
+                'pindah_barang_detail.qr_code',
+                'nama_barang',
+                'nama_satuan_barang',
+                'status_diterima',
+                DB::raw('(case when pindah_barang_detail.status_diterima = 1 then "Diterima" else "Belum diterima" end) as status_diterima'),
+                'pindah_barang_detail.batch',
+                'pindah_barang_detail.tanggal_kadaluarsa'
+            )
+            ->leftJoin('barang', 'pindah_barang_detail.id_barang', '=', 'barang.id_barang')
+            ->leftJoin('satuan_barang', 'pindah_barang_detail.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
+            ->where('status_diterima', 0);
+    }
+
+    public static function createcodeCabang($id_cabang)
     {
         $branchCode = DB::table('cabang')->where('id_cabang', $id_cabang)->first();
         $string = 'TC.' . $branchCode->kode_cabang . '.' . date('ym');
@@ -111,42 +181,66 @@ class MoveBranch extends Model
         return $string . '.' . $nol . $check;
     }
 
-    public function savedetails($details, $type = 'in')
+    public static function createcodeGudang($id_cabang)
     {
-        $idJenisTransaksi = ($type == 'out') ? '21' : '22';
-        $detail = json_decode($details);
-        $ids = array_column($detail, 'id_pindah_barang_detail');
-        $selectTrash = MoveBranchDetail::where('id_pindah_barang', $this->id_pindah_barang)
-            ->whereNotIn('id_pindah_barang_detail', $ids)
-            ->get();
-        foreach ($selectTrash as $trash) {
-            $trashQrCode = MasterQrCode::where('kode_batang_master_qr_code', $trash->qr_code)->first();
-            if ($trashQrCode) {
-                if ($type == 'out') {
-                    $trashQrCode->sisa_master_qr_code = $trashQrCode->jumlah_master_qr_code;
-                } else {
-                    $trashQrCode->sisa_master_qr_code = 0;
-                }
-
-                $trashQrCode->save();
-            }
-
-            $kartuStok = KartuStok::where('id_jenis_transaksi', $idJenisTransaksi)
-                ->where('kode_batang_kartu_stok', $trash->qr_code)
-                ->where('kode_kartu_stok', $this->kode_pindah_barang)
-                ->delete();
-
-            $trash->delete();
+        $branchCode = DB::table('cabang')->where('id_cabang', $id_cabang)->first();
+        $string = 'TG.' . $branchCode->kode_cabang . '.' . date('ym');
+        $check = DB::table('pindah_barang')->where('kode_pindah_barang', 'like', $string . '%')->count();
+        $check += 1;
+        $nol = '';
+        for ($i = 0; $i < (4 - strlen((string) $check)); $i++) {
+            $nol .= '0';
         }
 
+        return $string . '.' . $nol . $check;
+    }
+
+    public function removedetails($details, $type = 'in')
+    {
+        $idJenisTransaksi = $this->id_jenis_transaksi;
+        $detail = json_decode($details);
+        $ids = array_column($detail, 'id_pindah_barang_detail');
+        foreach ($detail as $trash) {
+            $selectTrash = MoveBranchDetail::where('id_pindah_barang', $this->id_pindah_barang)
+                ->where('id_pindah_barang_detail', $trash->id_pindah_barang_detail)
+                ->first();
+            if ($selectTrash) {
+                $trashQrCode = MasterQrCode::where('kode_batang_master_qr_code', $trash->qr_code)->first();
+                if ($trashQrCode) {
+                    if ($type == 'out') {
+                        $trashQrCode->sisa_master_qr_code = $trash->qty;
+                    } else {
+                        $trashQrCode->sisa_master_qr_code = 0;
+                    }
+
+                    $trashQrCode->save();
+                }
+
+                $kartuStok = KartuStok::where('id_jenis_transaksi', $idJenisTransaksi)
+                    ->where('kode_batang_kartu_stok', $trash->qr_code)
+                    ->where('kode_kartu_stok', $this->kode_pindah_barang)
+                    ->delete();
+
+                $selectTrash->delete();
+            }
+        }
+
+        return ['status' => 'success'];
+    }
+
+    public function savedetails($details, $type = 'in')
+    {
+        $idJenisTransaksi = $this->id_jenis_transaksi;
+        $detail = json_decode($details);
+
         foreach ($detail as $data) {
-            $check = MoveBranchDetail::where('id_pindah_barang_detail', $data->id_pindah_barang_detail)->first();
+            $check = MoveBranchDetail::where('id_pindah_barang', $this->id_pindah_barang)->where('qr_code', $data->qr_code)->first();
             if (!$check) {
                 $array = [
                     'id_pindah_barang' => $this->id_pindah_barang,
                     'id_barang' => $data->id_barang,
                     'id_satuan_barang' => $data->id_satuan_barang,
-                    'qty' => normalizeNumber($data->qty),
+                    'qty' => $data->qty,
                     'qr_code' => $data->qr_code,
                     'sg' => $data->sg,
                     'be' => $data->be,
@@ -158,7 +252,10 @@ class MoveBranch extends Model
                     'user_created' => session()->get('user')['id_pengguna'],
                     'dt_created' => date('Y-m-d H:i:s'),
                     'batch' => $data->batch,
-                    'tanggal_kadaluarsa' => $data->tanggal_kadaluarsa,
+                    'tanggal_kadaluarsa' => $data->tanggal_kadaluarsa ? $data->tanggal_kadaluarsa : null,
+                    'zak' => $data->zak,
+                    'id_wrapper_zak' => $data->id_wrapper_zak,
+                    'weight_zak' => $data->weight_zak,
                 ];
                 $store = new MoveBranchDetail;
                 $store->fill($array);
@@ -167,7 +264,7 @@ class MoveBranch extends Model
                 $master = MasterQrCode::where('kode_batang_master_qr_code', $data->qr_code)->first();
                 if ($master) {
                     if ($type == 'in' && $data->status_diterima == 1) {
-                        $master->sisa_master_qr_code = $master->jumlah_master_qr_code;
+                        $master->sisa_master_qr_code = $data->qty;
                         $master->id_cabang = $this->id_cabang;
                         $master->id_gudang = $this->id_gudang;
                         $master->id_jenis_transaksi = $idJenisTransaksi;
@@ -178,34 +275,50 @@ class MoveBranch extends Model
                     $master->save();
                 }
 
-                DB::table('kartu_stok')->insert([
-                    'id_gudang' => $this->id_gudang,
-                    'id_jenis_transaksi' => $idJenisTransaksi,
-                    'kode_kartu_stok' => $this->kode_pindah_barang,
-                    'id_barang' => $data->id_barang,
-                    'id_satuan_barang' => $data->id_satuan_barang,
-                    'nama_kartu_stok' => $this->id_pindah_barang,
-                    'nomor_kartu_stok' => $store->id_pindah_barang_detail,
-                    'tanggal_kartu_stok' => date('Y-m-d'),
-                    'debit_kartu_stok' => 0,
-                    'kredit_kartu_stok' => ($type == 'in' && $data->status_diterima == 1) ? '-' . $store->qty : $store->qty,
-                    'tanggal_kadaluarsa_kartu_stok' => $data->tanggal_kadaluarsa,
-                    'mtotal_debit_kartu_stok' => 0,
-                    'mtotal_kredit_kartu_stok' => 0,
-                    'kode_batang_kartu_stok' => $data->qr_code,
-                    'kode_batang_lama_kartu_stok' => $data->qr_code,
-                    'rak_kartu_stok' => '',
-                    'batch_kartu_stok' => $data->batch,
-                    'id_perkiraan' => 34,
-                    'sg_kartu_stok' => $data->sg,
-                    'be_kartu_stok' => $data->be,
-                    'ph_kartu_stok' => $data->ph,
-                    'warna_kartu_stok' => $data->warna,
-                    'keterangan_kartu_stok' => $data->keterangan,
-                    'status_kartu_stok' => 1,
-                    'user_kartu_stok' => session()->get('user')['id_pengguna'],
-                    'date_kartu_stok' => date('Y-m-d H:i:s'),
-                ]);
+                if (in_array($idJenisTransaksi, ['21', '22'])) {
+                    DB::table('kartu_stok')->insert([
+                        'id_gudang' => $this->id_gudang,
+                        'id_jenis_transaksi' => $idJenisTransaksi,
+                        'kode_kartu_stok' => $this->kode_pindah_barang,
+                        'id_barang' => $data->id_barang,
+                        'id_satuan_barang' => $data->id_satuan_barang,
+                        'nama_kartu_stok' => $this->id_pindah_barang,
+                        'nomor_kartu_stok' => $store->id_pindah_barang_detail,
+                        'tanggal_kartu_stok' => $this->tanggal_pindah_barang,
+                        'debit_kartu_stok' => $type == 'in' ? $store->qty : 0,
+                        'kredit_kartu_stok' => $type == 'out' ? $store->qty : 0,
+                        'tanggal_kadaluarsa_kartu_stok' => $data->tanggal_kadaluarsa ? $data->tanggal_kadaluarsa : null,
+                        'mtotal_debit_kartu_stok' => 0,
+                        'mtotal_kredit_kartu_stok' => 0,
+                        'kode_batang_kartu_stok' => $data->qr_code,
+                        'kode_batang_lama_kartu_stok' => '',
+                        'rak_kartu_stok' => '',
+                        'batch_kartu_stok' => $data->batch,
+                        'id_perkiraan' => 34,
+                        'sg_kartu_stok' => $data->sg,
+                        'be_kartu_stok' => $data->be,
+                        'ph_kartu_stok' => $data->ph,
+                        'warna_kartu_stok' => $data->warna,
+                        'keterangan_kartu_stok' => $data->keterangan,
+                        'status_kartu_stok' => 1,
+                        'user_kartu_stok' => session()->get('user')['id_pengguna'],
+                        'date_kartu_stok' => date('Y-m-d H:i:s'),
+                        'zak' => $data->zak,
+                        'id_wrapper_zak' => $data->id_wrapper_zak,
+                        'weight_zak' => $data->weight_zak,
+                    ]);
+                }
+
+                if (in_array($idJenisTransaksi, ['24'])) {
+                    DB::table('kartu_stok')
+                        ->where('id_jenis_transaksi', $idJenisTransaksi)
+                        ->where('kode_batang_kartu_stok', $data->qr_code)
+                        ->update([
+                            'status_kartu_stok' => 1,
+                            'kode_kartu_stok' => $this->kode_pindah_barang,
+                            'tanggal_kartu_stok' => $this->tanggal_pindah_barang,
+                        ]);
+                }
             }
         }
 
@@ -217,11 +330,30 @@ class MoveBranch extends Model
         foreach ($this->details as $detail) {
             $master = MasterQrCode::where('kode_batang_master_qr_code', $detail->qr_code)->first();
             if ($master) {
-                $master->sisa_master_qr_code = $master->jumlah_master_qr_code;
+                $master->sisa_master_qr_code = $detail->qty;
                 $master->save();
             }
+
+            DB::table('kartu_stok')->where('kode_kartu_stok', $this->kode_pindah_barang)
+                ->where('kode_batang_kartu_stok', $detail->qr_code)
+                ->where('id_jenis_transaksi', $this->id_jenis_transaksi)->delete();
         }
 
         return ['status' => 'success'];
+    }
+
+    public function saveChangeStatusFromParent($array)
+    {
+        $details = MoveBranchDetail::where('id_pindah_barang', $this->id_pindah_barang)->get();
+        foreach ($details as $detail) {
+            if (in_array($detail->qr_code, $array)) {
+                $detail->status_diterima = 1;
+                $detail->save();
+            }
+        }
+
+        return response()->json([
+            'status' => 'success',
+        ]);
     }
 }

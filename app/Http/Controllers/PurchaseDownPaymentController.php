@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\ApiController;
 use App\PurchaseDownPayment;
+use App\TransactionBalance;
 use DB;
 use Illuminate\Http\Request;
 use Log;
@@ -17,7 +19,21 @@ class PurchaseDownPaymentController extends Controller
         }
 
         if ($request->ajax()) {
-            $data = DB::table('uang_muka_pembelian as ump')->select('id_uang_muka_pembelian', 'kode_uang_muka_pembelian', 'tanggal', 'pp.nama_permintaan_pembelian', DB::raw("concat(mu.kode_mata_uang,' - ',mu.nama_mata_uang) as nama_mata_uang"), 'nama_pemasok', 'rate', 'nominal', 'total', 'catatan', 'void')
+            $data = DB::table('uang_muka_pembelian as ump')
+                ->select(
+                    'id_uang_muka_pembelian',
+                    'kode_uang_muka_pembelian',
+                    'tanggal',
+                    'pp.nama_permintaan_pembelian',
+                    DB::raw("concat(mu.kode_mata_uang,' - ',mu.nama_mata_uang) as nama_mata_uang"),
+                    'nama_pemasok',
+                    'rate',
+                    'nominal',
+                    'total',
+                    'catatan',
+                    'void',
+                    'konversi_nominal'
+                )
                 ->leftJoin('permintaan_pembelian as pp', 'ump.id_permintaan_pembelian', '=', 'pp.id_permintaan_pembelian')
                 ->leftJoin('pemasok as p', 'pp.id_pemasok', '=', 'p.id_pemasok')
                 ->leftJoin('mata_uang as mu', 'ump.id_mata_uang', '=', 'mu.id_mata_uang');
@@ -31,25 +47,32 @@ class PurchaseDownPaymentController extends Controller
             }
 
             $data = $data->orderBy('ump.dt_created', 'desc');
+
+            $idUser = session()->get('user')['id_pengguna'];
+            $filterUser = DB::table('pengguna')
+                ->where(function ($w) {
+                    $w->where('id_grup_pengguna', session()->get('user')['id_grup_pengguna'])->orWhere('id_grup_pengguna', 1);
+                })
+                ->where('status_pengguna', '1')->pluck('id_pengguna')->toArray();
+
             return Datatables::of($data)
                 ->addIndexColumn()
-                ->addColumn('action', function ($row) {
-                    if ($row->void == '1') {
-                        $btn = '<label class="label label-default">Batal</label>';
-                    } else {
-                        $btn = '<ul class="horizontal-list">';
-                        $btn .= '<li><a href="' . route('purchase-down-payment-view', $row->id_uang_muka_pembelian) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
-                        $btn .= '<li><a href="' . route('purchase-down-payment-entry', $row->id_uang_muka_pembelian) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
+                ->addColumn('action', function ($row) use ($filterUser, $idUser) {
+                    $btn = '<ul class="horizontal-list">';
+                    $btn .= '<li><a href="' . route('purchase-down-payment-view', $row->id_uang_muka_pembelian) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
+                    $btn .= '<li><a href="' . route('purchase-down-payment-entry', $row->id_uang_muka_pembelian) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
+                    if ($row->void == '0' && (in_array($idUser, $filterUser) || $idUser == $row->user_created)) {
                         $btn .= '<li><a href="' . route('purchase-down-payment-delete', $row->id_uang_muka_pembelian) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Void</a></li>';
-                        $btn .= '</ul>';
                     }
+
+                    $btn .= '</ul>';
                     return $btn;
                 })
                 ->rawColumns(['action'])
                 ->make(true);
         }
 
-        $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
+        $cabang = session()->get('access_cabang');
         return view('ops.purchaseDownPayment.index', [
             'cabang' => $cabang,
             "pageTitle" => "SCA OPS | Uang Muka Pembelian | List",
@@ -75,15 +98,15 @@ class PurchaseDownPaymentController extends Controller
             $remainingPayment = $totalPO - $totalPayment;
         }
 
-        $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
-        $slip = DB::table('master_slip')->select('id_slip as id', DB::raw("CONCAT(kode_slip,' - ',nama_slip) as text"))
-            ->get();
+        $cabang = session()->get('access_cabang');
+        // $slip = DB::table('master_slip')->select('id_slip as id', DB::raw("CONCAT(kode_slip,' - ',nama_slip) as text"))
+        //     ->get();
         return view('ops.purchaseDownPayment.form', [
             'data' => $data,
             'cabang' => $cabang,
             'maxPayment' => $remainingPayment,
             "pageTitle" => "SCA OPS | Uang Muka Pembelian | " . ($id == 0 ? 'Create' : 'Edit'),
-            "slip" => $slip,
+            // "slip" => $slip,
         ]);
     }
 
@@ -111,17 +134,54 @@ class PurchaseDownPaymentController extends Controller
             $data->konversi_nominal = normalizeNumber($request->konversi_nominal);
             $data->save();
 
-            $resApi = $this->callApiJournal($data);
-            $convertResApi = (array) json_decode($resApi);
-            if ($convertResApi['result'] == false) {
+            //save saldo transaksi
+            $resultSaldoTransaksi = (new ApiController)->transactionBalance(new Request([
+                'tipe_transaksi' => 'Uang Muka Pembelian',
+                'id_transaksi' => $data->kode_uang_muka_pembelian,
+                'tanggal' => $data->tanggal,
+                'ref_id' => $data->purchaseOrder->nama_permintaan_pembelian,
+                'catatan' => $data->catatan,
+                'id_pelanggan' => null,
+                'id_pemasok' => $data->purchaseOrder->id_pemasok,
+                'dpp' => $data->konversi_nominal,
+                'ppn' => 0,
+                'uang_muka' => 0,
+                'biaya' => 0,
+                'tipe_pembayaran' => null,
+            ]));
+
+            if ($resultSaldoTransaksi->getData()->result == false) {
                 DB::rollback();
-                Log::error($convertResApi['message']);
-                Log::error($convertResApi);
+                Log::error($resultSaldoTransaksi->getData()->message);
+                Log::error($resultSaldoTransaksi);
                 return response()->json([
                     "result" => false,
-                    "message" => $convertResApi['message'],
+                    "message" => $resultSaldoTransaksi->getData()->message,
                 ], 500);
             }
+
+            // $resultJurnalUangMukaPembelian = (new ApiController)->journalUangMukaPembelian(new Request([
+            //     "no_transaksi" => $data->kode_uang_muka_pembelian,
+            //     "tanggal" => $data->tanggal,
+            //     "slip" => null,
+            //     "cabang" => $data->id_cabang,
+            //     "pemasok" => $data->purchaseOrder->id_pemasok,
+            //     "void" => $data->void,
+            //     "user" => session()->get('user')['id_pengguna'],
+            //     "total" => $data->konversi_nominal,
+            //     "uang_muka" => $data->konversi_nominal,
+            //     "ppn" => 0,
+            // ]));
+
+            // if ($resultJurnalUangMukaPembelian->getData()->result == false) {
+            //     DB::rollback();
+            //     Log::error($resultJurnalUangMukaPembelian->getData()->message);
+            //     Log::error($resultJurnalUangMukaPembelian);
+            //     return response()->json([
+            //         "result" => false,
+            //         "message" => $resultJurnalUangMukaPembelian->getData()->message,
+            //     ], 500);
+            // }
 
             DB::commit();
             return response()->json([
@@ -173,15 +233,36 @@ class PurchaseDownPaymentController extends Controller
             $data->void_user_id = session()->get('user')['id_pengguna'];
             $data->save();
 
-            $resApi = $this->callApiJournal($data);
-            $convertResApi = (array) json_decode($resApi);
-            if ($convertResApi['result'] == false) {
-                DB::rollback();
-                Log::error($convertResApi['message']);
-                Log::error($convertResApi);
+            $payment = TransactionBalance::where('id_transaksi', $data->kode_uang_muka_pembelian)->where('tipe_transaksi', 'Uang Muka Pembelian')->first();
+            if ($payment && $payment->bayar > 0) {
                 return response()->json([
                     "result" => false,
-                    "message" => $convertResApi['message'],
+                    "message" => "Uang muka sudah terbayar",
+                ], 500);
+            }
+
+            $payment->delete();
+
+            $resultJurnalUangMukaPembelian = (new ApiController)->journalUangMukaPembelian(new Request([
+                "no_transaksi" => $data->kode_uang_muka_pembelian,
+                "tanggal" => $data->tanggal,
+                "slip" => null,
+                "cabang" => $data->id_cabang,
+                "pemasok" => $data->purchaseOrder->id_pemasok,
+                "void" => $data->void,
+                "user" => session()->get('user')['id_pengguna'],
+                "total" => $data->konversi_nominal,
+                "uang_muka" => $data->konversi_nominal,
+                "ppn" => 0,
+            ]));
+
+            if ($resultJurnalUangMukaPembelian->getData()->result == false) {
+                DB::rollback();
+                Log::error($resultJurnalUangMukaPembelian->getData()->message);
+                Log::error($resultJurnalUangMukaPembelian);
+                return response()->json([
+                    "result" => false,
+                    "message" => $resultJurnalUangMukaPembelian->getData()->message,
                 ], 500);
             }
 
@@ -197,7 +278,7 @@ class PurchaseDownPaymentController extends Controller
             Log::error($e);
             return response()->json([
                 "result" => false,
-                "message" => "Data gagal tersimpana",
+                "message" => "Data gagal diproses",
             ], 500);
         }
     }
@@ -205,19 +286,30 @@ class PurchaseDownPaymentController extends Controller
     public function autoPo(Request $request)
     {
         $idCabang = $request->id_cabang;
-        $duration = DB::table('setting')->where('code', 'UMP Duration')->first();
-        $startDate = date('Y-m-d', strtotime('-' . intval($duration->value2) . ' days'));
+        $duration = DB::table('setting')->where('code', 'UMB Duration')->first();
+        $valDuration = '1';
+        if ($duration) {
+            $valDuration = $duration->value2;
+        }
+
+        $startDate = date('Y-m-d', strtotime('-' . intval($valDuration) . ' days'));
         $endDate = date('Y-m-d');
-        $datas = DB::table('permintaan_pembelian as pp')->select('pp.id_permintaan_pembelian as id', 'nama_permintaan_pembelian as text', 'mtotal_permintaan_pembelian')
+        $datas = DB::table('permintaan_pembelian as pp')
+            ->select(
+                'pp.id_permintaan_pembelian as id',
+                DB::raw('concat(nama_permintaan_pembelian," ( ",nama_pemasok," )") as text'),
+                'mtotal_permintaan_pembelian'
+            )
             ->leftJoin('uang_muka_pembelian as ump', function ($join) {
                 $join->on('pp.id_permintaan_pembelian', '=', 'ump.id_permintaan_pembelian')
                     ->where('ump.void', 0);
             })
+            ->leftJoin('pemasok as p', 'pp.id_pemasok', 'p.id_pemasok')
             ->whereBetween('tanggal_permintaan_pembelian', [$startDate, $endDate])
             ->where('pp.id_cabang', $idCabang)
             ->groupBy('pp.id_permintaan_pembelian')
             ->having(DB::raw('mtotal_permintaan_pembelian - COALESCE(sum(nominal),0)'), '<>', '0')
-            ->orderBy('tanggal_permintaan_penjualan', 'desc')->get();
+            ->orderBy('tanggal_permintaan_pembelian', 'desc')->get();
         return response()->json([
             'result' => true,
             'data' => $datas,
@@ -243,61 +335,7 @@ class PurchaseDownPaymentController extends Controller
             'total' => $countDataPo->mtotal_permintaan_pembelian,
             'nilai_mata_uang' => $countDataPo->nilai_mata_uang,
             'id_mata_uang' => $countDataPo->id_mata_uang,
+            'nama_mata_uang' => $countDataPo->nama_mata_uang,
         ], 200);
-    }
-
-    public function callApiJournal($data)
-    {
-        try {
-            $date = date('Y-m-d H:i:s');
-            $findToken = DB::table('token_pengguna')->where('id_pengguna', session()->get('user')['id_pengguna'])
-                ->where('status_token_pengguna', '1')
-                ->where('waktu_habis_token_pengguna', '>=', $date)
-                ->where('nama2_token_pengguna', '!=', null)
-                ->orderBy('date_token_pengguna', 'desc')->first();
-            $token = $findToken->nama2_token_pengguna;
-            if ($token) {
-                $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL, route('jurnal-otomatis-uangmuka-pembelian'));
-                curl_setopt($ch, CURLOPT_POST, 1);
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-                    'Accept: application/json',
-                    'Authorization: Bearer ' . $token,
-                ));
-                curl_setopt($ch, CURLOPT_POSTFIELDS,
-                    http_build_query(
-                        array(
-                            "no_transaksi" => $data->kode_uang_muka_pembelian,
-                            "tanggal" => $data->tanggal,
-                            "slip" => $data->id_slip,
-                            "cabang" => $data->id_cabang,
-                            "pemasok" => $data->purchaseOrder->id_pemasok,
-                            "void" => $data->void,
-                            "user" => session()->get('user')['id_pengguna'],
-                            "total" => $data->nominal,
-                            "uang_muka" => $data->nominal,
-                            "ppn" => 0,
-                        )
-                    )
-                );
-                $newData = curl_exec($ch);
-                curl_close($ch);
-                return $newData;
-            } else {
-                Log::error("Error when token tidak ditemukan");
-                return response()->json([
-                    "result" => false,
-                    "message" => "Token tidak ditemukan",
-                ], 500);
-            }
-        } catch (\Exception $th) {
-            Log::error("Error when gagal purchase down payment");
-            Log::error($th);
-            return response()->json([
-                "result" => false,
-                "message" => "Data gagal tersimpan",
-            ], 500);
-        }
     }
 }

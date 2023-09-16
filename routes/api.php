@@ -14,12 +14,14 @@ use Illuminate\Support\Facades\Route;
  */
 
 Route::post('login', 'ApiController@login');
+Route::post('store_fcm_token', 'ApiController@storeFcmToken');
 
 Route::group(['middleware' => ['auth:api']], function () {
     Route::get('profile', 'ApiController@profile');
     Route::post('logout', 'ApiController@logout');
 
     Route::post('transaction-balance', 'ApiController@transactionBalance')->name('transaction-balance');
+    Route::post('minimal-stok', 'ApiController@stokmin')->name('minimal-stok');
 
     Route::prefix('/jurnal_otomatis')->group(function () {
         Route::post('/uangmuka_penjualan', 'ApiController@journalUangMukaPenjualan')->name('jurnal-otomatis-uangmuka-penjualan');
@@ -33,5 +35,6 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::post('/jurnal_closing_pemakaian', 'ApiController@jurnalClosingPemakaian')->name('jurnal-otomatis-closing-pemakaian');
         Route::post('/jurnal_closing_retur_jual', 'ApiController@jurnalClosingReturJual')->name('jurnal-otomatis-closing-retur-jual');
     });
-});
 
+    require __DIR__ . '/penyusutan/penyusutan.php';
+});

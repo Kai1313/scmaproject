@@ -53,11 +53,11 @@
                                 <select name="id_cabang" class="form-control select2" data-validation="[NOTEMPTY]"
                                     data-validation-message="Cabang tidak boleh kosong">
                                     <option value="">Pilih Cabang</option>
-                                    @foreach ($cabang as $branch)
-                                        <option value="{{ $branch->id_cabang }}"
-                                            {{ old('id_cabang', $data ? $data->id_cabang : '') == $branch->id_cabang ? 'selected' : '' }}>
-                                            {{ $branch->nama_cabang }}</option>
-                                    @endforeach
+                                    @if ($data && $data->id_cabang)
+                                        <option value="{{ $data->id_cabang }}" selected>
+                                            {{ $data->cabang->kode_cabang }} - {{ $data->cabang->nama_cabang }}
+                                        </option>
+                                    @endif
                                 </select>
                             </div>
                             <label>Kode Uang Muka Pembelian</label>
@@ -75,13 +75,14 @@
                             </div>
                             <label>ID Permintaan Pembelian (PO) <span>*</span></label>
                             <div class="form-group">
-                                <select name="id_permintaan_pembelian" class="form-control selectAjax"
+                                <select name="id_permintaan_pembelian" class="form-control select2"
                                     data-validation="[NOTEMPTY]"
                                     data-validation-message="ID permintaan pembelian tidak boleh kosong">
                                     <option value="">Pilih Permintaan Pembelian (PO)</option>
                                     @if ($data && $data->id_permintaan_pembelian)
                                         <option value="{{ $data->id_permintaan_pembelian }}" selected>
-                                            {{ $data->purchaseOrder->nama_permintaan_pembelian }}
+                                            {{ $data->purchaseOrder->nama_permintaan_pembelian }} (
+                                            {{ $data->purchaseOrder->supplier->nama_pemasok }} )
                                         </option>
                                     @endif
                                 </select>
@@ -108,23 +109,22 @@
                                     data-max="{{ $maxPayment }}" data-validation="[NOTEMPTY]"
                                     data-validation-message="Nominal tidak boleh kosong">
                             </div>
-                            <label>Konversi Nominal <span>*</span></label>
+                            <label>Konversi Rupiah</label>
                             <div class="form-group">
                                 <input type="text" name="konversi_nominal" class="form-control handle-number-2" readonly
                                     value="{{ old('konversi_nominal', $data ? $data->konversi_nominal : '') }}" readonly>
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <label>Total <span>*</span></label>
+                            <label>Total Tagihan</label>
                             <div class="form-group">
                                 <input type="text" name="total" class="form-control handle-number-2" readonly
                                     value="{{ old('total', $data ? $data->total : '') }}" data-validation="[NOTEMPTY]"
                                     data-validation-message="Total tidak boleh kosong">
                             </div>
-                            <label>Slip <span>*</span></label>
+                            {{-- <label>Slip</label>
                             <div class="form-group">
-                                <select name="id_slip" class="form-control select2" data-validation="[NOTEMPTY]"
-                                    data-validation-message="Slip tidak boleh kosong">
+                                <select name="id_slip" class="form-control select2">
                                     <option value="">Pilih Slip</option>
                                     @foreach ($slip as $dataSlip)
                                         <option value="{{ $dataSlip->id }}"
@@ -132,7 +132,7 @@
                                             {{ $dataSlip->text }}</option>
                                     @endforeach
                                 </select>
-                            </div>
+                            </div> --}}
                             <label>Catatan</label>
                             <div class="form-group">
                                 <textarea name="catatan" class="form-control" rows="5">{{ old('catatan', $data ? $data->catatan : '') }}</textarea>
@@ -159,24 +159,16 @@
 
 @section('externalScripts')
     <script>
+        let branch = {!! json_encode($cabang) !!}
         $('.select2').select2()
         $('.datepicker').datepicker({
             format: 'yyyy-mm-dd',
         });
 
-        if ($('[name="id_cabang"]').val() == '') {
-            $('[name="id_permintaan_pembelian"]').prop('disabled', true)
-        }
-
-        $('[name="id_cabang"]').select2().on('select2:select', function(e) {
+        $('[name="id_cabang"]').select2({
+            data: branch
+        }).on('select2:select', function(e) {
             let dataselect = e.params.data
-            let self = $('[name="id_permintaan_pembelian"]')
-            if (dataselect.id == '') {
-                self.val('').prop('disabled', true).trigger('change')
-            } else {
-                self.val('').prop('disabled', false).trigger('change')
-            }
-
             $('[name="nominal"]').val('').attr('data-max', 0)
             $('[name="total"]').val('')
             getPurchaseOrder()
@@ -216,13 +208,13 @@
                     id: '{{ $data ? $data->id_uang_muka_pembelian : 0 }}'
                 },
                 success: function(res) {
-                    $('[name="nominal"]').val(formatNumber(res.nominal)).attr(
+                    $('[name="nominal"]').val(formatNumber(res.nominal, 2)).attr(
                         'data-max', res
                         .nominal)
-                    $('[name="total"]').val(formatNumber(res.total))
+                    $('[name="total"]').val(formatNumber(res.total, 2))
                     $('[name="id_mata_uang"]').val(res.id_mata_uang)
-                    $('[name="rate"]').val(formatNumber(res.nilai_mata_uang))
-                    $('[name="konversi_nominal"]').val(formatNumber(res.nilai_mata_uang * res.nominal))
+                    $('[name="rate"]').val(formatNumber(res.nilai_mata_uang, 2))
+                    $('[name="konversi_nominal"]').val(formatNumber(res.nilai_mata_uang * res.nominal, 2))
                     $('[name="nama_mata_uang"]').val(res.nama_mata_uang)
                     $('#cover-spin').hide()
                 },
@@ -236,7 +228,7 @@
         $('body').on('input', '[name="rate"],[name="nominal"]', function() {
             let rate = normalizeNumber($('[name="rate"]').val())
             let nominal = normalizeNumber($('[name="nominal"]').val())
-            $('[name="konversi_nominal"]').val(formatNumber(rate * nominal))
+            $('[name="konversi_nominal"]').val(formatNumber(rate * nominal, 2))
         })
     </script>
 @endsection

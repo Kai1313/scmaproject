@@ -13,6 +13,9 @@
 
 use Illuminate\Support\Facades\Route;
 
+//tes firebase
+Route::get('firebase', 'SessionController@tesFirebase');
+
 Route::get('/', 'SessionController@index')->name('welcome');
 Route::get('/logout', 'SessionController@logout')->name('logout');
 
@@ -30,6 +33,7 @@ Route::prefix('master_biaya')->group(function () {
     Route::get('/view/{id}', 'MasterBiayaController@viewData')->name('master-biaya-view');
     Route::post('/save_entry/{id}', 'MasterBiayaController@saveEntry')->name('master-biaya-save-entry');
     Route::get('/delete/{id}', 'MasterBiayaController@destroy')->name('master-biaya-delete');
+    Route::get('/get-account', 'MasterBiayaController@getAccountFilter')->name('master-biaya-get-account');
 });
 
 Route::prefix('master_wrapper')->group(function () {
@@ -51,6 +55,7 @@ Route::prefix('purchase_requisitions')->group(function () {
     Route::get('/auto_satuan', 'PurchaseRequestController@autoSatuan')->name('purchase-request-auto-satuan');
     Route::get('/change_status/{id}/{type}', 'PurchaseRequestController@changeStatus')->name('purchase-request-change-status');
     Route::get('/print/{id}', 'PurchaseRequestController@printData')->name('purchase-request-print-data');
+    Route::post('/change_status_detail', 'PurchaseRequestController@changeStatusDetail')->name('purchase-request-change-status-detail');
 });
 
 Route::prefix('uang_muka_pembelian')->group(function () {
@@ -79,25 +84,149 @@ Route::prefix('qc_penerimaan_barang')->group(function () {
     Route::post('/save_entry/{id}', 'QcReceiptController@saveEntry')->name('qc_receipt-save-entry');
     Route::get('/auto_purchasing', 'QcReceiptController@autoPurchasing')->name('qc_receipt-auto-purchasing');
     Route::get('/auto-item', 'QcReceiptController@autoItem')->name('qc_receipt-auto-item');
+    Route::get('/print/{id}', 'QcReceiptController@printData')->name('qc_receipt-print-data');
+    Route::get('/find', 'QcReceiptController@findDataQc')->name('qc_receipt-find-data-qc');
+    Route::post('/save-change-status/{id}', 'QcReceiptController@saveChangeStatus')->name('qc_receipt-save-change-status');
 });
 
-Route::prefix('send_to_branch')->group(function () {
+Route::prefix('kirim_ke_cabang')->group(function () {
     Route::get('/index/{user_id?}', 'SendToBranchController@index')->name('send_to_branch');
     Route::get('/entry/{id?}', 'SendToBranchController@entry')->name('send_to_branch-entry');
     Route::post('/save_entry/{id}', 'SendToBranchController@saveEntry')->name('send_to_branch-save-entry');
     Route::get('/view/{id}', 'SendToBranchController@viewData')->name('send_to_branch-view');
     Route::get('/delete/{id}', 'SendToBranchController@destroy')->name('send_to_branch-delete');
     Route::get('/auto-qrcode', 'SendToBranchController@autoQRCode')->name('send_to_branch-qrcode');
+    Route::get('/print/{id}', 'SendToBranchController@printData')->name('send_to_branch-print-data');
 });
 
-Route::prefix('received_from_branch')->group(function () {
+Route::prefix('terima_dari_cabang')->group(function () {
     Route::get('/index/{user_id?}', 'ReceivedFromBranchController@index')->name('received_from_branch');
     Route::get('/entry/{id?}', 'ReceivedFromBranchController@entry')->name('received_from_branch-entry');
     Route::post('/save_entry/{id}', 'ReceivedFromBranchController@saveEntry')->name('received_from_branch-save-entry');
     Route::get('/view/{id}', 'ReceivedFromBranchController@viewData')->name('received_from_branch-view');
-    Route::get('/delete/{id}', 'ReceivedFromBranchController@destroy')->name('received_from_branch-delete');
+    // Route::get('/delete/{id}', 'ReceivedFromBranchController@destroy')->name('received_from_branch-delete');
     Route::get('/auto-code', 'ReceivedFromBranchController@autoCode')->name('received_from_branch-code');
     Route::get('/auto-detail-item', 'ReceivedFromBranchController@getDetailItem')->name('received_from_branch-detail-item');
+    Route::get('/print/{id}', 'ReceivedFromBranchController@printData')->name('received_from_branch-print-data');
+});
+
+Route::prefix('terima_dari_gudang')->group(function () {
+    Route::get('/index/{user_id?}', 'ReceivedFromWarehouseController@index')->name('received_from_warehouse');
+    Route::get('/entry/{id?}', 'ReceivedFromWarehouseController@entry')->name('received_from_warehouse-entry');
+    Route::post('/save_entry/{id}', 'ReceivedFromWarehouseController@saveEntry')->name('received_from_warehouse-save-entry');
+    Route::get('/view/{id}', 'ReceivedFromWarehouseController@viewData')->name('received_from_warehouse-view');
+    // Route::get('/delete/{id}', 'ReceivedFromWarehouseController@destroy')->name('received_from_warehouse-delete');
+    Route::get('/auto-qrcode', 'ReceivedFromWarehouseController@autoQRCode')->name('received_from_warehouse-qrcode');
+});
+
+Route::prefix('pemakaian')->group(function () {
+    Route::get('/index/{user_id?}', 'MaterialUsageController@index')->name('material_usage');
+    Route::get('/entry/{id?}', 'MaterialUsageController@entry')->name('material_usage-entry');
+    Route::post('/save_entry/{id}', 'MaterialUsageController@saveEntry')->name('material_usage-save-entry');
+    Route::get('/view/{id}', 'MaterialUsageController@viewData')->name('material_usage-view');
+    Route::get('/delete/{id}', 'MaterialUsageController@destroy')->name('material_usage-delete');
+    Route::get('/auto-qrcode', 'MaterialUsageController@autoQRCode')->name('material_usage-qrcode');
+    Route::get('/reload-timbangan', 'MaterialUsageController@reloadWeight')->name('material_usage-reload-weight');
+});
+
+Route::prefix('marketing-tool')->group(function () {
+    Route::prefix('pre_visit')->group(function () {
+        Route::get('/index/{user_id?}', 'ScheduleVisitController@index')->name('pre_visit');
+        Route::get('/entry/{id?}', 'ScheduleVisitController@entry')->name('pre_visit-entry');
+        Route::get('/append-map', 'ScheduleVisitController@appendMap')->name('append-map');
+        Route::post('/save_entry/{id}', 'ScheduleVisitController@saveEntry')->name('pre_visit-save-entry');
+        Route::get('/view/{id}', 'ScheduleVisitController@viewData')->name('pre_visit-view');
+        Route::get('/delete/{id}', 'ScheduleVisitController@destroy')->name('pre_visit-delete');
+        Route::get('/void/{id}', 'ScheduleVisitController@void')->name('pre_visit-void');
+    });
+
+    Route::prefix('visit')->group(function () {
+        Route::get('/index/{user_id?}', 'VisitController@index')->name('visit');
+        Route::get('/entry/{id?}', 'VisitController@entry')->name('visit-entry');
+        Route::post('/save_entry/{id}', 'VisitController@saveEntry')->name('visit-save-entry');
+        Route::get('/view/{id}', 'VisitController@viewData')->name('visit-view');
+        Route::post('/cancel-visit', 'VisitController@cancelVisit')->name('cancel-visit');
+        Route::post('/update-visit', 'VisitController@updateVisit')->name('update-visit');
+        Route::get('/delete/{id}', 'VisitController@destroy')->name('visit-delete');
+        Route::resource('reporting', 'ReportingVisitController', [
+            'as' => 'visit',
+        ]);
+        Route::prefix('/reporting')->group(function () {
+            Route::get('/select-reporting-visit', 'ReportingVisitController@select')->name('visit.reporting.select');
+        });
+    });
+
+    Route::get('/progress-visit/index/show/{show}', 'ProgressVisitController@show')->name('visit.progress-visit.show');
+    Route::get('/progress-visit/index/{user_id?}', 'ProgressVisitController@index')->name('progress_visit');
+    Route::get('/progress-visit/generate-visualisasi-data/{user_id?}', 'ProgressVisitController@generateVisualisasiData')->name('generate-visualisasi-data-visit');
+    Route::get('/progress-visit/get-calendar/{user_id?}', 'ProgressVisitController@getCalendar')->name('get-calendar-visit');
+    Route::get('/progress-visit/get-data/{user_id?}', 'ProgressVisitController@getData')->name('get-data-progress-visit');
+});
+
+Route::get('kirim_ke_gudang/print2/{id}', 'SendToWarehouseController@print2')->name('send_to_warehouse-print2');
+Route::get('kirim_ke_gudang/print/{id}', 'SendToWarehouseController@print')->name('send_to_warehouse-print');
+Route::get('stok_minimal/excel/{id}/{id_cabang}', 'StokMinHistoryController@getExcel')->name('stok_minimal-excel');
+
+Route::namespace('Report')->group(function () {
+    Route::prefix('laporan_qc_penerimaan')->group(function () {
+        Route::get('index/{user_id?}', 'QcReceivedController@index')->name('report_qc-index');
+        Route::get('print', 'QcReceivedController@print')->name('report_qc-print');
+        Route::get('excel', 'QcReceivedController@getExcel')->name('report_qc-excel');
+    });
+
+    Route::prefix('laporan_pemakaian')->group(function () {
+        Route::get('index/{user_id?}', 'MaterialUsageController@index')->name('report_material_usage-index');
+        Route::get('print', 'MaterialUsageController@print')->name('report_material_usage-print');
+        Route::get('excel', 'MaterialUsageController@getExcel')->name('report_material_usage-excel');
+    });
+
+    Route::prefix('laporan_terima_dari_cabang')->group(function () {
+        Route::get('index/{user_id?}', 'ReceivedFromBranchController@index')->name('report_received_from_branch-index');
+        Route::get('print', 'ReceivedFromBranchController@print')->name('report_received_from_branch-print');
+        Route::get('excel', 'ReceivedFromBranchController@getExcel')->name('report_received_from_branch-excel');
+    });
+
+    Route::prefix('laporan_terima_dari_gudang')->group(function () {
+        Route::get('index/{user_id?}', 'ReceivedFromWarehouseController@index')->name('report_received_from_warehouse-index');
+        Route::get('print', 'ReceivedFromWarehouseController@print')->name('report_received_from_warehouse-print');
+        Route::get('excel', 'ReceivedFromWarehouseController@getExcel')->name('report_received_from_warehouse-excel');
+    });
+
+    Route::prefix('laporan_kirim_ke_cabang')->group(function () {
+        Route::get('index/{user_id?}', 'SendToBranchController@index')->name('report_send_to_branch-index');
+        Route::get('print', 'SendToBranchController@print')->name('report_send_to_branch-print');
+        Route::get('excel', 'SendToBranchController@getExcel')->name('report_send_to_branch-excel');
+    });
+
+    Route::prefix('laporan_kirim_ke_gudang')->group(function () {
+        Route::get('index/{user_id?}', 'SendToWarehouseController@index')->name('report_send_to_warehouse-index');
+        Route::get('print', 'SendToWarehouseController@print')->name('report_send_to_warehouse-print');
+        Route::get('excel', 'SendToWarehouseController@getExcel')->name('report_send_to_warehouse-excel');
+    });
+
+    Route::prefix('laporan_uang_muka_pembelian')->group(function () {
+        Route::get('index/{user_id?}', 'PurchaseDownPaymentController@index')->name('report_purchase_down_payment-index');
+        Route::get('print', 'PurchaseDownPaymentController@print')->name('report_purchase_down_payment-print');
+        Route::get('excel', 'PurchaseDownPaymentController@getExcel')->name('report_purchase_down_payment-excel');
+    });
+
+    Route::prefix('laporan_uang_muka_penjualan')->group(function () {
+        Route::get('index/{user_id?}', 'SalesDownPaymentController@index')->name('report_sales_down_payment-index');
+        Route::get('print', 'SalesDownPaymentController@print')->name('report_sales_down_payment-print');
+        Route::get('excel', 'SalesDownPaymentController@getExcel')->name('report_sales_down_payment-excel');
+    });
+
+    Route::prefix('laporan_hutang_current')->group(function () {
+        Route::get('index/{user_id?}', 'LaporanHutangCurrentController@index')->name('report_payable-index');
+        Route::get('print', 'LaporanHutangCurrentController@print')->name('report_payable-print');
+        Route::get('excel', 'LaporanHutangCurrentController@getExcel')->name('report_payable-excel');
+    });
+
+    Route::prefix('laporan_piutang_current')->group(function () {
+        Route::get('index/{user_id?}', 'LaporanPiutangCurrentController@index')->name('report_receiveable-index');
+        Route::get('print', 'LaporanPiutangCurrentController@print')->name('report_receiveable-print');
+        Route::get('excel', 'LaporanPiutangCurrentController@getExcel')->name('report_receiveable-excel');
+    });
 });
 
 // Master
@@ -182,9 +311,9 @@ Route::prefix('transaction')->group(function () {
 });
 
 // Report
-Route::prefix('report')->group(function(){
+Route::prefix('report')->group(function () {
     // Slip
-    Route::prefix('slip')->group(function(){
+    Route::prefix('slip')->group(function () {
         Route::get('/index/{user_id?}', 'ReportSlipController@index')->name('report-slip');
         Route::get('/populate', 'ReportSlipController@populate')->name('report-slip-populate');
         Route::get('/excel', 'ReportSlipController@exportExcel')->name('report-slip-excel');
@@ -193,7 +322,7 @@ Route::prefix('report')->group(function(){
     });
 
     // Giro
-    Route::prefix('giro')->group(function(){
+    Route::prefix('giro')->group(function () {
         Route::get('/index/{user_id?}', 'ReportGiroController@index')->name('report-giro');
         Route::get('/populate', 'ReportGiroController@populate')->name('report-giro-populate');
         Route::get('/populate2', 'ReportGiroController@populate2')->name('report-giro-populate2');
@@ -203,7 +332,7 @@ Route::prefix('report')->group(function(){
     });
 
     // Ledger
-    Route::prefix('general_ledger')->group(function(){
+    Route::prefix('general_ledger')->group(function () {
         Route::get('/index/{user_id?}', 'ReportGeneralLedgerController@index')->name('report-general-ledger');
         Route::get('/populate', 'ReportGeneralLedgerController@populate')->name('report-general-ledger-populate');
         Route::get('/excel', 'ReportGeneralLedgerController@exportExcel')->name('report-general-ledger-excel');
@@ -211,7 +340,7 @@ Route::prefix('report')->group(function(){
     });
 
     // Profit Loss
-    Route::prefix('profit_loss')->group(function(){
+    Route::prefix('profit_loss')->group(function () {
         Route::get('/index/{user_id?}', 'ReportProfitAndLossController@index')->name('report-profit-loss');
         Route::get('/populate', 'ReportProfitAndLossController@populate')->name('report-profit-loss-populate');
         Route::get('/excel', 'ReportProfitAndLossController@exportExcel')->name('report-profit-loss-excel');
@@ -219,7 +348,7 @@ Route::prefix('report')->group(function(){
     });
 
     // Balance
-    Route::prefix('balance')->group(function(){
+    Route::prefix('balance')->group(function () {
         Route::get('/index/{user_id?}', 'ReportBalanceController@index')->name('report-balance');
         Route::get('/populate', 'ReportBalanceController@populate')->name('report-balance-populate');
         Route::get('/excel', 'ReportBalanceController@exportExcel')->name('report-balance-excel');
@@ -235,3 +364,24 @@ Route::get('/refresh-token', function() {
     ];
     return $data;
 })->name('refresh-token');
+
+Route::get('tes-data', function () {
+    $newQuery = \App\SaldoTransaksi::with(['pelanggan', 'penjualan'])->get();
+    $array = [];
+    foreach ($newQuery as $value) {
+        $array[] = [
+            'id_transaksi' => $value->id_transaksi,
+            'kode_pelanggan' => $value->pelanggan ? $value->pelanggan->kode_pelanggan : null,
+            'nama_pelanggan' => $value->pelanggan ? $value->pelanggan->nama_pelanggan : null,
+            'tanggal_jurnal' => $value->jurnal_detail ? $value->jurnal_detail->jurnal_header : null,
+            'tanggal_penjualan' => $value->tanggal,
+            'aging' => $value->aging,
+            'top' => $value->penjualan ? $value->penjualan->tempo_hari_penjualan : null,
+            'bayar' => $value->bayar,
+            'mtotal_penjualan' => '',
+            'sisa' => $value->sisa,
+            'tanggal' => $value->tanggal,
+        ];
+    }
+    return $array;
+});

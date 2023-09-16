@@ -49,8 +49,7 @@ class MasterBiayaController extends Controller
                 ->make(true);
         }
 
-        $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
-
+        $cabang = session()->get('access_cabang');
         return view('ops.master.biaya.index', [
             'cabang' => $cabang,
             "pageTitle" => "SCA OPS | Master Biaya | List",
@@ -64,12 +63,9 @@ class MasterBiayaController extends Controller
         }
 
         $data = MasterBiaya::find($id);
-        $akunBiaya = DB::table('master_akun')->where('isshown', 1)->get();
-        $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
-
+        $cabang = session()->get('access_cabang');
         return view('ops.master.biaya.form', [
             'data' => $data,
-            'akunBiaya' => $akunBiaya,
             'cabang' => $cabang,
             "pageTitle" => "SCA OPS | Master Biaya | " . ($id == 0 ? 'Create' : 'Edit'),
         ]);
@@ -172,5 +168,20 @@ class MasterBiayaController extends Controller
                 "message" => "Data gagal dihapus",
             ], 500);
         }
+    }
+
+    public function getAccountFilter(Request $request)
+    {
+        $akunBiaya = DB::table('master_akun')
+            ->select('id_akun as id', DB::raw('concat(kode_akun," - ",nama_akun) as text'))
+            ->where('id_cabang', $request->id_cabang)
+            ->where(function ($q) use ($request) {
+                $q->where('kode_akun', 'like', '%' . $request->search . '%')->orWhere('nama_akun', 'like', '%' . $request->search . '%');
+            })
+            ->where('isshown', 1)->limit(10)->get();
+        return response()->json([
+            'status' => 'success',
+            'data' => $akunBiaya,
+        ], 200);
     }
 }

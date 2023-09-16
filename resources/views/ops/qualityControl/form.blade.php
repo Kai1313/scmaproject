@@ -51,6 +51,21 @@
         .handle-number-4 {
             text-align: right;
         }
+
+        select[readonly].select2-hidden-accessible+.select2-container {
+            pointer-events: none;
+            touch-action: none;
+        }
+
+        select[readonly].select2-hidden-accessible+.select2-container .select2-selection {
+            background: #eee;
+            box-shadow: none;
+        }
+
+        select[readonly].select2-hidden-accessible+.select2-container .select2-selection__arrow,
+        select[readonly].select2-hidden-accessible+.select2-container .select2-selection__clear {
+            display: none;
+        }
     </style>
 @endsection
 
@@ -74,7 +89,12 @@
             <div class="box">
                 <div class="box-header">
                     <h3 class="box-title">Cari Penerimaan Pembelian</h3>
-                    <a href="{{ route('qc_receipt') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right">
+                    <a href="javascript:void(0)" class="btn btn-default btn-flat pull-right btn-print pull-right btn-sm"
+                        target="_blank" style="display:none;margin-right:10px;">
+                        <span class="glyphicon glyphicon-print mr-1"></span> Cetak
+                    </a>
+                    <a href="{{ route('qc_receipt') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right"
+                        style="margin-right:10px;">
                         <span class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali
                     </a>
                 </div>
@@ -86,11 +106,6 @@
                                 <select name="id_cabang" class="form-control select2" data-validation="[NOTEMPTY]"
                                     data-validation-message="Cabang tidak boleh kosong">
                                     <option value="">Pilih Cabang</option>
-                                    @foreach ($cabang as $branch)
-                                        <option value="{{ $branch->id_cabang }}"
-                                            {{ old('id_cabang', $data ? $data->id_cabang : '') == $branch->id_cabang ? 'selected' : '' }}>
-                                            {{ $branch->nama_cabang }}</option>
-                                    @endforeach
                                 </select>
                             </div>
                         </div>
@@ -144,8 +159,8 @@
                             <thead>
                                 <tr>
                                     <th>Nama Barang</th>
-                                    <th>Satuan</th>
                                     <th>Jumlah</th>
+                                    <th>Satuan</th>
                                     <th>Tanggal QC</th>
                                     <th>Status</th>
                                     <th>Alasan</th>
@@ -155,6 +170,7 @@
                                     <th>Warna</th>
                                     <th>Bentuk</th>
                                     <th>Keterangan</th>
+                                    {{-- <th>Foto</th> --}}
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -187,62 +203,83 @@
                                 </select>
                                 <input type="hidden" name="nama_barang" class="validate">
                             </div>
-                            <label>Total <span>*</span></label>
-                            <div class="form-group">
-                                <div class="input-group" id="qty">
-                                    <input type="text" name="jumlah_pembelian_detail"
-                                        class="form-control handle-number-4" readonly>
-                                    <span class="input-group-addon">KG</span>
+                            <div class="show-after-search">
+                                <label>Total <span>*</span></label>
+                                <div class="form-group">
+                                    <div class="input-group" id="qty">
+                                        <input type="text" name="jumlah_pembelian_detail" class="form-control"
+                                            readonly>
+                                        <span class="input-group-addon">KG</span>
+                                    </div>
+                                    <input type="hidden" name="nama_satuan_barang" class="validate">
+                                    <input type="hidden" name="id_satuan_barang" class="validate">
+                                    <input type="hidden" name="tanggal_qc" value="{{ date('Y-m-d') }}">
                                 </div>
-                                <input type="hidden" name="nama_satuan_barang" class="validate">
-                                <input type="hidden" name="id_satuan_barang" class="validate">
-                                <input type="hidden" name="tanggal_qc" value="{{ date('Y-m-d') }}">
-                            </div>
-                            <label>Status <span>*</span></label>
-                            <div class="form-group">
-                                <select name="status_qc" class="form-control validate">
-                                </select>
-                            </div>
-                            <label>Alasan</label>
-                            <div class="form-group">
-                                <textarea name="reason" class="form-control" readonly></textarea>
+                                <div class="row">
+                                    <label class="col-md-4">Status</label>
+                                    <div class="form-group col-md-8">
+                                        <div id="target-status">
+
+                                        </div>
+                                        <input name="label_status_qc" class="form-control validate" readonly
+                                            style="display:none;">
+                                        <input type="hidden" name="status_qc" value="">
+                                    </div>
+                                </div>
+                                <label>Alasan</label>
+                                <div class="form-group">
+                                    <textarea name="reason" class="form-control" readonly></textarea>
+                                </div>
+                                <label>Upload Foto</label>
+                                <input id="f_image" type="file" class="form-control" name="file_upload"
+                                    accept=".png,.jpeg,.jpg">
+                                <input type="hidden" name="image_path">
+                                <img alt="" height="100" id="uploadPreview1" style="margin:10px;">
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-6 show-after-search">
                             <div class="row">
                                 <div class="col-sm-6">
-                                    <label>SG </label>
+                                    <label>SG <span>*</span></label>
                                     <div class="form-group">
                                         <input type="text" name="sg_pembelian_detail"
-                                            class="form-control handle-number-4">
+                                            class="form-control handle-number-4 check-range validate" data-type="sg">
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
-                                    <label>BE </label>
+                                    <label>BE <span>*</span></label>
                                     <div class="form-group">
                                         <input type="text" name="be_pembelian_detail"
-                                            class="form-control handle-number-4">
+                                            class="form-control handle-number-4 check-range validate" data-type="be">
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-sm-6">
-                                    <label>PH </label>
+                                    <label>PH <span>*</span></label>
                                     <div class="form-group">
                                         <input type="text" name="ph_pembelian_detail"
-                                            class="form-control handle-number-4">
+                                            class="form-control handle-number-4 check-range validate" data-type="ph">
                                     </div>
                                 </div>
-                                <div class="col-sm-6">
-                                    <label>Warna</label>
-                                    <div class="form-group">
-                                        <input type="text" name="warna_pembelian_detail" class="form-control">
-                                    </div>
+                            </div>
+                            <label>Warna</label>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input type="text" name="warna_pembelian_detail" class="form-control" readonly>
+                                    <span class="input-group-addon">
+                                        <input type="checkbox" name="checkbox_warna" class="check-checkbox">
+                                    </span>
                                 </div>
                             </div>
                             <label>Bentuk</label>
                             <div class="form-group">
-                                <input type="text" name="bentuk_pembelian_detail" class="form-control">
+                                <div class="input-group">
+                                    <input type="text" name="bentuk_pembelian_detail" class="form-control" readonly>
+                                    <span class="input-group-addon">
+                                        <input type="checkbox" name="checkbox_bentuk" class="check-checkbox">
+                                    </span>
+                                </div>
                             </div>
                             <label>Keterangan</label>
                             <div class="form-group">
@@ -253,7 +290,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary cancel-entry btn-flat">Batal</button>
-                    <button type="button" class="btn btn-primary save-entry btn-flat">Simpan</button>
+                    <button type="button" class="btn btn-primary save-entry btn-flat show-after-search">Simpan</button>
                 </div>
             </div>
         </div>
@@ -272,105 +309,108 @@
 
 @section('externalScripts')
     <script>
+        let branch = {!! json_encode($cabang) !!}
         let arrayStatus = {!! json_encode($arrayStatus) !!};
+        let items = []
         let details = [];
         let detailSelect = []
         let statusModal = 'create'
-        let indexSelect = 0
+        let indexSelect = -1
+        let paramQcSelect = []
         $('.select2').select2()
-        $('[name="status_qc"]').select2({
-            data: arrayStatus
-        })
 
         var resDataTable = $('#table-detail').DataTable({
+            paging: false,
             data: details,
             ordering: false,
             columns: [{
-                    data: 'nama_barang',
-                    name: 'nama_barang'
+                data: 'nama_barang',
+                name: 'nama_barang'
+            }, {
+                data: 'jumlah_pembelian_detail',
+                name: 'jumlah_pembelian_detail',
+                render: function(data) {
+                    return data ? formatNumber(data, 4) : 0
                 },
-                {
-                    data: 'nama_satuan_barang',
-                    name: 'nama_satuan_barang'
+                className: 'text-right'
+            }, {
+                data: 'nama_satuan_barang',
+                name: 'nama_satuan_barang'
+            }, {
+                data: 'tanggal_qc',
+                name: 'tanggal_qc',
+            }, {
+                data: 'status_qc',
+                name: 'status_qc',
+                render: function(data, type, row) {
+                    let index = data
+                    return '<label class="' + arrayStatus[index]['class'] + '">' + arrayStatus[index][
+                        'text'
+                    ] + '</label>';
                 },
-                {
-                    data: 'jumlah_pembelian_detail',
-                    name: 'jumlah_pembelian_detail',
-                    render: $.fn.dataTable.render.number('.', ',', 4),
-                    className: 'text-right'
+                className: 'text-center'
+            }, {
+                data: 'reason',
+                name: 'reason',
+            }, {
+                data: 'sg_pembelian_detail',
+                name: 'sg_pembelian_detail',
+                render: function(data) {
+                    return data ? formatNumber(data, 4) : 0
                 },
-                {
-                    data: 'tanggal_qc',
-                    name: 'tanggal_qc',
+                className: 'text-right'
+            }, {
+                data: 'be_pembelian_detail',
+                name: 'be_pembelian_detail',
+                render: function(data) {
+                    return data ? formatNumber(data, 4) : 0
                 },
-                {
-                    data: 'status_qc',
-                    name: 'status_qc',
-                    render: function(data, type, row) {
-                        return '<label class="' + arrayStatus[data]['class'] + '">' + arrayStatus[data][
-                            'text'
-                        ] + '</label>';
-                    },
-                    className: 'text-center'
+                className: 'text-right'
+            }, {
+                data: 'ph_pembelian_detail',
+                name: 'ph_pembelian_detail',
+                render: function(data) {
+                    return data ? formatNumber(data, 4) : 0
                 },
-                {
-                    data: 'reason',
-                    name: 'reason',
-                },
-                {
-                    data: 'sg_pembelian_detail',
-                    name: 'sg_pembelian_detail',
-                    render: $.fn.dataTable.render.number('.', ',', 4),
-                    className: 'text-right'
-                },
-                {
-                    data: 'be_pembelian_detail',
-                    name: 'be_pembelian_detail',
-                    render: $.fn.dataTable.render.number('.', ',', 4),
-                    className: 'text-right'
-                },
-                {
-                    data: 'ph_pembelian_detail',
-                    name: 'ph_pembelian_detail',
-                    render: $.fn.dataTable.render.number('.', ',', 4),
-                    className: 'text-right'
-                },
-                {
-                    data: 'warna_pembelian_detail',
-                    name: 'warna_pembelian_detail',
-                },
-                {
-                    data: 'bentuk_pembelian_detail',
-                    name: 'bentuk_pembelian_detail',
-                },
-                {
-                    data: 'keterangan_pembelian_detail',
-                    name: 'keterangan_pembelian_detail',
-                },
-                {
-                    data: 'id_barang',
-                    className: 'text-center',
-                    name: 'id_barang',
-                    searchable: false,
-                    render: function(data, type, row, meta) {
-                        let btn = '';
-                        if (row.status_qc == 3) {
-                            btn = '<ul class="horizontal-list">';
-                            btn +=
-                                '<li><a href="javascript:void(0)" data-id="' + data +
-                                '" class="btn btn-warning btn-xs mr-1 mb-1 edit-entry"><i class="glyphicon glyphicon-pencil"></i></a></li>';
-                            btn += '</ul>';
-                        }
-
-                        return btn;
+                className: 'text-right'
+            }, {
+                data: 'warna_pembelian_detail',
+                name: 'warna_pembelian_detail',
+            }, {
+                data: 'bentuk_pembelian_detail',
+                name: 'bentuk_pembelian_detail',
+            }, {
+                data: 'keterangan_pembelian_detail',
+                name: 'keterangan_pembelian_detail',
+            }, {
+                data: 'id_barang',
+                className: 'text-center',
+                name: 'id_barang',
+                searchable: false,
+                render: function(data, type, row, meta) {
+                    let btn = '';
+                    if (row.status_qc == 3 || row.id == '') {
+                        btn = '<ul class="horizontal-list">';
+                        btn +=
+                            '<li><a href="javascript:void(0)" data-id="' + data +
+                            '" class="btn btn-warning btn-xs mr-1 mb-1 edit-entry"><i class="glyphicon glyphicon-pencil"></i></a></li>';
+                        btn +=
+                            '<li><a href="javascript:void(0)" data-id="' + data +
+                            '" class="btn btn-danger btn-xs mr-1 mb-1 remove-entry"><i class="glyphicon glyphicon-trash"></i></a></li>';
+                        btn += '</ul>';
                     }
-                },
-            ]
+
+                    return btn;
+                }
+            }]
         });
 
-        $('[name="id_cabang"]').select2().on('select2:select', function(e) {
+        $('[name="id_cabang"]').select2({
+            data: branch
+        }).on('select2:select', function(e) {
             let dataselect = e.params.data
             getPurchasingNumber()
+            $('[name="id_barang"]').empty()
         });
 
 
@@ -398,7 +438,6 @@
                     $('#cover-spin').hide()
                 },
                 error: function(error) {
-                    console.log(error)
                     $('#cover-spin').hide()
                 }
             })
@@ -412,29 +451,41 @@
                     number: param,
                 },
                 success: function(res) {
+                    items = res.list_item
                     $('[name="id_barang"]').empty()
                     $('[name="id_barang"]').select2({
                         data: [{
                             'id': "",
                             'text': 'Pilih Barang'
-                        }, ...res.list_item]
+                        }, ...items]
                     }).on('select2:select', function(e) {
                         let dataselect = e.params.data
+                        paramQcSelect = dataselect
                         $('#qty').find('[name="jumlah_pembelian_detail"]').val(dataselect
                             .jumlah_pembelian_detail).trigger('input')
                         $('#qty').find('span').text(dataselect.nama_satuan_barang)
                         $('[name="nama_barang"]').val(dataselect.text)
                         $('[name="nama_satuan_barang"]').val(dataselect.nama_satuan_barang)
                         $('[name="id_satuan_barang"]').val(dataselect.id_satuan_barang)
+                        $('[name="warna_pembelian_detail"]').val(dataselect.warna_qc_barang)
+                        $('[name="bentuk_pembelian_detail"]').val(dataselect.bentuk_qc_barang)
+                        checkRangeQc()
+
+                        if (dataselect.id) {
+                            $('.show-after-search').css('display', 'inline')
+                        } else {
+                            $('.show-after-search').css('display', 'none')
+                        }
                     });
 
                     details = res.qc
+                    $('.btn-print').attr('href', res.route_print).css('display', 'block')
                     resDataTable.clear().rows.add(details).draw()
+                    $('[name="details"]').val(JSON.stringify(details))
                     $('#cover-spin').hide()
                 },
                 error: function(error) {
                     $('#cover-spin').hide()
-                    console.log(error)
                 }
             })
         }
@@ -442,13 +493,10 @@
         $('.add-entry').click(function() {
             statusModal = 'create'
             detailSelect = []
+            indexSelect = -1
             $('#modalEntry').find('input,select,textarea').each(function(i, v) {
                 if ($(v).hasClass('handle-number-4')) {
-                    if ($(v).prop('name') == 'sg_pembelian_detail') {
-                        $(v).val(1).trigger('change')
-                    } else {
-                        $(v).val(0).trigger('change')
-                    }
+                    $(v).val(0).trigger('change')
                 } else {
                     $(v).val('').trigger('change')
                 }
@@ -461,14 +509,13 @@
             }, 500);
 
             $('[name="status_qc"]').empty()
-            $('[name="status_qc"]').select2({
-                data: arrayStatus
-            })
-
             $('.handle-number-4').each(function(i, v) {
                 let val = $(v).val().replace('.', ',')
                 $(v).val(formatRupiah(val, 4))
             })
+
+            $('[name="id_barang"]').attr('readonly', false)
+            $('.show-after-search').css('display', 'none')
         })
 
         $('.save-entry').click(function() {
@@ -484,6 +531,8 @@
             modal.find('input,select,textarea').each(function(i, v) {
                 if ($(v).hasClass('handle-number-4')) {
                     detailSelect[$(v).prop('name')] = normalizeNumber($(v).val())
+                } else if ($(v).prop('type') == 'checkbox') {
+                    detailSelect[$(v).prop('name')] = $(v).is(':checked') ? 1 : 0;
                 } else {
                     detailSelect[$(v).prop('name')] = $(v).val()
                 }
@@ -498,6 +547,7 @@
             }
 
             $('[name="details"]').val(JSON.stringify(details))
+            console.log(details)
             statusModal = ''
             detailSelect = []
 
@@ -505,19 +555,32 @@
             $('#modalEntry').modal('hide')
         })
 
-        $('[name="status_qc"]').change(function() {
-            $('[name="reason"]').attr('readonly', true)
-            if ($(this).val() == 2) {
-                $('[name="reason"]').attr('readonly', false).addClass('validate')
-            } else if ($(this).val() == 3) {
-                $('[name="reason"]').attr('readonly', false)
-            } else {
-                $('[name="reason"]').attr('readonly', true).removeClass('validate')
-            }
-        })
-
         $('.cancel-entry').click(function() {
             $('#modalEntry').modal('hide')
+        })
+
+        $('body').on('click', '.remove-entry', function() {
+            let index = $(this).parents('tr').index()
+            Swal.fire({
+                title: 'Anda yakin ingin menghapus data ini?',
+                icon: 'info',
+                showDenyButton: true,
+                confirmButtonText: 'Yes',
+                denyButtonText: 'No',
+                reverseButtons: true,
+                customClass: {
+                    actions: 'my-actions',
+                    confirmButton: 'order-1',
+                    denyButton: 'order-3',
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    details.splice(index, 1)
+
+                    resDataTable.clear().rows.add(details).draw()
+                    $('[name="details"]').val(JSON.stringify(details))
+                }
+            })
         })
 
         $('body').on('click', '.edit-entry', function() {
@@ -545,48 +608,49 @@
                 detailSelect = []
             }
 
+            for (let i = 0; i < items.length; i++) {
+                if (items[i]['id'] == detailSelect.id_barang) {
+                    paramQcSelect = items[i]
+                    break
+                }
+            }
+
             for (select in detailSelect) {
                 if (['jumlah_pembelian_detail'].includes(select)) {
                     $('#qty').find('span').text(detailSelect['nama_satuan_barang'])
                 }
 
-                if (['id_barang'].includes(select)) {
-                    let nameSelect = 'nama_barang';
-                    $('[name="' + select + '"]').append('<option value="' + detailSelect[select] + '" selected>' +
-                        detailSelect[nameSelect] + '</option>')
-                }
-
-                if (['status_qc'].includes(select)) {
-                    $('[name="' + select + '"]').empty()
-                    $('[name="' + select + '"]').select2({
-                        data: [
-                            arrayStatus[1],
-                            arrayStatus[2],
-                            arrayStatus[3]
-                        ]
-                    })
-                }
-
                 $('[name="' + select + '"]').val(detailSelect[select]).trigger('change')
             }
 
+            checkRangeQc()
+            $('[name="label_status_qc"]').val(arrayStatus[detailSelect.status_qc]['text'])
             $('.handle-number-4').each(function(i, v) {
                 let val = $(v).val().replace('.', ',')
                 $(v).val(formatRupiah(val, 4))
             })
+
+            $('[name="id_barang"]').attr('readonly', true)
+            $('.show-after-search').css('display', 'inline')
+        })
+
+        $('#modalEntry').on('input', '.check-range', function() {
+            checkRangeQc()
         })
 
         function validatorModal(barang, id) {
             let message = 'Lengkapi inputan yang diperlukan'
             let valid = true
             $('#modalEntry').find('.validate').each(function(i, v) {
+                $(v).parent().removeClass('has-error')
                 if ($(v).val() == '') {
+                    $(v).parent().addClass('has-error')
                     valid = false
                 }
 
                 if ($(v).prop('name') == 'id_barang') {
                     let findItem = details.filter(p => p.id_barang == $(v).val())
-                    if (findItem.length > 0 && id == 0 && findItem[0].id_barang == barang) {
+                    if (findItem.length > 0 && id == '' && findItem[0].id_barang == barang && indexSelect < 0) {
                         message = "Barang sudah ada dalam daftar"
                         valid = false
                     }
@@ -598,5 +662,116 @@
                 'message': message
             }
         }
+
+        $('.check-checkbox').click(function() {
+            checkRangeQc()
+        })
+
+        function checkRangeQc() {
+            let countError = 0;
+            $('.check-range').each(function(i, v) {
+                let type = $(v).data('type')
+                let val = $(v).val()
+
+                if ($(v).parent().find('label')) {
+                    $(v).parent().find('label').remove()
+                }
+
+                let value = val ? normalizeNumber(val) : 0
+                if (type == 'sg') {
+                    if (value < paramQcSelect.start_range_sg || value > paramQcSelect.final_range_sg) {
+                        $(this).after('<label class="label label-danger">Rentang ' + paramQcSelect
+                            .start_range_sg + ' - ' + paramQcSelect.final_range_sg + '</label>')
+                        countError++
+                    }
+                }
+
+                if (type == 'be') {
+                    if (value < paramQcSelect.start_range_be || value > paramQcSelect.final_range_be) {
+                        $(this).after('<label class="label label-danger">Rentang ' + paramQcSelect
+                            .start_range_be + ' - ' + paramQcSelect.final_range_be + '</label>')
+                        countError++
+                    }
+                }
+
+                if (type == 'ph') {
+                    if (value < paramQcSelect.start_range_ph || value > paramQcSelect.final_range_ph) {
+                        $(this).after('<label class="label label-danger">Rentang ' + paramQcSelect
+                            .start_range_ph + ' - ' + paramQcSelect.final_range_ph + '</label>')
+                        countError++
+                    }
+                }
+            })
+
+            $('.check-checkbox').each(function(i, v) {
+                if ($(v).parents('.form-group').find('label')) {
+                    $(v).parents('.form-group').find('label').remove()
+                }
+
+                if (!$(v).is(':checked')) {
+                    $(this).parents('.input-group').after('<label class="label label-danger">Tidak Sesuai</label>')
+                    countError++
+                }
+            })
+
+            let selectArray = []
+            if (countError > 0) {
+                selectArray = arrayStatus[2]
+            } else {
+                selectArray = arrayStatus[1]
+            }
+
+            $('#target-status').html('<label class="' + selectArray['class'] + '" style="font-size:20px;">' + selectArray[
+                'text'] + '</label>')
+            $('[name="status_qc"]').val(selectArray['id'])
+            $('[name="label_status_qc"]').val(selectArray['text'])
+
+            if (selectArray['id'] == 2) {
+                $('[name="reason"]').attr('readonly', false).addClass('validate')
+            } else if (selectArray['id'] == 3) {
+                $('[name="reason"]').attr('readonly', false).addClass('validate')
+            } else {
+                $('[name="reason"]').attr('readonly', true).removeClass('validate')
+            }
+        }
+
+        $('[name="file_upload"]').change(function() {
+            if ($(this).val()) {
+                let oFReader = new FileReader();
+                let file = document.getElementById("f_image").files[0];
+                if (file.type.match(/image.*/)) {
+                    let reader = new FileReader();
+                    reader.onload = function(readerEvent) {
+                        let image = new Image();
+                        image.onload = function(imageEvent) {
+                            let canvas = document.createElement('canvas'),
+                                max_size = 1000,
+                                width = image.width,
+                                height = image.height;
+                            if (width > height) {
+                                if (width > max_size) {
+                                    height *= max_size / width;
+                                    width = max_size;
+                                }
+                            } else {
+                                if (height > max_size) {
+                                    width *= max_size / height;
+                                    height = max_size;
+                                }
+                            }
+                            canvas.width = width;
+                            canvas.height = height;
+                            canvas.getContext('2d').drawImage(image, 0, 0, width, height);
+                            let dataUrl = canvas.toDataURL('image/jpeg');
+                            $('[name="image_path"]').val(dataUrl)
+                            $('[name="file_upload"]').val('')
+                            document.getElementById("uploadPreview1").src = dataUrl;
+                        }
+                        image.src = readerEvent.target.result;
+                    }
+                    reader.readAsDataURL(file);
+                }
+            }
+        })
     </script>
 @endsection

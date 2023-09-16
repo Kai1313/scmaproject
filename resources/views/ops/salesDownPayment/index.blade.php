@@ -60,9 +60,7 @@
                         <div class="form-group">
                             <select name="id_cabang" class="form-control select2">
                                 @foreach ($cabang as $branch)
-                                    <option value="{{ $branch->id_cabang }}">{{ $branch->kode_cabang }} -
-                                        {{ $branch->nama_cabang }}
-                                    </option>
+                                    <option value="{{ $branch['id'] }}">{{ $branch['text'] }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -126,37 +124,43 @@
                 '[name="show_void"]').is(':checked'),
             columns: [{
                 data: 'kode_uang_muka_penjualan',
-                name: 'kode_uang_muka_penjualan'
+                name: 'ump.kode_uang_muka_penjualan'
             }, {
                 data: 'tanggal',
-                name: 'tanggal'
+                name: 'ump.tanggal'
             }, {
                 data: 'nama_permintaan_penjualan',
-                name: 'nama_permintaan_penjualan',
+                name: 'pp.nama_permintaan_penjualan',
             }, {
                 data: 'nama_pelanggan',
-                name: 'nama_pelanggan',
+                name: 'p.nama_pelanggan',
             }, {
                 data: 'nama_mata_uang',
-                name: 'nama_mata_uang',
+                name: 'mu.nama_mata_uang',
             }, {
                 data: 'rate',
-                name: 'rate',
-                render: $.fn.dataTable.render.number('.', ',', 2),
+                name: 'ump.rate',
+                render: function(data) {
+                    return data ? formatNumber(data, 2) : 0
+                },
                 className: 'text-right'
             }, {
                 data: 'nominal',
-                name: 'nominal',
-                render: $.fn.dataTable.render.number('.', ',', 2),
+                name: 'ump.nominal',
+                render: function(data) {
+                    return data ? formatNumber(data, 2) : 0
+                },
                 className: 'text-right'
             }, {
                 data: 'total',
-                name: 'total',
-                render: $.fn.dataTable.render.number('.', ',', 2),
+                name: 'ump.total',
+                render: function(data) {
+                    return data ? formatNumber(data, 2) : 0
+                },
                 className: 'text-right'
             }, {
                 data: 'catatan',
-                name: 'catatan',
+                name: 'ump.catatan',
             }, {
                 data: 'action',
                 name: 'action',

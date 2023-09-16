@@ -40,9 +40,9 @@ $('select.select2').on('select2:closing', function (e) {
     })
 })
 
-function formatNumber(angka) {
+function formatNumber(angka, lengthComa) {
     angka = angka.toString().replace('.', ',')
-    return formatRupiah(angka, 4)
+    return formatRupiah(angka, lengthComa)
 }
 
 function formatRupiah(angka, prefix, self = '') {
@@ -174,12 +174,12 @@ function deleteData(url) {
                     }
                 })
             } else {
-                Swal.fire("Gagal", data.message, 'error')
+                Swal.fire("Gagal Proses Data.", data.message, 'error')
             }
         },
         error: function (data) {
             $('#cover-spin').hide()
-            Swal.fire("Gagal", data.responseJSON.message, 'error')
+            Swal.fire("Gagal Proses Data.", data.responseJSON.message, 'error')
         }
     })
 }
@@ -198,3 +198,36 @@ function getCookie(cname) {
     }
     return "";
 }
+
+// $('#tabel').on('search.dt', function () {
+//     var value = $('.dataTables_filter input').val();
+//     sessionStorage.setItem("search_" + pageName, value);
+// });
+
+// $('#tabel').on('length.dt', function (e, settings, len) {
+//     // sessionStorage.setItem("length_" + pageName, len);
+// });
+
+// if (sessionStorage.getItem("list_" + pageName) === null) {
+//     variableGlobal['length_' + pageName] = 50;
+// } else {
+//     variableGlobal['length_' + pageName] = parseInt(sessionStorage.getItem("length_" + pageName));
+// }
+
+// if (sessionStorage.getItem("page_" + pageName) === null) {
+//     variableGlobal["page_" + pageName] = 0
+// } else {
+//     variableGlobal["page_" + pageName] = parseInt(sessionStorage.getItem("page_" + pageName))
+// }
+
+// if (sessionStorage.getItem("display_" + pageName) === null) {
+//     variableGlobal["display_" + pageName] = 0
+// } else {
+//     variableGlobal["display_" + pageName] = variableGlobal['length_' + pageName]
+// }
+
+// if (sessionStorage.getItem("search_" + pageName) === null) {
+//     variableGlobal["search_" + pageName] = ''
+// } else {
+//     variableGlobal["search_" + pageName] = sessionStorage.getItem("search_" + pageName);
+// }

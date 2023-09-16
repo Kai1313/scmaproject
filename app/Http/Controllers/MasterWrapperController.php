@@ -18,12 +18,14 @@ class MasterWrapperController extends Controller
 
         if ($request->ajax()) {
             $data = DB::table('master_wrapper')
-                ->select('id_wrapper', 'nama_wrapper', 'weight', 'catatan', 'path2', 'path', 'dt_created as created_at');
+                ->select('id_wrapper', 'nama_wrapper', 'weight', 'catatan', 'path2', 'path', 'dt_created as created_at', DB::raw('(CASE WHEN id_kategori_wrapper = 1 THEN "Palet" ELSE "Wadah" END) AS kategori_wrapper'));
             if (isset($request->c)) {
                 $data = $data->where('id_cabang', $request->c);
             }
 
-            $data = $data->orderBy('master_wrapper.dt_created', 'desc');
+            if ($request->order == null) {
+                $data = $data->orderBy('master_wrapper.dt_created', 'desc');
+            }
 
             return Datatables::of($data)
                 ->addIndexColumn()
@@ -37,17 +39,17 @@ class MasterWrapperController extends Controller
                 })
                 ->editColumn('path2', function ($row) use ($request) {
                     if ($request->show_img == "true") {
-                        return '<img src="' . env('FTP_GET_FILE') . $row->path2 . '" width="100">';
+                        return '<img src="' . asset('asset/' . $row->path) . '" width="100">';
                     } else {
                         return '<span style="color:#a9a9a9;">Gambar tidak ditampilkan</span>';
                     }
                 })
                 ->rawColumns(['action', 'path2'])
+                ->orderColumns(['nama_wrapper', 'weight', 'catatan', 'id_kategori_wrapper'], '-:column $1')
                 ->make(true);
         }
 
-        $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
-
+        $cabang = session()->get('access_cabang');
         return view('ops.master.wrapper.index', [
             'cabang' => $cabang,
             "pageTitle" => "SCA OPS | Master Wrapper | List",
@@ -61,7 +63,7 @@ class MasterWrapperController extends Controller
         }
 
         $data = MasterWrapper::find($id);
-        $cabang = DB::table('cabang')->where('status_cabang', 1)->get();
+        $cabang = session()->get('access_cabang');
         return view('ops.master.wrapper.form', [
             'data' => $data,
             'cabang' => $cabang,
@@ -76,20 +78,22 @@ class MasterWrapperController extends Controller
             DB::beginTransaction();
             if (!$data) {
                 $data = new MasterWrapper;
-                $data['dt_created'] = date('Y-m-d H:i:s');
+                $dat['user_created'] = session()->get('user')['id_pengguna'];
             } else {
-                $data['dt_modified'] = date('Y-m-d H:i:s');
+                $dat['user_modified'] = session()->get('user')['id_pengguna'];
             }
 
             $checkData = DB::table('master_wrapper')
                 ->where('id_cabang', $request->id_cabang)
                 ->where('nama_wrapper', $request->nama_wrapper)
-                ->where('id_wrapper', '!=', $id)->first();
+                ->where('id_wrapper', '!=', $id)
+                ->where('id_kategori_wrapper', $request->id_kategori_wrapper)
+                ->where('weight', $request->weight)->first();
             if ($checkData) {
                 DB::rollback();
                 return response()->json([
                     "result" => false,
-                    "message" => "Nama " . $request->nama_wrapper . " sudah ada",
+                    "message" => "Data master sudah ada",
                 ], 500);
             }
 

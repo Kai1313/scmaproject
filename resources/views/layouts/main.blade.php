@@ -3,11 +3,12 @@
 This is a starter template page. Use this page to start your new project from
 scratch. This page gets rid of all links and provides the needed markup only.
 -->
-<html>
+<html translate="no">
 
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
     <title>{{ $pageTitle }}</title>
     <link rel="icon" href="{{ asset('assets/img/logo.png') }}">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
@@ -152,6 +153,18 @@ scratch. This page gets rid of all links and provides the needed markup only.
             display: inline-block;
             margin: 5px;
         }
+
+        .disabled {
+            pointer-events: none;
+        }
+
+        .w-full {
+            width: 100%;
+        }
+
+        .mb-3 {
+            margin-bottom: 1.25rem;
+        }
     </style>
     <!-- AdminLTE Skins. We have chosen the skin-blue for this starter
             page. However, you can choose any other skin. Make sure you
@@ -185,6 +198,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         @include('layouts.control_sidebar')
         @yield('modal-section')
         <div class="control-sidebar-bg"></div>
+        <button style="display:none;" class="play-voice"></button>
     </div>
     <div id="cover-spin" style="display: none;"><img src="{{ asset('images/833.gif') }}" alt=""></div>
     @include('includes.scripts')
@@ -192,6 +206,15 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <!-- AdminLTE App -->
     <script src="{{ asset('assets/dist/js/adminlte.js') }}"></script>
     <script src="{{ asset('assets/bower_components/jquery-slimscroll/jquery.slimscroll.min.js') }}"></script>
+    @if (env('FIREBASE_STATUS') == true)
+        <script src="https://www.gstatic.com/firebasejs/8.4.3/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.4.0/firebase-messaging.js"></script>
+        <script>
+            let siteMain = '{{ url('/') }}';
+        </script>
+        <script src="{{ asset('js/firebaseinit.js') }}"></script>
+        <script src="https://code.responsivevoice.org/responsivevoice.js?key=Od43k81C"></script>
+    @endif
     @yield('externalScripts')
 </body>
 
