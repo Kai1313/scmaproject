@@ -487,7 +487,7 @@
                         width: '10%',
                         render: function(data, type, row) {
                             let route = '';
-                            let detail_route = "{{ route('transaction-general-ledger-show') }}"
+                            let detail_route = (row["jenis_jurnal"] == "ME")?"{{ route('transaction-adjustment-ledger-show') }}":"{{ route('transaction-general-ledger-show') }}"
 
                             if (row.id_jurnal) {
                                 route = '<a href="' + detail_route + '/' + row.id_jurnal + '" target="_blank">' + data + '</a>'

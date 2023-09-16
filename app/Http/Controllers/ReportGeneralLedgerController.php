@@ -168,7 +168,7 @@ class ReportGeneralLedgerController extends Controller
                 $data_ledgers = $data_ledgers->selectRaw("jurnal_header.id_jurnal, master_akun.id_cabang, master_akun.id_akun, master_akun.kode_akun, master_akun.nama_akun, SUM(jurnal_detail.debet) as debet, SUM(jurnal_detail.credit) as kredit")->groupBy("jurnal_detail.id_akun");
             }
             else {
-                $data_ledgers = $data_ledgers->selectRaw("jurnal_header.id_jurnal, master_akun.id_cabang, master_akun.id_akun, master_akun.kode_akun, master_akun.nama_akun, master_akun.posisi_debet, jurnal_header.kode_jurnal, jurnal_detail.keterangan, jurnal_detail.id_transaksi, jurnal_detail.debet as debet, jurnal_detail.credit as kredit, jurnal_header.tanggal_jurnal");
+                $data_ledgers = $data_ledgers->selectRaw("jurnal_header.id_jurnal, jurnal_header.jenis_jurnal, master_akun.id_cabang, master_akun.id_akun, master_akun.kode_akun, master_akun.nama_akun, master_akun.posisi_debet, jurnal_header.kode_jurnal, jurnal_detail.keterangan, jurnal_detail.id_transaksi, jurnal_detail.debet as debet, jurnal_detail.credit as kredit, jurnal_header.tanggal_jurnal");
             }
             if ($id_cabang != "all") {
                 $data_ledgers = $data_ledgers->where("jurnal_header.id_cabang", $id_cabang);
@@ -292,6 +292,7 @@ class ReportGeneralLedgerController extends Controller
                             "kode_akun"=>$value->kode_akun,
                             "nama_akun"=>$value->nama_akun,
                             "kode_jurnal"=>"",
+                            "jenis_jurnal"=>"",
                             "id_transaksi"=>"",
                             "keterangan"=>"Saldo Awal",
                             "debet"=>$saldo_awal_debet,
@@ -308,6 +309,7 @@ class ReportGeneralLedgerController extends Controller
                         "kode_akun"=>$value->kode_akun,
                         "nama_akun"=>$value->nama_akun,
                         "kode_jurnal"=>$value->kode_jurnal,
+                        "jenis_jurnal"=>$value->jenis_jurnal,
                         "id_transaksi"=>$value->id_transaksi,
                         "keterangan"=>$value->keterangan,
                         "debet"=>$value->debet,
