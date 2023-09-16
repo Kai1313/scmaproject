@@ -918,6 +918,7 @@ class ApiController extends Controller
             $id_cabang = $request->cabang;
             $id_slip = $request->slip;
             $detail_inventory = array_values($request->detail);
+            $biaya_pembelian = array_values($request->biaya);
 
             $data_pemasok = DB::table("pemasok")->where('id_pemasok', $id_pemasok)->first();
             $nama_pemasok = $data_pemasok->nama_pemasok;
@@ -972,6 +973,16 @@ class ApiController extends Controller
             $nominal_ppn = round(floatval($request->ppn), 2);
             $discount = round(floatval($request->discount), 2);
 
+            $pembelian = DB::table('pembelian')->where('nama_pembelian', $id_transaksi)->first();
+
+            if(empty($pembelian)){
+                return response()->json([
+                    "result" => false,
+                    "code" => 400,
+                    "message" => "Error transaksi pembelian tidak ditemukan",
+                ], 400);
+            }
+
             if (isset($discount) && $discount > 0) {
                 $data_akun_potongan_pembelian = DB::table('setting')->where('code', 'Potongan Pembelian')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
                 if (empty($data_akun_potongan_pembelian)) {
@@ -1006,6 +1017,18 @@ class ApiController extends Controller
                 ],
             ];
 
+            if(count($biaya_pembelian) > 0){
+                foreach($biaya_pembelian as $biaya){
+                     array_push($jurnal_detail_me, [
+                         'akun' => $biaya['akun'],
+                         'debet' => 0,
+                         'credit' => $biaya['total'],
+                         'keterangan' => 'Jurnal Otomatis Biaya Pembelian - ' . $id_transaksi  . ' - ' . date('d M Y', strtotime($biaya['tanggal'])) . ' ' . $biaya['catatan'],
+                         'id_transaksi' => null,
+                     ]);
+                }
+             }
+
             if (isset($discount) && $discount > 0) {
                 array_push($jurnal_detail_me, [
                     'akun' => $akun_potongan_pembelian,
@@ -1034,10 +1057,17 @@ class ApiController extends Controller
                 ]);
             }
 
+
             foreach ($detail_inventory as $d_inv) {
+                $total_detail = floatval($d_inv['total']);
+
+                if(isset($d_inv['biaya']) && $d_inv['biaya'] > 0){
+                    $total_detail += floatval($d_inv['biaya']);
+                }
+
                 array_push($jurnal_detail_me, [
                     'akun' => $d_inv['akun_id'],
-                    'debet' => round(floatval($d_inv['total']), 2),
+                    'debet' => round($total_detail, 2),
                     'credit' => 0,
                     'keterangan' => 'Jurnal Otomatis Pembelian Persediaan - ' . $id_transaksi . ' - ' . $nama_pemasok . ' - ' . $d_inv['nama_barang'],
                     'id_transaksi' => null,
