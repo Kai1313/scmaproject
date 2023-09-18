@@ -55,6 +55,7 @@ function checkUserSession($request, $alias_menu, $type)
 
         $listMenu = \App\Menu::with(['childs', 'childs.childs'])
             ->where('tingkatan_menu', '0')
+            ->where('status_menu', '1')
             ->orderBy('urut_menu', 'asc')
             ->get();
 
