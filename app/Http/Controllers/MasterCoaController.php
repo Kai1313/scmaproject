@@ -21,15 +21,15 @@ class MasterCoaController extends Controller
      */
     public function index(Request $request)
     {
-        if (checkUserSession($request, 'master_coa', 'show') == false) {
+        if (checkUserSession($request, 'master/coa', 'show') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
         $data_cabang = getCabang();
-        
+
         if (count($data_cabang) == 0) {
             $cabang = Cabang::find(1);
-        }else{
+        } else {
             $cabang = Cabang::find($data_cabang[0]->id_cabang);
         }
 
@@ -74,7 +74,7 @@ class MasterCoaController extends Controller
      */
     public function create(Request $request)
     {
-        if (checkAccessMenu('master_coa', 'create') == false) {
+        if (checkAccessMenu('master/coa', 'create') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
@@ -162,7 +162,7 @@ class MasterCoaController extends Controller
      */
     public function show(Request $request, $id)
     {
-        if (checkAccessMenu('master_coa', 'show') == false) {
+        if (checkAccessMenu('master/coa', 'show') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
@@ -194,7 +194,7 @@ class MasterCoaController extends Controller
      */
     public function edit(Request $request, $id)
     {
-        if (checkAccessMenu('master_coa', 'edit') == false) {
+        if (checkAccessMenu('master/coa', 'edit') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
@@ -283,7 +283,7 @@ class MasterCoaController extends Controller
      */
     public function destroy(Request $request, $id)
     {
-        if (checkAccessMenu('master_coa', 'delete') == false) {
+        if (checkAccessMenu('master/coa', 'delete') == false) {
             return response()->json([
                 "result" => false,
                 "message" => "Error, Anda tidak punya akses!",
@@ -295,7 +295,7 @@ class MasterCoaController extends Controller
             // Get akun data
             $akun = Akun::where("id_akun", $id)->first();
             $kode_akun = $akun->kode_akun;
-            if (checkAccessMenu('master_coa', 'delete') == false) {
+            if (checkAccessMenu('master/coa', 'delete') == false) {
                 return response()->json([
                     "result" => false,
                     "message" => "Error, Anda tidak punya akses!",
@@ -418,7 +418,7 @@ class MasterCoaController extends Controller
 
     public function export_excel(Request $request)
     {
-        if (checkAccessMenu('master_coa', 'print') == false) {
+        if (checkAccessMenu('master/coa', 'print') == false) {
             return response()->json([
                 "result" => false,
                 "message" => "Error, Anda tidak punya akses!",
@@ -427,7 +427,7 @@ class MasterCoaController extends Controller
 
         try {
             // $session = $request->session()->get('access');
-            if (checkAccessMenu('master_coa', 'edit') == false) {
+            if (checkAccessMenu('master/coa', 'edit') == false) {
                 return response()->json([
                     "result" => false,
                     "message" => "Error, anda tidak punya akses!",

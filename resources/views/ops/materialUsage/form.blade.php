@@ -445,6 +445,9 @@
 
         $('[name="id_timbangan"]').select2({
             data: timbangan
+        }).on('select2:select', function(e) {
+            let dataselect = e.params.data
+            $('.reload-timbangan').click()
         })
 
         $('#modalEntry').on('input', '[name="jumlah"]', function() {
@@ -559,10 +562,10 @@
             }
 
             $('[name="details"]').val(JSON.stringify(details))
-            console.log(details)
 
             statusModal = ''
             detailSelect = []
+            console.log(details)
 
             resDataTable.clear().rows.add(details).draw()
             $('#modalEntry').modal('hide')
@@ -640,22 +643,31 @@
                     detailSelect = res.data
                     let modal = $('#modalEntry')
                     let data = res.data
+                    console.log(data)
                     for (let key in data) {
                         modal.find('[name="' + key + '"]').val(data[key])
+                        console.log(key, data[key])
+                        if (['weight_zak', 'wrapper_weight'].includes(key)) {
+                            if (data[key] == null) {
+                                modal.find('[name="' + key + '"]').val(0)
+                            }
+                        }
 
-                        if (['weight_zak', 'wrapper_weight'].includes(key) && data[key] == null) {
+                        if (key == 'jumlah_zak') {
                             modal.find('[name="' + key + '"]').val(0)
                         }
+
+                        if ('wrapper')
                     }
 
-                    $('#max-jumlah').text('Max ' + formatNumber(data.sisa_master_qr_code))
+                    $('#max-jumlah').text('Sisa ' + formatNumber(data.sisa_master_qr_code))
 
                     modal.find('[name="max_weight"]').val(data.sisa_master_qr_code)
                     if (data.jumlah_zak == null) {
                         modal.find('[name="jumlah_zak"]').prop('readonly', true).removeClass('validate')
                     } else {
                         $('#label-jumlah-zak').html('Jumlah Zak <span>*</span>')
-                        $('#max-jumlah-zak').text('Max ' + formatNumber(data.jumlah_zak, 4))
+                        $('#max-jumlah-zak').text('Sisa ' + formatNumber(data.jumlah_zak, 4))
                         modal.find('[name="jumlah_zak"]').prop('readonly', false).addClass('validate')
                     }
 

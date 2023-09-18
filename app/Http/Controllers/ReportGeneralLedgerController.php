@@ -2,20 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Accounting\JurnalDetail;
-use App\Models\Accounting\JurnalHeader;
-use App\Models\Accounting\SaldoBalance;
 use App\Exports\ReportGeneralLedgerExport;
+use App\Models\Accounting\JurnalDetail;
+use App\Models\Accounting\SaldoBalance;
 use App\Models\Master\Akun;
 use App\Models\Master\Cabang;
-use App\Models\Master\Slip;
-use Illuminate\Http\Request;
 use Excel;
-use PDF;
-use stdClass;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use PDF;
 
 class ReportGeneralLedgerController extends Controller
 {
@@ -26,23 +22,23 @@ class ReportGeneralLedgerController extends Controller
      */
     public function index(Request $request)
     {
-        if (checkUserSession($request, 'report_general_ledger', 'show') == false) {
+        if (checkUserSession($request, 'report/general_ledger', 'show') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
         // Check get parameter
-        $cabang = ($request->has("cabang"))?$request->cabang:NULL;
+        $cabang = ($request->has("cabang")) ? $request->cabang : null;
         if ($request->has("kode_akun")) {
             $kode_akun = $request->kode_akun;
             $getAkun = Akun::where("kode_akun", $kode_akun)->where("id_cabang", $cabang)->first();
-            $id_akun = ($getAkun)?$getAkun->id_akun:NULL;
+            $id_akun = ($getAkun) ? $getAkun->id_akun : null;
         } else {
-            $id_akun = ($request->has("id_akun"))?$request->id_akun:NULL;
+            $id_akun = ($request->has("id_akun")) ? $request->id_akun : null;
         }
-        $startdate = ($request->has("startdate"))?$request->startdate:NULL;
-        $enddate = ($request->has("enddate"))?$request->enddate:NULL;
-        $type = ($request->has("type"))?$request->type:NULL;
-        $akun = ($id_akun)?Akun::find($id_akun):NULL;
+        $startdate = ($request->has("startdate")) ? $request->startdate : null;
+        $enddate = ($request->has("enddate")) ? $request->enddate : null;
+        $type = ($request->has("type")) ? $request->type : null;
+        $akun = ($id_akun) ? Akun::find($id_akun) : null;
 
         $data_cabang = getCabang();
 
@@ -54,7 +50,7 @@ class ReportGeneralLedgerController extends Controller
             "startdate" => $startdate,
             "enddate" => $enddate,
             "cabang" => $cabang,
-            "type" => $type
+            "type" => $type,
         ];
         // dd($data);
 
@@ -140,14 +136,14 @@ class ReportGeneralLedgerController extends Controller
             $month = date("m", strtotime("$start_date"));
             $year = date("Y", strtotime($start_date));
             $start_of_the_month = date("Y-m-01", strtotime($start_date));
-            $saldo_date = date("Y-m-d", strtotime($start_date." -1 day"));
+            $saldo_date = date("Y-m-d", strtotime($start_date . " -1 day"));
 
             // Init Datatable
             $offset = $request->start;
             $limit = $request->length;
             $keyword = $request->search['value'];
             $sort = [];
-            $order = ($request->order)?$request->order:[];
+            $order = ($request->order) ? $request->order : [];
             foreach ($order as $key => $order) {
                 $columnIdx = $order['column'];
                 $sortDir = $order['dir'];
@@ -166,8 +162,7 @@ class ReportGeneralLedgerController extends Controller
                 ->whereBetween("jurnal_header.tanggal_jurnal", [$start_date, $end_date]);
             if ($type == "recap") {
                 $data_ledgers = $data_ledgers->selectRaw("jurnal_header.id_jurnal, master_akun.id_cabang, master_akun.id_akun, master_akun.kode_akun, master_akun.nama_akun, SUM(jurnal_detail.debet) as debet, SUM(jurnal_detail.credit) as kredit")->groupBy("jurnal_detail.id_akun");
-            }
-            else {
+            } else {
                 $data_ledgers = $data_ledgers->selectRaw("jurnal_header.id_jurnal, jurnal_header.jenis_jurnal, master_akun.id_cabang, master_akun.id_akun, master_akun.kode_akun, master_akun.nama_akun, master_akun.posisi_debet, jurnal_header.kode_jurnal, jurnal_detail.keterangan, jurnal_detail.id_transaksi, jurnal_detail.debet as debet, jurnal_detail.credit as kredit, jurnal_header.tanggal_jurnal");
             }
             if ($id_cabang != "all") {
@@ -181,14 +176,13 @@ class ReportGeneralLedgerController extends Controller
                     if ($type == "recap") {
                         $query->orWhere("master_akun.kode_akun", "LIKE", "%$keyword%")
                             ->orWhere("master_akun.nama_akun", "LIKE", "%$keyword%");
-                    }
-                    else {
+                    } else {
                         $query->orWhere("master_akun.kode_akun", "LIKE", "%$keyword%")
                             ->orWhere("master_akun.nama_akun", "LIKE", "%$keyword%")
                             ->orWhere("jurnal_header.kode_jurnal", "LIKE", "%$keyword%")
                             ->orWhere("jurnal_detail.id_transaksi", "LIKE", "%$keyword%")
                             ->orWhere("jurnal_detail.keterangan", "LIKE", "%$keyword%");
-                            
+
                     }
                 });
             }
@@ -202,21 +196,19 @@ class ReportGeneralLedgerController extends Controller
                     ];
                     return response()->json($data);
                 }
-    
+
                 foreach ($sort as $key => $s) {
                     $column = $s["column"];
                     $directon = $s["dir"];
-    
+
                     if ($column != "") {
                         $data_ledgers->orderBy($column, $directon);
                     }
                 }
-            }
-            else {
+            } else {
                 if ($type == "recap") {
                     $data_ledgers->orderBy("master_akun.kode_akun", "ASC");
-                }
-                else {
+                } else {
                     $data_ledgers->orderBy("jurnal_header.tanggal_jurnal", "ASC");
                     $data_ledgers->orderBy("master_akun.kode_akun", "ASC");
                 }
@@ -246,30 +238,6 @@ class ReportGeneralLedgerController extends Controller
                 if ($type == "recap") {
                     $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")->where("id_akun", $value->id_akun)->where("id_cabang", $value->id_cabang)->where("bulan", $month)->where("tahun", $year)->first();
                     $data_saldo_ledgers = JurnalDetail::selectRaw("IFNULL(SUM(jurnal_detail.debet), 0) as debet, IFNULL(SUM(jurnal_detail.credit), 0) as kredit")
-                    ->join("jurnal_header", "jurnal_header.id_jurnal", "jurnal_detail.id_jurnal")
-                    ->join("master_akun", "master_akun.id_akun", "jurnal_detail.id_akun")
-                    ->where("jurnal_detail.id_akun", $value->id_akun)
-                    ->where("jurnal_header.id_cabang", $value->id_cabang)
-                    ->where("jurnal_header.tanggal_jurnal", ">=", $start_of_the_month)
-                    ->where("jurnal_header.tanggal_jurnal", "<", $start_date)
-                    ->groupBy("jurnal_detail.id_akun")->first();
-                    $saldo_debet = ($saldo)?$saldo->saldo_debet:0;
-                    $saldo_kredit = ($saldo)?$saldo->saldo_kredit:0;
-                    $debet = ($data_saldo_ledgers)?$data_saldo_ledgers->debet:0;
-                    $kredit = ($data_saldo_ledgers)?$data_saldo_ledgers->kredit:0;
-                    $saldo_awal = ($saldo_debet - $saldo_kredit) + ($debet - $kredit);
-                    $saldo_akhir = $saldo_awal + $value->debet - $value->kredit;
-                    $value["saldo_awal"] = round($saldo_awal, 2);
-                    $value["saldo_akhir"] = round($saldo_akhir, 2);
-                }
-                else {
-                    Log::info("posisi debet");
-                    $posisi = ($value->posisi_debet != "")?$value->posisi_debet:1;
-                    Log::info($posisi);
-                    if ($saldo_awal_current != $value->id_akun) {
-                        $saldo_awal_current = $value->id_akun;
-                        $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")->where("id_akun", $value->id_akun)->where("id_cabang", $value->id_cabang)->where("bulan", $month)->where("tahun", $year)->first();
-                        $data_saldo_ledgers = JurnalDetail::selectRaw("IFNULL(SUM(jurnal_detail.debet), 0) as debet, IFNULL(SUM(jurnal_detail.credit), 0) as kredit")
                         ->join("jurnal_header", "jurnal_header.id_jurnal", "jurnal_detail.id_jurnal")
                         ->join("master_akun", "master_akun.id_akun", "jurnal_detail.id_akun")
                         ->where("jurnal_detail.id_akun", $value->id_akun)
@@ -277,61 +245,83 @@ class ReportGeneralLedgerController extends Controller
                         ->where("jurnal_header.tanggal_jurnal", ">=", $start_of_the_month)
                         ->where("jurnal_header.tanggal_jurnal", "<", $start_date)
                         ->groupBy("jurnal_detail.id_akun")->first();
-                        $saldo_debet = ($saldo)?$saldo->saldo_debet:0;
-                        $saldo_kredit = ($saldo)?$saldo->saldo_kredit:0;
-                        $debet = ($data_saldo_ledgers)?$data_saldo_ledgers->debet:0;
-                        $kredit = ($data_saldo_ledgers)?$data_saldo_ledgers->kredit:0;
+                    $saldo_debet = ($saldo) ? $saldo->saldo_debet : 0;
+                    $saldo_kredit = ($saldo) ? $saldo->saldo_kredit : 0;
+                    $debet = ($data_saldo_ledgers) ? $data_saldo_ledgers->debet : 0;
+                    $kredit = ($data_saldo_ledgers) ? $data_saldo_ledgers->kredit : 0;
+                    $saldo_awal = ($saldo_debet - $saldo_kredit) + ($debet - $kredit);
+                    $saldo_akhir = $saldo_awal + $value->debet - $value->kredit;
+                    $value["saldo_awal"] = round($saldo_awal, 2);
+                    $value["saldo_akhir"] = round($saldo_akhir, 2);
+                } else {
+                    Log::info("posisi debet");
+                    $posisi = ($value->posisi_debet != "") ? $value->posisi_debet : 1;
+                    Log::info($posisi);
+                    if ($saldo_awal_current != $value->id_akun) {
+                        $saldo_awal_current = $value->id_akun;
+                        $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")->where("id_akun", $value->id_akun)->where("id_cabang", $value->id_cabang)->where("bulan", $month)->where("tahun", $year)->first();
+                        $data_saldo_ledgers = JurnalDetail::selectRaw("IFNULL(SUM(jurnal_detail.debet), 0) as debet, IFNULL(SUM(jurnal_detail.credit), 0) as kredit")
+                            ->join("jurnal_header", "jurnal_header.id_jurnal", "jurnal_detail.id_jurnal")
+                            ->join("master_akun", "master_akun.id_akun", "jurnal_detail.id_akun")
+                            ->where("jurnal_detail.id_akun", $value->id_akun)
+                            ->where("jurnal_header.id_cabang", $value->id_cabang)
+                            ->where("jurnal_header.tanggal_jurnal", ">=", $start_of_the_month)
+                            ->where("jurnal_header.tanggal_jurnal", "<", $start_date)
+                            ->groupBy("jurnal_detail.id_akun")->first();
+                        $saldo_debet = ($saldo) ? $saldo->saldo_debet : 0;
+                        $saldo_kredit = ($saldo) ? $saldo->saldo_kredit : 0;
+                        $debet = ($data_saldo_ledgers) ? $data_saldo_ledgers->debet : 0;
+                        $kredit = ($data_saldo_ledgers) ? $data_saldo_ledgers->kredit : 0;
                         $saldo_awal_debet = $saldo_debet + $debet;
                         $saldo_awal_kredit = $saldo_kredit + $kredit;
                         Log::info($posisi);
                         $saldo_balance = ($posisi != 0) ? $saldo_awal_debet - $saldo_awal_kredit : $saldo_awal_kredit - $saldo_awal_debet;
-                        $result_detail[] = (object)[
-                            "id_jurnal"=>$value->id_jurnal,
-                            "id_cabang"=>$value->id_cabang,
-                            "id_akun"=>$value->id_akun,
-                            "kode_akun"=>$value->kode_akun,
-                            "nama_akun"=>$value->nama_akun,
-                            "kode_jurnal"=>"",
-                            "jenis_jurnal"=>"",
-                            "id_transaksi"=>"",
-                            "keterangan"=>"Saldo Awal",
-                            "debet"=>$saldo_awal_debet,
-                            "kredit"=>$saldo_awal_kredit,
-                            "tanggal_jurnal"=>$saldo_date,
-                            "saldo_balance"=>round($saldo_balance, 2)
+                        $result_detail[] = (object) [
+                            "id_jurnal" => $value->id_jurnal,
+                            "id_cabang" => $value->id_cabang,
+                            "id_akun" => $value->id_akun,
+                            "kode_akun" => $value->kode_akun,
+                            "nama_akun" => $value->nama_akun,
+                            "kode_jurnal" => "",
+                            "jenis_jurnal" => "",
+                            "id_transaksi" => "",
+                            "keterangan" => "Saldo Awal",
+                            "debet" => $saldo_awal_debet,
+                            "kredit" => $saldo_awal_kredit,
+                            "tanggal_jurnal" => $saldo_date,
+                            "saldo_balance" => round($saldo_balance, 2),
                         ];
                     }
                     $saldo_balance = ($posisi != 0) ? $saldo_balance + $value->debet - $value->kredit : $saldo_balance + $value->kredit - $value->debet;
-                    $result_detail[] = (object)[
-                        "id_jurnal"=>$value->id_jurnal,
-                        "id_cabang"=>$value->id_cabang,
-                        "id_akun"=>$value->id_akun,
-                        "kode_akun"=>$value->kode_akun,
-                        "nama_akun"=>$value->nama_akun,
-                        "kode_jurnal"=>$value->kode_jurnal,
-                        "jenis_jurnal"=>$value->jenis_jurnal,
-                        "id_transaksi"=>$value->id_transaksi,
-                        "keterangan"=>$value->keterangan,
-                        "debet"=>$value->debet,
-                        "kredit"=>$value->kredit,
-                        "tanggal_jurnal"=>$value->tanggal_jurnal,
-                        "saldo_balance"=>round($saldo_balance, 2)
+                    $result_detail[] = (object) [
+                        "id_jurnal" => $value->id_jurnal,
+                        "id_cabang" => $value->id_cabang,
+                        "id_akun" => $value->id_akun,
+                        "kode_akun" => $value->kode_akun,
+                        "nama_akun" => $value->nama_akun,
+                        "kode_jurnal" => $value->kode_jurnal,
+                        "jenis_jurnal" => $value->jenis_jurnal,
+                        "id_transaksi" => $value->id_transaksi,
+                        "keterangan" => $value->keterangan,
+                        "debet" => $value->debet,
+                        "kredit" => $value->kredit,
+                        "tanggal_jurnal" => $value->tanggal_jurnal,
+                        "saldo_balance" => round($saldo_balance, 2),
                     ];
                 }
             }
             $table['draw'] = $draw;
             $table['recordsTotal'] = $data_ledgers->count();
             $table['recordsFiltered'] = $filtered_data->count();
-            $table['data'] = ($type == "recap")?$result:$result_detail;
+            $table['data'] = ($type == "recap") ? $result : $result_detail;
             return json_encode($table);
-        } 
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $message = "Failed to get populate general ledger for view";
             Log::error($message);
             Log::error($e);
             return response()->json([
-                "result"=>False,
-                "message"=>$message
+                "result" => false,
+                "message" => $message,
             ]);
         }
     }
@@ -343,7 +333,7 @@ class ReportGeneralLedgerController extends Controller
             // Init Data
             $id_cabang = $request->id_cabang;
             $cabang = Cabang::find($id_cabang);
-            $nama_cabang = ($cabang)?$cabang->nama_cabang:NULL;
+            $nama_cabang = ($cabang) ? $cabang->nama_cabang : null;
             $start_date = $request->start_date;
             $end_date = $request->end_date;
             $type = $request->type;
@@ -351,7 +341,7 @@ class ReportGeneralLedgerController extends Controller
             $month = date("m", strtotime("$start_date"));
             $year = date("Y", strtotime($start_date));
             $start_of_the_month = date("Y-m-01", strtotime($start_date));
-            $saldo_date = date("Y-m-d", strtotime($start_date." -1 day"));
+            $saldo_date = date("Y-m-d", strtotime($start_date . " -1 day"));
 
             $data_ledgers = JurnalDetail::join("jurnal_header", "jurnal_header.id_jurnal", "jurnal_detail.id_jurnal")
                 ->join("master_akun", "master_akun.id_akun", "jurnal_detail.id_akun")
@@ -360,8 +350,7 @@ class ReportGeneralLedgerController extends Controller
                 ->whereBetween("jurnal_header.tanggal_jurnal", [$start_date, $end_date]);
             if ($type == "recap") {
                 $data_ledgers = $data_ledgers->selectRaw("master_akun.id_cabang, master_akun.id_akun, master_akun.kode_akun, master_akun.nama_akun, SUM(jurnal_detail.debet) as debet, SUM(jurnal_detail.credit) as kredit")->groupBy("jurnal_detail.id_akun");
-            }
-            else {
+            } else {
                 $data_ledgers = $data_ledgers->selectRaw("master_akun.id_cabang, master_akun.id_akun, master_akun.kode_akun, master_akun.nama_akun, jurnal_header.kode_jurnal, jurnal_detail.keterangan, jurnal_detail.id_transaksi, jurnal_detail.debet as debet, jurnal_detail.credit as kredit, jurnal_header.tanggal_jurnal");
             }
             if ($id_cabang != "all") {
@@ -372,8 +361,7 @@ class ReportGeneralLedgerController extends Controller
             }
             if ($type == "recap") {
                 $data_ledgers->orderBy("master_akun.kode_akun", "ASC");
-            }
-            else {
+            } else {
                 $data_ledgers->orderBy("jurnal_header.tanggal_jurnal", "ASC");
                 $data_ledgers->orderBy("master_akun.kode_akun", "ASC");
             }
@@ -385,27 +373,6 @@ class ReportGeneralLedgerController extends Controller
                 if ($type == "recap") {
                     $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")->where("id_akun", $value->id_akun)->where("id_cabang", $value->id_cabang)->where("bulan", $month)->where("tahun", $year)->first();
                     $data_saldo_ledgers = JurnalDetail::selectRaw("IFNULL(SUM(jurnal_detail.debet), 0) as debet, IFNULL(SUM(jurnal_detail.credit), 0) as kredit")
-                    ->join("jurnal_header", "jurnal_header.id_jurnal", "jurnal_detail.id_jurnal")
-                    ->join("master_akun", "master_akun.id_akun", "jurnal_detail.id_akun")
-                    ->where("jurnal_detail.id_akun", $value->id_akun)
-                    ->where("jurnal_header.id_cabang", $value->id_cabang)
-                    ->where("jurnal_header.tanggal_jurnal", ">=", $start_of_the_month)
-                    ->where("jurnal_header.tanggal_jurnal", "<", $start_date)
-                    ->groupBy("jurnal_detail.id_akun")->first();
-                    $saldo_debet = ($saldo)?$saldo->saldo_debet:0;
-                    $saldo_kredit = ($saldo)?$saldo->saldo_kredit:0;
-                    $debet = ($data_saldo_ledgers)?$data_saldo_ledgers->debet:0;
-                    $kredit = ($data_saldo_ledgers)?$data_saldo_ledgers->kredit:0;
-                    $saldo_awal = ($saldo_debet - $saldo_kredit) + ($debet - $kredit);
-                    $saldo_akhir = $saldo_awal + $value->debet - $value->kredit;
-                    $value["saldo_awal"] = $saldo_awal;
-                    $value["saldo_akhir"] = $saldo_akhir;
-                }
-                else {
-                    if ($saldo_awal_current != $value->id_akun) {
-                        $saldo_awal_current = $value->id_akun;
-                        $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")->where("id_akun", $value->id_akun)->where("id_cabang", $value->id_cabang)->where("bulan", $month)->where("tahun", $year)->first();
-                        $data_saldo_ledgers = JurnalDetail::selectRaw("IFNULL(SUM(jurnal_detail.debet), 0) as debet, IFNULL(SUM(jurnal_detail.credit), 0) as kredit")
                         ->join("jurnal_header", "jurnal_header.id_jurnal", "jurnal_detail.id_jurnal")
                         ->join("master_akun", "master_akun.id_akun", "jurnal_detail.id_akun")
                         ->where("jurnal_detail.id_akun", $value->id_akun)
@@ -413,49 +380,69 @@ class ReportGeneralLedgerController extends Controller
                         ->where("jurnal_header.tanggal_jurnal", ">=", $start_of_the_month)
                         ->where("jurnal_header.tanggal_jurnal", "<", $start_date)
                         ->groupBy("jurnal_detail.id_akun")->first();
-                        $saldo_debet = ($saldo)?$saldo->saldo_debet:0;
-                        $saldo_kredit = ($saldo)?$saldo->saldo_kredit:0;
-                        $debet = ($data_saldo_ledgers)?$data_saldo_ledgers->debet:0;
-                        $kredit = ($data_saldo_ledgers)?$data_saldo_ledgers->kredit:0;
+                    $saldo_debet = ($saldo) ? $saldo->saldo_debet : 0;
+                    $saldo_kredit = ($saldo) ? $saldo->saldo_kredit : 0;
+                    $debet = ($data_saldo_ledgers) ? $data_saldo_ledgers->debet : 0;
+                    $kredit = ($data_saldo_ledgers) ? $data_saldo_ledgers->kredit : 0;
+                    $saldo_awal = ($saldo_debet - $saldo_kredit) + ($debet - $kredit);
+                    $saldo_akhir = $saldo_awal + $value->debet - $value->kredit;
+                    $value["saldo_awal"] = $saldo_awal;
+                    $value["saldo_akhir"] = $saldo_akhir;
+                } else {
+                    if ($saldo_awal_current != $value->id_akun) {
+                        $saldo_awal_current = $value->id_akun;
+                        $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")->where("id_akun", $value->id_akun)->where("id_cabang", $value->id_cabang)->where("bulan", $month)->where("tahun", $year)->first();
+                        $data_saldo_ledgers = JurnalDetail::selectRaw("IFNULL(SUM(jurnal_detail.debet), 0) as debet, IFNULL(SUM(jurnal_detail.credit), 0) as kredit")
+                            ->join("jurnal_header", "jurnal_header.id_jurnal", "jurnal_detail.id_jurnal")
+                            ->join("master_akun", "master_akun.id_akun", "jurnal_detail.id_akun")
+                            ->where("jurnal_detail.id_akun", $value->id_akun)
+                            ->where("jurnal_header.id_cabang", $value->id_cabang)
+                            ->where("jurnal_header.tanggal_jurnal", ">=", $start_of_the_month)
+                            ->where("jurnal_header.tanggal_jurnal", "<", $start_date)
+                            ->groupBy("jurnal_detail.id_akun")->first();
+                        $saldo_debet = ($saldo) ? $saldo->saldo_debet : 0;
+                        $saldo_kredit = ($saldo) ? $saldo->saldo_kredit : 0;
+                        $debet = ($data_saldo_ledgers) ? $data_saldo_ledgers->debet : 0;
+                        $kredit = ($data_saldo_ledgers) ? $data_saldo_ledgers->kredit : 0;
                         $saldo_awal_debet = $saldo_debet + $debet;
                         $saldo_awal_kredit = $saldo_kredit + $kredit;
                         $saldo_balance = $saldo_awal_debet - $saldo_awal_kredit;
-                        $result_detail[] = (object)[
-                            "id_cabang"=>$value->id_cabang,
-                            "id_akun"=>$value->id_akun,
-                            "kode_akun"=>$value->kode_akun,
-                            "nama_akun"=>$value->nama_akun,
-                            "kode_jurnal"=>"",
-                            "id_transaksi"=>"",
-                            "keterangan"=>"Saldo Awal",
-                            "debet"=>$saldo_awal_debet,
-                            "kredit"=>$saldo_awal_kredit,
-                            "tanggal_jurnal"=>$saldo_date,
-                            "saldo_balance"=>$saldo_balance
+                        $result_detail[] = (object) [
+                            "id_cabang" => $value->id_cabang,
+                            "id_akun" => $value->id_akun,
+                            "kode_akun" => $value->kode_akun,
+                            "nama_akun" => $value->nama_akun,
+                            "kode_jurnal" => "",
+                            "id_transaksi" => "",
+                            "keterangan" => "Saldo Awal",
+                            "debet" => $saldo_awal_debet,
+                            "kredit" => $saldo_awal_kredit,
+                            "tanggal_jurnal" => $saldo_date,
+                            "saldo_balance" => $saldo_balance,
                         ];
                     }
                     $saldo_balance = $saldo_balance + $value->debet - $value->kredit;
-                    $result_detail[] = (object)[
-                        "id_cabang"=>$value->id_cabang,
-                        "id_akun"=>$value->id_akun,
-                        "kode_akun"=>$value->kode_akun,
-                        "nama_akun"=>$value->nama_akun,
-                        "kode_jurnal"=>$value->kode_jurnal,
-                        "id_transaksi"=>$value->id_transaksi,
-                        "keterangan"=>$value->keterangan,
-                        "debet"=>$value->debet,
-                        "kredit"=>$value->kredit,
-                        "tanggal_jurnal"=>$value->tanggal_jurnal,
-                        "saldo_balance"=>$saldo_balance
+                    $result_detail[] = (object) [
+                        "id_cabang" => $value->id_cabang,
+                        "id_akun" => $value->id_akun,
+                        "kode_akun" => $value->kode_akun,
+                        "nama_akun" => $value->nama_akun,
+                        "kode_jurnal" => $value->kode_jurnal,
+                        "id_transaksi" => $value->id_transaksi,
+                        "keterangan" => $value->keterangan,
+                        "debet" => $value->debet,
+                        "kredit" => $value->kredit,
+                        "tanggal_jurnal" => $value->tanggal_jurnal,
+                        "saldo_balance" => $saldo_balance,
                     ];
                 }
             }
             $data = [
-                "type"=>$type,
-                "start_date"=>$start_date,
-                "end_date"=>$end_date,
-                "cabang"=>$nama_cabang,
-                "data"=>($type == "recap")?$result:$result_detail
+                "type" => $type,
+                "start_date" => $start_date,
+                "end_date" => $end_date,
+                "cabang" => $nama_cabang,
+                "data" => ($type == "recap") ? $result : $result_detail,
             ];
             if (count($data["data"]) > 0) {
                 $pdf = PDF::loadView('accounting.report.general_ledger.print', $data);
@@ -465,25 +452,23 @@ class ReportGeneralLedgerController extends Controller
                     'Content-Disposition' => 'attachment; filename="download.pdf"',
                 ];
                 return response()->json([
-                    "result"=>True,
-                    "pdfData"=>base64_encode($pdf->output()),
-                    "pdfHeaders"=>$headers,
+                    "result" => true,
+                    "pdfData" => base64_encode($pdf->output()),
+                    "pdfHeaders" => $headers,
                 ]);
-            }
-            else {
+            } else {
                 return response()->json([
-                    "result"=>False,
-                    "message"=>"Tidak ada data"
+                    "result" => false,
+                    "message" => "Tidak ada data",
                 ]);
             }
-        } 
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $message = "Failed to print general ledger for pdf";
             Log::error($message);
             Log::error($e);
             return response()->json([
-                "result"=>False,
-                "message"=>$message
+                "result" => false,
+                "message" => $message,
             ]);
         }
     }
@@ -495,7 +480,7 @@ class ReportGeneralLedgerController extends Controller
             // Init Data
             $id_cabang = $request->id_cabang;
             $cabang = Cabang::find($id_cabang);
-            $nama_cabang = ($cabang)?$cabang->nama_cabang:NULL;
+            $nama_cabang = ($cabang) ? $cabang->nama_cabang : null;
             $start_date = $request->start_date;
             $end_date = $request->end_date;
             $type = $request->type;
@@ -503,7 +488,7 @@ class ReportGeneralLedgerController extends Controller
             $month = date("m", strtotime("$start_date"));
             $year = date("Y", strtotime($start_date));
             $start_of_the_month = date("Y-m-01", strtotime($start_date));
-            $saldo_date = date("Y-m-d", strtotime($start_date." -1 day"));
+            $saldo_date = date("Y-m-d", strtotime($start_date . " -1 day"));
 
             $data_ledgers = JurnalDetail::join("jurnal_header", "jurnal_header.id_jurnal", "jurnal_detail.id_jurnal")
                 ->join("master_akun", "master_akun.id_akun", "jurnal_detail.id_akun")
@@ -512,8 +497,7 @@ class ReportGeneralLedgerController extends Controller
                 ->whereBetween("jurnal_header.tanggal_jurnal", [$start_date, $end_date]);
             if ($type == "recap") {
                 $data_ledgers = $data_ledgers->selectRaw("master_akun.id_cabang, master_akun.id_akun, master_akun.kode_akun, master_akun.nama_akun, SUM(jurnal_detail.debet) as debet, SUM(jurnal_detail.credit) as kredit")->groupBy("jurnal_detail.id_akun");
-            }
-            else {
+            } else {
                 $data_ledgers = $data_ledgers->selectRaw("master_akun.id_cabang, master_akun.id_akun, master_akun.kode_akun, master_akun.nama_akun, jurnal_header.kode_jurnal, jurnal_detail.keterangan, jurnal_detail.id_transaksi, jurnal_detail.debet as debet, jurnal_detail.credit as kredit, jurnal_header.tanggal_jurnal");
             }
             if ($id_cabang != "all") {
@@ -524,8 +508,7 @@ class ReportGeneralLedgerController extends Controller
             }
             if ($type == "recap") {
                 $data_ledgers->orderBy("master_akun.kode_akun", "ASC");
-            }
-            else {
+            } else {
                 $data_ledgers->orderBy("jurnal_header.tanggal_jurnal", "ASC");
                 $data_ledgers->orderBy("master_akun.kode_akun", "ASC");
             }
@@ -537,27 +520,6 @@ class ReportGeneralLedgerController extends Controller
                 if ($type == "recap") {
                     $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")->where("id_akun", $value->id_akun)->where("id_cabang", $value->id_cabang)->where("bulan", $month)->where("tahun", $year)->first();
                     $data_saldo_ledgers = JurnalDetail::selectRaw("IFNULL(SUM(jurnal_detail.debet), 0) as debet, IFNULL(SUM(jurnal_detail.credit), 0) as kredit")
-                    ->join("jurnal_header", "jurnal_header.id_jurnal", "jurnal_detail.id_jurnal")
-                    ->join("master_akun", "master_akun.id_akun", "jurnal_detail.id_akun")
-                    ->where("jurnal_detail.id_akun", $value->id_akun)
-                    ->where("jurnal_header.id_cabang", $value->id_cabang)
-                    ->where("jurnal_header.tanggal_jurnal", ">=", $start_of_the_month)
-                    ->where("jurnal_header.tanggal_jurnal", "<", $start_date)
-                    ->groupBy("jurnal_detail.id_akun")->first();
-                    $saldo_debet = ($saldo)?$saldo->saldo_debet:0;
-                    $saldo_kredit = ($saldo)?$saldo->saldo_kredit:0;
-                    $debet = ($data_saldo_ledgers)?$data_saldo_ledgers->debet:0;
-                    $kredit = ($data_saldo_ledgers)?$data_saldo_ledgers->kredit:0;
-                    $saldo_awal = ($saldo_debet - $saldo_kredit) + ($debet - $kredit);
-                    $saldo_akhir = $saldo_awal + $value->debet - $value->kredit;
-                    $value["saldo_awal"] = $saldo_awal;
-                    $value["saldo_akhir"] = $saldo_akhir;
-                }
-                else {
-                    if ($saldo_awal_current != $value->id_akun) {
-                        $saldo_awal_current = $value->id_akun;
-                        $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")->where("id_akun", $value->id_akun)->where("id_cabang", $value->id_cabang)->where("bulan", $month)->where("tahun", $year)->first();
-                        $data_saldo_ledgers = JurnalDetail::selectRaw("IFNULL(SUM(jurnal_detail.debet), 0) as debet, IFNULL(SUM(jurnal_detail.credit), 0) as kredit")
                         ->join("jurnal_header", "jurnal_header.id_jurnal", "jurnal_detail.id_jurnal")
                         ->join("master_akun", "master_akun.id_akun", "jurnal_detail.id_akun")
                         ->where("jurnal_detail.id_akun", $value->id_akun)
@@ -565,68 +527,86 @@ class ReportGeneralLedgerController extends Controller
                         ->where("jurnal_header.tanggal_jurnal", ">=", $start_of_the_month)
                         ->where("jurnal_header.tanggal_jurnal", "<", $start_date)
                         ->groupBy("jurnal_detail.id_akun")->first();
-                        $saldo_debet = ($saldo)?$saldo->saldo_debet:0;
-                        $saldo_kredit = ($saldo)?$saldo->saldo_kredit:0;
-                        $debet = ($data_saldo_ledgers)?$data_saldo_ledgers->debet:0;
-                        $kredit = ($data_saldo_ledgers)?$data_saldo_ledgers->kredit:0;
+                    $saldo_debet = ($saldo) ? $saldo->saldo_debet : 0;
+                    $saldo_kredit = ($saldo) ? $saldo->saldo_kredit : 0;
+                    $debet = ($data_saldo_ledgers) ? $data_saldo_ledgers->debet : 0;
+                    $kredit = ($data_saldo_ledgers) ? $data_saldo_ledgers->kredit : 0;
+                    $saldo_awal = ($saldo_debet - $saldo_kredit) + ($debet - $kredit);
+                    $saldo_akhir = $saldo_awal + $value->debet - $value->kredit;
+                    $value["saldo_awal"] = $saldo_awal;
+                    $value["saldo_akhir"] = $saldo_akhir;
+                } else {
+                    if ($saldo_awal_current != $value->id_akun) {
+                        $saldo_awal_current = $value->id_akun;
+                        $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")->where("id_akun", $value->id_akun)->where("id_cabang", $value->id_cabang)->where("bulan", $month)->where("tahun", $year)->first();
+                        $data_saldo_ledgers = JurnalDetail::selectRaw("IFNULL(SUM(jurnal_detail.debet), 0) as debet, IFNULL(SUM(jurnal_detail.credit), 0) as kredit")
+                            ->join("jurnal_header", "jurnal_header.id_jurnal", "jurnal_detail.id_jurnal")
+                            ->join("master_akun", "master_akun.id_akun", "jurnal_detail.id_akun")
+                            ->where("jurnal_detail.id_akun", $value->id_akun)
+                            ->where("jurnal_header.id_cabang", $value->id_cabang)
+                            ->where("jurnal_header.tanggal_jurnal", ">=", $start_of_the_month)
+                            ->where("jurnal_header.tanggal_jurnal", "<", $start_date)
+                            ->groupBy("jurnal_detail.id_akun")->first();
+                        $saldo_debet = ($saldo) ? $saldo->saldo_debet : 0;
+                        $saldo_kredit = ($saldo) ? $saldo->saldo_kredit : 0;
+                        $debet = ($data_saldo_ledgers) ? $data_saldo_ledgers->debet : 0;
+                        $kredit = ($data_saldo_ledgers) ? $data_saldo_ledgers->kredit : 0;
                         $saldo_awal_debet = $saldo_debet + $debet;
                         $saldo_awal_kredit = $saldo_kredit + $kredit;
                         $saldo_balance = $saldo_awal_debet - $saldo_awal_kredit;
-                        $result_detail[] = (object)[
-                            "id_cabang"=>$value->id_cabang,
-                            "id_akun"=>$value->id_akun,
-                            "kode_akun"=>$value->kode_akun,
-                            "nama_akun"=>$value->nama_akun,
-                            "kode_jurnal"=>"",
-                            "id_transaksi"=>"",
-                            "keterangan"=>"Saldo Awal",
-                            "debet"=>$saldo_awal_debet,
-                            "kredit"=>$saldo_awal_kredit,
-                            "tanggal_jurnal"=>$saldo_date,
-                            "saldo_balance"=>$saldo_balance
+                        $result_detail[] = (object) [
+                            "id_cabang" => $value->id_cabang,
+                            "id_akun" => $value->id_akun,
+                            "kode_akun" => $value->kode_akun,
+                            "nama_akun" => $value->nama_akun,
+                            "kode_jurnal" => "",
+                            "id_transaksi" => "",
+                            "keterangan" => "Saldo Awal",
+                            "debet" => $saldo_awal_debet,
+                            "kredit" => $saldo_awal_kredit,
+                            "tanggal_jurnal" => $saldo_date,
+                            "saldo_balance" => $saldo_balance,
                         ];
                     }
                     $saldo_balance = $saldo_balance + $value->debet - $value->kredit;
-                    $result_detail[] = (object)[
-                        "id_cabang"=>$value->id_cabang,
-                        "id_akun"=>$value->id_akun,
-                        "kode_akun"=>$value->kode_akun,
-                        "nama_akun"=>$value->nama_akun,
-                        "kode_jurnal"=>$value->kode_jurnal,
-                        "id_transaksi"=>$value->id_transaksi,
-                        "keterangan"=>$value->keterangan,
-                        "debet"=>$value->debet,
-                        "kredit"=>$value->kredit,
-                        "tanggal_jurnal"=>$value->tanggal_jurnal,
-                        "saldo_balance"=>$saldo_balance
+                    $result_detail[] = (object) [
+                        "id_cabang" => $value->id_cabang,
+                        "id_akun" => $value->id_akun,
+                        "kode_akun" => $value->kode_akun,
+                        "nama_akun" => $value->nama_akun,
+                        "kode_jurnal" => $value->kode_jurnal,
+                        "id_transaksi" => $value->id_transaksi,
+                        "keterangan" => $value->keterangan,
+                        "debet" => $value->debet,
+                        "kredit" => $value->kredit,
+                        "tanggal_jurnal" => $value->tanggal_jurnal,
+                        "saldo_balance" => $saldo_balance,
                     ];
                 }
             }
             $data = [
-                "type"=>$type,
-                "start_date"=>$start_date,
-                "end_date"=>$end_date,
-                "cabang"=>$nama_cabang,
-                "data"=>($type == "recap")?$result:$result_detail
+                "type" => $type,
+                "start_date" => $start_date,
+                "end_date" => $end_date,
+                "cabang" => $nama_cabang,
+                "data" => ($type == "recap") ? $result : $result_detail,
             ];
             // dd(count($data["data"]));
             if (count($data["data"]) > 0) {
                 return Excel::download(new ReportGeneralLedgerExport($data), 'ReportGeneralLedger.xlsx');
-            }
-            else {
+            } else {
                 return response()->json([
-                    "result"=>False,
-                    "message"=>"Tidak ada data"
+                    "result" => false,
+                    "message" => "Tidak ada data",
                 ]);
             }
-        } 
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $message = "Failed to print general ledger for excel";
             Log::error($message);
             Log::error($e);
             return response()->json([
-                "result"=>False,
-                "message"=>$message
+                "result" => false,
+                "message" => $message,
             ]);
         }
     }

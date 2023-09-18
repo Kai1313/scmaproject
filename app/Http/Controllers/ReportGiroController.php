@@ -5,17 +5,17 @@ namespace App\Http\Controllers;
 use App\Exports\ReportGiroExport;
 use App\Models\Master\Cabang;
 use App\Models\Master\Slip;
-use Illuminate\Http\Request;
 use Excel;
-use PDF;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use PDF;
 
 class ReportGiroController extends Controller
 {
     public function index(Request $request)
     {
-        if (checkUserSession($request, 'report_giro', 'show') == false) {
+        if (checkUserSession($request, 'report/giro', 'show') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
@@ -24,27 +24,27 @@ class ReportGiroController extends Controller
         $data_status = array(
             array(
                 'value' => 'All',
-                'title' => 'All'
+                'title' => 'All',
             ),
             array(
                 'value' => '0',
-                'title' => 'Belum Cair'
+                'title' => 'Belum Cair',
             ),
             array(
                 'value' => '1',
-                'title' => 'Cair'
+                'title' => 'Cair',
             ),
             array(
                 'value' => '2',
-                'title' => 'Tolak'
-            )
-        );        
+                'title' => 'Tolak',
+            ),
+        );
 
         $data = [
             "pageTitle" => "SCA Accounting | Report Giro",
             "data_slip" => $data_slip,
             "data_cabang" => $data_cabang,
-            "data_status" => $data_status
+            "data_status" => $data_status,
         ];
 
         return view('accounting.report.giro.index', $data);
@@ -79,12 +79,12 @@ class ReportGiroController extends Controller
                 ->where('head.void', 0)
                 ->where('head.id_cabang', $cabang)
                 ->where('head.jenis_jurnal', $tipe)
-                ->where('head.tanggal_giro_jt', '<=',  $tanggal);
-    
+                ->where('head.tanggal_giro_jt', '<=', $tanggal);
+
             if ($slip != 'All') {
                 $giro = $giro->where('head.id_slip', $slip);
             }
-    
+
             if ($status != 'All') {
                 if ($status == 0) {
                     $giro = $giro->where('saldo.sisa', '>', 0);
@@ -94,10 +94,10 @@ class ReportGiroController extends Controller
                     $giro = $giro->where('saldo.status_giro', $status);
                 }
             }
-    
+
             $giro = $giro->groupBy('det.id_jurnal')
                 ->orderBy('head.tanggal_jurnal', 'DESC');
-    
+
             $data = $giro->get();
             foreach ($data as $key => $value) {
                 $cair = DB::table('jurnal_header as head')
@@ -111,12 +111,12 @@ class ReportGiroController extends Controller
                     ->where('saldo.sisa', '=', 0)
                     ->where('saldo.status_giro', '=', 1)
                     ->first();
-    
+
                 $value->cair_id_jurnal = isset($cair) ? $cair->id_jurnal : '';
                 $value->cair_kode_jurnal = isset($cair) ? $cair->kode_jurnal : '';
                 $value->cair_tanggal_jurnal = isset($cair) ? $cair->tanggal_giro_jt : '';
                 $value->cair_slip = isset($cair) ? $cair->nama_slip : '';
-    
+
                 $tolak = DB::table('jurnal_header as head')
                     ->join('saldo_transaksi as saldo', 'saldo.id_jurnal', 'head.id_jurnal')
                     ->join('master_slip as slip', 'slip.id_slip', 'head.id_slip')
@@ -128,7 +128,7 @@ class ReportGiroController extends Controller
                     ->where('saldo.sisa', '=', 0)
                     ->where('saldo.status_giro', '=', 2)
                     ->first();
-    
+
                 $value->tolak_id_jurnal = isset($tolak) ? $tolak->id_jurnal : '';
                 $value->tolak_kode_jurnal = isset($tolak) ? $tolak->kode_jurnal : '';
                 $value->tolak_tanggal_jurnal = isset($tolak) ? $tolak->tanggal_giro_jt : '';
@@ -136,17 +136,16 @@ class ReportGiroController extends Controller
 
             return response()->json([
                 "result" => true,
-                "data" => $data
+                "data" => $data,
             ]);
         } catch (\Exception $e) {
             Log::debug($e);
-           
+
             return response()->json([
                 "result" => false,
-                "data" => $data
-            ]); 
+                "data" => $data,
+            ]);
         }
-
 
         return $data;
     }
@@ -191,7 +190,7 @@ class ReportGiroController extends Controller
                 ->where('head.void', 0)
                 ->where('head.id_cabang', $cabang)
                 ->where('head.jenis_jurnal', $tipe)
-                ->where('head.tanggal_giro_jt', '<=',  $tanggal);
+                ->where('head.tanggal_giro_jt', '<=', $tanggal);
 
             if (isset($keyword)) {
                 $giro->where(function ($query) use ($keyword) {
@@ -268,7 +267,6 @@ class ReportGiroController extends Controller
                     ->where('head.void', '0')
                     ->first();
 
-
                 $value->cair_kode_jurnal = isset($cair) ? $cair->kode_jurnal : '';
                 $value->cair_tanggal_giro = isset($cair) ? $cair->tanggal_jurnal : '';
                 $value->cair_slip = isset($cair) ? $cair->nama_slip : '';
@@ -299,7 +297,7 @@ class ReportGiroController extends Controller
             Log::error($e);
             return response()->json([
                 "result" => false,
-                "message" => $message
+                "message" => $message,
             ]);
         }
     }
@@ -316,7 +314,7 @@ class ReportGiroController extends Controller
         Log::debug($request->all());
 
         try {
-            return Excel::download(new ReportGiroExport($request->cabang, $request->slip, $request->tipe, $request->tanggal,  $request->status), 'ReportGiros.xlsx');
+            return Excel::download(new ReportGiroExport($request->cabang, $request->slip, $request->tipe, $request->tanggal, $request->status), 'ReportGiros.xlsx');
         } catch (\Exception $e) {
             Log::error("Error when export excel report giro");
             Log::error($e);
@@ -393,7 +391,6 @@ class ReportGiroController extends Controller
                     ->where('head.void', '0')
                     ->first();
 
-
                 $value->cair_kode_jurnal = isset($cair) ? $cair->kode_jurnal : '';
                 $value->cair_tanggal_giro = isset($cair) ? $cair->tanggal_jurnal : '';
                 $value->cair_slip = isset($cair) ? $cair->nama_slip : '';
@@ -432,7 +429,7 @@ class ReportGiroController extends Controller
                 'slip' => $slip,
                 'tanggal' => $tanggal,
                 'tipe' => $tipe,
-                'status' => $status
+                'status' => $status,
             ];
 
             // return view('accounting.report.slip.print', $data);
@@ -452,7 +449,7 @@ class ReportGiroController extends Controller
             } else {
                 return response()->json([
                     'status' => false,
-                    'message' => 'No data found'
+                    'message' => 'No data found',
                 ]);
             }
         } catch (\Exception $e) {
@@ -460,8 +457,8 @@ class ReportGiroController extends Controller
             Log::error($message);
             Log::error($e);
             return response()->json([
-                "result" => False,
-                "message" => $message
+                "result" => false,
+                "message" => $message,
             ]);
         }
     }
@@ -484,12 +481,12 @@ class ReportGiroController extends Controller
             return response()->json([
                 "result" => true,
                 "message" => 'Success get slip data',
-                "data" => $slip
+                "data" => $slip,
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 "result" => false,
-                "message" => 'Error when get slip data'
+                "message" => 'Error when get slip data',
             ]);
         }
     }

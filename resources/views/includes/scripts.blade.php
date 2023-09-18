@@ -10,4 +10,7 @@
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
+
+    let activeMenu = $('li.nav-item.active')
+    activeMenu.parents('li').addClass('active')
 </script>

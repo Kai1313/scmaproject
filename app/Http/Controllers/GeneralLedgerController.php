@@ -26,7 +26,7 @@ class GeneralLedgerController extends Controller
      */
     public function index(Request $request)
     {
-        if (checkUserSession($request, 'general_ledger', 'show') == false) {
+        if (checkUserSession($request, 'transaction/general_ledger', 'show') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
@@ -49,7 +49,7 @@ class GeneralLedgerController extends Controller
      */
     public function create(Request $request)
     {
-        if (checkAccessMenu('general_ledger', 'create') == false) {
+        if (checkAccessMenu('transaction/general_ledger', 'create') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
@@ -68,7 +68,7 @@ class GeneralLedgerController extends Controller
             "data_pemasok" => $data_pemasok,
             "piutang_dagang" => $piutang_dagang,
             "hutang_dagang" => $hutang_dagang,
-            "user_id" => $userSession->id_pengguna
+            "user_id" => $userSession->id_pengguna,
         ];
         Log::debug(json_encode($request->session()->get('user')));
 
@@ -100,7 +100,7 @@ class GeneralLedgerController extends Controller
             $userData = $request->session()->get('user');
             if (!$userData) {
                 Log::info("session expired");
-                if (checkUserSession($request, 'general_ledger', 'create') == false) {
+                if (checkUserSession($request, 'transaction/general_ledger', 'create') == false) {
                     return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
                 }
                 $userData = $request->session()->get('user');
@@ -196,10 +196,10 @@ class GeneralLedgerController extends Controller
                 if ($checkAkun) {
                     if ($checkAkun->id_cabang != $cabangID) {
                         DB::rollback();
-                    return response()->json([
-                        "result" => false,
-                        "message" => "Error when store Jurnal data on table detail. Detail has different cabang on the account ".$checkAkun->nama_akun,
-                    ]);
+                        return response()->json([
+                            "result" => false,
+                            "message" => "Error when store Jurnal data on table detail. Detail has different cabang on the account " . $checkAkun->nama_akun,
+                        ]);
                     }
                 }
 
@@ -287,7 +287,7 @@ class GeneralLedgerController extends Controller
      */
     public function show(Request $request, $id)
     {
-        if (checkAccessMenu('general_ledger', 'show') == false) {
+        if (checkAccessMenu('transaction/general_ledger', 'show') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
@@ -396,7 +396,7 @@ class GeneralLedgerController extends Controller
      */
     public function edit(Request $request, $id)
     {
-        if (checkAccessMenu('general_ledger', 'edit') == false) {
+        if (checkAccessMenu('transaction/general_ledger', 'edit') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
@@ -432,25 +432,25 @@ class GeneralLedgerController extends Controller
             "jurnal_header" => $jurnal_header,
             "jurnal_detail" => json_encode($details),
             "jurnal_detail_count" => count($details),
-            "user_id" => $userSession->id_pengguna
+            "user_id" => $userSession->id_pengguna,
         ];
         // dd($details);
         // Check periode close
         $period = Periode::checkPeriod($jurnal_header->tanggal_jurnal);
         if ($period) {
-            if (checkUserSession($request, 'general_ledger', 'show') == false) {
+            if (checkUserSession($request, 'transaction/general_ledger', 'show') == false) {
                 return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
             }
-    
+
             // $cabang = Cabang::find(1);
-    
+
             $data = [
                 "pageTitle" => "SCA Accounting | Transaksi Jurnal Umum | List",
                 // "cabang" => $cabang,
                 "data_cabang" => $data_cabang,
-                "closePeriod" => $period
+                "closePeriod" => $period,
             ];
-    
+
             return view('accounting.journal.general_ledger.index', $data);
         }
 
@@ -484,7 +484,7 @@ class GeneralLedgerController extends Controller
             $userData = $request->session()->get('user');
             if (!$userData) {
                 Log::info("session expired");
-                if (checkUserSession($request, 'general_ledger', 'edit') == false) {
+                if (checkUserSession($request, 'transaction/general_ledger', 'edit') == false) {
                     return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
                 }
                 $userData = $request->session()->get('user');
@@ -597,13 +597,13 @@ class GeneralLedgerController extends Controller
                 if ($checkAkun) {
                     if ($checkAkun->id_cabang != $cabangID) {
                         DB::rollback();
-                    return response()->json([
-                        "result" => false,
-                        "message" => "Error when store Jurnal data on table detail. Detail has different cabang on the account ".$checkAkun->nama_akun,
-                    ]);
+                        return response()->json([
+                            "result" => false,
+                            "message" => "Error when store Jurnal data on table detail. Detail has different cabang on the account " . $checkAkun->nama_akun,
+                        ]);
                     }
                 }
-                
+
                 // Store Detail
                 $debet = str_replace('.', '', $data['debet']);
                 $debet = str_replace(',', '.', $debet);
@@ -698,9 +698,9 @@ class GeneralLedgerController extends Controller
         $current_page = $offset / $limit + 1;
 
         $data_general_ledger = JurnalHeader::join('master_slip', 'jurnal_header.id_slip', 'master_slip.id_slip')
-        ->leftJoin('jurnal_detail', 'jurnal_detail.id_jurnal', 'jurnal_header.id_jurnal')
-        ->leftJoin('saldo_transaksi', 'saldo_transaksi.id_transaksi', 'jurnal_detail.id_transaksi')
-        ->select('jurnal_header.*', DB::raw('GROUP_CONCAT(CONCAT(jurnal_detail.id_transaksi, "-", saldo_transaksi.ref_id) SEPARATOR \', \') AS concat_id_transaksi'), 'master_slip.kode_slip', DB::raw('
+            ->leftJoin('jurnal_detail', 'jurnal_detail.id_jurnal', 'jurnal_header.id_jurnal')
+            ->leftJoin('saldo_transaksi', 'saldo_transaksi.id_transaksi', 'jurnal_detail.id_transaksi')
+            ->select('jurnal_header.*', DB::raw('GROUP_CONCAT(CONCAT(jurnal_detail.id_transaksi, "-", saldo_transaksi.ref_id) SEPARATOR \', \') AS concat_id_transaksi'), 'master_slip.kode_slip', DB::raw('
                     (CASE
                         WHEN jenis_jurnal = "KK" THEN "Kas Keluar"
                         WHEN jenis_jurnal = "KM" THEN "Kas Masuk"
@@ -710,17 +710,17 @@ class GeneralLedgerController extends Controller
                         WHEN jenis_jurnal = "HG" THEN "Hutang Giro"
                         WHEN jenis_jurnal = "ME" THEN "Memorial"
                     END) as jenis_name')
-        )
-        ->groupBy('jurnal_header.id_jurnal');
+            )
+            ->groupBy('jurnal_header.id_jurnal');
         $data_general_ledger_table = DB::table(DB::raw('(' . $data_general_ledger->toSql() . ') as jurnal_header'))
             ->join('jurnal_detail', 'jurnal_detail.id_jurnal', 'jurnal_header.id_jurnal')
             ->where('jurnal_header.void', $void)
             ->where('jurnal_header.jenis_jurnal', '<>', 'ME')
             ->where('id_cabang', $cabang)
             ->groupBy('jurnal_header.id_jurnal', 'jurnal_header.tanggal_jurnal')
-            // ->select('jurnal_header.*', DB::raw("GROUP_CONCAT(jurnal_detail.id_transaksi SEPARATOR ', ') AS id_transaksi"), DB::raw('SUM(jurnal_detail.credit) as jumlah'));
+        // ->select('jurnal_header.*', DB::raw("GROUP_CONCAT(jurnal_detail.id_transaksi SEPARATOR ', ') AS id_transaksi"), DB::raw('SUM(jurnal_detail.credit) as jumlah'));
             ->select('jurnal_header.*', DB::raw('SUM(jurnal_detail.credit) as jumlah'));
-                
+
         if (isset($keyword)) {
             $data_general_ledger_table->where(function ($query) use ($keyword) {
                 $query->orWhere('kode_jurnal', 'LIKE', "%$keyword%")
@@ -752,8 +752,7 @@ class GeneralLedgerController extends Controller
                     $data_general_ledger_table->orderBy($column, $directon);
                 }
             }
-        } 
-        else {
+        } else {
             $data_general_ledger_table->orderBy('jurnal_header.id_jurnal', 'DESC');
         }
 
@@ -784,7 +783,7 @@ class GeneralLedgerController extends Controller
 
     public function void(Request $request, $id)
     {
-        if (checkAccessMenu('general_ledger', 'edit') == false) {
+        if (checkAccessMenu('transaction/general_ledger', 'edit') == false) {
             return response()->json([
                 "result" => false,
                 "message" => "Error when void Jurnal data, user has no access!",
@@ -813,7 +812,7 @@ class GeneralLedgerController extends Controller
                 ]);
             }
             $session = $request->session()->get('access');
-            if (checkAccessMenu('general_ledger', 'delete') == false) {
+            if (checkAccessMenu('transaction/general_ledger', 'delete') == false) {
                 return response()->json([
                     "result" => false,
                     "message" => "Maaf, tidak bisa void jurnal dengan id " . $id . ", anda tidak punya akses!",
@@ -868,7 +867,7 @@ class GeneralLedgerController extends Controller
 
     public function active(Request $request, $id)
     {
-        if (checkAccessMenu('general_ledger', 'edit') == false) {
+        if (checkAccessMenu('transaction/general_ledger', 'edit') == false) {
             return response()->json([
                 "result" => false,
                 "message" => "Error when activate Jurnal data, user has no access!",
@@ -1002,7 +1001,7 @@ class GeneralLedgerController extends Controller
                 $data_saldo = $data_saldo->where("saldo_transaksi.id_pemasok", $supplier);
             }
             if ($type == "piutang giro" || $type == "hutang giro") {
-                $slip = ($request->has('slip'))?$request->slip:"";
+                $slip = ($request->has('slip')) ? $request->slip : "";
                 // Log::info("slip ".$slip);
                 if ($slip != "") {
                     // Log::info("slip here");

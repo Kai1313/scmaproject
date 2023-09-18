@@ -18,4 +18,19 @@ class Menu extends Model
         '/print',
         '/edit',
     ];
+
+    public function akses()
+    {
+        return $this->belongsTo(AksesMenu::class, 'id_menu', 'id_menu');
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(Menu::class, 'kepala_menu', 'id_menu');
+    }
+
+    public function childs()
+    {
+        return $this->hasMany(Menu::class, 'kepala_menu', 'id_menu')->where('status_menu', 1)->orderBy('urut_menu', 'asc');
+    }
 }

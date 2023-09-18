@@ -53,6 +53,11 @@ function checkUserSession($request, $alias_menu, $type)
             ->where('alias_menu', 'not like', '%detail')
             ->get();
 
+        $listMenu = \App\Menu::with(['childs', 'childs.childs'])
+            ->where('tingkatan_menu', '0')
+            ->orderBy('urut_menu', 'asc')
+            ->get();
+
         $arrayMenuAccess = [];
         foreach ($menu_access as $menu) {
             $arrayMenuAccess[$menu->alias_menu] = $menu;
@@ -87,6 +92,7 @@ function checkUserSession($request, $alias_menu, $type)
             session()->put('user', $user);
             session()->put('access', $arrayMenuAccess);
             session()->put('access_cabang', $arrayCabang);
+            session()->put('list_menu', $listMenu);
         } else if (session()->has('token')) {
         } else {
             session()->flush();
@@ -220,12 +226,11 @@ function getCabang()
     return $cabang;
 }
 
-
 function menuActive($url, $currentUrl)
 {
     $suffix = Menu::$suffixUrl;
 
-    foreach ($suffix as  $value) {
+    foreach ($suffix as $value) {
         $baseUrl = explode($value, $url);
         if ($baseUrl > 1) {
             if ($baseUrl[0] == $currentUrl) {
