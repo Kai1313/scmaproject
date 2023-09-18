@@ -21,7 +21,7 @@ class MaterialUsageController extends Controller
                 ->select(
                     'pemakaian_header.*',
                     'g.nama_gudang',
-                    'c.nama_cabang',
+                    'c.nama_cabang'
                 )
                 ->leftJoin('gudang as g', 'pemakaian_header.id_gudang', '=', 'g.id_gudang')
                 ->leftJoin('cabang as c', 'pemakaian_header.id_cabang', '=', 'c.id_cabang');
