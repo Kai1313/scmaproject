@@ -1,5 +1,5 @@
 @php
-    $datas = session()->get('list_menu');
+    $datas = session()->get('list_menu') ?? [];
     $routeName = request()
         ->route()
         ->getName();
