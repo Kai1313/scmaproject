@@ -347,13 +347,12 @@
                         <textarea name="keterangan" class="form-control" rows="5"></textarea>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary cancel-entry btn-flat">Batal</button>
+                        <button type="button" class="btn btn-secondary btn-flat" data-dismiss="modal">Batal</button>
                         <button type="button" class="btn btn-primary save-entry-edit btn-flat">Simpan</button>
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
 @endsection
 
@@ -475,7 +474,6 @@
                         }
 
                         btn += '</ul>';
-                        console.log()
                         return btn;
                     }
                 },

@@ -7,6 +7,17 @@
         th {
             text-align: center;
         }
+
+        ul.horizontal-list {
+            min-width: 200px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        ul.horizontal-list li {
+            display: inline;
+        }
     </style>
 @endsection
 
@@ -116,9 +127,29 @@
                                 <th>Warna</th>
                                 <th>Keterangan</th>
                                 <th>Status</th>
+                                <th></th>
                             </tr>
                         </thead>
                     </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalEntryEdit" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Edit Barang</h4>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="index">
+                    <label>Keterangan</label>
+                    <textarea name="keterangan" class="form-control" rows="5"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-flat" data-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-primary save-entry-edit btn-flat">Simpan</button>
                 </div>
             </div>
         </div>
@@ -130,6 +161,7 @@
     <script src="{{ asset('assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js') }}"></script>
     <script src="{{ asset('assets/bower_components/datatables-responsive/js/dataTables.responsive.js') }}"></script>
     <script src="{{ asset('js/custom.js') }}"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 @endsection
 
 @section('externalScripts')
@@ -207,8 +239,68 @@
                 }, {
                     data: 'status_akhir',
                     name: 'status_akhir',
+                }, {
+                    data: 'id_pindah_barang_detail',
+                    className: 'text-center',
+                    name: 'id_pindah_barang_detail',
+                    width: 150,
+                    searchable: false,
+                    render: function(data, type, row, meta) {
+                        let btn = '<ul class="horizontal-list">';
+                        if (row.id_pindah_barang_detail != '') {
+                            btn +=
+                                '<li><a href="javascript:void(0)" class="btn btn-warning btn-xs mr-1 mb-1 edit-entry"><i class="glyphicon glyphicon-pencil"></i></a></li>';
+                        }
+
+                        btn += '</ul>';
+                        return btn;
+                    }
                 }
             ]
         });
+
+        $('body').on('click', '.edit-entry', function() {
+            let index = $(this).parents('tr').index()
+            let modal = $('#modalEntryEdit')
+            modal.find('[name="index"]').val(index)
+            console.log(details[index])
+            modal.find('[name="keterangan"]').val(details[index].keterangan)
+            modal.modal('show')
+        })
+
+        $('.save-entry-edit').click(function() {
+            let modal = $('#modalEntryEdit')
+            let index = modal.find('[name="index"]').val()
+            let object = {
+                id_pindah_barang_detail: details[index].id_pindah_barang_detail,
+                keterangan: modal.find('[name="keterangan"]').val().trim()
+            }
+            saveDetail(object)
+        })
+
+        function saveDetail(object) {
+            let modal = $('#modalEntryEdit')
+            $('#cover-spin').show()
+            $.ajax({
+                url: '{{ route('send_to_branch-save-entry-detail') }}',
+                type: 'post',
+                data: object,
+                success: function(res) {
+                    if (res.redirect) {
+                        window.location.href = res.redirect
+                    }
+
+                    modal.modal('hide')
+                    $('#cover-spin').hide()
+                },
+                error: function(error) {
+                    let textError = error.hasOwnProperty('responseJSON') ? error.responseJSON.message : error
+                        .statusText
+                    Swal.fire("Gagal Mengambil Data. ", textError, 'error')
+                    modal.modal('hide')
+                    $('#cover-spin').hide()
+                }
+            })
+        }
     </script>
 @endsection

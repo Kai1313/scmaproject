@@ -298,4 +298,42 @@ class SendToBranchController extends Controller
         $pdf->setPaper('a5', 'landscape');
         return $pdf->stream('Surat jalan pindah cabang ' . $data->kode_pindah_barang . '.pdf');
     }
+
+    public function saveEntryDetail(Request $request)
+    {
+        $store = MoveBranchDetail::find($request->id_pindah_barang_detail);
+        if (!$store) {
+            return response()->json([
+                "result" => false,
+                "message" => "Data tidak ditemukan",
+            ], 500);
+        }
+
+        DB::beginTransaction();
+        try {
+            $store->keterangan = $request->keterangan;
+            $store->save();
+
+            DB::table('kartu_stok')
+                ->where('id_jenis_transaksi', 21)
+                ->where('kode_batang_kartu_stok', $store->qr_code)->update([
+                'keterangan_kartu_stok' => $store->keterangan,
+            ]);
+
+            DB::commit();
+            return response()->json([
+                "result" => true,
+                "message" => "Data berhasil disimpan",
+                "redirect" => route('send_to_branch-view', $store->id_pindah_barang),
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error("Error when save send to branch");
+            Log::error($e);
+            return response()->json([
+                "result" => false,
+                "message" => "Data gagal tersimpan",
+            ], 500);
+        }
+    }
 }
