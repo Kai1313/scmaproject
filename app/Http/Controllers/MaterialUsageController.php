@@ -227,7 +227,6 @@ class MaterialUsageController extends Controller
                 'mqc.id_satuan_barang',
                 'sisa_master_qr_code',
                 'isweighed',
-                'master_wrapper.weight as wrapper_weight',
                 'id_wrapper_zak',
                 'weight_zak',
                 'zak as jumlah_zak',

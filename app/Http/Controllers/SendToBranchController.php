@@ -169,9 +169,16 @@ class SendToBranchController extends Controller
         }
 
         $data = MoveBranch::where('type', 0)->where('id_pindah_barang', $id)->first();
+        $groupPengguna = DB::table('pengguna')->select(DB::raw('distinct(id_grup_pengguna)'))->where('id_pengguna', $data->user_created)->orWhere('id_grup_pengguna', 1)->get()->toArray();
+        $groups = [];
+        foreach ($groupPengguna as $grup) {
+            $groups[] = $grup->id_grup_pengguna;
+        }
+
         return view('ops.sendToBranch.detail', [
             'data' => $data,
             "pageTitle" => "SCA OPS | Kirim Ke Cabang | Lihat",
+            'isEdit' => in_array(session()->get('user')['id_grup_pengguna'], $groups),
         ]);
     }
 

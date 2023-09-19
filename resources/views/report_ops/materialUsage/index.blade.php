@@ -149,16 +149,20 @@
 
                     $('#target-table-rekap').show()
                     table = $('.data-table-rekap').DataTable({
+                        lengthMenu: [
+                            [10, 50, 100, -1],
+                            [10, 50, 100, "All"]
+                        ],
                         bDestroy: true,
                         processing: true,
                         serverSide: true,
                         ajax: defaultUrlIndex + param,
                         columns: [{
                             data: 'tanggal',
-                            name: 'tanggal'
+                            name: 'mu.tanggal'
                         }, {
                             data: 'kode_pemakaian',
-                            name: 'kode_pemakaian'
+                            name: 'mu.kode_pemakaian'
                         }, {
                             data: 'nama_cabang',
                             name: 'c.nama_cabang',
@@ -167,7 +171,7 @@
                             name: 'g.nama_gudang',
                         }, {
                             data: 'catatan',
-                            name: 'catatan',
+                            name: 'mu.catatan',
                         }, ]
                     });
                     break;
@@ -178,16 +182,20 @@
 
                     $('#target-table-detail').show()
                     table = $('.data-table-detail').DataTable({
+                        lengthMenu: [
+                            [10, 50, 100, -1],
+                            [10, 50, 100, "All"]
+                        ],
                         bDestroy: true,
                         processing: true,
                         serverSide: true,
                         ajax: defaultUrlIndex + param,
                         columns: [{
                             data: 'tanggal',
-                            name: 'tanggal'
+                            name: 'ph.tanggal'
                         }, {
                             data: 'kode_pemakaian',
-                            name: 'kode_pemakaian'
+                            name: 'ph.kode_pemakaian'
                         }, {
                             data: 'nama_cabang',
                             name: 'c.nama_cabang',

@@ -247,7 +247,7 @@
                     searchable: false,
                     render: function(data, type, row, meta) {
                         let btn = '<ul class="horizontal-list">';
-                        if (row.id_pindah_barang_detail != '') {
+                        if ('{{ $isEdit }}') {
                             btn +=
                                 '<li><a href="javascript:void(0)" class="btn btn-warning btn-xs mr-1 mb-1 edit-entry"><i class="glyphicon glyphicon-pencil"></i></a></li>';
                         }
@@ -263,7 +263,6 @@
             let index = $(this).parents('tr').index()
             let modal = $('#modalEntryEdit')
             modal.find('[name="index"]').val(index)
-            console.log(details[index])
             modal.find('[name="keterangan"]').val(details[index].keterangan)
             modal.modal('show')
         })

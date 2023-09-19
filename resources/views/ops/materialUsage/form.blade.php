@@ -273,7 +273,6 @@
                                         </a>
                                     </div>
                                 </div>
-                                <input type="hidden" name="max_weight" class="validate">
                                 <label id="alertWeight" style="display:none;color:red;"></label>
                             </div>
                             <label>Catatan</label>
@@ -471,9 +470,7 @@
                     id: $('[name="id_timbangan"]').val()
                 },
                 success: function(res) {
-                    let beratTimbangan = res.data
-                    let beratMax = $('[name="max_weight"]').val()
-                    if (parseFloat(beratTimbangan) > parseFloat(beratMax)) {
+                    if (parseFloat(res.data) > parseFloat(detailSelect.sisa_master_qr_code)) {
                         $('[name="jumlah"]').addClass('error-field')
                         $('#alertWeight').text('Berat melebihi stok').show()
                     } else {
@@ -643,21 +640,16 @@
                     detailSelect = res.data
                     let modal = $('#modalEntry')
                     let data = res.data
-                    console.log(data)
-                    for (let key in data) {
-                        modal.find('[name="' + key + '"]').val(data[key])
-                        console.log(key, data[key])
-                        if (['weight_zak', 'wrapper_weight'].includes(key)) {
-                            if (data[key] == null) {
-                                modal.find('[name="' + key + '"]').val(0)
-                            }
-                        }
-
-                        if (key == 'jumlah_zak') {
+                    for (let key in detailSelect) {
+                        modal.find('[name="' + key + '"]').val(detailSelect[key])
+                        if (key == 'jumlah_zak' || key == 'weight_zak') {
                             modal.find('[name="' + key + '"]').val(0)
                         }
 
-                        // if ('wrapper')
+                        if (key == 'weight_zak') {
+                            let weight = detailSelect.weight_zak / detailSelect.jumlah_zak
+                            modal.find('[name="wrapper_weight"]').val(weight)
+                        }
                     }
 
                     $('#max-jumlah').text('Sisa ' + formatNumber(data.sisa_master_qr_code))
