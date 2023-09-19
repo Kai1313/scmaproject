@@ -306,11 +306,6 @@
                                     <td id="warna" class="setData"></td>
                                 </tr>
                                 <tr>
-                                    <td><b>Keterangan</b></td>
-                                    <td>:</td>
-                                    <td id="keterangan" class="setData"></td>
-                                </tr>
-                                <tr>
                                     <td><b>Batch</b></td>
                                     <td>:</td>
                                     <td id="batch" class="setData"></td>
@@ -319,6 +314,14 @@
                                     <td><b>Kadaluarsa</b></td>
                                     <td>:</td>
                                     <td id="tanggal_kadaluarsa" class="setData"></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3"><b>Keterangan</b></td>
+                                </tr>
+                                <tr>
+                                    <td class="setData" colspan="3" id="keterangan">
+                                        <textarea name="keterangan" class="form-control" rows="5"></textarea>
+                                    </td>
                                 </tr>
                             </table>
                         </div>
@@ -330,6 +333,27 @@
                 </div>
             </div>
         </div>
+
+        <div class="modal fade" id="modalEntryEdit" role="dialog" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-sm" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Edit Barang</h4>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="index">
+                        <label>Keterangan</label>
+                        <textarea name="keterangan" class="form-control" rows="5"></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary cancel-entry btn-flat">Batal</button>
+                        <button type="button" class="btn btn-primary save-entry-edit btn-flat">Simpan</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 @endsection
 
@@ -436,15 +460,22 @@
                     data: 'id_pindah_barang_detail',
                     className: 'text-center',
                     name: 'id_pindah_barang_detail',
+                    width: 150,
                     searchable: false,
                     render: function(data, type, row, meta) {
                         let btn = '<ul class="horizontal-list">';
+                        if (row.id_pindah_barang_detail != '') {
+                            btn +=
+                                '<li><a href="javascript:void(0)" class="btn btn-warning btn-xs mr-1 mb-1 edit-entry"><i class="glyphicon glyphicon-pencil"></i></a></li>';
+                        }
+
                         if (!qrcodeReceived.includes(row.qr_code)) {
                             btn +=
                                 '<li><a href="javascript:void(0)" class="btn btn-danger btn-xs mr-1 mb-1 delete-entry"><i class="glyphicon glyphicon-trash"></i></a></li>';
                         }
 
                         btn += '</ul>';
+                        console.log()
                         return btn;
                     }
                 },
@@ -499,7 +530,11 @@
             })
 
             $('#modalEntry').find('.setData').each(function(i, v) {
-                $(v).text('')
+                if ($(v).prop('id') == 'keterangan') {
+                    $(v).find('textarea').val('')
+                } else {
+                    $(v).text('')
+                }
             })
 
             statusModal = 'create'
@@ -529,7 +564,11 @@
                 if (id == 'qty') {
                     detailSelect[id] = normalizeNumber($(v).text())
                 } else {
-                    detailSelect[id] = $(v).text()
+                    if (id == 'keterangan') {
+                        detailSelect[id] = $(v).find('textarea').val()
+                    } else {
+                        detailSelect[id] = $(v).text()
+                    }
                 }
             })
 
@@ -617,7 +656,11 @@
                         if (select == 'qty') {
                             $('#' + select).text(formatNumber(res.data[select]))
                         } else {
-                            $('#' + select).text(res.data[select])
+                            if (select == 'keterangan') {
+                                $('#' + select).find('textarea').val(res.data[select])
+                            } else {
+                                $('#' + select).text(res.data[select])
+                            }
                         }
                     }
 
@@ -645,5 +688,22 @@
         function onScanError(errorMessage) {
             toastr.error(JSON.strignify(errorMessage))
         }
+
+        $('body').on('click', '.edit-entry', function() {
+            let index = $(this).parents('tr').index()
+            let modal = $('#modalEntryEdit')
+            modal.find('[name="index"]').val(index)
+            modal.find('[name="keterangan"]').val(details[index].keterangan)
+            modal.modal('show')
+        })
+
+        $('.save-entry-edit').click(function() {
+            let modal = $('#modalEntryEdit')
+            let index = modal.find('[name="index"]').val()
+            details[index].keterangan = modal.find('[name="keterangan"]').val()
+            modal.modal('hide')
+            resDataTable.clear().rows.add(details).draw()
+            $('[name="details"]').val(JSON.stringify(details))
+        })
     </script>
 @endsection

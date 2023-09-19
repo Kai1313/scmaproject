@@ -657,7 +657,7 @@
                             modal.find('[name="' + key + '"]').val(0)
                         }
 
-                        if ('wrapper')
+                        // if ('wrapper')
                     }
 
                     $('#max-jumlah').text('Sisa ' + formatNumber(data.sisa_master_qr_code))

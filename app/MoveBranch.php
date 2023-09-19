@@ -319,6 +319,15 @@ class MoveBranch extends Model
                             'tanggal_kartu_stok' => $this->tanggal_pindah_barang,
                         ]);
                 }
+            } else {
+                $check->keterangan = $data->keterangan;
+                $check->save();
+
+                DB::table('kartu_stok')
+                    ->where('id_jenis_transaksi', $idJenisTransaksi)
+                    ->where('kode_batang_kartu_stok', $data->qr_code)->update([
+                    'keterangan_kartu_stok' => $data->keterangan,
+                ]);
             }
         }
 
