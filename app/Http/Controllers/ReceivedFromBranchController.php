@@ -39,7 +39,7 @@ class ReceivedFromBranchController extends Controller
                 $data = $data->where('pb.id_cabang', $request->c);
             }
 
-            $data = $data->orderBy('pb.kode_pindah_barang', 'desc');
+            $data = $data->orderBy('pb.tanggal_pindah_barang', 'desc')->orderBy('pb.kode_pindah_barang', 'desc');
 
             $idUser = session()->get('user')['id_pengguna'];
             $filterUser = DB::table('pengguna')
