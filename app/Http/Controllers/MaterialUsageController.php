@@ -6,6 +6,7 @@ use App\MaterialUsage;
 use DB;
 use Illuminate\Http\Request;
 use Log;
+use PDF;
 use Yajra\DataTables\DataTables;
 
 class MaterialUsageController extends Controller
@@ -56,6 +57,7 @@ class MaterialUsageController extends Controller
                     } else {
                         $btn = '<ul class="horizontal-list">';
                         $btn .= '<li><a href="' . route('material_usage-view', $row->id_pemakaian) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
+                        $btn .= '<li><a href="' . route('material_usage-print-data', $row->id_pemakaian) . '" class="btn btn-default btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-print"></i> Cetak</a></li>';
                         if (in_array($idUser, $filterUser) || $idUser == $row->user_created) {
                             $btn .= '<li><a href="' . route('material_usage-entry', $row->id_pemakaian) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
                         }
@@ -280,5 +282,21 @@ class MaterialUsageController extends Controller
         return response()->json([
             'data' => $value,
         ], 200);
+    }
+
+    public function printData($id)
+    {
+        if (checkAccessMenu('pemakaian', 'print') == false) {
+            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+        }
+
+        $data = MaterialUsage::where('id_pemakaian', $id)->first();
+        if (!$data) {
+            return 'data tidak ditemukan';
+        }
+
+        $pdf = PDF::loadView('ops.materialUsage.print', ['data' => $data]);
+        $pdf->setPaper('a5', 'landscape');
+        return $pdf->stream('Pemakaian ' . $data->kode_pemakaian . '.pdf');
     }
 }

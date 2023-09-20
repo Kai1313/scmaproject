@@ -103,7 +103,7 @@
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>Cabang Pemakaian <span>*</span></label>
-                                <select name="id_cabang" class="form-control select2" data-validation="[NOTEMPTY]"
+                                <select name="id_cabang" class="form-control select2 lock-form" data-validation="[NOTEMPTY]"
                                     data-validation-message="Cabang tidak boleh kosong" {{ $data ? 'readonly' : '' }}>
                                     <option value="">Pilih Cabang</option>
                                     @if ($data && $data->id_cabang)
@@ -115,7 +115,7 @@
                             </div>
                             <label>Gudang Pemakaian <span>*</span></label>
                             <div class="form-group">
-                                <select name="id_gudang" class="form-control select2" data-validation="[NOTEMPTY]"
+                                <select name="id_gudang" class="form-control select2 lock-form" data-validation="[NOTEMPTY]"
                                     data-validation-message="Gudang tidak boleh kosong" {{ $data ? 'readonly' : '' }}>
                                     <option value="">Pilih Gudang</option>
                                     @if ($data && $data->id_gudang)
@@ -142,7 +142,8 @@
                             </div>
                             <label>Jenis Pemakaian <span>*</span></label>
                             <div class="form-group">
-                                <select name="jenis_pemakaian" class="form-control select2" data-validation="[NOTEMPTY]"
+                                <select name="jenis_pemakaian" class="form-control select2 lock-form"
+                                    data-validation="[NOTEMPTY]"
                                     data-validation-message="Jenis pemakaian tidak boleh kosong">
                                     <option value="">Pilih Jenis Pemakaian</option>
                                     @foreach ($types as $dType)
@@ -373,6 +374,7 @@
                 className: 'text-center',
                 name: 'index',
                 searchable: false,
+                width: 150,
                 render: function(data, type, row, meta) {
                     let btn = '<ul class="horizontal-list">'
                     if (!row.hasOwnProperty('id_pemakaian')) {
@@ -558,14 +560,12 @@
                 details[newObj.index - 1] = newObj
             }
 
-            $('[name="details"]').val(JSON.stringify(details))
-
             statusModal = ''
             detailSelect = []
-            console.log(details)
-
             resDataTable.clear().rows.add(details).draw()
+            $('[name="details"]').val(JSON.stringify(details))
             $('#modalEntry').modal('hide')
+            $('.lock-form').attr('readonly', true)
         })
 
         $('.cancel-entry').click(function() {
@@ -605,6 +605,9 @@
 
                     resDataTable.clear().rows.add(details).draw()
                     $('[name="details"]').val(JSON.stringify(details))
+                    if (details.length == 0) {
+                        $('.lock-form').attr('readonly', false)
+                    }
                 }
             })
         })
@@ -652,7 +655,7 @@
                         }
                     }
 
-                    $('#max-jumlah').text('Sisa ' + formatNumber(data.sisa_master_qr_code))
+                    $('#max-jumlah').text('Sisa ' + formatNumber(data.sisa_master_qr_code, 4))
 
                     modal.find('[name="max_weight"]').val(data.sisa_master_qr_code)
                     if (data.jumlah_zak == null) {
@@ -664,16 +667,28 @@
                     }
 
                     $('#label-berat').html('Berat Barang <span>*</span>')
-                    if (data.isweighed == 1) {
-                        modal.find('[name="jumlah"]').prop('readonly', true).addClass('validate')
-                        modal.find('[name="id_timbangan"]').prop('disabled', false).addClass('validate')
-                        $('#label-timbangan').html('Timbangan <span>*</span>')
-                        $('.reload-timbangan').show()
-                    } else {
-                        modal.find('[name="jumlah"]').prop('readonly', false).addClass('validate')
+                    if ($('[name="jenis_pemakaian"]').val() == 'Kerugian Lain') {
                         modal.find('[name="id_timbangan"]').prop('disabled', true).removeClass('validate')
                         $('.reload-timbangan').hide()
+                        modal.find('[name="jumlah"]').prop('readonly', true).addClass('validate').val(
+                            formatNumber(data.sisa_master_qr_code, 4))
+                        modal.find('[name="jumlah_zak"]').prop('readonly', true).val(formatNumber(data
+                            .jumlah_zak, 4))
+                        modal.find('[name="wrapper_weight"]').val(detailSelect.weight_zak)
+                    } else {
+                        if (data.isweighed == 1) {
+                            modal.find('[name="jumlah"]').prop('readonly', true).addClass('validate')
+                            modal.find('[name="id_timbangan"]').prop('disabled', false).addClass('validate')
+                            $('#label-timbangan').html('Timbangan <span>*</span>')
+                            $('.reload-timbangan').show()
+                        } else {
+                            modal.find('[name="jumlah"]').prop('readonly', false).addClass('validate')
+                            modal.find('[name="id_timbangan"]').prop('disabled', true).removeClass('validate')
+                            $('.reload-timbangan').hide()
+                        }
                     }
+
+
 
                     $('.result-form').show()
                     $('#cover-spin').hide()

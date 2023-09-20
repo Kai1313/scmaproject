@@ -46,6 +46,11 @@ function formatNumber(angka, lengthComa) {
 }
 
 function formatRupiah(angka, prefix, self = '') {
+    let labelMinus = ''
+    if (angka[0] == '-') {
+        labelMinus = '-'
+    }
+
     angka = angka.toString().replace(/^\,|^0/, '0').replace(/[^,\d]/g, '')
     let number_string = angka.toString()
 
@@ -64,8 +69,8 @@ function formatRupiah(angka, prefix, self = '') {
         rupiah += separator + ribuan.join('.');
     }
 
-    rupiah = split[1] != undefined ? rupiah + ',' + (split[1].length > prefix ? split[1].substring(0, prefix) :
-        split[1]) : rupiah;
+    rupiah = split[1] != undefined ? labelMinus + rupiah + ',' + (split[1].length > prefix ? split[1].substring(0, prefix) :
+        split[1]) : labelMinus + rupiah;
     return rupiah;
 }
 

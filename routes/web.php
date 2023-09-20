@@ -128,6 +128,7 @@ Route::prefix('pemakaian')->group(function () {
     Route::get('/delete/{id}', 'MaterialUsageController@destroy')->name('material_usage-delete');
     Route::get('/auto-qrcode', 'MaterialUsageController@autoQRCode')->name('material_usage-qrcode');
     Route::get('/reload-timbangan', 'MaterialUsageController@reloadWeight')->name('material_usage-reload-weight');
+    Route::get('/print/{id}', 'MaterialUsageController@printData')->name('material_usage-print-data');
 });
 
 Route::prefix('marketing-tool')->group(function () {
