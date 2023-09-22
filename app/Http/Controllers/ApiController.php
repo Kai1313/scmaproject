@@ -575,7 +575,7 @@ class ApiController extends Controller
             // cari biaya
             $penjualan = DB::table('penjualan')->where('nama_penjualan', $id_transaksi)->first();
 
-            if(empty($penjualan)){
+            if (empty($penjualan)) {
                 return response()->json([
                     "result" => false,
                     "code" => 400,
@@ -585,8 +585,8 @@ class ApiController extends Controller
 
             $total_biaya = 0;
 
-            if(count($biaya_penjualan) > 0){
-               foreach($biaya_penjualan as $biaya){
+            if (count($biaya_penjualan) > 0) {
+                foreach ($biaya_penjualan as $biaya) {
                     $total_biaya += round(floatval($biaya['total']), 2);
 
                     array_push($jurnal_detail_me, [
@@ -975,7 +975,7 @@ class ApiController extends Controller
 
             $pembelian = DB::table('pembelian')->where('nama_pembelian', $id_transaksi)->first();
 
-            if(empty($pembelian)){
+            if (empty($pembelian)) {
                 return response()->json([
                     "result" => false,
                     "code" => 400,
@@ -1017,17 +1017,17 @@ class ApiController extends Controller
                 ],
             ];
 
-            if(count($biaya_pembelian) > 0){
-                foreach($biaya_pembelian as $biaya){
-                     array_push($jurnal_detail_me, [
-                         'akun' => $biaya['akun'],
-                         'debet' => 0,
-                         'credit' => $biaya['total'],
-                         'keterangan' => 'Jurnal Otomatis Biaya Pembelian - ' . $id_transaksi  . ' - ' . date('d M Y', strtotime($biaya['tanggal'])) . ' ' . $biaya['catatan'],
-                         'id_transaksi' => null,
-                     ]);
+            if (count($biaya_pembelian) > 0) {
+                foreach ($biaya_pembelian as $biaya) {
+                    array_push($jurnal_detail_me, [
+                        'akun' => $biaya['akun'],
+                        'debet' => 0,
+                        'credit' => $biaya['total'],
+                        'keterangan' => 'Jurnal Otomatis Biaya Pembelian - ' . $id_transaksi . ' - ' . date('d M Y', strtotime($biaya['tanggal'])) . ' ' . $biaya['catatan'],
+                        'id_transaksi' => null,
+                    ]);
                 }
-             }
+            }
 
             if (isset($discount) && $discount > 0) {
                 array_push($jurnal_detail_me, [
@@ -1057,11 +1057,10 @@ class ApiController extends Controller
                 ]);
             }
 
-
             foreach ($detail_inventory as $d_inv) {
                 $total_detail = floatval($d_inv['total']);
 
-                if(isset($d_inv['biaya']) && $d_inv['biaya'] > 0){
+                if (isset($d_inv['biaya']) && $d_inv['biaya'] > 0) {
                     $total_detail += floatval($d_inv['biaya']);
                 }
 
@@ -2209,8 +2208,7 @@ class ApiController extends Controller
     public function transactionBalance(Request $req)
     {
         //param : tipe_transaksi,id_transaksi,tanggal,ref_id,catatan,target(supplier/customer),dpp,ppn,uang_muka,biaya,payment_status,discount,branch_id
-        $data = TransactionBalance::where('id_cabang', $req->id_cabang)
-            ->where('id_transaksi', $req->id_transaksi)
+        $data = TransactionBalance::where('id_transaksi', $req->id_transaksi)
             ->where('tipe_transaksi', $req->tipe_transaksi)
             ->first();
         try {
