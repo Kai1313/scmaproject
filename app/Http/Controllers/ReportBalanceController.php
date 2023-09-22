@@ -218,13 +218,15 @@ class ReportBalanceController extends Controller
                 CASE WHEN header1 IS NULL OR header1 = "" THEN "" ELSE header1 END as new_header1,
                 CASE WHEN header2 IS NULL OR header2 = "" THEN "" ELSE header2 END as new_header2,
                 CASE WHEN header3 IS NULL OR header3 = "" THEN "" ELSE header3 END as new_header3,
-                SUM(IFNULL(total_summary, 0)) as total
+                SUM(IFNULL(sum_posisi_credit, 0)) as sum_posisi_credit,
+                SUM(IFNULL(sum_posisi_debet, 0)) as sum_posisi_debet,
+                master_akun.posisi_debet
             ')
             ->leftJoin(DB::raw('(
-                SELECT id_akun, sum(total) AS total_summary
+                SELECT id_akun, sum(sum_posisi_credit) AS sum_posisi_credit, sum(sum_posisi_debet) AS sum_posisi_debet
                 FROM
                     (
-                    SELECT id_akun, sum( debet - credit ) AS total
+                    SELECT id_akun, sum( credit - debet ) AS sum_posisi_credit, sum( debet - credit ) AS sum_posisi_debet
                     FROM
                         jurnal_header a
                         INNER JOIN jurnal_detail b ON a.id_jurnal = b.id_jurnal
@@ -235,7 +237,7 @@ class ReportBalanceController extends Controller
                         AND a.id_cabang = ' . $id_cabang . '
                     GROUP BY id_akun
                     UNION ALL
-                    SELECT id_akun, sum( debet - credit ) AS total
+                    SELECT id_akun, sum( credit - debet ) AS sum_posisi_credit, sum( debet - credit ) AS sum_posisi_debet
                     FROM
                         saldo_balance sb
                     WHERE
@@ -349,16 +351,18 @@ class ReportBalanceController extends Controller
                 CASE WHEN header1 IS NULL OR header1 = "" THEN "" ELSE header1 END as new_header1,
                 CASE WHEN header2 IS NULL OR header2 = "" THEN "" ELSE header2 END as new_header2,
                 CASE WHEN header3 IS NULL OR header3 = "" THEN "" ELSE header3 END as new_header3,
-                IFNULL(total_summary, 0) as total,
                 kode_akun,
                 nama_akun,
-                master_akun.id_akun
+                master_akun.id_akun,
+                SUM(IFNULL(sum_posisi_credit, 0)) as sum_posisi_credit,
+                SUM(IFNULL(sum_posisi_debet, 0)) as sum_posisi_debet,
+                master_akun.posisi_debet
             ')
             ->leftJoin(DB::raw('(
-                SELECT id_akun, sum(total) AS total_summary
+                SELECT id_akun, sum(sum_posisi_credit) AS sum_posisi_credit, sum(sum_posisi_debet) AS sum_posisi_debet
                 FROM
                     (
-                    SELECT id_akun, sum( debet - credit ) AS total
+                    SELECT id_akun, sum( credit - debet ) AS sum_posisi_credit, sum( debet - credit ) AS sum_posisi_debet
                     FROM
                         jurnal_header a
                         INNER JOIN jurnal_detail b ON a.id_jurnal = b.id_jurnal
@@ -369,7 +373,7 @@ class ReportBalanceController extends Controller
                         AND a.id_cabang = ' . $id_cabang . '
                     GROUP BY id_akun
                     UNION ALL
-                    SELECT id_akun, sum( debet - credit ) AS total
+                    SELECT id_akun, sum( credit - debet ) AS sum_posisi_credit, sum( debet - credit ) AS sum_posisi_debet
                     FROM
                         saldo_balance sb
                     WHERE
@@ -489,10 +493,12 @@ class ReportBalanceController extends Controller
                 CASE WHEN header1 IS NULL OR header1 = "" THEN "" ELSE header1 END as new_header1,
                 CASE WHEN header2 IS NULL OR header2 = "" THEN "" ELSE header2 END as new_header2,
                 CASE WHEN header3 IS NULL OR header3 = "" THEN "" ELSE header3 END as new_header3,
-                SUM(IFNULL(total_summary, 0)) as total
+                SUM(IFNULL(sum_posisi_credit, 0)) as sum_posisi_credit,
+                SUM(IFNULL(sum_posisi_debet, 0)) as sum_posisi_debet,
+                master_akun.posisi_debet
             ')
             ->leftJoin(DB::raw('(
-                SELECT id_akun, sum( debet - credit ) AS total_summary
+                SELECT id_akun, sum( credit - debet ) AS sum_posisi_credit, sum( debet - credit ) AS sum_posisi_debet
                 FROM
                     saldo_balance sb
                 WHERE
@@ -588,13 +594,15 @@ class ReportBalanceController extends Controller
                 CASE WHEN header1 IS NULL OR header1 = "" THEN "" ELSE header1 END as new_header1,
                 CASE WHEN header2 IS NULL OR header2 = "" THEN "" ELSE header2 END as new_header2,
                 CASE WHEN header3 IS NULL OR header3 = "" THEN "" ELSE header3 END as new_header3,
-                SUM(IFNULL(total_summary, 0)) as total,
                 kode_akun,
                 nama_akun,
-                master_akun.id_akun
+                master_akun.id_akun,
+                SUM(IFNULL(sum_posisi_credit, 0)) as sum_posisi_credit,
+                SUM(IFNULL(sum_posisi_debet, 0)) as sum_posisi_debet,
+                master_akun.posisi_debet
             ')
             ->leftJoin(DB::raw('(
-                SELECT id_akun, sum( debet - credit ) AS total_summary
+                SELECT id_akun, sum( credit - debet ) AS sum_posisi_credit, sum( debet - credit ) AS sum_posisi_debet
                 FROM
                     saldo_balance sb
                 WHERE
@@ -702,6 +710,13 @@ class ReportBalanceController extends Controller
             $newHeader1 = $item['new_header1'];
             $newHeader2 = $item['new_header2'];
             $newHeader3 = $item['new_header3'];
+            $posisi_debet = $item['posisi_debet'];
+
+            if ($posisi_debet == true || $posisi_debet == null) {
+                $item_total = $item['sum_posisi_debet'];
+            }else{
+                $item_total = $item['sum_posisi_credit'];
+            }
 
             if ($newHeader1 == "") {
                 $newHeader1 = "00. Header1";
@@ -738,20 +753,20 @@ class ReportBalanceController extends Controller
                 if (!empty($newHeader3)) {
                     $map[$newHeader1]['children'][$newHeader2]['children'][] = [
                         'header' => $newHeader3,
-                        'total' => $item['total']
+                        'total' => $item_total
                     ];
 
-                    $map[$newHeader1]['children'][$newHeader2]['total'] += $item['total'];
+                    $map[$newHeader1]['children'][$newHeader2]['total'] += $item_total;
                 }
-                $map[$newHeader1]['total'] += $item['total'];
+                $map[$newHeader1]['total'] += $item_total;
             } else {
                 // Add new_header3 as a child of new_header1
                 if (!empty($newHeader3)) {
                     $map[$newHeader1]['children'][] = [
                         'header' => $newHeader3,
-                        'total' => $item['total']
+                        'total' => $item_total
                     ];
-                    $map[$newHeader1]['total'] += $item['total'];
+                    $map[$newHeader1]['total'] += $item_total;
                 }
             }
         }
@@ -879,6 +894,13 @@ class ReportBalanceController extends Controller
             $newHeader2 = $item['new_header2'];
             $newHeader3 = $item['new_header3'];
             $newHeader4 = $item['kode_akun'] . '.' . $item['nama_akun'];
+            $posisi_debet = $item['posisi_debet'];
+
+            if ($posisi_debet == true || $posisi_debet == null) {
+                $item_total = $item['sum_posisi_debet'];
+            }else{
+                $item_total = $item['sum_posisi_credit'];
+            }
 
             if ($newHeader1 == "") {
                 $newHeader1 = "00. Header1";
@@ -929,33 +951,33 @@ class ReportBalanceController extends Controller
                             'start_date' => $start_date,
                             'end_date' => $end_date,
                             'id_cabang' => $id_cabang,
-                            'total' => $item['total']
+                            'total' => $item_total
                         ];
 
-                        $map[$newHeader1]['children'][$newHeader2]['children'][$newHeader3]['total'] += $item['total'];
+                        $map[$newHeader1]['children'][$newHeader2]['children'][$newHeader3]['total'] += $item_total;
                     }
 
-                    $map[$newHeader1]['children'][$newHeader2]['total'] += $item['total'];
+                    $map[$newHeader1]['children'][$newHeader2]['total'] += $item_total;
                 } else {
                     // Add new_header3 as a child of new_header1
                     if (!empty($newHeader3)) {
                         $map[$newHeader1]['children'][] = [
                             'header' => $newHeader3,
-                            'total' => $item['total']
+                            'total' => $item_total
                         ];
-                        $map[$newHeader1]['children'][$newHeader2]['total'] += $item['total'];
+                        $map[$newHeader1]['children'][$newHeader2]['total'] += $item_total;
                     }
                 }
-                $map[$newHeader1]['total'] += $item['total'];
+                $map[$newHeader1]['total'] += $item_total;
             } else {
                 // maybe never execute
                 // Add new_header4 as a child of new_header1
                 if (!empty($newHeader4)) {
                     $map[$newHeader1]['children'][] = [
                         'header' => $newHeader4,
-                        'total' => $item['total']
+                        'total' => $item_total
                     ];
-                    $map[$newHeader1]['total'] += $item['total'];
+                    $map[$newHeader1]['total'] += $item_total;
                 }
             }
         }
