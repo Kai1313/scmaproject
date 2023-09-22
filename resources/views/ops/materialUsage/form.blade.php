@@ -245,6 +245,10 @@
                                 <input type="text" name="nama_satuan_barang" class="validate form-control" readonly>
                                 <input type="hidden" name="id_satuan_barang" class="validate">
                             </div>
+                            <div class="form-group">
+                                <label>Semua</label>
+                                <input type="checkbox" name="checked_all">
+                            </div>
                             <label id="label-jumlah-zak">Jumlah Zak</label>
                             <div class="form-group">
                                 <div class="input-group">
@@ -498,6 +502,7 @@
             $('#alertWeight').text('').hide()
             $('#max-jumlah').text('')
             $('#max-jumlah-zak').text('')
+            $('[name="checked_all"]').prop('checked', false)
             statusModal = 'create'
             count += 1
             $('#modalEntry').find('[name="index"]').val(count)
@@ -520,7 +525,7 @@
         $('#modalEntry').on('input', '[name="jumlah_zak"]', function() {
             let weightWrapper = $('[name="wrapper_weight"]').val()
             let jumlahZak = normalizeNumber($(this).val() ? $(this).val() : '0')
-            let weightZak = jumlahZak * weightWrapper
+            let weightZak = Math.kali(jumlahZak, weightWrapper)
             if (jumlahZak > detailSelect.jumlah_zak) {
                 $('#alertZak').text('Jumlah melebihi maksimal').show()
                 $(this).addClass('error-field')
@@ -551,7 +556,7 @@
             })
 
             detailSelect['tare'] = detailSelect['weight_zak']
-            detailSelect['nett'] = detailSelect['jumlah'] - detailSelect['tare']
+            detailSelect['nett'] = Math.kurang(detailSelect['jumlah'], detailSelect['tare'])
 
             let newObj = Object.assign({}, detailSelect)
             if (statusModal == 'create') {
@@ -566,6 +571,7 @@
             $('[name="details"]').val(JSON.stringify(details))
             $('#modalEntry').modal('hide')
             $('.lock-form').attr('readonly', true)
+            $('[name="search-qrcode"]').val('')
         })
 
         $('.cancel-entry').click(function() {
@@ -642,7 +648,6 @@
                 success: function(res) {
                     detailSelect = res.data
                     let modal = $('#modalEntry')
-                    let data = res.data
                     for (let key in detailSelect) {
                         modal.find('[name="' + key + '"]').val(detailSelect[key])
                         if (key == 'jumlah_zak' || key == 'weight_zak') {
@@ -650,45 +655,41 @@
                         }
 
                         if (key == 'weight_zak') {
-                            let weight = detailSelect.weight_zak / detailSelect.jumlah_zak
+                            let weight = Math.bagi(detailSelect.weight_zak, detailSelect.jumlah_zak)
                             modal.find('[name="wrapper_weight"]').val(weight)
                         }
                     }
 
-                    $('#max-jumlah').text('Sisa ' + formatNumber(data.sisa_master_qr_code, 4))
+                    $('#max-jumlah').text('Sisa ' + formatNumber(detailSelect.sisa_master_qr_code, 4))
+                    $('[name="jumlah"]').val(0)
 
-                    modal.find('[name="max_weight"]').val(data.sisa_master_qr_code)
-                    if (data.jumlah_zak == null) {
+                    modal.find('[name="max_weight"]').val(detailSelect.sisa_master_qr_code)
+                    if (detailSelect.jumlah_zak == null) {
                         modal.find('[name="jumlah_zak"]').prop('readonly', true).removeClass('validate')
                     } else {
                         $('#label-jumlah-zak').html('Jumlah Zak <span>*</span>')
-                        $('#max-jumlah-zak').text('Sisa ' + formatNumber(data.jumlah_zak, 4))
+                        $('#max-jumlah-zak').text('Sisa ' + formatNumber(detailSelect.jumlah_zak, 4))
                         modal.find('[name="jumlah_zak"]').prop('readonly', false).addClass('validate')
                     }
 
                     $('#label-berat').html('Berat Barang <span>*</span>')
-                    if ($('[name="jenis_pemakaian"]').val() == 'Kerugian Lain') {
+
+                    if (detailSelect.isweighed == 1) {
+                        modal.find('[name="jumlah"]').prop('readonly', true).addClass('validate')
+                        modal.find('[name="id_timbangan"]').prop('disabled', false).addClass('validate')
+                        $('#label-timbangan').html('Timbangan <span>*</span>')
+                        $('.reload-timbangan').show()
+                    } else {
+                        modal.find('[name="jumlah"]').prop('readonly', false).addClass('validate')
                         modal.find('[name="id_timbangan"]').prop('disabled', true).removeClass('validate')
                         $('.reload-timbangan').hide()
-                        modal.find('[name="jumlah"]').prop('readonly', true).addClass('validate').val(
-                            formatNumber(data.sisa_master_qr_code, 4))
-                        modal.find('[name="jumlah_zak"]').prop('readonly', true).val(formatNumber(data
-                            .jumlah_zak, 4))
-                        modal.find('[name="wrapper_weight"]').val(detailSelect.weight_zak)
-                    } else {
-                        if (data.isweighed == 1) {
-                            modal.find('[name="jumlah"]').prop('readonly', true).addClass('validate')
-                            modal.find('[name="id_timbangan"]').prop('disabled', false).addClass('validate')
-                            $('#label-timbangan').html('Timbangan <span>*</span>')
-                            $('.reload-timbangan').show()
-                        } else {
-                            modal.find('[name="jumlah"]').prop('readonly', false).addClass('validate')
-                            modal.find('[name="id_timbangan"]').prop('disabled', true).removeClass('validate')
-                            $('.reload-timbangan').hide()
-                        }
                     }
 
-
+                    if ($('[name="jenis_pemakaian"]').val() == 'Kerugian Lain') {
+                        $('[name="checked_all"]').prop('disabled', false)
+                    } else {
+                        $('[name="checked_all"]').prop('disabled', true)
+                    }
 
                     $('.result-form').show()
                     $('#cover-spin').hide()
@@ -747,5 +748,36 @@
         function onScanError(errorMessage) {
             toastr.error(JSON.strignify(errorMessage))
         }
+
+        $('[name="checked_all"]').change(function() {
+            let modal = $('#modalEntry')
+            if ($(this).is(':checked')) {
+                if ($('[name="jenis_pemakaian"]').val() == 'Kerugian Lain') {
+                    modal.find('[name="id_timbangan"]').val('').prop('disabled', true).removeClass('validate')
+                        .change()
+                    $('.reload-timbangan').hide()
+                    modal.find('[name="jumlah"]').val(formatNumber(detailSelect.sisa_master_qr_code, 4)).prop(
+                        'readonly', true).addClass('validate')
+                    modal.find('[name="jumlah_zak"]').val(formatNumber(detailSelect.jumlah_zak, 4)).prop('readonly',
+                        true)
+                    let weight = modal.find('[name="wrapper_weight"]').val()
+                    modal.find('[name="weight_zak"]').val(Math.kali(weight, detailSelect
+                        .jumlah_zak))
+                }
+            } else {
+                modal.find('[name="jumlah_zak"]').val(0).prop('readonly', false)
+                modal.find('[name="weight_zak"]').val(0)
+                if (detailSelect.isweighed == 1) {
+                    modal.find('[name="jumlah"]').prop('readonly', true).addClass('validate').val(0)
+                    modal.find('[name="id_timbangan"]').prop('disabled', false).addClass('validate')
+                    $('#label-timbangan').html('Timbangan <span>*</span>')
+                    $('.reload-timbangan').show()
+                } else {
+                    modal.find('[name="jumlah"]').prop('readonly', false).addClass('validate').val(0)
+                    modal.find('[name="id_timbangan"]').prop('disabled', true).removeClass('validate')
+                    $('.reload-timbangan').hide()
+                }
+            }
+        })
     </script>
 @endsection

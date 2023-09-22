@@ -20,28 +20,38 @@
         <div class="navbar-custom-menu">
             <ul class="nav navbar-nav">
                 <!-- User Account Menu -->
-                <li class="dropdown user user-menu">
-                    <!-- Menu Toggle Button -->
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        <i class="fa fa-user-circle"></i>
-                        <!-- hidden-xs hides the username on small devices so only the image appears. -->
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                        aria-expanded="true">
+                        <span class="glyphicon glyphicon-user"></span>
                         <span
-                            class="hidden-xs">{{ Session::get('user') != null ? Session::get('user')->nama_pengguna : 'Login First' }}</span>
+                            id="patokan_nama_pengguna">{{ Session::get('user') != null ? Session::get('user')->nama_pengguna : 'Login First' }}</span>
+                        <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu">
-                        <!-- Menu Footer-->
-                        <li class="user-footer">
-                            <div class="pull-left" style="padding-top: 7px;">
-                                <i class="fa fa-user-circle"></i>
-                                <span
-                                    class="">{{ Session::get('user') != null ? Session::get('user')->nama_pengguna : 'Login First' }}</span>
-                            </div>
-                            <div class="pull-right">
-                                @if (Session::get('user') != null)
-                                    <a href="{{ route('logout') }}" class="btn btn-default btn-flat">Sign out</a>
-                                @endif
-                            </div>
-                        </li>
+                        @if (session()->has('user'))
+                            <li class="patokan_halaman_masuk">
+                                <a href="javascript:void(0)" onclick="$('#ganti_profil').modal('show')">
+                                    <span class="glyphicon glyphicon-pencil"></span> Ubah Profil
+                                </a>
+                            </li>
+                            <li class="patokan_halaman_masuk">
+                                <a href="javascript:void(0)" onclick="$('#ganti_password').modal('show')">
+                                    <span class="glyphicon glyphicon-pencil"></span> Ubah Password
+                                </a>
+                            </li>
+                            <li class="patokan_halaman_masuk">
+                                <a href="{{ route('logout') }}">
+                                    <span class="glyphicon glyphicon-log-out"></span> Keluar
+                                </a>
+                            </li>
+                        @else
+                            <li class="patokan_halaman_keluar">
+                                <a href="{{ env('OLD_URL_ROOT') }}">
+                                    <span class="glyphicon glyphicon-log-in"></span> Masuk
+                                </a>
+                            </li>
+                        @endif
                     </ul>
                 </li>
             </ul>
