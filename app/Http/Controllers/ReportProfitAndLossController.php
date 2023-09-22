@@ -981,8 +981,12 @@ class ReportProfitAndLossController extends Controller
                     ];
 
                     foreach($list_cabang as $cabang){
-                        $map[$newHeader1]['children'][]['total_' . $cabang->new_nama_cabang] +=  $item['total_' . $cabang->new_nama_cabang];
-                        $total['grand_total_' . $cabang->new_nama_cabang] += $item['total_' . $cabang->new_nama_cabang];
+                        if ($posisi_debet == true || $posisi_debet == null) {
+                            $map[$newHeader1]['children'][]['total_' . $cabang->new_nama_cabang] +=  $item['sum_posisi_debet_' . $cabang->new_nama_cabang];
+                        }else{
+                            $map[$newHeader1]['children'][]['total_' . $cabang->new_nama_cabang] +=  $item['sum_posisi_credit_' . $cabang->new_nama_cabang];
+                        }
+                        $total['grand_total_' . $cabang->new_nama_cabang] += $item['sum_posisi_credit_' . $cabang->new_nama_cabang];
                     }
                     $map[$newHeader1]['total_all'] += $item['total_all'];
                     $total['grand_total'] += $item['total_credit'];
