@@ -39,12 +39,14 @@ class ScheduleVisitController extends Controller
                 $data = $data->where('v.id_cabang', $request->c);
             }
 
-            $data = $data->orderBy('v.created_at', 'desc');
+            if (!$request->order) {
+                $data = $data->orderBy('v.created_at', 'desc');
+            }
+
             $idUser = session()->get('user')['id_pengguna'];
             $idGrupUser = session()->get('user')['id_grup_pengguna'];
 
             return Datatables::of($data)
-                ->addIndexColumn()
                 ->addColumn('action', function ($row) use ($idUser, $idGrupUser) {
                     if ($row->status == '0') {
                         $btn = '<label class="label label-default">Batal</label>';
