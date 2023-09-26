@@ -206,7 +206,6 @@ function getCookie(cname) {
 
 var _cf = (function () {
     function _shift(x) {
-        console.log(x)
         var parts = x.toString().split('.');
         return (parts.length < 2) ? 1 : Math.pow(10, parts[1].length);
     }
