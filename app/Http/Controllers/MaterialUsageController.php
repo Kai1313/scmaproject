@@ -230,8 +230,8 @@ class MaterialUsageController extends Controller
                 'sisa_master_qr_code',
                 'isweighed',
                 'id_wrapper_zak',
-                'weight_zak',
-                'zak as jumlah_zak',
+                DB::raw('IFNULL(weight_zak,0) as weight_zak'),
+                DB::raw('IFNULL(zak,0) as jumlah_zak'),
                 'mqc.status_qc_qr_code'
             )
             ->leftJoin('barang', 'mqc.id_barang', '=', 'barang.id_barang')

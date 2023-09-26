@@ -648,6 +648,7 @@
                 success: function(res) {
                     detailSelect = res.data
                     let modal = $('#modalEntry')
+                    console.log(detailSelect)
                     for (let key in detailSelect) {
                         modal.find('[name="' + key + '"]').val(detailSelect[key])
                         if (key == 'jumlah_zak' || key == 'weight_zak') {
