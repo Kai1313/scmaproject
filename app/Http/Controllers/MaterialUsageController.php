@@ -6,6 +6,7 @@ use App\MaterialUsage;
 use DB;
 use Illuminate\Http\Request;
 use Log;
+use PDF;
 use Yajra\DataTables\DataTables;
 
 class MaterialUsageController extends Controller
@@ -19,16 +20,9 @@ class MaterialUsageController extends Controller
         if ($request->ajax()) {
             $data = DB::table('pemakaian_header')
                 ->select(
-                    'id_pemakaian',
-                    'kode_pemakaian',
-                    'tanggal',
+                    'pemakaian_header.*',
                     'g.nama_gudang',
-                    'c.nama_cabang',
-                    'user_created',
-                    'catatan',
-                    'is_qc',
-                    'void',
-                    'jenis_pemakaian'
+                    'c.nama_cabang'
                 )
                 ->leftJoin('gudang as g', 'pemakaian_header.id_gudang', '=', 'g.id_gudang')
                 ->leftJoin('cabang as c', 'pemakaian_header.id_cabang', '=', 'c.id_cabang');
@@ -53,11 +47,6 @@ class MaterialUsageController extends Controller
             $arrayAccessVoid = explode(',', $accessVoid);
 
             return Datatables::of($data)
-                ->addIndexColumn()
-                ->filterColumn('keterangan_jenis_pemakaian', function ($row, $keyword) {
-                    $keywords = trim($keyword);
-                    $row->whereRaw("(case when jenis_pemakaian = 1 then 'Penjualan' when jenis_pemakaian = 2 then 'Keperluan Lab' when jenis_pemakaian = 3 then 'Produksi' else '' end) like ?", ["%{$keywords}%"]);
-                })
                 ->addColumn('action', function ($row) use ($filterUser, $idUser, $idGrupUser, $arrayAccessVoid) {
                     if ($row->void == '1') {
                         $btn = '<label class="label label-default">Batal</label>';
@@ -68,6 +57,7 @@ class MaterialUsageController extends Controller
                     } else {
                         $btn = '<ul class="horizontal-list">';
                         $btn .= '<li><a href="' . route('material_usage-view', $row->id_pemakaian) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
+                        $btn .= '<li><a href="' . route('material_usage-print-data', $row->id_pemakaian) . '" class="btn btn-default btn-xs mr-1 mb-1" target="_blank"><i class="glyphicon glyphicon-print"></i> Cetak</a></li>';
                         if (in_array($idUser, $filterUser) || $idUser == $row->user_created) {
                             $btn .= '<li><a href="' . route('material_usage-entry', $row->id_pemakaian) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
                         }
@@ -121,6 +111,12 @@ class MaterialUsageController extends Controller
             DB::beginTransaction();
             if (!$data) {
                 $data = new MaterialUsage;
+            } else {
+                $rev = $data->revertMasterQrcode();
+                if ($rev['result'] == false) {
+                    DB::rollback();
+                    return response()->json($rev, 500);
+                }
             }
 
             $data->fill($request->except('is_qc'));
@@ -137,14 +133,14 @@ class MaterialUsageController extends Controller
             $checkStock = $data->checkStockDetails($request->details);
             if ($checkStock['result'] == false) {
                 DB::rollback();
-                return response()->json([
-                    "result" => $checkStock['result'],
-                    "message" => $checkStock['message'],
-                ], 500);
+                return response()->json($checkStock, 500);
             }
 
-            $data->savedetails($request->details);
-            $data->rmdetails($request->detele_details);
+            $resSave = $data->savedetails($request->details);
+            if ($resSave['result'] == false) {
+                DB::rollback();
+                return response()->json($resSave, 500);
+            }
 
             DB::commit();
             return response()->json([
@@ -233,10 +229,9 @@ class MaterialUsageController extends Controller
                 'mqc.id_satuan_barang',
                 'sisa_master_qr_code',
                 'isweighed',
-                'master_wrapper.weight as wrapper_weight',
                 'id_wrapper_zak',
-                'weight_zak',
-                'zak as jumlah_zak',
+                DB::raw('IFNULL(weight_zak,0) as weight_zak'),
+                DB::raw('IFNULL(zak,0) as jumlah_zak'),
                 'mqc.status_qc_qr_code'
             )
             ->leftJoin('barang', 'mqc.id_barang', '=', 'barang.id_barang')
@@ -287,5 +282,21 @@ class MaterialUsageController extends Controller
         return response()->json([
             'data' => $value,
         ], 200);
+    }
+
+    public function printData($id)
+    {
+        if (checkAccessMenu('pemakaian', 'print') == false) {
+            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+        }
+
+        $data = MaterialUsage::where('id_pemakaian', $id)->first();
+        if (!$data) {
+            return 'data tidak ditemukan';
+        }
+
+        $pdf = PDF::loadView('ops.materialUsage.print', ['data' => $data]);
+        $pdf->setPaper('a5', 'landscape');
+        return $pdf->stream('Pemakaian ' . $data->kode_pemakaian . '.pdf');
     }
 }

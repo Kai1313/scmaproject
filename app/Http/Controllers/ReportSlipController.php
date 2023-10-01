@@ -5,17 +5,17 @@ namespace App\Http\Controllers;
 use App\Exports\ReportSlipExport;
 use App\Models\Master\Cabang;
 use App\Models\Master\Slip;
-use Illuminate\Http\Request;
 use Excel;
-use PDF;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use PDF;
 
 class ReportSlipController extends Controller
 {
     public function index(Request $request)
     {
-        if (checkUserSession($request, 'report_slip', 'show') == false) {
+        if (checkUserSession($request, 'report/slip', 'show') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
@@ -98,7 +98,7 @@ class ReportSlipController extends Controller
             'mutasis' => $mutasis,
             'cabang' => $cabang,
             'from' => $start_date,
-            'to' => $end_date
+            'to' => $end_date,
         ];
     }
 
@@ -255,7 +255,7 @@ class ReportSlipController extends Controller
             Log::error($e);
             return response()->json([
                 "result" => false,
-                "message" => $message
+                "message" => $message,
             ]);
         }
     }
@@ -366,7 +366,7 @@ class ReportSlipController extends Controller
                 'cabang' => $cabang,
                 'slip' => $slip,
                 'from' => $start_date,
-                'to' => $end_date
+                'to' => $end_date,
             ];
 
             // return view('accounting.report.slip.print', $data);
@@ -388,7 +388,7 @@ class ReportSlipController extends Controller
             } else {
                 return response()->json([
                     'status' => false,
-                    'message' => 'No data found'
+                    'message' => 'No data found',
                 ]);
             }
         } catch (\Exception $e) {
@@ -396,8 +396,8 @@ class ReportSlipController extends Controller
             Log::error($message);
             Log::error($e);
             return response()->json([
-                "result" => False,
-                "message" => $message
+                "result" => false,
+                "message" => $message,
             ]);
         }
     }
@@ -409,12 +409,12 @@ class ReportSlipController extends Controller
             return response()->json([
                 "result" => true,
                 "message" => 'Success get slip data',
-                "data" => $slip
+                "data" => $slip,
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 "result" => false,
-                "message" => 'Error when get slip data'
+                "message" => 'Error when get slip data',
             ]);
         }
     }

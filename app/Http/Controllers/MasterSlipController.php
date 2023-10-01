@@ -21,7 +21,7 @@ class MasterSlipController extends Controller
      */
     public function index(Request $request)
     {
-        if (checkUserSession($request, 'master_slip', 'show') == false) {
+        if (checkUserSession($request, 'master/slip', 'show') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
@@ -47,14 +47,14 @@ class MasterSlipController extends Controller
      */
     public function create(Request $request)
     {
-        if (checkAccessMenu('master_slip', 'create') == false) {
+        if (checkAccessMenu('master/slip', 'create') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
         $data_cabang = getCabang();
         if (count($data_cabang) == 0) {
             $cabang = Cabang::find(1);
-        }else{
+        } else {
             $cabang = Cabang::find($data_cabang[0]->id_cabang);
         }
         $data_akun = Akun::where("isshown", 1)->where("id_cabang", $cabang->id_cabang)->get(); //DB::select('select * from master_akun');
@@ -131,7 +131,7 @@ class MasterSlipController extends Controller
      */
     public function show(Request $request, $id = null)
     {
-        if (checkAccessMenu('master_slip', 'show') == false) {
+        if (checkAccessMenu('master/slip', 'show') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
@@ -155,7 +155,7 @@ class MasterSlipController extends Controller
      */
     public function edit(Request $request, $id = null)
     {
-        if (checkAccessMenu('master_slip', 'edit') == false) {
+        if (checkAccessMenu('master/slip', 'edit') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
@@ -248,8 +248,8 @@ class MasterSlipController extends Controller
         $data_journal_header = JurnalHeader::where('id_slip', $id)->get();
         $data_slip = Slip::find($id);
         $kode_slip = $data_slip->kode_slip;
-        
-        if (checkAccessMenu('master_slip', 'delete') == false) {
+
+        if (checkAccessMenu('master/slip', 'delete') == false) {
             return response()->json([
                 "result" => false,
                 "message" => "Maaf, tidak bisa menghapus slip dengan kode slip " . $kode_slip . ", anda tidak punya akses!",
@@ -371,7 +371,7 @@ class MasterSlipController extends Controller
 
     public function export_excel(Request $request)
     {
-        if (checkAccessMenu('master_slip', 'print') == false) {
+        if (checkAccessMenu('master/slip', 'print') == false) {
             return response()->json([
                 "result" => false,
                 "message" => "Error, anda tidak punya akses!",
@@ -482,23 +482,22 @@ class MasterSlipController extends Controller
             // Log::info(count($data_slip));
             if (empty($data_slip)) {
                 return response()->json([
-                    "result"=>FALSE,
-                    "message"=>"Data slip not found!!!"
+                    "result" => false,
+                    "message" => "Data slip not found!!!",
                 ]);
             }
             return response()->json([
-                "result"=>TRUE,
-                "message"=>"Successfully get slip giro by cabang",
-                "data"=>$data_slip
+                "result" => true,
+                "message" => "Successfully get slip giro by cabang",
+                "data" => $data_slip,
             ]);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $message = "Error when get slip giro by cabang";
             Log::error($message);
             Log::error($e);
             return response()->json([
-                "result"=>FALSE,
-                "message"=>$message
+                "result" => false,
+                "message" => $message,
             ]);
         }
     }

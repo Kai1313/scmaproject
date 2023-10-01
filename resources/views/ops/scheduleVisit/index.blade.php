@@ -113,6 +113,7 @@
         var table = $('.data-table').DataTable({
             processing: true,
             serverSide: true,
+            order: [],
             ajax: "{{ route('pre_visit') }}?c=" + $('[name="id_cabang"]').val(),
             columns: [{
                 data: 'visit_code',

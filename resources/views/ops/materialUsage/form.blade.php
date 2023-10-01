@@ -103,7 +103,7 @@
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>Cabang Pemakaian <span>*</span></label>
-                                <select name="id_cabang" class="form-control select2" data-validation="[NOTEMPTY]"
+                                <select name="id_cabang" class="form-control select2 lock-form" data-validation="[NOTEMPTY]"
                                     data-validation-message="Cabang tidak boleh kosong" {{ $data ? 'readonly' : '' }}>
                                     <option value="">Pilih Cabang</option>
                                     @if ($data && $data->id_cabang)
@@ -115,7 +115,7 @@
                             </div>
                             <label>Gudang Pemakaian <span>*</span></label>
                             <div class="form-group">
-                                <select name="id_gudang" class="form-control select2" data-validation="[NOTEMPTY]"
+                                <select name="id_gudang" class="form-control select2 lock-form" data-validation="[NOTEMPTY]"
                                     data-validation-message="Gudang tidak boleh kosong" {{ $data ? 'readonly' : '' }}>
                                     <option value="">Pilih Gudang</option>
                                     @if ($data && $data->id_gudang)
@@ -142,7 +142,8 @@
                             </div>
                             <label>Jenis Pemakaian <span>*</span></label>
                             <div class="form-group">
-                                <select name="jenis_pemakaian" class="form-control select2" data-validation="[NOTEMPTY]"
+                                <select name="jenis_pemakaian" class="form-control select2 lock-form"
+                                    data-validation="[NOTEMPTY]"
                                     data-validation-message="Jenis pemakaian tidak boleh kosong">
                                     <option value="">Pilih Jenis Pemakaian</option>
                                     @foreach ($types as $dType)
@@ -244,6 +245,10 @@
                                 <input type="text" name="nama_satuan_barang" class="validate form-control" readonly>
                                 <input type="hidden" name="id_satuan_barang" class="validate">
                             </div>
+                            <div class="form-group">
+                                <label>Semua</label>
+                                <input type="checkbox" name="checked_all">
+                            </div>
                             <label id="label-jumlah-zak">Jumlah Zak</label>
                             <div class="form-group">
                                 <div class="input-group">
@@ -273,7 +278,6 @@
                                         </a>
                                     </div>
                                 </div>
-                                <input type="hidden" name="max_weight" class="validate">
                                 <label id="alertWeight" style="display:none;color:red;"></label>
                             </div>
                             <label>Catatan</label>
@@ -374,6 +378,7 @@
                 className: 'text-center',
                 name: 'index',
                 searchable: false,
+                width: 150,
                 render: function(data, type, row, meta) {
                     let btn = '<ul class="horizontal-list">'
                     if (!row.hasOwnProperty('id_pemakaian')) {
@@ -445,6 +450,9 @@
 
         $('[name="id_timbangan"]').select2({
             data: timbangan
+        }).on('select2:select', function(e) {
+            let dataselect = e.params.data
+            $('.reload-timbangan').click()
         })
 
         $('#modalEntry').on('input', '[name="jumlah"]', function() {
@@ -468,9 +476,7 @@
                     id: $('[name="id_timbangan"]').val()
                 },
                 success: function(res) {
-                    let beratTimbangan = res.data
-                    let beratMax = $('[name="max_weight"]').val()
-                    if (parseFloat(beratTimbangan) > parseFloat(beratMax)) {
+                    if (parseFloat(res.data) > parseFloat(detailSelect.sisa_master_qr_code)) {
                         $('[name="jumlah"]').addClass('error-field')
                         $('#alertWeight').text('Berat melebihi stok').show()
                     } else {
@@ -496,6 +502,7 @@
             $('#alertWeight').text('').hide()
             $('#max-jumlah').text('')
             $('#max-jumlah-zak').text('')
+            $('[name="checked_all"]').prop('checked', false)
             statusModal = 'create'
             count += 1
             $('#modalEntry').find('[name="index"]').val(count)
@@ -518,7 +525,7 @@
         $('#modalEntry').on('input', '[name="jumlah_zak"]', function() {
             let weightWrapper = $('[name="wrapper_weight"]').val()
             let jumlahZak = normalizeNumber($(this).val() ? $(this).val() : '0')
-            let weightZak = jumlahZak * weightWrapper
+            let weightZak = Math.kali(jumlahZak, weightWrapper)
             if (jumlahZak > detailSelect.jumlah_zak) {
                 $('#alertZak').text('Jumlah melebihi maksimal').show()
                 $(this).addClass('error-field')
@@ -549,7 +556,7 @@
             })
 
             detailSelect['tare'] = detailSelect['weight_zak']
-            detailSelect['nett'] = detailSelect['jumlah'] - detailSelect['tare']
+            detailSelect['nett'] = Math.kurang(detailSelect['jumlah'], detailSelect['tare'])
 
             let newObj = Object.assign({}, detailSelect)
             if (statusModal == 'create') {
@@ -558,14 +565,13 @@
                 details[newObj.index - 1] = newObj
             }
 
-            $('[name="details"]').val(JSON.stringify(details))
-            console.log(details)
-
             statusModal = ''
             detailSelect = []
-
             resDataTable.clear().rows.add(details).draw()
+            $('[name="details"]').val(JSON.stringify(details))
             $('#modalEntry').modal('hide')
+            $('.lock-form').attr('readonly', true)
+            $('[name="search-qrcode"]').val('')
         })
 
         $('.cancel-entry').click(function() {
@@ -605,6 +611,9 @@
 
                     resDataTable.clear().rows.add(details).draw()
                     $('[name="details"]').val(JSON.stringify(details))
+                    if (details.length == 0) {
+                        $('.lock-form').attr('readonly', false)
+                    }
                 }
             })
         })
@@ -639,28 +648,33 @@
                 success: function(res) {
                     detailSelect = res.data
                     let modal = $('#modalEntry')
-                    let data = res.data
-                    for (let key in data) {
-                        modal.find('[name="' + key + '"]').val(data[key])
-
-                        if (['weight_zak', 'wrapper_weight'].includes(key) && data[key] == null) {
+                    for (let key in detailSelect) {
+                        modal.find('[name="' + key + '"]').val(detailSelect[key])
+                        if (key == 'jumlah_zak' || key == 'weight_zak') {
                             modal.find('[name="' + key + '"]').val(0)
+                        }
+
+                        if (key == 'weight_zak') {
+                            let weight = Math.bagi(detailSelect.weight_zak, detailSelect.jumlah_zak)
+                            modal.find('[name="wrapper_weight"]').val(weight)
                         }
                     }
 
-                    $('#max-jumlah').text('Max ' + formatNumber(data.sisa_master_qr_code))
+                    $('#max-jumlah').text('Sisa ' + formatNumber(detailSelect.sisa_master_qr_code, 4))
+                    $('[name="jumlah"]').val(0)
 
-                    modal.find('[name="max_weight"]').val(data.sisa_master_qr_code)
-                    if (data.jumlah_zak == null) {
+                    modal.find('[name="max_weight"]').val(detailSelect.sisa_master_qr_code)
+                    if (detailSelect.jumlah_zak == null) {
                         modal.find('[name="jumlah_zak"]').prop('readonly', true).removeClass('validate')
                     } else {
                         $('#label-jumlah-zak').html('Jumlah Zak <span>*</span>')
-                        $('#max-jumlah-zak').text('Max ' + formatNumber(data.jumlah_zak, 4))
+                        $('#max-jumlah-zak').text('Sisa ' + formatNumber(detailSelect.jumlah_zak, 4))
                         modal.find('[name="jumlah_zak"]').prop('readonly', false).addClass('validate')
                     }
 
                     $('#label-berat').html('Berat Barang <span>*</span>')
-                    if (data.isweighed == 1) {
+
+                    if (detailSelect.isweighed == 1) {
                         modal.find('[name="jumlah"]').prop('readonly', true).addClass('validate')
                         modal.find('[name="id_timbangan"]').prop('disabled', false).addClass('validate')
                         $('#label-timbangan').html('Timbangan <span>*</span>')
@@ -669,6 +683,12 @@
                         modal.find('[name="jumlah"]').prop('readonly', false).addClass('validate')
                         modal.find('[name="id_timbangan"]').prop('disabled', true).removeClass('validate')
                         $('.reload-timbangan').hide()
+                    }
+
+                    if ($('[name="jenis_pemakaian"]').val() == 'Kerugian Lain') {
+                        $('[name="checked_all"]').prop('disabled', false)
+                    } else {
+                        $('[name="checked_all"]').prop('disabled', true)
                     }
 
                     $('.result-form').show()
@@ -728,5 +748,36 @@
         function onScanError(errorMessage) {
             toastr.error(JSON.strignify(errorMessage))
         }
+
+        $('[name="checked_all"]').change(function() {
+            let modal = $('#modalEntry')
+            if ($(this).is(':checked')) {
+                if ($('[name="jenis_pemakaian"]').val() == 'Kerugian Lain') {
+                    modal.find('[name="id_timbangan"]').val('').prop('disabled', true).removeClass('validate')
+                        .change()
+                    $('.reload-timbangan').hide()
+                    modal.find('[name="jumlah"]').val(formatNumber(detailSelect.sisa_master_qr_code, 4)).prop(
+                        'readonly', true).addClass('validate')
+                    modal.find('[name="jumlah_zak"]').val(formatNumber(detailSelect.jumlah_zak, 4)).prop('readonly',
+                        true)
+                    let weight = modal.find('[name="wrapper_weight"]').val()
+                    modal.find('[name="weight_zak"]').val(Math.kali(weight, detailSelect
+                        .jumlah_zak))
+                }
+            } else {
+                modal.find('[name="jumlah_zak"]').val(0).prop('readonly', false)
+                modal.find('[name="weight_zak"]').val(0)
+                if (detailSelect.isweighed == 1) {
+                    modal.find('[name="jumlah"]').prop('readonly', true).addClass('validate').val(0)
+                    modal.find('[name="id_timbangan"]').prop('disabled', false).addClass('validate')
+                    $('#label-timbangan').html('Timbangan <span>*</span>')
+                    $('.reload-timbangan').show()
+                } else {
+                    modal.find('[name="jumlah"]').prop('readonly', false).addClass('validate').val(0)
+                    modal.find('[name="id_timbangan"]').prop('disabled', true).removeClass('validate')
+                    $('.reload-timbangan').hide()
+                }
+            }
+        })
     </script>
 @endsection

@@ -5,6 +5,7 @@ namespace App;
 use App\Models\Master\Cabang;
 use DB;
 use Illuminate\Database\Eloquent\Model;
+use Log;
 
 class MaterialUsage extends Model
 {
@@ -117,22 +118,21 @@ class MaterialUsage extends Model
 
     public function savedetails($details)
     {
-        $idJenisTransaksi = 25;
-        $detail = json_decode($details);
+        try {
+            $idJenisTransaksi = 25;
+            $detail = json_decode($details);
 
-        foreach ($detail as $data) {
-            $check = MaterialUsageDetail::where('id_pemakaian', $this->id_pemakaian)->where('index', $data->index)->first();
-            if (!$check) {
+            foreach ($detail as $key => $data) {
                 $array = [
                     'id_pemakaian' => $this->id_pemakaian,
                     'id_barang' => $data->id_barang,
                     'id_satuan_barang' => $data->id_satuan_barang,
                     'jumlah' => $data->jumlah,
                     'kode_batang' => $data->kode_batang,
-                    'index' => $data->index,
+                    'index' => $key + 1,
                     'weight' => 0,
                     'jumlah_zak' => $data->jumlah_zak,
-                    'weight_zak' => $data->weight_zak,
+                    'weight_zak' => $data->tare,
                     'catatan' => $data->catatan,
                 ];
                 $store = new MaterialUsageDetail;
@@ -179,50 +179,70 @@ class MaterialUsage extends Model
                     'weight_zak' => $store->weight_zak,
                 ]);
             }
+
+            return ['result' => true];
+        } catch (\Exception $e) {
+            Log::error($e);
+            return [
+                "result" => false,
+                "message" => "Data batalkan",
+            ];
         }
-
-        return ['status' => 'success'];
-    }
-
-    public function rmdetails($details)
-    {
-        $detail = json_decode($details);
-        foreach ($detail as $data) {
-
-            $master = MasterQrCode::where('kode_batang_master_qr_code', $data->kode_batang)->first();
-            if ($master) {
-                $master->sisa_master_qr_code = $master->sisa_master_qr_code + $data->jumlah;
-                $master->zak = ($master->zak ? $master->zak : 0) + $data->jumlah_zak;
-                $master->weight_zak = ($master->weight_zak ? $master->weight_zak : 0) + $data->tare;
-                $master->save();
-            }
-
-            DB::table('kartu_stok')->where('kode_kartu_stok', $this->kode_pemakaian)
-                ->where('kode_batang_kartu_stok', $data->kode_batang)
-                ->where('id_jenis_transaksi', 25)->delete();
-
-            $delete = MaterialUsageDetail::where('id_pemakaian', $data->id_pemakaian)->where('index', $data->index)->delete();
-        }
-
-        return ['status' => 'success'];
     }
 
     public function voidDetails()
     {
-        foreach ($this->details as $detail) {
-            $master = MasterQrCode::where('kode_batang_master_qr_code', $detail->kode_batang)->first();
-            if ($master) {
-                $master->sisa_master_qr_code = $master->sisa_master_qr_code + $detail->jumlah;
-                $master->zak = ($master->zak ? $master->zak : 0) + $detail->jumlah_zak;
-                $master->weight_zak = ($master->weight_zak ? $master->weight_zak : 0) + $detail->weight_zak;
-                $master->save();
+        try {
+            foreach ($this->details as $detail) {
+                $master = MasterQrCode::where('kode_batang_master_qr_code', $detail->kode_batang)->first();
+                if ($master) {
+                    $master->sisa_master_qr_code = $master->sisa_master_qr_code + $detail->jumlah;
+                    $master->zak = ($master->zak ? $master->zak : 0) + $detail->jumlah_zak;
+                    $master->weight_zak = ($master->weight_zak ? $master->weight_zak : 0) + $detail->weight_zak;
+                    $master->save();
+                }
+
+                DB::table('kartu_stok')->where('kode_kartu_stok', $this->kode_pemakaian)
+                    ->where('kode_batang_kartu_stok', $detail->kode_batang)
+                    ->where('id_jenis_transaksi', 25)->delete();
             }
 
-            DB::table('kartu_stok')->where('kode_kartu_stok', $this->kode_pemakaian)
-                ->where('kode_batang_kartu_stok', $detail->kode_batang)
-                ->where('id_jenis_transaksi', 25)->delete();
+            return ['result' => true];
+        } catch (\Exception $e) {
+            Log::error($e);
+            return [
+                "result" => false,
+                "message" => "Data batalkan",
+            ];
         }
+    }
 
-        return ['status' => 'success'];
+    public function revertMasterQrcode()
+    {
+        try {
+            foreach ($this->details as $detail) {
+                $master = MasterQrCode::where('kode_batang_master_qr_code', $detail->kode_batang)->first();
+                if ($master) {
+                    $master->sisa_master_qr_code = $master->sisa_master_qr_code + $detail->jumlah;
+                    $master->zak = ($master->zak ? $master->zak : 0) + $detail->jumlah_zak;
+                    $master->weight_zak = ($master->weight_zak ? $master->weight_zak : 0) + $detail->weight_zak;
+                    $master->save();
+                }
+
+                DB::table('kartu_stok')->where('kode_kartu_stok', $this->kode_pemakaian)
+                    ->where('kode_batang_kartu_stok', $detail->kode_batang)
+                    ->where('id_jenis_transaksi', 25)->delete();
+            }
+
+            MaterialUsageDetail::where('id_pemakaian', $this->id_pemakaian)->delete();
+
+            return ['result' => true];
+        } catch (\Exception $e) {
+            Log::error($e);
+            return [
+                "result" => false,
+                "message" => "Data dikembalikan",
+            ];
+        }
     }
 }

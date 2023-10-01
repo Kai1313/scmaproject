@@ -201,6 +201,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         <button style="display:none;" class="play-voice"></button>
     </div>
     <div id="cover-spin" style="display: none;"><img src="{{ asset('images/833.gif') }}" alt=""></div>
+    @include('layouts.modal-change-password')
     @include('includes.scripts')
     @yield('addedScripts')
     <!-- AdminLTE App -->

@@ -25,7 +25,7 @@ class AdjustmentLedgerController extends Controller
      */
     public function index(Request $request)
     {
-        if (checkUserSession($request, 'adjustment_ledger', 'show') == false) {
+        if (checkUserSession($request, 'transaction/adjustment_ledger', 'show') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
@@ -48,7 +48,7 @@ class AdjustmentLedgerController extends Controller
      */
     public function create(Request $request)
     {
-        if (checkAccessMenu('adjustment_ledger', 'create') == false) {
+        if (checkAccessMenu('transaction/adjustment_ledger', 'create') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
@@ -62,7 +62,7 @@ class AdjustmentLedgerController extends Controller
             "data_cabang" => $data_cabang,
             "data_pelanggan" => $data_pelanggan,
             "data_pemasok" => $data_pemasok,
-            "user_id" => $userSession->id_pengguna
+            "user_id" => $userSession->id_pengguna,
         ];
 
         Log::debug(json_encode($request->session()->get('user')));
@@ -94,7 +94,7 @@ class AdjustmentLedgerController extends Controller
             $userData = $request->session()->get('user');
             if (!$userData) {
                 Log::info("session expired");
-                if (checkUserSession($request, 'adjustment_ledger', 'create') == false) {
+                if (checkUserSession($request, 'transaction/adjustment_ledger', 'create') == false) {
                     return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
                 }
                 $userData = $request->session()->get('user');
@@ -147,13 +147,13 @@ class AdjustmentLedgerController extends Controller
                 if ($checkAkun) {
                     if ($checkAkun->id_cabang != $cabangID) {
                         DB::rollback();
-                    return response()->json([
-                        "result" => false,
-                        "message" => "Error when store Jurnal data on table detail. Detail has different cabang on the account ".$checkAkun->nama_akun,
-                    ]);
+                        return response()->json([
+                            "result" => false,
+                            "message" => "Error when store Jurnal data on table detail. Detail has different cabang on the account " . $checkAkun->nama_akun,
+                        ]);
                     }
                 }
-                
+
                 //Store Detail
                 $debet = str_replace('.', '', $data['debet']);
                 $debet = str_replace(',', '.', $debet);
@@ -185,7 +185,7 @@ class AdjustmentLedgerController extends Controller
                 // Update Saldo Transaksi
                 $trx_saldo = TrxSaldo::where("id_transaksi", $data["trx"])->first();
                 if ($trx_saldo) {
-                    $tolak = (str_contains($data["notes"], "GIRO-TOLAK"))?TRUE:FALSE;
+                    $tolak = (str_contains($data["notes"], "GIRO-TOLAK")) ? true : false;
                     $update_trx_saldo = $this->updateTrxSaldo($trx_saldo, $debet, $kredit, $tolak);
                     if (!$update_trx_saldo) {
                         DB::rollback();
@@ -260,7 +260,7 @@ class AdjustmentLedgerController extends Controller
      */
     public function show(Request $request, $id)
     {
-        if (checkAccessMenu('adjustment_ledger', 'show') == false) {
+        if (checkAccessMenu('transaction/adjustment_ledger', 'show') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
@@ -298,7 +298,7 @@ class AdjustmentLedgerController extends Controller
             "pageTitle" => "SCA Accounting | Transaksi Jurnal Umum | Detail",
             "data_jurnal_header" => $data_jurnal_header,
             "data_jurnal_detail" => $data_jurnal_detail,
-            "shortcutLink" => $shortcutLink
+            "shortcutLink" => $shortcutLink,
         ];
 
         return view('accounting.journal.adjusting_journal.detail', $data);
@@ -364,7 +364,7 @@ class AdjustmentLedgerController extends Controller
      */
     public function edit(Request $request, $id)
     {
-        if (checkAccessMenu('adjustment_ledger', 'edit') == false) {
+        if (checkAccessMenu('transaction/adjustment_ledger', 'edit') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
@@ -401,7 +401,7 @@ class AdjustmentLedgerController extends Controller
             "jurnal_header" => $jurnal_header,
             "jurnal_detail" => json_encode($details),
             "jurnal_detail_count" => count($details),
-            "user_id" => $userSession->id_pengguna
+            "user_id" => $userSession->id_pengguna,
         ];
         // dd($data);
 
@@ -411,16 +411,16 @@ class AdjustmentLedgerController extends Controller
             if (checkUserSession($request, 'general_ledger', 'show') == false) {
                 return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
             }
-    
+
             // $cabang = Cabang::find(1);
-    
+
             $data = [
                 "pageTitle" => "SCA Accounting | Transaksi Jurnal Penyesuaian | List",
                 // "cabang" => $cabang,
                 "data_cabang" => $data_cabang,
-                "closePeriod" => $period
+                "closePeriod" => $period,
             ];
-    
+
             return view('accounting.journal.adjusting_journal.index', $data);
         }
 
@@ -455,7 +455,7 @@ class AdjustmentLedgerController extends Controller
             $userData = $request->session()->get('user');
             if (!$userData) {
                 Log::info("session expired");
-                if (checkUserSession($request, 'adjustment_ledger', 'edit') == false) {
+                if (checkUserSession($request, 'transaction/adjustment_ledger', 'edit') == false) {
                     return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
                 }
                 $userData = $request->session()->get('user');
@@ -485,7 +485,7 @@ class AdjustmentLedgerController extends Controller
             // Update saldo transaksi before delete
             $old_details = JurnalDetail::where("id_jurnal", $journalID)->get();
             foreach ($old_details as $key => $detail) {
-                $tolak = (str_contains($detail->keterangan, "GIRO-TOLAK"))?TRUE:FALSE;
+                $tolak = (str_contains($detail->keterangan, "GIRO-TOLAK")) ? true : false;
                 $debet = $detail->debet;
                 $kredit = $detail->credit;
                 $trx_saldo = TrxSaldo::where("id_transaksi", $detail->id_transaksi)->first();
@@ -547,13 +547,13 @@ class AdjustmentLedgerController extends Controller
                 if ($checkAkun) {
                     if ($checkAkun->id_cabang != $cabangID) {
                         DB::rollback();
-                    return response()->json([
-                        "result" => false,
-                        "message" => "Error when store Jurnal data on table detail. Detail has different cabang on the account ".$checkAkun->nama_akun,
-                    ]);
+                        return response()->json([
+                            "result" => false,
+                            "message" => "Error when store Jurnal data on table detail. Detail has different cabang on the account " . $checkAkun->nama_akun,
+                        ]);
                     }
                 }
-                
+
                 //Store Detail
                 $debet = str_replace('.', '', $data['debet']);
                 $debet = str_replace(',', '.', $debet);
@@ -582,7 +582,7 @@ class AdjustmentLedgerController extends Controller
                 //  Update Saldo Transaksi
                 $trx_saldo = TrxSaldo::where("id_transaksi", $data["trx"])->first();
                 if ($trx_saldo) {
-                    $tolak = (str_contains($data["notes"], "GIRO-TOLAK"))?TRUE:FALSE;
+                    $tolak = (str_contains($data["notes"], "GIRO-TOLAK")) ? true : false;
                     $update_trx_saldo = $this->updateTrxSaldo($trx_saldo, $debet, $kredit, $tolak);
                     if (!$update_trx_saldo) {
                         DB::rollback();
@@ -617,7 +617,7 @@ class AdjustmentLedgerController extends Controller
 
             DB::commit();
             return response()->json([
-                "result" => TRUE,
+                "result" => true,
                 "message" => "Successfully stored Jurnal data",
             ]);
         } catch (\Exception $e) {
@@ -689,7 +689,7 @@ class AdjustmentLedgerController extends Controller
                 $query->orWhere('kode_jurnal', 'LIKE', "%$keyword%")
                     ->orWhere('tanggal_jurnal', 'LIKE', "%$keyword%")
                     ->orWhere('jenis_name', 'LIKE', "%$keyword%")
-                    // ->orWhere('jurnal_header.id_transaksi', 'LIKE', "%$keyword%")
+                // ->orWhere('jurnal_header.id_transaksi', 'LIKE', "%$keyword%")
                     ->orWhere('concat_id_transaksi', 'LIKE', "%$keyword%")
                     ->orWhere('catatan', 'LIKE', "%$keyword%");
             });
@@ -746,7 +746,7 @@ class AdjustmentLedgerController extends Controller
 
     public function void(Request $request, $id)
     {
-        if (checkAccessMenu('adjustment_ledger', 'edit') == false) {
+        if (checkAccessMenu('transaction/adjustment_ledger', 'edit') == false) {
             return response()->json([
                 "result" => false,
                 "message" => "Error when void Jurnal data, user has no access!",
@@ -777,7 +777,7 @@ class AdjustmentLedgerController extends Controller
 
             // Find Header data
             $header = JurnalHeader::where("id_jurnal", $id)->first();
-            if (checkAccessMenu('adjustment_ledger', 'delete') == false) {
+            if (checkAccessMenu('transaction/adjustment_ledger', 'delete') == false) {
                 return response()->json([
                     "result" => false,
                     "message" => "Maaf, tidak bisa void jurnal dengan id " . $id . ", anda tidak punya akses!",
@@ -787,7 +787,7 @@ class AdjustmentLedgerController extends Controller
             // Update saldo transaksi before delete
             $old_details = JurnalDetail::where("id_jurnal", $id)->get();
             foreach ($old_details as $key => $detail) {
-                $tolak = (str_contains($detail->keterangan, "GIRO-TOLAK"))?TRUE:FALSE;
+                $tolak = (str_contains($detail->keterangan, "GIRO-TOLAK")) ? true : false;
                 $debet = $detail->debet;
                 $kredit = $detail->credit;
                 $trx_saldo = TrxSaldo::where("id_transaksi", $detail->id_transaksi)->first();
@@ -862,7 +862,7 @@ class AdjustmentLedgerController extends Controller
 
     public function active(Request $request, $id)
     {
-        if (checkAccessMenu('adjustment_ledger', 'edit') == false) {
+        if (checkAccessMenu('transaction/adjustment_ledger', 'edit') == false) {
             return response()->json([
                 "result" => false,
                 "message" => "Error when activate Jurnal data, user has no access!",
@@ -899,7 +899,7 @@ class AdjustmentLedgerController extends Controller
                 //  Update Saldo Transaksi
                 $trx_saldo = TrxSaldo::where("id_transaksi", $detail->id_transaksi)->first();
                 if ($trx_saldo) {
-                    $tolak = (str_contains($detail->keterangan, "GIRO-TOLAK"))?TRUE:FALSE;
+                    $tolak = (str_contains($detail->keterangan, "GIRO-TOLAK")) ? true : false;
                     $update_trx_saldo = $this->updateTrxSaldo($trx_saldo, $detail->debet, $detail->credit, $tolak);
                     if (!$update_trx_saldo) {
                         DB::rollback();
@@ -979,12 +979,12 @@ class AdjustmentLedgerController extends Controller
         }
     }
 
-    public function updateTrxSaldo($trx, $debet, $kredit, $tolak = FALSE)
+    public function updateTrxSaldo($trx, $debet, $kredit, $tolak = false)
     {
         try {
             // DB::beginTransaction();
             $trx_saldo = TrxSaldo::find($trx->id);
-            $type = ($tolak)?$trx->tipe_transaksi." Tolak":$trx->tipe_transaksi;
+            $type = ($tolak) ? $trx->tipe_transaksi . " Tolak" : $trx->tipe_transaksi;
             $current_total = $trx->total;
             $current_bayar = $trx->bayar;
             $current_sisa = $trx->sisa;
@@ -1122,39 +1122,38 @@ class AdjustmentLedgerController extends Controller
         try {
             $id = $ids;
             $jurnal_header = JurnalHeader::where("kode_jurnal", $ids)->first();
-            $jurnal_detail = ($jurnal_header)?JurnalDetail::where("id_jurnal", $jurnal_header->id_jurnal)->get():[];
+            $jurnal_detail = ($jurnal_header) ? JurnalDetail::where("id_jurnal", $jurnal_header->id_jurnal)->get() : [];
             $details = [];
             $i = 0;
             foreach ($jurnal_detail as $key => $jurnal) {
                 $akun = Akun::find($jurnal->id_akun);
                 $trx_id = TrxSaldo::where("id_transaksi", $jurnal->id_transaksi)->first();
-                Log::info("iterator ".$i);
-                Log::info("count ".count($jurnal_detail));
+                Log::info("iterator " . $i);
+                Log::info("count " . count($jurnal_detail));
                 $details[] = [
                     "guid" => (++$i == count($jurnal_detail)) ? "gen" : (($trx_id) ? "trx-" . $trx_id->id : $jurnal->index),
                     "akun" => $akun->id_akun,
                     "nama_akun" => $akun->nama_akun,
                     "kode_akun" => $akun->kode_akun,
-                    "notes" => ($i == count($jurnal_detail))?$jurnal->keterangan." - GIRO-TOLAK":$jurnal->keterangan,
-                    "trx" => ($i == count($jurnal_detail))?$ids:$jurnal->id_transaksi,
+                    "notes" => ($i == count($jurnal_detail)) ? $jurnal->keterangan . " - GIRO-TOLAK" : $jurnal->keterangan,
+                    "trx" => ($i == count($jurnal_detail)) ? $ids : $jurnal->id_transaksi,
                     // Dibalik karena giro tolak
                     "debet" => str_replace(".", ",", $jurnal->credit),
                     "kredit" => str_replace(".", ",", $jurnal->debet),
                 ];
             }
             return response()->json([
-                "result" => TRUE,
+                "result" => true,
                 "message" => "Successfully fetched giro tolak",
-                "details" => $details
+                "details" => $details,
             ]);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $message = "Error when get giro tolak record";
             Log::error($message);
             Log::error($e);
             return response()->json([
-                "result" => FALSE,
-                "message" => $message
+                "result" => false,
+                "message" => $message,
             ]);
         }
     }
@@ -1169,18 +1168,18 @@ class AdjustmentLedgerController extends Controller
                 case 'KR':
                     // Stock Correction
                     $getId = StockCorrectionHeader::where("nama_koreksi_stok", $code)->first();
-                    $shortcutLink = ($getId)?"https://vps.scasda.my.id/v2/#koreksi_stok&data_master=$getId->id_koreksi_stok":NULL;
+                    $shortcutLink = ($getId) ? "https://vps.scasda.my.id/v2/#koreksi_stok&data_master=$getId->id_koreksi_stok" : null;
                     break;
-                
+
                 default:
-                    $shortcutLink = NULL;
+                    $shortcutLink = null;
                     break;
             }
 
             return $shortcutLink;
         } catch (\Exception $e) {
             Log::error("Error when get reference shortcut link");
-            return NULL;
+            return null;
         }
     }
 }

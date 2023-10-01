@@ -47,7 +47,7 @@ class SendToBranchController extends Controller
                 $data = $data->where('pb.void', '0');
             }
 
-            $data = $data->orderBy('pb.kode_pindah_barang', 'desc');
+            $data = $data->orderBy('pb.tanggal_pindah_barang', 'desc')->orderBy('pb.kode_pindah_barang', 'desc');
 
             $idUser = session()->get('user')['id_pengguna'];
             $filterUser = DB::table('pengguna')
@@ -169,9 +169,16 @@ class SendToBranchController extends Controller
         }
 
         $data = MoveBranch::where('type', 0)->where('id_pindah_barang', $id)->first();
+        $groupPengguna = DB::table('pengguna')->select(DB::raw('distinct(id_grup_pengguna)'))->where('id_pengguna', $data->user_created)->orWhere('id_grup_pengguna', 1)->get()->toArray();
+        $groups = [];
+        foreach ($groupPengguna as $grup) {
+            $groups[] = $grup->id_grup_pengguna;
+        }
+
         return view('ops.sendToBranch.detail', [
             'data' => $data,
             "pageTitle" => "SCA OPS | Kirim Ke Cabang | Lihat",
+            'isEdit' => in_array(session()->get('user')['id_grup_pengguna'], $groups),
         ]);
     }
 
@@ -297,5 +304,43 @@ class SendToBranchController extends Controller
         $pdf = PDF::loadView('ops.sendToBranch.print', ['data' => $data, 'arraySatuan' => $arraySatuan]);
         $pdf->setPaper('a5', 'landscape');
         return $pdf->stream('Surat jalan pindah cabang ' . $data->kode_pindah_barang . '.pdf');
+    }
+
+    public function saveEntryDetail(Request $request)
+    {
+        $store = MoveBranchDetail::find($request->id_pindah_barang_detail);
+        if (!$store) {
+            return response()->json([
+                "result" => false,
+                "message" => "Data tidak ditemukan",
+            ], 500);
+        }
+
+        DB::beginTransaction();
+        try {
+            $store->keterangan = $request->keterangan;
+            $store->save();
+
+            DB::table('kartu_stok')
+                ->where('id_jenis_transaksi', 21)
+                ->where('kode_batang_kartu_stok', $store->qr_code)->update([
+                'keterangan_kartu_stok' => $store->keterangan,
+            ]);
+
+            DB::commit();
+            return response()->json([
+                "result" => true,
+                "message" => "Data berhasil disimpan",
+                "redirect" => route('send_to_branch-view', $store->id_pindah_barang),
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error("Error when save send to branch");
+            Log::error($e);
+            return response()->json([
+                "result" => false,
+                "message" => "Data gagal tersimpan",
+            ], 500);
+        }
     }
 }

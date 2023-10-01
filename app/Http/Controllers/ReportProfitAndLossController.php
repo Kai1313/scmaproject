@@ -3,21 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Exports\ReportProfitAndLossExport;
-use App\Models\Accounting\JurnalDetail;
-use App\Models\Accounting\SaldoBalance;
 use App\Models\Master\Akun;
 use App\Models\Master\Cabang;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Excel;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use PDF;
 
 class ReportProfitAndLossController extends Controller
 {
     public function index(Request $request)
     {
-        if (checkUserSession($request, 'report_profit_loss', 'show') == false) {
+        if (checkUserSession($request, 'report/profit_loss', 'show') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
@@ -29,7 +27,7 @@ class ReportProfitAndLossController extends Controller
             $all = (object) [
                 "id_cabang" => "",
                 "nama_cabang" => "ALL",
-                "kode_cabang" => "ALL"
+                "kode_cabang" => "ALL",
             ];
             array_unshift($data_cabang, $all);
         }
@@ -63,8 +61,8 @@ class ReportProfitAndLossController extends Controller
             Log::error($message);
             Log::error($e);
             return response()->json([
-                "result" => False,
-                "message" => $message
+                "result" => false,
+                "message" => $message,
             ]);
         }
     }
@@ -97,7 +95,7 @@ class ReportProfitAndLossController extends Controller
                 'periode_table' => $monthName[$month - 1] . ' ' . $year,
                 'periode' => date('M Y', strtotime($year . '-' . $month . '-1')),
                 'type' => ucwords(str_replace('_', ' ', $type)),
-                'data' => $data_profit_loss
+                'data' => $data_profit_loss,
             ];
 
             if (!empty($data["data"])) {
@@ -108,14 +106,14 @@ class ReportProfitAndLossController extends Controller
                     'Content-Disposition' => 'attachment; filename="download.pdf"',
                 ];
                 return response()->json([
-                    "result" => True,
+                    "result" => true,
                     "pdfData" => base64_encode($pdf->output()),
                     "pdfHeaders" => $headers,
                 ]);
             } else {
                 return response()->json([
-                    "result" => False,
-                    "message" => "Tidak ada data"
+                    "result" => false,
+                    "message" => "Tidak ada data",
                 ]);
             }
         } catch (\Exception $e) {
@@ -123,8 +121,8 @@ class ReportProfitAndLossController extends Controller
             Log::error($message);
             Log::error($e);
             return response()->json([
-                "result" => False,
-                "message" => $message
+                "result" => false,
+                "message" => $message,
             ]);
         }
     }
@@ -158,7 +156,7 @@ class ReportProfitAndLossController extends Controller
                 'periode_table' => $monthName[$month - 1] . ' ' . $year,
                 'periode' => date('M Y', strtotime($year . '-' . $month . '-1')),
                 'type' => str_replace('_', ' ', $type),
-                'data' => $data_profit_loss
+                'data' => $data_profit_loss,
             ];
 
             // dd(count($data["data"]));
@@ -168,8 +166,8 @@ class ReportProfitAndLossController extends Controller
                 return Excel::download(new ReportProfitAndLossExport($data), 'ReportProfitLoss.xlsx');
             } else {
                 return response()->json([
-                    "result" => False,
-                    "message" => "Tidak ada data"
+                    "result" => false,
+                    "message" => "Tidak ada data",
                 ]);
             }
         } catch (\Exception $e) {
@@ -177,39 +175,39 @@ class ReportProfitAndLossController extends Controller
             Log::error($message);
             Log::error($e);
             return response()->json([
-                "result" => False,
-                "message" => $message
+                "result" => false,
+                "message" => $message,
             ]);
         }
     }
 
     private function getData($id_cabang, $tahun, $bulan, $type)
     {
-        if($id_cabang == null){
+        if ($id_cabang == null) {
             if ($type == 'recap') {
                 Log::debug('recap cabang null');
                 $data_balance = $this->getSummaryBalanceKonsolidasi($tahun, $bulan);
             } else if ($type == 'detail') {
                 Log::debug('detail cabang null');
                 $data_balance = $this->getDetailBalanceKonsolidasi($tahun, $bulan);
-            } else if($type == 'awal') {
+            } else if ($type == 'awal') {
                 Log::debug('awal cabang null');
                 $data_balance = $this->getInitBalanceKonsolidasi($tahun, $bulan);
-            }else{
+            } else {
                 Log::debug('else cabang null');
                 $data_balance = $this->getInitDetailBalanceKonsolidasi($tahun, $bulan);
             }
-        }else{
+        } else {
             if ($type == 'recap') {
                 Log::debug('recap cabang ada');
                 $data_balance = $this->getSummaryBalance($id_cabang, $tahun, $bulan);
             } else if ($type == 'detail') {
                 Log::debug('detail cabang ada');
                 $data_balance = $this->getDetailBalance($id_cabang, $tahun, $bulan);
-            } else if($type == 'awal') {
+            } else if ($type == 'awal') {
                 Log::debug('awal cabang ada');
                 $data_balance = $this->getInitBalance($id_cabang, $tahun, $bulan);
-            }else{
+            } else {
                 Log::debug('else cabang ada');
                 $data_balance = $this->getInitDetailBalance($id_cabang, $tahun, $bulan);
             }
@@ -263,25 +261,25 @@ class ReportProfitAndLossController extends Controller
             ->get();
 
         $total = [];
-    
+
         $total['grand_total'] = 0;
 
         // Log::debug(json_encode($data));
-        
+
         $summary_data = [
             'transaction_data' => $data,
-            'total' => $total
+            'total' => $total,
         ];
 
         // Log::debug(json_encode($data));
-        
+
         $data = $this->getMapSummary($summary_data);
 
         // Log::debug(json_encode($data));
-        
+
         $data = [
             'data' => (Object) $data['map'],
-            'total' => $data['total']
+            'total' => $data['total'],
         ];
 
         return $data;
@@ -295,18 +293,18 @@ class ReportProfitAndLossController extends Controller
         $total_konsolidasi = [];
         $urutan_cabang = 1;
 
-        foreach($data_cabang as $cabang){
-            $format_nama =  str_replace(' ', '_', strtolower($cabang->nama_cabang));
+        foreach ($data_cabang as $cabang) {
+            $format_nama = str_replace(' ', '_', strtolower($cabang->nama_cabang));
             $select_query = '
                 CASE WHEN header1 IS NULL OR header1 = "" THEN "" ELSE header1 END as new_header1,
                 CASE WHEN header2 IS NULL OR header2 = "" THEN "" ELSE header2 END as new_header2,
                 CASE WHEN header3 IS NULL OR header3 = "" THEN "" ELSE header3 END as new_header3,
-                SUM(IFNULL(sum_posisi_credit, 0)) as sum_posisi_credit_' . $format_nama .',
-                SUM(IFNULL(sum_posisi_debet, 0)) as sum_posisi_debet_' . $format_nama .',
+                SUM(IFNULL(sum_posisi_credit, 0)) as sum_posisi_credit_' . $format_nama . ',
+                SUM(IFNULL(sum_posisi_debet, 0)) as sum_posisi_debet_' . $format_nama . ',
                 master_akun.posisi_debet';
 
             $data = Akun::selectRaw($select_query)
-            ->leftJoin(DB::raw('(
+                ->leftJoin(DB::raw('(
                 SELECT id_akun, sum(sum_posisi_credit) AS sum_posisi_credit, sum(sum_posisi_debet) AS sum_posisi_debet
                 FROM
                     (
@@ -333,14 +331,14 @@ class ReportProfitAndLossController extends Controller
                 ) summary
                 GROUP BY id_akun
             ) as jurnal'), 'master_akun.id_akun', '=', 'jurnal.id_akun')
-            ->where('isshown', 1)
-            ->where('tipe_akun', 1)
-            ->groupBy('new_header1', 'new_header2', 'new_header3')
-            ->get()->toArray();
+                ->where('isshown', 1)
+                ->where('tipe_akun', 1)
+                ->groupBy('new_header1', 'new_header2', 'new_header3')
+                ->get()->toArray();
 
-            if($urutan_cabang == 1){
+            if ($urutan_cabang == 1) {
                 $data_konsolidasi = $data;
-                for($i = 0; $i < count($data_konsolidasi); $i++){
+                for ($i = 0; $i < count($data_konsolidasi); $i++) {
                     $posisi_debet = $data_konsolidasi[$i]['posisi_debet'];
                     if ($posisi_debet == true || $posisi_debet == null) {
                         $total_konsolidasi[$i]['total_all'] = $data_konsolidasi[$i]['sum_posisi_debet_' . $format_nama];
@@ -350,8 +348,8 @@ class ReportProfitAndLossController extends Controller
 
                     $total_konsolidasi[$i]['total_credit'] = $data_konsolidasi[$i]['sum_posisi_credit_' . $format_nama];
                 }
-            }else{
-                for($i = 0; $i < count($data_konsolidasi); $i++){
+            } else {
+                for ($i = 0; $i < count($data_konsolidasi); $i++) {
                     $posisi_debet = $data_konsolidasi[$i]['posisi_debet'];
                     $data_konsolidasi[$i]['sum_posisi_debet_' . $format_nama] = $data[$i]['sum_posisi_debet_' . $format_nama];
                     $data_konsolidasi[$i]['sum_posisi_credit_' . $format_nama] = $data[$i]['sum_posisi_credit_' . $format_nama];
@@ -367,14 +365,14 @@ class ReportProfitAndLossController extends Controller
             $urutan_cabang++;
         }
 
-        for($i = 0; $i < count($data_konsolidasi); $i++){
+        for ($i = 0; $i < count($data_konsolidasi); $i++) {
             $data_konsolidasi[$i]['total_all'] = $total_konsolidasi[$i]['total_all'];
             $data_konsolidasi[$i]['total_credit'] = $total_konsolidasi[$i]['total_credit'];
         }
 
         $total = [];
 
-        foreach($data_cabang as $cabang){
+        foreach ($data_cabang as $cabang) {
             $total['grand_total_' . $cabang->new_nama_cabang] = 0;
         }
 
@@ -385,7 +383,7 @@ class ReportProfitAndLossController extends Controller
         $summary_data = [
             'transaction_data' => $data_konsolidasi,
             'list_cabang' => $data_cabang,
-            'total' => $total
+            'total' => $total,
         ];
 
         $map_konsolidasi = $this->getMapSummaryKonsolidasi($summary_data);
@@ -394,7 +392,7 @@ class ReportProfitAndLossController extends Controller
         $data = [
             'data' => $map_konsolidasi['map'],
             'total' => $map_konsolidasi['total'],
-            'cabang' => $data_cabang
+            'cabang' => $data_cabang,
         ];
 
         return $data;
@@ -447,21 +445,21 @@ class ReportProfitAndLossController extends Controller
             ->get();
 
         $total = [];
-    
+
         $total['grand_total'] = 0;
-            
+
         $detail_data = [
             'transaction_data' => $data,
             'period' => $tahun . '-' . $bulan,
             'id_cabang' => $id_cabang,
-            'total' => $total
+            'total' => $total,
         ];
 
         $data = $this->getMapDetail($detail_data);
 
         $data = [
             'data' => (Object) $data['map'],
-            'total' => $data['total']
+            'total' => $data['total'],
         ];
 
         return $data;
@@ -475,21 +473,21 @@ class ReportProfitAndLossController extends Controller
         $total_konsolidasi = [];
         $urutan_cabang = 1;
 
-        foreach($data_cabang as $cabang){
-            $format_nama =  str_replace(' ', '_', strtolower($cabang->nama_cabang));
+        foreach ($data_cabang as $cabang) {
+            $format_nama = str_replace(' ', '_', strtolower($cabang->nama_cabang));
             $select_query = '
                 CASE WHEN header1 IS NULL OR header1 = "" THEN "" ELSE header1 END as new_header1,
                 CASE WHEN header2 IS NULL OR header2 = "" THEN "" ELSE header2 END as new_header2,
                 CASE WHEN header3 IS NULL OR header3 = "" THEN "" ELSE header3 END as new_header3,
-                SUM(IFNULL(sum_posisi_credit, 0)) as sum_posisi_credit_' . $format_nama .',
-                SUM(IFNULL(sum_posisi_debet, 0)) as sum_posisi_debet_' . $format_nama .',
+                SUM(IFNULL(sum_posisi_credit, 0)) as sum_posisi_credit_' . $format_nama . ',
+                SUM(IFNULL(sum_posisi_debet, 0)) as sum_posisi_debet_' . $format_nama . ',
                 master_akun.kode_akun,
                 master_akun.nama_akun,
                 master_akun.id_akun,
                 master_akun.posisi_debet';
 
             $data = Akun::selectRaw($select_query)
-            ->leftJoin(DB::raw('(
+                ->leftJoin(DB::raw('(
                 SELECT id_akun, sum(sum_posisi_credit) AS sum_posisi_credit, sum(sum_posisi_debet) AS sum_posisi_debet
                 FROM
                     (
@@ -516,14 +514,14 @@ class ReportProfitAndLossController extends Controller
                 ) summary
                 GROUP BY id_akun
             ) as jurnal'), 'master_akun.id_akun', '=', 'jurnal.id_akun')
-            ->where('isshown', 1)
-            ->where('tipe_akun', 1)
-            ->groupBy('new_header1', 'new_header2', 'new_header3', 'master_akun.kode_akun')
-            ->get()->toArray();
+                ->where('isshown', 1)
+                ->where('tipe_akun', 1)
+                ->groupBy('new_header1', 'new_header2', 'new_header3', 'master_akun.kode_akun')
+                ->get()->toArray();
 
-            if($urutan_cabang == 1){
+            if ($urutan_cabang == 1) {
                 $data_konsolidasi = $data;
-                for($i = 0; $i < count($data_konsolidasi); $i++){
+                for ($i = 0; $i < count($data_konsolidasi); $i++) {
                     $posisi_debet = $data_konsolidasi[$i]['posisi_debet'];
                     if ($posisi_debet == true || $posisi_debet == null) {
                         $total_konsolidasi[$i]['total_all'] = $data_konsolidasi[$i]['sum_posisi_debet_' . $format_nama];
@@ -533,8 +531,8 @@ class ReportProfitAndLossController extends Controller
 
                     $total_konsolidasi[$i]['total_credit'] = $data_konsolidasi[$i]['sum_posisi_credit_' . $format_nama];
                 }
-            }else{
-                for($i = 0; $i < count($data_konsolidasi); $i++){
+            } else {
+                for ($i = 0; $i < count($data_konsolidasi); $i++) {
                     $posisi_debet = $data_konsolidasi[$i]['posisi_debet'];
                     $data_konsolidasi[$i]['sum_posisi_debet_' . $format_nama] = $data[$i]['sum_posisi_debet_' . $format_nama];
                     $data_konsolidasi[$i]['sum_posisi_credit_' . $format_nama] = $data[$i]['sum_posisi_credit_' . $format_nama];
@@ -550,7 +548,7 @@ class ReportProfitAndLossController extends Controller
             $urutan_cabang++;
         }
 
-        for($i = 0; $i < count($data_konsolidasi); $i++){
+        for ($i = 0; $i < count($data_konsolidasi); $i++) {
             $data_konsolidasi[$i]['total_all'] = $total_konsolidasi[$i]['total_all'];
             $data_konsolidasi[$i]['total_credit'] = $total_konsolidasi[$i]['total_credit'];
         }
@@ -559,7 +557,7 @@ class ReportProfitAndLossController extends Controller
         // Log::info("data end");
         // Log::info(json_encode($data_konsolidasi));
 
-        foreach($data_cabang as $cabang){
+        foreach ($data_cabang as $cabang) {
             $total['grand_total_' . $cabang->new_nama_cabang] = 0;
         }
 
@@ -569,7 +567,7 @@ class ReportProfitAndLossController extends Controller
             'transaction_data' => $data_konsolidasi,
             'period' => $tahun . '-' . $bulan,
             'list_cabang' => $data_cabang,
-            'total' => $total
+            'total' => $total,
         ];
 
         $map_konsolidasi = $this->getMapDetailKonsolidasi($detail_data);
@@ -580,7 +578,7 @@ class ReportProfitAndLossController extends Controller
         $data = [
             'data' => $map_konsolidasi['map'],
             'total' => $map_konsolidasi['total'],
-            'cabang' => $data_cabang
+            'cabang' => $data_cabang,
         ];
 
         return $data;
@@ -601,7 +599,7 @@ class ReportProfitAndLossController extends Controller
                 WHERE
                     tahun = ' . $tahun . '
                     AND bulan = ' . $bulan . '
-                    AND id_cabang = ' . $id_cabang .  '
+                    AND id_cabang = ' . $id_cabang . '
                 GROUP BY id_akun
             ) as jurnal'), 'master_akun.id_akun', '=', 'jurnal.id_akun')
             ->where('isshown', 1)
@@ -611,7 +609,7 @@ class ReportProfitAndLossController extends Controller
             ->get();
 
         $summary_data = [
-            'transaction_data' => $data
+            'transaction_data' => $data,
         ];
 
         $data = $this->getMapSummary($summary_data);
@@ -627,8 +625,8 @@ class ReportProfitAndLossController extends Controller
         $total_konsolidasi = [];
         $urutan_cabang = 1;
 
-        foreach($data_cabang as $cabang){
-            $format_nama =  str_replace(' ', '_', strtolower($cabang->nama_cabang));
+        foreach ($data_cabang as $cabang) {
+            $format_nama = str_replace(' ', '_', strtolower($cabang->nama_cabang));
             $select_query = '
                 CASE WHEN header1 IS NULL OR header1 = "" THEN "" ELSE header1 END as new_header1,
                 CASE WHEN header2 IS NULL OR header2 = "" THEN "" ELSE header2 END as new_header2,
@@ -643,7 +641,7 @@ class ReportProfitAndLossController extends Controller
                     WHERE
                         tahun = ' . $tahun . '
                         AND bulan = ' . $bulan . '
-                        AND id_cabang = ' . $cabang->id_cabang .  '
+                        AND id_cabang = ' . $cabang->id_cabang . '
                     GROUP BY id_akun
                 ) as jurnal'), 'master_akun.id_akun', '=', 'jurnal.id_akun')
                 ->where('isshown', 1)
@@ -651,13 +649,13 @@ class ReportProfitAndLossController extends Controller
                 ->groupBy('new_header1', 'new_header2', 'new_header3')
                 ->get()->toArray();
 
-            if($urutan_cabang == 1){
+            if ($urutan_cabang == 1) {
                 $data_konsolidasi = $data;
-                for($i = 0; $i < count($data_konsolidasi); $i++){
+                for ($i = 0; $i < count($data_konsolidasi); $i++) {
                     $total_konsolidasi[$i]['total_all'] = $data_konsolidasi[$i]['total_' . $format_nama];
                 }
-            }else{
-                for($i = 0; $i < count($data_konsolidasi); $i++){
+            } else {
+                for ($i = 0; $i < count($data_konsolidasi); $i++) {
                     $data_konsolidasi[$i]['total_' . $format_nama] = $data[$i]['total_' . $format_nama];
                     $total_konsolidasi[$i]['total_all'] += $data_konsolidasi[$i]['total_' . $format_nama];
                 }
@@ -665,13 +663,13 @@ class ReportProfitAndLossController extends Controller
             $urutan_cabang++;
         }
 
-        for($i = 0; $i < count($data_konsolidasi); $i++){
+        for ($i = 0; $i < count($data_konsolidasi); $i++) {
             $data_konsolidasi[$i]['total_all'] = $total_konsolidasi[$i]['total_all'];
         }
 
         $summary_data = [
             'transaction_data' => $data_konsolidasi,
-            'list_cabang' => $data_cabang
+            'list_cabang' => $data_cabang,
         ];
 
         $map_konsolidasi = $this->getMapSummaryKonsolidasi($summary_data);
@@ -679,7 +677,7 @@ class ReportProfitAndLossController extends Controller
         // Convert the hash map to an array
         $data = [
             'data' => $map_konsolidasi,
-            'cabang' => $data_cabang
+            'cabang' => $data_cabang,
         ];
 
         return $data;
@@ -703,7 +701,7 @@ class ReportProfitAndLossController extends Controller
                 WHERE
                     tahun = ' . $tahun . '
                     AND bulan = ' . $bulan . '
-                    AND id_cabang = ' . $id_cabang .  '
+                    AND id_cabang = ' . $id_cabang . '
                 GROUP BY id_akun
             ) as jurnal'), 'master_akun.id_akun', '=', 'jurnal.id_akun')
             ->where('isshown', 1)
@@ -716,7 +714,7 @@ class ReportProfitAndLossController extends Controller
         $detail_data = [
             'transaction_data' => $data,
             'period' => $tahun . '-' . $bulan,
-            'id_cabang' => $id_cabang
+            'id_cabang' => $id_cabang,
         ];
 
         $data = $this->getMapDetail($detail_data);
@@ -732,40 +730,40 @@ class ReportProfitAndLossController extends Controller
         $total_konsolidasi = [];
         $urutan_cabang = 1;
 
-        foreach($data_cabang as $cabang){
-            $format_nama =  str_replace(' ', '_', strtolower($cabang->nama_cabang));
+        foreach ($data_cabang as $cabang) {
+            $format_nama = str_replace(' ', '_', strtolower($cabang->nama_cabang));
             $select_query = '
                 CASE WHEN header1 IS NULL OR header1 = "" THEN "" ELSE header1 END as new_header1,
                 CASE WHEN header2 IS NULL OR header2 = "" THEN "" ELSE header2 END as new_header2,
                 CASE WHEN header3 IS NULL OR header3 = "" THEN "" ELSE header3 END as new_header3,
-                SUM(IFNULL(total_summary, 0)) as total_' . $format_nama .',
+                SUM(IFNULL(total_summary, 0)) as total_' . $format_nama . ',
                 kode_akun,
                 nama_akun,
                 master_akun.id_akun';
 
             $data = Akun::selectRaw($select_query)
-            ->leftJoin(DB::raw('(
+                ->leftJoin(DB::raw('(
                 SELECT id_akun, sum( credit - debet ) AS total_summary
                 FROM
                     saldo_balance sb
                 WHERE
                     tahun = ' . $tahun . '
                     AND bulan = ' . $bulan . '
-                    AND id_cabang = ' . $cabang->id_cabang .  '
+                    AND id_cabang = ' . $cabang->id_cabang . '
                 GROUP BY id_akun
             ) as jurnal'), 'master_akun.id_akun', '=', 'jurnal.id_akun')
-            ->where('isshown', 1)
-            ->where('tipe_akun', 1)
-            ->groupBy('new_header1', 'new_header2', 'new_header3', 'master_akun.kode_akun')
-            ->get()->toArray();
+                ->where('isshown', 1)
+                ->where('tipe_akun', 1)
+                ->groupBy('new_header1', 'new_header2', 'new_header3', 'master_akun.kode_akun')
+                ->get()->toArray();
 
-            if($urutan_cabang == 1){
+            if ($urutan_cabang == 1) {
                 $data_konsolidasi = $data;
-                for($i = 0; $i < count($data_konsolidasi); $i++){
+                for ($i = 0; $i < count($data_konsolidasi); $i++) {
                     $total_konsolidasi[$i]['total_all'] = $data_konsolidasi[$i]['total_' . $format_nama];
                 }
-            }else{
-                for($i = 0; $i < count($data_konsolidasi); $i++){
+            } else {
+                for ($i = 0; $i < count($data_konsolidasi); $i++) {
                     $data_konsolidasi[$i]['total_' . $format_nama] = $data[$i]['total_' . $format_nama];
                     $total_konsolidasi[$i]['total_all'] += $data_konsolidasi[$i]['total_' . $format_nama];
                 }
@@ -773,14 +771,14 @@ class ReportProfitAndLossController extends Controller
             $urutan_cabang++;
         }
 
-        for($i = 0; $i < count($data_konsolidasi); $i++){
+        for ($i = 0; $i < count($data_konsolidasi); $i++) {
             $data_konsolidasi[$i]['total_all'] = $total_konsolidasi[$i]['total_all'];
         }
 
         $detail_data = [
             'transaction_data' => $data_konsolidasi,
             'period' => $tahun . '-' . $bulan,
-            'list_cabang' => $data_cabang
+            'list_cabang' => $data_cabang,
         ];
 
         $map_konsolidasi = $this->getMapDetailKonsolidasi($detail_data);
@@ -788,13 +786,14 @@ class ReportProfitAndLossController extends Controller
         // Convert the hash map to an array
         $data = [
             'data' => $map_konsolidasi,
-            'cabang' => $data_cabang
+            'cabang' => $data_cabang,
         ];
 
         return $data;
     }
 
-    private function getMapSummary($summary_data){
+    private function getMapSummary($summary_data)
+    {
         $data = $summary_data['transaction_data'];
         $total = $summary_data['total'];
 
@@ -810,7 +809,7 @@ class ReportProfitAndLossController extends Controller
 
             if ($posisi_debet == true || $posisi_debet == null) {
                 $item_total = $item['sum_posisi_debet'];
-            }else{
+            } else {
                 $item_total = $item['sum_posisi_credit'];
             }
 
@@ -831,7 +830,7 @@ class ReportProfitAndLossController extends Controller
                 $map[$newHeader1] = [
                     'header' => $newHeader1,
                     'total' => 0,
-                    'children' => []
+                    'children' => [],
                 ];
             }
 
@@ -841,7 +840,7 @@ class ReportProfitAndLossController extends Controller
                     $map[$newHeader1]['children'][$newHeader2] = [
                         'header' => $newHeader2,
                         'total' => 0,
-                        'children' => []
+                        'children' => [],
                     ];
                 }
 
@@ -849,7 +848,7 @@ class ReportProfitAndLossController extends Controller
                 if (!empty($newHeader3)) {
                     $map[$newHeader1]['children'][$newHeader2]['children'][] = [
                         'header' => $newHeader3,
-                        'total' => $item_total
+                        'total' => $item_total,
                     ];
 
                     $map[$newHeader1]['children'][$newHeader2]['total'] += $item_total;
@@ -861,7 +860,7 @@ class ReportProfitAndLossController extends Controller
                 if (!empty($newHeader3)) {
                     $map[$newHeader1]['children'][] = [
                         'header' => $newHeader3,
-                        'total' => $item_total
+                        'total' => $item_total,
                     ];
                     $map[$newHeader1]['total'] += $item_total;
                     $total['grand_total'] += $item['sum_posisi_credit'];
@@ -875,7 +874,8 @@ class ReportProfitAndLossController extends Controller
         return $data;
     }
 
-    private function getMapSummaryKonsolidasi($summary_data){
+    private function getMapSummaryKonsolidasi($summary_data)
+    {
         $data_konsolidasi = $summary_data['transaction_data'];
         $list_cabang = $summary_data['list_cabang'];
         $total = $summary_data['total'];
@@ -905,10 +905,10 @@ class ReportProfitAndLossController extends Controller
             if (!isset($map[$newHeader1])) {
                 $map[$newHeader1] = [
                     'header' => $newHeader1,
-                    'children' => []
+                    'children' => [],
                 ];
 
-                foreach($list_cabang as $cabang){
+                foreach ($list_cabang as $cabang) {
                     $map[$newHeader1]['total_' . $cabang->new_nama_cabang] = 0;
                 }
 
@@ -920,10 +920,10 @@ class ReportProfitAndLossController extends Controller
                 if (!isset($map[$newHeader1]['children'][$newHeader2])) {
                     $map[$newHeader1]['children'][$newHeader2] = [
                         'header' => $newHeader2,
-                        'children' => []
+                        'children' => [],
                     ];
 
-                    foreach($list_cabang as $cabang){
+                    foreach ($list_cabang as $cabang) {
                         $map[$newHeader1]['children'][$newHeader2]['total_' . $cabang->new_nama_cabang] = 0;
                     }
 
@@ -934,14 +934,14 @@ class ReportProfitAndLossController extends Controller
                 if (!empty($newHeader3)) {
                     // input child 3
                     $array_item = [
-                        'header' => $newHeader3
+                        'header' => $newHeader3,
                     ];
 
-                    foreach($list_cabang as $cabang){
+                    foreach ($list_cabang as $cabang) {
                         if ($posisi_debet == true || $posisi_debet == null) {
-                            $array_item['total_' . $cabang->new_nama_cabang] =  $item['sum_posisi_debet_' . $cabang->new_nama_cabang];
-                        }else{
-                            $array_item['total_' . $cabang->new_nama_cabang] =  $item['sum_posisi_credit_' . $cabang->new_nama_cabang];
+                            $array_item['total_' . $cabang->new_nama_cabang] = $item['sum_posisi_debet_' . $cabang->new_nama_cabang];
+                        } else {
+                            $array_item['total_' . $cabang->new_nama_cabang] = $item['sum_posisi_credit_' . $cabang->new_nama_cabang];
                         }
                     }
 
@@ -950,22 +950,22 @@ class ReportProfitAndLossController extends Controller
                     $map[$newHeader1]['children'][$newHeader2]['children'][] = $array_item;
                     // end
 
-                    foreach($list_cabang as $cabang){
+                    foreach ($list_cabang as $cabang) {
                         if ($posisi_debet == true || $posisi_debet == null) {
-                            $map[$newHeader1]['children'][$newHeader2]['total_' . $cabang->new_nama_cabang] +=  $item['sum_posisi_debet_' . $cabang->new_nama_cabang];
-                        }else{
-                            $map[$newHeader1]['children'][$newHeader2]['total_' . $cabang->new_nama_cabang] +=  $item['sum_posisi_credit_' . $cabang->new_nama_cabang];
+                            $map[$newHeader1]['children'][$newHeader2]['total_' . $cabang->new_nama_cabang] += $item['sum_posisi_debet_' . $cabang->new_nama_cabang];
+                        } else {
+                            $map[$newHeader1]['children'][$newHeader2]['total_' . $cabang->new_nama_cabang] += $item['sum_posisi_credit_' . $cabang->new_nama_cabang];
                         }
                     }
 
                     $map[$newHeader1]['children'][$newHeader2]['total_all'] += $item['total_all'];
                 }
 
-                foreach($list_cabang as $cabang){
+                foreach ($list_cabang as $cabang) {
                     if ($posisi_debet == true || $posisi_debet == null) {
-                        $map[$newHeader1]['total_' . $cabang->new_nama_cabang] +=  $item['sum_posisi_debet_' . $cabang->new_nama_cabang];
-                    }else{
-                        $map[$newHeader1]['total_' . $cabang->new_nama_cabang] +=  $item['sum_posisi_credit_' . $cabang->new_nama_cabang];
+                        $map[$newHeader1]['total_' . $cabang->new_nama_cabang] += $item['sum_posisi_debet_' . $cabang->new_nama_cabang];
+                    } else {
+                        $map[$newHeader1]['total_' . $cabang->new_nama_cabang] += $item['sum_posisi_credit_' . $cabang->new_nama_cabang];
                     }
                     $total['grand_total_' . $cabang->new_nama_cabang] += $item['sum_posisi_credit_' . $cabang->new_nama_cabang];
                 }
@@ -977,11 +977,11 @@ class ReportProfitAndLossController extends Controller
                 // Add new_header3 as a child of new_header1
                 if (!empty($newHeader3)) {
                     $map[$newHeader1]['children'][] = [
-                        'header' => $newHeader3
+                        'header' => $newHeader3,
                     ];
 
-                    foreach($list_cabang as $cabang){
-                        $map[$newHeader1]['children'][]['total_' . $cabang->new_nama_cabang] +=  $item['total_' . $cabang->new_nama_cabang];
+                    foreach ($list_cabang as $cabang) {
+                        $map[$newHeader1]['children'][]['total_' . $cabang->new_nama_cabang] += $item['total_' . $cabang->new_nama_cabang];
                         $total['grand_total_' . $cabang->new_nama_cabang] += $item['total_' . $cabang->new_nama_cabang];
                     }
                     $map[$newHeader1]['total_all'] += $item['total_all'];
@@ -995,7 +995,8 @@ class ReportProfitAndLossController extends Controller
         return $data;
     }
 
-    private function getMapDetail($detail_data){
+    private function getMapDetail($detail_data)
+    {
         $data = $detail_data['transaction_data'];
         $start_date = date('Y-m-d', strtotime($detail_data['period'] . '-1'));
         $end_date = date('Y-m-t', strtotime($detail_data['period'] . '-1'));
@@ -1015,7 +1016,7 @@ class ReportProfitAndLossController extends Controller
 
             if ($posisi_debet == true || $posisi_debet == null) {
                 $item_total = $item['sum_posisi_debet'];
-            }else{
+            } else {
                 $item_total = $item['sum_posisi_credit'];
             }
 
@@ -1036,7 +1037,7 @@ class ReportProfitAndLossController extends Controller
                 $map[$newHeader1] = [
                     'header' => $newHeader1,
                     'total' => 0,
-                    'children' => []
+                    'children' => [],
                 ];
             }
 
@@ -1046,7 +1047,7 @@ class ReportProfitAndLossController extends Controller
                     $map[$newHeader1]['children'][$newHeader2] = [
                         'header' => $newHeader2,
                         'total' => 0,
-                        'children' => []
+                        'children' => [],
                     ];
                 }
 
@@ -1056,7 +1057,7 @@ class ReportProfitAndLossController extends Controller
                         $map[$newHeader1]['children'][$newHeader2]['children'][$newHeader3] = [
                             'header' => $newHeader3,
                             'total' => 0,
-                            'children' => []
+                            'children' => [],
                         ];
                     }
 
@@ -1068,7 +1069,7 @@ class ReportProfitAndLossController extends Controller
                             'start_date' => $start_date,
                             'end_date' => $end_date,
                             'id_cabang' => $id_cabang,
-                            'total' => $item_total
+                            'total' => $item_total,
                         ];
 
                         $map[$newHeader1]['children'][$newHeader2]['children'][$newHeader3]['total'] += $item_total;
@@ -1080,7 +1081,7 @@ class ReportProfitAndLossController extends Controller
                     if (!empty($newHeader3)) {
                         $map[$newHeader1]['children'][] = [
                             'header' => $newHeader3,
-                            'total' => $item_total
+                            'total' => $item_total,
                         ];
                         $map[$newHeader1]['children'][$newHeader2]['total'] += $item_total;
                     }
@@ -1093,7 +1094,7 @@ class ReportProfitAndLossController extends Controller
                 if (!empty($newHeader4)) {
                     $map[$newHeader1]['children'][] = [
                         'header' => $newHeader4,
-                        'total' => $item_total
+                        'total' => $item_total,
                     ];
                     $map[$newHeader1]['total'] += $item_total;
                     $total['grand_total'] += $item['sum_posisi_credit'];
@@ -1107,7 +1108,8 @@ class ReportProfitAndLossController extends Controller
         return $data;
     }
 
-    private function getMapDetailKonsolidasi($detail_data){
+    private function getMapDetailKonsolidasi($detail_data)
+    {
         $data_konsolidasi = $detail_data['transaction_data'];
         $start_date = date('Y-m-d', strtotime($detail_data['period'] . '-1'));
         $end_date = date('Y-m-t', strtotime($detail_data['period'] . '-1'));
@@ -1141,10 +1143,10 @@ class ReportProfitAndLossController extends Controller
             if (!isset($map[$newHeader1])) {
                 $map[$newHeader1] = [
                     'header' => $newHeader1,
-                    'children' => []
+                    'children' => [],
                 ];
 
-                foreach($list_cabang as $cabang){
+                foreach ($list_cabang as $cabang) {
                     $map[$newHeader1]['total_' . $cabang->new_nama_cabang] = 0;
                 }
 
@@ -1156,10 +1158,10 @@ class ReportProfitAndLossController extends Controller
                 if (!isset($map[$newHeader1]['children'][$newHeader2])) {
                     $map[$newHeader1]['children'][$newHeader2] = [
                         'header' => $newHeader2,
-                        'children' => []
+                        'children' => [],
                     ];
 
-                    foreach($list_cabang as $cabang){
+                    foreach ($list_cabang as $cabang) {
                         $map[$newHeader1]['children'][$newHeader2]['total_' . $cabang->new_nama_cabang] = 0;
                     }
 
@@ -1171,10 +1173,10 @@ class ReportProfitAndLossController extends Controller
                     if (!isset($map[$newHeader1]['children'][$newHeader2]['children'][$newHeader3])) {
                         $map[$newHeader1]['children'][$newHeader2]['children'][$newHeader3] = [
                             'header' => $newHeader3,
-                            'children' => []
+                            'children' => [],
                         ];
 
-                        foreach($list_cabang as $cabang){
+                        foreach ($list_cabang as $cabang) {
                             $map[$newHeader1]['children'][$newHeader2]['children'][$newHeader3]['total_' . $cabang->new_nama_cabang] = 0;
                         }
 
@@ -1192,34 +1194,34 @@ class ReportProfitAndLossController extends Controller
                             'end_date' => $end_date,
                         ];
 
-                        foreach($list_cabang as $cabang){
+                        foreach ($list_cabang as $cabang) {
                             if ($posisi_debet == true || $posisi_debet == null) {
-                                $array_item['total_' . $cabang->new_nama_cabang] =  $item['sum_posisi_debet_' . $cabang->new_nama_cabang];
-                            }else{                                
-                                $array_item['total_' . $cabang->new_nama_cabang] =  $item['sum_posisi_credit_' . $cabang->new_nama_cabang];
-                            }                            
+                                $array_item['total_' . $cabang->new_nama_cabang] = $item['sum_posisi_debet_' . $cabang->new_nama_cabang];
+                            } else {
+                                $array_item['total_' . $cabang->new_nama_cabang] = $item['sum_posisi_credit_' . $cabang->new_nama_cabang];
+                            }
                         }
 
-                        $array_item['total_all'] =  $item['total_all'];
+                        $array_item['total_all'] = $item['total_all'];
 
                         $map[$newHeader1]['children'][$newHeader2]['children'][$newHeader3]['children'][] = $array_item;
 
-                        foreach($list_cabang as $cabang){
+                        foreach ($list_cabang as $cabang) {
                             if ($posisi_debet == true || $posisi_debet == null) {
-                                $map[$newHeader1]['children'][$newHeader2]['children'][$newHeader3]['total_' . $cabang->new_nama_cabang] +=  $item['sum_posisi_debet_' . $cabang->new_nama_cabang];
-                            }else{
-                                $map[$newHeader1]['children'][$newHeader2]['children'][$newHeader3]['total_' . $cabang->new_nama_cabang] +=  $item['sum_posisi_credit_' . $cabang->new_nama_cabang];
+                                $map[$newHeader1]['children'][$newHeader2]['children'][$newHeader3]['total_' . $cabang->new_nama_cabang] += $item['sum_posisi_debet_' . $cabang->new_nama_cabang];
+                            } else {
+                                $map[$newHeader1]['children'][$newHeader2]['children'][$newHeader3]['total_' . $cabang->new_nama_cabang] += $item['sum_posisi_credit_' . $cabang->new_nama_cabang];
                             }
                         }
 
                         $map[$newHeader1]['children'][$newHeader2]['children'][$newHeader3]['total_all'] += $item['total_all'];
                     }
 
-                    foreach($list_cabang as $cabang){
+                    foreach ($list_cabang as $cabang) {
                         if ($posisi_debet == true || $posisi_debet == null) {
-                            $map[$newHeader1]['children'][$newHeader2]['total_' . $cabang->new_nama_cabang] +=  $item['sum_posisi_debet_' . $cabang->new_nama_cabang];
-                        }else{                                
-                            $map[$newHeader1]['children'][$newHeader2]['total_' . $cabang->new_nama_cabang] +=  $item['sum_posisi_credit_' . $cabang->new_nama_cabang];
+                            $map[$newHeader1]['children'][$newHeader2]['total_' . $cabang->new_nama_cabang] += $item['sum_posisi_debet_' . $cabang->new_nama_cabang];
+                        } else {
+                            $map[$newHeader1]['children'][$newHeader2]['total_' . $cabang->new_nama_cabang] += $item['sum_posisi_credit_' . $cabang->new_nama_cabang];
                         }
                     }
 
@@ -1231,11 +1233,11 @@ class ReportProfitAndLossController extends Controller
                             'header' => $newHeader3,
                         ];
 
-                        foreach($list_cabang as $cabang){
+                        foreach ($list_cabang as $cabang) {
                             if ($posisi_debet == true || $posisi_debet == null) {
-                                $array_item['total_' . $cabang->new_nama_cabang] =  $item['sum_posisi_debet_' . $cabang->new_nama_cabang];
-                            }else{                                
-                                $array_item['total_' . $cabang->new_nama_cabang] =  $item['sum_posisi_credit_' . $cabang->new_nama_cabang];
+                                $array_item['total_' . $cabang->new_nama_cabang] = $item['sum_posisi_debet_' . $cabang->new_nama_cabang];
+                            } else {
+                                $array_item['total_' . $cabang->new_nama_cabang] = $item['sum_posisi_credit_' . $cabang->new_nama_cabang];
                             }
                         }
 
@@ -1243,11 +1245,11 @@ class ReportProfitAndLossController extends Controller
 
                         $map[$newHeader1]['children'][] = $array_item;
 
-                        foreach($list_cabang as $cabang){
+                        foreach ($list_cabang as $cabang) {
                             if ($posisi_debet == true || $posisi_debet == null) {
-                                $map[$newHeader1]['children'][$newHeader2]['total_' . $cabang->new_nama_cabang] +=  $item['sum_posisi_debet_' . $cabang->new_nama_cabang];
-                            }else{                                
-                                $map[$newHeader1]['children'][$newHeader2]['total_' . $cabang->new_nama_cabang] +=  $item['sum_posisi_credit_' . $cabang->new_nama_cabang];
+                                $map[$newHeader1]['children'][$newHeader2]['total_' . $cabang->new_nama_cabang] += $item['sum_posisi_debet_' . $cabang->new_nama_cabang];
+                            } else {
+                                $map[$newHeader1]['children'][$newHeader2]['total_' . $cabang->new_nama_cabang] += $item['sum_posisi_credit_' . $cabang->new_nama_cabang];
                             }
                         }
 
@@ -1255,12 +1257,11 @@ class ReportProfitAndLossController extends Controller
                     }
                 }
 
-
-                foreach($list_cabang as $cabang){
+                foreach ($list_cabang as $cabang) {
                     if ($posisi_debet == true || $posisi_debet == null) {
-                        $map[$newHeader1]['total_' . $cabang->new_nama_cabang] +=  $item['sum_posisi_debet_' . $cabang->new_nama_cabang];
-                    }else{                                
-                        $map[$newHeader1]['total_' . $cabang->new_nama_cabang] +=  $item['sum_posisi_credit_' . $cabang->new_nama_cabang];
+                        $map[$newHeader1]['total_' . $cabang->new_nama_cabang] += $item['sum_posisi_debet_' . $cabang->new_nama_cabang];
+                    } else {
+                        $map[$newHeader1]['total_' . $cabang->new_nama_cabang] += $item['sum_posisi_credit_' . $cabang->new_nama_cabang];
                     }
                     $total['grand_total_' . $cabang->new_nama_cabang] += $item['sum_posisi_credit_' . $cabang->new_nama_cabang];
                 }
@@ -1275,19 +1276,19 @@ class ReportProfitAndLossController extends Controller
                         'header' => $newHeader4,
                     ];
 
-                    foreach($list_cabang as $cabang){
-                        $array_item['total_' . $cabang->new_nama_cabang] =  $item['total_' . $cabang->new_nama_cabang];
+                    foreach ($list_cabang as $cabang) {
+                        $array_item['total_' . $cabang->new_nama_cabang] = $item['total_' . $cabang->new_nama_cabang];
                     }
 
-                    $array_item['total_all'] =  $item['total_all'];
+                    $array_item['total_all'] = $item['total_all'];
 
                     $map[$newHeader1]['children'][] = $array_item;
 
-                    foreach($list_cabang as $cabang){
+                    foreach ($list_cabang as $cabang) {
                         if ($posisi_debet == true || $posisi_debet == null) {
-                            $map[$newHeader1]['total_' . $cabang->new_nama_cabang] +=  $item['sum_posisi_debet_' . $cabang->new_nama_cabang];
-                        }else{                                
-                            $map[$newHeader1]['total_' . $cabang->new_nama_cabang] +=  $item['sum_posisi_credit_' . $cabang->new_nama_cabang];
+                            $map[$newHeader1]['total_' . $cabang->new_nama_cabang] += $item['sum_posisi_debet_' . $cabang->new_nama_cabang];
+                        } else {
+                            $map[$newHeader1]['total_' . $cabang->new_nama_cabang] += $item['sum_posisi_credit_' . $cabang->new_nama_cabang];
                         }
                         $total['grand_total_' . $cabang->new_nama_cabang] += $item['sum_posisi_credit_' . $cabang->new_nama_cabang];
                     }

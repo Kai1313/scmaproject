@@ -39,7 +39,7 @@ class ReceivedFromWarehouseController extends Controller
                 $data = $data->where('pb.id_cabang', $request->c);
             }
 
-            $data = $data->orderBy('pb.kode_pindah_barang', 'desc');
+            $data = $data->orderBy('pb.tanggal_pindah_barang', 'desc')->orderBy('pb.kode_pindah_barang', 'desc');
             return Datatables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {

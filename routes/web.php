@@ -97,6 +97,7 @@ Route::prefix('kirim_ke_cabang')->group(function () {
     Route::get('/delete/{id}', 'SendToBranchController@destroy')->name('send_to_branch-delete');
     Route::get('/auto-qrcode', 'SendToBranchController@autoQRCode')->name('send_to_branch-qrcode');
     Route::get('/print/{id}', 'SendToBranchController@printData')->name('send_to_branch-print-data');
+    Route::post('/save_entry_detail', 'SendToBranchController@saveEntryDetail')->name('send_to_branch-save-entry-detail');
 });
 
 Route::prefix('terima_dari_cabang')->group(function () {
@@ -127,6 +128,7 @@ Route::prefix('pemakaian')->group(function () {
     Route::get('/delete/{id}', 'MaterialUsageController@destroy')->name('material_usage-delete');
     Route::get('/auto-qrcode', 'MaterialUsageController@autoQRCode')->name('material_usage-qrcode');
     Route::get('/reload-timbangan', 'MaterialUsageController@reloadWeight')->name('material_usage-reload-weight');
+    Route::get('/print/{id}', 'MaterialUsageController@printData')->name('material_usage-print-data');
 });
 
 Route::prefix('marketing-tool')->group(function () {
@@ -357,10 +359,10 @@ Route::prefix('report')->group(function () {
 });
 
 Route::get('/dummyAjax', 'ClosingJournalController@dummyAjax')->name('dummy-ajax');
-Route::get('/refresh-token', function() {
+Route::get('/refresh-token', function () {
     $data = [
         "result" => true,
-        "token" => csrf_token()
+        "token" => csrf_token(),
     ];
     return $data;
 })->name('refresh-token');

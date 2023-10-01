@@ -39,12 +39,14 @@ class ScheduleVisitController extends Controller
                 $data = $data->where('v.id_cabang', $request->c);
             }
 
-            $data = $data->orderBy('v.created_at', 'desc');
+            if (!$request->order) {
+                $data = $data->orderBy('v.created_at', 'desc');
+            }
+
             $idUser = session()->get('user')['id_pengguna'];
             $idGrupUser = session()->get('user')['id_grup_pengguna'];
 
             return Datatables::of($data)
-                ->addIndexColumn()
                 ->addColumn('action', function ($row) use ($idUser, $idGrupUser) {
                     if ($row->status == '0') {
                         $btn = '<label class="label label-default">Batal</label>';
@@ -54,7 +56,7 @@ class ScheduleVisitController extends Controller
                         return $btn;
                     } elseif ($row->status == '1') {
                         $btn = '<ul class="horizontal-list">';
-                        $btn .= '<li><a href="' . route('pre_visit-view', $row->id) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
+                        // $btn .= '<li><a href="' . route('pre_visit-view', $row->id) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
                         if ($idUser == $row->user_created) {
                             $btn .= '<li><a href="' . route('pre_visit-entry', $row->id) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
                             $btn .= '<li><a href="' . route('visit-entry', $row->id) . '" class="btn btn-success btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Buat Kunjungan</a></li>';
