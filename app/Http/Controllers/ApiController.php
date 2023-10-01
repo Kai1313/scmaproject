@@ -1348,8 +1348,8 @@ class ApiController extends Controller
                 ], 404);
             }
 
-            $data_akun_penjualan = DB::table('setting')->where('code', 'Penjualan')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
-            if (empty($data_akun_penjualan)) {
+            $data_akun_retur_penjualan = DB::table('setting')->where('code', 'HPP Retur Penjualan')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
+            if (empty($data_akun_retur_penjualan)) {
                 return response()->json([
                     "result" => false,
                     "code" => 404,
@@ -1372,7 +1372,7 @@ class ApiController extends Controller
             // Memorial
             $akun_piutang_dagang = $data_akun_piutang_dagang->value2;
             $akun_ppn_keluaran = $data_akun_ppn_keluaran->value2;
-            $akun_penjualan = $data_akun_penjualan->value2;
+            $akun_retur_penjualan = $data_akun_retur_penjualan->value2;
             $total = round(floatval($request->total), 2);
             $nominal_ppn = round(floatval($request->ppn), 2);
 
@@ -1398,33 +1398,8 @@ class ApiController extends Controller
             ];
 
             foreach ($detail_inventory as $d_inv) {
-                $barang = Barang::find($d_inv['id_barang']);
-                if ($id_cabang == 1) {
-                    $akun_retur_penjualan_barang = $barang->id_akun_retur_penjualan;
-                } else {
-                    $format_akun = 'id_akun_retur_penjualan' . $id_cabang;
-                    $akun_retur_penjualan_barang = $barang->$format_akun;
-                }
-
-                if ($akun_retur_penjualan_barang == null) {
-                    DB::rollback();
-                    return response()->json([
-                        "result" => false,
-                        "message" => "Error when store Jurnal data on table detail. Akun Retur Penjualan Barang " . $barang->kode_barang . ' - ' . $barang->nama_barang . ' can not null.',
-                    ]);
-                } else {
-                    $data_akun_penjualan_barang = Akun::find($akun_retur_penjualan_barang);
-                    if (empty($data_akun_penjualan_barang)) {
-                        DB::rollback();
-                        return response()->json([
-                            "result" => false,
-                            "message" => "Error when store Jurnal data on table detail. Akun Retur Penjualan Barang " . $barang->kode_barang . ' - ' . $barang->nama_barang . ' not found.',
-                        ]);
-                    }
-                }
-
                 array_push($jurnal_detail_me, [
-                    'akun' => $akun_retur_penjualan_barang,
+                    'akun' => $akun_retur_penjualan,
                     'debet' => round(floatval($d_inv['total']), 2),
                     'credit' => 0,
                     'keterangan' => 'Jurnal Otomatis Retur Penjualan - ' . $id_transaksi . ' - ' . $nama_pelanggan . ' - ' . $d_inv['nama_barang'],
