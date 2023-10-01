@@ -1635,6 +1635,8 @@ class ClosingJournalController extends Controller
                             "message" => "Store Closing retur penjualan failed, Error when store Jurnal data on table detail",
                         ]);
                     }
+
+                    $i++;
                 }
             }
 
