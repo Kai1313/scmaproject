@@ -263,6 +263,15 @@
                                 '"><i class="fa fa-times"></i> Tolak</a></a></li>';
                         }
                     }
+                    console.log(row)
+                    if (row.approval_status == 1 && row.closed != 1) {
+                        btn +=
+                            '<li><a href="' + changeStatusDetail +
+                            '" class="btn btn-default btn-xs mr-1 mb-1 btn-change-status-modal" data-item="' +
+                            row.nama_barang +
+                            '" data-type="2" data-index="' + data +
+                            '"><i class="fa fa-times"></i> Tolak</a></a></li>';
+                    }
 
                     btn += '</ul>';
                     return btn;

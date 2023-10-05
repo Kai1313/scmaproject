@@ -423,12 +423,12 @@ class PurchaseRequestController extends Controller
             ], 500);
         }
 
-        if ($check->approval_status != 0) {
-            return response()->json([
-                'result' => 'error',
-                'message' => 'Status data sudah diubah menjadi ' . ($check->approval_status == '1' ? 'disetujui' : 'ditolak'),
-            ], 500);
-        }
+        // if ($check->approval_status != 0) {
+        //     return response()->json([
+        //         'result' => 'error',
+        //         'message' => 'Status data sudah diubah menjadi ' . ($check->approval_status == '1' ? 'disetujui' : 'ditolak'),
+        //     ], 500);
+        // }
 
         try {
             DB::beginTransaction();
