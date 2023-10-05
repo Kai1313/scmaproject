@@ -98,7 +98,16 @@ class ReceivedFromWarehouseController extends Controller
                     ], 500);
                 } else {
                     $data = new MoveBranch;
+                    $period = $this->checkPeriod($request->tanggal_pindah_barang);
+                    if ($period['result'] == false) {
+                        return response()->json($period, 500);
+                    }
                 }
+            }
+
+            $period = $this->checkPeriod($data->tanggal_pindah_barang);
+            if ($period['result'] == false) {
+                return response()->json($period, 500);
             }
 
             $data->fill($request->all());
@@ -193,5 +202,26 @@ class ReceivedFromWarehouseController extends Controller
             'details' => $data->formatdetail,
             'parent' => $data->parent,
         ]);
+    }
+
+    public function checkPeriod($date)
+    {
+        if (!$date) {
+            return ['result' => false, 'message' => 'Tanggal tidak ditemukan'];
+        }
+
+        $year = date('Y', strtotime($date));
+        $month = date('m', strtotime($date));
+
+        $data = DB::table('periode')->where('tahun_periode', $year)->where('bulan_periode', $month)->first();
+        if (!$data) {
+            return ['result' => false, 'message' => 'Periode tidak ditemukan'];
+        }
+
+        if ($data->status_periode == '0') {
+            return ['result' => false, 'message' => 'Periode sudah ditutup'];
+        }
+
+        return ['result' => true];
     }
 }

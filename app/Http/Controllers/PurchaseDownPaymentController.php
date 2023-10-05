@@ -117,6 +117,15 @@ class PurchaseDownPaymentController extends Controller
             DB::beginTransaction();
             if (!$data) {
                 $data = new PurchaseDownPayment;
+                $period = $this->checkPeriod($request->tanggal);
+                if ($period['result'] == false) {
+                    return response()->json($period, 500);
+                }
+            }
+
+            $period = $this->checkPeriod($data->tanggal);
+            if ($period['result'] == false) {
+                return response()->json($period, 500);
             }
 
             $data->fill($request->all());
@@ -225,6 +234,11 @@ class PurchaseDownPaymentController extends Controller
                 "result" => false,
                 "message" => "Data tidak ditemukan",
             ], 500);
+        }
+
+        $period = $this->checkPeriod($data->tanggal);
+        if ($period['result'] == false) {
+            return response()->json($period, 500);
         }
 
         try {
@@ -337,5 +351,26 @@ class PurchaseDownPaymentController extends Controller
             'id_mata_uang' => $countDataPo->id_mata_uang,
             'nama_mata_uang' => $countDataPo->nama_mata_uang,
         ], 200);
+    }
+
+    public function checkPeriod($date)
+    {
+        if (!$date) {
+            return ['result' => false, 'message' => 'Tanggal tidak ditemukan'];
+        }
+
+        $year = date('Y', strtotime($date));
+        $month = date('m', strtotime($date));
+
+        $data = DB::table('periode')->where('tahun_periode', $year)->where('bulan_periode', $month)->first();
+        if (!$data) {
+            return ['result' => false, 'message' => 'Periode tidak ditemukan'];
+        }
+
+        if ($data->status_periode == '0') {
+            return ['result' => false, 'message' => 'Periode sudah ditutup'];
+        }
+
+        return ['result' => true];
     }
 }
