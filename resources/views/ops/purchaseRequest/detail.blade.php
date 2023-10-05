@@ -152,9 +152,9 @@
             <div class="modal-content ">
                 <div class="modal-body">
                     <h3><span id="item_name"></span> di<span id="type_item"></span></h3>
-                    <label>Ubah Qty</label>
+                    <label class="input-qty">Ubah Qty</label>
                     <div class="form-group">
-                        <input type="text" name="revised_qty" class="form-control handle-number-4 text-right">
+                        <input type="text" name="revised_qty" class="form-control handle-number-4 text-right input-qty">
                     </div>
                     <label>Alasan</label>
                     <div class="form-group">
@@ -313,6 +313,11 @@
             $('[name="approval_status"]').val(type)
             $('[name="revised_qty"]').val(formatRupiah(tempData.qty))
             $('.save-change-status-detail').attr('data-url', url)
+            if (type == '2') {
+                $('.input-qty').hide()
+            } else {
+                $('.input-qty').show()
+            }
 
             $('#modalChangeStatus').modal()
         })
