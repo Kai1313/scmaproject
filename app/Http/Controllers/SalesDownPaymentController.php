@@ -118,11 +118,11 @@ class SalesDownPaymentController extends Controller
                 if ($period['result'] == false) {
                     return response()->json($period, 500);
                 }
-            }
-
-            $period = $this->checkPeriod($data->tanggal);
-            if ($period['result'] == false) {
-                return response()->json($period, 500);
+            } else {
+                $period = $this->checkPeriod($data->tanggal);
+                if ($period['result'] == false) {
+                    return response()->json($period, 500);
+                }
             }
 
             $data->fill($request->all());

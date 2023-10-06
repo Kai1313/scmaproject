@@ -112,11 +112,11 @@ class ReceivedFromBranchController extends Controller
             if ($period['result'] == false) {
                 return response()->json($period, 500);
             }
-        }
-
-        $period = $this->checkPeriod($data->tanggal_pindah_barang);
-        if ($period['result'] == false) {
-            return response()->json($period, 500);
+        } else {
+            $period = $this->checkPeriod($data->tanggal_pindah_barang);
+            if ($period['result'] == false) {
+                return response()->json($period, 500);
+            }
         }
 
         try {

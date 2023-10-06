@@ -132,11 +132,11 @@ class PurchaseRequestController extends Controller
                 if ($period['result'] == false) {
                     return response()->json($period, 500);
                 }
-            }
-
-            $period = $this->checkPeriod($data->purchase_request_date);
-            if ($period['result'] == false) {
-                return response()->json($period, 500);
+            } else {
+                $period = $this->checkPeriod($data->purchase_request_date);
+                if ($period['result'] == false) {
+                    return response()->json($period, 500);
+                }
             }
 
             $data->fill($request->all());
