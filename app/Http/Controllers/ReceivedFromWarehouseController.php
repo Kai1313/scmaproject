@@ -110,14 +110,9 @@ class ReceivedFromWarehouseController extends Controller
                 }
             }
 
-            $period = $this->checkPeriod($data->tanggal_pindah_barang);
-            if ($period['result'] == false) {
-                return response()->json($period, 500);
-            }
-
             $data->fill($request->all());
             if ($id == 0) {
-                $data->kode_pindah_barang = MoveBranch::createcodeGudang($request->id_cabang);
+                $data->kode_pindah_barang = MoveBranch::createcodeGudang($request->id_cabang, $request->tanggal_pindah_barang);
                 $data->status_pindah_barang = 0;
                 $data->type = 1;
                 $data->user_created = session()->get('user')['id_pengguna'];

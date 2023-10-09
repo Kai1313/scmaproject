@@ -167,10 +167,10 @@ class MoveBranch extends Model
             ->where('status_diterima', 0);
     }
 
-    public static function createcodeCabang($id_cabang)
+    public static function createcodeCabang($id_cabang, $date)
     {
         $branchCode = DB::table('cabang')->where('id_cabang', $id_cabang)->first();
-        $string = 'TC.' . $branchCode->kode_cabang . '.' . date('ym');
+        $string = 'TC.' . $branchCode->kode_cabang . '.' . date('ym', strtotime($date));
         $check = DB::table('pindah_barang')->where('kode_pindah_barang', 'like', $string . '%')->count();
         $check += 1;
         $nol = '';

@@ -123,7 +123,7 @@ class ReceivedFromBranchController extends Controller
             DB::beginTransaction();
             $data->fill($request->all());
             if ($id == 0) {
-                $data->kode_pindah_barang = MoveBranch::createcodeCabang($request->id_cabang);
+                $data->kode_pindah_barang = MoveBranch::createcodeCabang($request->id_cabang, $request->tanggal_pindah_barang);
                 $data->status_pindah_barang = 0;
                 $data->type = 1;
                 $data->user_created = session()->get('user')['id_pengguna'];
