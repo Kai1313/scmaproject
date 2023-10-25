@@ -2450,7 +2450,7 @@ class ApiController extends Controller
         }
     }
 
-    public function productionSupplies($production_id)
+    public function productionSupplies($production_id, $cabang_id)
     {
         // cari data produksi input
         $data_production_supplies = DB::table("produksi_detail")
@@ -2468,7 +2468,7 @@ class ApiController extends Controller
                                     ROUND(IFNULL(SUM(produksi_detail.kredit_produksi_detail * master_qr_code.produksi_master_qr_code), 0), 2) as produksi,
                                     ROUND(IFNULL(SUM(produksi_detail.kredit_produksi_detail * master_qr_code.listrik_master_qr_code), 0), 2) as listrik,
                                     ROUND(IFNULL(SUM(produksi_detail.kredit_produksi_detail * master_qr_code.pegawai_master_qr_code), 0), 2) as pegawai,
-                                    barang.id_akun as id_akun')
+                                    barang.id_akun as id_akun', 'barang.id_akun2')
             ->where('produksi_detail.id_produksi', $production_id)
             ->groupBy('produksi_detail.id_barang')
             ->orderBy('produksi_detail.id_barang', 'ASC')
@@ -2488,7 +2488,7 @@ class ApiController extends Controller
             $total_supplies += $total;
 
             array_push($data_supplies, [
-                'akun' => $production->id_akun,
+                'akun' => $cabang_id == 2 ? $production->id_akun2 : $production->id_akun,
                 'notes' => $production->nama_barang . ' - ' . $production->kredit_produksi . ' ' . $production->nama_satuan,
                 'debet' => 0,
                 'kredit' => round($total, 2),
@@ -2670,7 +2670,7 @@ class ApiController extends Controller
         $id_produksi = $data_produksi->id_produksi;
 
         // tahap 1
-        $data_production_supplies = $this->productionSupplies($id_produksi);
+        $data_production_supplies = $this->productionSupplies($id_produksi, $id_cabang);
 
         if ($data_production_supplies == false) {
             DB::rollBack();
