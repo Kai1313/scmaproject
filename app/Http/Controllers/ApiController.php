@@ -2468,7 +2468,7 @@ class ApiController extends Controller
                                     ROUND(IFNULL(SUM(produksi_detail.kredit_produksi_detail * master_qr_code.produksi_master_qr_code), 0), 2) as produksi,
                                     ROUND(IFNULL(SUM(produksi_detail.kredit_produksi_detail * master_qr_code.listrik_master_qr_code), 0), 2) as listrik,
                                     ROUND(IFNULL(SUM(produksi_detail.kredit_produksi_detail * master_qr_code.pegawai_master_qr_code), 0), 2) as pegawai,
-                                    barang.id_akun as id_akun', 'barang.id_akun2')
+                                    barang.id_akun as id_akun, barang.id_akun2')
             ->where('produksi_detail.id_produksi', $production_id)
             ->groupBy('produksi_detail.id_barang')
             ->orderBy('produksi_detail.id_barang', 'ASC')
