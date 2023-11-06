@@ -299,8 +299,8 @@ class PurchaseRequestController extends Controller
             ];
 
             $stok = DB::table('master_qr_code')->select(DB::raw('(case
-                    when sum(sisa_master_qr_code) > 0 and barang.id_kategori_barang <> 7
-                    then sum(sisa_master_qr_code)
+                    when sum(sisa_master_qr_code-weight-weight_zak) > 0 and barang.id_kategori_barang <> 7
+                    then sum(sisa_master_qr_code-weight-weight_zak)
                     else 0
                 end) as stok'), 'nama_satuan_barang')
                 ->join('barang', 'master_qr_code.id_barang', 'barang.id_barang')
