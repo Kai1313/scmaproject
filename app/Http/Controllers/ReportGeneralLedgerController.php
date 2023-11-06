@@ -235,6 +235,7 @@ class ReportGeneralLedgerController extends Controller
             $result_detail = [];
             $saldo_awal_current = '';
             $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")->where("id_akun", $coa)->where("id_cabang", $id_cabang)->where("bulan", (int) $month)->where("tahun", (int) $year)->first();
+            // Log::info($saldo);
             $dataCoa = DB::table('master_akun')->where('id_akun', $coa)->first();
             if ($saldo) {
                 $data_saldo_ledgers = JurnalDetail::selectRaw("IFNULL(SUM(jurnal_detail.debet), 0) as debet, IFNULL(SUM(jurnal_detail.credit), 0) as kredit")
@@ -247,6 +248,39 @@ class ReportGeneralLedgerController extends Controller
                     ->groupBy("jurnal_detail.id_akun")->first();
                 $saldo_debet = $saldo->saldo_debet;
                 $saldo_kredit = $saldo->saldo_kredit;
+                $debet = ($data_saldo_ledgers) ? $data_saldo_ledgers->debet : 0;
+                $kredit = ($data_saldo_ledgers) ? $data_saldo_ledgers->kredit : 0;
+                $saldo_awal_debet = $saldo_debet + $debet;
+                $saldo_awal_kredit = $saldo_kredit + $kredit;
+
+                $saldo_balance = ($dataCoa->posisi_debet != '0') ? $saldo_awal_debet - $saldo_awal_kredit : $saldo_awal_kredit - $saldo_awal_debet;
+                $result_detail[] = (object) [
+                    "id_jurnal" => "",
+                    "id_cabang" => $id_cabang,
+                    "id_akun" => $coa,
+                    "kode_akun" => $dataCoa->kode_akun,
+                    "nama_akun" => $dataCoa->nama_akun,
+                    "kode_jurnal" => "",
+                    "jenis_jurnal" => "",
+                    "id_transaksi" => "",
+                    "keterangan" => "Saldo Awal",
+                    "debet" => $saldo_awal_debet,
+                    "kredit" => $saldo_awal_kredit,
+                    "tanggal_jurnal" => $saldo_date,
+                    "saldo_balance" => round($saldo_balance, 2),
+                ];
+            }
+            else {
+                $data_saldo_ledgers = JurnalDetail::selectRaw("IFNULL(SUM(jurnal_detail.debet), 0) as debet, IFNULL(SUM(jurnal_detail.credit), 0) as kredit")
+                    ->join("jurnal_header", "jurnal_header.id_jurnal", "jurnal_detail.id_jurnal")
+                    ->join("master_akun", "master_akun.id_akun", "jurnal_detail.id_akun")
+                    ->where("jurnal_detail.id_akun", $coa)
+                    ->where("jurnal_header.id_cabang", $id_cabang)
+                    ->where("jurnal_header.tanggal_jurnal", ">=", $start_of_the_month)
+                    ->where("jurnal_header.tanggal_jurnal", "<", $start_date)
+                    ->groupBy("jurnal_detail.id_akun")->first();
+                $saldo_debet = 0;
+                $saldo_kredit = 0;
                 $debet = ($data_saldo_ledgers) ? $data_saldo_ledgers->debet : 0;
                 $kredit = ($data_saldo_ledgers) ? $data_saldo_ledgers->kredit : 0;
                 $saldo_awal_debet = $saldo_debet + $debet;
@@ -307,24 +341,6 @@ class ReportGeneralLedgerController extends Controller
                         "saldo_balance" => round($saldo_balance, 2),
                     ];
                 }
-            }
-
-            if ($type == "detail" && count($result_detail) == 0) {
-                $result_detail[] = (object) [
-                    "id_jurnal" => "",
-                    "id_cabang" => $id_cabang,
-                    "id_akun" => $coa,
-                    "kode_akun" => $dataCoa->kode_akun,
-                    "nama_akun" => $dataCoa->nama_akun,
-                    "kode_jurnal" => "",
-                    "jenis_jurnal" => "",
-                    "id_transaksi" => "",
-                    "keterangan" => "Saldo Awal",
-                    "debet" => 0,
-                    "kredit" => 0,
-                    "tanggal_jurnal" => $saldo_date,
-                    "saldo_balance" => 0,
-                ];
             }
 
             $table['draw'] = $draw;
