@@ -235,9 +235,8 @@ class ReportGeneralLedgerController extends Controller
             $result_detail = [];
             $saldo_awal_current = '';
             $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")->where("id_akun", $coa)->where("id_cabang", $id_cabang)->where("bulan", (int) $month)->where("tahun", (int) $year)->first();
-
+            $dataCoa = DB::table('master_akun')->where('id_akun', $coa)->first();
             if ($saldo) {
-                $dataCoa = DB::table('master_akun')->where('id_akun', $coa)->first();
                 $data_saldo_ledgers = JurnalDetail::selectRaw("IFNULL(SUM(jurnal_detail.debet), 0) as debet, IFNULL(SUM(jurnal_detail.credit), 0) as kredit")
                     ->join("jurnal_header", "jurnal_header.id_jurnal", "jurnal_detail.id_jurnal")
                     ->join("master_akun", "master_akun.id_akun", "jurnal_detail.id_akun")
@@ -309,6 +308,25 @@ class ReportGeneralLedgerController extends Controller
                     ];
                 }
             }
+
+            if ($type == "detail" && count($result_detail) == 0) {
+                $result_detail[] = (object) [
+                    "id_jurnal" => "",
+                    "id_cabang" => $id_cabang,
+                    "id_akun" => $coa,
+                    "kode_akun" => $dataCoa->kode_akun,
+                    "nama_akun" => $dataCoa->nama_akun,
+                    "kode_jurnal" => "",
+                    "jenis_jurnal" => "",
+                    "id_transaksi" => "",
+                    "keterangan" => "Saldo Awal",
+                    "debet" => 0,
+                    "kredit" => 0,
+                    "tanggal_jurnal" => $saldo_date,
+                    "saldo_balance" => 0,
+                ];
+            }
+
             $table['draw'] = $draw;
             $table['recordsTotal'] = $data_ledgers->count();
             $table['recordsFiltered'] = $filtered_data->count();
