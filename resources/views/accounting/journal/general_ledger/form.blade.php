@@ -476,6 +476,7 @@
     let setting_data_route = "{{ route('master-setting-get-pelunasan', ':id') }}"
     let piutang_dagang 
     let hutang_dagang
+    let uang_muka_pembelian
 
     var validateLedger = {
         submit: {
@@ -979,9 +980,9 @@
                         })
                         details.push({
                             guid: "trx-" + trx_id,
-                            akun: hutang_dagang.id_akun,
-                            nama_akun: hutang_dagang.nama_akun,
-                            kode_akun: hutang_dagang.kode_akun,
+                            akun: uang_muka_pembelian.id_akun,
+                            nama_akun: uang_muka_pembelian.nama_akun,
+                            kode_akun: uang_muka_pembelian.kode_akun,
                             notes: 'Jurnal Otomatis Pelunasan - ' + no_beli + ' - ' + pemasok,
                             trx: no_beli,
                             debet: formatNumberAsLocalFloat(debet),
@@ -1257,6 +1258,7 @@
                 if (data.result) {
                     piutang_dagang = data.piutang_dagang
                     hutang_dagang = data.hutang_dagang
+                    uang_muka_pembelian = data.uang_muka_pembelian
                     // console.log(piutang_dagang)
                     // console.log(hutang_dagang)
                 }
