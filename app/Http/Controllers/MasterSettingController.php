@@ -16,10 +16,12 @@ class MasterSettingController extends Controller
             $cabang = $cabang;
             $piutang_dagang = Setting::select("master_akun.id_akun", "master_akun.nama_akun", "master_akun.kode_akun")->where("code", "Piutang Dagang")->where("setting.id_cabang", $cabang)->join("master_akun", "master_akun.id_akun", "setting.value2")->first();
             $hutang_dagang = Setting::select("master_akun.id_akun", "master_akun.nama_akun", "master_akun.kode_akun")->where("code", "Hutang Dagang")->where("setting.id_cabang", $cabang)->join("master_akun", "master_akun.id_akun", "setting.value2")->first();
+            $uang_muka_pembelian = Setting::select("master_akun.id_akun", "master_akun.nama_akun", "master_akun.kode_akun")->where("code", "Uang Muka Pembelian")->where("setting.id_cabang", $cabang)->join("master_akun", "master_akun.id_akun", "setting.value2")->first();
             return response()->json([
                 "result"=>TRUE,
                 "piutang_dagang" => $piutang_dagang,
                 "hutang_dagang" => $hutang_dagang,
+                "uang_muka_pembelian" => $uang_muka_pembelian,
             ]);
         } 
         catch (\Exception $e) {
