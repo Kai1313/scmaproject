@@ -509,8 +509,10 @@
                             alert("Error loading data. Exception: " + ThrownException + '\n' + textStatus)
                         }
                     },
+                    drawCallback: function(settings) {
+                        $($('#table_detail').find('tbody tr')[0]).css('background-color', 'rgb(238, 238, 238)')
+                    },
                     footerCallback: function(row, data, start, end, display) {
-
                         var api = this.api(),
                             data;
                         var totalDebet = api
