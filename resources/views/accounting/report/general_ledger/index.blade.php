@@ -192,6 +192,20 @@
                                                     <th>Balance</th>
                                                 </tr>
                                             </thead>
+                                            <tfoot>
+                                                <tr>
+                                                    <td style="background-color:rgb(238, 238, 238);font-weight:bold;"
+                                                        colspan="6">Total
+                                                    </td>
+                                                    <td
+                                                        style="background-color:rgb(238, 238, 238);text-align:right;font-weight:bold;">
+                                                    </td>
+                                                    <td
+                                                        style="background-color:rgb(238, 238, 238);text-align:right;font-weight:bold;">
+                                                    </td>
+                                                    <td style="background-color:rgb(238, 238, 238);"></td>
+                                                </tr>
+                                            </tfoot>
                                         </table>
                                     </div>
                                 </div>
@@ -494,6 +508,32 @@
                         "error": function(xhr, textStatus, ThrownException) {
                             alert("Error loading data. Exception: " + ThrownException + '\n' + textStatus)
                         }
+                    },
+                    footerCallback: function(row, data, start, end, display) {
+
+                        var api = this.api(),
+                            data;
+                        var totalDebet = api
+                            .column(6)
+                            .data()
+                            .reduce(function(a, b, i) {
+                                return i == 0 ? 0 : (a + parseFloat(b));
+                            }, 0);
+
+                        var totalCredit = api
+                            .column(7)
+                            .data()
+                            .reduce(function(a, b, i) {
+                                return i == 0 ? 0 : (a + parseFloat(b));
+                            }, 0);
+
+                        $(api.column(0).footer()).html('Total');
+                        $(api.column(6).footer()).html(
+                            formatCurr(formatNumberAsFloatFromDB(totalDebet.toFixed(2)))
+                        );
+                        $(api.column(7).footer()).html(
+                            formatCurr(formatNumberAsFloatFromDB(totalCredit.toFixed(2)))
+                        );
                     },
                     columns: [{
                         data: 'tanggal_jurnal',
