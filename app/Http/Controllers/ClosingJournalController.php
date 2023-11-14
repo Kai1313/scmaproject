@@ -1536,7 +1536,7 @@ class ClosingJournalController extends Controller
                     $detail->id_jurnal = $header->id_jurnal;
                     $detail->index = $i + 1;
                     $detail->id_akun = $barang->id_akun;
-                    $detail->keterangan = "Persediaan Jurnal Retur Penjualan ". $id_transaksi . ' - ' . $out['note'];
+                    $detail->keterangan = "Persediaan Jurnal Retur Penjualan " . $id_transaksi . ' - ' . $out['note'];
                     $detail->id_transaksi = $id_transaksi;
                     $detail->debet = $out['sum'];
                     $detail->credit = 0;
@@ -1615,12 +1615,12 @@ class ClosingJournalController extends Controller
                     $detail->id_jurnal = $header->id_jurnal;
                     $detail->index = $i + 1;
                     $detail->id_akun = $akun_retur_penjualan_barang;
-                    $detail->keterangan = "Persediaan Jurnal Retur Penjualan ".$id_transaksi;
+                    $detail->keterangan = "Persediaan Jurnal Retur Penjualan " . $id_transaksi;
                     $detail->id_transaksi = $id_transaksi;
                     $detail->debet = 0;
                     $detail->credit = $out['sum'];
-                    $detail->user_created = NULL;
-                    $detail->user_modified = NULL;
+                    $detail->user_created = null;
+                    $detail->user_modified = null;
                     $detail->dt_created = $end_date;
                     $detail->dt_modified = $end_date;
                     // dd(json_encode($detail));
@@ -1684,7 +1684,6 @@ class ClosingJournalController extends Controller
             //     if ($check) {
             //         $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
             //     }
-
 
             //     return response()->json([
             //         "result" => FALSE,
@@ -2215,7 +2214,7 @@ class ClosingJournalController extends Controller
                     $detail = new JurnalDetail();
                     $detail->id_jurnal = $header->id_jurnal;
                     $detail->index = $index;
-                    if (strtoupper($cabang->nama_cabang) == 'GEDANGAN') {
+                    if (strtoupper($cabang->nama_cabang) == 'SURABAYA') {
                         $detail->id_akun = $asset->id_akun_biaya;
                     } else if (strtoupper($cabang->nama_cabang) == 'JAKARTA') {
                         $detail->id_akun = $asset->id_akun_biaya2;
@@ -2244,7 +2243,7 @@ class ClosingJournalController extends Controller
                     $detail2 = new JurnalDetail();
                     $detail2->id_jurnal = $header->id_jurnal;
                     $detail2->index = $index;
-                    if (strtoupper($cabang->nama_cabang) == 'GEDANGAN') {
+                    if (strtoupper($cabang->nama_cabang) == 'SURABAYA') {
                         $detail2->id_akun = $asset->id_akun;
                     } else if (strtoupper($cabang->nama_cabang) == 'JAKARTA') {
                         $detail2->id_akun = $asset->id_akun2;
@@ -2554,8 +2553,7 @@ class ClosingJournalController extends Controller
                 "result" => true,
                 "message" => "Successfully proceed closing closing journal",
             ]);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
             // Revert post closing
             $month = $request->month;
