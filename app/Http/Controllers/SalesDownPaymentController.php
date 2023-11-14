@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\ApiController;
 use App\SalesDownPayment;
 use DB;
 use Illuminate\Http\Request;
@@ -140,15 +141,24 @@ class SalesDownPaymentController extends Controller
             $data->konversi_nominal = normalizeNumber($request->konversi_nominal);
             $data->save();
 
-            $resApi = $this->callApiJournal($data);
-            $convertResApi = (array) json_decode($resApi);
-            if ($convertResApi['result'] == false) {
+            $resultJurnalUangMukaPenjualan = (new ApiController)->journalUangMukaPenjualan(new Request([
+                "no_transaksi" => $data->kode_uang_muka_penjualan,
+                "tanggal" => $data->tanggal,
+                "slip" => null,
+                "cabang" => $data->id_cabang,
+                "pelanggan" => $data->salesOrder->id_pelanggan,
+                "void" => $data->void,
+                "user" => session()->get('user')['id_pengguna'],
+                "total" => $data->konversi_nominal,
+                "uang_muka" => $data->konversi_nominal,
+                "ppn" => 0,
+            ]));
+
+            if ($resultJurnalUangMukaPenjualan->getData()->result == false) {
                 DB::rollback();
-                Log::error($convertResApi['message']);
-                Log::error($convertResApi);
                 return response()->json([
                     "result" => false,
-                    "message" => $convertResApi['message'],
+                    "message" => $resultJurnalUangMukaPenjualan->getData()->message,
                 ], 500);
             }
 
@@ -290,60 +300,60 @@ class SalesDownPaymentController extends Controller
         ], 200);
     }
 
-    public function callApiJournal($data)
-    {
-        try {
-            $date = date('Y-m-d H:i:s');
-            $findToken = DB::table('token_pengguna')->where('id_pengguna', session()->get('user')['id_pengguna'])
-                ->where('status_token_pengguna', '1')
-                ->where('waktu_habis_token_pengguna', '>=', $date)
-                ->where('nama2_token_pengguna', '!=', null)
-                ->orderBy('date_token_pengguna', 'desc')->first();
-            $token = $findToken->nama2_token_pengguna;
-            if ($token) {
-                $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL, route('jurnal-otomatis-uangmuka-penjualan'));
-                curl_setopt($ch, CURLOPT_POST, 1);
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-                    'Accept: application/json',
-                    'Authorization: Bearer ' . $token,
-                ));
-                curl_setopt($ch, CURLOPT_POSTFIELDS,
-                    http_build_query(
-                        array(
-                            "no_transaksi" => $data->kode_uang_muka_penjualan,
-                            "tanggal" => $data->tanggal,
-                            "slip" => $data->id_slip,
-                            "cabang" => $data->id_cabang,
-                            "pelanggan" => $data->salesOrder->id_pemasok,
-                            "void" => $data->void,
-                            "user" => session()->get('user')['id_pengguna'],
-                            "total" => $data->nominal,
-                            "uang_muka" => $data->nominal,
-                            "ppn" => 0,
-                        )
-                    )
-                );
-                $newData = curl_exec($ch);
-                curl_close($ch);
-                return $newData;
-            } else {
-                Log::error("Error when token tidak ditemukan");
-                return response()->json([
-                    "result" => false,
-                    "message" => "Token tidak ditemukan",
-                ], 500);
-            }
-        } catch (\Exception $th) {
-            Log::error("Error when gagal sales down payment");
-            Log::error($th);
-            return response()->json([
-                "result" => false,
-                "message" => "Data gagal tersimpan",
-            ], 500);
-        }
-    }
+    // public function callApiJournal($data)
+    // {
+    //     try {
+    //         $date = date('Y-m-d H:i:s');
+    //         $findToken = DB::table('token_pengguna')->where('id_pengguna', session()->get('user')['id_pengguna'])
+    //             ->where('status_token_pengguna', '1')
+    //             ->where('waktu_habis_token_pengguna', '>=', $date)
+    //             ->where('nama2_token_pengguna', '!=', null)
+    //             ->orderBy('date_token_pengguna', 'desc')->first();
+    //         $token = $findToken->nama2_token_pengguna;
+    //         if ($token) {
+    //             $ch = curl_init();
+    //             curl_setopt($ch, CURLOPT_URL, route('jurnal-otomatis-uangmuka-penjualan'));
+    //             curl_setopt($ch, CURLOPT_POST, 1);
+    //             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    //             curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+    //                 'Accept: application/json',
+    //                 'Authorization: Bearer ' . $token,
+    //             ));
+    //             curl_setopt($ch, CURLOPT_POSTFIELDS,
+    //                 http_build_query(
+    //                     array(
+    //                         "no_transaksi" => $data->kode_uang_muka_penjualan,
+    //                         "tanggal" => $data->tanggal,
+    //                         "slip" => $data->id_slip,
+    //                         "cabang" => $data->id_cabang,
+    //                         "pelanggan" => $data->salesOrder->id_pemasok,
+    //                         "void" => $data->void,
+    //                         "user" => session()->get('user')['id_pengguna'],
+    //                         "total" => $data->nominal,
+    //                         "uang_muka" => $data->nominal,
+    //                         "ppn" => 0,
+    //                     )
+    //                 )
+    //             );
+    //             $newData = curl_exec($ch);
+    //             curl_close($ch);
+    //             return $newData;
+    //         } else {
+    //             Log::error("Error when token tidak ditemukan");
+    //             return response()->json([
+    //                 "result" => false,
+    //                 "message" => "Token tidak ditemukan",
+    //             ], 500);
+    //         }
+    //     } catch (\Exception $th) {
+    //         Log::error("Error when gagal sales down payment");
+    //         Log::error($th);
+    //         return response()->json([
+    //             "result" => false,
+    //             "message" => "Data gagal tersimpan",
+    //         ], 500);
+    //     }
+    // }
 
     public function checkPeriod($date)
     {

@@ -122,7 +122,7 @@
                                     value="{{ old('total', $data ? $data->total : '') }}" data-validation="[NOTEMPTY]"
                                     data-validation-message="Total tidak boleh kosong">
                             </div>
-                            <label>Slip <span>*</span></label>
+                            {{-- <label>Slip <span>*</span></label>
                             <div class="form-group">
                                 <select name="id_slip" class="form-control select2" data-validation="[NOTEMPTY]"
                                     data-validation-message="Slip tidak boleh kosong">
@@ -133,7 +133,7 @@
                                             {{ $dataSlip->text }}</option>
                                     @endforeach
                                 </select>
-                            </div>
+                            </div> --}}
                             <label>Catatan</label>
                             <div class="form-group">
                                 <textarea name="catatan" class="form-control" rows="5">{{ old('catatan', $data ? $data->catatan : '') }}</textarea>

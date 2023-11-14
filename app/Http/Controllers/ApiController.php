@@ -89,18 +89,42 @@ class ApiController extends Controller
 
             $data_slip = Slip::find($id_slip);
 
-            if ($data_slip->jenis_slip == 0) {
-                $jurnal_type = 'KM';
-                $jurnal_type_detail = 'Kas Masuk';
-            } else if ($data_slip->jenis_slip == 1) {
-                $jurnal_type = 'BM';
-                $jurnal_type_detail = 'Bank Masuk';
+            if (empty($data_slip)) {
+                $data_akun_piutang_dagang = DB::table('setting')->where('code', 'Piutang Dagang')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
+                if (empty($data_akun_piutang_dagang)) {
+                    return response()->json([
+                        "result" => false,
+                        "code" => 400,
+                        "message" => "Error, please use slip Kas Masuk, Bank Masuk, or set up Piutang Dagang setting first",
+                    ], 400);
+                } else {
+                    $data_akun = Akun::find($data_akun_piutang_dagang->value2);
+                    if (empty($data_akun)) {
+                        return response()->json([
+                            "result" => false,
+                            "code" => 400,
+                            "message" => "Error, can not find id_akun in Piutang Dagang setting",
+                        ], 400);
+                    } else {
+                        $jurnal_type = 'ME';
+                        $jurnal_type_detail = 'Memorial';
+                        $data_slip = $data_akun;
+                    }
+                }
             } else {
-                return response()->json([
-                    "result" => false,
-                    "code" => 400,
-                    "message" => "Error, please use slip Kas Masuk or Bank Masuk",
-                ], 400);
+                if ($data_slip->jenis_slip == 0) {
+                    $jurnal_type = 'KM';
+                    $jurnal_type_detail = 'Kas Masuk';
+                } else if ($data_slip->jenis_slip == 1) {
+                    $jurnal_type = 'BM';
+                    $jurnal_type_detail = 'Bank Masuk';
+                } else {
+                    return response()->json([
+                        "result" => false,
+                        "code" => 400,
+                        "message" => "Error, please use slip Kas Masuk or Bank Masuk",
+                    ], 400);
+                }
             }
 
             // detail

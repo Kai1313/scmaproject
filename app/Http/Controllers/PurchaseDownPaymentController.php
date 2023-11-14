@@ -169,28 +169,26 @@ class PurchaseDownPaymentController extends Controller
                 ], 500);
             }
 
-            // $resultJurnalUangMukaPembelian = (new ApiController)->journalUangMukaPembelian(new Request([
-            //     "no_transaksi" => $data->kode_uang_muka_pembelian,
-            //     "tanggal" => $data->tanggal,
-            //     "slip" => null,
-            //     "cabang" => $data->id_cabang,
-            //     "pemasok" => $data->purchaseOrder->id_pemasok,
-            //     "void" => $data->void,
-            //     "user" => session()->get('user')['id_pengguna'],
-            //     "total" => $data->konversi_nominal,
-            //     "uang_muka" => $data->konversi_nominal,
-            //     "ppn" => 0,
-            // ]));
+            $resultJurnalUangMukaPembelian = (new ApiController)->journalUangMukaPembelian(new Request([
+                "no_transaksi" => $data->kode_uang_muka_pembelian,
+                "tanggal" => $data->tanggal,
+                "slip" => null,
+                "cabang" => $data->id_cabang,
+                "pemasok" => $data->purchaseOrder->id_pemasok,
+                "void" => $data->void,
+                "user" => session()->get('user')['id_pengguna'],
+                "total" => $data->konversi_nominal,
+                "uang_muka" => $data->konversi_nominal,
+                "ppn" => 0,
+            ]));
 
-            // if ($resultJurnalUangMukaPembelian->getData()->result == false) {
-            //     DB::rollback();
-            //     Log::error($resultJurnalUangMukaPembelian->getData()->message);
-            //     Log::error($resultJurnalUangMukaPembelian);
-            //     return response()->json([
-            //         "result" => false,
-            //         "message" => $resultJurnalUangMukaPembelian->getData()->message,
-            //     ], 500);
-            // }
+            if ($resultJurnalUangMukaPembelian->getData()->result == false) {
+                DB::rollback();
+                return response()->json([
+                    "result" => false,
+                    "message" => $resultJurnalUangMukaPembelian->getData()->message,
+                ], 500);
+            }
 
             DB::commit();
             return response()->json([
