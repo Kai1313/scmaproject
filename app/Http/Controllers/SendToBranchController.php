@@ -333,6 +333,7 @@ class SendToBranchController extends Controller
         DB::beginTransaction();
         try {
             $store->keterangan = $request->keterangan;
+            $store->keterangan_sj = $request->keterangan_sj;
             $store->save();
 
             DB::table('kartu_stok')

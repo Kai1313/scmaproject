@@ -31,6 +31,7 @@ class MoveBranchDetail extends Model
         'zak',
         'id_wrapper_zak',
         'weight_zak',
+        'keterangan_sj',
     ];
 
     public function barang()

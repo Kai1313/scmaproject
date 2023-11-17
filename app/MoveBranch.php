@@ -104,7 +104,8 @@ class MoveBranch extends Model
                 'weight_zak',
                 'id_wrapper_zak',
                 'pindah_barang_detail.id_barang as id_barang2',
-                DB::raw('count(*) as count_data')
+                DB::raw('count(*) as count_data'),
+                'keterangan_sj'
             )
             ->leftJoin('barang', 'pindah_barang_detail.id_barang', '=', 'barang.id_barang')
             ->leftJoin('satuan_barang', 'pindah_barang_detail.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
@@ -114,32 +115,14 @@ class MoveBranch extends Model
     public function formatdetail()
     {
         return $this->hasMany(MoveBranchDetail::class, 'id_pindah_barang')
-            ->select(
-                'pindah_barang_detail.be',
-                'pindah_barang_detail.bentuk',
-                'pindah_barang_detail.id_barang',
-                'pindah_barang_detail.id_pindah_barang_detail',
-                'pindah_barang_detail.id_satuan_barang',
-                'pindah_barang_detail.qty',
-                'pindah_barang_detail.keterangan',
-                'pindah_barang_detail.qr_code',
+            ->select('pindah_barang_detail.*',
                 'nama_barang',
                 'nama_satuan_barang',
-                'pindah_barang_detail.ph',
-                'pindah_barang_detail.sg',
-                'pindah_barang_detail.warna',
                 DB::raw('(case when pindah_barang_detail.status_diterima = 1 then "Diterima" else "Belum diterima" end) as status_akhir'),
-                'pindah_barang_detail.status_diterima',
-                'pindah_barang_detail.batch',
-                'pindah_barang_detail.tanggal_kadaluarsa',
-                'pindah_barang_detail.zak',
-                'pindah_barang_detail.weight_zak',
-                'pindah_barang_detail.id_wrapper_zak'
-                // 'pbd.qr_code as accept_qr_code'
             )
             ->leftJoin('barang', 'pindah_barang_detail.id_barang', '=', 'barang.id_barang')
             ->leftJoin('satuan_barang', 'pindah_barang_detail.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
-            ->leftJoin('pindah_barang as pb', 'pindah_barang_detail.id_pindah_barang', 'pb.id_pindah_barang');
+            ->leftJoin('pindah_barang as pb', 'pindah_barang_detail.id_pindah_barang', 'pb.id_pindah_barang')->orderBy('nama_barang', 'asc');
         // ->leftJoin('pindah_barang as pb2', 'pb.id_pindah_barang', 'pb2.id_pindah_barang2');
         // ->leftJoin('pindah_barang_detail as pbd', function ($jo) {
         //     $jo->on('pindah_barang_detail.qr_code', 'pbd.qr_code')->on('pbd.id_pindah_barang', 'pb2.id_pindah_barang');

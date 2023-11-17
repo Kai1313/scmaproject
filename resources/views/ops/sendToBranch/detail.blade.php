@@ -125,7 +125,8 @@
                                 <th>PH</th>
                                 <th>Bentuk</th>
                                 <th>Warna</th>
-                                <th>Keterangan</th>
+                                <th>Catatan</th>
+                                <th>Keterangan SJ</th>
                                 <th>Status</th>
                                 <th></th>
                             </tr>
@@ -144,8 +145,14 @@
                 </div>
                 <div class="modal-body">
                     <input type="hidden" name="index">
-                    <label>Keterangan</label>
-                    <textarea name="keterangan" class="form-control" rows="5"></textarea>
+                    <label>Catatan</label>
+                    <div class="form-group">
+                        <textarea name="keterangan" class="form-control" rows="3"></textarea>
+                    </div>
+                    <label>Keterangan Surat Jalan</label>
+                    <div class="form-group">
+                        <textarea name="keterangan_sj" class="form-control" rows="3"></textarea>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary btn-flat" data-dismiss="modal">Batal</button>
@@ -237,22 +244,23 @@
                     data: 'keterangan',
                     name: 'keterangan',
                 }, {
+                    data: 'keterangan_sj',
+                    name: 'keterangan_sj',
+                }, {
                     data: 'status_akhir',
                     name: 'status_akhir',
                 }, {
                     data: 'id_pindah_barang_detail',
                     className: 'text-center',
                     name: 'id_pindah_barang_detail',
-                    width: 150,
+                    width: 40,
                     searchable: false,
                     render: function(data, type, row, meta) {
-                        let btn = '<ul class="horizontal-list">';
+                        let btn = ''
                         if ('{{ $isEdit }}') {
                             btn +=
-                                '<li><a href="javascript:void(0)" class="btn btn-warning btn-xs mr-1 mb-1 edit-entry"><i class="glyphicon glyphicon-pencil"></i></a></li>';
+                                '<a href="javascript:void(0)" class="btn btn-warning btn-xs mr-1 mb-1 edit-entry"><i class="glyphicon glyphicon-pencil"></i></a>';
                         }
-
-                        btn += '</ul>';
                         return btn;
                     }
                 }
@@ -264,6 +272,7 @@
             let modal = $('#modalEntryEdit')
             modal.find('[name="index"]').val(index)
             modal.find('[name="keterangan"]').val(details[index].keterangan)
+            modal.find('[name="keterangan_sj"]').val(details[index].keterangan_sj)
             modal.modal('show')
         })
 
@@ -272,7 +281,8 @@
             let index = modal.find('[name="index"]').val()
             let object = {
                 id_pindah_barang_detail: details[index].id_pindah_barang_detail,
-                keterangan: modal.find('[name="keterangan"]').val().trim()
+                keterangan: modal.find('[name="keterangan"]').val().trim(),
+                keterangan_sj: modal.find('[name="keterangan_sj"]').val().trim()
             }
             saveDetail(object)
         })

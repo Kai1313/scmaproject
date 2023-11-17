@@ -158,8 +158,12 @@
                         {{ $detail->tanggal_kadaluarsa == '0000-00-00' ? '' : $detail->tanggal_kadaluarsa }}
                     </td>
                     <td class="text-center">
-                        {{ $detail->count_data }}
-                        {{ isset($arraySatuan[$detail->id_barang2]) ? $arraySatuan[$detail->id_barang2] : '' }}
+                        @if ($detail->keterangan_sj)
+                            {{ $detail->keterangan_sj }}
+                        @else
+                            {{ $detail->count_data }}
+                            {{ isset($arraySatuan[$detail->id_barang2]) ? $arraySatuan[$detail->id_barang2] : '' }}
+                        @endif
                     </td>
                 </tr>
             @endforeach
