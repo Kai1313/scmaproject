@@ -197,8 +197,7 @@
                             value="{{ old('id_jenis_transaksi', $data ? $data->id_jenis_transaksi : '21') }}">
                         <input type="hidden" name="details" value="[]">
                         <input type="hidden" name="detele_details" value="[]">
-                        <table id="table-detail" class="table table-bordered data-table display responsive nowrap"
-                            width="100%">
+                        <table id="table-detail" class="table table-bordered data-table nowrap" style="width:100%">
                             <thead>
                                 <tr>
                                     <th>QR Code</th>
@@ -386,6 +385,7 @@
         $('[name="details"]').val(JSON.stringify(details))
 
         var resDataTable = $('#table-detail').DataTable({
+            scrollX: true,
             paging: false,
             data: details,
             ordering: false,
@@ -459,21 +459,20 @@
                     data: 'id_pindah_barang_detail',
                     className: 'text-center',
                     name: 'id_pindah_barang_detail',
-                    width: 150,
+                    width: 80,
                     searchable: false,
                     render: function(data, type, row, meta) {
-                        let btn = '<ul class="horizontal-list">';
+                        let btn = '';
                         if (row.id_pindah_barang_detail != '') {
                             btn +=
-                                '<li><a href="javascript:void(0)" class="btn btn-warning btn-xs mr-1 mb-1 edit-entry"><i class="glyphicon glyphicon-pencil"></i></a></li>';
+                                '<a href="javascript:void(0)" class="btn btn-warning btn-xs mr-1 mb-1 edit-entry"><i class="glyphicon glyphicon-pencil"></i></a>';
                         }
 
                         if (!qrcodeReceived.includes(row.qr_code)) {
                             btn +=
-                                '<li><a href="javascript:void(0)" class="btn btn-danger btn-xs mr-1 mb-1 delete-entry"><i class="glyphicon glyphicon-trash"></i></a></li>';
+                                '<a href="javascript:void(0)" class="btn btn-danger btn-xs mr-1 mb-1 delete-entry"><i class="glyphicon glyphicon-trash"></i></a>';
                         }
 
-                        btn += '</ul>';
                         return btn;
                     }
                 },
