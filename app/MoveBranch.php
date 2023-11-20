@@ -139,7 +139,7 @@ class MoveBranch extends Model
             )
             ->leftJoin('barang', 'pindah_barang_detail.id_barang', '=', 'barang.id_barang')
             ->leftJoin('satuan_barang', 'pindah_barang_detail.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
-            ->leftJoin('pindah_barang as pb', 'pindah_barang_detail.id_pindah_barang', 'pb.id_pindah_barang')->orderBy('id', 'asc');
+            ->leftJoin('pindah_barang as pb', 'pindah_barang_detail.id_pindah_barang', 'pb.id_pindah_barang')->orderBy('id_pindah_barang_detail', 'asc');
         // ->leftJoin('pindah_barang as pb2', 'pb.id_pindah_barang', 'pb2.id_pindah_barang2');
         // ->leftJoin('pindah_barang_detail as pbd', function ($jo) {
         //     $jo->on('pindah_barang_detail.qr_code', 'pbd.qr_code')->on('pbd.id_pindah_barang', 'pb2.id_pindah_barang');
