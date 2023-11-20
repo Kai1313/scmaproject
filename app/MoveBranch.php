@@ -129,6 +129,23 @@ class MoveBranch extends Model
         // });
     }
 
+    public function formatdetail2()
+    {
+        return $this->hasMany(MoveBranchDetail::class, 'id_pindah_barang')
+            ->select('pindah_barang_detail.*',
+                'nama_barang',
+                'nama_satuan_barang',
+                DB::raw('(case when pindah_barang_detail.status_diterima = 1 then "Diterima" else "Belum diterima" end) as status_akhir')
+            )
+            ->leftJoin('barang', 'pindah_barang_detail.id_barang', '=', 'barang.id_barang')
+            ->leftJoin('satuan_barang', 'pindah_barang_detail.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
+            ->leftJoin('pindah_barang as pb', 'pindah_barang_detail.id_pindah_barang', 'pb.id_pindah_barang')->orderBy('dt_created', 'desc');
+        // ->leftJoin('pindah_barang as pb2', 'pb.id_pindah_barang', 'pb2.id_pindah_barang2');
+        // ->leftJoin('pindah_barang_detail as pbd', function ($jo) {
+        //     $jo->on('pindah_barang_detail.qr_code', 'pbd.qr_code')->on('pbd.id_pindah_barang', 'pb2.id_pindah_barang');
+        // });
+    }
+
     public function notReceivedDetail()
     {
         return $this->hasMany(MoveBranchDetail::class, 'id_pindah_barang')

@@ -286,9 +286,11 @@
                         }, 0);
 
                     $(api.column(0).footer()).html('Total');
-                    $(api.column(3).footer()).html(formatNumber(totalDebet, 2)).css('text-align',
+                    $(api.column(3).footer()).html(formatNumber(totalDebet.toFixed(2), 2)).css(
+                        'text-align',
                         'right');
-                    $(api.column(4).footer()).html(formatNumber(totalCredit, 2)).css('text-align',
+                    $(api.column(4).footer()).html(formatNumber(totalCredit.toFixed(2), 2)).css(
+                        'text-align',
                         'right');
                 }
             })

@@ -225,8 +225,8 @@
     <script>
         let idData = {{ $data ? $data->id_pindah_barang : 0 }}
         let arrayQRCode = {!! $data ? $data->getDetailQRCode->pluck('qr_code') : '[]' !!};
-        let oldDetails = {!! $data && $data->parent ? $data->parent->formatdetail : '[]' !!};
-        let details = {!! $data ? $data->formatdetail : '[]' !!}
+        let oldDetails = {!! $data && $data->parent ? $data->parent->formatdetail2 : '[]' !!};
+        let details = {!! $data ? $data->formatdetail2 : '[]' !!}
         let html5QrcodeScanner = new Html5QrcodeScanner("reader", {
             fps: 10,
             qrbox: 250

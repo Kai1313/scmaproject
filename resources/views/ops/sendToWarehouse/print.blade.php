@@ -145,7 +145,7 @@
                 <th width="70">Batch</th>
                 <th width="70">Kadaluarsa</th>
             </tr>
-            @foreach ($data->formatdetail as $key => $detail)
+            @foreach ($data->formatdetail2 as $key => $detail)
                 <tr>
                     <td class="text-center">{{ $key + 1 }}</td>
                     <td>{{ $detail->qr_code }}</td>

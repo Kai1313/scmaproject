@@ -166,7 +166,7 @@
 
 @section('externalScripts')
     <script>
-        let oldDetails = {!! $data && $data->parent ? $data->parent->formatdetail : '[]' !!};
+        let oldDetails = {!! $data && $data->parent ? $data->parent->formatdetail2 : '[]' !!};
         let arrayQRCode = {!! $data ? $data->getDetailQRCode->pluck('qr_code') : '[]' !!};
         let details = oldDetails
 
