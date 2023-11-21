@@ -100,7 +100,7 @@
             </div>
             <div class="box-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered data-table display responsive nowrap" width="100%">
+                    <table class="table table-bordered data-table display nowrap" width="100%">
                         <thead>
                             <tr>
                                 <th>Kode Pembelian</th>
@@ -112,8 +112,8 @@
                                 <th>PH</th>
                                 <th>Warna</th>
                                 <th>Bentuk</th>
-                                <th>Keterangan</th>
                                 <th>Status</th>
+                                <th>Keterangan</th>
                                 <th>Tanggal QC</th>
                                 <th>Alasan QC</th>
                                 <th>Otorisasi</th>
@@ -194,6 +194,7 @@
         });
 
         var table = $('.data-table').DataTable({
+            scrollX: true,
             processing: true,
             serverSide: true,
             ajax: "{{ route('qc_receipt') }}?c=" + $('[name="id_cabang"]').val() + '&start_date=' + $(
@@ -242,12 +243,12 @@
                 data: 'bentuk_pembelian_detail',
                 name: 'pembelian_detail.bentuk_pembelian_detail',
             }, {
-                data: 'keterangan_pembelian_detail',
-                name: 'pembelian_detail.keterangan_pembelian_detail',
-            }, {
                 data: 'status_qc',
                 name: 'qc.status_qc',
                 className: 'text-center'
+            }, {
+                data: 'keterangan_pembelian_detail',
+                name: 'pembelian_detail.keterangan_pembelian_detail',
             }, {
                 data: 'tanggal_qc',
                 name: 'qc.tanggal_qc'
@@ -266,6 +267,7 @@
             }, {
                 data: 'action',
                 name: 'action',
+                orderable: false
             }, ]
         });
 

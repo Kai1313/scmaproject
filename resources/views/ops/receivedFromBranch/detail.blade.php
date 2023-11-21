@@ -99,8 +99,7 @@
             <div class="box-body">
                 <h4>Detil Barang</h4>
                 <div class="table-responsive">
-                    <table id="table-detail" class="table table-bordered data-table display responsive nowrap"
-                        width="100%">
+                    <table id="table-detail" class="table table-bordered data-table display nowrap" width="100%">
                         <thead>
                             <tr>
                                 <th>QR Code</th>
@@ -136,6 +135,7 @@
     <script>
         let details = {!! $data ? $data->formatdetail : '[]' !!};
         var resDataTable = $('#table-detail').DataTable({
+            scrollX: true,
             paging: false,
             data: details,
             ordering: false,

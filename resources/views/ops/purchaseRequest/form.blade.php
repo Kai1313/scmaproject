@@ -164,8 +164,7 @@
                 <div class="box-body">
                     <div class="table-responsive">
                         <input type="hidden" name="details" value="">
-                        <table id="table-detail" class="table table-bordered data-table display responsive nowrap"
-                            width="100%">
+                        <table id="table-detail" class="table table-bordered data-table display nowrap" width="100%">
                             <thead>
                                 <tr>
                                     <th>Kode Barang</th>
@@ -265,9 +264,9 @@
         }
 
         $('[name="details"]').val(JSON.stringify(details))
-        console.log(details)
 
         var resDataTable = $('#table-detail').DataTable({
+            scrollX: true,
             paging: false,
             data: details,
             ordering: false,
@@ -303,12 +302,10 @@
                 name: 'index',
                 searchable: false,
                 render: function(data, type, row, meta) {
-                    let btn = '<ul class="horizontal-list">';
+                    let btn =
+                        '<a href="javascript:void(0)" class="btn btn-warning btn-xs mr-1 mb-1 edit-entry"><i class="glyphicon glyphicon-pencil"></i></a>';
                     btn +=
-                        '<li><a href="javascript:void(0)" class="btn btn-warning btn-xs mr-1 mb-1 edit-entry"><i class="glyphicon glyphicon-pencil"></i></a></li>';
-                    btn +=
-                        '<li><a href="javascript:void(0)" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1 delete-entry"><i class="glyphicon glyphicon-trash"></i></a></li>';
-                    btn += '</ul>';
+                        '<a href="javascript:void(0)" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1 delete-entry"><i class="glyphicon glyphicon-trash"></i></a>';
                     return btn;
                 }
             }]
@@ -513,7 +510,6 @@
 
                     resDataTable.clear().rows.add(details).draw()
                     $('[name="details"]').val(JSON.stringify(details))
-                    console.log(details)
                 }
             })
         })

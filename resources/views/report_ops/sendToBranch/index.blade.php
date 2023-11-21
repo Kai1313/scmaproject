@@ -91,7 +91,7 @@
             </div>
             <div class="box-body">
                 <div class="table-responsive" id="target-table-rekap" style="display:none;">
-                    <table class="table table-bordered data-table-rekap display responsive nowrap" width="100%">
+                    <table class="table table-bordered data-table-rekap display nowrap" width="100%">
                         <thead>
                             <tr>
                                 <th>Tanggal</th>
@@ -112,7 +112,7 @@
                 </div>
 
                 <div class="table-responsive" id="target-table-detail" style="display:none;">
-                    <table class="table table-bordered data-table-detail display responsive nowrap" width="100%">
+                    <table class="table table-bordered data-table-detail display nowrap" width="100%">
                         <thead>
                             <tr>
                                 <th>Tanggal</th>
@@ -135,7 +135,7 @@
                 </div>
 
                 <div class="table-responsive" id="target-table-outstanding" style="display:none;">
-                    <table class="table table-bordered data-table-outstanding display responsive nowrap" width="100%">
+                    <table class="table table-bordered data-table-outstanding display nowrap" width="100%">
                         <thead>
                             <tr>
                                 <th>Tanggal</th>
@@ -189,6 +189,7 @@
 
                     $('#target-table-rekap').show()
                     table = $('.data-table-rekap').DataTable({
+                        scrollX: true,
                         bDestroy: true,
                         processing: true,
                         serverSide: true,
@@ -231,6 +232,7 @@
 
                     $('#target-table-detail').show()
                     table = $('.data-table-detail').DataTable({
+                        scrollX: true,
                         bDestroy: true,
                         processing: true,
                         serverSide: true,
@@ -283,6 +285,7 @@
 
                     $('#target-table-outstanding').show()
                     table = $('.data-table-outstanding').DataTable({
+                        scrollX: true,
                         bDestroy: true,
                         processing: true,
                         serverSide: true,

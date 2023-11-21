@@ -62,7 +62,7 @@
             </div>
             <div class="box-body">
                 <div class="table-responsive" id="target-table" style="display:none;">
-                    <table class="table table-bordered data-table display responsive nowrap" width="100%">
+                    <table class="table table-bordered data-table display nowrap" width="100%">
                         <thead>
                             <tr>
                                 <th>Tanggal</th>
@@ -103,6 +103,7 @@
         function loadDatatable() {
             $('#target-table').show()
             table = $('.data-table').DataTable({
+                scrollX: true,
                 processing: true,
                 serverSide: true,
                 ajax: defaultUrlIndex + param,

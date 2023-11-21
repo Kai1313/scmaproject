@@ -194,8 +194,7 @@
                         <input name="id_jenis_transaksi" type="hidden"
                             value="{{ old('id_jenis_transaksi', $data ? $data->id_jenis_transaksi : '22') }}">
                         <input type="hidden" name="details" value="[]">
-                        <table id="table-detail" class="table table-bordered data-table display responsive nowrap"
-                            width="100%">
+                        <table id="table-detail" class="table table-bordered data-table display nowrap" width="100%">
                             <thead>
                                 <tr>
                                     <th>QR Code</th>
@@ -383,6 +382,7 @@
         $('[name="details"]').val(JSON.stringify(details))
 
         var resDataTable = $('#table-detail').DataTable({
+            scrollX: true,
             paging: false,
             data: details,
             ordering: false,
@@ -460,10 +460,8 @@
                     render: function(data, type, row, meta) {
                         let btn = '';
                         if (row.id_pindah_barang_detail == '') {
-                            btn = '<ul class="horizontal-list">';
                             btn +=
-                                '<li><a href="javascript:void(0)" class="btn btn-danger btn-xs mr-1 mb-1 delete-entry"><i class="glyphicon glyphicon-trash"></i></a></li>';
-                            btn += '</ul>';
+                                '<a href="javascript:void(0)" class="btn btn-danger btn-xs mr-1 mb-1 delete-entry"><i class="glyphicon glyphicon-trash"></i></a>';
                         }
 
                         return btn;

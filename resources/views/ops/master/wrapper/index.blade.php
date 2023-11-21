@@ -81,7 +81,7 @@
                     </div>
                 @endif
                 <div class="table-responsive">
-                    <table class="table table-bordered data-table display responsive nowrap" width="100%">
+                    <table class="table table-bordered data-table display nowrap" width="100%">
                         <thead>
                             <tr>
                                 <th>Nama Pembungkus</th>
@@ -114,6 +114,7 @@
     <script>
         $('.select2').select2()
         var table = $('.data-table').DataTable({
+            scrollX: true,
             processing: true,
             serverSide: true,
             order: [],

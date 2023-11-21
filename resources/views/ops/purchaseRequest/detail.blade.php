@@ -125,8 +125,7 @@
             </div>
             <div class="box-body">
                 <div class="table-responsive">
-                    <table id="table-detail" class="table table-bordered data-table display responsive nowrap"
-                        width="100%">
+                    <table id="table-detail" class="table table-bordered data-table display nowrap" width="100%">
                         <thead>
                             <tr>
                                 <th>Kode Barang</th>
@@ -185,12 +184,12 @@
 @section('externalScripts')
     <script>
         let details = {!! $data ? $data->formatdetail : '[]' !!};
-        console.log(details)
         let approval_header = {{ $data->approval_status }};
         let arrayAccess = {!! json_encode($arrayAccess) !!}
         let idUser = '{{ $idUser }}'
         let changeStatusDetail = '{{ route('purchase-request-change-status-detail') }}';
         var resDataTable = $('#table-detail').DataTable({
+            scrollX: true,
             data: details,
             ordering: false,
             columns: [{
@@ -245,35 +244,34 @@
                 name: 'index',
                 searchable: false,
                 render: function(data, type, row, meta) {
-                    let btn = '<ul class="horizontal-list">';
+                    let btn = '';
                     if (approval_header == 0 && (row.approval_status == 0 || row.approval_status ==
                             null)) {
                         if (arrayAccess.includes(idUser)) {
                             btn +=
-                                '<li><a href="' + changeStatusDetail +
+                                '<a href="' + changeStatusDetail +
                                 '" class="btn btn-success btn-xs mr-1 mb-1 btn-change-status-modal" data-item="' +
                                 row.nama_barang +
                                 '" data-type="1" data-index="' + data +
-                                '"><i class="glyphicon glyphicon-check"></i> Setuju</a></li>';
+                                '"><i class="glyphicon glyphicon-check"></i> Setuju</a>';
                             btn +=
-                                '<li><a href="' + changeStatusDetail +
+                                '<a href="' + changeStatusDetail +
                                 '" class="btn btn-default btn-xs mr-1 mb-1 btn-change-status-modal" data-item="' +
                                 row.nama_barang +
                                 '" data-type="2" data-index="' + data +
-                                '"><i class="fa fa-times"></i> Tolak</a></a></li>';
+                                '"><i class="fa fa-times"></i> Tolak</a></a>';
                         }
                     }
-                    console.log(row)
+
                     if (row.approval_status == 1 && row.closed != 1) {
                         btn +=
-                            '<li><a href="' + changeStatusDetail +
+                            '<a href="' + changeStatusDetail +
                             '" class="btn btn-default btn-xs mr-1 mb-1 btn-change-status-modal" data-item="' +
                             row.nama_barang +
                             '" data-type="2" data-index="' + data +
-                            '"><i class="fa fa-times"></i> Tolak</a></a></li>';
+                            '"><i class="fa fa-times"></i> Tolak</a></a>';
                     }
 
-                    btn += '</ul>';
                     return btn;
                 }
             }]

@@ -51,13 +51,12 @@ class ReceivedFromBranchController extends Controller
             return Datatables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) use ($idUser, $filterUser) {
-                    $btn = '<ul class="horizontal-list">';
-                    $btn .= '<li><a href="' . route('received_from_branch-view', $row->id_pindah_barang) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
+                    $btn = '';
+                    $btn .= '<a href="' . route('received_from_branch-view', $row->id_pindah_barang) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a>';
                     if ($row->status_pindah_barang == 0 && (in_array($idUser, $filterUser) || $idUser == $row->user_created)) {
-                        $btn .= '<li><a href="' . route('received_from_branch-entry', $row->id_pindah_barang) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
+                        $btn .= '<a href="' . route('received_from_branch-entry', $row->id_pindah_barang) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a>';
                     }
 
-                    $btn .= '</ul>';
                     return $btn;
                 })
                 ->editColumn('status_pindah_barang', function ($row) {

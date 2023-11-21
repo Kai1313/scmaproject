@@ -186,8 +186,7 @@
                     <div class="table-responsive">
                         <input type="hidden" name="details" value="{{ $data ? json_encode($data->formatdetail) : '[]' }}">
                         <input type="hidden" name="detele_details" value="[]">
-                        <table id="table-detail" class="table table-bordered data-table display responsive nowrap"
-                            width="100%">
+                        <table id="table-detail" class="table table-bordered data-table display nowrap" width="100%">
                             <thead>
                                 <tr>
                                     <th>Kode</th>
@@ -330,6 +329,7 @@
 
         $('.select2').select2()
         var resDataTable = $('#table-detail').DataTable({
+            scrollX: true,
             paging: false,
             data: details,
             ordering: false,
@@ -378,20 +378,19 @@
                 className: 'text-center',
                 name: 'index',
                 searchable: false,
-                width: 150,
                 render: function(data, type, row, meta) {
-                    let btn = '<ul class="horizontal-list">'
+                    let btn = ''
                     if (!row.hasOwnProperty('id_pemakaian')) {
                         btn +=
-                            '<li><a href="javascript:void(0)" data-index="' + data +
-                            '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1 delete-entry"><i class="glyphicon glyphicon-trash"></i></a></li>';
+                            '<a href="javascript:void(0)" data-index="' + data +
+                            '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1 delete-entry"><i class="glyphicon glyphicon-trash"></i></a>';
 
                     } else {
                         btn +=
-                            '<li><a href="javascript:void(0)" data-index="' + data +
-                            '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1 delete-entry"><i class="glyphicon glyphicon-trash"></i> void</a></li>';
+                            '<a href="javascript:void(0)" data-index="' + data +
+                            '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1 delete-entry"><i class="glyphicon glyphicon-trash"></i> void</a>';
                     }
-                    btn += '</ul>';
+
                     return btn;
                 }
             }, ],

@@ -81,7 +81,7 @@
             </div>
             <div class="box-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered data-table display responsive nowrap" width="100%">
+                    <table class="table table-bordered data-table display nowrap" width="100%">
                         <thead>
                             <tr>
                                 <th>Kode Pemakaian</th>
@@ -91,7 +91,7 @@
                                 <th>Jenis Pemakaian</th>
                                 <th>QC</th>
                                 <th>Catatan</th>
-                                <th width="150px">Action</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -116,6 +116,7 @@
     <script>
         $('.select2').select2()
         var table = $('.data-table').DataTable({
+            scrollX: true,
             processing: true,
             serverSide: true,
             ajax: "{{ route('material_usage') }}?c=" + $('[name="id_cabang"]').val() + '&show_void=' + $(

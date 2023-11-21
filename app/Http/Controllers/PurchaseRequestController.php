@@ -68,9 +68,9 @@ class PurchaseRequestController extends Controller
             return Datatables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) use ($arrayAccess, $filterUser, $idUser) {
-                    $btn = '<ul class="horizontal-list">';
+                    $btn = '';
                     if ($row->void == '0') {
-                        $btn .= '<li><a href="' . route('purchase-request-view', $row->purchase_request_id) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a></li>';
+                        $btn .= '<a href="' . route('purchase-request-view', $row->purchase_request_id) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a>';
                         if ($row->approval_status == 0) {
                             // if (in_array(session()->get('user')['id_grup_pengguna'], $arrayAccess)) {
                             //     $btn .= '<li><a href="' . route('purchase-request-change-status', [$row->purchase_request_id, 'approval']) . '" class="btn btn-success btn-xs mr-1 mb-1 btn-change-status" data-param="menyetujui"><i class="glyphicon glyphicon-check"></i> Approval</a></li>';
@@ -78,13 +78,12 @@ class PurchaseRequestController extends Controller
                             // }
 
                             if (in_array($idUser, $filterUser) || $idUser == $row->purchase_request_user_id) {
-                                $btn .= '<li><a href="' . route('purchase-request-entry', $row->purchase_request_id) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a></li>';
-                                $btn .= '<li><a href="' . route('purchase-request-delete', $row->purchase_request_id) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Void</a></li>';
+                                $btn .= '<a href="' . route('purchase-request-entry', $row->purchase_request_id) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a>';
+                                $btn .= '<a href="' . route('purchase-request-delete', $row->purchase_request_id) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Void</a>';
                             }
                         }
                     }
 
-                    $btn .= '</ul>';
                     return $btn;
                 })
                 ->editColumn('approval_status', function ($row) {

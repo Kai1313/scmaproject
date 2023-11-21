@@ -82,12 +82,12 @@
             </div>
             <div class="box-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered data-table display responsive nowrap" width="100%">
+                    <table class="table table-bordered data-table display nowrap" width="100%">
                         <thead>
                             <tr>
-                                <th>ID Uang Muka Pembelian</th>
+                                <th>Kode Transaksi</th>
                                 <th>Tanggal</th>
-                                <th>ID Permintaan Pembelian (PO)</th>
+                                <th>PO</th>
                                 <th>Supplier</th>
                                 <th>Mata Uang</th>
                                 <th>Rate</th>
@@ -120,6 +120,7 @@
     <script>
         $('.select2').select2()
         var table = $('.data-table').DataTable({
+            scrollX: true,
             processing: true,
             serverSide: true,
             ajax: "{{ route('purchase-down-payment') }}?c=" + $('[name="id_cabang"]').val() + '&show_void=' + $(

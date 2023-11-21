@@ -154,8 +154,7 @@
                     <div class="table-responsive">
                         <input type="hidden" name="details"
                             value="{{ $data ? json_encode($data->purchasing->qc) : '[]' }}">
-                        <table id="table-detail" class="table table-bordered data-table display responsive nowrap"
-                            width="100%">
+                        <table id="table-detail" class="table table-bordered data-table display nowrap" width="100%">
                             <thead>
                                 <tr>
                                     <th>Nama Barang</th>
@@ -320,6 +319,7 @@
         $('.select2').select2()
 
         var resDataTable = $('#table-detail').DataTable({
+            scrollX: true,
             paging: false,
             data: details,
             ordering: false,
@@ -390,14 +390,13 @@
                 render: function(data, type, row, meta) {
                     let btn = '';
                     if (row.status_qc == 3 || row.id == '') {
-                        btn = '<ul class="horizontal-list">';
+                        btn = '';
                         btn +=
-                            '<li><a href="javascript:void(0)" data-id="' + data +
-                            '" class="btn btn-warning btn-xs mr-1 mb-1 edit-entry"><i class="glyphicon glyphicon-pencil"></i></a></li>';
+                            '<a href="javascript:void(0)" data-id="' + data +
+                            '" class="btn btn-warning btn-xs mr-1 mb-1 edit-entry"><i class="glyphicon glyphicon-pencil"></i></a>';
                         btn +=
-                            '<li><a href="javascript:void(0)" data-id="' + data +
-                            '" class="btn btn-danger btn-xs mr-1 mb-1 remove-entry"><i class="glyphicon glyphicon-trash"></i></a></li>';
-                        btn += '</ul>';
+                            '<a href="javascript:void(0)" data-id="' + data +
+                            '" class="btn btn-danger btn-xs mr-1 mb-1 remove-entry"><i class="glyphicon glyphicon-trash"></i></a>';
                     }
 
                     return btn;

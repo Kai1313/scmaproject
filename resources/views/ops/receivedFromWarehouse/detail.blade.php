@@ -132,8 +132,7 @@
                 </div>
                 <div class="table-responsive">
                     <input type="hidden" name="details" value="[]">
-                    <table id="table-detail" class="table table-bordered data-table display responsive nowrap"
-                        width="100%">
+                    <table id="table-detail" class="table table-bordered data-table display nowrap" width="100%">
                         <thead>
                             <tr>
                                 <th>QR Code</th>
@@ -171,6 +170,7 @@
         let details = oldDetails
 
         var resDataTable = $('#table-detail').DataTable({
+            scrollX: true,
             paging: false,
             data: details,
             ordering: false,
