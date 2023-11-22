@@ -336,6 +336,21 @@
         let report_type = type;
         let route = "{{ Route('report-profit-loss-populate') }}"
 
+        let cabangInput = $('#cabang_input').val();
+
+        // Parse the 'period' string into a Date object
+        let periodDate = new Date(year + '-' + month + '-01');
+
+        // Create a new Date object for the start of the month
+        let startDate = new Date(periodDate.getFullYear(), periodDate.getMonth(), 1);
+
+        // Create a new Date object for the end of the month
+        let endDate = new Date(periodDate.getFullYear(), periodDate.getMonth() + 1, 0);
+
+        // Format the dates as 'YYYY-MM-DD'
+        startDate = startDate.toLocaleDateString('en-CA');
+        endDate = endDate.toLocaleDateString('en-CA');
+
         $("#table_detail_div").hide()
         $("#table_recap_div").show()
         $('#table_balance_recap').treetable('destroy');
@@ -364,7 +379,7 @@
                             $('#head_row').html('');
                             $('#head_row').html(html_thead);
                             getTreetable(data_coa, null, 13, report_type, route_general_ledger);
-                            getTotal(data_total);
+                            getTotal(data_total, route_general_ledger, cabangInput, startDate, endDate);
                         } else {
                             let html_thead = '<th style="background-color: #ffffff;" width="40%"><span id="header_table">Laba Rugi ' + monthNames[month - 1] + ' ' + year + '</span></th>';
                             list_cabang.forEach(function(cabang) {
@@ -375,7 +390,7 @@
                             $('#head_row').html(html_thead);
 
                             getTreetableConsolidation(data_coa, null, 13, list_cabang, report_type, route_general_ledger, data_total);
-                            getTotalConsolidation(data_total, list_cabang);
+                            getTotalConsolidation(data_total, list_cabang, route_general_ledger, startDate, endDate);
                         }
                         $('#coa_table').html(body_coa);
                         $('#coa_table').append(body_total);
@@ -549,23 +564,42 @@
         });
     }
 
-    function getTotal(total) {
+    function getTotal(total, ledgerRoute, cabang, startDate, endDate) {
         body_total += '<tr><td><b style="font-size:13px">LABA(RUGI) BERSIH</b></td></td>'
 
-        body_total += '<td class="text-right"><b style="font-size:13px">' + formatCurr(formatNumberAsFloatFromDB(total['grand_total'].toFixed(2))) + '</b></td>';
+        if (total['grand_total'].toFixed(2) < 0) {
+            fontColor = '#FA0202'
+        } else {
+            fontColor = '#000000'
+        }
+
+        body_total += '<td class="text-right"><a href="' + ledgerRoute + '?id_akun=all&cabang=' + cabang + '&startdate=' + startDate + '&enddate=' + endDate + '&type=detail" target="_blank"><b style="font-size:13px; color: ' + fontColor + '" ">' + formatCurr(formatNumberAsFloatFromDB(total['grand_total'].toFixed(2))) + '</b></a></td>';
 
         body_total += '</tr>';
     }
 
-    function getTotalConsolidation(total, cabang) {
+    function getTotalConsolidation(total, cabang, ledgerRoute, startDate, endDate) {
         body_total += '<tr><td><b style="font-size:13px">LABA(RUGI) BERSIH</b></td></td>'
         cabang.forEach(function(cabang) {
             let format = 'grand_total_' + cabang.new_nama_cabang;
 
-            body_total += '<td class="text-right"><b style="font-size:13px">' + formatCurr(formatNumberAsFloatFromDB(total[format].toFixed(2))) + '</b></td>';
+            if (total[format].toFixed(2) < 0) {
+                fontColor = '#FA0202'
+            } else {
+                fontColor = '#000000'
+            }
+
+            body_total += '<td class="text-right"><a href="' + ledgerRoute + '?id_akun=all&cabang=' + cabang.id_cabang + '&startdate=' + startDate + '&enddate=' + endDate + '&type=detail" target="_blank"><b style="font-size:13px; color: ' + fontColor + '" ">' + formatCurr(formatNumberAsFloatFromDB(total[format].toFixed(2))) + '</b></a></td>';
+            // body_total += '<td class="text-right"><b style="font-size:13px; color: ' + fontColor + '" ">' + formatCurr(formatNumberAsFloatFromDB(total[format].toFixed(2))) + '</b></td>';
         });
 
-        body_total += '<td class="text-right"><b style="font-size:13px">' + formatCurr(formatNumberAsFloatFromDB(total['grand_total'].toFixed(2))) + '</b></td>';
+        if (total['grand_total'].toFixed(2) < 0) {
+            fontColor = '#FA0202'
+        } else {
+            fontColor = '#000000'
+        }
+
+        body_total += '<td class="text-right"><b style="font-size:13px; color: ' + fontColor + '" ">' + formatCurr(formatNumberAsFloatFromDB(total['grand_total'].toFixed(2))) + '</b></td>';
 
         body_total += '</tr>';
     }
