@@ -208,11 +208,11 @@
                                     </tbody>
                                     <tfoot>
                                         <tr>
-                                            <td style="background-color:rgb(238, 238, 238);">Total</td>
+                                            <td style="background-color:rgb(238, 238, 238); font-weight: 700;">Total</td>
                                             <td style="background-color:rgb(238, 238, 238);"></td>
                                             <td style="background-color:rgb(238, 238, 238);"></td>
-                                            <td style="background-color:rgb(238, 238, 238);"></td>
-                                            <td style="background-color:rgb(238, 238, 238);"></td>
+                                            <td style="background-color:rgb(238, 238, 238); font-weight: 700;"></td>
+                                            <td style="background-color:rgb(238, 238, 238); font-weight: 700;"></td>
                                         </tr>
                                     </tfoot>
                                 </table>
