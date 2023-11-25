@@ -1005,6 +1005,10 @@ class AdjustmentLedgerController extends Controller
                     $trx_saldo->bayar = $current_bayar + $debet;
                     $trx_saldo->sisa = $current_sisa - $debet;
                     break;
+                case 'Uang Muka Penjualan':
+                    $trx_saldo->bayar = $current_bayar + $kredit;
+                    $trx_saldo->sisa = $current_sisa - $kredit;
+                    break;
                 case 'Retur Pembelian':
                     $trx_saldo->bayar = $current_bayar + $kredit;
                     $trx_saldo->sisa = $current_sisa - $kredit;
@@ -1073,6 +1077,10 @@ class AdjustmentLedgerController extends Controller
                 case 'Uang Muka Pembelian':
                     $trx_saldo->bayar = $current_bayar - $debet;
                     $trx_saldo->sisa = $current_sisa + $debet;
+                    break;
+                case 'Uang Muka Penjualan':
+                    $trx_saldo->bayar = $current_bayar - $kredit;
+                    $trx_saldo->sisa = $current_sisa + $kredit;
                     break;
                 case 'Retur Pembelian':
                     $trx_saldo->bayar = $current_bayar - $kredit;

@@ -262,6 +262,7 @@ class ApiController extends Controller
                 return response()->json([
                     "result" => false,
                     "code" => 400,
+                    "data" => $jurnal_detail,
                     "message" => "Error when store Jurnal data on table detail. Credit & debet not balance. credit: " . $check_balance_credit . ", debet : " . $check_balance_debit,
                 ], 400);
             }
@@ -477,6 +478,7 @@ class ApiController extends Controller
                 return response()->json([
                     "result" => false,
                     "code" => 400,
+                    "data" => $jurnal_detail,
                     "message" => "Error when store Jurnal data on table detail. Credit & debet not balance. credit: " . $check_balance_credit . ", debet : " . $check_balance_debit,
                 ], 400);
             }
