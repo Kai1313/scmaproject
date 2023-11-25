@@ -541,7 +541,14 @@ class MasterCoaController extends Controller
     public function getCoaByCabang($id_cabang)
     {
         try {
-            $data_akun = Akun::where("isshown", 1)->where("id_cabang", $id_cabang)->get();
+            $data_akun = Akun::where("isshown", 1);
+            if ($id_cabang != "all") {
+                $data_akun = $data_akun->where("id_cabang", $id_cabang);
+            }
+            else {
+                $data_akun = $data_akun->groupBy('kode_akun');
+            }
+            $data_akun = $data_akun->get();
             if (!empty($data_akun)) {
                 return response()->json([
                     "result" => true,

@@ -183,6 +183,7 @@
                                                 <tr>
                                                     <th>Tanggal</th>
                                                     <th>No Jurnal</th>
+                                                    <th>Cabang</th>
                                                     <th>Kode Akun</th>
                                                     <th>Nama Akun</th>
                                                     <th>Keterangan</th>
@@ -195,7 +196,7 @@
                                             <tfoot>
                                                 <tr>
                                                     <td style="background-color:rgb(238, 238, 238);font-weight:bold;"
-                                                        colspan="6">Total
+                                                        colspan="7">Total
                                                     </td>
                                                     <td
                                                         style="background-color:rgb(238, 238, 238);text-align:right;font-weight:bold;">
@@ -516,24 +517,24 @@
                         var api = this.api(),
                             data;
                         var totalDebet = api
-                            .column(6)
-                            .data()
-                            .reduce(function(a, b, i) {
-                                return i == 0 ? 0 : (a + parseFloat(b));
-                            }, 0);
-
-                        var totalCredit = api
                             .column(7)
                             .data()
                             .reduce(function(a, b, i) {
                                 return i == 0 ? 0 : (a + parseFloat(b));
                             }, 0);
 
+                        var totalCredit = api
+                            .column(8)
+                            .data()
+                            .reduce(function(a, b, i) {
+                                return i == 0 ? 0 : (a + parseFloat(b));
+                            }, 0);
+
                         $(api.column(0).footer()).html('Total');
-                        $(api.column(6).footer()).html(
+                        $(api.column(7).footer()).html(
                             formatCurr(formatNumberAsFloatFromDB(totalDebet.toFixed(2)))
                         );
-                        $(api.column(7).footer()).html(
+                        $(api.column(8).footer()).html(
                             formatCurr(formatNumberAsFloatFromDB(totalCredit.toFixed(2)))
                         );
                     },
@@ -559,6 +560,11 @@
                             }
                             return route
                         }
+                    }, {
+                        data: 'nama_cabang',
+                        name: 'nama_cabang',
+                        width: '10%',
+                        visible: ($("#cabang_input").val() == "")?true:false
                     }, {
                         data: 'kode_akun',
                         name: 'kode_akun',
@@ -657,7 +663,7 @@
         }
 
         function getCoa() {
-            let id_cabang = $("#cabang_input").val()
+            let id_cabang = ($("#cabang_input").val() == "")?"all":$("#cabang_input").val()
             let current_coa_route = coa_by_cabang_route.replace(':id', id_cabang);
 
             $.getJSON(current_coa_route, function(data) {
