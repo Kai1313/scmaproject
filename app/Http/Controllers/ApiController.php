@@ -529,6 +529,8 @@ class ApiController extends Controller
                     $array_inventory[$detail_inv['id_barang']] = [
                         'id_barang' => $detail_inv['id_barang'],
                         'nama_barang' => $detail_inv['nama_barang'],
+                        'satuan_barang' => $detail_inv['satuan_barang'],
+                        'qty' => $detail_inv['qty'],
                         'total' => $detail_inv['total'],
                     ];
                 }
@@ -569,6 +571,20 @@ class ApiController extends Controller
                     "code" => 404,
                     "message" => "Error, Setting Penjualan not found",
                 ], 404);
+            }
+
+            if($request->has('diskon')){
+                $data_akun_diskon = DB::table('setting')->where('code', 'Diskon Penjualan')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
+                if (empty($data_akun_diskon)) {
+                    return response()->json([
+                        "result" => false,
+                        "code" => 404,
+                        "message" => "Error, Setting Diskon Penjualan not found",
+                    ], 404);
+                }
+
+                $akun_diskon = $data_akun_diskon->value2;
+                $diskon = round(floatval($request->diskon), 2);
             }
 
             // cek apakah ada saldo_transaksi
@@ -643,6 +659,16 @@ class ApiController extends Controller
                 ]);
             }
 
+            if (isset($diskon) && $diskon > 0) {
+                array_push($jurnal_detail_me, [
+                    'akun' => $akun_diskon,
+                    'debet' => $diskon,
+                    'credit' => 0,
+                    'keterangan' => 'Jurnal Otomatis Diskon Penjualan - ' . $id_transaksi . ' - ' . $nama_pelanggan,
+                    'id_transaksi' => null,
+                ]);
+            }
+
             foreach ($array_inventory as $d_inv) {
                 $barang = Barang::find($d_inv['id_barang']);
                 if ($id_cabang == 1) {
@@ -673,7 +699,7 @@ class ApiController extends Controller
                     'akun' => $akun_penjualan_barang,
                     'debet' => 0,
                     'credit' => round(floatval($d_inv['total']), 2),
-                    'keterangan' => 'Jurnal Otomatis Penjualan - ' . $id_transaksi . ' - ' . $nama_pelanggan . ' - ' . $d_inv['nama_barang'],
+                    'keterangan' => 'Jurnal Otomatis Penjualan - ' . $id_transaksi . ' - ' . $nama_pelanggan . ' - ' . $d_inv['nama_barang'] . ' ' . $d_inv['qty'] . ' ' . $d_inv['satuan_barang'],
                     'id_transaksi' => null,
                 ]);
             }
