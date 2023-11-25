@@ -138,7 +138,7 @@ class ReportGeneralLedgerController extends Controller
     public function populate(Request $request)
     {
         try {
-            // dd($request->all());
+            Log::info($request->all());
             // Init Data
             $id_cabang = $request->id_cabang;
             $start_date = $request->start_date;
@@ -180,7 +180,7 @@ class ReportGeneralLedgerController extends Controller
             if ($id_cabang != "all" && $id_cabang != "") {
                 $data_ledgers = $data_ledgers->where("jurnal_header.id_cabang", $id_cabang)->where("master_akun.id_cabang", $id_cabang);
             }
-            if ($coa != "" && $coa != "all") {
+            if ($coa != "" && $coa != "all" && $coa != "recap") {
                 $data_ledgers = $data_ledgers->where("jurnal_detail.id_akun", $coa);
             }
             if (isset($keyword)) {
@@ -244,6 +244,7 @@ class ReportGeneralLedgerController extends Controller
             // Get saldo awal dan saldo akhir
             $result = $data_ledgers->get();
             $result_detail = [];
+            $resultNon = [];
             $saldo_awal_current = '';
             if ($type == "recap") {
                 // Log::info($id_cabang);
@@ -270,8 +271,17 @@ class ReportGeneralLedgerController extends Controller
                 //     $kredit = ($data_saldo_ledgers) ? $data_saldo_ledgers->kredit : 0;
                 //     $saldo_awal = ($saldo_debet - $saldo_kredit) + ($debet - $kredit);
                 //     $saldo_akhir = $saldo_awal + $value->debet - $value->kredit;
-                //     $resultNon["saldo_awal"] = round($saldo_awal, 2);
-                //     $resultNon["saldo_akhir"] = round($saldo_akhir, 2);
+                //     $resultNon[] = (object) [
+                //         "id_jurnal" => "-",
+                //         "id_cabang" => $value->id_cabang,
+                //         "id_akun" => $value->id_akun,
+                //         "kode_akun" => $value->kode_akun,
+                //         "nama_akun" => $value->nama_akun,
+                //         "debet" => 0,
+                //         "kredit" => 0,
+                //         "saldo_awal" => round($saldo_awal, 2),
+                //         "saldo_akhir" => round($saldo_akhir, 2),
+                //     ];
                 // }
             }
             else {
@@ -387,7 +397,9 @@ class ReportGeneralLedgerController extends Controller
                 }
             }
 
-            // Log::info(count($result));
+            // Log::info(json_encode($resultNon));
+            // Log::info(json_encode($result));
+            $table['resultNon'] = $resultNon;
             $table['draw'] = $draw;
             $table['recordsTotal'] = $data_ledgers->count();
             $table['recordsFiltered'] = $filtered_data->count();
