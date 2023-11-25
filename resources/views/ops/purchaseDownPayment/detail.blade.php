@@ -79,15 +79,33 @@
                             </div>
                         </div>
                         <div class="row">
+                            <label class="col-md-4">Jenis PPN</label>
+                            <div class="col-md-8">
+                                : @if ($data->ppn_uang_muka_pembelian == '0')
+                                    <label class="label label-danger">Tanpa PPN</label>
+                                @elseif($data->ppn_uang_muka_pembelian == '1')
+                                    <label class="label label-warning">Include</label>
+                                @elseif($data->ppn_uang_muka_pembelian == '2')
+                                    <label class="label label-success">Exclude</label>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="row">
                             <label class="col-md-4">Nominal</label>
                             <div class="col-md-8">
                                 : {{ number_format($data->nominal, 2, ',', '.') }}
                             </div>
                         </div>
                         <div class="row">
-                            <label class="col-md-4">Konversi Rupiah</label>
+                            <label class="col-md-4">DPP</label>
                             <div class="col-md-8">
-                                : {{ number_format($data->konversi_nominal, 2, ',', '.') }}
+                                : {{ number_format($data->dpp, 2, ',', '.') }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label class="col-md-4">PPN</label>
+                            <div class="col-md-8">
+                                : {{ number_format($data->ppn, 2, ',', '.') }}
                             </div>
                         </div>
                         <div class="row">

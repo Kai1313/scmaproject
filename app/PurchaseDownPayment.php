@@ -17,7 +17,7 @@ class PurchaseDownPayment extends Model
     const UPDATED_AT = 'dt_modified';
 
     protected $fillable = [
-        'id_cabang', 'kode_uang_muka_pembelian', 'tanggal', 'id_permintaan_pembelian', 'id_mata_uang', 'rate', 'nominal', 'total', 'catatan', 'id_slip', 'void', 'void_user_id', 'user_created', 'dt_created', 'user_modified', 'dt_modified', 'konversi_nominal',
+        'id_cabang', 'kode_uang_muka_pembelian', 'tanggal', 'id_permintaan_pembelian', 'id_mata_uang', 'rate', 'nominal', 'total', 'catatan', 'id_slip', 'void', 'void_user_id', 'user_created', 'dt_created', 'user_modified', 'dt_modified', 'konversi_nominal', 'dpp', 'ppn', 'ppn_uang_muka_pembelian',
     ];
 
     public function cabang()

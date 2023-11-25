@@ -20,19 +20,10 @@ class PurchaseDownPaymentController extends Controller
 
         if ($request->ajax()) {
             $data = DB::table('uang_muka_pembelian as ump')
-                ->select(
-                    'id_uang_muka_pembelian',
-                    'kode_uang_muka_pembelian',
-                    'tanggal',
+                ->select('ump.*',
                     'pp.nama_permintaan_pembelian',
                     DB::raw("concat(mu.kode_mata_uang,' - ',mu.nama_mata_uang) as nama_mata_uang"),
-                    'nama_pemasok',
-                    'rate',
-                    'nominal',
-                    'total',
-                    'catatan',
-                    'void',
-                    'konversi_nominal'
+                    'nama_pemasok'
                 )
                 ->leftJoin('permintaan_pembelian as pp', 'ump.id_permintaan_pembelian', '=', 'pp.id_permintaan_pembelian')
                 ->leftJoin('pemasok as p', 'pp.id_pemasok', '=', 'p.id_pemasok')
@@ -141,6 +132,8 @@ class PurchaseDownPaymentController extends Controller
             $data->nominal = normalizeNumber($request->nominal);
             $data->total = normalizeNumber($request->total);
             $data->konversi_nominal = normalizeNumber($request->konversi_nominal);
+            $data->dpp = normalizeNumber($request->dpp);
+            $data->ppn = normalizeNumber($request->ppn);
             $data->save();
 
             //save saldo transaksi
@@ -152,8 +145,8 @@ class PurchaseDownPaymentController extends Controller
                 'catatan' => $data->catatan,
                 'id_pelanggan' => null,
                 'id_pemasok' => $data->purchaseOrder->id_pemasok,
-                'dpp' => $data->konversi_nominal,
-                'ppn' => 0,
+                'dpp' => $data->dpp,
+                'ppn' => $data->ppn,
                 'uang_muka' => 0,
                 'biaya' => 0,
                 'tipe_pembayaran' => null,
@@ -178,8 +171,8 @@ class PurchaseDownPaymentController extends Controller
                 "void" => $data->void,
                 "user" => session()->get('user')['id_pengguna'],
                 "total" => $data->konversi_nominal,
-                "uang_muka" => $data->konversi_nominal,
-                "ppn" => 0,
+                "uang_muka" => $data->dpp,
+                "ppn" => $data->ppn,
             ]));
 
             if ($resultJurnalUangMukaPembelian->getData()->result == false) {
