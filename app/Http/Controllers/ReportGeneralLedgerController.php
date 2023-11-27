@@ -254,7 +254,8 @@ class ReportGeneralLedgerController extends Controller
             $resultNon = [];
             $saldo_awal_current = '';
             $saldo_balance = 0;
-            Log::info(count($result));
+            // Log::info(count($result));
+            // Log::info("id cabang ".$id_cabang);
             foreach ($result as $key => $value) {
                 if ($type == "recap") {
                     $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")->where("id_akun", $value->id_akun)->where("id_cabang", $value->id_cabang)->where("bulan", $month)->where("tahun", $year)->first();
@@ -278,7 +279,7 @@ class ReportGeneralLedgerController extends Controller
                 } else {
                     $posisi = ($value->posisi_debet != "") ? $value->posisi_debet : 1;
                     // Create Saldo Awal Record
-                    if ($id_cabang != "all") {
+                    if ($id_cabang != "all" && $id_cabang != "") {
                         if ($saldo_awal_current != $value->id_akun && $coa != "all") {
                             $saldo_awal_current = $value->id_akun;
                             if ($id_cabang != "all" && $id_cabang != "") {
