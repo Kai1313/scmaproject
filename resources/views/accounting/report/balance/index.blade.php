@@ -461,9 +461,13 @@
                     fontColor = '#FA0202'
                 } else {
                     fontColor = '#000000'
-                }
+                }                
 
-                body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px; color: ' + fontColor + '" >' + formatCurr(formatNumberAsFloatFromDB(element['total_all'].toFixed(2))) + '</td>';
+                if (reportType.includes('detail') && reportType.includes('awal') == false) {
+                    body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px; color: ' + fontColor + '" ><a href="' + ledgerRoute + '?kode_akun=' + element.kode_akun + '&cabang=&startdate=' + element.start_date + '&enddate=' + element.end_date + '&type=detail" target="_blank">' + formatCurr(formatNumberAsFloatFromDB(element['total_all'].toFixed(2))) + '</a></td>';
+                } else {
+                    body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px; color: ' + fontColor + '" >' + formatCurr(formatNumberAsFloatFromDB(element['total_all'].toFixed(2))) + '</td>';
+                }
             }
             body_coa += '</tr>';
             if(typeof(element.children) != "undefined"){
