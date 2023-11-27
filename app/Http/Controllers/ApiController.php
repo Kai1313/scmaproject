@@ -573,7 +573,7 @@ class ApiController extends Controller
                 ], 404);
             }
 
-            if($request->has('diskon')){
+            if ($request->has('diskon')) {
                 $data_akun_diskon = DB::table('setting')->where('code', 'Diskon Penjualan')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
                 if (empty($data_akun_diskon)) {
                     return response()->json([
@@ -2240,6 +2240,15 @@ class ApiController extends Controller
             ->first();
         try {
             DB::beginTransaction();
+
+            if (isset($req->void) && ($req->void == '1' || $req->void == 1)) {
+                $data->delete();
+                DB::commit();
+                return response()->json([
+                    "result" => true,
+                    "message" => "Data berhasil dihapus",
+                ], 200);
+            }
 
             $total = (handleNull($req->dpp) + handleNull($req->ppn) - handleNull($req->uang_muka) + handleNull($req->biaya));
             $array = [
