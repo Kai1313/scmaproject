@@ -59,7 +59,10 @@ class PurchaseDownPaymentController extends Controller
                     $btn .= '</ul>';
                     return $btn;
                 })
-                ->rawColumns(['action'])
+                ->editColumn('nama_permintaan_pembelian', function ($row) {
+                    return '<a target="_blank" href="' . env('OLD_URL_ROOT') . '#permintaan_pembelian&data_master2=' . $row->id_permintaan_pembelian . '">' . $row->nama_permintaan_pembelian . '</a>';
+                })
+                ->rawColumns(['action', 'nama_permintaan_pembelian'])
                 ->make(true);
         }
 

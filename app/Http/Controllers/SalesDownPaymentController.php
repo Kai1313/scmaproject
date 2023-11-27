@@ -58,7 +58,10 @@ class SalesDownPaymentController extends Controller
                     $btn .= '</ul>';
                     return $btn;
                 })
-                ->rawColumns(['action'])
+                ->editColumn('nama_permintaan_penjualan', function ($row) {
+                    return '<a target="_blank" href="' . env('OLD_URL_ROOT') . '#permintaan_penjualan&data_master2=' . $row->id_permintaan_penjualan . '">' . $row->nama_permintaan_penjualan . '</a>';
+                })
+                ->rawColumns(['action', 'nama_permintaan_penjualan'])
                 ->make(true);
         }
 
