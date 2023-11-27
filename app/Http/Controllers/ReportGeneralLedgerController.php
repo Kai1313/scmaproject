@@ -278,7 +278,7 @@ class ReportGeneralLedgerController extends Controller
                 } else {
                     $posisi = ($value->posisi_debet != "") ? $value->posisi_debet : 1;
                     // Create Saldo Awal Record
-                    if ($coa != "all") {
+                    if ($coa != "all" && $id_cabang != "all") {
                         if ($saldo_awal_current != $value->id_akun) {
                             $saldo_awal_current = $value->id_akun;
                             if ($id_cabang != "all" && $id_cabang != "") {
