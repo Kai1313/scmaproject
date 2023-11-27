@@ -170,7 +170,7 @@ class PurchaseDownPaymentController extends Controller
                 "pemasok" => $data->purchaseOrder->id_pemasok,
                 "void" => $data->void,
                 "user" => session()->get('user')['id_pengguna'],
-                "total" => $data->konversi_nominal,
+                "total" => $data->ppn_uang_muka_pembelian == '2' ? $data->konversi_nominal + $data->ppn : $data->konversi_nominal,
                 "uang_muka" => $data->dpp,
                 "ppn" => $data->ppn,
             ]));
