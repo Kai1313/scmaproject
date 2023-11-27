@@ -278,8 +278,8 @@ class ReportGeneralLedgerController extends Controller
                 } else {
                     $posisi = ($value->posisi_debet != "") ? $value->posisi_debet : 1;
                     // Create Saldo Awal Record
-                    if ($coa != "all" && $id_cabang != "all") {
-                        if ($saldo_awal_current != $value->id_akun) {
+                    if ($id_cabang != "all") {
+                        if ($saldo_awal_current != $value->id_akun && $coa != "all") {
                             $saldo_awal_current = $value->id_akun;
                             if ($id_cabang != "all" && $id_cabang != "") {
                                 $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")->where("id_akun", $value->id_akun)->where("id_cabang", $id_cabang)->where("bulan", (int) $month)->where("tahun", (int) $year)->first();
@@ -322,7 +322,7 @@ class ReportGeneralLedgerController extends Controller
                         }
                     }
                     else {
-                        if ($saldo_awal_current != $value->kode_akun) {
+                        if ($saldo_awal_current != $value->kode_akun && $coa != "all") {
                             $saldo_awal_current = $value->kode_akun;
                             if ($id_cabang != "all" && $id_cabang != "") {
                                 $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")->where("id_akun", $value->id_akun)->where("id_cabang", $id_cabang)->where("bulan", (int) $month)->where("tahun", (int) $year)->first();
