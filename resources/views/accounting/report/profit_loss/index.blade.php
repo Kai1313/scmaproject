@@ -485,8 +485,10 @@
                 } else {
                     fontColor = '#000000'
                 }
+                
+                body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px; color: ' + fontColor + '" ><a href="' + ledgerRoute + '?kode_akun=' + element.kode_akun + '&cabang=&startdate=' + element.start_date + '&enddate=' + element.end_date + '&type=detail" target="_blank">' + formatCurr(formatNumberAsFloatFromDB(element['total_all'].toFixed(2))) + '</a></td>';
 
-                body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px; color: ' + fontColor + '" >' + formatCurr(formatNumberAsFloatFromDB(element['total_all'].toFixed(2))) + '</td>';
+                // body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px; color: ' + fontColor + '" >' + formatCurr(formatNumberAsFloatFromDB(element['total_all'].toFixed(2))) + '</td>';
             }
             body_coa += '</tr>';
             if (typeof(element.children) != "undefined") {
@@ -513,6 +515,8 @@
                 } else {
                     fontColor = '#000000'
                 }
+                
+                // body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px; color: ' + fontColor + '" ><a href="' + ledgerRoute + '?kode_akun=' + element.kode_akun + '&cabang=&startdate=' + element.start_date + '&enddate=' + element.end_date + '&type=detail" target="_blank">' + formatCurr(formatNumberAsFloatFromDB(element['total_all'].toFixed(2))) + '</a></td>';
 
                 body_coa += '<td class="text-right"><b style="font-size:' + fontSize + 'px; color: ' + fontColor + '" >' + formatCurr(formatNumberAsFloatFromDB(element['total_all'].toFixed(2))) + '</b></td>';
                 body_coa += '</tr>';
@@ -572,8 +576,10 @@
         } else {
             fontColor = '#000000'
         }
+        
+        // body_total += '<td class="text-right"><a href="' + ledgerRoute + '?id_akun=all&cabang=' + cabang + '&startdate=' + startDate + '&enddate=' + endDate + '&type=detail" target="_blank"><b style="font-size:13px; color: ' + fontColor + '" ">' + formatCurr(formatNumberAsFloatFromDB(total['grand_total'].toFixed(2))) + '</b></a></td>';
+        body_total += '<td class="text-right"><b style="font-size:13px; color: ' + fontColor + '" ">' + formatCurr(formatNumberAsFloatFromDB(total['grand_total'].toFixed(2))) + '</b></td>';
 
-        body_total += '<td class="text-right"><a href="' + ledgerRoute + '?id_akun=all&cabang=' + cabang + '&startdate=' + startDate + '&enddate=' + endDate + '&type=detail" target="_blank"><b style="font-size:13px; color: ' + fontColor + '" ">' + formatCurr(formatNumberAsFloatFromDB(total['grand_total'].toFixed(2))) + '</b></a></td>';
 
         body_total += '</tr>';
     }
@@ -589,8 +595,7 @@
                 fontColor = '#000000'
             }
 
-            body_total += '<td class="text-right"><a href="' + ledgerRoute + '?id_akun=all&cabang=' + cabang.id_cabang + '&startdate=' + startDate + '&enddate=' + endDate + '&type=detail" target="_blank"><b style="font-size:13px; color: ' + fontColor + '" ">' + formatCurr(formatNumberAsFloatFromDB(total[format].toFixed(2))) + '</b></a></td>';
-            // body_total += '<td class="text-right"><b style="font-size:13px; color: ' + fontColor + '" ">' + formatCurr(formatNumberAsFloatFromDB(total[format].toFixed(2))) + '</b></td>';
+            body_total += '<td class="text-right"><b style="font-size:13px; color: ' + fontColor + '" ">' + formatCurr(formatNumberAsFloatFromDB(total[format].toFixed(2))) + '</b></td>';
         });
 
         if (total['grand_total'].toFixed(2) < 0) {
