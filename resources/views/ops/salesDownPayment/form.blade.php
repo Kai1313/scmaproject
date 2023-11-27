@@ -96,6 +96,20 @@
                                 <input type="hidden" name="id_mata_uang"
                                     value="{{ old('id_mata_uang', $data ? $data->id_mata_uang : '') }}">
                             </div>
+                            <label>Jenis PPN</label>
+                            <div class="form-group">
+                                <select name="ppn_uang_muka_penjualan" class="form-control select2">
+                                    <option value="0"
+                                        {{ $data && $data->ppn_uang_muka_penjualan == '0' ? 'selected' : '' }}>Tanpa PPN
+                                    </option>
+                                    <option value="1"
+                                        {{ $data && $data->ppn_uang_muka_penjualan == '1' ? 'selected' : '' }}>Include
+                                    </option>
+                                    <option value="2"
+                                        {{ $data && $data->ppn_uang_muka_penjualan == '2' ? 'selected' : '' }}>Exclude
+                                    </option>
+                                </select>
+                            </div>
                             <label>Rate <span>*</span></label>
                             <div class="form-group">
                                 <input type="text" name="rate" class="form-control handle-number-2"
@@ -108,14 +122,21 @@
                                     value="{{ old('nominal', $data ? $data->nominal : '') }}"
                                     data-max="{{ $maxPayment }}" data-validation="[NOTEMPTY]"
                                     data-validation-message="Nominal tidak boleh kosong">
-                            </div>
-                            <label>Konversi Nominal <span>*</span></label>
-                            <div class="form-group">
-                                <input type="text" name="konversi_nominal" class="form-control handle-number-2" readonly
-                                    value="{{ old('konversi_nominal', $data ? $data->konversi_nominal : '') }}" readonly>
+                                <input type="hidden" name="konversi_nominal"
+                                    value="{{ old('konversi_nominal', $data ? $data->konversi_nominal : '') }}">
                             </div>
                         </div>
                         <div class="col-md-4">
+                            <label>DPP</label>
+                            <div class="form-group">
+                                <input type="text" name="dpp" class="form-control handle-number-2" readonly
+                                    value="{{ old('dpp', $data ? $data->dpp : '') }}" readonly>
+                            </div>
+                            <label>PPN</label>
+                            <div class="form-group">
+                                <input type="text" name="ppn" class="form-control handle-number-2" readonly
+                                    value="{{ old('ppn', $data ? $data->ppn : '') }}" readonly>
+                            </div>
                             <label>Total <span>*</span></label>
                             <div class="form-group">
                                 <input type="text" name="total" class="form-control handle-number-2" readonly
@@ -136,7 +157,7 @@
                             </div> --}}
                             <label>Catatan</label>
                             <div class="form-group">
-                                <textarea name="catatan" class="form-control" rows="5">{{ old('catatan', $data ? $data->catatan : '') }}</textarea>
+                                <textarea name="catatan" class="form-control" rows="2">{{ old('catatan', $data ? $data->catatan : '') }}</textarea>
                             </div>
                         </div>
                     </div>
@@ -215,8 +236,9 @@
                     $('[name="total"]').val(formatNumber(res.total, 2))
                     $('[name="id_mata_uang"]').val(res.id_mata_uang)
                     $('[name="rate"]').val(formatNumber(res.nilai_mata_uang, 2))
-                    $('[name="konversi_nominal"]').val(formatNumber(res.nilai_mata_uang * res.nominal, 2))
+                    // $('[name="konversi_nominal"]').val(formatNumber(res.nilai_mata_uang * res.nominal, 2))
                     $('[name="nama_mata_uang"]').val(res.nama_mata_uang)
+                    calculate()
                     $('#cover-spin').hide()
                 },
                 error(error) {
@@ -227,9 +249,47 @@
         }
 
         $('body').on('input', '[name="rate"],[name="nominal"]', function() {
-            let rate = normalizeNumber($('[name="rate"]').val())
-            let nominal = normalizeNumber($('[name="nominal"]').val())
-            $('[name="konversi_nominal"]').val(formatNumber(rate * nominal, 2))
+            setTimeout(() => {
+                calculate()
+            }, 100);
+
         })
+
+        $('[name="ppn_uang_muka_penjualan"]')
+            .select2()
+            .on('select2:select', function(e) {
+                let dataselect = e.params.data
+                calculate()
+            })
+
+        calculate()
+
+        function calculate() {
+            let nominal = normalizeNumber($('[name="nominal"]').val())
+            let rate = normalizeNumber($('[name="rate"]').val())
+            let type = $('[name="ppn_uang_muka_penjualan"]').val()
+            let dpp = 0
+            let ppn = 0
+            switch (type) {
+                case '0':
+                    dpp = nominal * rate
+                    ppn = 0
+                    break;
+                case '1':
+                    dpp = (nominal * rate) / 1.11
+                    ppn = (nominal * rate) - dpp
+                    break;
+                case '2':
+                    dpp = nominal * rate
+                    ppn = (nominal * rate) * 0.11
+                    break;
+                default:
+                    break;
+            }
+
+            $('[name="konversi_nominal"]').val(formatNumber((nominal * rate).toFixed(2), 2))
+            $('[name="dpp"]').val(formatNumber(dpp.toFixed(2), 2))
+            $('[name="ppn"]').val(formatNumber(ppn.toFixed(2), 2))
+        }
     </script>
 @endsection

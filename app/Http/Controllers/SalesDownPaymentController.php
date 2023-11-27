@@ -19,18 +19,10 @@ class SalesDownPaymentController extends Controller
 
         if ($request->ajax()) {
             $data = DB::table('uang_muka_penjualan as ump')
-                ->select(
-                    'id_uang_muka_penjualan',
-                    'kode_uang_muka_penjualan',
-                    'tanggal',
+                ->select('ump.*',
                     'pp.nama_permintaan_penjualan',
                     DB::raw("concat(mu.kode_mata_uang,' - ',mu.nama_mata_uang) as nama_mata_uang"),
-                    'nama_pelanggan',
-                    'rate',
-                    'nominal',
-                    'total',
-                    'catatan',
-                    'void'
+                    'nama_pelanggan'
                 )
                 ->leftJoin('permintaan_penjualan as pp', 'ump.id_permintaan_penjualan', '=', 'pp.id_permintaan_penjualan')
                 ->leftJoin('pelanggan as p', 'pp.id_pelanggan', '=', 'p.id_pelanggan')
@@ -139,7 +131,35 @@ class SalesDownPaymentController extends Controller
             $data->nominal = normalizeNumber($request->nominal);
             $data->total = normalizeNumber($request->total);
             $data->konversi_nominal = normalizeNumber($request->konversi_nominal);
+            $data->dpp = normalizeNumber($request->dpp);
+            $data->ppn = normalizeNumber($request->ppn);
             $data->save();
+
+            //save saldo transaksi
+            $resultSaldoTransaksi = (new ApiController)->transactionBalance(new Request([
+                'tipe_transaksi' => 'Uang Muka Pembelian',
+                'id_transaksi' => $data->kode_uang_muka_penjualan,
+                'tanggal' => $data->tanggal,
+                'ref_id' => $data->salesOrder->nama_permintaan_penjualan,
+                'catatan' => $data->catatan,
+                'id_pelanggan' => null,
+                'id_pemasok' => $data->salesOrder->id_pelanggan,
+                'dpp' => $data->dpp,
+                'ppn' => $data->ppn,
+                'uang_muka' => 0,
+                'biaya' => 0,
+                'tipe_pembayaran' => null,
+            ]));
+
+            if ($resultSaldoTransaksi->getData()->result == false) {
+                DB::rollback();
+                Log::error($resultSaldoTransaksi->getData()->message);
+                Log::error($resultSaldoTransaksi);
+                return response()->json([
+                    "result" => false,
+                    "message" => $resultSaldoTransaksi->getData()->message,
+                ], 500);
+            }
 
             $resultJurnalUangMukaPenjualan = (new ApiController)->journalUangMukaPenjualan(new Request([
                 "no_transaksi" => $data->kode_uang_muka_penjualan,
@@ -149,9 +169,9 @@ class SalesDownPaymentController extends Controller
                 "pelanggan" => $data->salesOrder->id_pelanggan,
                 "void" => $data->void,
                 "user" => session()->get('user')['id_pengguna'],
-                "total" => $data->konversi_nominal,
-                "uang_muka" => $data->konversi_nominal,
-                "ppn" => 0,
+                "total" => $data->ppn_uang_muka_penjualan == '2' ? $data->konversi_nominal + $data->ppn : $data->konversi_nominal,
+                "uang_muka" => $data->dpp,
+                "ppn" => $data->ppn,
             ]));
 
             if ($resultJurnalUangMukaPenjualan->getData()->result == false) {

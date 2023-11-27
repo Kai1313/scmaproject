@@ -90,7 +90,10 @@
                                 <th>Pelanggan</th>
                                 <th>Mata Uang</th>
                                 <th>Rate</th>
+                                <th>Jenis PPN</th>
                                 <th>Nominal</th>
+                                <th>DPP</th>
+                                <th>PPN</th>
                                 <th>Total</th>
                                 <th>Catatan</th>
                                 <th width="150px">Action</th>
@@ -146,10 +149,45 @@
                 },
                 className: 'text-right'
             }, {
+                data: 'ppn_uang_muka_penjualan',
+                name: 'ump.ppn_uang_muka_penjualan',
+                render: function(data) {
+                    switch (data) {
+                        case '0':
+                            label = '<label class="label label-danger">Tanpa PPN</label>'
+                            break;
+                        case '1':
+                            label = '<label class="label label-warning">Include</label>'
+                            break;
+                        case '2':
+                            label = '<label class="label label-success">Exclude</label>'
+                            break;
+                        default:
+                            label = ''
+                            break;
+                    }
+
+                    return label
+                }
+            }, {
                 data: 'nominal',
                 name: 'ump.nominal',
                 render: function(data) {
                     return data ? formatNumber(data, 2) : 0
+                },
+                className: 'text-right'
+            }, {
+                data: 'dpp',
+                name: 'ump.dpp',
+                render: function(data) {
+                    return data ? formatNumber(data, 4) : 0
+                },
+                className: 'text-right'
+            }, {
+                data: 'ppn',
+                name: 'ump.ppn',
+                render: function(data) {
+                    return data ? formatNumber(data, 4) : 0
                 },
                 className: 'text-right'
             }, {
