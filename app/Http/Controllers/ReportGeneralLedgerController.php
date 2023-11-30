@@ -266,7 +266,15 @@ class ReportGeneralLedgerController extends Controller
             // Log::info(count($result));
             foreach ($result as $key => $value) {
                 if ($type == "recap") {
-                    $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")->where("id_akun", $value->id_akun)->where("id_cabang", $value->id_cabang)->where("bulan", $month)->where("tahun", $year)->first();
+                    // $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")->where("id_akun", $value->id_akun)->where("id_cabang", $value->id_cabang)->where("bulan", $month)->where("tahun", $year)->first();
+
+                    if ($id_cabang != "all" && $id_cabang != "") {
+                        $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")->where("id_akun", $value->id_akun)->where("id_cabang", $id_cabang)->where("bulan", (int) $month)->where("tahun", (int) $year)->first();
+                    }
+                    else {
+                        $kodeCoa = Akun::select("kode_akun")->where("id_akun", $value->id_akun)->first();
+                        $saldo = SaldoBalance::selectRaw("IFNULL(SUM(debet), 0) as saldo_debet, IFNULL(SUM(credit), 0) as saldo_kredit")->join("master_akun", "master_akun.id_akun", "saldo_balance.id_akun")->where("master_akun.kode_akun", $kodeCoa->kode_akun)->where("bulan", (int) $month)->where("tahun", (int) $year)->first();
+                    }
                     
                     $data_saldo_ledgers = JurnalDetail::selectRaw("IFNULL(SUM(jurnal_detail.debet), 0) as debet, IFNULL(SUM(jurnal_detail.credit), 0) as kredit")
                         ->join("jurnal_header", "jurnal_header.id_jurnal", "jurnal_detail.id_jurnal")
@@ -492,7 +500,15 @@ class ReportGeneralLedgerController extends Controller
                 });
 
                 foreach ($filteredAkunArray as $key => $value) {
-                    $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")->where("id_akun", $value["id_akun"])->where("id_cabang", $value["id_cabang"])->where("bulan", $month)->where("tahun", $year)->first();
+                    // $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")->where("id_akun", $value["id_akun"])->where("id_cabang", $value["id_cabang"])->where("bulan", $month)->where("tahun", $year)->first();
+
+                    if ($id_cabang != "all" && $id_cabang != "") {
+                        $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")->where("id_akun", $value["id_akun"])->where("id_cabang", $id_cabang)->where("bulan", (int) $month)->where("tahun", (int) $year)->first();
+                    }
+                    else {
+                        $kodeCoa = Akun::select("kode_akun")->where("id_akun", $value["id_akun"])->first();
+                        $saldo = SaldoBalance::selectRaw("IFNULL(SUM(debet), 0) as saldo_debet, IFNULL(SUM(credit), 0) as saldo_kredit")->join("master_akun", "master_akun.id_akun", "saldo_balance.id_akun")->where("master_akun.kode_akun", $kodeCoa->kode_akun)->where("bulan", (int) $month)->where("tahun", (int) $year)->first();
+                    }
                     
                     $data_saldo_ledgers = JurnalDetail::selectRaw("IFNULL(SUM(jurnal_detail.debet), 0) as debet, IFNULL(SUM(jurnal_detail.credit), 0) as kredit")
                         ->join("jurnal_header", "jurnal_header.id_jurnal", "jurnal_detail.id_jurnal")
@@ -600,7 +616,15 @@ class ReportGeneralLedgerController extends Controller
             
             foreach ($result as $key => $value) {
                 if ($type == "recap") {
-                    $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")->where("id_akun", $value->id_akun)->where("id_cabang", $value->id_cabang)->where("bulan", $month)->where("tahun", $year)->first();
+                    // $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")->where("id_akun", $value->id_akun)->where("id_cabang", $value->id_cabang)->where("bulan", $month)->where("tahun", $year)->first();
+
+                    if ($id_cabang != "all" && $id_cabang != "") {
+                        $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")->where("id_akun", $value->id_akun)->where("id_cabang", $id_cabang)->where("bulan", (int) $month)->where("tahun", (int) $year)->first();
+                    }
+                    else {
+                        $kodeCoa = Akun::select("kode_akun")->where("id_akun", $value->id_akun)->first();
+                        $saldo = SaldoBalance::selectRaw("IFNULL(SUM(debet), 0) as saldo_debet, IFNULL(SUM(credit), 0) as saldo_kredit")->join("master_akun", "master_akun.id_akun", "saldo_balance.id_akun")->where("master_akun.kode_akun", $kodeCoa->kode_akun)->where("bulan", (int) $month)->where("tahun", (int) $year)->first();
+                    }
                     
                     $data_saldo_ledgers = JurnalDetail::selectRaw("IFNULL(SUM(jurnal_detail.debet), 0) as debet, IFNULL(SUM(jurnal_detail.credit), 0) as kredit")
                         ->join("jurnal_header", "jurnal_header.id_jurnal", "jurnal_detail.id_jurnal")
@@ -826,7 +850,15 @@ class ReportGeneralLedgerController extends Controller
                 });
 
                 foreach ($filteredAkunArray as $key => $value) {
-                    $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")->where("id_akun", $value["id_akun"])->where("id_cabang", $value["id_cabang"])->where("bulan", $month)->where("tahun", $year)->first();
+                    // $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")->where("id_akun", $value["id_akun"])->where("id_cabang", $value["id_cabang"])->where("bulan", $month)->where("tahun", $year)->first();
+
+                    if ($id_cabang != "all" && $id_cabang != "") {
+                        $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")->where("id_akun", $value["id_akun"])->where("id_cabang", $id_cabang)->where("bulan", (int) $month)->where("tahun", (int) $year)->first();
+                    }
+                    else {
+                        $kodeCoa = Akun::select("kode_akun")->where("id_akun", $value["id_akun"])->first();
+                        $saldo = SaldoBalance::selectRaw("IFNULL(SUM(debet), 0) as saldo_debet, IFNULL(SUM(credit), 0) as saldo_kredit")->join("master_akun", "master_akun.id_akun", "saldo_balance.id_akun")->where("master_akun.kode_akun", $kodeCoa->kode_akun)->where("bulan", (int) $month)->where("tahun", (int) $year)->first();
+                    }
                     
                     $data_saldo_ledgers = JurnalDetail::selectRaw("IFNULL(SUM(jurnal_detail.debet), 0) as debet, IFNULL(SUM(jurnal_detail.credit), 0) as kredit")
                         ->join("jurnal_header", "jurnal_header.id_jurnal", "jurnal_detail.id_jurnal")
@@ -952,7 +984,15 @@ class ReportGeneralLedgerController extends Controller
             
             foreach ($result as $key => $value) {
                 if ($type == "recap") {
-                    $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")->where("id_akun", $value->id_akun)->where("id_cabang", $value->id_cabang)->where("bulan", $month)->where("tahun", $year)->first();
+                    // $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")->where("id_akun", $value->id_akun)->where("id_cabang", $value->id_cabang)->where("bulan", $month)->where("tahun", $year)->first();
+
+                    if ($id_cabang != "all" && $id_cabang != "") {
+                        $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")->where("id_akun", $value->id_akun)->where("id_cabang", $id_cabang)->where("bulan", (int) $month)->where("tahun", (int) $year)->first();
+                    }
+                    else {
+                        $kodeCoa = Akun::select("kode_akun")->where("id_akun", $value->id_akun)->first();
+                        $saldo = SaldoBalance::selectRaw("IFNULL(SUM(debet), 0) as saldo_debet, IFNULL(SUM(credit), 0) as saldo_kredit")->join("master_akun", "master_akun.id_akun", "saldo_balance.id_akun")->where("master_akun.kode_akun", $kodeCoa->kode_akun)->where("bulan", (int) $month)->where("tahun", (int) $year)->first();
+                    }
                     
                     $data_saldo_ledgers = JurnalDetail::selectRaw("IFNULL(SUM(jurnal_detail.debet), 0) as debet, IFNULL(SUM(jurnal_detail.credit), 0) as kredit")
                         ->join("jurnal_header", "jurnal_header.id_jurnal", "jurnal_detail.id_jurnal")
@@ -1178,7 +1218,15 @@ class ReportGeneralLedgerController extends Controller
                 });
 
                 foreach ($filteredAkunArray as $key => $value) {
-                    $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")->where("id_akun", $value["id_akun"])->where("id_cabang", $value["id_cabang"])->where("bulan", $month)->where("tahun", $year)->first();
+                    // $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")->where("id_akun", $value["id_akun"])->where("id_cabang", $value["id_cabang"])->where("bulan", $month)->where("tahun", $year)->first();
+
+                    if ($id_cabang != "all" && $id_cabang != "") {
+                        $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")->where("id_akun", $value["id_akun"])->where("id_cabang", $id_cabang)->where("bulan", (int) $month)->where("tahun", (int) $year)->first();
+                    }
+                    else {
+                        $kodeCoa = Akun::select("kode_akun")->where("id_akun", $value["id_akun"])->first();
+                        $saldo = SaldoBalance::selectRaw("IFNULL(SUM(debet), 0) as saldo_debet, IFNULL(SUM(credit), 0) as saldo_kredit")->join("master_akun", "master_akun.id_akun", "saldo_balance.id_akun")->where("master_akun.kode_akun", $kodeCoa->kode_akun)->where("bulan", (int) $month)->where("tahun", (int) $year)->first();
+                    }
                     
                     $data_saldo_ledgers = JurnalDetail::selectRaw("IFNULL(SUM(jurnal_detail.debet), 0) as debet, IFNULL(SUM(jurnal_detail.credit), 0) as kredit")
                         ->join("jurnal_header", "jurnal_header.id_jurnal", "jurnal_detail.id_jurnal")
