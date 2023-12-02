@@ -272,7 +272,16 @@ class ReportGeneralLedgerController extends Controller
                         $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")->where("id_akun", $value->id_akun)->where("id_cabang", $id_cabang)->where("bulan", (int) $month)->where("tahun", (int) $year)->first();
                     }
                     else {
+                        Log::info(json_encode($value));
                         $kodeCoa = Akun::select("kode_akun")->where("id_akun", $value->id_akun)->first();
+                        if (!$kodeCoa) {
+                            $message = "Failed to get populate general ledger for view. Coa is null when using ALL branch. Check journal with ID: ".$value->id_jurnal;
+                            Log::error($message);
+                            return response()->json([
+                                "result" => false,
+                                "message" => $message,
+                            ]);
+                        }
                         $saldo = SaldoBalance::selectRaw("IFNULL(SUM(debet), 0) as saldo_debet, IFNULL(SUM(credit), 0) as saldo_kredit")->join("master_akun", "master_akun.id_akun", "saldo_balance.id_akun")->where("master_akun.kode_akun", $kodeCoa->kode_akun)->where("bulan", (int) $month)->where("tahun", (int) $year)->first();
                     }
                     
