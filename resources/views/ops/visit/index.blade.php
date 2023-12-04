@@ -36,6 +36,10 @@
         .rounded-0 {
             border-radius: 0;
         }
+
+        .select2 {
+            width: 100% !important;
+        }
     </style>
 @endsection
 
@@ -57,17 +61,10 @@
         <div class="box">
             <div class="box-header">
                 <div class="row">
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <button class="btn" onclick="trigger_filter()"><i class="fa fa-filter"></i></button>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
                     <div class="col-md-2 filter-div">
                         <label>Cabang</label>
                         <div class="form-group">
-                            <select id="id_cabang" class="form-control select2">
+                            <select id="id_cabang" class="form-control select2" name="id_cabang">
                                 <option value="">Semua Cabang</option>
                                 @foreach ($cabang as $branch)
                                     <option value="{{ $branch['id'] }}">{{ $branch['text'] }}</option>
@@ -76,16 +73,26 @@
                         </div>
                     </div>
                     <div class="col-md-2 filter-div">
+                        <label>Tanggal</label>
+                        <div class="form-group">
+                            <input type="text" id="daterangepicker" class="form-control" name="daterangepicker" />
+                        </div>
+                    </div>
+                    <div class="col-md-2 filter-div">
                         <label>Sales</label>
                         <div class="form-group">
-                            <select id="id_salesman" class="form-control select2">
+                            <select id="id_salesman" class="form-control select2" name="id_salesman">
+                                <option value="">Semua Sales</option>
+                                @foreach ($salesmans as $sales)
+                                    <option value="{{ $sales->id }}">{{ $sales->text }}</option>
+                                @endforeach
                             </select>
                         </div>
                     </div>
                     <div class="col-md-2 filter-div">
                         <label>Status</label>
                         <div class="form-group">
-                            <select id="status" class="form-control select2">
+                            <select id="status" class="form-control select2" name="status">
                                 <option value="">Semua Status</option>
                                 <option value="1">Belum Visit</option>
                                 <option value="2">Sudah Visit</option>
@@ -94,33 +101,14 @@
                         </div>
                     </div>
                     <div class="col-md-2 filter-div">
-                        <label>Progress Indicator</label>
-                        <div class="form-group">
-                            <select id="progress_ind" class="form-control select2">
-                                <option value="">Semua Status</option>
-                                <option value="0">Belum Report</option>
-                                @foreach (App\Visit::$progressIndicator as $i => $item)
-                                    <option value="{{ $i }}">{{ $item }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-2 filter-div">
                         <label>Kategori Pelanggan</label>
                         <div class="form-group">
-                            <select id="status_pelanggan" class="form-control select2">
-                                <option value="">Semua Kategori Pelanggan</option>
-                                @foreach (App\Visit::$kategoriPelanggan as $i => $item)
-                                    <option value="{{ $i }}">{{ $item }}</option>
+                            <select id="status_pelanggan" class="form-control select2" name="status_pelanggan">
+                                <option value="">Semua Kategori</option>
+                                @foreach ($customerCategory as $category)
+                                    <option value="{{ $category }}">{{ $category }}</option>
                                 @endforeach
                             </select>
-                        </div>
-                    </div>
-                    <div class="col-md-2 filter-div">
-                        <label>Range Tanggal</label>
-                        <div class="form-group">
-                            <input type="text" id="daterangepicker" class="form-control"
-                                value="{{ startOfMonth('d/m/Y') }} - {{ endOfMonth('d/m/Y') }}" />
                         </div>
                     </div>
                     <div class="col-md-2 filter-div">
@@ -159,34 +147,6 @@
             </div>
         </div>
     </div>
-
-    <div class="modal fade" id="modal-gambar" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <label for="">Kode Visit <h5 class="visit_code"></h5></label>
-                        </div>
-                        <div class="col-md-6">
-                            <img id="gambar1" style="width: 100%"
-                                onerror="this.src='https://perpus.umri.ac.id/ckfinder/userfiles/images/no-image.png'"
-                                alt="">
-                        </div>
-                        <div class="col-md-6">
-                            <img id="gambar2" style="width: 100%"
-                                onerror="this.src='https://perpus.umri.ac.id/ckfinder/userfiles/images/no-image.png'"
-                                alt="">
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary cancel-entry btn-flat"
-                        onclick="$('#modal-gambar').modal('toggle')">Batal</button>
-                </div>
-            </div>
-        </div>
-    </div>
 @endsection
 @section('addedScripts')
     <script src="{{ asset('assets/bower_components/datatables.net/js/jquery.dataTables.min.js') }}"></script>
@@ -195,22 +155,36 @@
     <script src="{{ asset('assets/bower_components/select2/dist/js/select2.min.js') }}"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/custom.js') }}"></script>
-    <script src="{{ asset('js/filter-button.js') }}"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 @endsection
 
 @section('externalScripts')
     <script>
-        $('.select2').select2({
-            width: '100%'
-        });
+        var salesman = {!! json_encode($salesmans) !!}
+        $('.select2').select2();
 
         $('#daterangepicker').daterangepicker({
+            timePicker: false,
+            startDate: moment().subtract(30, 'days'),
+            endDate: moment(),
             locale: {
-                format: 'DD/MM/YYYY'
+                format: 'YYYY-MM-DD'
             }
         });
+
+        filterDatatable()
+
+        function filterDatatable() {
+            let param = {};
+            $('.box-header').find('select,input').each(function(i, v) {
+                param[$(v).attr('name')] = function() {
+                    return $(v).val()
+                }
+            })
+
+            return param;
+        }
 
         var table = $('.data-table').DataTable({
             processing: true,
@@ -219,26 +193,7 @@
             "ordering": false,
             ajax: {
                 url: "{{ route('visit') }}",
-                data: {
-                    id_cabang: function() {
-                        return $('#id_cabang').val();
-                    },
-                    id_salesman: function() {
-                        return $('#id_salesman').val();
-                    },
-                    status: function() {
-                        return $('#status').val();
-                    },
-                    progress_ind: function() {
-                        return $('#progress_ind').val();
-                    },
-                    daterangepicker: function() {
-                        return $('#daterangepicker').val();
-                    },
-                    status_pelanggan: function() {
-                        return $('#status_pelanggan').val();
-                    },
-                },
+                data: filterDatatable(),
             },
             columns: [{
                 data: 'action',
@@ -274,53 +229,5 @@
                 className: 'limit-text'
             }],
         });
-
-        $(document).ready(function() {
-            @if (session()->get('user')->salesman)
-                var option = new Option('{{ session()->get('user')->salesman->nama_salesman }}',
-                    '{{ session()->get('user')->salesman->id_salesman }}', true)
-                $('#id_salesman').append(option).trigger('change.select2');
-                table.ajax.reload();
-            @endif
-
-        })
-
-        $("#id_salesman").select2({
-            width: '100%',
-            allowClear: true,
-            ajax: {
-                url: "{{ route('visit.reporting.select') }}?param=id_salesman",
-                dataType: 'json',
-                data: function(params) {
-                    return {
-                        q: params.term,
-                        page: params.page
-                    };
-                },
-                processResults: function(data, params) {
-                    params.page = params.page || 1;
-                    return {
-                        results: data.data,
-                        pagination: {
-                            more: (params.page * 10) < data.total
-                        }
-                    };
-                },
-                cache: true,
-                type: 'GET',
-            },
-            placeholder: 'Semua Salesman',
-            minimumInputLength: 0,
-            templateResult: formatRepoNormal,
-            templateSelection: formatRepoNormalSelection
-        });
-
-        function openModalBukti(kode, gambar1, gambar2) {
-            $('#gambar1').prop('src', gambar1);
-            $('#gambar2').prop('src', gambar2);
-            $('.visit_code').html(kode);
-
-            $('#modal-gambar').modal('toggle');
-        }
     </script>
 @endsection

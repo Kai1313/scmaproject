@@ -42,11 +42,7 @@ class Visit extends Model
         '3' => 'Penawaran/Order',
     ];
 
-    public static $kategoriPelanggan = [
-        'EXISTING CUSTOMER' => 'EXISTING CUSTOMER',
-        'NEW CUSTOMER' => 'NEW CUSTOMER',
-        'OLD CUSTOMER' => 'OLD CUSTOMER',
-    ];
+    public static $kategoriPelanggan = ['EXISTING CUSTOMER', 'NEW CUSTOMER', 'OLD CUSTOMER'];
 
     public function getNamaPelangganAttribute()
     {
