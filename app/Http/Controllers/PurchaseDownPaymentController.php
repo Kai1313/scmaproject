@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\ApiController;
 use App\PurchaseDownPayment;
+use App\PurchaseOrder;
 use App\TransactionBalance;
 use DB;
 use Illuminate\Http\Request;
@@ -302,22 +303,29 @@ class PurchaseDownPaymentController extends Controller
 
         $startDate = date('Y-m-d', strtotime('-' . intval($valDuration) . ' days'));
         $endDate = date('Y-m-d');
-        $datas = DB::table('permintaan_pembelian as pp')
+
+        $datas = new PurchaseOrder;
+        $datas = $datas
             ->select(
-                'pp.id_permintaan_pembelian as id',
+                'id_permintaan_pembelian as id',
                 DB::raw('concat(nama_permintaan_pembelian," ( ",nama_pemasok," )") as text'),
-                'mtotal_permintaan_pembelian'
+                DB::raw('case
+                    when sisa is null then sum(mtotal_permintaan_pembelian)
+                    else sum(sisa)
+                end as mtotal_permintaan_pembelian')
             )
-            ->leftJoin('uang_muka_pembelian as ump', function ($join) {
-                $join->on('pp.id_permintaan_pembelian', '=', 'ump.id_permintaan_pembelian')
-                    ->where('ump.void', 0);
-            })
-            ->leftJoin('pemasok as p', 'pp.id_pemasok', 'p.id_pemasok')
+            ->leftJoin('saldo_transaksi', 'permintaan_pembelian.nama_permintaan_pembelian', 'saldo_transaksi.ref_id')
+            ->leftJoin('pemasok', 'permintaan_pembelian.id_pemasok', 'pemasok.id_pemasok')
             ->whereBetween('tanggal_permintaan_pembelian', [$startDate, $endDate])
-            ->where('pp.id_cabang', $idCabang)
-            ->groupBy('pp.id_permintaan_pembelian')
-            ->having(DB::raw('mtotal_permintaan_pembelian - COALESCE(sum(nominal),0)'), '<>', '0')
-            ->orderBy('tanggal_permintaan_pembelian', 'desc')->get();
+            ->where('permintaan_pembelian.id_cabang', $idCabang)
+            ->where(function ($a) {
+                $a->where('sisa', null)->orWhere('sisa', '>', '0');
+            })
+            ->groupBy('id_permintaan_pembelian')
+            ->orderBy('tanggal_permintaan_pembelian', 'desc')
+            ->orderBy('nama_permintaan_pembelian', 'desc')
+            ->get();
+
         return response()->json([
             'result' => true,
             'data' => $datas,
