@@ -140,13 +140,13 @@ class SalesDownPaymentController extends Controller
 
             //save saldo transaksi
             $resultSaldoTransaksi = (new ApiController)->transactionBalance(new Request([
-                'tipe_transaksi' => 'Uang Muka Pembelian',
+                'tipe_transaksi' => 'Uang Muka Penjualan',
                 'id_transaksi' => $data->kode_uang_muka_penjualan,
                 'tanggal' => $data->tanggal,
                 'ref_id' => $data->salesOrder->nama_permintaan_penjualan,
                 'catatan' => $data->catatan,
-                'id_pelanggan' => null,
-                'id_pemasok' => $data->salesOrder->id_pelanggan,
+                'id_pelanggan' => $data->salesOrder->id_pelanggan,
+                'id_pemasok' => null,
                 'dpp' => $data->dpp,
                 'ppn' => $data->ppn,
                 'uang_muka' => 0,
