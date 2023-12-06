@@ -16,25 +16,28 @@ class VisitController extends Controller
         }
 
         if ($request->ajax()) {
-            return $request->all();
-            $data = Visit::with(['salesman', 'cabang', 'pelanggan'])->where('status', '!=', 3);
-            if ($request->id_cabang != '') {
+            $data = Visit::select('visit.*', 'salesman.nama_salesman', 'pelanggan.nama_pelanggan')
+                ->leftJoin('salesman', 'visit.id_salesman', 'salesman.id_salesman')
+                ->leftJoin('pelanggan', 'visit.id_pelanggan', 'pelanggan.id_pelanggan')
+                ->where('visit.status', '!=', 3);
+            if ($request->id_cabang) {
                 $data = $data->where('id_cabang', $request->id_cabang);
             }
 
-            if ($request->id_salesman != '') {
+            if ($request->id_salesman) {
                 $data = $data->where('id_salesman', $request->id_salesman);
             }
 
-            if ($request->daterangepicker != '') {
-                $data = $data->whereBetween('visit_date', [dateStore(explode(' - ', $request->daterangepicker)[0]), dateStore(explode(' - ', $request->daterangepicker)[1])]);
+            if ($request->daterangepicker) {
+                $explode = explode(' - ', $request->daterangepicker);
+                $data = $data->whereBetween('visit_date', $explode);
             }
 
-            if ($request->status != '') {
+            if ($request->status) {
                 $data = $data->where('status', $request->status);
             }
 
-            if ($request->status_pelanggan != '') {
+            if ($request->status_pelanggan) {
                 $data = $data->where('status_pelanggan', $request->status_pelanggan);
             }
 
@@ -43,13 +46,13 @@ class VisitController extends Controller
             $idUser = session()->get('user')['id_pengguna'];
             $idGrupUser = session()->get('user')['id_grup_pengguna'];
 
-            return DataTables::eloquent($data)
+            return DataTables::of($data)
                 ->addColumn('action', function ($data) {
                     return view('ops.visit.action', compact('data'));
                 })
-                ->addColumn('detail', function ($data) {
-                    return view('ops.visit.detail', compact('data'));
-                })
+            // ->addColumn('detail', function ($data) {
+            //     return view('ops.visit.detail', compact('data'));
+            // })
                 ->editColumn('status', function ($data) {
                     switch ($data->status) {
                         case '0':
@@ -72,14 +75,8 @@ class VisitController extends Controller
                             break;
                     }
                 })
-                ->editColumn('progress_ind', function ($data) {
-                    if ($data->progress_ind == null) {
-                        return "<label class='label label-warning'>Belum Report</label>";
-                    } else {
-                        return "<label class='label label-primary'>Sudah Report</label>";
-                    }
-                })
-                ->rawColumns(['action', 'status', 'progress_ind', 'detail'])
+
+                ->rawColumns(['action', 'status'])
                 ->make(true);
         }
 
