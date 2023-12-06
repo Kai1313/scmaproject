@@ -895,7 +895,7 @@ class ClosingJournalController extends Controller
             $month = $request->month;
             $year = $request->year;
             $start_date = date("Y-m-d", strtotime("$year-$month-1"));
-            // $end_date = date("Y-m-t", strtotime("$year-$month-1"));
+            $end_date = date("Y-m-t", strtotime("$year-$month-1"));
             $void = 0;
             $status = 1;
             $hpp_account = Setting::where("id_cabang", $id_cabang)->where("code", "HPP Transfer Cabang")->first();
@@ -922,7 +922,7 @@ class ClosingJournalController extends Controller
             foreach ($data_header as $key => $header) {
                 // Log::info($header->kode_pindah_barang);
                 $id_transaksi = $header->kode_pindah_barang;
-                $end_date = $header->tanggal_pindah_barang;
+                $transaction_date = $header->tanggal_pindah_barang;
                 // Delete detail and header existing first
                 JurnalDetail::where("id_transaksi", $id_transaksi)->where("keterangan", "HPP Transfer Cabang Keluar " . $id_transaksi)->delete();
                 JurnalHeader::where("id_transaksi", "Closing " . $id_transaksi)->where("catatan", "Closing Transfer Barang Keluar")->delete();
@@ -961,7 +961,7 @@ class ClosingJournalController extends Controller
                     $header->id_transaksi = 'Closing ' . $id_transaksi;
                     $header->catatan = "Closing Transfer Barang Keluar";
                     $header->void = 0;
-                    $header->tanggal_jurnal = $end_date;
+                    $header->tanggal_jurnal = $transaction_date;
                     $header->user_created = null;
                     $header->user_modified = null;
                     $header->dt_created = $end_date;
@@ -1090,7 +1090,7 @@ class ClosingJournalController extends Controller
                     $header->id_transaksi = 'Closing ' . $id_transaksi;
                     $header->catatan = "Closing Transfer Barang Masuk";
                     $header->void = 0;
-                    $header->tanggal_jurnal = $end_date;
+                    $header->tanggal_jurnal = $transaction_date;
                     $header->user_created = null;
                     $header->user_modified = null;
                     $header->dt_created = $end_date;
@@ -1220,7 +1220,7 @@ class ClosingJournalController extends Controller
             $month = $request->month;
             $year = $request->year;
             $start_date = date("Y-m-d", strtotime("$year-$month-1"));
-            // $end_date = date("Y-m-t", strtotime("$year-$month-1"));
+            $end_date = date("Y-m-t", strtotime("$year-$month-1"));
             $status = 1;
             $hpp_account = Setting::where("id_cabang", $id_cabang)->where("code", "Koreksi Stok")->first();
             // dd($hpp_account);
@@ -1243,7 +1243,7 @@ class ClosingJournalController extends Controller
             DB::beginTransaction();
             foreach ($data_header as $key => $header) {
                 $id_transaksi = $header->nama_koreksi_stok;
-                $end_date = $header->tanggal_koreksi_stok;
+                $transaction_date = $header->tanggal_koreksi_stok;
                 $details = [];
                 // Delete detail and header existing first
                 // JurnalDetail::where("id_transaksi", $id_transaksi)->where("keterangan", "Koreksi Stok ".$id_transaksi)->delete();
@@ -1297,7 +1297,7 @@ class ClosingJournalController extends Controller
                 $header->id_transaksi = 'Closing ' . $id_transaksi;
                 $header->catatan = "Koreksi Stok " . $id_transaksi;
                 $header->void = 0;
-                $header->tanggal_jurnal = $end_date;
+                $header->tanggal_jurnal = $transaction_date;
                 $header->user_created = null;
                 $header->user_modified = null;
                 $header->dt_created = $end_date;
@@ -1425,7 +1425,7 @@ class ClosingJournalController extends Controller
             $month = $request->month;
             $year = $request->year;
             $start_date = date("Y-m-d", strtotime("$year-$month-1"));
-            // $end_date = date("Y-m-t", strtotime("$year-$month-1"));
+            $end_date = date("Y-m-t", strtotime("$year-$month-1"));
             $journal_type = "ME";
             $void = 0;
             $status = 1;
@@ -1438,7 +1438,7 @@ class ClosingJournalController extends Controller
             foreach ($data_header as $key => $header) {
                 // dd($header);
                 $id_transaksi = $header->nama_retur_penjualan;
-                $end_date = $header->tanggal_retur_penjualan;
+                $transaction_date = $header->tanggal_retur_penjualan;
 
                 // Delete detail and header existing first
                 $jurnal_header = JurnalHeader::where("id_transaksi", 'Closing ' . $id_transaksi)->where('tanggal_jurnal', $end_date)->where("catatan", "Closing Retur Penjualan")->get();
@@ -1496,7 +1496,7 @@ class ClosingJournalController extends Controller
                 $header->id_transaksi = 'Closing ' . $id_transaksi;
                 $header->catatan = "Closing Retur Penjualan";
                 $header->void = 0;
-                $header->tanggal_jurnal = $end_date;
+                $header->tanggal_jurnal = $transaction_date;
                 $header->user_created = null;
                 $header->user_modified = null;
                 $header->dt_created = $end_date;
@@ -1674,7 +1674,7 @@ class ClosingJournalController extends Controller
             $month = $request->month;
             $year = $request->year;
             $start_date = date("Y-m-d", strtotime("$year-$month-1"));
-            // $end_date = date("Y-m-t", strtotime("$year-$month-1"));
+            $end_date = date("Y-m-t", strtotime("$year-$month-1"));
             $journal_type = "ME";
             $void = 0;
             $status = 1;
@@ -1718,7 +1718,7 @@ class ClosingJournalController extends Controller
                     ]);
                 }
                 $id_transaksi = $header->kode_pemakaian;
-                $end_date = $header->tanggal;
+                $transaction_date = $header->tanggal;
 
                 // Delete detail and header existing first
                 $jurnal_header = JurnalHeader::where("id_transaksi", 'Closing ' . $id_transaksi)->where('tanggal_jurnal', $end_date)->where("catatan", "Closing Pemakaian")->get();
@@ -1778,7 +1778,7 @@ class ClosingJournalController extends Controller
                 $header->id_transaksi = 'Closing ' . $id_transaksi;
                 $header->catatan = "Closing Pemakaian";
                 $header->void = 0;
-                $header->tanggal_jurnal = $end_date;
+                $header->tanggal_jurnal = $transaction_date;
                 $header->user_created = null;
                 $header->user_modified = null;
                 $header->dt_created = $end_date;
@@ -1907,7 +1907,7 @@ class ClosingJournalController extends Controller
             $month = $request->month;
             $year = $request->year;
             $start_date = date("Y-m-d", strtotime("$year-$month-1"));
-            // $end_date = date("Y-m-t", strtotime("$year-$month-1"));
+            $end_date = date("Y-m-t", strtotime("$year-$month-1"));
             $void = 0;
             $status = 1;
             $hpp_account = Setting::where("id_cabang", $id_cabang)->where("code", "HPP Penjualan")->first();
@@ -1931,7 +1931,7 @@ class ClosingJournalController extends Controller
             foreach ($data_header as $key => $header) {
                 // Log::info($header->kode_pindah_barang);
                 $id_transaksi = $header->nama_penjualan;
-                $end_date = $header->tanggal_penjualan;
+                $transaction_date = $header->tanggal_penjualan;
                 // Delete detail and header existing first
                 $jurnal_header = JurnalHeader::where("id_transaksi", 'Closing ' . $id_transaksi)->where('tanggal_jurnal', $end_date)->where("catatan", "Closing Penjualan")->get();
 
@@ -1983,7 +1983,7 @@ class ClosingJournalController extends Controller
                 $header->id_transaksi = 'Closing ' . $id_transaksi;
                 $header->catatan = "Closing Penjualan";
                 $header->void = 0;
-                $header->tanggal_jurnal = $end_date;
+                $header->tanggal_jurnal = $transaction_date;
                 $header->user_created = null;
                 $header->user_modified = null;
                 $header->dt_created = $end_date;

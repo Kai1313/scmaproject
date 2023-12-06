@@ -310,6 +310,15 @@ Route::prefix('transaction')->group(function () {
         Route::get('/closingJournal', 'ClosingJournalController@closingJournal')->name('transaction-closing-journal-closing-journal');
         Route::get('/saldo_transfer', 'ClosingJournalController@saldoTransfer')->name('transaction-closing-journal-saldo-transfer');
     });
+
+    Route::prefix('transfer_balance')->group(function () {
+        Route::get('/index/{user_id?}', 'TransferBalanceController@index')->name('transaction-transfer-balance');
+        Route::get('/form/create', 'TransferBalanceController@create')->name('transaction-transfer-balance-create');
+        Route::get('/store', 'TransferBalanceController@store')->name('transaction-transfer-balance-store');
+        Route::get('/populate', 'TransferBalanceController@populate')->name('transaction-transfer-balance-populate');
+        Route::get('/destroy/{id?}', 'TransferBalanceController@destroy')->name('transaction-transfer-balance-destroy');
+        Route::get('/saldo_transfer', 'TransferBalanceController@saldoTransfer')->name('transaction-transfer-balance-saldo-transfer');
+    });
 });
 
 // Report
