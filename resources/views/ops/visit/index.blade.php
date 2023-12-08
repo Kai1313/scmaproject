@@ -128,14 +128,13 @@
                                 <thead>
                                     <tr>
                                         <th style="width:30px;">Action</th>
-                                        <th>Kode Jadwal</th>
-                                        <th>Tanggal</th>
-                                        <th>Salesman</th>
-                                        <th>Pelanggan</th>
-                                        <th>Kategori Pelanggan</th>
-                                        <th>Status</th>
-                                        <th>Status Report</th>
-                                        <th style="width:300px;">Detail</th>
+                                        <th style="width:100px;">Kode Jadwal</th>
+                                        <th style="width:100px;">Tanggal</th>
+                                        <th style="width:100px;">Salesman</th>
+                                        <th style="width:200px;">Pelanggan</th>
+                                        <th style="width:150px;">Kategori Pelanggan</th>
+                                        <th style="width:100px;">Status</th>
+                                        <th>Catatan</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -195,6 +194,16 @@
                 url: "{{ route('visit') }}",
                 data: filterDatatable(),
             },
+            language: {
+                processing: '<img src="{{ asset('images/833.gif') }}" alt="">',
+                paginate: {
+                    'first': 'First',
+                    'last': 'Last',
+                    'next': '→',
+                    'previous': '←'
+                },
+                emptyTable: "Data Tidak Ditemukan",
+            },
             columns: [{
                 data: 'action',
                 name: 'action',
@@ -220,13 +229,8 @@
                 name: 'status',
                 class: 'text-center',
             }, {
-                data: 'progress_ind',
-                name: 'progress_ind',
-                class: 'text-center',
-            }, {
-                data: 'detail',
-                name: 'detail',
-                className: 'limit-text'
+                data: 'visit_title',
+                name: 'visit_title'
             }],
         });
     </script>

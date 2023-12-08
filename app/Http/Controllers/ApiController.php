@@ -515,7 +515,12 @@ class ApiController extends Controller
             $id_cabang = $request->cabang;
             $id_slip = $request->slip;
             $detail_inventory = array_values($request->detail);
-            $biaya_penjualan = array_values($request->biaya);
+
+            if($request->has('biaya')){
+                if($request->biaya != null && count($request->biaya) > 0){
+                    $biaya_penjualan = array_values($request->biaya);
+                }
+            }
 
             $data_pelanggan = DB::table("pelanggan")->where('id_pelanggan', $id_pelanggan)->first();
             $nama_pelanggan = $data_pelanggan->nama_pelanggan;
@@ -627,17 +632,19 @@ class ApiController extends Controller
 
             $total_biaya = 0;
 
-            if (count($biaya_penjualan) > 0) {
-                foreach ($biaya_penjualan as $biaya) {
-                    $total_biaya += round(floatval($biaya['total']), 2);
+            if(isset($biaya_penjualan)){
+                if (count($biaya_penjualan) > 0) {
+                    foreach ($biaya_penjualan as $biaya) {
+                        $total_biaya += round(floatval($biaya['total']), 2);
 
-                    array_push($jurnal_detail_me, [
-                        'akun' => $biaya['akun'],
-                        'debet' => 0,
-                        'credit' => $biaya['total'],
-                        'keterangan' => 'Jurnal Otomatis Biaya Penjualan - ' . $id_transaksi . ' - ' . date('d M Y', strtotime($biaya['tanggal'])) . ' ' . $biaya['catatan'],
-                        'id_transaksi' => null,
-                    ]);
+                        array_push($jurnal_detail_me, [
+                            'akun' => $biaya['akun'],
+                            'debet' => 0,
+                            'credit' => $biaya['total'],
+                            'keterangan' => 'Jurnal Otomatis Biaya Penjualan - ' . $id_transaksi . ' - ' . date('d M Y', strtotime($biaya['tanggal'])) . ' ' . $biaya['catatan'],
+                            'id_transaksi' => null,
+                        ]);
+                    }
                 }
             }
 
@@ -801,6 +808,7 @@ class ApiController extends Controller
                     "result" => false,
                     "code" => 400,
                     "message" => "Error when store Jurnal data on table detail. Credit & debet not balance. credit: " . $check_balance_credit . ", debet : " . $check_balance_debit,
+                    "data" => $jurnal_detail_me,
                 ], 400);
             }
 
@@ -970,7 +978,11 @@ class ApiController extends Controller
             $id_cabang = $request->cabang;
             $id_slip = $request->slip;
             $detail_inventory = array_values($request->detail);
-            $biaya_pembelian = array_values($request->biaya);
+            if($request->has('biaya')){
+                if($request->biaya != null && count($request->biaya) > 0){
+                    $biaya_pembelian = array_values($request->biaya);
+                }
+            }
 
             $data_pemasok = DB::table("pemasok")->where('id_pemasok', $id_pemasok)->first();
             $nama_pemasok = $data_pemasok->nama_pemasok;
@@ -1069,15 +1081,17 @@ class ApiController extends Controller
                 ],
             ];
 
-            if (count($biaya_pembelian) > 0) {
-                foreach ($biaya_pembelian as $biaya) {
-                    array_push($jurnal_detail_me, [
-                        'akun' => $biaya['akun'],
-                        'debet' => 0,
-                        'credit' => $biaya['total'],
-                        'keterangan' => 'Jurnal Otomatis Biaya Pembelian - ' . $id_transaksi . ' - ' . date('d M Y', strtotime($biaya['tanggal'])) . ' ' . $biaya['catatan'],
-                        'id_transaksi' => null,
-                    ]);
+            if(isset($biaya_pembelian)){
+                if (count($biaya_pembelian) > 0) {
+                    foreach ($biaya_pembelian as $biaya) {
+                        array_push($jurnal_detail_me, [
+                            'akun' => $biaya['akun'],
+                            'debet' => 0,
+                            'credit' => $biaya['total'],
+                            'keterangan' => 'Jurnal Otomatis Biaya Pembelian - ' . $id_transaksi . ' - ' . date('d M Y', strtotime($biaya['tanggal'])) . ' ' . $biaya['catatan'],
+                            'id_transaksi' => null,
+                        ]);
+                    }
                 }
             }
 
@@ -1206,6 +1220,7 @@ class ApiController extends Controller
                     "result" => false,
                     "code" => 400,
                     "message" => "Error when store Jurnal data on table detail. Credit & debet not balance. credit: " . $check_balance_credit . ", debet : " . $check_balance_debit,
+                    "data" => $jurnal_detail_me,
                 ], 400);
             }
 
