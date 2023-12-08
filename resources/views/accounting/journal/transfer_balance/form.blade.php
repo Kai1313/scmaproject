@@ -59,7 +59,7 @@
 
 @section('main-section')
 <div class="content container-fluid">
-    <form id="form_ledger" data-toggle="validator" enctype="multipart/form-data">
+    <form id="form" data-toggle="validator" enctype="multipart/form-data">
         <div class="row">
             <div class="col-xs-12">
                 <div class="box box-primary">
@@ -90,8 +90,27 @@
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
-                                        <label>Bulan</label>
-                                        <select name="month" id="month" class="form-control select2">
+                                        <label>Bulan Awal</label>
+                                        <select name="start_month" id="start_month" class="form-control select2">
+                                            <option value="1">Januari</option>
+                                            <option value="2">Februari</option>
+                                            <option value="3">Maret</option>
+                                            <option value="4">April</option>
+                                            <option value="5">Mei</option>
+                                            <option value="6">Juni</option>
+                                            <option value="7">Juli</option>
+                                            <option value="8">Agustus</option>
+                                            <option value="9">September</option>
+                                            <option value="10">Oktober</option>
+                                            <option value="11">November</option>
+                                            <option value="12">Desember</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Bulan Akhir</label>
+                                        <select name="end_month" id="end_month" class="form-control select2">
                                             <option value="1">Januari</option>
                                             <option value="2">Februari</option>
                                             <option value="3">Maret</option>
@@ -174,7 +193,7 @@
     let hutang_dagang
     var myButton = document.getElementById("btn-process")
 
-    var validateLedger = {
+    var validateForm = {
         submit: {
             settings: {
                 form: '#form_ledger',
@@ -190,17 +209,20 @@
             },
             callback: {
                 onSubmit: function(node, formData) {
-                    let total_debet = parseFloat(0)
-                    let total_kredit = parseFloat(0)
-                    details.forEach(detail => {
-                        total_debet = parseFloat(total_debet) + parseFloat(detail.debet)
-                        total_kredit = parseFloat(total_kredit) + parseFloat(detail.kredit)
-                    })
-                    if (total_debet == total_kredit) {
-                        save_data()
-                    }
-                    else {
-                        Swal.fire("Sorry, Can't save data. ", "Jumlah total debet harus sama dengan dari total kredit", 'error')
+                    console.log('test');
+                    console.log(formData);
+                    let cabang = $("#cabang_input").val()
+                    let start_month = $("#start_month").val()
+                    let end_month = $("#end_month").val()
+                    let year = $("#year").val()
+                    let param = "?id_cabang=" + cabang + "&month=" + month + "&year=" + year
+                    let route = "{{ Route('dummy-ajax') }}"
+
+                    if (start_month <= end_month) {
+                        // Start ajax chain
+                        save_data(routeSaldoTransfer, param, "1")
+                    } else {
+                        Swal.fire("Sorry, Can't save data. ", "Bulan Awal tidak bisa lebih besar dari Bulan Akhir", 'error')
                     }
                 }
             }
@@ -215,7 +237,7 @@
     var guid = 1
 
     $(function() {
-        $.validate(validateLedger)
+        $.validate(validateForm)
 
         $('.select2').select2({
             width: '100%'
@@ -225,9 +247,11 @@
             // console.log("Clicked")
             // Init data
             let cabang = $("#cabang_input").val()
-            let month = $("#month").val()
+            let start_month = $("#start_month").val()
+            let end_month = $("#end_month").val()
             let year = $("#year").val()
-            let param = "?id_cabang="+cabang+"&month="+month+"&year="+year
+            let param = "?id_cabang=" + cabang + "&start_month=" + start_month + "&end_month=" + end_month + "&year=" + year
+            // console.log(param);
             let route = "{{ Route('dummy-ajax') }}"
             route = route + param
             // console.log(route)
@@ -240,7 +264,14 @@
             $("#response1").empty()
 
             // Start ajax chain
-            save_data(routeSaldoTransfer, param, "1")
+            if (parseInt(start_month) <= parseInt(end_month)) {
+                // Start ajax chain
+                save_data(routeSaldoTransfer, param, "1")
+            } else {
+                Swal.fire("Sorry, Can't save data. ", "Bulan Awal tidak bisa lebih besar dari Bulan Akhir", 'error')
+                myButton.disabled = false
+                myButton.innerHTML = "Proses"
+            }
         })
 
         $(document).on('select2:open', () => {
@@ -262,21 +293,20 @@
     function save_data(route, param, step) {
         $.ajax({
             type: "GET",
-            url: route+param,
+            url: route + param,
         }).done(function(data) {
-            console.log("ajax response "+step)
+            console.log("ajax response " + step)
             console.log(data)
-            let res = '<span><i class="fa fa-check-circle" style="color: green;"></i>'+data.message+'</span>'
-            let fail = '<span><i class="fa fa-times-circle" style="color: red;"></i> '+data.message+'</span>'
+            let res = '<span><i class="fa fa-check-circle" style="color: green;"></i>' + data.message + '</span>'
+            let fail = '<span><i class="fa fa-times-circle" style="color: red;"></i> ' + data.message + '</span>'
             if (data.result) {
                 console.log("succeed")
-                $("#response"+step).append(res)
+                $("#response" + step).append(res)
                 alert('Successfully store transfer saldo data')
                 location.reload()
-            }
-            else {
-                console.log("ajax response false "+step)
-                $("#response"+step).append(fail)
+            } else {
+                console.log("ajax response false " + step)
+                $("#response" + step).append(fail)
                 myButton.disabled = false
                 myButton.innerHTML = "Proses"
             }
