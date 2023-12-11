@@ -115,32 +115,34 @@
                         <label class="d-block">&nbsp;</label>
                         <div class="form-group">
                             <button type="button" class="btn btn-info" onclick="table.ajax.reload()"><i
-                                    class="fa fa-search"></i> Cari</button>
+                                    class="fa fa-search mr-1"></i> Cari</button>
                         </div>
                     </div>
+                </div>
+                <div class="pull-right">
+                    <a href="{{ route('visit-entry') }}" class="btn btn-primary"><i class="fa fa-plus mr-1"></i> Tambah
+                        Kunjungan</a>
                 </div>
             </div>
             <div class="box-body">
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="table-responsive">
-                            <table class="table table-bordered data-table display responsive nowrap" width="100%">
-                                <thead>
-                                    <tr>
-                                        <th style="width:30px;">Action</th>
-                                        <th style="width:100px;">Kode Jadwal</th>
-                                        <th style="width:100px;">Tanggal</th>
-                                        <th style="width:100px;">Salesman</th>
-                                        <th style="width:200px;">Pelanggan</th>
-                                        <th style="width:150px;">Kategori Pelanggan</th>
-                                        <th style="width:100px;">Status</th>
-                                        <th>Catatan</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                </tbody>
-                            </table>
-                        </div>
+                        <table class="table table-bordered data-table display nowrap" width="100%">
+                            <thead>
+                                <tr>
+                                    <th style="width:100px;">Kode Jadwal</th>
+                                    <th style="width:100px;">Tanggal</th>
+                                    <th style="width:100px;">Salesman</th>
+                                    <th style="width:200px;">Pelanggan</th>
+                                    <th style="width:150px;">Kategori Pelanggan</th>
+                                    <th style="width:100px;">Status</th>
+                                    <th>Catatan</th>
+                                    <th style="width:30px;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -189,7 +191,7 @@
             processing: true,
             serverSide: true,
             pageLength: 50,
-            "ordering": false,
+            scrollX: true,
             ajax: {
                 url: "{{ route('visit') }}",
                 data: filterDatatable(),
@@ -205,10 +207,6 @@
                 emptyTable: "Data Tidak Ditemukan",
             },
             columns: [{
-                data: 'action',
-                name: 'action',
-                className: 'text-center',
-            }, {
                 data: 'visit_code',
                 name: 'visit_code'
             }, {
@@ -231,6 +229,10 @@
             }, {
                 data: 'visit_title',
                 name: 'visit_title'
+            }, {
+                data: 'action',
+                name: 'action',
+                className: 'text-center',
             }],
         });
     </script>

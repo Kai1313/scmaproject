@@ -37,9 +37,13 @@ class Visit extends Model
     ];
 
     public static $progressIndicator = [
-        '1' => 'Perkenalan',
-        '2' => 'Potensial',
-        '3' => 'Penawaran/Order',
+        'VISIT', 'TERIMA SAMPLE', 'TRIAL SAMPLE', 'APPROVAL SAMPLE', 'QUOTATION', 'APPROVAL QUOTATION', 'ISSUED PO',
+    ];
+
+    public static $visitMethod = [
+        'LOKASI',
+        'WHATSAPP',
+        'TELEPON',
     ];
 
     public static $kategoriPelanggan = ['EXISTING CUSTOMER', 'NEW CUSTOMER', 'OLD CUSTOMER'];
