@@ -578,11 +578,12 @@
                         name: 'keterangan',
                         width: '10%',
                         render: function(data, type, row) {
-                            if (data != '' && data != null) {
-                                return data.substring(0, 15)
-                            } else {
-                                return data;
-                            }
+                            // if (data != '' && data != null) {
+                            //     return data.substring(0, 15)
+                            // } else {
+                            //     return data;
+                            // }
+                            return data;
                         }
                     }, {
                         data: 'id_transaksi',
