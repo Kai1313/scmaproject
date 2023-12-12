@@ -35,6 +35,10 @@ class Visit extends Model
         'proofment_2',
         'permintaan_penjualan_id',
         'alasan_ubah_tanggal',
+        'kategori_kunjungan',
+        'solusi',
+        'latitude_visit',
+        'longitude_visit',
     ];
 
     public static $progressIndicator = [
@@ -44,6 +48,12 @@ class Visit extends Model
     public static $visitMethod = ['LOKASI', 'WHATSAPP', 'TELEPON'];
 
     public static $kategoriPelanggan = ['EXISTING CUSTOMER', 'NEW CUSTOMER', 'OLD CUSTOMER'];
+
+    public static $listStatus = [
+        '0' => ['text' => 'Batal', 'html' => '<label class="label label-danger">Batal</label>'],
+        '1' => ['text' => 'Belum Dilaksanakan', 'html' => '<label class="label label-info">Belum dilaksanakan</label>'],
+        '2' => ['text' => 'Sudah Dilaksanakan', 'html' => '<label class="label label-success">Sudah Dilaksanakan</label>'],
+    ];
 
     public function getNamaPelangganAttribute()
     {
@@ -80,6 +90,13 @@ class Visit extends Model
         return $this->belongsTo(PermintaanPenjualan::class, 'permintaan_penjualan_id', 'id_permintaan_penjualan');
     }
 
+    public function medias()
+    {
+        return $this->hasMany(Media::class, 'id', 'id')
+            ->select('id_media as id', 'lokasi_media as image')
+            ->where('tipe_media', 'visit');
+    }
+
     public static function createcode($id_cabang)
     {
         $branchCode = DB::table('cabang')->where('id_cabang', $id_cabang)->first();
@@ -94,25 +111,47 @@ class Visit extends Model
         return $string . '.' . $nol . $check;
     }
 
-    public function uploadfile($req, $data)
+    public function uploadfile($medias)
     {
-        if ($req->image_path) {
-            $explode = explode(";base64,", $req->image_path);
-            $findExt = explode("image/", $explode[0]);
+        foreach ($medias as $media) {
+            if (is_string($media)) {
+                $explode = explode(";base64,", $media);
+                $findExt = explode("image/", $explode[0]);
 
-            $ext = $findExt[1];
-            $name = uniqid();
+                $ext = $findExt[1];
+                $name = uniqid();
 
-            $media = base64_decode($explode[1]);
-            $mainpath = $name . '.' . $ext;
+                $media = base64_decode($explode[1]);
+                $mainpath = $name . '.' . $ext;
 
-            $img = \Image::make($media)->fit(150);
-            $img->save('asset/' . $mainpath);
+                $img = \Image::make($media);
+                $img->save('asset/' . $mainpath);
 
-            $data->path = $mainpath;
-            $data->save();
+                $id = DB::table('media')->insert([
+                    'id' => $this->id,
+                    'lokasi_media' => 'asset/' . $mainpath,
+                    'status_media' => '1',
+                    'tipe_media' => 'visit',
+                    'keterangan_media' => '',
+                    'date_media' => date('Y-m-d'),
+                    'user_media' => session()->get('user')['id_pengguna'],
+                ]);
+            }
         }
 
-        return ['status' => 'success'];
+        return ['result' => true];
+    }
+
+    public function removefile($medias)
+    {
+        foreach ($medias as $media) {
+            if (!is_string($media)) {
+                $data = Media::where('id_media', $media->id)->first();
+                unlink(public_path($media->image));
+                $data->delete();
+            }
+        }
+
+        return ['result' => true];
     }
 }

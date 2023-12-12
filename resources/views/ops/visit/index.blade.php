@@ -135,6 +135,7 @@
                                     <th style="width:100px;">Salesman</th>
                                     <th style="width:200px;">Pelanggan</th>
                                     <th style="width:150px;">Kategori Pelanggan</th>
+                                    <th style="width:150px">Kategori Kunjungan</th>
                                     <th style="width:100px;">Status</th>
                                     <th>Catatan</th>
                                     <th style="width:30px;">Action</th>
@@ -223,17 +224,67 @@
                 name: 'status_pelanggan',
                 class: 'text-center',
             }, {
+                data: 'kategori_kunjungan',
+                name: 'kategori_kunjungan',
+                class: 'text-center',
+            }, {
                 data: 'status',
                 name: 'status',
                 class: 'text-center',
             }, {
-                data: 'visit_title',
-                name: 'visit_title'
+                data: 'pre_visit_desc',
+                name: 'pre_visit_desc'
             }, {
                 data: 'action',
                 name: 'action',
                 className: 'text-center',
             }],
         });
+
+        $('body').on('click', '.action-delete', function(e) {
+            e.preventDefault()
+            let url = $(this).prop('href')
+            Swal.fire({
+                title: 'Anda yakin ingin menghapus data ini?',
+                icon: 'info',
+                showDenyButton: true,
+                confirmButtonText: 'Yes',
+                denyButtonText: 'No',
+                reverseButtons: true,
+                customClass: {
+                    actions: 'my-actions',
+                    confirmButton: 'order-1',
+                    denyButton: 'order-3',
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    actionDelete(url)
+                }
+            })
+        })
+
+        function actionDelete(url) {
+            $('#cover-spin').show()
+            $.ajax({
+                url: url,
+                type: 'post',
+                success: function(data) {
+                    $('#cover-spin').hide()
+                    if (data.result) {
+                        Swal.fire('Bashasil!', data.message, 'success').then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = data.redirect;
+                            }
+                        })
+                    } else {
+                        Swal.fire("Gagal Hapus Data. ", data.message, 'error')
+                    }
+                },
+                erorr: function(error) {
+                    $('#cover-spin').hide()
+                    Swal.fire("Gagal Hapus Data. ", data.responseJSON.message, 'error')
+                }
+            })
+        }
     </script>
 @endsection

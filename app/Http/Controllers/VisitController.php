@@ -47,7 +47,7 @@ class VisitController extends Controller
                 $data = $data->where('status_pelanggan', $request->status_pelanggan);
             }
 
-            $data = $data->orderBy('visit_date', 'desc');
+            $data = $data->orderBy('visit_date', 'desc')->orderBy('visit_code', 'desc');
 
             $idUser = session()->get('user')['id_pengguna'];
             $idGrupUser = session()->get('user')['id_grup_pengguna'];
@@ -55,35 +55,28 @@ class VisitController extends Controller
             return DataTables::of($data)
                 ->addColumn('action', function ($data) {
                     $btn = '<div class="dropdown">
-                    <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown"><i class="fa fa-bars"></i>
+                    <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown"><i class="glyphicon glyphicon-menu-hamburger"></i>
                     <span class="caret"></span></button>
                     <ul class="dropdown-menu dropdown-menu-right">';
-
-                    $btn .= '<li><a href="' . route('visit-view', $data->id) . '"><i class="fa fa-eye"></i> Lihat</a></li>';
-                    if ($data->status != 0) {
-                        $btn .= '<li><a href="' . route('visit-report-entry', $data->id) . '"><i class="fa fa-truck"></i> Kunjungan</a></li>';
-                        $btn .= '<li><a href="' . route('visit-entry', $data->id) . '"><i class="fa fa-pencil"></i> Edit</a></li>';
-                    }
-
-                    // $btn .= '<li><a href="#"><i class="fa fa-trash"></i> Hapus</a></li>';
-
+                    $btn .= '<li><a href="' . route('visit-entry', $data->id) . '"><i class="glyphicon glyphicon-pencil"></i> Edit</a></li>';
+                    $btn .= '<li><a href="' . route('visit-delete', $data->id) . '" class="action-delete"><i class="glyphicon glyphicon-trash"></i> Hapus</a></li>';
                     $btn .= '</ul></div>';
                     return $btn;
                 })
                 ->editColumn('status', function ($data) {
                     switch ($data->status) {
                         case '0':
-                            return "<label class='label label-danger'>Batal Visit</label>";
+                            return "<label class='label label-danger'>BATAL VISIT</label>";
                             break;
                         case '1':
-                            return "<label class='label label-warning'>Belum Visit</label>";
+                            return "<label class='label label-warning'>BELUM VISIT</label>";
                             break;
                         case '2':
                             $html = '';
                             if ($data->visit_type == 'LOKASI') {
-                                $html .= "<label class='label label-primary'>Sudah Visit " . $data->visit_type . "</label>";
+                                $html .= "<label class='label label-primary'>SUDAH VISIT KE " . $data->visit_type . "</label>";
                             } else {
-                                $html .= "<label class='label label-success'>Sudah Visit " . $data->visit_type . "</label>";
+                                $html .= "<label class='label label-success'>SUDAH VISIT VIA " . $data->visit_type . "</label>";
                             }
                             return $html;
                             break;
@@ -126,6 +119,7 @@ class VisitController extends Controller
         $methods = Visit::$visitMethod;
         $categories = DB::table('kategori_kunjungan')->where('status_kategori_kunjungan', '1')->get();
         $salesman = Salesman::where('pengguna_id', session()->get('user')->id_pengguna)->first();
+        $listStatus = Visit::$listStatus;
         return view('ops.visit.form', [
             'cabang' => $cabang,
             "pageTitle" => "SCA OPS | Kunjungan | " . ($data ? 'Edit' : 'Tambah'),
@@ -134,6 +128,7 @@ class VisitController extends Controller
             'progress' => $progress,
             'categories' => $categories,
             'methods' => $methods,
+            'listStatus' => $listStatus,
         ]);
     }
 
@@ -206,37 +201,6 @@ class VisitController extends Controller
         }
     }
 
-    public function viewData($id)
-    {
-        $data = Visit::find($id);
-        if (!$data) {
-            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
-        }
-
-        return view('ops.visit.detail', [
-            "pageTitle" => "SCA OPS | Kunjungan | Lihat",
-            'data' => $data,
-        ]);
-    }
-
-    public function reportEntry($id)
-    {
-        $data = Visit::find($id);
-        if (!$data) {
-            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
-        }
-
-        $progress = Visit::$progressIndicator;
-        $methods = Visit::$visitMethod;
-
-        return view('ops.visit.form-report', [
-            "pageTitle" => "SCA OPS | Kunjungan | Input Laporan",
-            'data' => $data,
-            'progress' => $progress,
-            'methods' => $methods,
-        ]);
-    }
-
     public function cancelVisit(Request $request, $id)
     {
         DB::beginTransaction();
@@ -256,7 +220,7 @@ class VisitController extends Controller
             $data->status = 0;
             $data->save();
             DB::commit();
-            return response()->json(["result" => true, 'redirect' => route('visit-view', $id), "message" => 'Kunjungan berhasil dibatalkan'], 200);
+            return response()->json(["result" => true, 'redirect' => route('visit-entry', $id), "message" => 'Kunjungan berhasil dibatalkan'], 200);
         } catch (\Exception $th) {
             DB::rollback();
             Log::error($th);
@@ -266,7 +230,46 @@ class VisitController extends Controller
 
     public function saveReportEntry(Request $request, $id)
     {
-        return $request->all();
+        $data = Visit::find($id);
+        if (!$data) {
+            return response()->json(['result' => false, 'message' => 'Data kunjungan tidak ditemukan'], 500);
+        }
+
+        DB::beginTransaction();
+        try {
+            $data->fill($request->all());
+            $data->status = 2;
+            if (isset($request->progress_ind)) {
+                $data->progress_ind = implode(', ', $request->progress_ind);
+            }
+
+            $data->save();
+
+            if (isset($request->remove_base64)) {
+                $decodeRemoveMedia = json_decode($request->remove_base64);
+                $removeFile = $data->removefile($decodeRemoveMedia);
+                if (!$removeFile['result']) {
+                    DB::rollback();
+                    return response()->json(['result' => false, 'message' => 'Hapus file bermasalah'], 500);
+                }
+            }
+
+            if (isset($request->upload_base64)) {
+                $decodeMedia = json_decode($request->upload_base64);
+                $uploadFile = $data->uploadfile($decodeMedia);
+                if (!$uploadFile['result']) {
+                    DB::rollback();
+                    return response()->json(['result' => false, 'message' => 'Upload file bermasalah'], 500);
+                }
+            }
+
+            DB::commit();
+            return response()->json(["result" => true, 'redirect' => route('visit-entry', $id), "message" => 'Hasil kunjungan berhasil disimpan'], 200);
+        } catch (\Exception $th) {
+            DB::rollback();
+            Log::error($th);
+            return response()->json(["result" => false, "message" => 'Hasil kunjungan gagal disimpan'], 500);
+        }
     }
 
     public function findCustomer($customerid)
@@ -342,6 +345,30 @@ class VisitController extends Controller
             DB::rollback();
             Log::error($th);
             return response()->json(["result" => false, "message" => 'Perubahan tanggal gagal disimpan'], 500);
+        }
+    }
+
+    public function removeEntry($id)
+    {
+        $data = Visit::find($id);
+        if (!$data) {
+            return response()->json(['result' => false, 'message' => 'Kunjungan tidak ditemukan'], 500);
+        }
+
+        DB::beginTransaction();
+        try {
+            foreach ($data->medias as $media) {
+                unlink(public_path($media->image));
+                $media->delete();
+            }
+
+            $data->delete();
+            DB::commit();
+            return response()->json(['result' => true, 'message' => 'Kunjungan berhasil dihapus', 'redirect' => route('visit')], 200);
+        } catch (\Exception $th) {
+            DB::rollback();
+            Log::error($th);
+            return response()->json(["result" => false, "message" => 'Kunjungan gagal dihapus'], 500);
         }
     }
 }

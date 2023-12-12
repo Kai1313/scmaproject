@@ -87,6 +87,47 @@
         .select2-container .select2-selection--single .select2-selection__rendered {
             white-space: normal !important;
         }
+
+        .remove-media-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+        }
+
+        .item-media:hover .remove-media-container {
+            opacity: 1;
+        }
+
+        .item-media {
+            width: 100px;
+            padding: 3px;
+            position: relative;
+        }
+
+        .item-media>a>img {
+            height: 94px;
+            object-fit: cover;
+        }
+
+        .container-media {
+            border: 1px solid #d2d6de;
+            display: flex;
+            flex-wrap: wrap;
+            border-radius: 3px;
+            margin-bottom: 10px;
+            min-height: 102px;
+        }
+
+        .add-image {
+            padding-top: 30px;
+            border: 1px dashed #3c8dbc;
+            border-radius: 3px;
+        }
+
+        .add-image:hover {
+            cursor: pointer;
+        }
     </style>
 @endsection
 
@@ -140,6 +181,14 @@
                                         data-validation-message="Tanggal tidak boleh kosong" {{ $data ? 'readonly' : '' }}>
                                 </div>
                             </div>
+                            @if ($data && $data->alasan_ubah_tanggal)
+                                <div class="row">
+                                    <label class="col-md-4">Alasan Perubahan Tanggal</label>
+                                    <div class="form-group col-md-8">
+                                        <textarea name="alasan_ubah_tanggal" class="form-control" readonly>{{ $data->alasan_ubah_tanggal }}</textarea>
+                                    </div>
+                                </div>
+                            @endif
                         </div>
                         <div class="col-md-4">
                             <div class="row">
@@ -169,6 +218,27 @@
                                     </select>
                                 </div>
                             </div>
+                            <div class="row">
+                                <label class="col-md-4">Status</label>
+                                <div class="form-group col-md-8">
+                                    <select name="status" class="form-control select2" readonly>
+                                        @foreach ($listStatus as $ks => $status)
+                                            <option value="{{ $status['text'] }}"
+                                                {{ $data ? ($data->status == $ks ? 'selected' : '') : ($ks == 1 ? 'selected' : '') }}>
+                                                {{ $status['text'] }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
+                            @if ($data && $data->status == 0)
+                                <div class="row">
+                                    <label class="col-md-4">Alasan Pembatalan</label>
+                                    <div class="form-group col-md-8">
+                                        <textarea name="alasan_pembatalan" class="form-control" readonly>{{ $data->alasan_pembatalan }}</textarea>
+                                    </div>
+                                </div>
+                            @endif
                         </div>
                         <div class="col-md-4">
                             <div class="row">
@@ -203,12 +273,11 @@
                             </div>
                         </div>
                     </div>
-                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
                     <div class="pull-right">
                         <button type="submit" class="btn btn-primary submit-header"
                             style="{{ $data ? 'display:none' : 'display:inline' }}"><i class="fa fa-floppy-o mr-1"></i>
                             Simpan</button>
-                        @if ($data)
+                        @if ($data && $data->status != 0)
                             <button type="button" class="btn btn-warning edit-header"><i class="fa fa-pencil mr-1"></i>
                                 Perbarui Data Kunjungan</button>
                             <button type="button" class="btn btn-default cancel-edit-header" style="display:none;"><i
@@ -220,11 +289,8 @@
             </form>
         </div>
 
-        @if ($data)
+        @if ($data && $data->status != 0)
             <div class="text-right" style="margin-bottom:15px;">
-                <a href="{{ route('visit-report-entry', $data->id) }}" class="btn btn-info">
-                    <i class="fa fa-plus mr-1"></i> Buat Hasil Kunjungan
-                </a>
                 <a href="{{ route('visit-save-date-change', $data->id) }}" class="btn btn-success change-date"><i
                         class="fa fa-calendar mr-1"></i>
                     Perbarui Tanggal Kunjungan</a>
@@ -243,7 +309,8 @@
                             <div class="col-md-4">
                                 <label for="">Metode Kunjungan</label>
                                 <div class="form-group">
-                                    <select name="visit_type" class="form-control select2">
+                                    <select name="visit_type" class="form-control select2" data-validation="[NOTEMPTY]"
+                                        data-validation-message="Metode tidak boleh kosong">
                                         <option value="">Pilih Metode</option>
                                         @foreach ($methods as $method)
                                             <option value="{{ $method }}"
@@ -254,7 +321,9 @@
                                 </div>
                                 <label for="">Kategori Kunjungan</label>
                                 <div class="form-group">
-                                    <select name="kategori_kunjungan" class="form-control select2">
+                                    <select name="kategori_kunjungan" class="form-control select2"
+                                        data-validation="[NOTEMPTY]"
+                                        data-validation-message="Kategori tidak boleh kosong">
                                         <option value="">Pilih Kategori</option>
                                         @foreach ($categories as $category)
                                             <option value="{{ $category->nama_kategori_kunjungan }}"
@@ -265,17 +334,28 @@
                                 </div>
                                 <label for="">Hasil Kunjungan</label>
                                 <div class="form-group">
-                                    <textarea name="visit_title" class="form-control" rows="3">{{ $data->visit_title }}</textarea>
+                                    <textarea name="visit_title" class="form-control" rows="3" data-validation="[NOTEMPTY]"
+                                        data-validation-message="Hasil kunjungan tidak boleh kosong">{{ $data->visit_title }}</textarea>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <label for="">Progres</label>
                                 <div class="form-group">
-                                    @foreach ($progress as $pro)
-                                        <label style="margin-right:10px;">
-                                            <input type="checkbox" name="progress_ind[]" value="{{ $pro }}">
+                                    @php
+                                        $explodeExtra = explode(', ', $data->progress_ind);
+                                    @endphp
+                                    @foreach ($progress as $key => $pro)
+                                        <span style="margin-right:10px;">
+                                            @php
+                                                $extra = '';
+                                                if ($key == 0) {
+                                                    $extra = 'data-validation=[NOTEMPTY] data-validation-message=Hasil_kunjungan_tidak_boleh_kosong';
+                                                }
+                                            @endphp
+                                            <input type="checkbox" name="progress_ind[]" value="{{ $pro }}"
+                                                {{ $extra }} {{ in_array($pro, $explodeExtra) ? 'checked' : '' }}>
                                             {{ $pro }}
-                                        </label>
+                                        </span>
                                     @endforeach
                                 </div>
                                 <label for="">Kendala</label>
@@ -289,15 +369,32 @@
                             </div>
                             <div class="col-md-4">
                                 <label for="">Gambar</label>
-                                <div style="border:1px solid black;height:118px;overflow-x: scroll;white-space:nowrap;">
-                                    <img src="{{ asset('images/default.jpg') }}" style="width:100px;padding:3px;">
-                                    <img src="{{ asset('images/default.jpg') }}" style="width:100px;padding:3px;">
-                                    <img src="{{ asset('images/default.jpg') }}" style="width:100px;padding:3px;">
-                                    <img src="{{ asset('images/default.jpg') }}" style="width:100px;padding:3px;">
+                                <div class="container-media">
+                                    @foreach ($data->medias as $media)
+                                        <div class="item-media">
+                                            <a href="javascript:void(0)">
+                                                <img src="{{ asset($media->image) }}" style="width:100%;">
+                                            </a>
+                                            <a href="javascript:void(0)"
+                                                class="remove-media-container btn btn-danger btn-sm">
+                                                <i class="fa fa-close"></i>
+                                            </a>
+                                        </div>
+                                    @endforeach
+                                    <div class="item-media text-center add-image" style="">
+                                        <i class="fa fa-plus" style="font-size:37px;color:#3c8dbc;"></i>
+                                    </div>
                                 </div>
+                                <input type="file" name="upload_image" class="form-control" value="" multiple
+                                    style="display:none;" accept=".png,.jpeg,.jpg" id="upload_image">
+                                <input type="hidden" name="upload_base64"
+                                    value="{{ $data->medias ? json_encode($data->medias) : [] }}">
+                                <input type="hidden" name="remove_base64" value="[]">
                             </div>
                         </div>
                         <div class="pull-right">
+                            <input type="hidden" name="latitude_visit" value="{{ $data->latitude_visit }}">
+                            <input type="hidden" name="longitude_visit" value="{{ $data->longitude_visit }}">
                             <button type="submit" class="btn btn-primary"><i class="fa fa-floppy-o mr-1"></i>
                                 Simpan</button>
                         </div>
@@ -530,5 +627,89 @@
             modal.find('[name="new_date"]').val($('[name="visit_date"]').val())
             modal.modal()
         })
+
+        $('body').on('click', '.remove-media-container', function(e) {
+            e.preventDefault()
+            let el = $(this).parents('.item-media')
+            let index = el.index()
+            let medias = JSON.parse($('[name="upload_base64"]').val())
+            let removeMedias = JSON.parse($('[name="remove_base64"]').val())
+
+            removeMedias.push(medias[index])
+            medias.splice(index, 1);
+            el.remove()
+
+            $('[name="remove_base64"]').val(JSON.stringify(removeMedias))
+        })
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                let latitude = position.coords.latitude;
+                let longitude = position.coords.longitude;
+                $('[name="latitude_visit"]').val(latitude)
+                $('[name="longitude_visit"]').val(longitude)
+            });
+        } else {
+            console.log("Geolocation is not supported by this browser.");
+        }
+
+        $('.add-image').click(function() {
+            $('[name="upload_image"]').click()
+        })
+
+        $('[name="upload_image"]').change(function(e) {
+            createBase64Format(this)
+        })
+
+        function createBase64Format(self) {
+            if ($(self).val()) {
+                let files = document.getElementById("upload_image").files;
+                for (let i = 0; i < files.length; i++) {
+                    let file = files[i]
+                    let oFReader = new FileReader();
+                    if (file.type.match(/image.*/)) {
+                        let reader = new FileReader();
+                        reader.onload = function(readerEvent) {
+                            let image = new Image();
+                            image.onload = function(imageEvent) {
+                                let canvas = document.createElement('canvas'),
+                                    max_size = 1000,
+                                    width = image.width,
+                                    height = image.height;
+                                if (width > height) {
+                                    if (width > max_size) {
+                                        height *= max_size / width;
+                                        width = max_size;
+                                    }
+                                } else {
+                                    if (height > max_size) {
+                                        width *= max_size / height;
+                                        height = max_size;
+                                    }
+                                }
+                                canvas.width = width;
+                                canvas.height = height;
+                                canvas.getContext('2d').drawImage(image, 0, 0, width, height);
+                                let dataUrl = canvas.toDataURL('image/jpeg');
+                                $('.add-image').before(createHtmlImage(dataUrl))
+
+                                let json = JSON.parse($('[name="upload_base64"]').val())
+                                json.push(dataUrl)
+                                $('[name="upload_base64"]').val(JSON.stringify(json))
+                            }
+                            image.src = readerEvent.target.result;
+                        }
+                        reader.readAsDataURL(file);
+                    }
+                }
+            }
+        }
+
+        function createHtmlImage(base64) {
+            let html = '<div class="item-media"><input type="hidden" name="medias[]" value="">' +
+                '<a href="javascript:void(0)"><img src="' + base64 + '" style="width:100%;"></a>' +
+                '<a href="javascript:void(0)" class="remove-media-container btn btn-danger btn-sm"><i class="fa fa-close"></i></a></div>'
+            return html;
+        }
     </script>
 @endsection
