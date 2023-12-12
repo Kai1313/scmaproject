@@ -303,7 +303,9 @@
                 console.log("succeed")
                 $("#response" + step).append(res)
                 alert('Successfully store transfer saldo data')
-                location.reload()
+                myButton.disabled = false
+                myButton.innerHTML = "Proses"
+                // location.reload()
             } else {
                 console.log("ajax response false " + step)
                 $("#response" + step).append(fail)
