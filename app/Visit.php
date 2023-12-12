@@ -34,17 +34,14 @@ class Visit extends Model
         'proofment_1',
         'proofment_2',
         'permintaan_penjualan_id',
+        'alasan_ubah_tanggal',
     ];
 
     public static $progressIndicator = [
         'VISIT', 'TERIMA SAMPLE', 'TRIAL SAMPLE', 'APPROVAL SAMPLE', 'QUOTATION', 'APPROVAL QUOTATION', 'ISSUED PO',
     ];
 
-    public static $visitMethod = [
-        'LOKASI',
-        'WHATSAPP',
-        'TELEPON',
-    ];
+    public static $visitMethod = ['LOKASI', 'WHATSAPP', 'TELEPON'];
 
     public static $kategoriPelanggan = ['EXISTING CUSTOMER', 'NEW CUSTOMER', 'OLD CUSTOMER'];
 

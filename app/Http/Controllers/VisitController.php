@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Master\Pelanggan;
 use App\Models\Master\Setting;
 use App\Penjualan;
 use App\Salesman;
@@ -46,7 +47,7 @@ class VisitController extends Controller
                 $data = $data->where('status_pelanggan', $request->status_pelanggan);
             }
 
-            $data = $data->orderBy('created_at', 'desc');
+            $data = $data->orderBy('visit_date', 'desc');
 
             $idUser = session()->get('user')['id_pengguna'];
             $idGrupUser = session()->get('user')['id_grup_pengguna'];
@@ -117,13 +118,22 @@ class VisitController extends Controller
             }
         }
 
-        $cabang = DB::table('cabang')->select('id_cabang as id', DB::raw('concat(kode_cabang," - ",nama_cabang) as text'))->where('status_cabang', '1')->get();
+        $cabang = DB::table('cabang')
+            ->select('id_cabang as id', DB::raw('concat(kode_cabang," - ",nama_cabang) as text'))
+            ->where('status_cabang', '1')
+            ->get();
+        $progress = Visit::$progressIndicator;
+        $methods = Visit::$visitMethod;
+        $categories = DB::table('kategori_kunjungan')->where('status_kategori_kunjungan', '1')->get();
         $salesman = Salesman::where('pengguna_id', session()->get('user')->id_pengguna)->first();
         return view('ops.visit.form', [
             'cabang' => $cabang,
             "pageTitle" => "SCA OPS | Kunjungan | " . ($data ? 'Edit' : 'Tambah'),
             'salesman' => $salesman,
             'data' => $data,
+            'progress' => $progress,
+            'categories' => $categories,
+            'methods' => $methods,
         ]);
     }
 
@@ -259,20 +269,79 @@ class VisitController extends Controller
         return $request->all();
     }
 
-    public function saveCustomer(Request $request, $id = 0)
+    public function findCustomer($customerid)
     {
-        $data = Pelanggan::find($id);
-        if (!$data) {
-            $data = new Pelanggan;
+        $data = Pelanggan::select('nama_pelanggan', 'alamat_pelanggan', 'telepon1_pelanggan', 'kontak_person_pelanggan', 'kota_pelanggan')
+            ->where('id_pelanggan', $customerid)->first();
+
+        return $data;
+    }
+
+    public function saveCustomer(Request $request, $id = 0, $customerid = 0)
+    {
+        $check = Pelanggan::where('nama_pelanggan', $request->nama_pelanggan)
+            ->where('id_pelanggan', '!=', $customerid)
+            ->first();
+        if ($check) {
+            return response()->json(['result' => false, 'message' => 'Nama pelanggan sudah ada'], 500);
         }
 
-        $data->nama_pelanggan = $request->nama_pelanggan;
-        $data->alamat_pelanggan = $request->alamat_pelanggan;
-        $data->kota_pelanggan = $request->kota_pelanggan;
-        $data->telepon1_pelanggan = $request->telepon1_pelanggan;
-        $data->kotak_person_pelanggan = $request->kotan_person_pelanggan;
-        $data->save();
+        DB::beginTransaction();
+        try {
+            $data = Pelanggan::find($customerid);
+            if (!$data) {
+                $data = new Pelanggan;
+                $data->id_wilayah_pelanggan = '1';
+                $data->id_kategori_pelanggan = '1';
+                $data->id_gudang = 1;
+                $data->status_pelanggan = '1';
+                $data->plafon_hari_pelanggan = '0';
+                $data->user_pelanggan = session()->get('user')['id_pengguna'];
+            }
 
-        return $request->all();
+            $data->nama_pelanggan = $request->nama_pelanggan;
+            $data->alamat_pelanggan = $request->alamat_pelanggan;
+            $data->kota_pelanggan = $request->kota_pelanggan;
+            $data->telepon1_pelanggan = $request->telepon1_pelanggan;
+            $data->kontak_person_pelanggan = $request->kontak_person_pelanggan;
+            $data->save();
+
+            DB::commit();
+            return response()->json([
+                'result' => true,
+                'message' => 'Pelanggan berhasil disimpan',
+                'redirect' => route('visit-entry', $id),
+            ], 200);
+        } catch (\Exception $th) {
+            DB::rollback();
+            Log::error($th);
+            return response()->json(["result" => false, "message" => 'Pelanggan gagal disimpan'], 500);
+        }
+    }
+
+    public function saveDateChange(Request $request, $id)
+    {
+        $data = Visit::find($id);
+        if (!$data) {
+            return response()->json(['result' => false, 'message' => 'Data kunjungan tidak ditemukan'], 500);
+        }
+
+        DB::beginTransaction();
+        try {
+            $data->alasan_ubah_tanggal = $request->alasan_ubah_tanggal . ', tanggal sebelumnya ' . $data->visit_date;
+            $data->visit_date = $request->new_date;
+            $data->save();
+
+            DB::commit();
+            return response()->json([
+                'result' => true,
+                'message' => 'Perubahan tanggal berhasil disimpan',
+                'redirect' => route('visit-entry', $id),
+            ], 200);
+        } catch (\Exception $th) {
+            DB::rollback();
+            Log::error($th);
+            return response()->json(["result" => false, "message" => 'Perubahan tanggal gagal disimpan'], 500);
+        }
     }
 }

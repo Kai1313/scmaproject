@@ -93,7 +93,7 @@
                             <tr>
                                 <td class="list-head">Pelanggan</td>
                                 <td class="list-sparator">:</td>
-                                <td class="list-value">{{ $data->id_pelanggan }}{{ $data->pelanggan->nama_pelanggan }}
+                                <td class="list-value">{{ $data->pelanggan->nama_pelanggan }}
                                 </td>
                             </tr>
                             <tr>

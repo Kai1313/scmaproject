@@ -106,8 +106,8 @@
 
 @section('main-section')
     <div class="content container-fluid">
-        <form action="{{ route('visit-save-entry', $data ? $data->id : 0) }}" method="post" class="post-action">
-            <div class="box">
+        <div class="box">
+            <form action="{{ route('visit-save-entry', $data ? $data->id : 0) }}" method="post" class="post-action">
                 <div class="box-header">
                     <h3 class="box-title">{{ $data ? 'Edit' : 'Tambah' }} Kunjungan</h3>
                     <a href="{{ route('visit') }}" class="btn bg-navy btn-sm btn-default pull-right">
@@ -137,7 +137,7 @@
                                     <input type="date" name="visit_date"
                                         value="{{ old('visit_date', $data ? $data->visit_date : date('Y-m-d')) }}"
                                         class="form-control datepicker" data-validation="[NOTEMPTY]"
-                                        data-validation-message="Tanggal tidak boleh kosong">
+                                        data-validation-message="Tanggal tidak boleh kosong" {{ $data ? 'readonly' : '' }}>
                                 </div>
                             </div>
                         </div>
@@ -175,31 +175,136 @@
                                 <label class="col-md-4">Pelanggan <span>*</span></label>
                                 <div class="form-group col-md-8">
                                     <select name="id_pelanggan" class="form-control select2" data-validation="[NOTEMPTY]"
-                                        data-validation-message="Pelanggan tidak boleh kosong">
+                                        data-validation-message="Pelanggan tidak boleh kosong"
+                                        {{ $data ? 'readonly' : '' }}>
                                         <option value="">Pilih Pelanggan</option>
                                         @if ($data && $data->id_pelanggan)
                                             <option value="{{ $data->id_pelanggan }}" selected>
                                                 {{ $data->pelanggan->nama_pelanggan }}</option>
                                         @endif
                                     </select>
-                                    <a href="javascript:void(0)" class="show-customer">Tambah Pelanggan Baru</a>
+                                    <div class="customer-action" style="{{ $data ? 'display:none' : 'display:block' }}">
+                                        <a href="{{ route('visit-save-customer', [$data ? $data->id : 0, 0]) }}"
+                                            class="show-customer">Tambah Pelanggan</a>
+                                        @if ($data && $data->id_pelanggan)
+                                            |
+                                            <a href="{{ route('visit-save-customer', [$data ? $data->id : 0, $data->id_pelanggan]) }}"
+                                                class="show-customer" data-id="{{ $data->id_pelanggan }}">Perbarui
+                                                Pelanggan</a>
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
                             <div class="row">
                                 <label class="col-md-4">Catatan</label>
                                 <div class="form-group col-md-8">
-                                    <textarea name="pre_visit_desc" class="form-control" rows="3">{{ old('pre_visit_desc', $data ? $data->pre_visit_desc : '') }}</textarea>
+                                    <textarea name="pre_visit_desc" class="form-control" rows="3" {{ $data ? 'readonly' : '' }}>{{ old('pre_visit_desc', $data ? $data->pre_visit_desc : '') }}</textarea>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
                     <div class="pull-right">
-                        <button type="submit" class="btn btn-primary"><i class="fa fa-floppy-o mr-1"></i> Simpan</button>
+                        <button type="submit" class="btn btn-primary submit-header"
+                            style="{{ $data ? 'display:none' : 'display:inline' }}"><i class="fa fa-floppy-o mr-1"></i>
+                            Simpan</button>
+                        @if ($data)
+                            <button type="button" class="btn btn-warning edit-header"><i class="fa fa-pencil mr-1"></i>
+                                Perbarui Data Kunjungan</button>
+                            <button type="button" class="btn btn-default cancel-edit-header" style="display:none;"><i
+                                    class="fa fa-close mr-1"></i>
+                                Batal</button>
+                        @endif
                     </div>
                 </div>
+            </form>
+        </div>
+
+        @if ($data)
+            <div class="text-right" style="margin-bottom:15px;">
+                <a href="{{ route('visit-report-entry', $data->id) }}" class="btn btn-info">
+                    <i class="fa fa-plus mr-1"></i> Buat Hasil Kunjungan
+                </a>
+                <a href="{{ route('visit-save-date-change', $data->id) }}" class="btn btn-success change-date"><i
+                        class="fa fa-calendar mr-1"></i>
+                    Perbarui Tanggal Kunjungan</a>
+                <a href="{{ route('cancel-visit', $data->id) }}" class="btn btn-danger show-cancel-visit">
+                    <i class="fa fa-close mr-1"></i> Batal Kunjungan
+                </a>
             </div>
-        </form>
+
+            <div class="box">
+                <form action="{{ route('visit-save-report-entry', $data->id) }}" method="post" class="post-action">
+                    <div class="box-header">
+                        <h3 class="box-title">Hasil Kunjungan</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label for="">Metode Kunjungan</label>
+                                <div class="form-group">
+                                    <select name="visit_type" class="form-control select2">
+                                        <option value="">Pilih Metode</option>
+                                        @foreach ($methods as $method)
+                                            <option value="{{ $method }}"
+                                                {{ $data->visit_type == $method ? 'selected' : '' }}>
+                                                {{ $method }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <label for="">Kategori Kunjungan</label>
+                                <div class="form-group">
+                                    <select name="kategori_kunjungan" class="form-control select2">
+                                        <option value="">Pilih Kategori</option>
+                                        @foreach ($categories as $category)
+                                            <option value="{{ $category->nama_kategori_kunjungan }}"
+                                                {{ $data->kategori_kunjungan == $category->nama_kategori_kunjungan ? 'selected' : '' }}>
+                                                {{ $category->nama_kategori_kunjungan }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <label for="">Hasil Kunjungan</label>
+                                <div class="form-group">
+                                    <textarea name="visit_title" class="form-control" rows="3">{{ $data->visit_title }}</textarea>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="">Progres</label>
+                                <div class="form-group">
+                                    @foreach ($progress as $pro)
+                                        <label style="margin-right:10px;">
+                                            <input type="checkbox" name="progress_ind[]" value="{{ $pro }}">
+                                            {{ $pro }}
+                                        </label>
+                                    @endforeach
+                                </div>
+                                <label for="">Kendala</label>
+                                <div class="form-group">
+                                    <textarea name="visit_desc" class="form-control" rows="3">{{ $data->visit_desc }}</textarea>
+                                </div>
+                                <label for="">Solusi</label>
+                                <div class="form-group">
+                                    <textarea name="solusi" class="form-control" rows="3">{{ $data->solusi }}</textarea>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="">Gambar</label>
+                                <div style="border:1px solid black;height:118px;overflow-x: scroll;white-space:nowrap;">
+                                    <img src="{{ asset('images/default.jpg') }}" style="width:100px;padding:3px;">
+                                    <img src="{{ asset('images/default.jpg') }}" style="width:100px;padding:3px;">
+                                    <img src="{{ asset('images/default.jpg') }}" style="width:100px;padding:3px;">
+                                    <img src="{{ asset('images/default.jpg') }}" style="width:100px;padding:3px;">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pull-right">
+                            <button type="submit" class="btn btn-primary"><i class="fa fa-floppy-o mr-1"></i>
+                                Simpan</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        @endif
     </div>
 
     <div id="modal-customer-visit" class="modal fade" role="dialog">
@@ -214,32 +319,90 @@
                         <div class="row">
                             <label for="" class="col-md-4">Nama Pelanggan</label>
                             <div class="form-group col-md-8">
-                                <input type="text" class="form-control" name="nama_pelanggan">
+                                <input type="text" class="form-control" name="nama_pelanggan"
+                                    data-validation="[NOTEMPTY]" data-validation-message="Nama tidak boleh kosong">
                             </div>
                         </div>
                         <div class="row">
                             <label for="" class="col-md-4">Alamat</label>
                             <div class="form-group col-md-8">
-                                <textarea name="alamat_pelanggan" class="form-control"></textarea>
+                                <textarea name="alamat_pelanggan" class="form-control" data-validation="[NOTEMPTY]"
+                                    data-validation-message="Alamat tidak boleh kosong"></textarea>
                             </div>
                         </div>
                         <div class="row">
                             <label for="" class="col-md-4">Kota</label>
                             <div class="form-group col-md-8">
-                                <input type="text" class="form-control" name="kota_pelanggan">
+                                <input type="text" class="form-control" name="kota_pelanggan"
+                                    data-validation="[NOTEMPTY]" data-validation-message="Kota tidak boleh kosong">
                             </div>
                         </div>
                         <div class="row">
                             <label for="" class="col-md-4">Telepon</label>
                             <div class="form-group col-md-8">
-                                <input type="text" class="form-control" name="telepon1_pelanggan">
+                                <input type="text" class="form-control" name="telepon1_pelanggan"
+                                    data-validation="[NOTEMPTY]" data-validation-message="Telepon tidak boleh kosong">
                             </div>
                         </div>
                         <div class="row">
                             <label for="" class="col-md-4">Orang yang dihubungi</label>
                             <div class="form-group col-md-8">
-                                <input type="text" class="form-control" name="kontak_person_pelanggan">
+                                <input type="text" class="form-control" name="kontak_person_pelanggan"
+                                    data-validation="[NOTEMPTY]" data-validation-message="Kontak tidak boleh kosong">
                             </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-cancel-visit" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <form action="" method="post" class="post-action">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Batalkan Kunjungan</h4>
+                    </div>
+                    <div class="modal-body">
+                        <label for="">Alasan Pembatalan</label>
+                        <div class="form-group">
+                            <textarea name="alasan_pembatalan" class="form-control" data-validation="[NOTEMPTY]"
+                                data-validation-message="Alasan pembatalan tidak boleh kosong"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-date-change-visit" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <form action="" method="post" class="post-action">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Perbarui Tanggal Kunjungan</h4>
+                    </div>
+                    <div class="modal-body">
+                        <label for="">Tanggal</label>
+                        <div class="form-group">
+                            <input type="date" class="form-control" data-validation="[NOTEMPTY]"
+                                data-validation-message="Tanggal tidak boleh kosong" name="new_date">
+                        </div>
+                        <label for="">Alasan Ubah Tanggal</label>
+                        <div class="form-group">
+                            <textarea name="alasan_ubah_tanggal" class="form-control" data-validation="[NOTEMPTY]"
+                                data-validation-message="Alasan tidak boleh kosong"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -302,7 +465,70 @@
 
         $('.show-customer').click(function(e) {
             e.preventDefault()
-            console.log($('#modal-customer-visit').modal())
+            let modal = $('#modal-customer-visit')
+            modal.find('input,textarea').val('')
+            if ($(this).data('id')) {
+                $('#cover-spin').show()
+                $.ajax({
+                    url: "{{ route('visit-find-customer', $data ? $data->id_pelanggan : 0) }}",
+                    success: function(res) {
+                        for (let key in res) {
+                            $('[name="' + key + '"]').val(res[key].trim())
+                        }
+
+                        $('#cover-spin').hide()
+                    },
+                    error: function(error) {
+                        $('#cover-spin').hide()
+                        Swal.fire("Gagal Menyimpan Data. ", data.responseJSON.message, 'error')
+                    }
+                })
+            }
+
+            let url = $(this).prop('href')
+            modal.find('form').attr('action', url)
+            modal.modal()
+        })
+
+        $('.show-cancel-visit').click(function(e) {
+            e.preventDefault()
+            let url = $(this).prop('href')
+            let modal = $('#modal-cancel-visit')
+            modal.find('form').attr('action', url)
+            modal.modal()
+        })
+
+        $('.edit-header').click(function() {
+            let arrayFormHeader = ['id_pelanggan', 'pre_visit_desc'];
+            for (let i = 0; i < arrayFormHeader.length; i++) {
+                $('[name="' + arrayFormHeader[i] + '"]').attr('readonly', false)
+            }
+
+            $('.submit-header').css('display', 'inline')
+            $('.edit-header').css('display', 'none')
+            $('.cancel-edit-header').css('display', 'inline')
+            $('.customer-action').css('display', 'inline')
+        })
+
+        $('.cancel-edit-header').click(function() {
+            let arrayFormHeader = ['id_pelanggan', 'pre_visit_desc'];
+            for (let i = 0; i < arrayFormHeader.length; i++) {
+                $('[name="' + arrayFormHeader[i] + '"]').attr('readonly', true)
+            }
+
+            $('.submit-header').css('display', 'none')
+            $('.edit-header').css('display', 'inline')
+            $('.cancel-edit-header').css('display', 'none')
+            $('.customer-action').css('display', 'none')
+        })
+
+        $('.change-date').click(function(e) {
+            e.preventDefault()
+            let url = $(this).prop('href')
+            let modal = $('#modal-date-change-visit')
+            modal.find('form').attr('action', url)
+            modal.find('[name="new_date"]').val($('[name="visit_date"]').val())
+            modal.modal()
         })
     </script>
 @endsection

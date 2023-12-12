@@ -151,17 +151,18 @@ Route::prefix('marketing-tool')->group(function () {
         Route::get('/report-entry/{id}', 'VisitController@reportEntry')->name('visit-report-entry');
         Route::post('/cancel-visit/{id}', 'VisitController@cancelVisit')->name('cancel-visit');
         route::post('/save_report_entry/{id}', 'VisitController@saveReportEntry')->name('visit-save-report-entry');
-        Route::post('/update-visit', 'VisitController@updateVisit')->name('update-visit');
+        // Route::post('/update-visit', 'VisitController@updateVisit')->name('update-visit');
         Route::get('/delete/{id}', 'VisitController@destroy')->name('visit-delete');
-        Route::resource('reporting', 'ReportingVisitController', [
-            'as' => 'visit',
-        ]);
-        Route::prefix('/reporting')->group(function () {
-            Route::get('/select-reporting-visit', 'ReportingVisitController@select')->name('visit.reporting.select');
-        });
+        // Route::resource('reporting', 'ReportingVisitController', [
+        //     'as' => 'visit',
+        // ]);
+        // Route::prefix('/reporting')->group(function () {
+        //     Route::get('/select-reporting-visit', 'ReportingVisitController@select')->name('visit.reporting.select');
+        // });
 
-        Route::get('customer/{id?}', 'VisitController@customer')->name('visit-customer');
-        Route::post('save-customer/{id}', 'VisitController@saveCustomer')->name('visit-save-customer');
+        Route::get('find-customer/{customerid}', 'VisitController@findCustomer')->name('visit-find-customer');
+        Route::post('save-customer/{id}/{customerid}', 'VisitController@saveCustomer')->name('visit-save-customer');
+        Route::post('save-date-change/{id}', 'VisitController@saveDateChange')->name('visit-save-date-change');
     });
 
     Route::get('/progress-visit/index/show/{show}', 'ProgressVisitController@show')->name('visit.progress-visit.show');

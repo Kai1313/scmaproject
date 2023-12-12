@@ -122,7 +122,7 @@ if ($('.post-action').length > 0) {
             },
             callback: {
                 onSubmit: function (node, formData) {
-                    saveData()
+                    saveData(node)
                 }
             }
         },
@@ -137,13 +137,13 @@ if ($('.post-action').length > 0) {
     $.validate(validation)
 }
 
-function saveData() {
-    let url = $('form').prop('action')
+function saveData(node) {
+    let url = node.prop('action')
     $('#cover-spin').show()
     $.ajax({
         url: url,
         type: "POST",
-        data: $("form").serialize(),
+        data: node.serialize(),
         dataType: "JSON",
         success: function (data) {
             $('#cover-spin').hide()
