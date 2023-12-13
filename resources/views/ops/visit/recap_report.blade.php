@@ -46,12 +46,12 @@
 @section('header')
     <section class="content-header">
         <h1>
-            Laporan Kunjungan
+            Laporan Rekap Kunjungan
             <small></small>
         </h1>
         <ol class="breadcrumb">
             <li><a href="#"><i class="fa fa-dashboard"></i> Dashboard</a></li>
-            <li class="active">Laporan Kunjungan</li>
+            <li class="active">Laporan Rekap Kunjungan</li>
         </ol>
     </section>
 @endsection
@@ -90,55 +90,16 @@
                         </div>
                     </div>
                     <div class="col-md-2 filter-div">
-                        <label>Status</label>
-                        <div class="form-group">
-                            <select id="status" class="form-control select2" name="status">
-                                <option value="">Semua Status</option>
-                                <option value="1">Belum Visit</option>
-                                <option value="2">Sudah Visit</option>
-                                <option value="0">Batal Visit</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-2 filter-div">
-                        <label>Kategori Pelanggan</label>
-                        <div class="form-group">
-                            <select id="status_pelanggan" class="form-control select2" name="status_pelanggan">
-                                <option value="">Semua Kategori</option>
-                                @foreach ($customerCategory as $category)
-                                    <option value="{{ $category }}">{{ $category }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-2 filter-div">
                         <label class="d-block">&nbsp;</label>
                         <div class="form-group">
-                            <button type="button" class="btn btn-info" onclick="table.ajax.reload()"><i
-                                    class="fa fa-search mr-1"></i> Cari</button>
+                            <button type="button" class="btn btn-info btn-search"><i class="fa fa-search mr-1"></i>
+                                Cari</button>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="box-body">
-                <div class="row">
-                    <div class="col-md-12">
-                        <table class="table table-bordered data-table display" width="100%">
-                            <thead>
-                                <tr>
-                                    <th style="width:100px;">Tanggal</th>
-                                    <th style="width:100px;">Sales</th>
-                                    <th>Pelanggan</th>
-                                    <th style="width:300px">Hasil Kunjungan</th>
-                                    <th style="width:300px">Masalah</th>
-                                    <th style="width:300px">Solusi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+            <div class="box-body" id="target-body">
+
             </div>
         </div>
     </div>
@@ -181,44 +142,24 @@
             return param;
         }
 
-        var table = $('.data-table').DataTable({
-            processing: true,
-            serverSide: true,
-            pageLength: 50,
-            scrollX: true,
-            ajax: {
-                url: "{{ route('visit_report') }}",
+        $('.btn-search').click(function(e) {
+            e.preventDefault()
+            $('#cover-spin').show()
+            $.ajax({
+                url: '',
                 data: filterDatatable(),
-            },
-            language: {
-                processing: '<img src="{{ asset('images/833.gif') }}" alt="">',
-                paginate: {
-                    'first': 'First',
-                    'last': 'Last',
-                    'next': '→',
-                    'previous': '←'
+                success: function(res) {
+                    if (res.result) {
+                        $('#target-body').html(res.html)
+                    }
+
+                    $('#cover-spin').hide()
                 },
-                emptyTable: "Data Tidak Ditemukan",
-            },
-            columns: [{
-                data: 'visit_date',
-                name: 'visit_date'
-            }, {
-                data: 'salesman.nama_salesman',
-                name: 'salesman.nama_salesman',
-            }, {
-                data: 'pelanggan.nama_pelanggan',
-                name: 'pelanggan.nama_pelanggan',
-            }, {
-                data: 'visit_title',
-                name: 'visit_title',
-            }, {
-                data: 'visit_desc',
-                name: 'visit_desc',
-            }, {
-                data: 'solusi',
-                name: 'solusi',
-            }],
-        });
+                error: function(error) {
+                    $('#cover-spin').hide()
+                    Swal.fire("Gagal Ambil Data. ", data.responseJSON.message, 'error')
+                }
+            })
+        })
     </script>
 @endsection

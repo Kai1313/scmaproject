@@ -165,9 +165,9 @@ Route::prefix('marketing-tool')->group(function () {
         Route::post('save-date-change/{id}', 'VisitController@saveDateChange')->name('visit-save-date-change');
     });
 
-    Route::prefix('visit_report')->namespace('Report')->group(function () {
-        Route::get('/index/{user_id?}', 'VisitController@index')->name('visit_report');
-    });
+    Route::get('visit_recap_report/index/{user_id?}', 'Report\VisitController@recapIndex')->name('visit_recap_report');
+
+    Route::get('visit_report/index/{user_id?}', 'Report\VisitController@index')->name('visit_report');
 
     Route::get('/progress-visit/index/show/{show}', 'ProgressVisitController@show')->name('visit.progress-visit.show');
     Route::get('/progress-visit/index/{user_id?}', 'ProgressVisitController@index')->name('progress_visit');
