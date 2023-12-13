@@ -165,6 +165,10 @@ Route::prefix('marketing-tool')->group(function () {
         Route::post('save-date-change/{id}', 'VisitController@saveDateChange')->name('visit-save-date-change');
     });
 
+    Route::prefix('visit_report')->namespace('Report')->group(function () {
+        Route::get('/index/{user_id?}', 'VisitController@index')->name('visit_report');
+    });
+
     Route::get('/progress-visit/index/show/{show}', 'ProgressVisitController@show')->name('visit.progress-visit.show');
     Route::get('/progress-visit/index/{user_id?}', 'ProgressVisitController@index')->name('progress_visit');
     Route::get('/progress-visit/generate-visualisasi-data/{user_id?}', 'ProgressVisitController@generateVisualisasiData')->name('generate-visualisasi-data-visit');
