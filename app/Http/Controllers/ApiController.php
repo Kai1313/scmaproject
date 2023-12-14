@@ -965,6 +965,320 @@ class ApiController extends Controller
         }
     }
 
+    public function journalPenjualanAsset(Request $request)
+    {
+        try {
+            // init data
+            // header
+            $id_transaksi = $request->no_transaksi;
+            $tanggal_jurnal = date('Y-m-d', strtotime($request->tanggal));
+            $void = $request->void;
+            $user_created = $request->user;
+            $id_pelanggan = $request->pelanggan;
+            $id_cabang = $request->cabang;
+            $detail_inventory = array_values($request->detail);
+
+            $data_pelanggan = DB::table("pelanggan")->where('id_pelanggan', $id_pelanggan)->first();
+            $nama_pelanggan = $data_pelanggan->nama_pelanggan;
+            $catatan_me = 'Journal Otomatis Penjualan Asset - ' . $id_transaksi . ' - ' . $nama_pelanggan;
+
+            $array_inventory = [];
+            foreach ($detail_inventory as $detail_inv) {
+                $array_inventory[$detail_inv['id_barang']] = [
+                    'id_barang' => $detail_inv['id_barang'],
+                    'nama_barang' => $detail_inv['nama_barang'],
+                    'kode_batang' => $detail_inv['kode_batang'],
+                    'kode_barang' => $detail_inv['kode_barang'],
+                    'value' => $detail_inv['value'],
+                    'asset_beli' => $detail_inv['asset_beli'],
+                    'akumulasi_penyusutan' => $detail_inv['akumulasi_penyusutan'],
+                ];
+            }
+
+            // init setting
+            $data_akun_laba_rugi_asset = DB::table('setting')->where('code', 'Laba Rugi Asset')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
+            if (empty($data_akun_laba_rugi_asset)) {
+                return response()->json([
+                    "result" => false,
+                    "code" => 404,
+                    "message" => "Error, Setting Laba Rugi Asset not found",
+                ], 404);
+            }
+
+            $data_akun_piutang_dagang = DB::table('setting')->where('code', 'Piutang Dagang')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
+            if (empty($data_akun_piutang_dagang)) {
+                return response()->json([
+                    "result" => false,
+                    "code" => 404,
+                    "message" => "Error, Setting Piutang Dagang not found",
+                ], 404);
+            }
+
+            $data_akun_ppn_keluaran = DB::table('setting')->where('code', 'PPN Keluaran')->where('tipe', 2)->where('id_cabang', $id_cabang)->first();
+            if (empty($data_akun_ppn_keluaran)) {
+                return response()->json([
+                    "result" => false,
+                    "code" => 404,
+                    "message" => "Error, Setting PPN Keluaran not found",
+                ], 404);
+            }
+
+            // cek apakah ada saldo_transaksi
+            $check_trx_saldo = TrxSaldo::where("id_transaksi", $id_transaksi)->first();
+            if (empty($check_trx_saldo)) {
+                DB::rollback();
+                return response()->json([
+                    "result" => false,
+                    "code" => 404,
+                    "message" => "Error saldo transaksi belum ada",
+                ], 404);
+            }
+
+            // detail
+            // Memorial
+            $akun_laba_rugi_asset = $data_akun_laba_rugi_asset->value2;
+            $akun_piutang_dagang = $data_akun_piutang_dagang->value2;
+            $akun_ppn_keluaran = $data_akun_ppn_keluaran->value2;
+            $total = round(floatval($request->total), 2);
+            $nominal_ppn = round(floatval($request->ppn), 2);
+
+            // Check balance
+            $check_balance_debit = 0;
+            $check_balance_credit = 0;
+
+            $jurnal_detail_me = [];
+
+            // cari biaya
+            $penjualan = DB::table('penjualan')->where('nama_penjualan', $id_transaksi)->first();
+
+            if (empty($penjualan)) {
+                return response()->json([
+                    "result" => false,
+                    "code" => 400,
+                    "message" => "Error transaksi penjualan tidak ditemukan",
+                ], 400);
+            }
+
+            if ($akun_laba_rugi_asset == null) {
+                DB::rollback();
+                return response()->json([
+                    "result" => false,
+                    "message" => "Error when store Jurnal data on table detail. Akun Laba Rugi Asset can not null.",
+                ]);
+            } else {
+                $data_master_akun_laba_rugi_asset = Akun::find($akun_laba_rugi_asset);
+                if (empty($data_master_akun_laba_rugi_asset)) {
+                    DB::rollback();
+                    return response()->json([
+                        "result" => false,
+                        "message" => "Error when store Jurnal data on table detail. Akun Laba Rugi Asset not found.",
+                    ]);
+                }
+            }
+
+            foreach ($array_inventory as $d_inv) {
+                $barang = Barang::find($d_inv['id_barang']);
+                if ($id_cabang == 1) {
+                    $akun_penyusutan_barang = $barang->id_akun_biaya;
+                } else {
+                    $format_akun = 'id_akun_biaya' . $id_cabang;
+                    $akun_penyusutan_barang = $barang->$format_akun;
+                }
+
+                if ($id_cabang == 1) {
+                    $akun_asset_barang = $barang->id_akun;
+                } else {
+                    $format_akun = 'id_akun' . $id_cabang;
+                    $akun_asset_barang = $barang->$format_akun;
+                }
+
+                if ($akun_penyusutan_barang == null) {
+                    DB::rollback();
+                    return response()->json([
+                        "result" => false,
+                        "message" => "Error when store Jurnal data on table detail. Akun Penyusutan Barang " . $barang->kode_barang . ' - ' . $barang->nama_barang . ' can not null.',
+                    ]);
+                } else {
+                    $data_akun_penyusutan_barang = Akun::find($akun_penyusutan_barang);
+                    if (empty($data_akun_penyusutan_barang)) {
+                        DB::rollback();
+                        return response()->json([
+                            "result" => false,
+                            "message" => "Error when store Jurnal data on table detail. Akun Penyusutan Barang " . $barang->kode_barang . ' - ' . $barang->nama_barang . ' not found.',
+                        ]);
+                    }
+                }
+
+                if ($akun_asset_barang == null) {
+                    DB::rollback();
+                    return response()->json([
+                        "result" => false,
+                        "message" => "Error when store Jurnal data on table detail. Akun Penyusutan Barang " . $barang->kode_barang . ' - ' . $barang->nama_barang . ' can not null.',
+                    ]);
+                } else {
+                    $data_akun_asset_barang = Akun::find($akun_asset_barang);
+                    if (empty($data_akun_asset_barang)) {
+                        DB::rollback();
+                        return response()->json([
+                            "result" => false,
+                            "message" => "Error when store Jurnal data on table detail. Akun Penyusutan Barang " . $barang->kode_barang . ' - ' . $barang->nama_barang . ' not found.',
+                        ]);
+                    }
+                }
+
+                array_push($jurnal_detail_me, [
+                    'akun' => $akun_laba_rugi_asset,
+                    'debet' => round(floatval($d_inv['asset_beli']) - floatval($d_inv['akumulasi_penyusutan']), 2),
+                    'credit' => 0,
+                    'keterangan' => 'Jurnal Otomatis Laba Rugi Asset - ' . $id_transaksi . ' - ' . $nama_pelanggan . ' - '  . $d_inv['kode_batang'] .  ' - ' . $d_inv['kode_barang'] . ' - ' . $d_inv['nama_barang'],
+                    'id_transaksi' => null,
+                ]);
+
+                array_push($jurnal_detail_me, [
+                    'akun' => $akun_penyusutan_barang,
+                    'debet' => round(floatval($d_inv['akumulasi_penyusutan']), 2),
+                    'credit' => 0,
+                    'keterangan' => 'Jurnal Otomatis Akumulasi Penyusutan Barang - ' . $id_transaksi . ' - ' . $nama_pelanggan . ' - ' . $data_akun_penyusutan_barang->nama_akun . ' - ' . $d_inv['kode_batang'] .  ' - ' . $d_inv['kode_barang'] . ' - ' . $d_inv['nama_barang'],
+                    'id_transaksi' => null,
+                ]);
+
+                array_push($jurnal_detail_me, [
+                    'akun' => $akun_asset_barang,
+                    'debet' => 0,
+                    'credit' => round(floatval($d_inv['asset_beli']), 2),
+                    'keterangan' => 'Jurnal Otomatis Asset - ' . $id_transaksi . ' - ' . $nama_pelanggan . ' - ' . $data_akun_asset_barang->nama_akun . ' - ' . $d_inv['kode_batang'] .  ' - ' . $d_inv['kode_barang'] . ' - ' . $d_inv['nama_barang'],
+                    'id_transaksi' => null,
+                ]);
+            }
+
+            array_push($jurnal_detail_me,
+                [
+                    'akun' => $akun_piutang_dagang,
+                    'debet' => round($total, 2),
+                    'credit' => 0,
+                    'keterangan' => 'Jurnal Otomatis Penjualan Asset ' . $id_transaksi . ' - ' . $nama_pelanggan,
+                    'id_transaksi' => null,
+                ],
+                [
+                    'akun' => $akun_laba_rugi_asset,
+                    'debet' => 0,
+                    'credit' => round(floatval($total) - floatval($nominal_ppn), 2),
+                    'keterangan' => 'Jurnal Otomatis Laba Rugi Asset ' . $id_transaksi . ' - ' . $nama_pelanggan,
+                    'id_transaksi' => null,
+                ],
+                [
+                    'akun' => $akun_ppn_keluaran,
+                    'debet' => 0,
+                    'credit' => $nominal_ppn,
+                    'keterangan' => 'Jurnal Otomatis PPN Keluaran - ' . $id_transaksi . ' - ' . $nama_pelanggan,
+                    'id_transaksi' => null,
+                ]
+            );
+            // Find Header data and delete detail
+            $header_me = JurnalHeader::where("id_transaksi", $id_transaksi)->where('jenis_jurnal', 'ME')->where('void', 0)->first();
+
+            // Begin save
+            DB::beginTransaction();
+            if (!empty($header_me)) {
+                JurnalDetail::where('id_jurnal', $header_me->id_jurnal)->delete();
+                $header_me->id_cabang = $id_cabang;
+                $header_me->tanggal_jurnal = $tanggal_jurnal;
+                $header_me->void = $void;
+                $header_me->catatan = $catatan_me;
+                $header_me->user_modified = $user_created;
+                $header_me->dt_modified = date('Y-m-d h:i:s');
+            } else {
+                $header_me = new JurnalHeader();
+                $header_me->id_cabang = $id_cabang;
+                $header_me->kode_jurnal = $this->generateJournalCode($id_cabang, 'ME');
+                $header_me->id_transaksi = $id_transaksi;
+                $header_me->jenis_jurnal = 'ME';
+                $header_me->tanggal_jurnal = $tanggal_jurnal;
+                $header_me->void = $void;
+                $header_me->catatan = $catatan_me;
+                $header_me->user_created = $user_created;
+                $header_me->dt_created = date('Y-m-d h:i:s');
+                $header_me->user_modified = $user_created;
+                $header_me->dt_created = date('Y-m-d h:i:s');
+            }
+
+            if (!$header_me->save()) {
+                DB::rollback();
+                return response()->json([
+                    "result" => false,
+                    "code" => 400,
+                    "message" => "Error when store Jurnal data on table header",
+                ], 400);
+            }
+
+            if (!empty($jurnal_detail_me)) {
+                $index = 1;
+                foreach ($jurnal_detail_me as $jd) {
+                    if (($jd['debet'] > 0 && $jd['credit'] == 0) || ($jd['debet'] == 0 && $jd['credit'] > 0)) {
+                        $detail_me = new JurnalDetail();
+                        $detail_me->id_jurnal = $header_me->id_jurnal;
+                        $detail_me->index = $index;
+                        $detail_me->id_akun = $jd['akun'];
+                        $detail_me->debet = $jd['debet'];
+                        $detail_me->credit = $jd['credit'];
+                        $detail_me->keterangan = $jd['keterangan'];
+                        $detail_me->id_transaksi = $jd['id_transaksi'];
+                        $detail_me->user_created = $user_created;
+                        $detail_me->dt_created = date('Y-m-d h:i:s');
+                        $detail_me->user_modified = $user_created;
+                        $detail_me->dt_modified = date('Y-m-d h:i:s');
+
+                        // variable check
+                        $check_balance_debit += $jd['debet'];
+                        $check_balance_credit += $jd['credit'];
+
+                        if (!$detail_me->save()) {
+                            DB::rollback();
+                            return response()->json([
+                                "result" => false,
+                                "code" => 400,
+                                "message" => "Error when store Jurnal data on table detail",
+                            ], 400);
+                        }
+
+                        $index++;
+                    }
+                }
+            }
+
+            $check_balance_debit = round($check_balance_debit, 2);
+            $check_balance_credit = round($check_balance_credit, 2);
+            // check balance
+            if ($check_balance_debit != $check_balance_credit) {
+                DB::rollback();
+                return response()->json([
+                    "result" => false,
+                    "code" => 400,
+                    "message" => "Error when store Jurnal data on table detail. Credit & debet not balance. credit: " . $check_balance_credit . ", debet : " . $check_balance_debit,
+                    "data" => $jurnal_detail_me,
+                ], 400);
+            }
+
+            DB::commit();
+            return response()->json([
+                "result" => true,
+                "code" => 200,
+                "message" => "Successfully stored Jurnal data",
+                "data" => $header_me->kode_jurnal
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::info("Error when store Jurnal data");
+            Log::info($e);
+            return response()->json([
+                "result" => false,
+                "code" => 400,
+                "message" => "Error when store Jurnal data",
+                "exception" => $e,
+            ], 400);
+        }
+    }
+
     public function journalPembelian(Request $request)
     {
         try {
