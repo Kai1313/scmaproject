@@ -105,7 +105,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
+                                <!-- <div class="col-md-3">
                                     <div class="form-group">
                                         <label>Periode Bulan</label>
                                         <select name="month" id="month" class="form-control select2">
@@ -133,6 +133,18 @@
                                             <option value="2025">2025</option>
                                         </select>
                                     </div>
+                                </div> -->
+                                <div class="col-md-3 param-range">
+                                    <div class="form-group">
+                                        <label>Tanggal Awal</label>
+                                        <input type="text" class="form-control datepicker" id="start_date" name="start_date" placeholder="Masukkan tanggal awal" value="{{ isset($startdate) ? $startdate : date('Y-m-d') }}" data-validation="[NOTEMPTY]" data-validation-message="Tanggal awal tidak boleh kosong">
+                                    </div>
+                                </div>
+                                <div class="col-md-3 param-range">
+                                    <div class="form-group">
+                                        <label>Tanggal Akhir</label>
+                                        <input type="text" class="form-control datepicker" id="end_date" name="end_date" placeholder="Masukkan tanggal akhir" value="{{ isset($enddate) ? $enddate : date('Y-m-d') }}" data-validation="[NOTEMPTY]" data-validation-message="Tanggal akhir tidak boleh kosong">
+                                    </div>
                                 </div>
                                 <div class="col-md-2">
                                     <div class="form-group">
@@ -140,8 +152,8 @@
                                         <select name="type" id="type" class="form-control select2">
                                             <option value="recap">Laba Rugi</option>
                                             <option value="detail">Laba Rugi Detail</option>
-                                            {{-- <option value="awal">Laba Rugi Awal</option>
-                                            <option value="awal_detail">Laba Rugi Awal Detail</option> --}}
+                                            <!-- <option value="awal">Laba Rugi Awal</option>
+                                            <option value="awal_detail">Laba Rugi Awal Detail</option> -->
                                         </select>
                                     </div>
                                 </div>
@@ -222,6 +234,7 @@
     var viewButton = document.getElementById("btn-view")
     var excelButton = document.getElementById("btn-excel")
     var printButton = document.getElementById("btn-print")
+    const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
     var validateLedger = {
         submit: {
@@ -240,19 +253,20 @@
             callback: {
                 onSubmit: function(node, formData, event) {
                     // Init data
-                    const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
                     let cabang = $("#cabang_input").val()
                     let year = $("#year").val()
                     let month = $("#month").val()
                     let type = $("#type").val()
-                    let param = "?id_cabang=" + cabang + "&year=" + year + "&month=" + month + "&type=" + type;
+                    let startDate = $("#start_date").val();
+                    let endDate = $("#end_date").val();
+                    let param = "?id_cabang=" + cabang + "&start=" + startDate + "&end=" + endDate + "&year=" + year + "&month=" + month + "&type=" + type;
 
                     switch (guid) {
                         case "view":
                             // Prepare spinner on button
                             viewButton.disabled = true;
                             viewButton.innerHTML = '<i class="fa fa-spinner fa-spin"></i>'
-                            view(param, type, month, year)
+                            view(param, type, startDate, endDate, year, month)
                             break;
                         case "excel":
                             // Prepare spinner on button
@@ -271,7 +285,7 @@
                             break;
                     }
 
-                    $('#header_table').text('Laba Rugi ' + monthNames[month - 1] + ' ' + year);
+                    $('#header_table').text('Laba Rugi ' + formatDate(startDate) + ' s/d ' + formatDate(endDate));
                 }
             }
         },
@@ -331,7 +345,7 @@
 
     })
 
-    function view(param, type, month, year) {
+    function view(param, type, start, end, year, month) {
         const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
         let report_type = type;
         let route = "{{ Route('report-profit-loss-populate') }}"
@@ -375,13 +389,13 @@
                         console.log("data from");
                         // console.log(data_coa);
                         if (list_cabang == null) {
-                            let html_thead = '<th style="background-color: #ffffff;" width="40%"><span id="header_table">Laba Rugi ' + monthNames[month - 1] + ' ' + year + '</span></th><th style="background-color: #ffffff;" width="70%">Total</th>';
+                            let html_thead = '<th style="background-color: #ffffff;" width="40%"><span id="header_table">Neraca ' + formatDate(start) + ' s/d ' + formatDate(end) + '</span></th><th style="background-color: #ffffff;" width="70%">Total</th>';
                             $('#head_row').html('');
                             $('#head_row').html(html_thead);
                             getTreetable(data_coa, null, 13, report_type, route_general_ledger);
                             getTotal(data_total, route_general_ledger, cabangInput, startDate, endDate);
                         } else {
-                            let html_thead = '<th style="background-color: #ffffff;" width="40%"><span id="header_table">Laba Rugi ' + monthNames[month - 1] + ' ' + year + '</span></th>';
+                            let html_thead = '<th style="background-color: #ffffff;" width="40%"><span id="header_table">Neraca ' + formatDate(start) + ' s/d ' + formatDate(end) + '</span></th>';
                             list_cabang.forEach(function(cabang) {
                                 html_thead += '<th style="background-color: #ffffff;" width="20%">Total ' + capitalize(cabang.new_nama_cabang.replace('_', ' ')) + '</th>';
                             });
@@ -652,6 +666,14 @@
         const str2 = arr.join(" ");
 
         return str2;
+    }
+
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        const day = date.getDate();
+        const month = date.getMonth();
+        const year = date.getFullYear();
+        return day + ' ' + monthNames[month] + ' ' + year;
     }
 
     $.fn.expandAll = function() {

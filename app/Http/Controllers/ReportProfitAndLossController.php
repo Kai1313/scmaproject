@@ -49,8 +49,10 @@ class ReportProfitAndLossController extends Controller
             $month = $request->month;
             $year = $request->year;
             $type = $request->type;
+            $start_date = date('Y-m-d', strtotime($request->start));
+            $end_date = date('Y-m-d', strtotime($request->end));
 
-            $data = $this->getData($id_cabang, $year, $month, $type);
+            $data = $this->getData($id_cabang, $start_date, $end_date, $year, $month, $type);
 
             return response()->json([
                 "result" => true,
@@ -74,10 +76,12 @@ class ReportProfitAndLossController extends Controller
             $id_cabang = $request->id_cabang;
             $month = $request->month;
             $year = $request->year;
+            $start_date = date('Y-m-d', strtotime($request->start));
+            $end_date = date('Y-m-d', strtotime($request->end));
             $type = $request->type;
             $monthName = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
-            $data_profit_loss = $this->getData($id_cabang, $year, $month, $type);
+            $data_profit_loss = $this->getData($id_cabang, $start_date, $end_date, $year, $month, $type);
 
             if ($id_cabang == null) {
                 $nama_cabang = 'all';
@@ -89,11 +93,14 @@ class ReportProfitAndLossController extends Controller
                 $list_cabang = null;
             }
 
+            $periode_table =  date('d M Y', strtotime($start_date)) . ' s/d ' . date('d M Y', strtotime($end_date));
+            $periode = date('d M Y', strtotime($start_date)) . ' s/d ' . date('d M Y', strtotime($end_date));
+
             $data = [
                 'nama_cabang' => $nama_cabang,
                 'list_cabang' => $list_cabang,
-                'periode_table' => $monthName[$month - 1] . ' ' . $year,
-                'periode' => date('M Y', strtotime($year . '-' . $month . '-1')),
+                'periode_table' => $periode_table,
+                'periode' => $periode,
                 'type' => ucwords(str_replace('_', ' ', $type)),
                 'data' => $data_profit_loss,
             ];
@@ -135,9 +142,11 @@ class ReportProfitAndLossController extends Controller
             $month = $request->month;
             $year = $request->year;
             $type = $request->type;
+            $start_date = date('Y-m-d', strtotime($request->start));
+            $end_date = date('Y-m-d', strtotime($request->end));
             $monthName = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
-            $data_profit_loss = $this->getData($id_cabang, $year, $month, $type);
+            $data_profit_loss = $this->getData($id_cabang, $start_date, $end_date, $year, $month, $type);
 
             if ($id_cabang == null) {
                 $nama_cabang = 'all';
@@ -149,12 +158,15 @@ class ReportProfitAndLossController extends Controller
                 $list_cabang = null;
             }
 
+            $periode_table =  date('d M Y', strtotime($start_date)) . ' s/d ' . date('d M Y', strtotime($end_date));
+            $periode = date('d M Y', strtotime($start_date)) . ' s/d ' . date('d M Y', strtotime($end_date));
+
             // Log::debug(json_encode($data_profit_loss));
             $data = [
                 'nama_cabang' => $nama_cabang,
                 'list_cabang' => $list_cabang,
-                'periode_table' => $monthName[$month - 1] . ' ' . $year,
-                'periode' => date('M Y', strtotime($year . '-' . $month . '-1')),
+                'periode_table' => $periode_table,
+                'periode' => $periode,
                 'type' => str_replace('_', ' ', $type),
                 'data' => $data_profit_loss,
             ];
@@ -181,43 +193,92 @@ class ReportProfitAndLossController extends Controller
         }
     }
 
-    private function getData($id_cabang, $tahun, $bulan, $type)
+    private function getData($id_cabang, $start, $end, $year, $month, $type)
     {
         if ($id_cabang == null) {
             if ($type == 'recap') {
                 Log::debug('recap cabang null');
-                $data_balance = $this->getSummaryBalanceKonsolidasi($tahun, $bulan);
+                $data_balance = $this->getSummaryBalanceKonsolidasi($start, $end);
             } else if ($type == 'detail') {
                 Log::debug('detail cabang null');
-                $data_balance = $this->getDetailBalanceKonsolidasi($tahun, $bulan);
+                $data_balance = $this->getDetailBalanceKonsolidasi($start, $end);
             } else if ($type == 'awal') {
                 Log::debug('awal cabang null');
-                $data_balance = $this->getInitBalanceKonsolidasi($tahun, $bulan);
+                $data_balance = $this->getInitBalanceKonsolidasi($year, $month);
             } else {
                 Log::debug('else cabang null');
-                $data_balance = $this->getInitDetailBalanceKonsolidasi($tahun, $bulan);
+                $data_balance = $this->getInitDetailBalanceKonsolidasi($year, $month);
             }
         } else {
             if ($type == 'recap') {
                 Log::debug('recap cabang ada');
-                $data_balance = $this->getSummaryBalance($id_cabang, $tahun, $bulan);
+                $data_balance = $this->getSummaryBalance($id_cabang, $start, $end);
             } else if ($type == 'detail') {
                 Log::debug('detail cabang ada');
-                $data_balance = $this->getDetailBalance($id_cabang, $tahun, $bulan);
+                $data_balance = $this->getDetailBalance($id_cabang, $start, $end);
             } else if ($type == 'awal') {
                 Log::debug('awal cabang ada');
-                $data_balance = $this->getInitBalance($id_cabang, $tahun, $bulan);
+                $data_balance = $this->getInitBalance($id_cabang, $year, $month);
             } else {
                 Log::debug('else cabang ada');
-                $data_balance = $this->getInitDetailBalance($id_cabang, $tahun, $bulan);
+                $data_balance = $this->getInitDetailBalance($id_cabang, $year, $month);
             }
         }
 
         return $data_balance;
     }
 
-    private function getSummaryBalance($id_cabang, $tahun, $bulan)
+    private function getSummaryBalance($id_cabang, $start, $end)
     {
+        $start_saldo_awal = date('Y-m-01', strtotime($start));
+        $exp_start_date = explode('-', $start);
+
+        $table_query = '
+            SELECT id_akun, sum(sum_posisi_credit) AS sum_posisi_credit, sum(sum_posisi_debet) AS sum_posisi_debet
+            FROM
+                (
+                SELECT id_akun, sum( credit - debet ) AS sum_posisi_credit, sum( debet - credit ) AS sum_posisi_debet
+                FROM
+                    jurnal_header a
+                    INNER JOIN jurnal_detail b ON a.id_jurnal = b.id_jurnal
+                WHERE
+                    void = 0
+                    AND a.id_cabang = ' . $id_cabang . '
+                    AND tanggal_jurnal BETWEEN "' . $start . '" AND "' . $end . '"
+                    AND ((a.id_transaksi NOT LIKE "Closing 1%" AND a.id_transaksi NOT LIKE "Closing 2%") OR a.id_transaksi IS NULL)
+                GROUP BY id_akun
+        ';
+
+        if(intval($exp_start_date[2]) > 1){
+            $table_query .= '
+                UNION ALL
+                SELECT id_akun, sum( credit - debet ) AS sum_posisi_credit, sum( debet - credit ) AS sum_posisi_debet
+                FROM
+                    jurnal_header a
+                    INNER JOIN jurnal_detail b ON a.id_jurnal = b.id_jurnal
+                WHERE
+                    void = 0
+                    AND a.id_cabang = ' . $id_cabang . '
+                    AND tanggal_jurnal BETWEEN "' . $start_saldo_awal . '" AND "' . date('Y-m-d', strtotime($start . "-1 days")) . '"
+                    AND ((a.id_transaksi NOT LIKE "Closing 1%" AND a.id_transaksi NOT LIKE "Closing 2%") OR a.id_transaksi IS NULL)
+                GROUP BY id_akun
+            ';
+        }
+
+        $table_query .= '
+                UNION ALL
+                SELECT id_akun, sum( credit - debet ) AS sum_posisi_credit, sum( debet - credit ) AS sum_posisi_debet
+                FROM
+                    saldo_balance sb
+                WHERE
+                    tahun = ' . $exp_start_date[0] . '
+                    AND bulan = ' . $exp_start_date[1] . '
+                    AND id_cabang = ' . $id_cabang . '
+                GROUP BY id_akun
+            ) summary
+            GROUP BY id_akun
+        ';
+
         $data = Akun::selectRaw('
                 CASE WHEN header1 IS NULL OR header1 = "" THEN "" ELSE header1 END as new_header1,
                 CASE WHEN header2 IS NULL OR header2 = "" THEN "" ELSE header2 END as new_header2,
@@ -226,34 +287,8 @@ class ReportProfitAndLossController extends Controller
                 SUM(IFNULL(sum_posisi_debet, 0)) as sum_posisi_debet,
                 master_akun.posisi_debet,
                 master_akun.id_akun
-            ')
-            ->leftJoin(DB::raw('(
-                SELECT id_akun, sum(sum_posisi_credit) AS sum_posisi_credit, sum(sum_posisi_debet) AS sum_posisi_debet
-                FROM
-                    (
-                    SELECT id_akun, sum( credit - debet ) AS sum_posisi_credit, sum( debet - credit ) AS sum_posisi_debet
-                    FROM
-                        jurnal_header a
-                        INNER JOIN jurnal_detail b ON a.id_jurnal = b.id_jurnal
-                    WHERE
-                        void = 0
-                        AND YEAR ( tanggal_jurnal ) = ' . $tahun . '
-                        AND MONTH ( tanggal_jurnal ) = ' . $bulan . '
-                        AND a.id_cabang = ' . $id_cabang . '
-                        AND ((a.id_transaksi NOT LIKE "Closing 1%" AND a.id_transaksi NOT LIKE "Closing 2%") OR a.id_transaksi IS NULL)
-                    GROUP BY id_akun
-                    UNION ALL
-                    SELECT id_akun, sum( credit - debet ) AS sum_posisi_credit, sum( debet - credit ) AS sum_posisi_debet
-                    FROM
-                        saldo_balance sb
-                    WHERE
-                        tahun = ' . $tahun . '
-                        AND bulan = ' . $bulan . '
-                        AND id_cabang = ' . $id_cabang . '
-                    GROUP BY id_akun
-                ) summary
-                GROUP BY id_akun
-            ) as jurnal'), 'master_akun.id_akun', '=', 'jurnal.id_akun')
+            ')            
+            ->leftJoin(DB::raw('(' . $table_query . ') as jurnal'), 'master_akun.id_akun', '=', 'jurnal.id_akun')
             ->where('isshown', 1)
             ->where('tipe_akun', 1)
             ->where('master_akun.id_cabang', $id_cabang)
@@ -285,13 +320,15 @@ class ReportProfitAndLossController extends Controller
         return $data;
     }
 
-    private function getSummaryBalanceKonsolidasi($tahun, $bulan)
+    private function getSummaryBalanceKonsolidasi($start, $end)
     {
         $data_cabang = Cabang::where('status_cabang', 1)->selectRaw('*, REPLACE(LOWER(nama_cabang), " ", "_") as new_nama_cabang')->get();
 
         $data_konsolidasi = [];
         $total_konsolidasi = [];
         $urutan_cabang = 1;
+        $start_saldo_awal = date('Y-m-01', strtotime($start));
+        $exp_start_date = explode('-', $start);
 
         foreach ($data_cabang as $cabang) {
             $format_nama = str_replace(' ', '_', strtolower($cabang->nama_cabang));
@@ -302,9 +339,8 @@ class ReportProfitAndLossController extends Controller
                 SUM(IFNULL(sum_posisi_credit, 0)) as sum_posisi_credit_' . $format_nama . ',
                 SUM(IFNULL(sum_posisi_debet, 0)) as sum_posisi_debet_' . $format_nama . ',
                 master_akun.posisi_debet';
-
-            $data = Akun::selectRaw($select_query)
-                ->leftJoin(DB::raw('(
+            
+            $table_query = '
                 SELECT id_akun, sum(sum_posisi_credit) AS sum_posisi_credit, sum(sum_posisi_debet) AS sum_posisi_debet
                 FROM
                     (
@@ -314,23 +350,44 @@ class ReportProfitAndLossController extends Controller
                         INNER JOIN jurnal_detail b ON a.id_jurnal = b.id_jurnal
                     WHERE
                         void = 0
-                        AND YEAR ( tanggal_jurnal ) = ' . $tahun . '
-                        AND MONTH ( tanggal_jurnal ) = ' . $bulan . '
                         AND a.id_cabang = ' . $cabang->id_cabang . '
+                        AND tanggal_jurnal BETWEEN "' . $start . '" AND "' . $end . '"
                         AND ((a.id_transaksi NOT LIKE "Closing 1%" AND a.id_transaksi NOT LIKE "Closing 2%") OR a.id_transaksi IS NULL)
                     GROUP BY id_akun
+                ';
+
+            if(intval($exp_start_date[2]) > 1){
+                $table_query .= '
+                    UNION ALL
+                    SELECT id_akun, sum( credit - debet ) AS sum_posisi_credit, sum( debet - credit ) AS sum_posisi_debet
+                    FROM
+                        jurnal_header a
+                        INNER JOIN jurnal_detail b ON a.id_jurnal = b.id_jurnal
+                    WHERE
+                        void = 0
+                        AND a.id_cabang = ' . $cabang->id_cabang . '
+                        AND tanggal_jurnal BETWEEN "' . $start_saldo_awal . '" AND "' . date('Y-m-d', strtotime($start . "-1 days")) . '"
+                        AND ((a.id_transaksi NOT LIKE "Closing 1%" AND a.id_transaksi NOT LIKE "Closing 2%") OR a.id_transaksi IS NULL)
+                    GROUP BY id_akun
+                ';
+            }
+
+            $table_query .= '
                     UNION ALL
                     SELECT id_akun, sum( credit - debet ) AS sum_posisi_credit, sum( debet - credit ) AS sum_posisi_debet
                     FROM
                         saldo_balance sb
                     WHERE
-                        tahun = ' . $tahun . '
-                        AND bulan = ' . $bulan . '
+                        tahun = ' . $exp_start_date[0] . '
+                        AND bulan = ' . $exp_start_date[1] . '
                         AND id_cabang = ' . $cabang->id_cabang . '
                     GROUP BY id_akun
                 ) summary
                 GROUP BY id_akun
-            ) as jurnal'), 'master_akun.id_akun', '=', 'jurnal.id_akun')
+            ';
+
+            $data = Akun::selectRaw($select_query)
+                ->leftJoin(DB::raw('(' . $table_query . ') as jurnal'), 'master_akun.id_akun', '=', 'jurnal.id_akun')
                 ->where('isshown', 1)
                 ->where('tipe_akun', 1)
                 ->groupBy('new_header1', 'new_header2', 'new_header3')
@@ -398,8 +455,57 @@ class ReportProfitAndLossController extends Controller
         return $data;
     }
 
-    private function getDetailBalance($id_cabang, $tahun, $bulan)
+    private function getDetailBalance($id_cabang, $start, $end)
     {
+        $start_saldo_awal = date('Y-m-01', strtotime($start));
+        $exp_start_date = explode('-', $start);
+
+        $table_query = '
+            SELECT id_akun, sum(sum_posisi_credit) AS sum_posisi_credit, sum(sum_posisi_debet) AS sum_posisi_debet
+            FROM
+                (
+                SELECT id_akun, sum( credit - debet ) AS sum_posisi_credit, sum( debet - credit ) AS sum_posisi_debet
+                FROM
+                    jurnal_header a
+                    INNER JOIN jurnal_detail b ON a.id_jurnal = b.id_jurnal
+                WHERE
+                    void = 0
+                    AND a.id_cabang = ' . $id_cabang . '
+                    AND tanggal_jurnal BETWEEN "' . $start . '" AND "' . $end . '"
+                    AND ((a.id_transaksi NOT LIKE "Closing 1%" AND a.id_transaksi NOT LIKE "Closing 2%") OR a.id_transaksi IS NULL)
+                GROUP BY id_akun
+        ';
+
+        if(intval($exp_start_date[2]) > 1){
+            $table_query .= '
+                UNION ALL
+                SELECT id_akun, sum( credit - debet ) AS sum_posisi_credit, sum( debet - credit ) AS sum_posisi_debet
+                FROM
+                    jurnal_header a
+                    INNER JOIN jurnal_detail b ON a.id_jurnal = b.id_jurnal
+                WHERE
+                    void = 0
+                    AND a.id_cabang = ' . $id_cabang . '
+                    AND tanggal_jurnal BETWEEN "' . $start_saldo_awal . '" AND "' . date('Y-m-d', strtotime($start . "-1 days")) . '"
+                    AND ((a.id_transaksi NOT LIKE "Closing 1%" AND a.id_transaksi NOT LIKE "Closing 2%") OR a.id_transaksi IS NULL)
+                GROUP BY id_akun
+            ';
+        }
+
+        $table_query .= '
+                UNION ALL
+                SELECT id_akun, sum( credit - debet ) AS sum_posisi_credit, sum( debet - credit ) AS sum_posisi_debet
+                FROM
+                    saldo_balance sb
+                WHERE
+                    tahun = ' . $exp_start_date[0] . '
+                    AND bulan = ' . $exp_start_date[1] . '
+                    AND id_cabang = ' . $id_cabang . '
+                GROUP BY id_akun
+            ) summary
+            GROUP BY id_akun
+        ';
+
         $data = Akun::selectRaw('
                 CASE WHEN header1 IS NULL OR header1 = "" THEN "" ELSE header1 END as new_header1,
                 CASE WHEN header2 IS NULL OR header2 = "" THEN "" ELSE header2 END as new_header2,
@@ -411,33 +517,7 @@ class ReportProfitAndLossController extends Controller
                 SUM(IFNULL(sum_posisi_debet, 0)) as sum_posisi_debet,
                 master_akun.posisi_debet
             ')
-            ->leftJoin(DB::raw('(
-                SELECT id_akun, sum(sum_posisi_credit) AS sum_posisi_credit, sum(sum_posisi_debet) AS sum_posisi_debet
-                FROM
-                    (
-                    SELECT id_akun, sum( credit - debet ) AS sum_posisi_credit, sum( debet - credit ) AS sum_posisi_debet
-                    FROM
-                        jurnal_header a
-                        INNER JOIN jurnal_detail b ON a.id_jurnal = b.id_jurnal
-                    WHERE
-                        void = 0
-                        AND YEAR ( tanggal_jurnal ) = ' . $tahun . '
-                        AND MONTH ( tanggal_jurnal ) = ' . $bulan . '
-                        AND a.id_cabang = ' . $id_cabang . '
-                        AND ((a.id_transaksi NOT LIKE "Closing 1%" AND a.id_transaksi NOT LIKE "Closing 2%") OR a.id_transaksi IS NULL)
-                    GROUP BY id_akun
-                    UNION ALL
-                    SELECT id_akun, sum( credit - debet ) AS sum_posisi_credit, sum( debet - credit ) AS sum_posisi_debet
-                    FROM
-                        saldo_balance sb
-                    WHERE
-                        tahun = ' . $tahun . '
-                        AND bulan = ' . $bulan . '
-                        AND id_cabang = ' . $id_cabang . '
-                    GROUP BY id_akun
-                ) summary
-                GROUP BY id_akun
-            ) as jurnal'), 'master_akun.id_akun', '=', 'jurnal.id_akun')
+            ->leftJoin(DB::raw('(' . $table_query . ') as jurnal'), 'master_akun.id_akun', '=', 'jurnal.id_akun')
             ->where('isshown', 1)
             ->where('tipe_akun', 1)
             ->where('master_akun.id_cabang', $id_cabang)
@@ -450,7 +530,9 @@ class ReportProfitAndLossController extends Controller
 
         $detail_data = [
             'transaction_data' => $data,
-            'period' => $tahun . '-' . $bulan,
+            'period' => $start . '-' . $end,
+            'start' => $start,
+            'end' => $end,
             'id_cabang' => $id_cabang,
             'total' => $total,
         ];
@@ -465,13 +547,16 @@ class ReportProfitAndLossController extends Controller
         return $data;
     }
 
-    private function getDetailBalanceKonsolidasi($tahun, $bulan)
+    private function getDetailBalanceKonsolidasi($start, $end)
     {
         $data_cabang = Cabang::where('status_cabang', 1)->selectRaw('*, nama_cabang, REPLACE(LOWER(nama_cabang), " ", "_") as new_nama_cabang')->get();
 
         $data_konsolidasi = [];
         $total_konsolidasi = [];
         $urutan_cabang = 1;
+
+        $start_saldo_awal = date('Y-m-01', strtotime($start));
+        $exp_start_date = explode('-', $start);
 
         foreach ($data_cabang as $cabang) {
             $format_nama = str_replace(' ', '_', strtolower($cabang->nama_cabang));
@@ -486,8 +571,7 @@ class ReportProfitAndLossController extends Controller
                 master_akun.id_akun,
                 master_akun.posisi_debet';
 
-            $data = Akun::selectRaw($select_query)
-                ->leftJoin(DB::raw('(
+            $table_query = '
                 SELECT id_akun, sum(sum_posisi_credit) AS sum_posisi_credit, sum(sum_posisi_debet) AS sum_posisi_debet
                 FROM
                     (
@@ -497,23 +581,44 @@ class ReportProfitAndLossController extends Controller
                         INNER JOIN jurnal_detail b ON a.id_jurnal = b.id_jurnal
                     WHERE
                         void = 0
-                        AND YEAR ( tanggal_jurnal ) = ' . $tahun . '
-                        AND MONTH ( tanggal_jurnal ) = ' . $bulan . '
                         AND a.id_cabang =  ' . $cabang->id_cabang . '
+                        AND tanggal_jurnal BETWEEN "' . $start . '" AND "' . $end . '"
                         AND ((a.id_transaksi NOT LIKE "Closing 1%" AND a.id_transaksi NOT LIKE "Closing 2%") OR a.id_transaksi IS NULL)
                     GROUP BY id_akun
+            ';
+
+            if(intval($exp_start_date[2]) > 1){
+                $table_query .= '
+                    UNION ALL
+                    SELECT id_akun, sum( credit - debet ) AS sum_posisi_credit, sum( debet - credit ) AS sum_posisi_debet
+                    FROM
+                        jurnal_header a
+                        INNER JOIN jurnal_detail b ON a.id_jurnal = b.id_jurnal
+                    WHERE
+                        void = 0
+                        AND a.id_cabang =  ' . $cabang->id_cabang . '
+                        AND tanggal_jurnal BETWEEN "' . $start_saldo_awal . '" AND "' . date('Y-m-d', strtotime($start . "-1 days")) . '"
+                        AND ((a.id_transaksi NOT LIKE "Closing 1%" AND a.id_transaksi NOT LIKE "Closing 2%") OR a.id_transaksi IS NULL)
+                    GROUP BY id_akun
+                ';
+            }
+
+            $table_query .= '
                     UNION ALL
                     SELECT id_akun, sum( credit - debet ) AS sum_posisi_credit, sum( debet - credit ) AS sum_posisi_debet
                     FROM
                         saldo_balance sb
                     WHERE
-                        tahun = ' . $tahun . '
-                        AND bulan = ' . $bulan . '
+                        tahun = ' . $exp_start_date[0] . '
+                        AND bulan = ' . $exp_start_date[1] . '
                         AND id_cabang =  ' . $cabang->id_cabang . '
                     GROUP BY id_akun
                 ) summary
                 GROUP BY id_akun
-            ) as jurnal'), 'master_akun.id_akun', '=', 'jurnal.id_akun')
+            ';
+
+            $data = Akun::selectRaw($select_query)
+                ->leftJoin(DB::raw('(' . $table_query . ') as jurnal'), 'master_akun.id_akun', '=', 'jurnal.id_akun')
                 ->where('isshown', 1)
                 ->where('tipe_akun', 1)
                 ->groupBy('new_header1', 'new_header2', 'new_header3', 'master_akun.kode_akun')
@@ -565,7 +670,9 @@ class ReportProfitAndLossController extends Controller
 
         $detail_data = [
             'transaction_data' => $data_konsolidasi,
-            'period' => $tahun . '-' . $bulan,
+            'period' => $start . '-' . $end,
+            'start' => $start,
+            'end' => $end,
             'list_cabang' => $data_cabang,
             'total' => $total,
         ];
@@ -1002,8 +1109,13 @@ class ReportProfitAndLossController extends Controller
     private function getMapDetail($detail_data)
     {
         $data = $detail_data['transaction_data'];
-        $start_date = date('Y-m-d', strtotime($detail_data['period'] . '-1'));
-        $end_date = date('Y-m-t', strtotime($detail_data['period'] . '-1'));
+        if(isset($detail_data['start'])){
+            $start_date = date('Y-m-d', strtotime($detail_data['start']));
+            $end_date = date('Y-m-d', strtotime($detail_data['end']));
+        }else{
+            $start_date = date('Y-m-d', strtotime($detail_data['period'] . '-1'));
+            $end_date = date('Y-m-t', strtotime($detail_data['period'] . '-1'));
+        }
         $id_cabang = $detail_data['id_cabang'];
         $total = $detail_data['total'];
 
@@ -1115,8 +1227,13 @@ class ReportProfitAndLossController extends Controller
     private function getMapDetailKonsolidasi($detail_data)
     {
         $data_konsolidasi = $detail_data['transaction_data'];
-        $start_date = date('Y-m-d', strtotime($detail_data['period'] . '-1'));
-        $end_date = date('Y-m-t', strtotime($detail_data['period'] . '-1'));
+        if(isset($detail_data['start'])){
+            $start_date = date('Y-m-d', strtotime($detail_data['start']));
+            $end_date = date('Y-m-d', strtotime($detail_data['end']));
+        }else{
+            $start_date = date('Y-m-d', strtotime($detail_data['period'] . '-1'));
+            $end_date = date('Y-m-t', strtotime($detail_data['period'] . '-1'));
+        }
         $list_cabang = $detail_data['list_cabang'];
         $total = $detail_data['total'];
 
