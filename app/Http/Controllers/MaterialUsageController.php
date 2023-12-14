@@ -247,7 +247,8 @@ class MaterialUsageController extends Controller
                 'id_wrapper_zak',
                 DB::raw('IFNULL(weight_zak,0) as weight_zak'),
                 DB::raw('IFNULL(zak,0) as jumlah_zak'),
-                'mqc.status_qc_qr_code'
+                'mqc.status_qc_qr_code',
+                'id_rak'
             )
             ->leftJoin('barang', 'mqc.id_barang', '=', 'barang.id_barang')
             ->leftJoin('satuan_barang as sb', 'mqc.id_satuan_barang', '=', 'sb.id_satuan_barang')
@@ -266,6 +267,13 @@ class MaterialUsageController extends Controller
         if ($data->sisa_master_qr_code == 0) {
             return response()->json([
                 'message' => 'Barang sudah habis',
+                'status' => 'error',
+            ], 500);
+        }
+
+        if ($data->id_rak) {
+            return response()->json([
+                'message' => 'Barang masih dalam rak',
                 'status' => 'error',
             ], 500);
         }
