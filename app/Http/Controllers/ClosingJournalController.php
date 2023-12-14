@@ -1473,6 +1473,8 @@ class ClosingJournalController extends Controller
                     ];
                 }
 
+                dd($details);
+
                 // Log::info(json_encode($details));
                 // Grouping and sum the same barang
                 $grouped_out = array_reduce($details, function ($result, $out) {
@@ -1494,7 +1496,7 @@ class ClosingJournalController extends Controller
                 $header->id_cabang = $id_cabang;
                 $header->jenis_jurnal = $journal_type;
                 $header->id_transaksi = 'Closing ' . $id_transaksi;
-                $header->catatan = "Closing Retur Penjualan";
+                $header->catatan = "Closing Retur Penjualan " . $id_transaksi;
                 $header->void = 0;
                 $header->tanggal_jurnal = $transaction_date;
                 $header->user_created = null;
@@ -1618,7 +1620,7 @@ class ClosingJournalController extends Controller
                     $detail->id_jurnal = $header->id_jurnal;
                     $detail->index = $i + 1;
                     $detail->id_akun = $akun_retur_penjualan_barang;
-                    $detail->keterangan = "Persediaan Jurnal Retur Penjualan " . $id_transaksi;
+                    $detail->keterangan = "Persediaan Jurnal Retur Penjualan " . $id_transaksi . ' - ' . $out['note'];
                     $detail->id_transaksi = $id_transaksi;
                     $detail->debet = 0;
                     $detail->credit = $out['sum'];
