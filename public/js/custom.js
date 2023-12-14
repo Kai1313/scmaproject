@@ -140,6 +140,10 @@ if ($('.post-action').length > 0) {
 function saveData(node) {
     let url = node.prop('action')
     $('#cover-spin').show()
+    node.find('.handle-number-4,.handle-number-2').each(function (i, v) {
+        $(v).val(normalizeNumber($(v).val()))
+    })
+
     $.ajax({
         url: url,
         type: "POST",

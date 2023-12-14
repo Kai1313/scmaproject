@@ -129,6 +129,8 @@ Route::prefix('pemakaian')->group(function () {
     Route::get('/auto-qrcode', 'MaterialUsageController@autoQRCode')->name('material_usage-qrcode');
     Route::get('/reload-timbangan', 'MaterialUsageController@reloadWeight')->name('material_usage-reload-weight');
     Route::get('/print/{id}', 'MaterialUsageController@printData')->name('material_usage-print-data');
+    Route::post('/save-detail/{id}', 'MaterialUsageController@saveDetailEntry')->name('material_usage-save-detail');
+    Route::post('/delete-detail/{parent}/{id}', 'MaterialUsageController@deleteDetail')->name('material_usage-delete-detail');
 });
 
 Route::prefix('marketing-tool')->group(function () {

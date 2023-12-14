@@ -162,8 +162,8 @@ class VisitController extends Controller
                 $data = new Visit;
             }
 
-            $data->fill($request->all());
             if ($id == 0) {
+                $data->fill($request->all());
                 $data->status = '1';
                 $data->visit_code = Visit::createcode($request->id_cabang);
                 $data->user_created = session()->get('user')['id_pengguna'];
@@ -185,6 +185,8 @@ class VisitController extends Controller
                 }
             } else {
                 $data->user_modified = session()->get('user')['id_pengguna'];
+                $data->id_pelanggan = $request->id_pelanggan;
+                $data->pre_visit_desc = $request->pre_visit_desc;
             }
 
             $data->save();

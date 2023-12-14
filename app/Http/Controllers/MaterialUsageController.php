@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\MasterQrCode;
 use App\MaterialUsage;
 use DB;
 use Illuminate\Http\Request;
@@ -121,11 +122,11 @@ class MaterialUsageController extends Controller
                     return response()->json($period, 500);
                 }
 
-                $rev = $data->revertMasterQrcode();
-                if ($rev['result'] == false) {
-                    DB::rollback();
-                    return response()->json($rev, 500);
-                }
+                // $rev = $data->revertMasterQrcode();
+                // if ($rev['result'] == false) {
+                //     DB::rollback();
+                //     return response()->json($rev, 500);
+                // }
             }
 
             $data->fill($request->except('is_qc'));
@@ -139,17 +140,17 @@ class MaterialUsageController extends Controller
 
             $data->save();
 
-            $checkStock = $data->checkStockDetails($request->details);
-            if ($checkStock['result'] == false) {
-                DB::rollback();
-                return response()->json($checkStock, 500);
-            }
+            // $checkStock = $data->checkStockDetails($request->details);
+            // if ($checkStock['result'] == false) {
+            //     DB::rollback();
+            //     return response()->json($checkStock, 500);
+            // }
 
-            $resSave = $data->savedetails($request->details);
-            if ($resSave['result'] == false) {
-                DB::rollback();
-                return response()->json($resSave, 500);
-            }
+            // $resSave = $data->savedetails($request->details);
+            // if ($resSave['result'] == false) {
+            //     DB::rollback();
+            //     return response()->json($resSave, 500);
+            // }
 
             DB::commit();
             return response()->json([
@@ -333,5 +334,58 @@ class MaterialUsageController extends Controller
         }
 
         return ['result' => true];
+    }
+
+    public function saveDetailEntry(Request $request, $id)
+    {
+        $data = MaterialUsage::find($id);
+        if (!$data) {
+            return response()->json(['result' => false, 'message' => 'Pemakaian tidak ditemukan'], 500);
+        }
+
+        $stock = MasterQrCode::where('kode_batang_master_qr_code', $request->kode_batang)->first();
+        if (!$stock) {
+            return response()->json(['result' => false, 'message' => 'Stok tidak ditemukan'], 500);
+        }
+
+        if ($stock->sisa_master_qr_code < $request->jumlah) {
+            return response()->json(['result' => false, 'message' => 'Stok tidak mencukupi'], 500);
+        }
+
+        DB::beginTransaction();
+        $s = $data->savedetail($request);
+        if ($s['result'] == false) {
+            DB::rollback();
+            return response()->json($s, 500);
+        }
+
+        DB::commit();
+        return response()->json([
+            "result" => true,
+            "message" => "Data berhasil disimpan",
+            "redirect" => route('material_usage-entry', $id),
+        ], 200);
+    }
+
+    public function deleteDetail($parent, $id)
+    {
+        $data = MaterialUsage::where('id_pemakaian', $parent)->first();
+        if (!$data) {
+            return response()->json(['result' => false, 'message' => 'Data tidak ditemukan'], 500);
+        }
+
+        DB::beginTransaction();
+        $r = $data->deleteDetail($id);
+        if ($r['result'] == false) {
+            DB::rollback();
+            return response()->json($r, 500);
+        }
+
+        DB::commit();
+        return response()->json([
+            "result" => true,
+            "message" => "Data berhasil diproses",
+            "redirect" => route('material_usage-entry', $parent),
+        ], 200);
     }
 }
