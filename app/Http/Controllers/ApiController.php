@@ -656,14 +656,6 @@ class ApiController extends Controller
                     'keterangan' => 'Jurnal Otomatis Uang Muka Penjualan - ' . $id_transaksi . ' - ' . $nama_pelanggan,
                     'id_transaksi' => null,
                 ]);
-
-                array_push($jurnal_detail_me, [
-                    'akun' => $akun_piutang_dagang,
-                    'debet' => 0,
-                    'credit' => $uang_muka,
-                    'keterangan' => 'Jurnal Otomatis Pelunasan - ' . $id_transaksi . ' - ' . $nama_pelanggan,
-                    'id_transaksi' => $id_transaksi,
-                ]);
             }
 
             if (isset($diskon) && $diskon > 0) {
