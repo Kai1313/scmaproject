@@ -1113,7 +1113,7 @@ class ApiController extends Controller
                     DB::rollback();
                     return response()->json([
                         "result" => false,
-                        "message" => "Error when store Jurnal data on table detail. Akun Penyusutan Barang " . $barang->kode_barang . ' - ' . $barang->nama_barang . ' can not null.',
+                        "message" => "Error when store Jurnal data on table detail. Akun Asset Barang " . $barang->kode_barang . ' - ' . $barang->nama_barang . ' can not null.',
                     ]);
                 } else {
                     $data_akun_asset_barang = Akun::find($akun_asset_barang);
@@ -1121,7 +1121,7 @@ class ApiController extends Controller
                         DB::rollback();
                         return response()->json([
                             "result" => false,
-                            "message" => "Error when store Jurnal data on table detail. Akun Penyusutan Barang " . $barang->kode_barang . ' - ' . $barang->nama_barang . ' not found.',
+                            "message" => "Error when store Jurnal data on table detail. Akun Asset Barang " . $barang->kode_barang . ' - ' . $barang->nama_barang . ' not found.',
                         ]);
                     }
                 }
@@ -1156,7 +1156,7 @@ class ApiController extends Controller
                     'akun' => $akun_piutang_dagang,
                     'debet' => round($total, 2),
                     'credit' => 0,
-                    'keterangan' => 'Jurnal Otomatis Penjualan Asset ' . $id_transaksi . ' - ' . $nama_pelanggan,
+                    'keterangan' => 'Jurnal Otomatis Piutang Dagang Asset ' . $id_transaksi . ' - ' . $nama_pelanggan,
                     'id_transaksi' => null,
                 ],
                 [
