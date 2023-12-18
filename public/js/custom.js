@@ -45,6 +45,25 @@ function formatNumber(angka, lengthComa) {
     return formatRupiah(angka, lengthComa)
 }
 
+function formatNumberNew(number, prefix = 0) {
+    if (typeof number === 'string') {
+        if (number.includes(',')) {
+            let reg = number.match(/^([^,]*,[^,]*)/);
+            number = normalizeNumber(reg[0])
+        }
+    }
+
+    if (number == '0') {
+        return 0;
+    } else {
+        return new Intl.NumberFormat("id-ID", {
+            style: 'decimal',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: prefix
+        }).format(number);
+    }
+}
+
 function formatRupiah(angka, prefix, self = '') {
     let labelMinus = ''
     if (angka[0] == '-') {
@@ -75,6 +94,7 @@ function formatRupiah(angka, prefix, self = '') {
 }
 
 function normalizeNumber(number) {
+    number = number ? number : '0'
     if (number.indexOf(',')) {
         number = number.replaceAll('.', '').replaceAll(',', '.')
     } else {

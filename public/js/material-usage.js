@@ -102,10 +102,10 @@ function sumDetail() {
     $('#table-detail tbody').after(
         '<tfoot><tr>' +
         '<td colspan="3" class="text-left"><b>Total</b></td>' +
-        '<td class="text-right">' + formatNumber(totalJumlah, 4) + '</td>' +
-        '<td class="text-right">' + formatNumber(totalJumlahZak, 4) + '</td>' +
-        '<td class="text-right">' + formatNumber(totalTare, 4) + '</td>' +
-        '<td class="text-right">' + formatNumber(totalNett, 4) + '</td>' +
+        '<td class="text-right">' + formatNumberNew(totalJumlah, 4) + '</td>' +
+        '<td class="text-right">' + formatNumberNew(totalJumlahZak, 4) + '</td>' +
+        '<td class="text-right">' + formatNumberNew(totalTare, 4) + '</td>' +
+        '<td class="text-right">' + formatNumberNew(totalNett, 4) + '</td>' +
         '<td></td><td></td>' +
         '</tr></tfoot>'
     );
@@ -189,7 +189,6 @@ $('.add-entry').click(function () {
     $('.result-form').hide()
 
     setTimeout(() => {
-        console.log('asd')
         $('[name="search-qrcode"]').focus()
     }, 200);
 
@@ -299,7 +298,7 @@ function searchAsset(string) {
                 }
             }
             let sisaMasterQrCode = detailSelect.sisa_master_qr_code.toFixed(4);
-            $('#max-jumlah').text('Sisa ' + formatNumber(sisaMasterQrCode, 4))
+            $('#max-jumlah').text('Sisa ' + formatNumberNew(sisaMasterQrCode, 4))
             $('[name="jumlah"]').val(0)
 
             maxRemaining = sisaMasterQrCode
@@ -418,13 +417,13 @@ let validateModalForm = $('.post-action-modal').validate({
         jumlah_zak: {
             required: true,
             maxWithZero: function () {
-                return maxZakRemaining;
+                return formatNumberNew(maxZakRemaining, 4);
             }
         },
         jumlah: {
             required: true,
             maxNotZero: function () {
-                return maxRemaining;
+                return formatNumberNew(maxRemaining, 4);
             }
         }
     },
@@ -452,6 +451,7 @@ $.validator.addMethod(
     'maxWithZero',
     function (value, element, param) {
         let val = normalizeNumber(value)
+        param = normalizeNumber(param)
         return this.optional(element) || (val <= param)
     },
     'Tidak boleh lebih dari {0}'
@@ -461,6 +461,7 @@ $.validator.addMethod(
     'maxNotZero',
     function (value, element, param) {
         let val = normalizeNumber(value)
+        param = normalizeNumber(param)
         return this.optional(element) || ((val > 0) && (val <= param))
     },
     'Tidak boleh 0 atau lebih dari {0}'

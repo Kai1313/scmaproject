@@ -191,10 +191,10 @@
             $('#table-detail tbody').after(
                 '<tfoot><tr>' +
                 '<td colspan="3" class="text-left"><b>Total</b></td>' +
-                '<td class="text-right">' + formatNumber(totalJumlah, 4) + '</td>' +
-                '<td class="text-right">' + formatNumber(totalJumlahZak, 4) + '</td>' +
-                '<td class="text-right">' + formatNumber(totalTare, 4) + '</td>' +
-                '<td class="text-right">' + formatNumber(totalNett, 4) + '</td>' +
+                '<td class="text-right">' + formatNumberNew(totalJumlah, 4) + '</td>' +
+                '<td class="text-right">' + formatNumberNew(totalJumlahZak, 4) + '</td>' +
+                '<td class="text-right">' + formatNumberNew(totalTare, 4) + '</td>' +
+                '<td class="text-right">' + formatNumberNew(totalNett, 4) + '</td>' +
                 '<td></td>' +
                 '</tr></tfoot>'
             );

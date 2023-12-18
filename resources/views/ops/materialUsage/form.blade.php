@@ -210,12 +210,12 @@
                         </div>
                     </div>
                     <button class="btn btn-primary btn-flat pull-right btn-sm" type="submit">
-                        <i class="glyphicon glyphicon-floppy-saved"></i> Simpan Data
+                        <i class="glyphicon glyphicon-floppy-saved mr-1"></i> Simpan Data
                     </button>
                 </form>
             </div>
         </div>
-        <div class="box">
+        <div class="box" id="targetDetail" style="{{ $data ? 'display:block' : 'display:none' }}">
             <div class="box-header">
                 <h3 class="box-title">Detail Barang</h3>
                 <button class="btn btn-info add-entry btn-flat pull-right btn-sm" type="button">
@@ -346,7 +346,7 @@
     <script src="{{ asset('assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js') }}"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/html5-qrcode.min.js') }}"></script>
-    <script src="{{ asset('js/custom.js') }}"></script>
+    <script src="{{ asset('js/custom.js') }}?t={{ time() }}"></script>
 @endsection
 
 @section('externalScripts')
@@ -358,5 +358,5 @@
         let urlMaterialUsageQrcode = '{{ route('material_usage-qrcode') }}'
         let urlDeleteDetail = '{{ route('material_usage-delete-detail', [$data ? $data->id_pemakaian : 0, 0]) }}'
     </script>
-    <script src="{{ asset('js/material-usage.js') }}"></script>
+    <script src="{{ asset('js/material-usage.js') }}?t={{ time() }}"></script>
 @endsection

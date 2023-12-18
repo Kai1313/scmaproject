@@ -31,6 +31,11 @@
                     <ul class="dropdown-menu">
                         @if (session()->has('user'))
                             <li class="patokan_halaman_masuk">
+                                <a href="javascript:void(0)" onclick="location.reload(true)">
+                                    <span class="glyphicon glyphicon-refresh"></span> Reload
+                                </a>
+                            </li>
+                            <li class="patokan_halaman_masuk">
                                 <a href="javascript:void(0)" onclick="$('#ganti_profil').modal('show')">
                                     <span class="glyphicon glyphicon-pencil"></span> Ubah Profil
                                 </a>
