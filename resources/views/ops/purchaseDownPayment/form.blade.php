@@ -123,7 +123,8 @@
                                     data-max="{{ $maxPayment }}" data-validation="[NOTEMPTY]"
                                     data-validation-message="Nominal tidak boleh kosong">
                                 <input type="hidden" name="konversi_nominal"
-                                    value="{{ old('konversi_nominal', $data ? $data->konversi_nominal : '') }}">
+                                    value="{{ old('konversi_nominal', $data ? $data->konversi_nominal : '') }}"
+                                    class="handle-number-2">
                             </div>
                         </div>
                         <div class="col-md-4">

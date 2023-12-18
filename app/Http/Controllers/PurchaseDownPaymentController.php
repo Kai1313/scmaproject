@@ -132,12 +132,12 @@ class PurchaseDownPaymentController extends Controller
                 $data->user_modified = session()->get('user')['id_pengguna'];
             }
 
-            $data->rate = normalizeNumber($request->rate);
-            $data->nominal = normalizeNumber($request->nominal);
-            $data->total = normalizeNumber($request->total);
-            $data->konversi_nominal = normalizeNumber($request->konversi_nominal);
-            $data->dpp = normalizeNumber($request->dpp);
-            $data->ppn = normalizeNumber($request->ppn);
+            $data->rate = $request->rate;
+            $data->nominal = $request->nominal;
+            $data->total = $request->total;
+            $data->konversi_nominal = $request->konversi_nominal;
+            $data->dpp = $request->dpp;
+            $data->ppn = $request->ppn;
             $data->save();
 
             //save saldo transaksi

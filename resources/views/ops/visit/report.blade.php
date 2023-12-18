@@ -126,12 +126,12 @@
                         <table class="table table-bordered data-table display" width="100%">
                             <thead>
                                 <tr>
-                                    <th style="width:100px;">Tanggal</th>
-                                    <th style="width:100px;">Sales</th>
+                                    <th style="width:80px;">Tanggal</th>
+                                    <th style="width:80px;">Sales</th>
                                     <th>Pelanggan</th>
-                                    <th style="width:300px">Hasil Kunjungan</th>
-                                    <th style="width:300px">Masalah</th>
-                                    <th style="width:300px">Solusi</th>
+                                    <th style="width:200px">Hasil Kunjungan</th>
+                                    <th style="width:200px">Masalah</th>
+                                    <th style="width:200px">Solusi</th>
                                 </tr>
                             </thead>
                             <tbody>

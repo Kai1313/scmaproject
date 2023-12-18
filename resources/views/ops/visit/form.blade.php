@@ -290,15 +290,16 @@
         </div>
 
         @if ($data && $data->status != 0)
-            <div class="text-right" style="margin-bottom:15px;">
-                <a href="{{ route('visit-save-date-change', $data->id) }}" class="btn btn-success change-date"><i
-                        class="fa fa-calendar mr-1"></i>
-                    Perbarui Tanggal Kunjungan</a>
-                <a href="{{ route('cancel-visit', $data->id) }}" class="btn btn-danger show-cancel-visit">
-                    <i class="fa fa-close mr-1"></i> Batal Kunjungan
-                </a>
-            </div>
-
+            @if (!$data->visit_title)
+                <div class="text-right" style="margin-bottom:15px;">
+                    <a href="{{ route('visit-save-date-change', $data->id) }}" class="btn btn-success change-date"><i
+                            class="fa fa-calendar mr-1"></i>
+                        Perbarui Tanggal Kunjungan</a>
+                    <a href="{{ route('cancel-visit', $data->id) }}" class="btn btn-danger show-cancel-visit">
+                        <i class="fa fa-close mr-1"></i> Batal Kunjungan
+                    </a>
+                </div>
+            @endif
             <div class="box">
                 <form action="{{ route('visit-save-report-entry', $data->id) }}" method="post" class="post-action">
                     <div class="box-header">
@@ -307,7 +308,7 @@
                     <div class="box-body">
                         <div class="row">
                             <div class="col-md-4">
-                                <label for="">Metode Kunjungan</label>
+                                <label for="">Metode Kunjungan <span>*</span></label>
                                 <div class="form-group">
                                     <select name="visit_type" class="form-control select2" data-validation="[NOTEMPTY]"
                                         data-validation-message="Metode tidak boleh kosong">
@@ -319,7 +320,7 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <label for="">Kategori Kunjungan</label>
+                                <label for="">Kategori Kunjungan <span>*</span></label>
                                 <div class="form-group">
                                     <select name="kategori_kunjungan" class="form-control select2"
                                         data-validation="[NOTEMPTY]"
@@ -332,14 +333,14 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <label for="">Hasil Kunjungan</label>
+                                <label for="">Hasil Kunjungan <span>*</span></label>
                                 <div class="form-group">
                                     <textarea name="visit_title" class="form-control" rows="3" data-validation="[NOTEMPTY]"
                                         data-validation-message="Hasil kunjungan tidak boleh kosong">{{ $data->visit_title }}</textarea>
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <label for="">Progres</label>
+                                <label for="">Progres <span>*</span></label>
                                 <div class="form-group">
                                     @php
                                         $explodeExtra = explode(', ', $data->progress_ind);

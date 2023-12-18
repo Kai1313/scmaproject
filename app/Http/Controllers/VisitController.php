@@ -54,13 +54,9 @@ class VisitController extends Controller
 
             return DataTables::of($data)
                 ->addColumn('action', function ($data) {
-                    $btn = '<div class="dropdown">
-                    <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown"><i class="glyphicon glyphicon-menu-hamburger"></i>
-                    <span class="caret"></span></button>
-                    <ul class="dropdown-menu dropdown-menu-right">';
-                    $btn .= '<li><a href="' . route('visit-entry', $data->id) . '"><i class="glyphicon glyphicon-pencil"></i> Edit</a></li>';
-                    $btn .= '<li><a href="' . route('visit-delete', $data->id) . '" class="action-delete"><i class="glyphicon glyphicon-trash"></i> Hapus</a></li>';
-                    $btn .= '</ul></div>';
+                    $btn = '';
+                    $btn .= '<a href="' . route('visit-entry', $data->id) . '" class="btn btn-warning btn-sm mr-1"><i class="glyphicon glyphicon-pencil"></i></a>';
+                    $btn .= '<a href="' . route('visit-delete', $data->id) . '" class="action-delete btn btn-danger btn-sm"><i class="glyphicon glyphicon-trash"></i></a>';
                     return $btn;
                 })
                 ->editColumn('status', function ($data) {
