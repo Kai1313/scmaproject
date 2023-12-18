@@ -130,6 +130,13 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 background-color: #e2e3e8;
             }
 
+            .navbar-custom-menu>.navbar-nav>li>.dropdown-menu {
+                right: 0 !important;
+            }
+
+            .skin-yellow .main-header .navbar .dropdown-menu li a {
+                color: #333 !important;
+            }
         }
 
         .select2-container--default .select2-selection--multiple .select2-selection__choice {
