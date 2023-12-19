@@ -21,6 +21,11 @@
             </td>
         </tr>
     @endforeach
+    @if (count($datas) == 0)
+        <tr>
+            <td colspan="11">Data tidak ditemukan</td>
+        </tr>
+    @endif
 @endif
 
 @if ($type == 'recap-data')
@@ -28,7 +33,12 @@
         <tr>
             <td width="200px">{{ $kre }}</td>
             <td width="20px"> : </td>
-            <td>{{ $re }}</td>
+            <td width="20px">{{ $re }}</td>
         </tr>
     @endforeach
+    @if (count($recap) == 0)
+        <tr>
+            <td colspan="2">Data tidak ditemukan</td>
+        </tr>
+    @endif
 @endif

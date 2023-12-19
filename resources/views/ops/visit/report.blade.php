@@ -40,6 +40,11 @@
         .select2 {
             width: 100% !important;
         }
+
+        #recap-data>tr>td {
+            border-bottom: 1px solid #777;
+            padding: 5px;
+        }
     </style>
 @endsection
 
@@ -62,26 +67,15 @@
             <div class="box-header">
                 <div class="row">
                     <div class="col-md-2 filter-div">
-                        <label>Cabang</label>
-                        <div class="form-group">
-                            <select id="id_cabang" class="form-control select2" name="id_cabang">
-                                <option value="">Semua Cabang</option>
-                                @foreach ($cabang as $branch)
-                                    <option value="{{ $branch['id'] }}">{{ $branch['text'] }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-2 filter-div">
                         <label>Tanggal</label>
                         <div class="form-group">
-                            <input type="text" id="daterangepicker" class="form-control" name="daterangepicker" />
+                            <input type="text" class="form-control trigger-change" name="date" />
                         </div>
                     </div>
                     <div class="col-md-2 filter-div">
                         <label>Sales</label>
                         <div class="form-group">
-                            <select id="id_salesman" class="form-control select2" name="id_salesman">
+                            <select class="form-control select2 trigger-change" name="id_salesman">
                                 <option value="">Semua Sales</option>
                                 @foreach ($salesmans as $sales)
                                     <option value="{{ $sales->id }}">{{ $sales->text }}</option>
@@ -90,37 +84,48 @@
                         </div>
                     </div>
                     <div class="col-md-2 filter-div">
-                        <label>Status</label>
+                        <label>Jenis Laporan</label>
                         <div class="form-group">
-                            <select id="status" class="form-control select2" name="status">
-                                <option value="">Semua Status</option>
-                                <option value="1">Belum Visit</option>
-                                <option value="2">Sudah Visit</option>
-                                <option value="0">Batal Visit</option>
+                            <select class="form-control select2 trigger-change" name="report_type">
+                                <option value="rekap">Rekap</option>
+                                <option value="detail">Detail</option>
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-2 filter-div">
-                        <label>Kategori Pelanggan</label>
-                        <div class="form-group">
-                            <select id="status_pelanggan" class="form-control select2" name="status_pelanggan">
-                                <option value="">Semua Kategori</option>
-                                @foreach ($customerCategory as $category)
-                                    <option value="{{ $category }}">{{ $category }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-2 filter-div">
-                        <label class="d-block">&nbsp;</label>
-                        <div class="form-group">
-                            <button type="button" class="btn btn-info" onclick="table.ajax.reload()"><i
-                                    class="fa fa-search mr-1"></i> Cari</button>
-                        </div>
+                    <div class="col-md-2 filter-div" style="padding-top:27px;">
+                        <a href="{{ route('visit_report_excel') }}" class="btn btn-success btn-action btn-sm btn-flat"
+                            style="margin-bottom:5px;">
+                            <i class="fa fa-file-excel-o"></i> Excel
+                        </a>
+                        <a href="javascript:void(0)" class="btn btn-default btn-action btn-view-action btn-sm btn-flat"
+                            style="margin-bottom:5px;">
+                            <i class="glyphicon glyphicon-eye-open"></i> View
+                        </a>
                     </div>
                 </div>
             </div>
-            <div class="box-body">
+            <div class="box-body target-recap" style="display:none;">
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="main-data">
+                        <thead>
+                            <tr>
+                                <th rowspan="2" width="110">Sales Name</th>
+                                <th rowspan="2" width="110">Date</th>
+                                <th rowspan="2" width="220">Customer</th>
+                                <th colspan="{{ count($activities) }}">Activity</th>
+                                <th rowspan="2">Description</th>
+                            </tr>
+                            <tr>
+                                @foreach ($activities as $activity)
+                                    <th width="50">{{ $activity }}</th>
+                                @endforeach
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="box-body target-detail" style="display:none;">
                 <div class="row">
                     <div class="col-md-12">
                         <table class="table table-bordered data-table display" width="100%">
@@ -141,6 +146,18 @@
                 </div>
             </div>
         </div>
+        <div class="row target-recap" style="display:none;">
+            <div class="col-md-5">
+                <div class="box box-warning">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Rekap</h3>
+                    </div>
+                    <div class="box-body">
+                        <table id="recap-data"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 @endsection
 @section('addedScripts')
@@ -152,14 +169,13 @@
     <script src="{{ asset('js/custom.js') }}"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
-    <script src="{{ asset('assets/bower_components/chart.js/Chart.js') }}"></script>
 @endsection
 
 @section('externalScripts')
     <script>
         var salesman = {!! json_encode($salesmans) !!}
-        $('.select2').select2();
-
+        var activities = {!! json_encode($activities) !!}
+        let defaultUrlIndex = '{{ route('visit_report') }}'
         $('#daterangepicker').daterangepicker({
             timePicker: false,
             startDate: moment().subtract(30, 'days'),
@@ -169,57 +185,72 @@
             }
         });
 
-        filterDatatable()
+        function loadDatatable() {
+            if ($('[name="report_type"]').val() == 'rekap') {
+                $('.target-recap').show()
+                $('.target-detail').hide()
+                $('#cover-spin').show()
+                $('#main-data').find('tbody').html('')
+                $('#recap-data').html('')
+                $.ajax({
+                    url: defaultUrlIndex + param,
+                    success: function(res) {
+                        if (res.result) {
+                            $('#main-data').find('tbody').html(res.htmlMainData)
+                            $('#recap-data').html(res.htmlRecapData)
+                        }
 
-        function filterDatatable() {
-            let param = {};
-            $('.box-header').find('select,input').each(function(i, v) {
-                param[$(v).attr('name')] = function() {
-                    return $(v).val()
-                }
-            })
-
-            return param;
+                        $('#cover-spin').hide()
+                    },
+                    error: function(error) {
+                        $('#cover-spin').hide()
+                        Swal.fire("Gagal Ambil Data. ", error.responseJSON.message, 'error')
+                    }
+                })
+            } else {
+                $('.target-recap').hide()
+                $('.target-detail').show()
+                $('.data-table').DataTable().destroy();
+                $('.data-table').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    pageLength: 50,
+                    scrollX: true,
+                    ajax: {
+                        url: "{{ route('visit_report') }}" + param,
+                    },
+                    language: {
+                        processing: '<img src="{{ asset('images/833.gif') }}" alt="">',
+                        paginate: {
+                            'first': 'First',
+                            'last': 'Last',
+                            'next': '→',
+                            'previous': '←'
+                        },
+                        emptyTable: "Data Tidak Ditemukan",
+                    },
+                    columns: [{
+                        data: 'visit_date',
+                        name: 'visit_date'
+                    }, {
+                        data: 'salesman.nama_salesman',
+                        name: 'salesman.nama_salesman',
+                    }, {
+                        data: 'pelanggan.nama_pelanggan',
+                        name: 'pelanggan.nama_pelanggan',
+                    }, {
+                        data: 'visit_title',
+                        name: 'visit_title',
+                    }, {
+                        data: 'visit_desc',
+                        name: 'visit_desc',
+                    }, {
+                        data: 'solusi',
+                        name: 'solusi',
+                    }],
+                });
+            }
         }
-
-        var table = $('.data-table').DataTable({
-            processing: true,
-            serverSide: true,
-            pageLength: 50,
-            scrollX: true,
-            ajax: {
-                url: "{{ route('visit_report') }}",
-                data: filterDatatable(),
-            },
-            language: {
-                processing: '<img src="{{ asset('images/833.gif') }}" alt="">',
-                paginate: {
-                    'first': 'First',
-                    'last': 'Last',
-                    'next': '→',
-                    'previous': '←'
-                },
-                emptyTable: "Data Tidak Ditemukan",
-            },
-            columns: [{
-                data: 'visit_date',
-                name: 'visit_date'
-            }, {
-                data: 'salesman.nama_salesman',
-                name: 'salesman.nama_salesman',
-            }, {
-                data: 'pelanggan.nama_pelanggan',
-                name: 'pelanggan.nama_pelanggan',
-            }, {
-                data: 'visit_title',
-                name: 'visit_title',
-            }, {
-                data: 'visit_desc',
-                name: 'visit_desc',
-            }, {
-                data: 'solusi',
-                name: 'solusi',
-            }],
-        });
     </script>
+    <script src="{{ asset('js/for-report.js') }}"></script>
 @endsection
