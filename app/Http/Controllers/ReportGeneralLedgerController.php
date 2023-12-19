@@ -146,9 +146,11 @@ class ReportGeneralLedgerController extends Controller
             $type = $request->type;
             $coa = $request->coa;
             $month = date("m", strtotime("$start_date"));
+            $endMonth = date("m", strtotime("$end_date"));
             $year = date("Y", strtotime($start_date));
             $start_of_the_month = date("Y-m-01", strtotime($start_date));
             $saldo_date = date("Y-m-d", strtotime($start_date . " -1 day"));
+            Log::info("end month ".$endMonth);
 
             // Init Datatable
             $offset = $request->start;
@@ -167,12 +169,15 @@ class ReportGeneralLedgerController extends Controller
             $draw = $request->draw;
             $current_page = $offset / $limit + 1;
             $data_ledgers = JurnalDetail::join("jurnal_header", "jurnal_header.id_jurnal", "jurnal_detail.id_jurnal")
-                // ->join("master_akun", "master_akun.id_akun", "jurnal_detail.id_akun")
                 ->join("cabang", "cabang.id_cabang", "jurnal_header.id_cabang")
                 ->where("jurnal_header.void", "0")
-                ->whereRaw('((jurnal_header.id_transaksi NOT LIKE "Closing 1%" AND jurnal_header.id_transaksi NOT LIKE "Closing 2%") OR jurnal_header.id_transaksi IS NULL)')
-                // ->where("master_akun.id_cabang", $id_cabang)
                 ->whereBetween("jurnal_header.tanggal_jurnal", [$start_date, $end_date]);
+                if ($endMonth == 12) {
+                    $data_ledgers = $data_ledgers->whereRaw('((jurnal_header.id_transaksi NOT LIKE "Closing 1%" AND jurnal_header.id_transaksi NOT LIKE "Closing 2%" AND jurnal_header.id_transaksi NOT LIKE "Closing 3%" AND master_akun.tipe_akun = 1) AND (jurnal_header.id_transaksi NOT LIKE "Closing 3%" AND master_akun.tipe_akun = 0) OR jurnal_header.id_transaksi IS NULL)');
+                }
+                else {
+                    $data_ledgers = $data_ledgers->whereRaw('((jurnal_header.id_transaksi NOT LIKE "Closing 1%" AND jurnal_header.id_transaksi NOT LIKE "Closing 2%" AND jurnal_header.id_transaksi NOT LIKE "Closing 3%" AND master_akun.tipe_akun = 1) OR jurnal_header.id_transaksi IS NULL)');
+                }
             if ($type == "recap") {
                 $data_ledgers = $data_ledgers->selectRaw("jurnal_header.id_jurnal, master_akun.id_cabang, master_akun.id_akun, master_akun.kode_akun, master_akun.nama_akun, SUM(jurnal_detail.debet) as debet, SUM(jurnal_detail.credit) as kredit")
                 ->leftJoin("master_akun", "master_akun.id_akun", "jurnal_detail.id_akun");
@@ -266,8 +271,6 @@ class ReportGeneralLedgerController extends Controller
             // Log::info(count($result));
             foreach ($result as $key => $value) {
                 if ($type == "recap") {
-                    // $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")->where("id_akun", $value->id_akun)->where("id_cabang", $value->id_cabang)->where("bulan", $month)->where("tahun", $year)->first();
-
                     if ($id_cabang != "all" && $id_cabang != "") {
                         $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")->where("id_akun", $value->id_akun)->where("id_cabang", $id_cabang)->where("bulan", (int) $month)->where("tahun", (int) $year)->first();
                     }
