@@ -118,14 +118,16 @@
                     <div class="col-md-2 filter-div">
                         <label class="d-block">&nbsp;</label>
                         <div class="form-group">
-                            <button type="button" class="btn btn-info" onclick="table.ajax.reload()"><i
-                                    class="fa fa-search mr-1"></i> Cari</button>
+                            <button type="button" class="btn btn-info btn-sm btn-flat" onclick="table.ajax.reload()">
+                                <i class="fa fa-search mr-1"></i> Cari
+                            </button>
                         </div>
                     </div>
                 </div>
                 <div class="pull-right">
-                    <a href="{{ route('visit-entry') }}" class="btn btn-primary"><i class="fa fa-plus mr-1"></i> Tambah
-                        Kunjungan</a>
+                    <a href="{{ route('visit-entry') }}" class="btn btn-primary btn-sm btn-flat">
+                        <i class="fa fa-plus mr-1"></i> Tambah Kunjungan
+                    </a>
                 </div>
             </div>
             <div class="box-body">
@@ -173,7 +175,7 @@
         $('#daterangepicker').daterangepicker({
             timePicker: false,
             startDate: moment().subtract(30, 'days'),
-            endDate: moment(),
+            endDate: moment().add(30, 'days'),
             locale: {
                 format: 'YYYY-MM-DD'
             }

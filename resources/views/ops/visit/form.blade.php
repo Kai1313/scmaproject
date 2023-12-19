@@ -151,7 +151,7 @@
             <form action="{{ route('visit-save-entry', $data ? $data->id : 0) }}" method="post" class="post-action">
                 <div class="box-header">
                     <h3 class="box-title">{{ $data ? 'Edit' : 'Tambah' }} Kunjungan</h3>
-                    <a href="{{ route('visit') }}" class="btn bg-navy btn-sm btn-default pull-right">
+                    <a href="{{ route('visit') }}" class="btn bg-navy btn-sm btn-default pull-right btn-flat">
                         <span class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali
                     </a>
                 </div>
@@ -274,15 +274,18 @@
                         </div>
                     </div>
                     <div class="pull-right">
-                        <button type="submit" class="btn btn-primary submit-header"
-                            style="{{ $data ? 'display:none' : 'display:inline' }}"><i class="fa fa-floppy-o mr-1"></i>
-                            Simpan</button>
+                        <button type="submit" class="btn btn-primary submit-header btn-sm btn-flat"
+                            style="{{ $data ? 'display:none' : 'display:inline' }}">
+                            <i class="fa fa-floppy-o mr-1"></i> Simpan
+                        </button>
                         @if ($data && $data->status != 0)
-                            <button type="button" class="btn btn-warning edit-header"><i class="fa fa-pencil mr-1"></i>
-                                Perbarui Data Kunjungan</button>
-                            <button type="button" class="btn btn-default cancel-edit-header" style="display:none;"><i
-                                    class="fa fa-close mr-1"></i>
-                                Batal</button>
+                            <button type="button" class="btn btn-warning edit-header btn-sm btn-flat">
+                                <i class="fa fa-pencil mr-1"></i> Perbarui Data Kunjungan
+                            </button>
+                            <button type="button" class="btn btn-default cancel-edit-header btn-sm btn-flat"
+                                style="display:none;">
+                                <i class="fa fa-close mr-1"></i> Batal
+                            </button>
                         @endif
                     </div>
                 </div>
@@ -292,116 +295,123 @@
         @if ($data && $data->status != 0)
             @if (!$data->visit_title)
                 <div class="text-right" style="margin-bottom:15px;">
-                    <a href="{{ route('visit-save-date-change', $data->id) }}" class="btn btn-success change-date"><i
-                            class="fa fa-calendar mr-1"></i>
-                        Perbarui Tanggal Kunjungan</a>
-                    <a href="{{ route('cancel-visit', $data->id) }}" class="btn btn-danger show-cancel-visit">
+                    <a href="{{ route('visit-save-date-change', $data->id) }}"
+                        class="btn btn-success change-date btn-sm btn-flat">
+                        <i class="fa fa-calendar mr-1"></i> Perbarui Tanggal Kunjungan
+                    </a>
+                    <a href="{{ route('cancel-visit', $data->id) }}"
+                        class="btn btn-danger show-cancel-visit btn-sm btn-flat">
                         <i class="fa fa-close mr-1"></i> Batal Kunjungan
                     </a>
                 </div>
             @endif
-            <div class="box">
-                <form action="{{ route('visit-save-report-entry', $data->id) }}" method="post" class="post-action">
-                    <div class="box-header">
-                        <h3 class="box-title">Hasil Kunjungan</h3>
-                    </div>
-                    <div class="box-body">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <label for="">Metode Kunjungan <span>*</span></label>
-                                <div class="form-group">
-                                    <select name="visit_type" class="form-control select2" data-validation="[NOTEMPTY]"
-                                        data-validation-message="Metode tidak boleh kosong">
-                                        <option value="">Pilih Metode</option>
-                                        @foreach ($methods as $method)
-                                            <option value="{{ $method }}"
-                                                {{ $data->visit_type == $method ? 'selected' : '' }}>
-                                                {{ $method }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <label for="">Kategori Kunjungan <span>*</span></label>
-                                <div class="form-group">
-                                    <select name="kategori_kunjungan" class="form-control select2"
-                                        data-validation="[NOTEMPTY]"
-                                        data-validation-message="Kategori tidak boleh kosong">
-                                        <option value="">Pilih Kategori</option>
-                                        @foreach ($categories as $category)
-                                            <option value="{{ $category->nama_kategori_kunjungan }}"
-                                                {{ $data->kategori_kunjungan == $category->nama_kategori_kunjungan ? 'selected' : '' }}>
-                                                {{ $category->nama_kategori_kunjungan }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <label for="">Hasil Kunjungan <span>*</span></label>
-                                <div class="form-group">
-                                    <textarea name="visit_title" class="form-control" rows="3" data-validation="[NOTEMPTY]"
-                                        data-validation-message="Hasil kunjungan tidak boleh kosong">{{ $data->visit_title }}</textarea>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="">Progres <span>*</span></label>
-                                <div class="form-group">
-                                    @php
-                                        $explodeExtra = explode(', ', $data->progress_ind);
-                                    @endphp
-                                    @foreach ($progress as $key => $pro)
-                                        <span style="margin-right:10px;">
-                                            @php
-                                                $extra = '';
-                                                if ($key == 0) {
-                                                    $extra = 'data-validation=[NOTEMPTY] data-validation-message=Hasil_kunjungan_tidak_boleh_kosong';
-                                                }
-                                            @endphp
-                                            <input type="checkbox" name="progress_ind[]" value="{{ $pro }}"
-                                                {{ $extra }} {{ in_array($pro, $explodeExtra) ? 'checked' : '' }}>
-                                            {{ $pro }}
-                                        </span>
-                                    @endforeach
-                                </div>
-                                <label for="">Kendala</label>
-                                <div class="form-group">
-                                    <textarea name="visit_desc" class="form-control" rows="3">{{ $data->visit_desc }}</textarea>
-                                </div>
-                                <label for="">Solusi</label>
-                                <div class="form-group">
-                                    <textarea name="solusi" class="form-control" rows="3">{{ $data->solusi }}</textarea>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="">Gambar</label>
-                                <div class="container-media">
-                                    @foreach ($data->medias as $media)
-                                        <div class="item-media">
-                                            <a href="javascript:void(0)">
-                                                <img src="{{ asset($media->image) }}" style="width:100%;">
-                                            </a>
-                                            <a href="javascript:void(0)"
-                                                class="remove-media-container btn btn-danger btn-sm">
-                                                <i class="fa fa-close"></i>
-                                            </a>
-                                        </div>
-                                    @endforeach
-                                    <div class="item-media text-center add-image" style="">
-                                        <i class="fa fa-plus" style="font-size:37px;color:#3c8dbc;"></i>
+            @if (date('Y-m-d') >= $data->visit_date)
+                <div class="box">
+                    <form action="{{ route('visit-save-report-entry', $data->id) }}" method="post" class="post-action">
+                        <div class="box-header">
+                            <h3 class="box-title">Hasil Kunjungan</h3>
+                        </div>
+                        <div class="box-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label for="">Metode Kunjungan <span>*</span></label>
+                                    <div class="form-group">
+                                        <select name="visit_type" class="form-control select2"
+                                            data-validation="[NOTEMPTY]"
+                                            data-validation-message="Metode tidak boleh kosong">
+                                            <option value="">Pilih Metode</option>
+                                            @foreach ($methods as $method)
+                                                <option value="{{ $method }}"
+                                                    {{ $data->visit_type == $method ? 'selected' : '' }}>
+                                                    {{ $method }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <label for="">Kategori Kunjungan <span>*</span></label>
+                                    <div class="form-group">
+                                        <select name="kategori_kunjungan" class="form-control select2"
+                                            data-validation="[NOTEMPTY]"
+                                            data-validation-message="Kategori tidak boleh kosong">
+                                            <option value="">Pilih Kategori</option>
+                                            @foreach ($categories as $category)
+                                                <option value="{{ $category->nama_kategori_kunjungan }}"
+                                                    {{ $data->kategori_kunjungan == $category->nama_kategori_kunjungan ? 'selected' : '' }}>
+                                                    {{ $category->nama_kategori_kunjungan }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <label for="">Hasil Kunjungan <span>*</span></label>
+                                    <div class="form-group">
+                                        <textarea name="visit_title" class="form-control" rows="3" data-validation="[NOTEMPTY]"
+                                            data-validation-message="Hasil kunjungan tidak boleh kosong">{{ $data->visit_title }}</textarea>
                                     </div>
                                 </div>
-                                <input type="file" name="upload_image" class="form-control" value="" multiple
-                                    style="display:none;" accept=".png,.jpeg,.jpg" id="upload_image">
-                                <input type="hidden" name="upload_base64"
-                                    value="{{ $data->medias ? json_encode($data->medias) : [] }}">
-                                <input type="hidden" name="remove_base64" value="[]">
+                                <div class="col-md-4">
+                                    <label for="">Progres <span>*</span></label>
+                                    <div class="form-group">
+                                        @php
+                                            $explodeExtra = explode(', ', $data->progress_ind);
+                                        @endphp
+                                        @foreach ($progress as $key => $pro)
+                                            <span style="margin-right:10px;">
+                                                @php
+                                                    $extra = '';
+                                                    if ($key == 0) {
+                                                        $extra = 'data-validation=[NOTEMPTY] data-validation-message=Hasil_kunjungan_tidak_boleh_kosong';
+                                                    }
+                                                @endphp
+                                                <input type="checkbox" name="progress_ind[]" value="{{ $pro }}"
+                                                    {{ $extra }}
+                                                    {{ in_array($pro, $explodeExtra) ? 'checked' : '' }}>
+                                                {{ $pro }}
+                                            </span>
+                                        @endforeach
+                                    </div>
+                                    <label for="">Kendala</label>
+                                    <div class="form-group">
+                                        <textarea name="visit_desc" class="form-control" rows="3">{{ $data->visit_desc }}</textarea>
+                                    </div>
+                                    <label for="">Solusi</label>
+                                    <div class="form-group">
+                                        <textarea name="solusi" class="form-control" rows="3">{{ $data->solusi }}</textarea>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="">Gambar</label>
+                                    <div class="container-media">
+                                        @foreach ($data->medias as $media)
+                                            <div class="item-media">
+                                                <a href="javascript:void(0)">
+                                                    <img src="{{ asset($media->image) }}" style="width:100%;">
+                                                </a>
+                                                <a href="javascript:void(0)"
+                                                    class="remove-media-container btn btn-danger btn-sm btn-flat">
+                                                    <i class="fa fa-close"></i>
+                                                </a>
+                                            </div>
+                                        @endforeach
+                                        <div class="item-media text-center add-image" style="">
+                                            <i class="fa fa-plus" style="font-size:37px;color:#3c8dbc;"></i>
+                                        </div>
+                                    </div>
+                                    <input type="file" name="upload_image" class="form-control" value=""
+                                        multiple style="display:none;" accept=".png,.jpeg,.jpg" id="upload_image">
+                                    <input type="hidden" name="upload_base64"
+                                        value="{{ $data->medias ? json_encode($data->medias) : [] }}">
+                                    <input type="hidden" name="remove_base64" value="[]">
+                                </div>
+                            </div>
+                            <div class="pull-right">
+                                <input type="hidden" name="latitude_visit" value="{{ $data->latitude_visit }}">
+                                <input type="hidden" name="longitude_visit" value="{{ $data->longitude_visit }}">
+                                <button type="submit" class="btn btn-primary btn-sm btn-flat">
+                                    <i class="fa fa-floppy-o mr-1"></i> Simpan
+                                </button>
                             </div>
                         </div>
-                        <div class="pull-right">
-                            <input type="hidden" name="latitude_visit" value="{{ $data->latitude_visit }}">
-                            <input type="hidden" name="longitude_visit" value="{{ $data->longitude_visit }}">
-                            <button type="submit" class="btn btn-primary"><i class="fa fa-floppy-o mr-1"></i>
-                                Simpan</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
+                    </form>
+                </div>
+            @endif
         @endif
     </div>
 
@@ -415,28 +425,28 @@
                     </div>
                     <div class="modal-body">
                         <div class="row">
-                            <label for="" class="col-md-4">Nama Pelanggan</label>
+                            <label for="" class="col-md-4">Nama Pelanggan <span>*</span></label>
                             <div class="form-group col-md-8">
                                 <input type="text" class="form-control" name="nama_pelanggan"
                                     data-validation="[NOTEMPTY]" data-validation-message="Nama tidak boleh kosong">
                             </div>
                         </div>
                         <div class="row">
-                            <label for="" class="col-md-4">Alamat</label>
+                            <label for="" class="col-md-4">Alamat <span>*</span></label>
                             <div class="form-group col-md-8">
                                 <textarea name="alamat_pelanggan" class="form-control" data-validation="[NOTEMPTY]"
                                     data-validation-message="Alamat tidak boleh kosong"></textarea>
                             </div>
                         </div>
                         <div class="row">
-                            <label for="" class="col-md-4">Kota</label>
+                            <label for="" class="col-md-4">Kota <span>*</span></label>
                             <div class="form-group col-md-8">
                                 <input type="text" class="form-control" name="kota_pelanggan"
                                     data-validation="[NOTEMPTY]" data-validation-message="Kota tidak boleh kosong">
                             </div>
                         </div>
                         <div class="row">
-                            <label for="" class="col-md-4">Telepon</label>
+                            <label for="" class="col-md-4">Telepon <span>*</span></label>
                             <div class="form-group col-md-8">
                                 <input type="text" class="form-control" name="telepon1_pelanggan"
                                     data-validation="[NOTEMPTY]" data-validation-message="Telepon tidak boleh kosong">
@@ -445,14 +455,14 @@
                         <div class="row">
                             <label for="" class="col-md-4">Orang yang dihubungi</label>
                             <div class="form-group col-md-8">
-                                <input type="text" class="form-control" name="kontak_person_pelanggan"
-                                    data-validation="[NOTEMPTY]" data-validation-message="Kontak tidak boleh kosong">
+                                <input type="text" class="form-control" name="kontak_person_pelanggan">
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Simpan</button>
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary btn-sm btn-flat">Simpan</button>
+                        <button type="button" class="btn btn-default btn-sm btn-flat"
+                            data-dismiss="modal">Batal</button>
                     </div>
                 </div>
             </form>
@@ -468,15 +478,16 @@
                         <h4 class="modal-title">Batalkan Kunjungan</h4>
                     </div>
                     <div class="modal-body">
-                        <label for="">Alasan Pembatalan</label>
+                        <label for="">Alasan Pembatalan <span>*</span></label>
                         <div class="form-group">
                             <textarea name="alasan_pembatalan" class="form-control" data-validation="[NOTEMPTY]"
                                 data-validation-message="Alasan pembatalan tidak boleh kosong"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Simpan</button>
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary btn-sm btn-flat">Simpan</button>
+                        <button type="button" class="btn btn-default btn-sm btn-flat"
+                            data-dismiss="modal">Batal</button>
                     </div>
                 </div>
             </form>
@@ -492,20 +503,21 @@
                         <h4 class="modal-title">Perbarui Tanggal Kunjungan</h4>
                     </div>
                     <div class="modal-body">
-                        <label for="">Tanggal</label>
+                        <label for="">Tanggal <span>*</span></label>
                         <div class="form-group">
                             <input type="date" class="form-control" data-validation="[NOTEMPTY]"
                                 data-validation-message="Tanggal tidak boleh kosong" name="new_date">
                         </div>
-                        <label for="">Alasan Ubah Tanggal</label>
+                        <label for="">Alasan Ubah Tanggal <span>*</span></label>
                         <div class="form-group">
                             <textarea name="alasan_ubah_tanggal" class="form-control" data-validation="[NOTEMPTY]"
                                 data-validation-message="Alasan tidak boleh kosong"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Simpan</button>
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary btn-sm btn-flat">Simpan</button>
+                        <button type="button" class="btn btn-default btn-sm btn-flat"
+                            data-dismiss="modal">Batal</button>
                     </div>
                 </div>
             </form>
@@ -709,7 +721,7 @@
         function createHtmlImage(base64) {
             let html = '<div class="item-media"><input type="hidden" name="medias[]" value="">' +
                 '<a href="javascript:void(0)"><img src="' + base64 + '" style="width:100%;"></a>' +
-                '<a href="javascript:void(0)" class="remove-media-container btn btn-danger btn-sm"><i class="fa fa-close"></i></a></div>'
+                '<a href="javascript:void(0)" class="remove-media-container btn btn-danger btn-sm btn-sm btn-flat"><i class="fa fa-close"></i></a></div>'
             return html;
         }
     </script>
