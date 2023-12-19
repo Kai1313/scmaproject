@@ -78,17 +78,21 @@
                             <input type="text" id="daterangepicker" class="form-control" name="daterangepicker" />
                         </div>
                     </div>
-                    <div class="col-md-2 filter-div">
-                        <label>Sales</label>
-                        <div class="form-group">
-                            <select id="id_salesman" class="form-control select2" name="id_salesman">
-                                <option value="">Semua Sales</option>
-                                @foreach ($salesmans as $sales)
-                                    <option value="{{ $sales->id }}">{{ $sales->text }}</option>
-                                @endforeach
-                            </select>
+                    @if ($groupUser != 6)
+                        <div class="col-md-2 filter-div">
+                            <label>Sales</label>
+                            <div class="form-group">
+                                <select id="id_salesman" class="form-control select2" name="id_salesman">
+                                    <option value="">Semua Sales</option>
+                                    @foreach ($salesmans as $sales)
+                                        <option value="{{ $sales->id }}">{{ $sales->text }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
-                    </div>
+                    @else
+                        <input type="hidden" name="id_salesman" id="id_salesman" value="{{ $idUser }}">
+                    @endif
                     <div class="col-md-2 filter-div">
                         <label>Status</label>
                         <div class="form-group">

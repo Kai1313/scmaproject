@@ -18,6 +18,8 @@ class VisitController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
+        $idGrupUser = session()->get('user')['id_grup_pengguna'];
+        $sales = Salesman::where('pengguna_id', session()->get('user')['id_pengguna'])->first();
         $activities = Visit::$progressIndicator;
         if ($request->ajax()) {
             if ($request->report_type == 'rekap') {
@@ -34,6 +36,8 @@ class VisitController extends Controller
             "cabang" => $cabang,
             'salesmans' => $salesmans,
             'activities' => $activities,
+            'groupUser' => $idGrupUser,
+            'idUser' => $sales ? $sales->id_salesman : '0',
         ]);
     }
 
@@ -42,7 +46,7 @@ class VisitController extends Controller
         $data = Visit::select('visit.*', 'salesman.nama_salesman', 'pelanggan.nama_pelanggan')
             ->leftJoin('salesman', 'visit.id_salesman', 'salesman.id_salesman')
             ->leftJoin('pelanggan', 'visit.id_pelanggan', 'pelanggan.id_pelanggan')
-            ->where('visit.status', '!=', 3)
+            ->where('visit.status', 2)
             ->orderBy('visit.visit_date', 'desc');
 
         if ($request->date) {

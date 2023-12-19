@@ -21,17 +21,20 @@ class VisitController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
+        $idGrupUser = session()->get('user')['id_grup_pengguna'];
+        $sales = Salesman::where('pengguna_id', session()->get('user')['id_pengguna'])->first();
+
         if ($request->ajax()) {
             $data = Visit::select('visit.*', 'salesman.nama_salesman', 'pelanggan.nama_pelanggan')
                 ->leftJoin('salesman', 'visit.id_salesman', 'salesman.id_salesman')
                 ->leftJoin('pelanggan', 'visit.id_pelanggan', 'pelanggan.id_pelanggan')
                 ->where('visit.status', '!=', 3);
             if ($request->id_cabang) {
-                $data = $data->where('id_cabang', $request->id_cabang);
+                $data = $data->where('visit.id_cabang', $request->id_cabang);
             }
 
             if ($request->id_salesman) {
-                $data = $data->where('id_salesman', $request->id_salesman);
+                $data = $data->where('visit.id_salesman', $request->id_salesman);
             }
 
             if ($request->daterangepicker) {
@@ -39,24 +42,23 @@ class VisitController extends Controller
                 $data = $data->whereBetween('visit_date', $explode);
             }
 
-            if ($request->status) {
-                $data = $data->where('status', $request->status);
+            if (isset($request->status)) {
+                $data = $data->where('visit.status', $request->status);
             }
 
             if ($request->status_pelanggan) {
-                $data = $data->where('status_pelanggan', $request->status_pelanggan);
+                $data = $data->where('visit.status_pelanggan', $request->status_pelanggan);
             }
 
             $data = $data->orderBy('visit_date', 'desc')->orderBy('visit_code', 'desc');
-
-            $idUser = session()->get('user')['id_pengguna'];
-            $idGrupUser = session()->get('user')['id_grup_pengguna'];
-
             return DataTables::of($data)
-                ->addColumn('action', function ($data) {
+                ->addColumn('action', function ($data) use ($idGrupUser) {
                     $btn = '';
                     $btn .= '<a href="' . route('visit-entry', $data->id) . '" class="btn btn-warning btn-sm mr-1"><i class="glyphicon glyphicon-pencil"></i></a>';
-                    $btn .= '<a href="' . route('visit-delete', $data->id) . '" class="action-delete btn btn-danger btn-sm"><i class="glyphicon glyphicon-trash"></i></a>';
+                    if ($idGrupUser == 1) {
+                        $btn .= '<a href="' . route('visit-delete', $data->id) . '" class="action-delete btn btn-danger btn-sm"><i class="glyphicon glyphicon-trash"></i></a>';
+                    }
+
                     return $btn;
                 })
                 ->editColumn('status', function ($data) {
@@ -94,6 +96,8 @@ class VisitController extends Controller
             "pageTitle" => "SCA OPS | Kunjungan | List",
             'salesmans' => $salesman,
             'customerCategory' => $customerCategory,
+            'groupUser' => $idGrupUser,
+            'idUser' => $sales ? $sales->id_salesman : '0',
         ]);
     }
 

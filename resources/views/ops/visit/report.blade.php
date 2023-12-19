@@ -72,17 +72,21 @@
                             <input type="text" class="form-control trigger-change" name="date" />
                         </div>
                     </div>
-                    <div class="col-md-2 filter-div">
-                        <label>Sales</label>
-                        <div class="form-group">
-                            <select class="form-control select2 trigger-change" name="id_salesman">
-                                <option value="">Semua Sales</option>
-                                @foreach ($salesmans as $sales)
-                                    <option value="{{ $sales->id }}">{{ $sales->text }}</option>
-                                @endforeach
-                            </select>
+                    @if ($groupUser != 6)
+                        <div class="col-md-2 filter-div">
+                            <label>Sales</label>
+                            <div class="form-group">
+                                <select class="form-control select2 trigger-change" name="id_salesman">
+                                    <option value="">Semua Sales</option>
+                                    @foreach ($salesmans as $sales)
+                                        <option value="{{ $sales->id }}">{{ $sales->text }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
-                    </div>
+                    @else
+                        <input type="hidden" name="id_salesman" value="{{ $idUser }}" class="trigger-change">
+                    @endif
                     <div class="col-md-2 filter-div">
                         <label>Jenis Laporan</label>
                         <div class="form-group">
