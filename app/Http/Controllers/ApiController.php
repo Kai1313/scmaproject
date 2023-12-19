@@ -713,7 +713,7 @@ class ApiController extends Controller
                 ],
                 [
                     'akun' => $akun_piutang_dagang,
-                    'debet' => round(($total + $uang_muka + $total_biaya), 2),
+                    'debet' => round(($total + $total_biaya), 2),
                     'credit' => 0,
                     'keterangan' => 'Jurnal Otomatis Penjualan ' . $id_transaksi . ' - ' . $nama_pelanggan,
                     'id_transaksi' => null,
