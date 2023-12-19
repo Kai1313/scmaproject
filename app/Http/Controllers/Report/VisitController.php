@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Report;
 use App\Http\Controllers\Controller;
 use App\Salesman;
 use App\Visit;
-use DB;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -17,8 +16,9 @@ class VisitController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
+        $activities = Visit::$progressIndicator;
         if ($request->ajax()) {
-            return $this->getDataRecap($request);
+            return $this->getDataRecap($request, $activities);
         }
 
         $cabang = session()->get('access_cabang');
@@ -27,28 +27,61 @@ class VisitController extends Controller
             "pageTitle" => "SCA OPS | Laporan Kunjungan | List",
             "cabang" => $cabang,
             'salesmans' => $salesmans,
+            'activities' => $activities,
         ]);
     }
 
-    public function getDataRecap($request)
+    public function getDataRecap($request, $activities)
     {
-        $sub = Visit::orderBy('visit_date', 'DESC');
-
-        $data = DB::table(DB::raw("({$sub->toSql()}) as sub"))
-            ->leftJoin('salesman', 'sub.id_salesman', 'salesman.id_salesman')
-            ->leftJoin('pelanggan', 'sub.id_pelanggan', 'pelanggan.id_pelanggan')
-            ->where('sub.status', '!=', 3);
+        $data = Visit::select('visit.*', 'salesman.nama_salesman', 'pelanggan.nama_pelanggan')
+            ->leftJoin('salesman', 'visit.id_salesman', 'salesman.id_salesman')
+            ->leftJoin('pelanggan', 'visit.id_pelanggan', 'pelanggan.id_pelanggan')
+            ->where('visit.status', '!=', 3)
+            ->orderBy('visit.visit_date', 'desc');
 
         if ($request->daterangepicker) {
             $explode = explode(' - ', $request->daterangepicker);
             $data = $data->whereBetween('visit_date', $explode);
         }
 
-        $data = $data->get();
+        if ($request->id_salesman) {
+            $data = $data->where('visit.id_salesman', $request->id_salesman);
+        }
 
-        $activities = Visit::$progressIndicator;
-        $html = (string) view('ops.visit.template-report', ['datas' => $data, 'activities' => $activities]);
-        return response()->json(['result' => true, 'html' => $html, 'data' => $data]);
+        $data = $data->get()->unique('id_pelanggan');
+
+        $ac_values = [];
+        foreach ($data as $d) {
+            $prog = explode(', ', $d->progress_ind);
+            foreach ($activities as $ac) {
+                if (isset($ac_values[$ac])) {
+                    $ac_values[$ac] = in_array($ac, $prog) ? $ac_values[$ac] += 1 : $ac_values[$ac] += 0;
+                } else {
+                    $ac_values[$ac] = in_array($ac, $prog) ? 1 : 0;
+                }
+            }
+        }
+
+        $mainData = (string) view('ops.visit.template-report', [
+            'datas' => $data,
+            'activities' => $activities,
+            'type' => 'main-data',
+        ]);
+
+        $recapData = (string) view('ops.visit.template-report', [
+            'recap' => $ac_values,
+            'type' => 'recap-data',
+        ]);
+
+        return response()->json([
+            'result' => true,
+            'htmlMainData' => $mainData,
+            'htmlRecapData' => $recapData,
+            'chartData' => [
+                'labels' => $activities,
+                'values' => array_values($ac_values),
+            ],
+        ]);
     }
 
     public function index(Request $request)
