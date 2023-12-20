@@ -173,7 +173,7 @@
                         <div class="col-md-4">
                             <label>Keterangan</label>
                             <div class="form-group">
-                                <textarea name="keterangan_pindah_barang" class="form-control">{{ $data ? $data->keterangan_pindah_barang : '' }}</textarea>
+                                <textarea name="keterangan_pindah_barang" class="form-control" readonly>{{ $data ? $data->keterangan_pindah_barang : '' }}</textarea>
                             </div>
                         </div>
                     </div>
