@@ -981,7 +981,6 @@ class ApiController extends Controller
                     'nama_barang' => $detail_inv['nama_barang'],
                     'kode_batang' => $detail_inv['kode_batang'],
                     'kode_barang' => $detail_inv['kode_barang'],
-                    'value' => $detail_inv['value'],
                     'asset_beli' => $detail_inv['asset_beli'],
                     'akumulasi_penyusutan' => $detail_inv['akumulasi_penyusutan'],
                 ];
