@@ -1316,15 +1316,15 @@ class ApiController extends Controller
             }
 
             // cek apakah ada saldo_transaksi
-            $check_trx_saldo = TrxSaldo::where("id_transaksi", $id_transaksi)->first();
-            if (empty($check_trx_saldo)) {
-                DB::rollback();
-                return response()->json([
-                    "result" => false,
-                    "code" => 404,
-                    "message" => "Error saldo transaksi belum ada",
-                ], 404);
-            }
+            // $check_trx_saldo = TrxSaldo::where("id_transaksi", $id_transaksi)->first();
+            // if (empty($check_trx_saldo)) {
+            //     DB::rollback();
+            //     return response()->json([
+            //         "result" => false,
+            //         "code" => 404,
+            //         "message" => "Error saldo transaksi belum ada",
+            //     ], 404);
+            // }
 
             // detail
             // Memorial
