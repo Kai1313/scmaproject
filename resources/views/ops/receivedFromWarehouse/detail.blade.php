@@ -98,6 +98,12 @@
                                 : {{ $data->tanggal_pindah_barang }}
                             </div>
                         </div>
+                        <div class="row">
+                            <label class="col-md-4">Keterangan</label>
+                            <div class="col-md-8">
+                                : {{ $data->keterangan_pindah_barang }}
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md-6">
                         <div class="row">

@@ -170,6 +170,12 @@
                                     value="{{ old('id_gudang2', $data ? $data->id_gudang2 : '') }}">
                             </div>
                         </div>
+                        <div class="col-md-4">
+                            <label>Keterangan</label>
+                            <div class="form-group">
+                                <textarea name="keterangan_pindah_barang" class="form-control">{{ $data ? $data->keterangan_pindah_barang : '' }}</textarea>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
