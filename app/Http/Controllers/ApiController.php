@@ -936,6 +936,15 @@ class ApiController extends Controller
                         }
                     }
                 }
+            }else{
+                // Find Header data and delete detail
+                $header = JurnalHeader::where("id_transaksi", $id_transaksi)->where('jenis_jurnal', '<>', 'ME')->where('void', 0)->first();
+                if (!empty($header)) {
+                    $header->void = 1;
+                    $header->user_void = $user_created;
+                    $header->dt_void = date('Y-m-d h:i:s');
+                    $header->save();
+                }
             }
 
             DB::commit();
@@ -1959,6 +1968,15 @@ class ApiController extends Controller
                             $index++;
                         }
                     }
+                }
+            }else{
+                // Find Header data and delete detail
+                $header = JurnalHeader::where("id_transaksi", $id_transaksi)->where('jenis_jurnal', '<>', 'ME')->where('void', 0)->first();
+                if (!empty($header)) {
+                    $header->void = 1;
+                    $header->user_void = $user_created;
+                    $header->dt_void = date('Y-m-d h:i:s');
+                    $header->save();
                 }
             }
 
