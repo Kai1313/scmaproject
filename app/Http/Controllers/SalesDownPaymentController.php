@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\ApiController;
 use App\SalesDownPayment;
+use App\TransactionBalance;
 use DB;
 use Illuminate\Http\Request;
 use Log;
@@ -240,15 +241,49 @@ class SalesDownPaymentController extends Controller
             $data->void_user_id = session()->get('user')['id_pengguna'];
             $data->save();
 
-            $resApi = $this->callApiJournal($data);
-            $convertResApi = (array) json_decode($resApi);
-            if ($convertResApi['result'] == false) {
+            $payment = TransactionBalance::where('id_transaksi', $data->kode_uang_muka_penjualan)->where('tipe_transaksi', 'Uang Muka Penjualan')->first();
+            if ($payment) {
+                if ($payment && $payment->bayar > 0) {
+                    return response()->json([
+                        "result" => false,
+                        "message" => "Uang muka sudah terbayar",
+                    ], 500);
+                }
+
+                $payment->delete();
+            }
+
+            // dd([
+            //     "no_transaksi" => $data->kode_uang_muka_penjualan,
+            //     "tanggal" => $data->tanggal,
+            //     "slip" => null,
+            //     "cabang" => $data->id_cabang,
+            //     "pelanggan" => $data->salesOrder->id_pelanggan,
+            //     "void" => 1,
+            //     "user" => session()->get('user')['id_pengguna'],
+            //     "total" => $data->ppn_uang_muka_penjualan == '2' ? $data->konversi_nominal + $data->ppn : $data->konversi_nominal,
+            //     "uang_muka" => $data->dpp,
+            //     "ppn" => $data->ppn,
+            // ]);
+
+            $resultJurnalUangMukaPenjualan = (new ApiController)->journalUangMukaPenjualan(new Request([
+                "no_transaksi" => $data->kode_uang_muka_penjualan,
+                "tanggal" => $data->tanggal,
+                "slip" => null,
+                "cabang" => $data->id_cabang,
+                "pelanggan" => $data->salesOrder->id_pelanggan,
+                "void" => 1,
+                "user" => session()->get('user')['id_pengguna'],
+                "total" => $data->ppn_uang_muka_penjualan == '2' ? $data->konversi_nominal + $data->ppn : $data->konversi_nominal,
+                "uang_muka" => $data->konversi_nominal,
+                "ppn" => $data->ppn,
+            ]));
+
+            if ($resultJurnalUangMukaPenjualan->getData()->result == false) {
                 DB::rollback();
-                Log::error($convertResApi['message']);
-                Log::error($convertResApi);
                 return response()->json([
                     "result" => false,
-                    "message" => $convertResApi['message'],
+                    "message" => $resultJurnalUangMukaPenjualan->getData()->message,
                 ], 500);
             }
 
