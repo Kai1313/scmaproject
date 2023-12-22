@@ -17,6 +17,21 @@
         .handle-number-2 {
             text-align: right;
         }
+
+        select[readonly].select2-hidden-accessible+.select2-container {
+            pointer-events: none;
+            touch-action: none;
+        }
+
+        select[readonly].select2-hidden-accessible+.select2-container .select2-selection {
+            background: #eee;
+            box-shadow: none;
+        }
+
+        select[readonly].select2-hidden-accessible+.select2-container .select2-selection__arrow,
+        select[readonly].select2-hidden-accessible+.select2-container .select2-selection__clear {
+            display: none;
+        }
     </style>
 @endsection
 
@@ -98,7 +113,8 @@
                             </div>
                             <label>Jenis PPN</label>
                             <div class="form-group">
-                                <select name="ppn_uang_muka_penjualan" class="form-control select2">
+                                <select name="ppn_uang_muka_penjualan" class="form-control select2" readonly>
+                                    <option value=""></option>
                                     <option value="0"
                                         {{ $data && $data->ppn_uang_muka_penjualan == '0' ? 'selected' : '' }}>Tanpa PPN
                                     </option>
@@ -112,7 +128,7 @@
                             </div>
                             <label>Rate <span>*</span></label>
                             <div class="form-group">
-                                <input type="text" name="rate" class="form-control handle-number-2"
+                                <input type="text" name="rate" class="form-control handle-number-2" readonly
                                     value="{{ old('rate', $data ? $data->rate : '') }}" data-validation="[NOTEMPTY]"
                                     data-validation-message="Rate tidak boleh kosong">
                             </div>
@@ -237,6 +253,7 @@
                     $('[name="total"]').val(formatNumber(res.total, 2))
                     $('[name="id_mata_uang"]').val(res.id_mata_uang)
                     $('[name="rate"]').val(formatNumber(res.nilai_mata_uang, 2))
+                    $('[name="ppn_uang_muka_penjualan"]').val(res.ppn).change()
                     // $('[name="konversi_nominal"]').val(formatNumber(res.nilai_mata_uang * res.nominal, 2))
                     $('[name="nama_mata_uang"]').val(res.nama_mata_uang)
                     calculate()

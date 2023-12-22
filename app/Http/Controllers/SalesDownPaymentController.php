@@ -253,19 +253,6 @@ class SalesDownPaymentController extends Controller
                 $payment->delete();
             }
 
-            // dd([
-            //     "no_transaksi" => $data->kode_uang_muka_penjualan,
-            //     "tanggal" => $data->tanggal,
-            //     "slip" => null,
-            //     "cabang" => $data->id_cabang,
-            //     "pelanggan" => $data->salesOrder->id_pelanggan,
-            //     "void" => 1,
-            //     "user" => session()->get('user')['id_pengguna'],
-            //     "total" => $data->ppn_uang_muka_penjualan == '2' ? $data->konversi_nominal + $data->ppn : $data->konversi_nominal,
-            //     "uang_muka" => $data->dpp,
-            //     "ppn" => $data->ppn,
-            // ]);
-
             $resultJurnalUangMukaPenjualan = (new ApiController)->journalUangMukaPenjualan(new Request([
                 "no_transaksi" => $data->kode_uang_muka_penjualan,
                 "tanggal" => $data->tanggal,
@@ -310,23 +297,29 @@ class SalesDownPaymentController extends Controller
         $duration = DB::table('setting')->where('code', 'UMJ Duration')->first();
         $startDate = date('Y-m-d', strtotime('-' . intval($duration->value2) . ' days'));
         $endDate = date('Y-m-d');
-        $datas = DB::table('permintaan_penjualan as pp')
+
+        $datas = DB::table('permintaan_penjualan')
             ->select(
-                'pp.id_permintaan_penjualan as id',
+                'id_permintaan_penjualan as id',
                 DB::raw('concat(nama_permintaan_penjualan," ( ",nama_pelanggan," )") as text'),
-                'mtotal_permintaan_penjualan',
-                'tanggal_permintaan_penjualan'
+                DB::raw('case
+                    when sisa is null then sum(mtotal_permintaan_penjualan)
+                    else sum(sisa)
+                end as mtotal_permintaan_penjualan')
             )
-            ->leftJoin('uang_muka_penjualan as ump', function ($join) {
-                $join->on('pp.id_permintaan_penjualan', '=', 'ump.id_permintaan_penjualan')
-                    ->where('ump.void', 0);
-            })
-            ->leftJoin('pelanggan as p', 'pp.id_pelanggan', 'p.id_pelanggan')
+            ->leftJoin('saldo_transaksi', 'permintaan_penjualan.nama_permintaan_penjualan', 'saldo_transaksi.ref_id')
+            ->leftJoin('pelanggan', 'permintaan_penjualan.id_pelanggan', 'pelanggan.id_pelanggan')
             ->whereBetween('tanggal_permintaan_penjualan', [$startDate, $endDate])
-            ->where('pp.id_cabang', $idCabang)
-            ->groupBy('pp.id_permintaan_penjualan')
-            ->having(DB::raw('mtotal_permintaan_penjualan - COALESCE(sum(nominal),0)'), '<>', '0')
-            ->orderBy('tanggal_permintaan_penjualan', 'desc')->get();
+            ->where('permintaan_penjualan.id_cabang', $idCabang)
+            ->where('status_approval_permintaan_penjualan', '1')
+            ->where(function ($a) {
+                $a->where('sisa', null)->orWhere('sisa', '>', '0');
+            })
+            ->groupBy('id_permintaan_penjualan')
+            ->orderBy('tanggal_permintaan_penjualan', 'desc')
+            ->orderBy('nama_permintaan_penjualan', 'desc')
+            ->get();
+
         return response()->json([
             'result' => true,
             'data' => $datas,
@@ -340,7 +333,7 @@ class SalesDownPaymentController extends Controller
         $so_id = $request->so_id;
         $id = $request->id;
         $countDataSo = DB::table('permintaan_penjualan as pp')
-            ->select('pp.mtotal_permintaan_penjualan', 'nilai_mata_uang', 'pp.id_mata_uang', 'mu.nama_mata_uang')
+            ->select('pp.mtotal_permintaan_penjualan', 'nilai_mata_uang', 'pp.id_mata_uang', 'mu.nama_mata_uang', 'ppn_permintaan_penjualan', 'kurs_permintaan_penjualan')
             ->leftJoin('mata_uang as mu', 'pp.id_mata_uang', '=', 'mu.id_mata_uang')
             ->where('pp.id_permintaan_penjualan', $so_id)->first();
         $countData = DB::table('uang_muka_penjualan')
@@ -352,66 +345,12 @@ class SalesDownPaymentController extends Controller
             'status' => 'success',
             'nominal' => $countDataSo->mtotal_permintaan_penjualan - $countData,
             'total' => $countDataSo->mtotal_permintaan_penjualan,
-            'nilai_mata_uang' => $countDataSo->nilai_mata_uang,
+            'nilai_mata_uang' => $countDataSo->kurs_permintaan_penjualan,
             'id_mata_uang' => $countDataSo->id_mata_uang,
             'nama_mata_uang' => $countDataSo->nama_mata_uang,
+            'ppn' => $countDataSo->ppn_permintaan_penjualan,
         ], 200);
     }
-
-    // public function callApiJournal($data)
-    // {
-    //     try {
-    //         $date = date('Y-m-d H:i:s');
-    //         $findToken = DB::table('token_pengguna')->where('id_pengguna', session()->get('user')['id_pengguna'])
-    //             ->where('status_token_pengguna', '1')
-    //             ->where('waktu_habis_token_pengguna', '>=', $date)
-    //             ->where('nama2_token_pengguna', '!=', null)
-    //             ->orderBy('date_token_pengguna', 'desc')->first();
-    //         $token = $findToken->nama2_token_pengguna;
-    //         if ($token) {
-    //             $ch = curl_init();
-    //             curl_setopt($ch, CURLOPT_URL, route('jurnal-otomatis-uangmuka-penjualan'));
-    //             curl_setopt($ch, CURLOPT_POST, 1);
-    //             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    //             curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-    //                 'Accept: application/json',
-    //                 'Authorization: Bearer ' . $token,
-    //             ));
-    //             curl_setopt($ch, CURLOPT_POSTFIELDS,
-    //                 http_build_query(
-    //                     array(
-    //                         "no_transaksi" => $data->kode_uang_muka_penjualan,
-    //                         "tanggal" => $data->tanggal,
-    //                         "slip" => $data->id_slip,
-    //                         "cabang" => $data->id_cabang,
-    //                         "pelanggan" => $data->salesOrder->id_pemasok,
-    //                         "void" => $data->void,
-    //                         "user" => session()->get('user')['id_pengguna'],
-    //                         "total" => $data->nominal,
-    //                         "uang_muka" => $data->nominal,
-    //                         "ppn" => 0,
-    //                     )
-    //                 )
-    //             );
-    //             $newData = curl_exec($ch);
-    //             curl_close($ch);
-    //             return $newData;
-    //         } else {
-    //             Log::error("Error when token tidak ditemukan");
-    //             return response()->json([
-    //                 "result" => false,
-    //                 "message" => "Token tidak ditemukan",
-    //             ], 500);
-    //         }
-    //     } catch (\Exception $th) {
-    //         Log::error("Error when gagal sales down payment");
-    //         Log::error($th);
-    //         return response()->json([
-    //             "result" => false,
-    //             "message" => "Data gagal tersimpan",
-    //         ], 500);
-    //     }
-    // }
 
     public function checkPeriod($date)
     {

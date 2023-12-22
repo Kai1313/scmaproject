@@ -337,7 +337,7 @@ class PurchaseDownPaymentController extends Controller
         $po_id = $request->po_id;
         $id = $request->id;
         $countDataPo = DB::table('permintaan_pembelian as pp')
-            ->select('pp.mtotal_permintaan_pembelian', 'nilai_mata_uang', 'pp.id_mata_uang', 'mu.nama_mata_uang')
+            ->select('pp.mtotal_permintaan_pembelian', 'nilai_mata_uang', 'pp.id_mata_uang', 'mu.nama_mata_uang', 'ppn_permintaan_pembelian', 'kurs_permintaan_pembelian')
             ->leftJoin('mata_uang as mu', 'pp.id_mata_uang', '=', 'mu.id_mata_uang')
             ->where('pp.id_permintaan_pembelian', $po_id)->first();
         $countData = DB::table('uang_muka_pembelian')
@@ -349,9 +349,10 @@ class PurchaseDownPaymentController extends Controller
             'status' => 'success',
             'nominal' => $countDataPo->mtotal_permintaan_pembelian - $countData,
             'total' => $countDataPo->mtotal_permintaan_pembelian,
-            'nilai_mata_uang' => $countDataPo->nilai_mata_uang,
+            'nilai_mata_uang' => $countDataPo->kurs_permintaan_pembelian,
             'id_mata_uang' => $countDataPo->id_mata_uang,
             'nama_mata_uang' => $countDataPo->nama_mata_uang,
+            'ppn' => $countDataPo->ppn_permintaan_pembelian,
         ], 200);
     }
 
