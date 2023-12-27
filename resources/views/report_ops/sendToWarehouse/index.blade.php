@@ -191,6 +191,7 @@
                         bDestroy: true,
                         processing: true,
                         serverSide: true,
+                        pageLength: 100,
                         ajax: defaultUrlIndex + param,
                         columns: [{
                             data: 'tanggal_pindah_barang',
@@ -228,6 +229,7 @@
                         bDestroy: true,
                         processing: true,
                         serverSide: true,
+                        pageLength: 100,
                         ajax: defaultUrlIndex + param,
                         columns: [{
                             data: 'tanggal_pindah_barang',
@@ -281,6 +283,7 @@
                         bDestroy: true,
                         processing: true,
                         serverSide: true,
+                        pageLength: 100,
                         ajax: defaultUrlIndex + param,
                         columns: [{
                             data: 'tanggal_pindah_barang',

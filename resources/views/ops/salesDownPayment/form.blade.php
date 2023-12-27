@@ -294,12 +294,9 @@
                     ppn = 0
                     break;
                 case '1':
+                case '2':
                     dpp = (nominal * rate) / 1.11
                     ppn = (nominal * rate) - dpp
-                    break;
-                case '2':
-                    dpp = nominal * rate
-                    ppn = (nominal * rate) * 0.11
                     break;
                 default:
                     break;
