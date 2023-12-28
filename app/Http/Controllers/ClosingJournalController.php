@@ -2339,6 +2339,7 @@ class ClosingJournalController extends Controller
             $status = 1;
             $closing_account = Setting::where("id_cabang", $id_cabang)->where("code", "Closing")->first();
             $profitloss_account = Setting::where("id_cabang", $id_cabang)->where("code", "LR Berjalan")->first();
+            $profitlosshold_account = Setting::where("id_cabang", $id_cabang)->where("code", "LR Ditahan")->first();
             // Log::info("akun closing");
             // Log::info(json_encode($closing_account));
             // Log::info("akun laba rugi");
@@ -2355,6 +2356,17 @@ class ClosingJournalController extends Controller
                 ]);
             }
 
+            if($month == 12 && !$profitlosshold_account){
+                $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
+                if ($check) {
+                    $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
+                }
+                return response()->json([
+                    "result" => false,
+                    "message" => "Jurnal Closing Closing Jurnal Gagal. Akun Laba Rugi Ditahan tidak ditemukan",
+                ]);
+            }
+
             DB::beginTransaction();
             // Delete all journal before transaction
             $jurnal_header = JurnalHeader::where("id_transaksi", "Closing 1 $noteDate")->where('tanggal_jurnal', $end_date)->where("catatan", "Closing 1 $noteDate")->get();
@@ -2368,6 +2380,15 @@ class ClosingJournalController extends Controller
             foreach ($jurnal_header2 as $jurnal2) {
                 JurnalDetail::where("id_jurnal", $jurnal2->id_jurnal)->delete();
                 JurnalHeader::where("id_jurnal", $jurnal2->id_jurnal)->delete();
+            }
+
+            if($month == 12){
+                $jurnal_header3 = JurnalHeader::where("id_transaksi", "Closing 3 $noteDate")->where('tanggal_jurnal', $end_date)->where("catatan", "Closing 3 $noteDate")->get();
+                // dd(count($jurnal_header2));
+                foreach ($jurnal_header3 as $jurnal3) {
+                    JurnalDetail::where("id_jurnal", $jurnal3->id_jurnal)->delete();
+                    JurnalHeader::where("id_jurnal", $jurnal3->id_jurnal)->delete();
+                }
             }
 
             // Get all journal based on tipe laba rugi, void 0, between startdate - enddate
@@ -2555,6 +2576,90 @@ class ClosingJournalController extends Controller
                     "message" => "Jurnal Closing Closing Journal Gagal. Error when store Jurnal data on table detail 2.2",
                 ]);
             }
+
+            // create closing 3
+            if($month == 12){
+                $header3 = new JurnalHeader();
+                $header3->id_cabang = $id_cabang;
+                $header3->jenis_jurnal = $journal_type;
+                $header3->id_transaksi = "Closing 3 $noteDate";
+                $header3->catatan = "Closing 3 $noteDate";
+                $header3->void = 0;
+                $header3->tanggal_jurnal = $end_date;
+                $header3->user_created = null;
+                $header3->user_modified = null;
+                $header3->dt_created = $end_date;
+                $header3->dt_modified = $end_date;
+                $header3->kode_jurnal = $this->generateJournalCode($id_cabang, $journal_type);
+                // Log::info(json_encode($header3));
+                if (!$header3->save()) {
+                    DB::rollback();
+                    // Revert post closing
+                    $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
+                    if ($check) {
+                        $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
+                    }
+                    return response()->json([
+                        "result" => false,
+                        "message" => "Jurnal Closing Closing Journal Gagal. Error when store Jurnal data on table header 3",
+                    ]);
+                }
+                // Detail closing 3.1
+                $detailClosing31 = new JurnalDetail();
+                $detailClosing31->id_jurnal = $header3->id_jurnal;
+                $detailClosing31->index = 1;
+                $detailClosing31->id_akun = $profitloss_account->value2;
+                $detailClosing31->keterangan = "Jurnal Closing 3 $noteDate";
+                $detailClosing31->id_transaksi = null;
+                $detailClosing31->debet = ($closingSum < 0) ? abs($closingSum) : 0;
+                $detailClosing31->credit = ($closingSum < 0) ? 0 : $closingSum;
+                $detailClosing31->user_created = null;
+                $detailClosing31->user_modified = null;
+                $detailClosing31->dt_created = $end_date;
+                $detailClosing31->dt_modified = $end_date;
+                // Log::info(json_encode($detailClosing31));
+                // Log::info($closingSum);
+                if (!$detailClosing31->save()) {
+                    DB::rollback();
+                    // Revert post closing
+                    $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
+                    if ($check) {
+                        $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
+                    }
+                    return response()->json([
+                        "result" => false,
+                        "message" => "Jurnal Closing Closing Journal Gagal. Error when store Jurnal data on table detail 3.1",
+                    ]);
+                }
+                // Detail closing 3.2
+                $detailClosing32 = new JurnalDetail();
+                $detailClosing32->id_jurnal = $header3->id_jurnal;
+                $detailClosing32->index = 2;
+                $detailClosing32->id_akun = $profitlosshold_account->value2;
+                $detailClosing32->keterangan = "Jurnal Closing 3 $noteDate";
+                $detailClosing32->id_transaksi = null;
+                $detailClosing32->debet = ($closingSum < 0) ? 0 : abs($closingSum);
+                $detailClosing32->credit = ($closingSum < 0) ? $closingSum : 0;
+                $detailClosing32->user_created = null;
+                $detailClosing32->user_modified = null;
+                $detailClosing32->dt_created = $end_date;
+                $detailClosing32->dt_modified = $end_date;
+                // Log::info(json_encode($detailClosing32));
+                // Log::info($closingSum);
+                if (!$detailClosing32->save()) {
+                    DB::rollback();
+                    // Revert post closing
+                    $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
+                    if ($check) {
+                        $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
+                    }
+                    return response()->json([
+                        "result" => false,
+                        "message" => "Jurnal Closing Closing Journal Gagal. Error when store Jurnal data on table detail 3.2",
+                    ]);
+                }
+            }
+
             DB::commit();
             return response()->json([
                 "result" => true,
