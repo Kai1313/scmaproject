@@ -86,6 +86,7 @@
                                 <th>Kode Transaksi</th>
                                 <th>Cabang</th>
                                 <th>Gudang</th>
+                                <th>Jenis Pemakaian</th>
                                 <th>Catatan</th>
                             </tr>
                         </thead>
@@ -103,6 +104,7 @@
                                 <th>Kode Transaksi</th>
                                 <th>Cabang</th>
                                 <th>Gudang</th>
+                                <th>Jenis Pemakaian</th>
                                 <th>QR Code</th>
                                 <th>Nama Barang</th>
                                 <th>Jumlah</th>
@@ -171,9 +173,12 @@
                             data: 'nama_gudang',
                             name: 'g.nama_gudang',
                         }, {
+                            data: 'jenis_pemakaian',
+                            name: 'mu.jenis_pemakaian',
+                        }, {
                             data: 'catatan',
                             name: 'mu.catatan',
-                        }, ]
+                        }]
                     });
                     break;
                 case 'Detail':
@@ -204,6 +209,9 @@
                         }, {
                             data: 'nama_gudang',
                             name: 'g.nama_gudang',
+                        }, {
+                            data: 'jenis_pemakaian',
+                            name: 'ph.jenis_pemakaian',
                         }, {
                             data: 'kode_batang',
                             name: 'pd.kode_batang',

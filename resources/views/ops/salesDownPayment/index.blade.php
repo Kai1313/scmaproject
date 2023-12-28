@@ -193,8 +193,8 @@
             }, {
                 data: 'total',
                 name: 'ump.total',
-                render: function(data) {
-                    return data ? formatNumber(data, 2) : 0
+                render: function(data, d, r) {
+                    return data ? formatNumber(data * r.rate, 2) : 0
                 },
                 className: 'text-right'
             }, {

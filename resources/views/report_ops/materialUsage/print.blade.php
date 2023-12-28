@@ -58,6 +58,7 @@
                     <th>Kode Transaksi</th>
                     <th>Cabang</th>
                     <th>Gudang</th>
+                    <th>Jenis Pemakaian</th>
                     <th>Catatan</th>
                 </tr>
             </thead>
@@ -68,6 +69,7 @@
                         <td>{{ $data->kode_pemakaian }}</td>
                         <td>{{ $data->nama_cabang }}</td>
                         <td>{{ $data->nama_gudang }}</td>
+                        <td>{{ $data->jenis_pemakaian }}</td>
                         <td>{{ $data->catatan }}</td>
                     </tr>
                 @endforeach
@@ -81,6 +83,7 @@
                     <th>Kode Transaksi</th>
                     <th>Cabang</th>
                     <th>Gudang</th>
+                    <th>Jenis Pemakaian</th>
                     <th>QR Code</th>
                     <th>Nama Barang</th>
                     <th>Jumlah</th>
@@ -97,6 +100,7 @@
                         <td>{{ $data->kode_pemakaian }}</td>
                         <td>{{ $data->nama_cabang }}</td>
                         <td>{{ $data->nama_gudang }}</td>
+                        <td>{{ $data->jenis_pemakaian }}</td>
                         <td>{{ $data->kode_batang }}</td>
                         <td>{{ $data->nama_barang }}</td>
                         <td class="number">{{ $data->jumlah }}</td>

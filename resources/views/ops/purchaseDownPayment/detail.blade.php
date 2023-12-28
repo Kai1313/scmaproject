@@ -111,7 +111,7 @@
                         <div class="row">
                             <label class="col-md-4">Total Tagihan</label>
                             <div class="col-md-8">
-                                : {{ number_format($data->total, 2, ',', '.') }}
+                                : {{ number_format($data->total * $data->rate, 2, ',', '.') }}
                             </div>
                         </div>
                         <div class="row">

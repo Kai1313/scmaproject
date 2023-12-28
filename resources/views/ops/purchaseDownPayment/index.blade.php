@@ -194,8 +194,8 @@
             }, {
                 data: 'total',
                 name: 'ump.total',
-                render: function(data) {
-                    return data ? formatNumber(data, 4) : 0
+                render: function(data, d, r) {
+                    return data ? formatNumber(data * r.rate, 4) : 0
                 },
                 className: 'text-right'
             }, {

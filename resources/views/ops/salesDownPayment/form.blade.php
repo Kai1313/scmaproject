@@ -128,7 +128,7 @@
                             </div>
                             <label>Rate <span>*</span></label>
                             <div class="form-group">
-                                <input type="text" name="rate" class="form-control handle-number-2" readonly
+                                <input type="text" name="rate" class="form-control handle-number-2"
                                     value="{{ old('rate', $data ? $data->rate : '') }}" data-validation="[NOTEMPTY]"
                                     data-validation-message="Rate tidak boleh kosong">
                             </div>
@@ -156,7 +156,9 @@
                             </div>
                             <label>Total <span>*</span></label>
                             <div class="form-group">
-                                <input type="text" name="total" class="form-control handle-number-2" readonly
+                                <input type="text" name="konversi_total" class="form-control handle-number-2" readonly
+                                    value="{{ old('konversi_total', $data ? $data->total * $data->rate : 0) }}">
+                                <input type="hidden" name="total" class="form-control handle-number-2" readonly
                                     value="{{ old('total', $data ? $data->total : '') }}" data-validation="[NOTEMPTY]"
                                     data-validation-message="Total tidak boleh kosong">
                             </div>
@@ -251,6 +253,7 @@
                         'data-max', res
                         .nominal)
                     $('[name="total"]').val(formatNumber(res.total, 2))
+                    $('[name="konversi_total"]').val(formatNumber(res.total * res.nilai_mata_uang, 2))
                     $('[name="id_mata_uang"]').val(res.id_mata_uang)
                     $('[name="rate"]').val(formatNumber(res.nilai_mata_uang, 2))
                     $('[name="ppn_uang_muka_penjualan"]').val(res.ppn).change()
@@ -266,7 +269,7 @@
             })
         }
 
-        $('body').on('input', '[name="rate"],[name="nominal"]', function() {
+        $('body').on('change', '[name="rate"],[name="nominal"]', function() {
             setTimeout(() => {
                 calculate()
             }, 100);
@@ -285,6 +288,7 @@
         function calculate() {
             let nominal = normalizeNumber($('[name="nominal"]').val())
             let rate = normalizeNumber($('[name="rate"]').val())
+            let total = normalizeNumber($('[name="total"]').val())
             let type = $('[name="ppn_uang_muka_penjualan"]').val()
             let dpp = 0
             let ppn = 0
@@ -305,6 +309,7 @@
             $('[name="konversi_nominal"]').val(formatNumber((nominal * rate).toFixed(2), 2))
             $('[name="dpp"]').val(formatNumber(dpp.toFixed(2), 2))
             $('[name="ppn"]').val(formatNumber(ppn.toFixed(2), 2))
+            $('[name="konversi_total"]').val(formatNumber(total * rate, 2))
         }
     </script>
 @endsection

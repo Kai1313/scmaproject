@@ -41,6 +41,8 @@
                         Transaksi</th>
                     <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Cabang</th>
                     <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Gudang</th>
+                    <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Jenis
+                        Pemakaian</th>
                     <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Catatan</th>
                 </tr>
             </thead>
@@ -51,6 +53,7 @@
                         <td style="border: #000000 solid thin;">{{ $data->kode_pemakaian }}</td>
                         <td style="border: #000000 solid thin;">{{ $data->nama_cabang }}</td>
                         <td style="border: #000000 solid thin;">{{ $data->nama_gudang }}</td>
+                        <td style="border: #000000 solid thin;">{{ $data->jenis_pemakaian }}</td>
                         <td style="border: #000000 solid thin;">{{ $data->catatan }}</td>
                     </tr>
                 @endforeach
@@ -88,6 +91,8 @@
                         Transaksi</th>
                     <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Cabang</th>
                     <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Gudang</th>
+                    <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Jenis
+                        Pemakaian</th>
                     <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">QR Code</th>
                     <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Nama Barang
                     </th>
@@ -111,6 +116,7 @@
                         <td style="border: #000000 solid thin;">{{ $data->kode_pemakaian }}</td>
                         <td style="border: #000000 solid thin;">{{ $data->nama_cabang }}</td>
                         <td style="border: #000000 solid thin;">{{ $data->nama_gudang }}</td>
+                        <td style="border: #000000 solid thin;">{{ $data->jenis_pemakaian }}</td>
                         <td style="border: #000000 solid thin;">{{ $data->kode_batang }}</td>
                         <td style="border: #000000 solid thin;">{{ $data->nama_barang }}</td>
                         <td style="border: #000000 solid thin;text-align:right;">{{ $data->jumlah }}</td>
