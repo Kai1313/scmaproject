@@ -2397,7 +2397,7 @@ class ClosingJournalController extends Controller
                 ->where("jurnal_header.void", "0")
                 ->where("master_akun.tipe_akun", "1")
                 ->where("master_akun.id_cabang", $id_cabang)
-                ->whereRaw("((jurnal_header.id_transaksi <> 'Closing 1 $noteDate' AND jurnal_header.id_transaksi <> 'Closing 2 $noteDate') OR jurnal_header.id_transaksi IS NULL)")
+                ->whereRaw("((jurnal_header.id_transaksi <> 'Closing 1 $noteDate' AND jurnal_header.id_transaksi <> 'Closing 2 $noteDate' AND jurnal_header.id_transaksi <> 'Closing 3 $noteDate') OR jurnal_header.id_transaksi IS NULL)")
                 ->whereBetween("jurnal_header.tanggal_jurnal", [$start_date, $end_date])
                 ->selectRaw("jurnal_header.id_jurnal, master_akun.id_cabang, master_akun.id_akun, master_akun.kode_akun, master_akun.nama_akun, IFNULL(SUM(jurnal_detail.debet), 0) as debet, IFNULL(SUM(jurnal_detail.credit), 0) as kredit")->groupBy("jurnal_detail.id_akun")->get();
             // Log::info(count($data_ledgers));
