@@ -174,15 +174,24 @@ function saveData(node) {
             if (data.result) {
                 Swal.fire('Tersimpan!', data.message, 'success').then((result) => {
                     if (result.isConfirmed) {
+                        node.parents('.modal').modal('hide')
                         window.location.href = data.redirect;
                     }
                 })
             } else {
+                node.find('.handle-number-4').each(function (i, v) {
+                    $(v).val(formatNumberNew($(v).val(), 4))
+                })
+
                 Swal.fire("Gagal Menyimpan Data. ", data.message, 'error')
             }
         },
         error: function (data) {
             $('#cover-spin').hide()
+            node.find('.handle-number-4').each(function (i, v) {
+                $(v).val(formatNumberNew($(v).val(), 4))
+            })
+
             Swal.fire("Gagal Menyimpan Data. ", data.responseJSON.message, 'error')
         }
     })

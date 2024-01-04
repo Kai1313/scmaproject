@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\MasterQrCode;
 use App\MoveBranch;
 use App\MoveBranchDetail;
 use DB;
@@ -148,11 +149,11 @@ class SendToBranchController extends Controller
             }
 
             $data->save();
-            if (isset($request->detele_details)) {
-                $data->removedetails($request->detele_details, 'out');
-            }
+            // if (isset($request->detele_details)) {
+            //     $data->removedetails($request->detele_details, 'out');
+            // }
 
-            $data->saveDetails($request->details, 'out');
+            // $data->saveDetails($request->details, 'out');
             DB::commit();
             return response()->json([
                 "result" => true,
@@ -241,6 +242,7 @@ class SendToBranchController extends Controller
         $idCabang = $request->id_cabang;
         $idGudang = $request->id_gudang;
         $qrcode = $request->qrcode;
+        $id = $request->id;
         $data = DB::table('master_qr_code as mqc')
             ->select(
                 'mqc.id_barang',
@@ -286,6 +288,12 @@ class SendToBranchController extends Controller
         } else {
             $message = '';
             $status = 200;
+        }
+
+        $checkDetail = MoveBranchDetail::where('id_pindah_barang', $id)->where('qr_code', $qrcode)->first();
+        if ($checkDetail) {
+            $status = 500;
+            $message = 'Barang sudah discan';
         }
 
         return response()->json([
@@ -377,5 +385,64 @@ class SendToBranchController extends Controller
         }
 
         return ['result' => true];
+    }
+
+    public function saveDetailEntry(Request $request, $id)
+    {
+        $data = MoveBranch::find($id);
+        if (!$data) {
+            return response()->json(['result' => false, 'message' => 'Pengiriman tidak ditemukan'], 500);
+        }
+
+        $stock = MasterQrCode::where('kode_batang_master_qr_code', $request->qr_code)->first();
+        if (!$stock) {
+            return response()->json(['result' => false, 'message' => 'Stok tidak ditemukan'], 500);
+        }
+
+        if ($stock->id_cabang != $data->id_cabang || $stock->id_gudang != $data->id_gudang) {
+            return response()->json(['result' => false, 'message' => 'Lokasi stok dan lokasi pengiriman tidak sama'], 500);
+        }
+
+        if ($stock->id_rak != null) {
+            return response()->json(['result' => false, 'message' => 'Stok masih dalam rak'], 500);
+        }
+
+        DB::beginTransaction();
+        $array[] = $request->all();
+        $s = $data->savedetails(json_encode($array), 'out');
+        if ($s['result'] == false) {
+            DB::rollback();
+            return response()->json($s, 500);
+        }
+
+        DB::commit();
+        return response()->json([
+            "result" => true,
+            "message" => "Data berhasil disimpan",
+            "redirect" => route('send_to_branch-entry', $id),
+        ], 200);
+    }
+
+    public function deleteDetail(Request $request, $parent, $id)
+    {
+        $data = MaterialUsage::where('id_pemakaian', $parent)->first();
+        if (!$data) {
+            return response()->json(['result' => false, 'message' => 'Data tidak ditemukan'], 500);
+        }
+
+        DB::beginTransaction();
+        $r = $data->deleteDetail($id);
+        if ($r['result'] == false) {
+            DB::rollback();
+            return response()->json($r, 500);
+        }
+
+        DB::commit();
+        return response()->json([
+            "result" => true,
+            "message" => "Data berhasil diproses",
+            "redirect" => route('material_usage-entry', $parent),
+        ], 200);
+
     }
 }
