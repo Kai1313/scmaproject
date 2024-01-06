@@ -425,13 +425,19 @@ class SendToBranchController extends Controller
 
     public function deleteDetail(Request $request, $parent, $id)
     {
-        $data = MaterialUsage::where('id_pemakaian', $parent)->first();
+        $data = MoveBranch::where('id_pindah_barang', $parent)->first();
         if (!$data) {
             return response()->json(['result' => false, 'message' => 'Data tidak ditemukan'], 500);
         }
 
+        $detail = MoveBranchDetail::find($id);
+        if (!$detail) {
+            return response()->json(['result' => false, 'message' => 'Data tidak ditemukan'], 500);
+        }
+
         DB::beginTransaction();
-        $r = $data->deleteDetail($id);
+        $array[] = $detail;
+        $r = $data->removedetails(json_encode($array), 'out');
         if ($r['result'] == false) {
             DB::rollback();
             return response()->json($r, 500);
@@ -441,8 +447,20 @@ class SendToBranchController extends Controller
         return response()->json([
             "result" => true,
             "message" => "Data berhasil diproses",
-            "redirect" => route('material_usage-entry', $parent),
+            "redirect" => route('send_to_branch-entry', $parent),
         ], 200);
+    }
 
+    public function saveDetailDescEntry(Request $request, $id)
+    {
+        $data = MoveBranch::where('id_pindah_barang', $parent)->first();
+        if (!$data) {
+            return response()->json(['result' => false, 'message' => 'Data tidak ditemukan'], 500);
+        }
+
+        $detail = MoveBranchDetail::find($id);
+        if (!$detail) {
+            return response()->json(['result' => false, 'message' => 'Data tidak ditemukan'], 500);
+        }
     }
 }

@@ -309,19 +309,14 @@ class PurchaseDownPaymentController extends Controller
             ->select(
                 'id_permintaan_pembelian as id',
                 DB::raw('concat(nama_permintaan_pembelian," ( ",nama_pemasok," )") as text'),
-                DB::raw('case
-                    when sisa is null then sum(mtotal_permintaan_pembelian)
-                    else sum(sisa)
-                end as mtotal_permintaan_pembelian')
+                'mtotal_permintaan_pembelian'
             )
             ->leftJoin('saldo_transaksi', 'permintaan_pembelian.nama_permintaan_pembelian', 'saldo_transaksi.ref_id')
             ->leftJoin('pemasok', 'permintaan_pembelian.id_pemasok', 'pemasok.id_pemasok')
             ->whereBetween('tanggal_permintaan_pembelian', [$startDate, $endDate])
             ->where('permintaan_pembelian.id_cabang', $idCabang)
-            ->where(function ($a) {
-                $a->where('sisa', null)->orWhere('sisa', '>', '0');
-            })
             ->groupBy('id_permintaan_pembelian')
+            ->havingRaw('mtotal_permintaan_pembelian <> sum(total)')
             ->orderBy('tanggal_permintaan_pembelian', 'desc')
             ->orderBy('nama_permintaan_pembelian', 'desc')
             ->get();

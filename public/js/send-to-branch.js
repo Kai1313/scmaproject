@@ -94,7 +94,8 @@ var resDataTable = $('#table-detail').DataTable({
 
             if (!qrcodeReceived.includes(row.qr_code)) {
                 btn +=
-                    '<a href="javascript:void(0)" class="btn btn-danger btn-xs mr-1 mb-1 delete-entry"><i class="glyphicon glyphicon-trash"></i></a>';
+                    '<a href="' + urlDeleteDetail.replace('/0', '/' + data) + '" data-index="' + data +
+                    '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1 delete-entry"><i class="glyphicon glyphicon-trash"></i></a>';
             }
 
             return btn;
@@ -102,8 +103,6 @@ var resDataTable = $('#table-detail').DataTable({
     },
     ]
 });
-
-// $('#count-record-table').text(resDataTable.data().count())
 
 $('.select2').select2()
 $('.datepicker').datepicker({
@@ -177,8 +176,9 @@ $('.cancel-entry').click(function () {
     html5QrcodeScanner.clear();
 })
 
-$('body').on('click', '.delete-entry', function () {
-    let index = $(this).parents('tr').index()
+$('body').on('click', '.delete-entry', function (e) {
+    e.preventDefault()
+    let url = $(this).prop('href')
     Swal.fire({
         title: 'Anda yakin ingin menghapus data ini?',
         icon: 'info',
@@ -193,14 +193,34 @@ $('body').on('click', '.delete-entry', function () {
         }
     }).then((result) => {
         if (result.isConfirmed) {
-            deleteDetails.push(details[index])
-            details.splice(index, 1)
-            resDataTable.clear().rows.add(details).draw()
-            $('[name="details"]').val(JSON.stringify(details))
-            $('[name="detele_details"]').val(JSON.stringify(deleteDetails))
+            deleteDetail(url)
         }
     })
 })
+
+function deleteDetail(url) {
+    $('#cover-spin').show()
+    $.ajax({
+        url: url,
+        type: 'post',
+        success: function (data) {
+            $('#cover-spin').hide()
+            if (data.result) {
+                Swal.fire('Berhasil!', data.message, 'success').then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = data.redirect;
+                    }
+                })
+            } else {
+                Swal.fire("Gagal proses Data. ", data.message, 'error')
+            }
+        },
+        error: function (data) {
+            $('#cover-spin').hide()
+            Swal.fire("Gagal proses data. ", data.responseJSON.message, 'error')
+        }
+    })
+}
 
 $('.btn-search').click(function () {
     let self = $('[name="search-qrcode"]').val().trim()

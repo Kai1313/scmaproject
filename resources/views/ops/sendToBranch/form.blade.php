@@ -274,7 +274,7 @@
                                 </div>
                             </div>
                         </div>
-                        <form action="{{ route('send_to_branch-save-detail', $data->id_pindah_barang) }}"
+                        <form action="{{ route('send_to_branch-save-detail', $data ? $data->id_pindah_barang : 0) }}"
                             class="post-action-modal" method="post">
                             <div class="result-form" style="display:none;">
                                 <table class="table table-bordered">
@@ -407,6 +407,7 @@
         let qrcodeReceived = {!! json_encode($qrcodeReceived) !!}
         let urlSearchQrcode = "{{ route('send_to_branch-qrcode') }}"
         let sendId = {{ $data ? $data->id_pindah_barang : 0 }}
+        let urlDeleteDetail = '{{ route('send_to_branch-delete-detail', [$data ? $data->id_pindah_barang : 0, 0]) }}'
     </script>
     <script src="{{ asset('js/send-to-branch.js') }}"></script>
 @endsection

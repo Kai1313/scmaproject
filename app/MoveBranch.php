@@ -225,7 +225,7 @@ class MoveBranch extends Model
             }
         }
 
-        return ['status' => 'success'];
+        return ['status' => 'success', 'result' => true];
     }
 
     public function savedetails($details, $type = 'in')
