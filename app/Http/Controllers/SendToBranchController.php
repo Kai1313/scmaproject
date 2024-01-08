@@ -338,9 +338,14 @@ class SendToBranchController extends Controller
         }
 
         DB::beginTransaction();
+        $redirect = route('send_to_branch-entry', $store->id_pindah_barang);
         try {
             $store->keterangan = $request->keterangan;
-            $store->keterangan_sj = $request->keterangan_sj;
+            if (in_array('keterangan_sj', array_keys($request->all()))) {
+                $store->keterangan_sj = $request->keterangan_sj;
+                $redirect = route('send_to_branch-view', $store->id_pindah_barang);
+            }
+
             $store->save();
 
             DB::table('kartu_stok')
@@ -353,7 +358,7 @@ class SendToBranchController extends Controller
             return response()->json([
                 "result" => true,
                 "message" => "Data berhasil disimpan",
-                "redirect" => route('send_to_branch-view', $store->id_pindah_barang),
+                "redirect" => $redirect,
             ], 200);
         } catch (\Exception $e) {
             DB::rollback();
@@ -449,18 +454,5 @@ class SendToBranchController extends Controller
             "message" => "Data berhasil diproses",
             "redirect" => route('send_to_branch-entry', $parent),
         ], 200);
-    }
-
-    public function saveDetailDescEntry(Request $request, $id)
-    {
-        $data = MoveBranch::where('id_pindah_barang', $parent)->first();
-        if (!$data) {
-            return response()->json(['result' => false, 'message' => 'Data tidak ditemukan'], 500);
-        }
-
-        $detail = MoveBranchDetail::find($id);
-        if (!$detail) {
-            return response()->json(['result' => false, 'message' => 'Data tidak ditemukan'], 500);
-        }
     }
 }

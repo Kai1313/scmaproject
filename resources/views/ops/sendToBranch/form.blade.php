@@ -373,13 +373,17 @@
                         <h4 class="modal-title">Edit Barang</h4>
                     </div>
                     <div class="modal-body">
-                        <input type="hidden" name="index">
-                        <label>Keterangan</label>
-                        <textarea name="keterangan" class="form-control" rows="5"></textarea>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary btn-flat" data-dismiss="modal">Batal</button>
-                        <button type="button" class="btn btn-primary save-entry-edit btn-flat">Simpan</button>
+                        <form action="{{ route('send_to_branch-save-entry-detail') }}" class="post-action-edit-modal"
+                            method="post">
+                            <label>Keterangan</label>
+                            <textarea name="keterangan" class="form-control" rows="2"></textarea>
+                            <input type="hidden" name="id_pindah_barang_detail">
+                            <div class="text-right" style="margin-top:10px;">
+                                <button type="button" class="btn btn-secondary btn-flat"
+                                    data-dismiss="modal">Batal</button>
+                                <button type="submit" class="btn btn-primary btn-flat">Simpan</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>

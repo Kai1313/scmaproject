@@ -100,7 +100,6 @@ Route::prefix('kirim_ke_cabang')->group(function () {
     Route::post('/save_entry_detail', 'SendToBranchController@saveEntryDetail')->name('send_to_branch-save-entry-detail');
     Route::post('/save-detail/{id}', 'SendToBranchController@saveDetailEntry')->name('send_to_branch-save-detail');
     Route::post('/delete-detail/{parent}/{id}', 'SendToBranchController@deleteDetail')->name('send_to_branch-delete-detail');
-    Route::post('/save-desc-detail/{parent}/{id}', 'SendToBranchController@saveDetailDescEntry')->name('send_to_branch-save-desc-detail');
 });
 
 Route::prefix('terima_dari_cabang')->group(function () {

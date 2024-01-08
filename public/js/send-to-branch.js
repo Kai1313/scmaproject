@@ -278,19 +278,18 @@ function onScanError(errorMessage) {
 
 $('body').on('click', '.edit-entry', function () {
     let index = $(this).parents('tr').index()
+    let selData = details[index]
     let modal = $('#modalEntryEdit')
-    modal.find('[name="index"]').val(index)
-    modal.find('[name="keterangan"]').val(details[index].keterangan)
-    modal.modal('show')
-})
+    $('#modalEntryEdit').find('input,textarea').each(function (i, v) {
+        let nameInput = $(v).prop('name')
+        if (nameInput == 'qty') {
+            $(v).val(formatNumberNew(selData[nameInput], 4))
+        } else {
+            $(v).val(selData[nameInput])
+        }
 
-$('.save-entry-edit').click(function () {
-    let modal = $('#modalEntryEdit')
-    let index = modal.find('[name="index"]').val()
-    details[index].keterangan = modal.find('[name="keterangan"]').val()
-    modal.modal('hide')
-    resDataTable.clear().rows.add(details).draw()
-    $('[name="details"]').val(JSON.stringify(details))
+    })
+    modal.modal('show')
 })
 
 let validateForm = $(".post-action-custom").validate({
@@ -315,9 +314,21 @@ let validateForm = $(".post-action-custom").validate({
 });
 
 let validateModalForm = $('.post-action-modal').validate({
-    rules: {
-        qr_code_detail: 'required'
+    errorClass: 'has-error',
+    highlight: function (element, errorClass, validClass) {
+        $(element).parents("div.form-group").addClass('error');
     },
+    unhighlight: function (element, errorClass, validClass) {
+        $(element).parents(".error").removeClass('error');
+    },
+    submitHandler: function (form, e) {
+        e.preventDefault()
+        saveData($(form))
+        return false;
+    }
+});
+
+let validateModalEditForm = $('.post-action-edit-modal').validate({
     errorClass: 'has-error',
     highlight: function (element, errorClass, validClass) {
         $(element).parents("div.form-group").addClass('error');
