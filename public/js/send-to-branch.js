@@ -330,7 +330,7 @@ let validateModalForm = $('.post-action-modal').validate({
     },
     submitHandler: function (form, e) {
         e.preventDefault()
-        saveData($(form))
+        saveData($(form), false)
         return false;
     }
 });
@@ -345,7 +345,7 @@ let validateModalEditForm = $('.post-action-edit-modal').validate({
     },
     submitHandler: function (form, e) {
         e.preventDefault()
-        saveData($(form))
+        saveData($(form), false)
         return false;
     }
 });

@@ -157,7 +157,7 @@ if ($('.post-action').length > 0) {
     $.validate(validation)
 }
 
-function saveData(node, withNotif = false) {
+function saveData(node, withNotif = true) {
     let url = node.prop('action')
     $('#cover-spin').show()
     node.find('.handle-number-4,.handle-number-2').each(function (i, v) {
@@ -172,6 +172,7 @@ function saveData(node, withNotif = false) {
         success: function (data) {
             $('#cover-spin').hide()
             if (data.result) {
+                console.log(withNotif)
                 if (withNotif) {
                     Swal.fire('Tersimpan!', data.message, 'success').then((result) => {
                         if (result.isConfirmed) {
