@@ -157,7 +157,7 @@ if ($('.post-action').length > 0) {
     $.validate(validation)
 }
 
-function saveData(node) {
+function saveData(node, withNotif = false) {
     let url = node.prop('action')
     $('#cover-spin').show()
     node.find('.handle-number-4,.handle-number-2').each(function (i, v) {
@@ -172,12 +172,17 @@ function saveData(node) {
         success: function (data) {
             $('#cover-spin').hide()
             if (data.result) {
-                Swal.fire('Tersimpan!', data.message, 'success').then((result) => {
-                    if (result.isConfirmed) {
-                        node.parents('.modal').modal('hide')
-                        window.location.href = data.redirect;
-                    }
-                })
+                if (withNotif) {
+                    Swal.fire('Tersimpan!', data.message, 'success').then((result) => {
+                        if (result.isConfirmed) {
+                            node.parents('.modal').modal('hide')
+                            window.location.href = data.redirect;
+                        }
+                    })
+                } else {
+                    node.parents('.modal').modal('hide')
+                    window.location.href = data.redirect;
+                }
             } else {
                 node.find('.handle-number-4').each(function (i, v) {
                     $(v).val(formatNumberNew($(v).val(), 4))
