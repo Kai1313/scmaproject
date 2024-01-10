@@ -345,5 +345,11 @@
         function onScanError(errorMessage) {
             toastr.error(JSON.strignify(errorMessage))
         }
+
+        $("[name='search-qrcode']").on('keyup', function(e) {
+            if (e.key === 'Enter' || e.keyCode === 13) {
+                $('.btn-search').click()
+            }
+        });
     </script>
 @endsection

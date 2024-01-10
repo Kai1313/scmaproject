@@ -700,6 +700,12 @@
             }
         }
 
+        $("[name='search-qrcode']").on('keyup', function(e) {
+            if (e.key === 'Enter' || e.keyCode === 13) {
+                $('.btn-search').click()
+            }
+        });
+
         $('.btn-search').click(function() {
             let self = $('[name="search-qrcode"]').val()
             html5QrcodeScanner.clear();
