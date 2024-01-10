@@ -30,7 +30,8 @@ class SendToWarehouseController extends Controller
         ]);
     }
 
-    function print(Request $request) {
+    public function print(Request $request)
+    {
         if (checkAccessMenu('laporan_kirim_ke_gudang', 'print') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
@@ -163,7 +164,8 @@ class SendToWarehouseController extends Controller
                         WHEN status_diterima = "0" THEN "Belum Diterima"
                         WHEN status_diterima = "1" THEN "Sudah Diterima"
                         ELSE ""
-                    END) AS status_diterima')
+                    END) AS status_diterima'),
+                    'pb.keterangan_pindah_barang'
                 )
                     ->join('pindah_barang as pb', 'pbd.id_pindah_barang', 'pb.id_pindah_barang')
                     ->join('barang as b', 'pbd.id_barang', 'b.id_barang')
@@ -198,7 +200,8 @@ class SendToWarehouseController extends Controller
                         WHEN status_diterima = "0" THEN "Belum Diterima"
                         WHEN status_diterima = "1" THEN "Sudah Diterima"
                         ELSE ""
-                    END) AS status_diterima')
+                    END) AS status_diterima'),
+                    'pb.keterangan_pindah_barang'
                 )
                     ->join('pindah_barang as pb', 'pbd.id_pindah_barang', 'pb.id_pindah_barang')
                     ->join('barang as b', 'pbd.id_barang', 'b.id_barang')

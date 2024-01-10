@@ -109,6 +109,8 @@
                     </th>
                     <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Status
                     </th>
+                    <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Keterangan
+                    </th>
                 </tr>
             </thead>
             <tbody>
@@ -125,6 +127,7 @@
                         <td style="border: #000000 solid thin;text-align:right;">{{ $data->qty }}</td>
                         <td style="border: #000000 solid thin;">{{ $data->batch }}</td>
                         <td style="border: #000000 solid thin;">{{ $data->status_diterima }}</td>
+                        <td style="border: #000000 solid thin;">{{ $data->keterangan_pindah_barang }}</td>
                     </tr>
                 @endforeach
             </tbody>
@@ -174,6 +177,8 @@
                     </th>
                     <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Status
                     </th>
+                    <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Keterangan
+                    </th>
                 </tr>
             </thead>
             <tbody>
@@ -190,6 +195,7 @@
                         <td style="border: #000000 solid thin;text-align:right;">{{ $data->qty }}</td>
                         <td style="border: #000000 solid thin;">{{ $data->batch }}</td>
                         <td style="border: #000000 solid thin;">{{ $data->status_diterima }}</td>
+                        <td style="border: #000000 solid thin;">{{ $data->keterangan_pindah_barang }}</td>
                     </tr>
                 @endforeach
             </tbody>

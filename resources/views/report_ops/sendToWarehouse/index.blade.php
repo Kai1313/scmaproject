@@ -124,6 +124,7 @@
                                 <th>Jumlah</th>
                                 <th>Batch</th>
                                 <th>Status</th>
+                                <th>Keterangan</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -147,6 +148,7 @@
                                 <th>Jumlah</th>
                                 <th>Batch</th>
                                 <th>Status</th>
+                                <th>Keterangan</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -268,7 +270,10 @@
                         }, {
                             data: 'status_diterima',
                             name: 'pbd.status_diterima',
-                        }, ]
+                        }, {
+                            data: 'keterangan_pindah_barang',
+                            name: 'keterangan_pindah_barang',
+                        }]
                     });
                     break;
                 case 'Outstanding':
@@ -322,7 +327,10 @@
                         }, {
                             data: 'status_diterima',
                             name: 'pbd.status_diterima',
-                        }, ]
+                        }, {
+                            data: 'keterangan_pindah_barang',
+                            name: 'keterangan_pindah_barang',
+                        }]
                     });
                     break;
                 default:

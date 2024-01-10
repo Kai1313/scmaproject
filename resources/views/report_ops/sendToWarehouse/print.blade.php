@@ -93,6 +93,7 @@
                     <th>Jumlah</th>
                     <th>Batch</th>
                     <th>Status</th>
+                    <th>Keterangan</th>
                 </tr>
             </thead>
             <tbody>
@@ -109,6 +110,7 @@
                         <td class="number">{{ formatNumber($data->qty) }}</td>
                         <td>{{ $data->batch }}</td>
                         <td>{{ $data->status_diterima }}</td>
+                        <td>{{ $data->keterangan_pindah_barang }}</td>
                     </tr>
                 @endforeach
             </tbody>
@@ -128,6 +130,7 @@
                     <th>Jumlah</th>
                     <th>Batch</th>
                     <th>Status</th>
+                    <th>Keterangan</th>
                 </tr>
             </thead>
             <tbody>
@@ -144,6 +147,7 @@
                         <td class="number">{{ formatNumber($data->qty) }}</td>
                         <td>{{ $data->batch }}</td>
                         <td>{{ $data->status_diterima }}</td>
+                        <td>{{ $data->keterangan_pindah_barang }}</td>
                     </tr>
                 @endforeach
             </tbody>
