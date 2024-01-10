@@ -312,6 +312,10 @@ $('.cancel-entry').click(function () {
     html5QrcodeScanner.clear();
 })
 
+$("#modalEntry").on("hidden.bs.modal", function () {
+    html5QrcodeScanner.clear();
+});
+
 function validatorModal(id = 0) {
     let message = 'Lengkapi inputan yang diperlukan'
     let valid = true
@@ -328,7 +332,7 @@ function validatorModal(id = 0) {
 }
 
 $("[name='search-qrcode']").on('keyup', function (e) {
-    if (e.key === 'Enter' || e.keyCode === 13) {
+    if ($("[name='search-qrcode']").val().trim().length == 10) {
         $('.btn-search').click()
     }
 });

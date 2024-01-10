@@ -209,6 +209,10 @@ $('.cancel-entry').click(function () {
     $('#modalEntry').modal('hide')
 })
 
+$("#modalEntry").on("hidden.bs.modal", function () {
+    html5QrcodeScanner.clear();
+});
+
 $('body').on('click', '.delete-entry', function (e) {
     e.preventDefault()
     let url = $(this).prop('href')
@@ -257,7 +261,7 @@ function deleteDetail(url) {
 }
 
 $("[name='search-qrcode']").on('keyup', function (e) {
-    if (e.key === 'Enter' || e.keyCode === 13) {
+    if ($("[name='search-qrcode']").val().trim().length == 10) {
         $('.btn-search').click()
     }
 });

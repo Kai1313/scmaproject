@@ -347,7 +347,7 @@
         }
 
         $("[name='search-qrcode']").on('keyup', function(e) {
-            if (e.key === 'Enter' || e.keyCode === 13) {
+            if ($("[name='search-qrcode']").val().trim().length == 10) {
                 $('.btn-search').click()
             }
         });
