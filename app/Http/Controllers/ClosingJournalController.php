@@ -1441,7 +1441,7 @@ class ClosingJournalController extends Controller
                 $transaction_date = $header->tanggal_retur_penjualan;
 
                 // Delete detail and header existing first
-                $jurnal_header = JurnalHeader::where("id_transaksi", 'Closing ' . $id_transaksi)->where('tanggal_jurnal', $end_date)->where("catatan", "Closing Retur Penjualan")->get();
+                $jurnal_header = JurnalHeader::where("id_transaksi", 'Closing ' . $id_transaksi)->where("catatan", "Closing Retur Penjualan")->get();
                 // dd($jurnal_header);
 
                 foreach ($jurnal_header as $jurnal) {
@@ -1723,7 +1723,7 @@ class ClosingJournalController extends Controller
                 $transaction_date = $header->tanggal;
 
                 // Delete detail and header existing first
-                $jurnal_header = JurnalHeader::where("id_transaksi", 'Closing ' . $id_transaksi)->where('tanggal_jurnal', $end_date)->where("catatan", "Closing Pemakaian")->get();
+                $jurnal_header = JurnalHeader::where("id_transaksi", 'Closing ' . $id_transaksi)->where("catatan", "Closing Pemakaian")->get();
                 // dd($jurnal_header);
 
                 foreach ($jurnal_header as $jurnal) {
@@ -1935,7 +1935,7 @@ class ClosingJournalController extends Controller
                 $id_transaksi = $header->nama_penjualan;
                 $transaction_date = $header->tanggal_penjualan;
                 // Delete detail and header existing first
-                $jurnal_header = JurnalHeader::where("id_transaksi", 'Closing ' . $id_transaksi)->where('tanggal_jurnal', $end_date)->where("catatan", "Closing Penjualan")->get();
+                $jurnal_header = JurnalHeader::where("id_transaksi", 'Closing ' . $id_transaksi)->where("catatan", "Closing Penjualan")->get();
 
                 foreach ($jurnal_header as $jurnal) {
                     JurnalDetail::where("id_jurnal", $jurnal->id_jurnal)->delete();
