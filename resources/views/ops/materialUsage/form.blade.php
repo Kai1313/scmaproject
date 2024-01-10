@@ -248,7 +248,7 @@
         </div>
 
         <div class="modal fade" id="modalEntry" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-body">
                         <div class="alert alert-danger" style="display:none;" id="alertModal">
