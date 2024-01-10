@@ -107,9 +107,8 @@
                                 <th>Jenis Pemakaian</th>
                                 <th>QR Code</th>
                                 <th>Nama Barang</th>
+                                <th>Satuan</th>
                                 <th>Jumlah</th>
-                                <th>Jumlah Zak</th>
-                                <th>Berat Zak</th>
                                 <th>Catatan Header</th>
                                 <th>Catatan Detail</th>
                             </tr>
@@ -221,22 +220,11 @@
                             data: 'nama_barang',
                             name: 'b.nama_barang',
                         }, {
+                            data: 'nama_satuan_barang',
+                            name: 'nama_satuan_barang'
+                        }, {
                             data: 'jumlah',
                             name: 'pd.jumlah',
-                            render: function(data) {
-                                return data ? formatNumber(data, 4) : 0
-                            },
-                            className: 'text-right'
-                        }, {
-                            data: 'jumlah_zak',
-                            name: 'pd.jumlah_zak',
-                            render: function(data) {
-                                return data ? formatNumber(data, 4) : 0
-                            },
-                            className: 'text-right'
-                        }, {
-                            data: 'weight_zak',
-                            name: 'pd.weight_zak',
                             render: function(data) {
                                 return data ? formatNumber(data, 4) : 0
                             },

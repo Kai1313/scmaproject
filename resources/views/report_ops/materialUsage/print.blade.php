@@ -86,9 +86,10 @@
                     <th>Jenis Pemakaian</th>
                     <th>QR Code</th>
                     <th>Nama Barang</th>
+                    <th>Satuan</th>
                     <th>Jumlah</th>
-                    <th>Jumlah Zak</th>
-                    <th>Berat Zak</th>
+                    {{-- <th>Jumlah Zak</th>
+                    <th>Berat Zak</th> --}}
                     <th>Catatan Header</th>
                     <th>Catatan Detail</th>
                 </tr>
@@ -103,9 +104,10 @@
                         <td>{{ $data->jenis_pemakaian }}</td>
                         <td>{{ $data->kode_batang }}</td>
                         <td>{{ $data->nama_barang }}</td>
+                        <td>{{ $data->nama_satuan_barang }}</td>
                         <td class="number">{{ $data->jumlah }}</td>
-                        <td class="number">{{ $data->jumlah_zak }}</td>
-                        <td class="number">{{ $data->weight_zak }}</td>
+                        {{-- <td class="number">{{ $data->jumlah_zak }}</td>
+                        <td class="number">{{ $data->weight_zak }}</td> --}}
                         <th>{{ $data->catatan_header }}</th>
                         <th>{{ $data->catatan_detail }}</th>
                     </tr>

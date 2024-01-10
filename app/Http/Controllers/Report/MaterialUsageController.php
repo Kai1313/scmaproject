@@ -142,12 +142,14 @@ class MaterialUsageController extends Controller
                     'pd.jumlah_zak',
                     'pd.weight_zak',
                     'ph.catatan as catatan_header',
-                    'pd.catatan as catatan_detail'
+                    'pd.catatan as catatan_detail',
+                    'nama_satuan_barang'
                 )
                     ->leftJoin('pemakaian_header as ph', 'pd.id_pemakaian', 'ph.id_pemakaian')
                     ->leftJoin('cabang as c', 'ph.id_cabang', 'c.id_cabang')
                     ->leftJoin('gudang as g', 'ph.id_gudang', 'g.id_gudang')
                     ->leftJoin('barang as b', 'pd.id_barang', 'b.id_barang')
+                    ->leftJoin('satuan_barang as sb', 'pd.id_satuan_barang', 'sb.id_satuan_barang')
                     ->whereBetween('tanggal', $date)
                     ->whereIn('ph.id_cabang', $idCabang)->whereIn('ph.id_gudang', $idGudang)
                     ->orderBy('ph.tanggal', 'asc');

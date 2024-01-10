@@ -96,11 +96,12 @@
                     <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">QR Code</th>
                     <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Nama Barang
                     </th>
+                    <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Satuan</th>
                     <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Jumlah</th>
-                    <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Jumlah Zak
+                    {{-- <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Jumlah Zak
                     </th>
                     <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Berat Zak
-                    </th>
+                    </th> --}}
                     <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Catatan
                         Header
                     </th>
@@ -119,9 +120,10 @@
                         <td style="border: #000000 solid thin;">{{ $data->jenis_pemakaian }}</td>
                         <td style="border: #000000 solid thin;">{{ $data->kode_batang }}</td>
                         <td style="border: #000000 solid thin;">{{ $data->nama_barang }}</td>
+                        <td style="border: #000000 solid thin;">{{ $data->nama_satuan_barang }}</td>
                         <td style="border: #000000 solid thin;text-align:right;">{{ $data->jumlah }}</td>
-                        <td style="border: #000000 solid thin;text-align:right;">{{ $data->jumlah_zak }}</td>
-                        <td style="border: #000000 solid thin;text-align:right;">{{ $data->weight_zak }}</td>
+                        {{-- <td style="border: #000000 solid thin;text-align:right;">{{ $data->jumlah_zak }}</td>
+                        <td style="border: #000000 solid thin;text-align:right;">{{ $data->weight_zak }}</td> --}}
                         <td style="border: #000000 solid thin;">{{ $data->catatan_header }}</td>
                         <td style="border: #000000 solid thin;">{{ $data->catatan_detail }}</td>
                     </tr>
