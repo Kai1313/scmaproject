@@ -1473,7 +1473,7 @@ class ClosingJournalController extends Controller
                     ];
                 }
 
-                dd($details);
+                // dd($details);
 
                 // Log::info(json_encode($details));
                 // Grouping and sum the same barang
