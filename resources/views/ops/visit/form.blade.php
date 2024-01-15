@@ -539,7 +539,7 @@
         let customer = {
             id: '{{ $data ? $data->id_pelanggan : '' }}',
             title: '{{ $data ? $data->pelanggan->nama_pelaggan : '' }}',
-            address: '{{ $data ? $data->pelanggan->alamat_pelanggan : '' }}'
+            address: '{{ str_replace(["\n", "\r"], '', $data ? $data->pelanggan->alamat_pelanggan : '') }}'
         }
 
         function formatData(data) {
