@@ -4,6 +4,7 @@
             <td>{{ $data->nama_salesman }}</td>
             <td>{{ $data->visit_date }}</td>
             <td>{{ $data->nama_pelanggan }}</td>
+            <td>{{ $data->status_pelanggan }}</td>
             @php
                 $progress = explode(', ', $data->progress_ind);
             @endphp

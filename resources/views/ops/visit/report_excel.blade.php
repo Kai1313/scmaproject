@@ -31,6 +31,8 @@
                         width="100px">Date</th>
                     <th rowspan="2" style="font-weight: bold;text-align:center;vertical-align:center;"
                         width="200px">Customer</th>
+                    <th rowspan="2" style="font-weight: bold;text-align:center;vertical-align:center;"
+                        width="200px">Category</th>
                     <th colspan="{{ count($activities) }}" style="font-weight: bold;text-align:center;">Activity</th>
                     <th rowspan="2" style="font-weight: bold;text-align:center;vertical-align:center;"
                         width="300px">Description</th>
@@ -49,6 +51,7 @@
                         <td>{{ $data->nama_salesman }}</td>
                         <td>{{ $data->visit_date }}</td>
                         <td>{{ $data->nama_pelanggan }}</td>
+                        <td>{{ $data->status_pelanggan }}</td>
                         @php
                             $progress = explode(', ', $data->progress_ind);
                         @endphp

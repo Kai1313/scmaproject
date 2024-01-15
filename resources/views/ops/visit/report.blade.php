@@ -116,6 +116,7 @@
                                 <th rowspan="2" width="110">Sales Name</th>
                                 <th rowspan="2" width="110">Date</th>
                                 <th rowspan="2" width="220">Customer</th>
+                                <th rowspan="2" width="220">Category</th>
                                 <th colspan="{{ count($activities) }}">Activity</th>
                                 <th rowspan="2">Description</th>
                             </tr>
