@@ -177,7 +177,7 @@ class ReportGeneralLedgerController extends Controller
                     WHEN master_akun.tipe_akun = 1 THEN \"Closing %\"
                     ELSE \"--\"
                 END 
-                OR COALESCE(jurnal_header.id_transaksi, '') NOT LIKE
+                AND COALESCE(jurnal_header.id_transaksi, '') NOT LIKE
                 CASE
                     WHEN master_akun.tipe_akun = 0 THEN
                         CASE
@@ -550,16 +550,14 @@ class ReportGeneralLedgerController extends Controller
                 else {
                     $allAkun = Akun::where("isshown", 1)->groupBy("kode_akun")->get()->toArray();
                 }
-                // Extract the "kode_akun" values from the result array for comparison
+
                 $resultKodeAkun = array_column(json_decode(json_encode($result), true), 'kode_akun');
 
-                // Use array_filter to remove objects from $akunArray where 'kode_akun' is already present in $resultKodeAkun
                 $filteredAkunArray = array_filter($allAkun, function ($akun) use ($resultKodeAkun) {
                     return !in_array($akun["kode_akun"], $resultKodeAkun);
                 });
 
                 foreach ($filteredAkunArray as $key => $value) {
-                    // $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")->where("id_akun", $value["id_akun"])->where("id_cabang", $value["id_cabang"])->where("bulan", $month)->where("tahun", $year)->first();
 
                     if ($id_cabang != "all" && $id_cabang != "") {
                         $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")->where("id_akun", $value["id_akun"])->where("id_cabang", $id_cabang)->where("bulan", (int) $month)->where("tahun", (int) $year)->first();
@@ -583,17 +581,19 @@ class ReportGeneralLedgerController extends Controller
                     $kredit = ($data_saldo_ledgers) ? $data_saldo_ledgers->kredit : 0;
                     $saldo_awal = ($saldo_debet - $saldo_kredit) + ($debet - $kredit);
                     $saldo_akhir = $saldo_awal;
-                    $result[] = (object) [
-                        "id_jurnal" => "",
-                        "id_cabang" => $value["id_cabang"],
-                        "id_akun" => $value["id_akun"],
-                        "kode_akun" => $value["kode_akun"],
-                        "nama_akun" => $value["nama_akun"],
-                        "debet" => 0,
-                        "kredit" => 0,
-                        "saldo_awal" => round($saldo_awal, 2),
-                        "saldo_akhir" => round($saldo_akhir, 2)
-                    ];
+                    if ($saldo_akhir > 0) {
+                        $result[] = (object) [
+                            "id_jurnal" => "",
+                            "id_cabang" => $value["id_cabang"],
+                            "id_akun" => $value["id_akun"],
+                            "kode_akun" => $value["kode_akun"],
+                            "nama_akun" => $value["nama_akun"],
+                            "debet" => 0,
+                            "kredit" => 0,
+                            "saldo_awal" => round($saldo_awal, 2),
+                            "saldo_akhir" => round($saldo_akhir, 2)
+                        ];
+                    }
                 }
             }
 
@@ -640,7 +640,7 @@ class ReportGeneralLedgerController extends Controller
                     WHEN master_akun.tipe_akun = 1 THEN \"Closing %\"
                     ELSE \"--\"
                 END 
-                OR COALESCE(jurnal_header.id_transaksi, '') NOT LIKE
+                AND COALESCE(jurnal_header.id_transaksi, '') NOT LIKE
                 CASE
                     WHEN master_akun.tipe_akun = 0 THEN
                         CASE

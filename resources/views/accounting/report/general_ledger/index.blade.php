@@ -423,70 +423,79 @@
                             alert("Error loading data. Exception: " + ThrownException + '\n' + textStatus)
                         }
                     },
-                    columns: [{
-                        data: 'kode_akun',
-                        name: 'kode_akun',
-                        width: '10%',
-                        className: 'text-left',
-                        responsivePriority: 1
-                    }, {
-                        data: 'nama_akun',
-                        name: 'nama_akun',
-                        width: '12%',
-                        className: 'text-left',
-                        responsivePriority: 2,
-                        render: function(data, type, row) {
-                            let cabang = $("#cabang_input").val()
-                            let startdate = $("#start_date").val()
-                            let enddate = $("#end_date").val()
-                            let customRoute = "{{ route('report-general-ledger') }}"
-                            customRoute += '?id_akun=' + row["id_akun"] + '&cabang=' + cabang +
-                                '&startdate=' + startdate + '&enddate=' + enddate + '&type=detail'
-                            let namaAkun = '<a href="' + customRoute + '" target="__blank">' + data +
-                                '</a>'
-                            return namaAkun
+                    columns: [
+                        {
+                            data: 'kode_akun',
+                            name: 'kode_akun',
+                            width: '10%',
+                            sType: 'string',
+                            className: 'text-left',
+                            responsivePriority: 1
+                        }, 
+                        {
+                            data: 'nama_akun',
+                            name: 'nama_akun',
+                            width: '12%',
+                            className: 'text-left',
+                            responsivePriority: 2,
+                            render: function(data, type, row) {
+                                let cabang = $("#cabang_input").val()
+                                let startdate = $("#start_date").val()
+                                let enddate = $("#end_date").val()
+                                let customRoute = "{{ route('report-general-ledger') }}"
+                                customRoute += '?id_akun=' + row["id_akun"] + '&cabang=' + cabang +
+                                    '&startdate=' + startdate + '&enddate=' + enddate + '&type=detail'
+                                let namaAkun = '<a href="' + customRoute + '" target="__blank">' + data +
+                                    '</a>'
+                                return namaAkun
+                            }
+                        }, 
+                        {
+                            data: 'saldo_awal',
+                            name: 'saldo_awal',
+                            width: '10%',
+                            className: 'text-right',
+                            searchable: false,
+                            orderable: false,
+                            render: function(data, type, row) {
+                                return formatCurr(formatNumberAsFloatFromDB(data))
+                            }
+                        }, 
+                        {
+                            data: 'debet',
+                            name: 'debet',
+                            width: '10%',
+                            className: 'text-right',
+                            searchable: false,
+                            orderable: false,
+                            render: function(data, type, row) {
+                                return formatCurr(formatNumberAsFloatFromDB(data))
+                            }
+                        }, 
+                        {
+                            data: 'kredit',
+                            name: 'kredit',
+                            width: '10%',
+                            className: 'text-right',
+                            searchable: false,
+                            orderable: false,
+                            render: function(data, type, row) {
+                                return formatCurr(formatNumberAsFloatFromDB(data))
+                            }
+                        }, 
+                        {
+                            data: 'saldo_akhir',
+                            name: 'saldo_akhir',
+                            width: '10%',
+                            className: 'text-right',
+                            searchable: false,
+                            orderable: false,
+                            render: function(data, type, row) {
+                                return formatCurr(formatNumberAsFloatFromDB(data))
+                            }
                         }
-                    }, {
-                        data: 'saldo_awal',
-                        name: 'saldo_awal',
-                        width: '10%',
-                        className: 'text-right',
-                        searchable: false,
-                        orderable: false,
-                        render: function(data, type, row) {
-                            return formatCurr(formatNumberAsFloatFromDB(data))
-                        }
-                    }, {
-                        data: 'debet',
-                        name: 'debet',
-                        width: '10%',
-                        className: 'text-right',
-                        searchable: false,
-                        orderable: false,
-                        render: function(data, type, row) {
-                            return formatCurr(formatNumberAsFloatFromDB(data))
-                        }
-                    }, {
-                        data: 'kredit',
-                        name: 'kredit',
-                        width: '10%',
-                        className: 'text-right',
-                        searchable: false,
-                        orderable: false,
-                        render: function(data, type, row) {
-                            return formatCurr(formatNumberAsFloatFromDB(data))
-                        }
-                    }, {
-                        data: 'saldo_akhir',
-                        name: 'saldo_akhir',
-                        width: '10%',
-                        className: 'text-right',
-                        searchable: false,
-                        orderable: false,
-                        render: function(data, type, row) {
-                            return formatCurr(formatNumberAsFloatFromDB(data))
-                        }
-                    }],
+                    ],
+                    "order": [[0, "asc"]]
                 })
             } else {
                 $("#table_recap_div").hide()
@@ -686,7 +695,7 @@
                 if (ctrlAkun != null) {
                     console.log(ctrlAkun)
                     $("#coa").val(ctrlAkun).trigger("change")
-                    $("#btn-view").click()
+                    // $("#btn-view").click()
                 }
                 ctrlAkun = null
             })
