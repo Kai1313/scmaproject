@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Production;
 use App\PurchaseRequest;
 use DB;
 use Illuminate\Http\Request;
@@ -550,5 +551,34 @@ class PurchaseRequestController extends Controller
         }
 
         return ['result' => true];
+    }
+
+    public function getStockWithProduction(Request $request)
+    {
+        $idBarang = $request->id_barang;
+        $datas = Production::select('nomor_referensi_produksi', 'tanggal_produksi', 'nama_produksi', 'keterangan_produksi')
+            ->leftJoin('produksi_detail', 'produksi.id_produksi', 'produksi_detail.id_produksi')
+            ->where('id_jenis_transaksi', 16)->where('produksi_detail.id_produksi_detail', null)->get();
+        $array = [];
+        // return $datas;
+        foreach ($datas as $data) {
+            $bom = DB::table('bom')
+                ->join('bom_detail', 'bom.id_bom', 'bom_detail.id_bom')
+                ->join('satuan_barang', 'bom_detail.id_satuan_barang', 'satuan_barang.id_satuan_barang')
+                ->where('bom.id_bom', $data->nomor_referensi_produksi)->where('bom_detail.id_barang', $idBarang)
+                ->first();
+            if ($bom) {
+                $array[] = [
+                    'tanggal' => $data->tanggal_produksi,
+                    'kode_produksi' => $data->nama_produksi,
+                    'nama_produksi' => $bom->keterangan_bom,
+                    'keterangan' => $data->keterangan_produksi,
+                    'qty' => $bom->jumlah_bom_detail,
+                    'satuan' => $bom->nama_satuan_barang,
+                ];
+            }
+        }
+
+        return response()->json(['status' => 'success', 'datas' => $array], 200);
     }
 }

@@ -276,7 +276,19 @@ class VisitController extends Controller
 
     public function findCustomer($customerid)
     {
-        $data = Pelanggan::select('nama_pelanggan', 'alamat_pelanggan', 'telepon1_pelanggan', 'kontak_person_pelanggan', 'kota_pelanggan')
+        $data = Pelanggan::select(
+            'nama_pelanggan',
+            'alamat_pelanggan',
+            'telepon1_pelanggan',
+            'kontak_person_pelanggan',
+            'kota_pelanggan',
+            'bidang_usaha_pelanggan',
+            'kapasitas_pelanggan',
+            'posisi_kontak_person_pelanggan',
+            'aset_pelanggan',
+            'status_aktif_pelanggan',
+            'keterangan_pelanggan'
+        )
             ->where('id_pelanggan', $customerid)->first();
 
         return $data;
@@ -302,6 +314,8 @@ class VisitController extends Controller
                 $data->status_pelanggan = '1';
                 $data->plafon_hari_pelanggan = '0';
                 $data->user_pelanggan = session()->get('user')['id_pengguna'];
+                $data->plafon_pelanggan = 50000000;
+                $data->plafon_hari_pelanggan = 1;
             }
 
             $data->nama_pelanggan = $request->nama_pelanggan;
@@ -309,6 +323,12 @@ class VisitController extends Controller
             $data->kota_pelanggan = $request->kota_pelanggan;
             $data->telepon1_pelanggan = $request->telepon1_pelanggan;
             $data->kontak_person_pelanggan = $request->kontak_person_pelanggan;
+            $data->bidang_usaha_pelanggan = $request->bidang_usaha_pelanggan;
+            $data->kapasitas_pelanggan = $request->kapasitas_pelanggan;
+            $data->posisi_kontak_person_pelanggan = $request->posisi_kontak_person_pelanggan;
+            $data->aset_pelanggan = $request->aset_pelanggan;
+            $data->status_aktif_pelanggan = $request->status_aktif_pelanggan;
+            $data->keterangan_pelanggan = $request->keterangan_pelanggan;
             $data->save();
 
             DB::commit();

@@ -439,6 +439,12 @@
                             </div>
                         </div>
                         <div class="row">
+                            <label for="" class="col-md-4">Bidang usaha</label>
+                            <div class="form-group col-md-8">
+                                <input type="text" class="form-control" name="bidang_usaha_pelanggan">
+                            </div>
+                        </div>
+                        <div class="row">
                             <label for="" class="col-md-4">Kota <span>*</span></label>
                             <div class="form-group col-md-8">
                                 <input type="text" class="form-control" name="kota_pelanggan"
@@ -453,9 +459,44 @@
                             </div>
                         </div>
                         <div class="row">
+                            <label for="" class="col-md-4">Kapasitas pelanggan</label>
+                            <div class="form-group col-md-8">
+                                <input type="text" class="form-control" name="kapasitas_pelanggan">
+                            </div>
+                        </div>
+                        <div class="row">
                             <label for="" class="col-md-4">Orang yang dihubungi</label>
                             <div class="form-group col-md-8">
                                 <input type="text" class="form-control" name="kontak_person_pelanggan">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label for="" class="col-md-4">Posisi orang yang dihubungi</label>
+                            <div class="form-group col-md-8">
+                                <input type="text" class="form-control" name="posisi_kontak_person_pelanggan">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label for="" class="col-md-4">Aset</label>
+                            <div class="form-group col-md-8">
+                                <textarea name="aset_pelanggan" class="form-control"></textarea>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label for="" class="col-md-4">Status</label>
+                            <div class="form-group col-md-8">
+                                <select name="status_aktif_pelanggan" class="form-control">
+                                    {{-- <option value=""></option> --}}
+                                    <option value="1">Aktif</option>
+                                    <option value="2">Pindah</option>
+                                    <option value="3">Tutup</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label for="" class="col-md-4">Keterangan</label>
+                            <div class="form-group col-md-8">
+                                <textarea name="keterangan_pelanggan" class="form-control"></textarea>
                             </div>
                         </div>
                     </div>
@@ -583,9 +624,10 @@
                     url: "{{ route('visit-find-customer', $data ? $data->id_pelanggan : 0) }}",
                     success: function(res) {
                         for (let key in res) {
-                            $('[name="' + key + '"]').val(res[key].trim())
+                            $('[name="' + key + '"]').val(res[key] ? res[key].trim() : res[key])
                         }
 
+                        modal.modal()
                         $('#cover-spin').hide()
                     },
                     error: function(error) {
@@ -593,11 +635,13 @@
                         Swal.fire("Gagal Menyimpan Data. ", data.responseJSON.message, 'error')
                     }
                 })
+            } else {
+                modal.modal()
             }
 
             let url = $(this).prop('href')
             modal.find('form').attr('action', url)
-            modal.modal()
+
         })
 
         $('.show-cancel-visit').click(function(e) {

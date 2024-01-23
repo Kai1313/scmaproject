@@ -171,6 +171,32 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="modalInfo" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog " role="document">
+            <div class="modal-content ">
+                <div class="modal-body">
+                    <h4>RENCANA PRODUKSI</h4>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Produksi</th>
+                                <th>Jumlah</th>
+                                <th>Satuan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="target-info">
+
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-flat" data-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('addedScripts')
@@ -188,6 +214,7 @@
         let arrayAccess = {!! json_encode($arrayAccess) !!}
         let idUser = '{{ $idUser }}'
         let changeStatusDetail = '{{ route('purchase-request-change-status-detail') }}';
+        let urlGetStock = '{{ route('purchase-request-stock') }}'
         var resDataTable = $('#table-detail').DataTable({
             scrollX: true,
             data: details,
@@ -197,7 +224,11 @@
                 name: 'kode_barang'
             }, {
                 data: 'nama_barang',
-                name: 'nama_barang'
+                name: 'nama_barang',
+                render: function(data, type, row) {
+                    return '<a href="' + urlGetStock + '?id_barang=' + row.id_barang +
+                        '" class="btn-show-stock">' + data + '</a>'
+                }
             }, {
                 data: 'qty',
                 name: 'qty',
@@ -384,5 +415,42 @@
                 }
             })
         }
+
+        $('body').on('click', '.btn-show-stock', function(e) {
+            e.preventDefault()
+            let url = $(this).prop('href')
+            $.ajax({
+                url: url,
+                type: 'get',
+                success: function(res) {
+                    let html = ''
+                    let total = 0
+                    let satuan = ''
+                    for (let i = 0; i < res.datas.length; i++) {
+                        let d = res.datas[i]
+                        html += '<tr>'
+                        html += '<td>' + d['tanggal'] + '</td>'
+                        html += '<td>' + d['nama_produksi'] + '</td>'
+                        html += '<td>' + d['qty'] + '</td>'
+                        html += '<td>' + d['satuan'] + '</td>'
+                        html += '</tr>'
+                        total += d['qty']
+                        satuan = d['satuan']
+                    }
+
+                    html += '<tr>'
+                    html += '<td colspan="2">TOTAL</td>'
+                    html += '<td>' + total + '</td>'
+                    html += '<td>' + satuan + '</td>'
+                    html += '</tr>'
+
+                    $('#modalInfo').modal('show')
+                    $('#target-info').html(html)
+                },
+                error: function(error) {
+                    console.log(error)
+                }
+            })
+        })
     </script>
 @endsection
