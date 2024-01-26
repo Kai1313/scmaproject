@@ -516,8 +516,8 @@ class ApiController extends Controller
             $id_slip = $request->slip;
             $detail_inventory = array_values($request->detail);
 
-            if($request->has('biaya')){
-                if($request->biaya != null && count($request->biaya) > 0){
+            if ($request->has('biaya')) {
+                if ($request->biaya != null && count($request->biaya) > 0) {
                     $biaya_penjualan = array_values($request->biaya);
                 }
             }
@@ -632,7 +632,7 @@ class ApiController extends Controller
 
             $total_biaya = 0;
 
-            if(isset($biaya_penjualan)){
+            if (isset($biaya_penjualan)) {
                 if (count($biaya_penjualan) > 0) {
                     foreach ($biaya_penjualan as $biaya) {
                         $total_biaya += round(floatval($biaya['total']), 2);
@@ -936,7 +936,7 @@ class ApiController extends Controller
                         }
                     }
                 }
-            }else{
+            } else {
                 // Find Header data and delete detail
                 $header = JurnalHeader::where("id_transaksi", $id_transaksi)->where('jenis_jurnal', '<>', 'ME')->where('void', 0)->first();
                 if (!empty($header)) {
@@ -1130,7 +1130,7 @@ class ApiController extends Controller
                     'akun' => $akun_laba_rugi_asset,
                     'debet' => round(floatval($d_inv['asset_beli']) - floatval($d_inv['akumulasi_penyusutan']), 2),
                     'credit' => 0,
-                    'keterangan' => 'Jurnal Otomatis Laba Rugi Asset - ' . $id_transaksi . ' - ' . $nama_pelanggan . ' - '  . $d_inv['kode_batang'] .  ' - ' . $d_inv['kode_barang'] . ' - ' . $d_inv['nama_barang'],
+                    'keterangan' => 'Jurnal Otomatis Laba Rugi Asset - ' . $id_transaksi . ' - ' . $nama_pelanggan . ' - ' . $d_inv['kode_batang'] . ' - ' . $d_inv['kode_barang'] . ' - ' . $d_inv['nama_barang'],
                     'id_transaksi' => null,
                 ]);
 
@@ -1138,7 +1138,7 @@ class ApiController extends Controller
                     'akun' => $akun_penyusutan_barang,
                     'debet' => round(floatval($d_inv['akumulasi_penyusutan']), 2),
                     'credit' => 0,
-                    'keterangan' => 'Jurnal Otomatis Akumulasi Penyusutan Barang - ' . $id_transaksi . ' - ' . $nama_pelanggan . ' - ' . $data_akun_penyusutan_barang->nama_akun . ' - ' . $d_inv['kode_batang'] .  ' - ' . $d_inv['kode_barang'] . ' - ' . $d_inv['nama_barang'],
+                    'keterangan' => 'Jurnal Otomatis Akumulasi Penyusutan Barang - ' . $id_transaksi . ' - ' . $nama_pelanggan . ' - ' . $data_akun_penyusutan_barang->nama_akun . ' - ' . $d_inv['kode_batang'] . ' - ' . $d_inv['kode_barang'] . ' - ' . $d_inv['nama_barang'],
                     'id_transaksi' => null,
                 ]);
 
@@ -1146,7 +1146,7 @@ class ApiController extends Controller
                     'akun' => $akun_asset_barang,
                     'debet' => 0,
                     'credit' => round(floatval($d_inv['asset_beli']), 2),
-                    'keterangan' => 'Jurnal Otomatis Asset - ' . $id_transaksi . ' - ' . $nama_pelanggan . ' - ' . $data_akun_asset_barang->nama_akun . ' - ' . $d_inv['kode_batang'] .  ' - ' . $d_inv['kode_barang'] . ' - ' . $d_inv['nama_barang'],
+                    'keterangan' => 'Jurnal Otomatis Asset - ' . $id_transaksi . ' - ' . $nama_pelanggan . ' - ' . $data_akun_asset_barang->nama_akun . ' - ' . $d_inv['kode_batang'] . ' - ' . $d_inv['kode_barang'] . ' - ' . $d_inv['nama_barang'],
                     'id_transaksi' => null,
                 ]);
             }
@@ -1264,7 +1264,7 @@ class ApiController extends Controller
                 "result" => true,
                 "code" => 200,
                 "message" => "Successfully stored Jurnal data",
-                "data" => $header_me->kode_jurnal
+                "data" => $header_me->kode_jurnal,
             ], 200);
         } catch (\Exception $e) {
             DB::rollback();
@@ -1443,7 +1443,7 @@ class ApiController extends Controller
                     'akun' => $akun_disposal_barang,
                     'debet' => round(floatval($d_inv['asset_beli']) - floatval($d_inv['akumulasi_penyusutan']), 2),
                     'credit' => 0,
-                    'keterangan' => 'Jurnal Otomatis Laba Rugi Asset - ' . $id_transaksi . ' - '  . $d_inv['kode_batang'] .  ' - ' . $d_inv['kode_barang'] . ' - ' . $d_inv['nama_barang'],
+                    'keterangan' => 'Jurnal Otomatis Laba Rugi Asset - ' . $id_transaksi . ' - ' . $d_inv['kode_batang'] . ' - ' . $d_inv['kode_barang'] . ' - ' . $d_inv['nama_barang'],
                     'id_transaksi' => null,
                 ]);
 
@@ -1451,7 +1451,7 @@ class ApiController extends Controller
                     'akun' => $akun_penyusutan_barang,
                     'debet' => round(floatval($d_inv['akumulasi_penyusutan']), 2),
                     'credit' => 0,
-                    'keterangan' => 'Jurnal Otomatis Akumulasi Penyusutan Barang - ' . $id_transaksi . ' - ' . $data_akun_penyusutan_barang->nama_akun . ' - ' . $d_inv['kode_batang'] .  ' - ' . $d_inv['kode_barang'] . ' - ' . $d_inv['nama_barang'],
+                    'keterangan' => 'Jurnal Otomatis Akumulasi Penyusutan Barang - ' . $id_transaksi . ' - ' . $data_akun_penyusutan_barang->nama_akun . ' - ' . $d_inv['kode_batang'] . ' - ' . $d_inv['kode_barang'] . ' - ' . $d_inv['nama_barang'],
                     'id_transaksi' => null,
                 ]);
 
@@ -1459,7 +1459,7 @@ class ApiController extends Controller
                     'akun' => $akun_asset_barang,
                     'debet' => 0,
                     'credit' => round(floatval($d_inv['asset_beli']), 2),
-                    'keterangan' => 'Jurnal Otomatis Asset - ' . $id_transaksi . ' - ' . $data_akun_asset_barang->nama_akun . ' - ' . $d_inv['kode_batang'] .  ' - ' . $d_inv['kode_barang'] . ' - ' . $d_inv['nama_barang'],
+                    'keterangan' => 'Jurnal Otomatis Asset - ' . $id_transaksi . ' - ' . $data_akun_asset_barang->nama_akun . ' - ' . $d_inv['kode_batang'] . ' - ' . $d_inv['kode_barang'] . ' - ' . $d_inv['nama_barang'],
                     'id_transaksi' => null,
                 ]);
             }
@@ -1563,7 +1563,7 @@ class ApiController extends Controller
                 "result" => true,
                 "code" => 200,
                 "message" => "Successfully stored Jurnal data",
-                "data" => $header_me->kode_jurnal
+                "data" => $header_me->kode_jurnal,
             ], 200);
         } catch (\Exception $e) {
             DB::rollback();
@@ -1591,8 +1591,8 @@ class ApiController extends Controller
             $id_cabang = $request->cabang;
             $id_slip = $request->slip;
             $detail_inventory = array_values($request->detail);
-            if($request->has('biaya')){
-                if($request->biaya != null && count($request->biaya) > 0){
+            if ($request->has('biaya')) {
+                if ($request->biaya != null && count($request->biaya) > 0) {
                     $biaya_pembelian = array_values($request->biaya);
                 }
             }
@@ -1694,7 +1694,7 @@ class ApiController extends Controller
                 ],
             ];
 
-            if(isset($biaya_pembelian)){
+            if (isset($biaya_pembelian)) {
                 if (count($biaya_pembelian) > 0) {
                     foreach ($biaya_pembelian as $biaya) {
                         array_push($jurnal_detail_me, [
@@ -1969,7 +1969,7 @@ class ApiController extends Controller
                         }
                     }
                 }
-            }else{
+            } else {
                 // Find Header data and delete detail
                 $header = JurnalHeader::where("id_transaksi", $id_transaksi)->where('jenis_jurnal', '<>', 'ME')->where('void', 0)->first();
                 if (!empty($header)) {
@@ -2902,6 +2902,7 @@ class ApiController extends Controller
                 'total' => $total,
                 'discount' => isset($req->discount) ? handleNull($req->discount) : 0,
                 'id_cabang' => $req->id_cabang,
+                'tanggal_jatuh_tempo' => $req->tanggal_jatuh_tempo,
             ];
 
             $newTipePembayaran = $req->tipe_pembayaran;
