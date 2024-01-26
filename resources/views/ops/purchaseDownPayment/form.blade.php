@@ -173,9 +173,8 @@
                             <div class="form-group">
                                 <input type="text" name="konversi_total" class="form-control handle-number-2" readonly
                                     value="{{ old('konversi_total', $data ? $data->total * $data->rate : 0) }}">
-                                <input type="hidden" name="total" class="form-control handle-number-2"
-                                    value="{{ old('total', $data ? $data->total : '') }}" data-validation="[NOTEMPTY]"
-                                    data-validation-message="Total tidak boleh kosong">
+                                <input type="hidden" name="total" class="form-control"
+                                    value="{{ old('total', $data ? $data->total : '') }}">
                             </div>
                             <label>Catatan</label>
                             <div class="form-group">

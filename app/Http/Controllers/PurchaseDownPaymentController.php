@@ -86,11 +86,15 @@ class PurchaseDownPaymentController extends Controller
             $totalPO = DB::table('permintaan_pembelian')
                 ->where('id_permintaan_pembelian', $data->id_permintaan_pembelian)
                 ->value('mtotal_permintaan_pembelian');
-            $totalPayment = DB::table('uang_muka_pembelian')
-                ->where('id_permintaan_pembelian', $data->id_permintaan_pembelian)
-                ->where('id_uang_muka_pembelian', '!=', $data->id_uang_muka_pembelian)
-                ->where('void', 0)->sum('nominal');
-            $remainingPayment = $totalPO - $totalPayment;
+            $remainingPayment = $totalPO;
+            if ($id == 0) {
+                $totalPayment = DB::table('uang_muka_pembelian')
+                    ->where('id_permintaan_pembelian', $data->id_permintaan_pembelian)
+                    ->where('id_uang_muka_pembelian', '!=', $data->id_uang_muka_pembelian)
+                    ->where('void', 0)->sum('nominal');
+
+                $remainingPayment = $totalPO - $totalPayment;
+            }
         }
 
         $cabang = session()->get('access_cabang');

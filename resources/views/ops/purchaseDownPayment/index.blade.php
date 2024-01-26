@@ -125,6 +125,7 @@
             scrollX: true,
             processing: true,
             serverSide: true,
+            pageLength: 100,
             ajax: "{{ route('purchase-down-payment') }}?c=" + $('[name="id_cabang"]').val() + '&show_void=' + $(
                 '[name="show_void"]').is(':checked'),
             columns: [{
