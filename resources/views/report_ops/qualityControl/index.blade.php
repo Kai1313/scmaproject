@@ -85,8 +85,8 @@
                                 <th>PH</th>
                                 <th>Warna</th>
                                 <th>Bentuk</th>
-                                <th>Keterangan</th>
                                 <th>Status</th>
+                                <th>Keterangan</th>
                                 <th>Tanggal QC</th>
                                 <th>Alasan</th>
                             </tr>
