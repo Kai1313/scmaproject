@@ -135,6 +135,7 @@
                 scrollX: true,
                 processing: true,
                 serverSide: true,
+                pageLength: 100,
                 ajax: defaultUrlIndex + param,
                 columns: [{
                     data: 'tanggal_pembelian',
@@ -183,9 +184,6 @@
                     data: 'bentuk_pembelian_detail',
                     name: 'qc.bentuk_pembelian_detail',
                 }, {
-                    data: 'keterangan_pembelian_detail',
-                    name: 'qc.keterangan_pembelian_detail',
-                }, {
                     data: 'status_qc',
                     name: 'qc.status_qc',
                     render: function(data) {
@@ -196,6 +194,9 @@
                             return '<label class="label label-default">Pending</label>'
                         }
                     }
+                }, {
+                    data: 'keterangan_pembelian_detail',
+                    name: 'qc.keterangan_pembelian_detail',
                 }, {
                     data: 'tanggal_qc',
                     name: 'qc.tanggal_qc',
