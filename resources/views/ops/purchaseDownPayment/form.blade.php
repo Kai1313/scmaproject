@@ -212,8 +212,8 @@
             data: branch
         }).on('select2:select', function(e) {
             let dataselect = e.params.data
-            $('[name="nominal"]').val('').attr('data-max', 0)
-            $('[name="total"]').val('')
+            // $('[name="nominal"]').val('').attr('data-max', 0)
+            // $('[name="total"]').val('')
             getPurchaseOrder()
         })
 
@@ -275,7 +275,6 @@
             setTimeout(() => {
                 calculate()
             }, 100);
-
         })
 
         $('[name="ppn_uang_muka_pembelian"]')
