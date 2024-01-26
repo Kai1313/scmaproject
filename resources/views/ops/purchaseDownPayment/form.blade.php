@@ -171,10 +171,11 @@
                             </div>
                             <label>Total Tagihan</label>
                             <div class="form-group">
-                                <input type="text" name="konversi_total" class="form-control handle-number-2" readonly
-                                    value="{{ old('konversi_total', $data ? $data->total * $data->rate : 0) }}">
+                                <input type="text" name="konversi_total" class="form-control" readonly
+                                    value="{{ old('konversi_total', $data ? formatNumber($data->total * $data->rate, 2) : 0) }}"
+                                    style="text-align:right;">
                                 <input type="hidden" name="total" class="form-control"
-                                    value="{{ old('total', $data ? $data->total : '') }}">
+                                    value="{{ old('total', $data ? formatNumber($data->total, 2) : '') }}">
                             </div>
                             <label>Catatan</label>
                             <div class="form-group">
