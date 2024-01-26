@@ -33,7 +33,8 @@ class QcReceivedController extends Controller
         ]);
     }
 
-    function print(Request $request) {
+    public function print(Request $request)
+    {
         if (checkAccessMenu('laporan_qc_penerimaan', 'print') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
@@ -105,12 +106,7 @@ class QcReceivedController extends Controller
                 'p.nama_pembelian',
                 'b.nama_barang',
                 DB::raw('sum(pd.jumlah_purchase) as total_jumlah_purchase'),
-                DB::raw('(CASE
-                    WHEN qc.status_qc = 1 THEN "Passed"
-                    WHEN qc.status_qc = 2 THEN "Reject"
-                    WHEN qc.status_qc = 3 THEN "Hold"
-                    ELSE "Pending"
-                END) AS status_qc'),
+                'status_qc',
                 'sb.nama_satuan_barang',
                 'qc.reason',
                 'qc.sg_pembelian_detail',

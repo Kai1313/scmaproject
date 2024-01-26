@@ -114,6 +114,20 @@
 @section('externalScripts')
     <script>
         let defaultUrlIndex = '{{ route('report_qc-index') }}'
+        let arrayStatus = {
+            1: {
+                'text': 'Passed',
+                'class': 'label label-success'
+            },
+            2: {
+                'text': 'Reject',
+                'class': 'label label-danger'
+            },
+            3: {
+                'text': 'Hold',
+                'class': 'label label-warning'
+            }
+        }
 
         function loadDatatable() {
             $('#target-table').show()
@@ -174,6 +188,14 @@
                 }, {
                     data: 'status_qc',
                     name: 'qc.status_qc',
+                    render: function(data) {
+                        if (arrayStatus.hasOwnProperty(data)) {
+                            return '<label class="' + arrayStatus[data].class + '">' + arrayStatus[data]
+                                .text + '</label>'
+                        } else {
+                            return '<label class="label label-default">Pending</label>'
+                        }
+                    }
                 }, {
                     data: 'tanggal_qc',
                     name: 'qc.tanggal_qc',
