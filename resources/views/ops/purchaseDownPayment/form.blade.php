@@ -128,7 +128,7 @@
                             </div>
                             <label>Jenis PPN</label>
                             <div class="form-group">
-                                <select name="ppn_uang_muka_pembelian" class="form-control select2" readonly>
+                                <select name="ppn_uang_muka_pembelian" class="form-control select2">
                                     <option value=""></option>
                                     <option value="0"
                                         {{ $data && $data->ppn_uang_muka_pembelian == '0' ? 'selected' : '' }}>Tanpa PPN
