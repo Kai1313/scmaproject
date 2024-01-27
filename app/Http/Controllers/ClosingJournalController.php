@@ -97,6 +97,14 @@ class ClosingJournalController extends Controller
                     "message" => "Closing sudah pernah dilakukan",
                 ]);
             }
+
+            $jurnal_header = JurnalHeader::whereRaw("id_transaksi LIKE '%Closing%'")->whereYear('tanggal_jurnal', $year)->whereMonth("tanggal_jurnal", $month)->get();
+            // dd(count($jurnal_header));
+            foreach ($jurnal_header as $jurnal) {
+                JurnalDetail::where("id_jurnal", $jurnal->id_jurnal)->delete();
+                JurnalHeader::where("id_jurnal", $jurnal->id_jurnal)->delete();
+            }
+
             $closing = new Closing;
             $closing->month = $month;
             $closing->year = $year;
@@ -913,7 +921,7 @@ class ClosingJournalController extends Controller
             }
 
             // Get data pindah barang
-            $data_header = InventoryTransferHeader::where("id_cabang2", "<>", $id_cabang)->whereBetween("tanggal_pindah_barang", [$start_date, $end_date])->where("void", 0)->where("status_pindah_barang", 1)->get();
+            $data_header = InventoryTransferHeader::where("id_cabang2", "<>", $id_cabang)->whereBetween("tanggal_pindah_barang", [$start_date, $end_date])->where("void", 0)->where("status_pindah_barang", 1)->whereIn('id_jenis_transaksi', [21, 22])->get();
             $details_out = [];
             $details_in = [];
             // Log::info("jumlah data header");
@@ -1001,11 +1009,25 @@ class ClosingJournalController extends Controller
                                 "message" => "Jurnal Closing Transfer Cabang Gagal. Error when store Jurnal data on table detail, barang not found",
                             ]);
                         }
+
+                        if ($id_cabang == 1) {
+                            $akun_persediaan = $barang->id_akun;
+                        } else {
+                            $format_akun = 'id_akun' . $id_cabang;
+                            $akun_persediaan = $barang->$format_akun;
+                        }
+
+                        if($id_transaksi == 'TG/SCA/23/10/0009'){
+                            \Log::debug("========== CHeck ========");
+                            \Log::debug($id_cabang);
+                            \Log::debug(json_encode($barang));
+                        }
+
                         // Log::info(json_encode($barang->id_barang));
                         $detail = new JurnalDetail();
                         $detail->id_jurnal = $header->id_jurnal;
                         $detail->index = $i + 1;
-                        $detail->id_akun = $barang->id_akun;
+                        $detail->id_akun = $akun_persediaan;
                         $detail->keterangan = "HPP Transfer Cabang Keluar " . $id_transaksi;
                         $detail->id_transaksi = $id_transaksi;
                         $detail->debet = 0;
@@ -1130,11 +1152,19 @@ class ClosingJournalController extends Controller
                                 "message" => "Jurnal Closing Transfer Cabang Gagal. Error when store Jurnal data on table detail, barang not found",
                             ]);
                         }
+
+                        if ($id_cabang == 1) {
+                            $akun_persediaan = $barang->id_akun;
+                        } else {
+                            $format_akun = 'id_akun' . $id_cabang;
+                            $akun_persediaan = $barang->$format_akun;
+                        }
+
                         // Log::info(json_encode($barang->id_barang));
                         $detail = new JurnalDetail();
                         $detail->id_jurnal = $header->id_jurnal;
                         $detail->index = $i + 1;
-                        $detail->id_akun = $barang->id_akun;
+                        $detail->id_akun = $akun_persediaan;
                         $detail->keterangan = "HPP Transfer Cabang Masuk " . $id_transaksi;
                         $detail->id_transaksi = $id_transaksi;
                         $detail->debet = $in;
@@ -1336,11 +1366,19 @@ class ClosingJournalController extends Controller
                             "message" => "Jurnal Closing Koreksi Stok Gagal. Error when store Jurnal data on table detail, barang not found",
                         ]);
                     }
+
+                    if ($id_cabang == 1) {
+                        $akun_persediaan = $barang->id_akun;
+                    } else {
+                        $format_akun = 'id_akun' . $id_cabang;
+                        $akun_persediaan = $barang->$format_akun;
+                    }
+
                     // Log::info(json_encode($barang->id_barang));
                     $detail = new JurnalDetail();
                     $detail->id_jurnal = $header->id_jurnal;
                     $detail->index = $i + 1;
-                    $detail->id_akun = $barang->id_akun;
+                    $detail->id_akun = $akun_persediaan;
                     $detail->keterangan = "Koreksi Stok " . $id_transaksi . " " . $barang->nama_barang;
                     $detail->id_transaksi = $id_transaksi;
                     $detail->debet = ($out > 0) ? 0 : abs($out);
@@ -1536,11 +1574,18 @@ class ClosingJournalController extends Controller
                         ]);
                     }
 
+                    if ($id_cabang == 1) {
+                        $akun_persediaan = $barang->id_akun;
+                    } else {
+                        $format_akun = 'id_akun' . $id_cabang;
+                        $akun_persediaan = $barang->$format_akun;
+                    }
+
                     // akun persediaan barang
                     $detail = new JurnalDetail();
                     $detail->id_jurnal = $header->id_jurnal;
                     $detail->index = $i + 1;
-                    $detail->id_akun = $barang->id_akun;
+                    $detail->id_akun = $akun_persediaan;
                     $detail->keterangan = "Persediaan Jurnal Retur Penjualan " . $id_transaksi . ' - ' . $out['note'];
                     $detail->id_transaksi = $id_transaksi;
                     $detail->debet = $out['sum'];
@@ -1818,11 +1863,18 @@ class ClosingJournalController extends Controller
                         ]);
                     }
 
+                    if ($id_cabang == 1) {
+                        $akun_persediaan = $barang->id_akun;
+                    } else {
+                        $format_akun = 'id_akun' . $id_cabang;
+                        $akun_persediaan = $barang->$format_akun;
+                    }
+
                     // akun persediaan barang
                     $detail = new JurnalDetail();
                     $detail->id_jurnal = $header->id_jurnal;
                     $detail->index = $i + 1;
-                    $detail->id_akun = $barang->id_akun;
+                    $detail->id_akun = $akun_persediaan;
                     $detail->keterangan = "Pemakaian Barang " . $id_transaksi . ' - ' . $out['note'];
                     $detail->id_transaksi = $id_transaksi;
                     $detail->debet = 0;
@@ -2021,11 +2073,18 @@ class ClosingJournalController extends Controller
                         ]);
                     }
 
+                    if ($id_cabang == 1) {
+                        $akun_persediaan = $barang->id_akun;
+                    } else {
+                        $format_akun = 'id_akun' . $id_cabang;
+                        $akun_persediaan = $barang->$format_akun;
+                    }
+
                     // akun persediaan barang
                     $detail = new JurnalDetail();
                     $detail->id_jurnal = $header->id_jurnal;
                     $detail->index = $i + 1;
-                    $detail->id_akun = $barang->id_akun;
+                    $detail->id_akun = $akun_persediaan;
                     $detail->keterangan = "Harga Produksi Penjualan " . $id_transaksi . ' - ' . $out['note'];
                     // $detail->id_transaksi = $id_transaksi;
                     $detail->debet = 0;
