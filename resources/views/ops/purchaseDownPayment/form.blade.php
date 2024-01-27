@@ -171,11 +171,11 @@
                             </div>
                             <label>Total Tagihan</label>
                             <div class="form-group">
-                                <input type="text" name="konversi_total" class="form-control" readonly
-                                    value="{{ old('konversi_total', $data ? formatNumber($data->total * $data->rate, 2) : 0) }}"
+                                <input type="text" name="konversi_total" class="form-control handle-number-2" readonly
+                                    value="{{ old('konversi_total', $data ? $data->total * $data->rate : 0) }}"
                                     style="text-align:right;">
-                                <input type="hidden" name="total" class="form-control"
-                                    value="{{ old('total', $data ? formatNumber($data->total, 2) : '') }}">
+                                <input type="hidden" name="total" class="form-control handle-number-2"
+                                    value="{{ old('total', $data ? $data->total : '') }}">
                             </div>
                             <label>Catatan</label>
                             <div class="form-group">
@@ -285,7 +285,9 @@
                 calculate()
             })
 
-        calculate()
+        setTimeout(() => {
+            calculate()
+        }, 500);
 
         function calculate() {
             let nominal = normalizeNumber($('[name="nominal"]').val())
@@ -307,6 +309,7 @@
                 default:
                     break;
             }
+
             $('[name="konversi_nominal"]').val(formatNumber((nominal * rate).toFixed(2), 2))
             $('[name="dpp"]').val(formatNumber(dpp.toFixed(2), 2))
             $('[name="ppn"]').val(formatNumber(ppn.toFixed(2), 2))
