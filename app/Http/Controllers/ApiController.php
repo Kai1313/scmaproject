@@ -3272,7 +3272,7 @@ class ApiController extends Controller
         return $data;
     }
 
-    public function productionResults($production_id, $total_supplies, $biaya_listrik, $biaya_operator)
+    public function productionResults($production_id, $total_supplies, $biaya_listrik, $biaya_operator, $id_cabang)
     {
         // cari hasil produksi dari input produksi yang berlangsung
         $data_production_results = DB::table("produksi_detail")
@@ -3319,7 +3319,7 @@ class ApiController extends Controller
                                                 barang.nama_barang,
                                                 IFNULL(satuan_barang.nama_satuan_barang, "") as nama_satuan,
                                                 ROUND(SUM(debit_produksi_detail),2) as debit_produksi,
-                                                barang.id_akun,
+                                                CASE WHEN ' . $id_cabang . ' = 1 THEN barang.id_akun ELSE barang.id_akun2 END as id_akun,
                                                 ROUND(SUM(ROUND(master_qr_code.listrik_master_qr_code * produksi_detail.debit_produksi_detail, 2) + ROUND(master_qr_code.pegawai_master_qr_code * produksi_detail.debit_produksi_detail, 2) + ROUND(master_qr_code.produksi_master_qr_code * produksi_detail.debit_produksi_detail, 2)), 2) as total')
             ->where('produksi.nomor_referensi_produksi', $production_id)
             ->groupBy('produksi_detail.id_barang')
@@ -3403,7 +3403,7 @@ class ApiController extends Controller
         $nominal_gaji = $data_production_cost['nominal_gaji'];
 
         // tahap 4
-        $data_production_results = $this->productionResults($id_produksi, $total_supplies, $biaya_listrik, $biaya_operator);
+        $data_production_results = $this->productionResults($id_produksi, $total_supplies, $biaya_listrik, $biaya_operator, $id_cabang);
 
         // init data jurnal
         $data_production = DB::table('produksi')->where('id_produksi', $id_produksi)->first();
