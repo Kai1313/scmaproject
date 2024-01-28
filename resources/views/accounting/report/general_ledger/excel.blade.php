@@ -36,10 +36,10 @@
                 <tr>
                     <td style="border: #000000 solid thin; font-size: 12; text-align: center;">{{ $item->kode_akun }}</td>
                     <td style="border: #000000 solid thin; font-size: 12; text-align: left; word-wrap: break-word;">{{ $item->nama_akun }}</td>
-                    <td style="border: #000000 solid thin; font-size: 12; text-align: right;">{{ number_format($item->saldo_awal, 2,",",".") }}</td>
+                    <td style="border: #000000 solid thin; font-size: 12; text-align: right;">{{ number_format($item->saldo_start, 2,",",".") }}</td>
                     <td style="border: #000000 solid thin; font-size: 12; text-align: right;">{{ number_format($item->debet, 2,",",".") }}</td>
-                    <td style="border: #000000 solid thin; font-size: 12; text-align: right;">{{ number_format($item->kredit, 2,",",".") }}</td>
-                    <td style="border: #000000 solid thin; font-size: 12; text-align: right;">{{ number_format($item->saldo_akhir, 2,",",".") }}</td>
+                    <td style="border: #000000 solid thin; font-size: 12; text-align: right;">{{ number_format($item->credit, 2,",",".") }}</td>
+                    <td style="border: #000000 solid thin; font-size: 12; text-align: right;">{{ number_format($item->saldo_balance, 2,",",".") }}</td>
                 </tr>
             @endforeach
         @elseif ($data["type"] == "detail")
@@ -63,7 +63,7 @@
                     <td style="border: #000000 solid thin; font-size: 12; text-align: left; word-wrap: break-word;">{{ $item->keterangan }}</td>
                     <td style="border: #000000 solid thin; font-size: 12; text-align: left; word-wrap: break-word;">{{ $item->id_transaksi }}</td>
                     <td style="border: #000000 solid thin; font-size: 12; text-align: right;">{{ number_format($item->debet, 2,",",".") }}</td>
-                    <td style="border: #000000 solid thin; font-size: 12; text-align: right;">{{ number_format($item->kredit, 2,",",".") }}</td>
+                    <td style="border: #000000 solid thin; font-size: 12; text-align: right;">{{ number_format($item->credit, 2,",",".") }}</td>
                     <td style="border: #000000 solid thin; font-size: 12; text-align: right;">{{ number_format($item->saldo_balance, 2,",",".") }}</td>
                 </tr>
             @endforeach

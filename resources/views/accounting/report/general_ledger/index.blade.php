@@ -292,25 +292,14 @@
                             "&type=" + type + "&coa=" + coa
                         let route = "{{ Route('dummy-ajax') }}"
                         route = route + param
-                        console.log(route)
-                        console.log(guid)
                         switch (guid) {
                             case "view":
-                                // Prepare spinner on button
-                                viewButton.disabled = true;
-                                viewButton.innerHTML = '<i class="fa fa-spinner fa-spin"></i>'
                                 view(param, type)
                                 break;
                             case "excel":
-                                // Prepare spinner on button
-                                excelButton.disabled = true;
-                                excelButton.innerHTML = '<i class="fa fa-spinner fa-spin"></i>'
                                 excel(param)
                                 break;
                             case "print":
-                                // Prepare spinner on button
-                                printButton.disabled = true;
-                                printButton.innerHTML = '<i class="fa fa-spinner fa-spin"></i>'
                                 print(param)
                                 break;
 
@@ -339,8 +328,6 @@
             $(".datepicker").datepicker({
                 format: "yyyy-mm-dd"
             })
-
-            // console.log("akun "+ctrlAkun+" start "+ctrlStartDate+" end "+ctrlEndDate+" type "+ctrlType);
 
             // getCoa()
             let initType = (ctrlType) ? ctrlType : "recap"
@@ -400,7 +387,11 @@
 
         function view(param, type) {
             let route = "{{ Route('report-general-ledger-populate') }}"
+            let routeRecap = "{{ Route('report-general-ledger-populate-recap') }}"
             let coa = $("#coa").val()
+            // Prepare spinner on button
+            viewButton.disabled = true;
+            viewButton.innerHTML = '<i class="fa fa-spinner fa-spin"></i>'
             if (type == "recap") {
                 $("#table_detail_div").hide()
                 $("#table_recap_div").show()
@@ -416,12 +407,19 @@
                         ["All", 100, 50, 20, 10]
                     ],
                     ajax: {
-                        "url": route + param,
+                        "url": routeRecap + param,
                         "type": "GET",
                         "dataType": "JSON",
                         "error": function(xhr, textStatus, ThrownException) {
                             alert("Error loading data. Exception: " + ThrownException + '\n' + textStatus)
+                            viewButton.disabled = false
+                            viewButton.innerHTML = '<i class="fa fa-eye"></i> View'
                         }
+                    },
+                    "initComplete": function() {
+                        console.log("init complete recap");
+                        viewButton.disabled = false
+                        viewButton.innerHTML = '<i class="fa fa-eye"></i> View'
                     },
                     columns: [
                         {
@@ -451,8 +449,8 @@
                             }
                         }, 
                         {
-                            data: 'saldo_awal',
-                            name: 'saldo_awal',
+                            data: 'saldo_start',
+                            name: 'saldo_start',
                             width: '10%',
                             className: 'text-right',
                             searchable: false,
@@ -473,8 +471,8 @@
                             }
                         }, 
                         {
-                            data: 'kredit',
-                            name: 'kredit',
+                            data: 'credit',
+                            name: 'credit',
                             width: '10%',
                             className: 'text-right',
                             searchable: false,
@@ -484,8 +482,8 @@
                             }
                         }, 
                         {
-                            data: 'saldo_akhir',
-                            name: 'saldo_akhir',
+                            data: 'saldo_balance',
+                            name: 'saldo_balance',
                             width: '10%',
                             className: 'text-right',
                             searchable: false,
@@ -498,6 +496,8 @@
                     "order": [[0, "asc"]]
                 })
             } else {
+                var runningCoa = ""
+                var runningBalance = 0
                 $("#table_recap_div").hide()
                 $("#table_detail_div").show()
                 $('#table_detail').DataTable().destroy();
@@ -517,7 +517,14 @@
                         "dataType": "JSON",
                         "error": function(xhr, textStatus, ThrownException) {
                             alert("Error loading data. Exception: " + ThrownException + '\n' + textStatus)
+                            viewButton.disabled = false
+                            viewButton.innerHTML = '<i class="fa fa-eye"></i> View'
                         }
+                    },
+                    "initComplete": function() {
+                        console.log("init complete recap");
+                        viewButton.disabled = false
+                        viewButton.innerHTML = '<i class="fa fa-eye"></i> View'
                     },
                     drawCallback: function(settings) {
                         $($('#table_detail').find('tbody tr')[0]).css('background-color', 'rgb(238, 238, 238)')
@@ -547,97 +554,118 @@
                             formatCurr(formatNumberAsFloatFromDB(totalCredit.toFixed(2)))
                         );
                     },
-                    columns: [{
-                        data: 'tanggal_jurnal',
-                        name: 'tanggal_jurnal',
-                        width: '10%'
-                    }, {
-                        data: 'kode_jurnal',
-                        name: 'kode_jurnal',
-                        width: '10%',
-                        render: function(data, type, row) {
-                            let route = '';
-                            let detail_route = (row["jenis_jurnal"] == "ME") ?
-                                "{{ route('transaction-adjustment-ledger-edit') }}" :
-                                "{{ route('transaction-general-ledger-edit') }}"
+                    columns: [
+                        {
+                            data: 'tanggal_jurnal',
+                            name: 'tanggal_jurnal',
+                            width: '10%',
+                            searchable: false,
+                            orderable: false
+                        }, 
+                        {
+                            data: 'kode_jurnal',
+                            name: 'kode_jurnal',
+                            width: '10%',
+                            orderable: false,
+                            render: function(data, type, row) {
+                                let route = '';
+                                let detail_route = (row["jenis_jurnal"] == "ME") ?
+                                    "{{ route('transaction-adjustment-ledger-edit') }}" :
+                                    "{{ route('transaction-general-ledger-edit') }}"
 
-                            if (row.id_jurnal) {
-                                route = '<a href="' + detail_route + '/' + row.id_jurnal +
-                                    '" target="_blank">' + data + '</a>'
-                            } else {
-                                route = '';
+                                if (row.id_jurnal) {
+                                    route = '<a href="' + detail_route + '/' + row.id_jurnal +
+                                        '" target="_blank">' + data + '</a>'
+                                } else {
+                                    route = '';
+                                }
+                                return route
                             }
-                            return route
+                        }, 
+                        {
+                            data: 'nama_cabang',
+                            name: 'nama_cabang',
+                            width: '10%',
+                            searchable: false,
+                            orderable: false,
+                            visible: ($("#cabang_input").val() == "")?true:false
+                        }, 
+                        {
+                            data: 'kode_akun',
+                            name: 'kode_akun',
+                            width: '10%',
+                            orderable: false
+                        }, 
+                        {
+                            data: 'nama_akun',
+                            name: 'nama_akun',
+                            width: '12%',
+                            orderable: false
+                        }, 
+                        {
+                            data: 'keterangan',
+                            name: 'keterangan',
+                            width: '10%',
+                            orderable: false,
+                            render: function(data, type, row) {
+                                // if (data != '' && data != null) {
+                                //     return data.substring(0, 15)
+                                // } else {
+                                //     return data;
+                                // }
+                                return data;
+                            }
+                        }, 
+                        {
+                            data: 'id_transaksi',
+                            name: 'id_transaksi',
+                            orderable: false,
+                            width: '10%'
+                        }, 
+                        {
+                            data: 'debet',
+                            name: 'debet',
+                            width: '10%',
+                            searchable: false,
+                            orderable: false,
+                            className: 'text-right',
+                            render: function(data, type, row) {
+                                return formatCurr(formatNumberAsFloatFromDB(data))
+                            }
+                        }, 
+                        {
+                            data: 'credit',
+                            name: 'credit',
+                            width: '10%',
+                            searchable: false,
+                            orderable: false,
+                            className: 'text-right',
+                            render: function(data, type, row) {
+                                return formatCurr(formatNumberAsFloatFromDB(data))
+                            }
+                        }, 
+                        {
+                            data: 'saldo_balance',
+                            name: 'saldo_balance',
+                            width: '10%',
+                            searchable: false,
+                            orderable: false,
+                            className: 'text-right',
+                            visible: (coa != 'all') ? true : false,
+                            render: function(data, type, row) {
+                                return formatCurr(formatNumberAsFloatFromDB(data.toFixed(2)))
+                            }
                         }
-                    }, {
-                        data: 'nama_cabang',
-                        name: 'nama_cabang',
-                        width: '10%',
-                        visible: ($("#cabang_input").val() == "")?true:false
-                    }, {
-                        data: 'kode_akun',
-                        name: 'kode_akun',
-                        width: '10%'
-                    }, {
-                        data: 'nama_akun',
-                        name: 'nama_akun',
-                        width: '12%'
-                    }, {
-                        data: 'keterangan',
-                        name: 'keterangan',
-                        width: '10%',
-                        render: function(data, type, row) {
-                            // if (data != '' && data != null) {
-                            //     return data.substring(0, 15)
-                            // } else {
-                            //     return data;
-                            // }
-                            return data;
-                        }
-                    }, {
-                        data: 'id_transaksi',
-                        name: 'id_transaksi',
-                        width: '10%'
-                    }, {
-                        data: 'debet',
-                        name: 'debet',
-                        width: '10%',
-                        searchable: false,
-                        orderable: false,
-                        className: 'text-right',
-                        render: function(data, type, row) {
-                            return formatCurr(formatNumberAsFloatFromDB(data))
-                        }
-                    }, {
-                        data: 'kredit',
-                        name: 'kredit',
-                        width: '10%',
-                        searchable: false,
-                        orderable: false,
-                        className: 'text-right',
-                        render: function(data, type, row) {
-                            return formatCurr(formatNumberAsFloatFromDB(data))
-                        }
-                    }, {
-                        data: 'saldo_balance',
-                        name: 'saldo_balance',
-                        width: '10%',
-                        searchable: false,
-                        orderable: false,
-                        className: 'text-right',
-                        visible: (coa != 'all') ? true : false,
-                        render: function(data, type, row) {
-                            return formatCurr(formatNumberAsFloatFromDB(data))
-                        }
-                    }],
+                    ],
                     "order": []
                 })
             }
-            viewButton.disabled = false
-            viewButton.innerHTML = '<i class="fa fa-eye"></i> View'
         }
 
         function excel(param) {
+            // Prepare spinner on button
+            excelButton.disabled = true;
+            excelButton.innerHTML = '<i class="fa fa-spinner fa-spin"></i>'
             let route = "{{ Route('report-general-ledger-excel') }}"
             let base_url = "{{ url('') }}";
             window.open(route + param)
@@ -646,6 +674,9 @@
         }
 
         function print(param) {
+            // Prepare spinner on button
+            printButton.disabled = true;
+            printButton.innerHTML = '<i class="fa fa-spinner fa-spin"></i>'
             let route = "{{ Route('report-general-ledger-pdf') }}"
             $.ajax({
                 type: "GET",
@@ -693,9 +724,8 @@
                 }
             }).done(function() {
                 if (ctrlAkun != null) {
-                    console.log(ctrlAkun)
                     $("#coa").val(ctrlAkun).trigger("change")
-                    // $("#btn-view").click()
+                    $("#btn-view").click()
                 }
                 ctrlAkun = null
             })

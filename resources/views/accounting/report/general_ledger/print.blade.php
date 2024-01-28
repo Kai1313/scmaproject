@@ -77,10 +77,10 @@
                     <tr style="font-size: 12px;">
                         <td align="center">{{ $item->kode_akun }}</td>
                         <td align="left">{{ $item->nama_akun }}</td>
-                        <td align="right">{{ number_format($item->saldo_awal, 2, ",", ".") }}</td>
+                        <td align="right">{{ number_format($item->saldo_start, 2, ",", ".") }}</td>
                         <td align="right">{{ number_format($item->debet, 2, ",", ".") }}</td>
-                        <td align="right">{{ number_format($item->kredit, 2, ",", ".") }}</td>
-                        <td align="right">{{ number_format($item->saldo_akhir, 2, ",", ".") }}</td>
+                        <td align="right">{{ number_format($item->credit, 2, ",", ".") }}</td>
+                        <td align="right">{{ number_format($item->saldo_balance, 2, ",", ".") }}</td>
                     </tr>
                 @endforeach
             </tbody>
@@ -110,7 +110,7 @@
                         <td align="left">{{ $item->keterangan }}</td>
                         <td align="left">{{ $item->id_transaksi }}</td>
                         <td align="right">{{ number_format($item->debet, 2, ",", ".") }}</td>
-                        <td align="right">{{ number_format($item->kredit, 2, ",", ".") }}</td>
+                        <td align="right">{{ number_format($item->credit, 2, ",", ".") }}</td>
                         <td align="right">{{ number_format($item->saldo_balance, 2, ",", ".") }}</td>
                     </tr>
                 @endforeach
