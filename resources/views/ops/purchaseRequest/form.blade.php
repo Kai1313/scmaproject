@@ -227,6 +227,10 @@
                             <i class="glyphicon glyphicon-floppy-saved"></i> Simpan Data
                         </button>
                     @endif
+                    <div style="margin-top:10px;color:red;">
+                        <span>*</span> Upload gambar pendukung bisa di tambahkan disetiap detail barang
+                        permintaan setelah disimpan data
+                    </div>
                 </div>
             </div>
         </form>

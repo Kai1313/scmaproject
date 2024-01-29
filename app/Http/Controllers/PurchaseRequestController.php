@@ -179,7 +179,7 @@ class PurchaseRequestController extends Controller
             return response()->json([
                 "result" => true,
                 "message" => "Data berhasil disimpan",
-                "redirect" => route('purchase-request'),
+                "redirect" => route('purchase-request-entry', $data->purchase_request_id),
             ], 200);
         } catch (\Exception $e) {
             DB::rollback();
