@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Media;
 use App\Production;
 use App\PurchaseRequest;
+use App\PurchaseRequestDetail;
 use DB;
 use Illuminate\Http\Request;
 use Log;
@@ -580,5 +582,53 @@ class PurchaseRequestController extends Controller
         }
 
         return response()->json(['status' => 'success', 'datas' => $array], 200);
+    }
+
+    public function getFileUpload(Request $request)
+    {
+        $index = $request->index;
+        $parent = $request->parent;
+
+        $datas = Media::where('id', $parent)->where('nama_media', $index)->where('tipe_media', 'purchase_request')->get();
+        $array = [];
+        $html = '';
+        foreach ($datas as $data) {
+            $html .= '<div class="item-media">';
+            $html .= '<a data-src="' . asset($data->lokasi_media) . '" data-fancybox="gallery"><img src="' . asset($data->lokasi_media) . '" style="width:100%;"></a>';
+            $html .= '<a href="javascript:void(0)" class="remove-media-container btn btn-danger btn-sm btn-flat" data-id="' . $data->id_media . '"><i class="fa fa-close"></i></a>';
+            $html .= '</div>';
+
+            $array[] = $data->id_media;
+        }
+
+        return response()->json(['status' => 'success', 'datas' => $array, 'html' => $html], 200);
+    }
+
+    public function postFileUpload(Request $request)
+    {
+        $data = PurchaseRequestDetail::where('purchase_request_id', $request->purchase_request_id)->where('index', $request->index)->first();
+        if (!$data) {
+            return response()->json(['result' => false, 'message' => 'Data tidak ditemukan'], 500);
+        }
+
+        if (isset($request->remove_base64)) {
+            $decodeRemoveMedia = json_decode($request->remove_base64);
+            $removeFile = $data->removefile($decodeRemoveMedia);
+            if (!$removeFile['result']) {
+                DB::rollback();
+                return response()->json(['result' => false, 'message' => 'Hapus file bermasalah'], 500);
+            }
+        }
+
+        if (isset($request->upload_base64)) {
+            $decodeMedia = json_decode($request->upload_base64);
+            $uploadFile = $data->uploadfile($decodeMedia);
+            if (!$uploadFile['result']) {
+                DB::rollback();
+                return response()->json(['result' => false, 'message' => 'Upload file bermasalah'], 500);
+            }
+        }
+
+        return response()->json(['result' => true, 'message' => 'Gambar berhasil diproses'], 200);
     }
 }

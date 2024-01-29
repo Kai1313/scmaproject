@@ -3,6 +3,7 @@
 @section('addedStyles')
     <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables-responsive/css/responsive.dataTables.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/fancybox.css') }}" />
     <style>
         th {
             text-align: center;
@@ -17,6 +18,47 @@
 
         ul.horizontal-list li {
             display: inline;
+        }
+
+        .remove-media-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+        }
+
+        .item-media:hover .remove-media-container {
+            opacity: 1;
+        }
+
+        .item-media {
+            width: 100px;
+            padding: 3px;
+            position: relative;
+        }
+
+        .item-media>a>img {
+            height: 94px;
+            object-fit: cover;
+        }
+
+        .container-media {
+            border: 1px solid #d2d6de;
+            display: flex;
+            flex-wrap: wrap;
+            border-radius: 3px;
+            margin-bottom: 10px;
+            min-height: 102px;
+        }
+
+        .add-image {
+            padding-top: 30px;
+            border: 1px dashed #3c8dbc;
+            border-radius: 3px;
+        }
+
+        .add-image:hover {
+            cursor: pointer;
         }
     </style>
 @endsection
@@ -197,6 +239,26 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="modalCamera" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4>Gambar</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="container-media" id="target-result-image-upload">
+                        <div class="add-image">
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-flat" data-dismiss="modal">Batal</button>
+                    {{-- <button type="button" class="btn btn-primary btn-flat post-image">Simpan</button> --}}
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('addedScripts')
@@ -204,6 +266,7 @@
     <script src="{{ asset('assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js') }}"></script>
     <script src="{{ asset('assets/bower_components/datatables-responsive/js/dataTables.responsive.js') }}"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ asset('js/fancybox.min.js') }}"></script>
     <script src="{{ asset('js/custom.js') }}"></script>
 @endsection
 
@@ -215,6 +278,7 @@
         let idUser = '{{ $idUser }}'
         let changeStatusDetail = '{{ route('purchase-request-change-status-detail') }}';
         let urlGetStock = '{{ route('purchase-request-stock') }}'
+        let urlShowImage = '{{ route('purchase-request-show-image') }}';
         var resDataTable = $('#table-detail').DataTable({
             scrollX: true,
             data: details,
@@ -276,6 +340,10 @@
                 searchable: false,
                 render: function(data, type, row, meta) {
                     let btn = '';
+                    btn +=
+                        '<a href="javascript:void(0)" class="btn btn-info btn-xs mr-1 mb-1 edit-camera" data-index="' +
+                        row.index + '" data-parent="' + row.purchase_request_id +
+                        '"><i class="glyphicon glyphicon-camera"></i></a>';
                     if (approval_header == 0 && (row.approval_status == 0 || row.approval_status ==
                             null)) {
                         if (arrayAccess.includes(idUser)) {
@@ -449,6 +517,32 @@
                 },
                 error: function(error) {
                     console.log(error)
+                }
+            })
+        })
+
+        $('body').on('click', '.edit-camera', function() {
+            let index = $(this).data('index')
+            let parent = $(this).data('parent')
+            $('#cover-spin').show()
+            $.ajax({
+                url: urlShowImage + '?parent=' + parent + '&index=' + index,
+                type: 'get',
+                success: function(res) {
+                    $('.add-image').prevAll('.item-media').remove()
+                    let el = $('#modalCamera')
+                    el.find('[name="index"]').val(index)
+                    el.find('[name="purchase_request_id"]').val(parent)
+                    el.find('[name="upload_base64"]').val(JSON.stringify(res.datas))
+                    $('.add-image').before(res.html)
+                    $('#cover-spin').hide()
+                    el.modal()
+                    $('.item-media').find('.remove-media-container').remove()
+                    Fancybox.bind('[data-fancybox="gallery"]');
+                },
+                error: function(error) {
+                    Swal.fire("Gagal Menyimpan Data. ", error.responseJSON.message, 'error')
+                    $('#cover-spin').hide()
                 }
             })
         })

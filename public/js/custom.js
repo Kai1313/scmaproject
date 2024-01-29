@@ -172,7 +172,6 @@ function saveData(node, withNotif = true) {
         success: function (data) {
             $('#cover-spin').hide()
             if (data.result) {
-                console.log(withNotif)
                 if (withNotif) {
                     Swal.fire('Tersimpan!', data.message, 'success').then((result) => {
                         if (result.isConfirmed) {

@@ -34,6 +34,14 @@
         .rounded-0 {
             border-radius: 0;
         }
+
+        .text-wrap {
+            white-space: normal;
+        }
+
+        .width-200 {
+            width: 400px;
+        }
     </style>
 @endsection
 
@@ -123,8 +131,15 @@
             scrollX: true,
             processing: true,
             serverSide: true,
+            pageLength: 25,
             ajax: "{{ route('purchase-request') }}?c=" + $('[name="id_cabang"]').val() + '&show_void=' + $(
                 '[name="show_void"]').is(':checked'),
+            columnDefs: [{
+                render: function(data, type, full, meta) {
+                    return "<div class='text-wrap width-200'>" + data + "</div>";
+                },
+                targets: 9
+            }],
             columns: [{
                 data: 'purchase_request_code',
                 name: 'prh.purchase_request_code'
@@ -156,7 +171,6 @@
             }, {
                 data: 'catatan',
                 name: 'prh.catatan',
-                width: '200px'
             }, {
                 data: 'action',
                 name: 'action',

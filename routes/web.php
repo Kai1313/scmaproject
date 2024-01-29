@@ -57,6 +57,8 @@ Route::prefix('purchase_requisitions')->group(function () {
     Route::get('/print/{id}', 'PurchaseRequestController@printData')->name('purchase-request-print-data');
     Route::post('/change_status_detail', 'PurchaseRequestController@changeStatusDetail')->name('purchase-request-change-status-detail');
     Route::get('/stock-with-production', 'PurchaseRequestController@getStockWithProduction')->name('purchase-request-stock');
+    Route::get('show-image-upload', 'PurchaseRequestController@getFileUpload')->name('purchase-request-show-image');
+    Route::post('post-image-upload', 'PurchaseRequestController@postFileUpload')->name('purchase-request-post-image');
 });
 
 Route::prefix('uang_muka_pembelian')->group(function () {

@@ -48,6 +48,7 @@ class PurchaseRequest extends Model
         $gudang = $arrayCabang[$this->id_cabang];
         return $this->hasMany(PurchaseRequestDetail::class, 'purchase_request_id')
             ->select(
+                'purchase_request_id',
                 'index as old_index',
                 'index',
                 'purchase_request_detail.id_barang',
@@ -155,4 +156,11 @@ class PurchaseRequest extends Model
 
         return ['status' => 'success'];
     }
+
+    // public function medias()
+    // {
+    //     return $this->hasMany(Media::class, 'nama_media', 'id')
+    //         ->select('id_media as id', 'lokasi_media as image')
+    //         ->where('tipe_media', 'purchase_request')->where('nama_media');
+    // }
 }

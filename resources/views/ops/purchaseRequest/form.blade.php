@@ -6,6 +6,7 @@
     <link rel="stylesheet"
         href="{{ asset('assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/bower_components/select2/dist/css/select2.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/fancybox.css') }}" />
     <style>
         ul.horizontal-list {
             min-width: 200px;
@@ -50,6 +51,47 @@
 
         .handle-number-4 {
             text-align: right;
+        }
+
+        .remove-media-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+        }
+
+        .item-media:hover .remove-media-container {
+            opacity: 1;
+        }
+
+        .item-media {
+            width: 100px;
+            padding: 3px;
+            position: relative;
+        }
+
+        .item-media>a>img {
+            height: 94px;
+            object-fit: cover;
+        }
+
+        .container-media {
+            border: 1px solid #d2d6de;
+            display: flex;
+            flex-wrap: wrap;
+            border-radius: 3px;
+            margin-bottom: 10px;
+            min-height: 102px;
+        }
+
+        .add-image {
+            padding-top: 30px;
+            border: 1px dashed #3c8dbc;
+            border-radius: 3px;
+        }
+
+        .add-image:hover {
+            cursor: pointer;
         }
     </style>
 @endsection
@@ -231,6 +273,35 @@
                 </div>
             </div>
         </div>
+
+        <div class="modal fade" id="modalCamera" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4>Gambar</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="container-media" id="target-result-image-upload">
+                            <div class="item-media text-center add-image" style="">
+                                <i class="fa fa-plus" style="font-size:37px;color:#3c8dbc;"></i>
+                            </div>
+                        </div>
+                        <input type="file" name="upload_image" class="form-control" value="" multiple
+                            style="display:none;" accept=".png,.jpeg,.jpg" id="upload_image">
+                        {{-- <input type="hidden" name="upload_base64"
+                                value="{{ $data->medias ? json_encode($data->medias) : [] }}"> --}}
+                        <input type="hidden" name="upload_base64" value="[]">
+                        <input type="hidden" name="remove_base64" value="[]">
+                        <input type="hidden" name="purchase_request_id" value="">
+                        <input type="hidden" name="index" value="">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-flat" data-dismiss="modal">Batal</button>
+                        <button type="button" class="btn btn-primary btn-flat post-image">Simpan</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 @endsection
 
@@ -242,6 +313,7 @@
     <script src="{{ asset('assets/bower_components/select2/dist/js/select2.min.js') }}"></script>
     <script src="{{ asset('assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js') }}"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ asset('js/fancybox.min.js') }}"></script>
     <script src="{{ asset('js/custom.js') }}"></script>
 @endsection
 
@@ -250,19 +322,19 @@
         let branch = {!! json_encode($cabang) !!}
         let details = {!! $data ? $data->formatdetail : '[]' !!};
         let detailSelect = []
-        let count = details.length
-        let statusModal = 'create'
+        let count = 0
+        if (details[details.length - 1]) {
+            count = details[details.length - 1].index
+        }
 
+        let statusModal = 'create'
+        let urlShowImage = '{{ route('purchase-request-show-image') }}';
+        let urlPostImage = '{{ route('purchase-request-post-image') }}'
         $('.datepicker').datepicker({
             format: 'yyyy-mm-dd',
         });
 
         $('.select2').select2()
-
-        for (let i = 0; i < details.length; i++) {
-            details[i].index = i + 1
-        }
-
         $('[name="details"]').val(JSON.stringify(details))
 
         var resDataTable = $('#table-detail').DataTable({
@@ -302,7 +374,16 @@
                 name: 'index',
                 searchable: false,
                 render: function(data, type, row, meta) {
-                    let btn =
+                    console.log(row)
+                    let btn = ''
+                    if (row.purchase_request_id) {
+                        btn +=
+                            '<a href="javascript:void(0)" class="btn btn-info btn-xs mr-1 mb-1 edit-camera" data-index="' +
+                            row.index + '" data-parent="' + row.purchase_request_id +
+                            '"><i class="glyphicon glyphicon-camera"></i></a>';
+                    }
+
+                    btn +=
                         '<a href="javascript:void(0)" class="btn btn-warning btn-xs mr-1 mb-1 edit-entry"><i class="glyphicon glyphicon-pencil"></i></a>';
                     btn +=
                         '<a href="javascript:void(0)" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1 delete-entry"><i class="glyphicon glyphicon-trash"></i></a>';
@@ -486,7 +567,7 @@
         })
 
         $('body').on('click', '.delete-entry', function() {
-            let index = $(this).parents('tr').index()
+            let targetElement = $(this).parents('tr')
             Swal.fire({
                 title: 'Anda yakin ingin menghapus data ini?',
                 icon: 'info',
@@ -501,11 +582,12 @@
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    details.splice(index, 1)
-                    count = details.length
+                    details.splice(targetElement.index(), 1);
 
-                    for (let i = 0; i < details.length; i++) {
-                        details[i].index = i + 1
+                    if (details[details.length - 1]) {
+                        count = details[details.length - 1].index
+                    } else {
+                        count = 0
                     }
 
                     resDataTable.clear().rows.add(details).draw()
@@ -537,6 +619,144 @@
                 'status': valid,
                 'message': message
             }
+        }
+
+        $('body').on('click', '.edit-camera', function() {
+            let index = $(this).data('index')
+            let parent = $(this).data('parent')
+            $('#cover-spin').show()
+            $.ajax({
+                url: urlShowImage + '?parent=' + parent + '&index=' + index,
+                type: 'get',
+                success: function(res) {
+                    $('.add-image').prevAll('.item-media').remove()
+                    let el = $('#modalCamera')
+                    el.find('[name="index"]').val(index)
+                    el.find('[name="purchase_request_id"]').val(parent)
+                    el.find('[name="upload_base64"]').val(JSON.stringify(res.datas))
+                    $('.add-image').before(res.html)
+                    $('#cover-spin').hide()
+                    el.modal()
+                    Fancybox.bind('[data-fancybox="gallery"]');
+                },
+                error: function(error) {
+                    Swal.fire("Gagal Menyimpan Data. ", error.responseJSON.message, 'error')
+                    $('#cover-spin').hide()
+                }
+            })
+        })
+
+        $('body').on('click', '.remove-media-container', function(e) {
+            e.preventDefault()
+            let el = $(this).parents('.item-media')
+            let id = $(this).data('id')
+            let medias = JSON.parse($('[name="upload_base64"]').val())
+            let removeMedias = JSON.parse($('[name="remove_base64"]').val())
+
+            if (Number.isInteger(id)) {
+                let index = medias.indexOf(id);
+                if (index > -1) {
+                    removeMedias.push(medias[index])
+                    medias.splice(index, 1);
+                    el.remove()
+                }
+            } else {
+                let index = el.index()
+                medias.splice(index, 1)
+                el.remove()
+            }
+
+            $('[name="remove_base64"]').val(JSON.stringify(removeMedias))
+            $('[name="upload_base64"]').val(JSON.stringify(medias))
+        })
+
+        $('.add-image').click(function() {
+            $('[name="upload_image"]').click()
+        })
+
+        $('[name="upload_image"]').change(function(e) {
+            createBase64Format(this)
+        })
+
+        function createBase64Format(self) {
+            if ($(self).val()) {
+                let files = document.getElementById("upload_image").files;
+                for (let i = 0; i < files.length; i++) {
+                    let file = files[i]
+                    let oFReader = new FileReader();
+                    if (file.type.match(/image.*/)) {
+                        let reader = new FileReader();
+                        reader.onload = function(readerEvent) {
+                            let image = new Image();
+                            image.onload = function(imageEvent) {
+                                let canvas = document.createElement('canvas'),
+                                    max_size = 1000,
+                                    width = image.width,
+                                    height = image.height;
+                                if (width > height) {
+                                    if (width > max_size) {
+                                        height *= max_size / width;
+                                        width = max_size;
+                                    }
+                                } else {
+                                    if (height > max_size) {
+                                        width *= max_size / height;
+                                        height = max_size;
+                                    }
+                                }
+                                canvas.width = width;
+                                canvas.height = height;
+                                canvas.getContext('2d').drawImage(image, 0, 0, width, height);
+                                let dataUrl = canvas.toDataURL('image/jpeg');
+                                $('.add-image').before(createHtmlImage(dataUrl))
+
+                                let json = JSON.parse($('[name="upload_base64"]').val())
+                                json.push(dataUrl)
+                                $('[name="upload_base64"]').val(JSON.stringify(json))
+                            }
+                            image.src = readerEvent.target.result;
+                        }
+                        reader.readAsDataURL(file);
+                    }
+                }
+            }
+        }
+
+        function createHtmlImage(base64) {
+            let html = '<div class="item-media"><input type="hidden" name="medias[]" value="">' +
+                '<a href="javascript:void(0)"><img src="' + base64 + '" style="width:100%;"></a>' +
+                '<a href="javascript:void(0)" class="remove-media-container btn btn-danger btn-sm btn-sm btn-flat"><i class="fa fa-close"></i></a></div>'
+            return html;
+        }
+
+        $('.post-image').click(function() {
+            postImage()
+        })
+
+        function postImage() {
+            $('#cover-spin').show()
+            let el = $('#modalCamera')
+            $.ajax({
+                url: urlPostImage,
+                type: 'post',
+                data: {
+                    purchase_request_id: el.find('[name="purchase_request_id"]').val(),
+                    index: el.find('[name="index"]').val(),
+                    upload_base64: el.find('[name="upload_base64"]').val(),
+                    remove_base64: el.find('[name="remove_base64"]').val()
+                },
+                success: function(data) {
+                    el.modal('hide')
+                    $('#cover-spin').hide()
+                    el.find('[name="upload_base64"]').val('[]')
+                    el.find('[name="remove_base64"]').val('[]')
+                    Swal.fire('Tersimpan!', data.message, 'success')
+                },
+                error: function(error) {
+                    $('#cover-spin').hide()
+                    Swal.fire("Gagal Menyimpan Data. ", error.responseJSON.message, 'error')
+                }
+            })
         }
     </script>
 @endsection
