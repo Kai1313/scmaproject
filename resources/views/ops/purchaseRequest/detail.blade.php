@@ -403,7 +403,7 @@
             e.preventDefault()
             let url = $(this).prop('href')
             let type = $(this).data('type')
-            let tempData = details[$(this).data('index') - 1]
+            let tempData = details[$(this).parents('tr').index()]
             $('#item_name').text(tempData.nama_barang)
             $('#type_item').text(type == 1 ? 'terima' : 'tolak')
             $('[name="index"]').val($(this).data('index'))

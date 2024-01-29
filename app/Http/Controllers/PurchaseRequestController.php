@@ -515,7 +515,7 @@ class PurchaseRequestController extends Controller
             if ($access && $access->value1 == '1') {
                 $userSendWa = DB::table('pengguna')
                     ->select('nama_pengguna', 'telepon1_pengguna')
-                    ->whereIn('id_grup_pengguna', [7])
+                    ->where('id_pengguna', $parent->user_created)
                     ->where('status_pengguna', 1)->get();
                 $settingMessage = DB::table('setting')->where('code', 'Pesan Persetujuan Beli')->first();
                 $strParam = [
