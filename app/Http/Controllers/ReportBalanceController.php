@@ -249,7 +249,12 @@ class ReportBalanceController extends Controller
                     void = 0
                     AND a.id_cabang = ' . $id_cabang . '
                     AND tanggal_jurnal BETWEEN "' . $start . '" AND "' . $end . '"
-                    AND ((a.id_transaksi NOT LIKE "Closing 1%" AND a.id_transaksi NOT LIKE "Closing 2%" AND a.id_transaksi NOT LIKE "Closing 3%") OR a.id_transaksi IS NULL)
+                    AND (COALESCE(a.id_transaksi, "") NOT LIKE
+                        CASE
+                            WHEN MONTH('. $end .') = 12 THEN \'Closing 3%\'
+                            ELSE \'--\'
+                        END
+                    OR a.id_transaksi IS NULL)
                 GROUP BY id_akun
         ';
 
@@ -264,7 +269,12 @@ class ReportBalanceController extends Controller
                     void = 0
                     AND a.id_cabang = ' . $id_cabang . '
                     AND tanggal_jurnal BETWEEN "' . $start_saldo_awal . '" AND "' . date('Y-m-d', strtotime($start . "-1 days")) . '"
-                    AND ((a.id_transaksi NOT LIKE "Closing 1%" AND a.id_transaksi NOT LIKE "Closing 2%" AND a.id_transaksi NOT LIKE "Closing 3%") OR a.id_transaksi IS NULL)
+                    AND (COALESCE(a.id_transaksi, "") NOT LIKE
+                        CASE
+                            WHEN MONTH('. $end .') = 12 THEN \'Closing 3%\'
+                            ELSE \'--\'
+                        END
+                    OR a.id_transaksi IS NULL)
                 GROUP BY id_akun
             ';
         }
@@ -339,7 +349,12 @@ class ReportBalanceController extends Controller
                         void = 0
                         AND a.id_cabang = ' . $cabang->id_cabang . '
                         AND tanggal_jurnal BETWEEN "' . $start . '" AND "' . $end . '"
-                        AND ((a.id_transaksi NOT LIKE "Closing 1%" AND a.id_transaksi NOT LIKE "Closing 2%" AND a.id_transaksi NOT LIKE "Closing 3%") OR a.id_transaksi IS NULL)
+                        AND (COALESCE(a.id_transaksi, "") NOT LIKE
+                        CASE
+                            WHEN MONTH('. $end .') = 12 THEN \'Closing 3%\'
+                            ELSE \'--\'
+                        END
+                    OR a.id_transaksi IS NULL)
                     GROUP BY id_akun
                 ';
 
@@ -354,7 +369,12 @@ class ReportBalanceController extends Controller
                         void = 0
                         AND a.id_cabang = ' . $cabang->id_cabang . '
                         AND tanggal_jurnal BETWEEN "' . $start_saldo_awal . '" AND "' . date('Y-m-d', strtotime($start . "-1 days")) . '"
-                        AND ((a.id_transaksi NOT LIKE "Closing 1%" AND a.id_transaksi NOT LIKE "Closing 2%" AND a.id_transaksi NOT LIKE "Closing 3%") OR a.id_transaksi IS NULL)
+                        AND (COALESCE(a.id_transaksi, "") NOT LIKE
+                        CASE
+                            WHEN MONTH('. $end .') = 12 THEN \'Closing 3%\'
+                            ELSE \'--\'
+                        END
+                    OR a.id_transaksi IS NULL)
                     GROUP BY id_akun
                 ';
             }
@@ -447,7 +467,12 @@ class ReportBalanceController extends Controller
                     void = 0
                     AND a.id_cabang = ' . $id_cabang . '
                     AND tanggal_jurnal BETWEEN "' . $start . '" AND "' . $end . '"
-                    AND ((a.id_transaksi NOT LIKE "Closing 1%" AND a.id_transaksi NOT LIKE "Closing 2%" AND a.id_transaksi NOT LIKE "Closing 3%") OR a.id_transaksi IS NULL)
+                    AND (COALESCE(a.id_transaksi, "") NOT LIKE
+                        CASE
+                            WHEN MONTH('. $end .') = 12 THEN \'Closing 3%\'
+                            ELSE \'--\'
+                        END
+                    OR a.id_transaksi IS NULL)
                 GROUP BY id_akun
         ';
 
@@ -462,7 +487,12 @@ class ReportBalanceController extends Controller
                     void = 0
                     AND a.id_cabang = ' . $id_cabang . '
                     AND tanggal_jurnal BETWEEN "' . $start_saldo_awal . '" AND "' . date('Y-m-d', strtotime($start . "-1 days")) . '"
-                    AND ((a.id_transaksi NOT LIKE "Closing 1%" AND a.id_transaksi NOT LIKE "Closing 2%" AND a.id_transaksi NOT LIKE "Closing 3%") OR a.id_transaksi IS NULL)
+                    AND (COALESCE(a.id_transaksi, "") NOT LIKE
+                        CASE
+                            WHEN MONTH('. $end .') = 12 THEN \'Closing 3%\'
+                            ELSE \'--\'
+                        END
+                    OR a.id_transaksi IS NULL)
                 GROUP BY id_akun
             ';
         }
@@ -550,7 +580,12 @@ class ReportBalanceController extends Controller
                         void = 0
                         AND a.id_cabang =  ' . $cabang->id_cabang . '
                         AND tanggal_jurnal BETWEEN "' . $start . '" AND "' . $end . '"
-                        AND ((a.id_transaksi NOT LIKE "Closing 1%" AND a.id_transaksi NOT LIKE "Closing 2%" AND a.id_transaksi NOT LIKE "Closing 3%") OR a.id_transaksi IS NULL)
+                        AND (COALESCE(a.id_transaksi, "") NOT LIKE
+                        CASE
+                            WHEN MONTH('. $end .') = 12 THEN \'Closing 3%\'
+                            ELSE \'--\'
+                        END
+                    OR a.id_transaksi IS NULL)
                     GROUP BY id_akun
             ';
 
@@ -565,7 +600,12 @@ class ReportBalanceController extends Controller
                         void = 0
                         AND a.id_cabang =  ' . $cabang->id_cabang . '
                         AND tanggal_jurnal BETWEEN "' . $start_saldo_awal . '" AND "' . date('Y-m-d', strtotime($start . "-1 days")) . '"
-                        AND ((a.id_transaksi NOT LIKE "Closing 1%" AND a.id_transaksi NOT LIKE "Closing 2%" AND a.id_transaksi NOT LIKE "Closing 3%") OR a.id_transaksi IS NULL)
+                        AND (COALESCE(a.id_transaksi, "") NOT LIKE
+                        CASE
+                            WHEN MONTH('. $end .') = 12 THEN \'Closing 3%\'
+                            ELSE \'--\'
+                        END
+                    OR a.id_transaksi IS NULL)
                     GROUP BY id_akun
                 ';
             }
