@@ -366,6 +366,7 @@ Route::prefix('report')->group(function () {
         Route::get('/index/{user_id?}', 'ReportGeneralLedgerController@index')->name('report-general-ledger');
         Route::get('/populate', 'ReportGeneralLedgerController@populateDetail')->name('report-general-ledger-populate');
         Route::get('/populate/recap', 'ReportGeneralLedgerController@populateRecap')->name('report-general-ledger-populate-recap');
+        Route::get('/populateStaticRecap', 'ReportGeneralLedgerController@populateStaticRecap')->name('report-general-ledger-populate-static-recap');
         Route::get('/excel', 'ReportGeneralLedgerController@exportExcel')->name('report-general-ledger-excel');
         Route::get('/pdf', 'ReportGeneralLedgerController@exportPdf')->name('report-general-ledger-pdf');
     });

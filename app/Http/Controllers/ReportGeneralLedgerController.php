@@ -7,7 +7,7 @@ use App\Models\Accounting\JurnalDetail;
 use App\Models\Accounting\SaldoBalance;
 use App\Models\Master\Akun;
 use App\Models\Master\Cabang;
-use DB;
+use Illuminate\Support\Facades\DB;
 use Excel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -1121,6 +1121,332 @@ class ReportGeneralLedgerController extends Controller
                 "message" => $message,
             ]);
         }
+    }
+    
+    public function populateStaticRecap(Request $request){
+        // Init Data
+        $id_cabang = $request->id_cabang;
+        $start_date = $request->start_date;
+        $end_date = $request->end_date;
+        $type = $request->type;
+        $coa = $request->coa;
+        $month = date("m", strtotime("$start_date"));
+        $endMonth = date("m", strtotime("$end_date"));
+        $year = date("Y", strtotime($start_date));
+        $start_of_the_month = date("Y-m-01", strtotime($start_date));
+        $saldo_date = date("Y-m-d", strtotime($start_date . " -1 day"));
+
+        try {
+            // Start the queries
+            $mainQuery = DB::table("master_akun AS ma")
+            ->select(
+                'jl.id_jurnal',
+                'jl.id_akun',
+                'ma.kode_akun',
+                'ma.nama_akun',
+                'ma.posisi_debet',
+                DB::raw('IFNULL(SUM(jl.debet), 0) AS debet'),
+                DB::raw('IFNULL(SUM(jl.credit), 0) AS credit'),
+                DB::raw('IFNULL(sb.debet, 0) AS saldo_debet'),
+                DB::raw('IFNULL(sb.credit, 0) AS saldo_credit'),
+                DB::raw('0 AS trx_debet'),
+                DB::raw('0 AS trx_credit')
+            )->leftJoin('saldo_balance as sb', function ($join) use ($month, $year) {
+                    $join->on('sb.id_akun', '=', 'ma.id_akun')
+                        ->where('sb.bulan', '=', $month)
+                        ->where('sb.tahun', '=', $year);
+                }
+            )->leftJoin(
+                DB::raw('
+                    (SELECT 
+                        jd.id_jurnal,
+                        jd.id_akun,
+                        jd.debet,
+                        jd.credit
+                    FROM 
+                        jurnal_detail jd
+                        JOIN jurnal_header jh ON jh.id_jurnal = jd.id_jurnal
+                        JOIN master_akun mal ON mal.id_akun = jd.id_akun
+                    WHERE
+                        jh.tanggal_jurnal >= "'.$start_date.'" 
+                        AND jh.tanggal_jurnal <= "'.$end_date.'"
+                        AND jh.void = 0
+                        AND (
+                            CASE 
+                                WHEN MONTH("'.$start_date.'") = 12 THEN
+                                    COALESCE(jh.id_transaksi, "") NOT LIKE
+                                        CASE WHEN mal.tipe_akun = 1 THEN "Closing 1%" ELSE "--" END
+                                    AND COALESCE(jh.id_transaksi, "") NOT LIKE
+                                        CASE WHEN mal.tipe_akun = 1 THEN "Closing 2%" ELSE "--" END
+                                    AND COALESCE(jh.id_transaksi, "") NOT LIKE 
+                                        CASE WHEN mal.tipe_akun = 0 THEN "Closing 3%" ELSE "--" END
+                                ELSE 
+                                    COALESCE(jh.id_transaksi, "") NOT LIKE
+                                        CASE WHEN mal.tipe_akun = 1 THEN "Closing 1%" ELSE "--" END
+                                    AND COALESCE(jh.id_transaksi, "") NOT LIKE
+                                        CASE WHEN mal.tipe_akun = 1 THEN "Closing 2%" ELSE "--" END
+                            END
+                        )
+                ) jl'), 'jl.id_akun', '=', 'ma.id_akun'
+            )->groupBy('ma.kode_akun');
+        
+            $secondQuery = DB::table("master_akun AS ma")
+                ->select(
+                    'jd.id_jurnal',
+                    'jd.id_akun',
+                    'ma.kode_akun',
+                    'ma.nama_akun',
+                    'ma.posisi_debet',
+                    DB::raw('0 AS debet'),
+                    DB::raw('0 AS credit'),
+                    DB::raw('0 AS saldo_debet'),
+                    DB::raw('0 AS saldo_credit'),
+                    DB::raw('IFNULL(SUM(jd.debet), 0) AS trx_debet'),
+                    DB::raw('IFNULL(SUM(jd.credit), 0) AS trx_credit')
+                )->leftJoin('jurnal_detail AS jd', 'jd.id_akun', '=', 'ma.id_akun')
+                ->leftJoin('jurnal_header AS jh', 'jh.id_jurnal', '=', 'jd.id_jurnal')
+                ->where('jh.tanggal_jurnal', '>=', $start_of_the_month)
+                ->where('jh.tanggal_jurnal', '<', $start_date)
+                ->where('jh.void', '=', 0)
+                ->whereRaw(
+                    'CASE 
+                        WHEN MONTH("'.$start_date.'") = 12 THEN
+                            COALESCE(jh.id_transaksi, "") NOT LIKE
+                                CASE WHEN ma.tipe_akun = 1 THEN "Closing 1%" ELSE "--" END
+                            AND COALESCE(jh.id_transaksi, "") NOT LIKE
+                                CASE WHEN ma.tipe_akun = 1 THEN "Closing 2%" ELSE "--" END
+                            AND COALESCE(jh.id_transaksi, "") NOT LIKE 
+                                CASE WHEN ma.tipe_akun = 0 THEN "Closing 3%" ELSE "--" END
+                        ELSE 
+                            COALESCE(jh.id_transaksi, "") NOT LIKE
+                                CASE WHEN ma.tipe_akun = 1 THEN "Closing 1%" ELSE "--" END
+                            AND COALESCE(jh.id_transaksi, "") NOT LIKE
+                                CASE WHEN ma.tipe_akun = 1 THEN "Closing 2%" ELSE "--" END
+                    END'
+                )->groupBy('ma.kode_akun');
+            
+            if ($id_cabang != "all" && $id_cabang != "") {
+                $mainQuery = $mainQuery->where('ma.id_cabang', '=', $id_cabang);
+                $secondQuery = $secondQuery->where('ma.id_cabang', '=', $id_cabang);
+            }
+            
+            $combinedQuery = $secondQuery->union($mainQuery);
+    
+            $results = DB::query()->fromSub($combinedQuery, "fQ")
+            ->select(
+                'id_akun',
+                'kode_akun',
+                'nama_akun',
+                'posisi_debet',
+                DB::raw('SUM(debet) AS debet'),
+                DB::raw('SUM(credit) AS credit'),
+                DB::raw('SUM(saldo_debet) AS saldo_debet'),
+                DB::raw('SUM(saldo_credit) AS saldo_credit'),
+                DB::raw('SUM(trx_debet) AS trx_debet'),
+                DB::raw('SUM(trx_credit) AS trx_credit'),
+                DB::raw('CASE 
+                    WHEN IFNULL(posisi_debet, 1) != 0 THEN
+                        SUM(saldo_debet) - SUM(saldo_credit) + SUM(trx_debet) - SUM(trx_credit)
+                    ELSE
+                        SUM(saldo_credit) - SUM(saldo_debet) + SUM(trx_credit) - SUM(trx_debet)
+                END AS saldo_start'),
+                DB::raw('CASE 
+                    WHEN IFNULL(posisi_debet, 1) != 0 THEN
+                        SUM(saldo_debet) - SUM(saldo_credit) + SUM(trx_debet) - SUM(trx_credit) + SUM(debet) - SUM(credit)
+                    ELSE
+                        SUM(saldo_credit) - SUM(saldo_debet) + SUM(trx_credit) - SUM(trx_debet) + SUM(credit) - SUM(debet)
+                END AS saldo_balance')
+            )->groupBy("kode_akun")
+            ->havingRaw("debet <> 0 OR credit <> 0 OR saldo_debet <> 0 OR saldo_credit <> 0 OR saldo_balance <> 0");
+    
+            $data = Akun::selectRaw('
+                CASE WHEN header1 IS NULL OR header1 = "" THEN "" ELSE header1 END as new_header1,
+                CASE WHEN header2 IS NULL OR header2 = "" THEN "" ELSE header2 END as new_header2,
+                CASE WHEN header3 IS NULL OR header3 = "" THEN "" ELSE header3 END as new_header3,
+                master_akun.kode_akun,
+                master_akun.nama_akun,
+                master_akun.id_akun,
+                saldo_start as saldo_awal,
+                debet,
+                credit,
+                saldo_balance as saldo_akhir,
+                master_akun.posisi_debet 
+            ')
+            ->join(DB::raw('(' . $results->toSql() . ') as jurnal'), function ($join) use ($results) {
+                $join->on('master_akun.kode_akun', '=', 'jurnal.kode_akun');
+            })
+            ->addBinding($results->getBindings(), 'select')
+            ->groupBy('new_header1', 'new_header2', 'new_header3', 'master_akun.kode_akun')
+            ->get();
+    
+            $total = [];
+    
+            $total['grand_total'] = 0;
+    
+            $detail_data = [
+                'transaction_data' => $data,
+                'period' => $start_date . '-' . $end_date,
+                'start' => $start_date,
+                'end' => $end_date,
+                'id_cabang' => $id_cabang,
+                'total' => $total,
+            ];
+    
+            $data = $this->getMapStaticRecap($detail_data);
+    
+            $data = [
+                'data' => (Object) $data['map'],
+                'total' => $data['total'],
+            ];
+    
+            // dd($data);
+    
+            return response()->json([
+                "result" => true,
+                "data" => $data,
+            ]);
+        } catch (\Exception $e) {
+            $message = "Failed to get populate profit and loss for view";
+            Log::error($message);
+            Log::error($e);
+            return response()->json([
+                "result" => false,
+                "message" => $message,
+            ]);
+        }
+    }
+
+    public function getMapStaticRecap($detail_data){        
+        $data = $detail_data['transaction_data'];
+        if(isset($detail_data['start'])){
+            $start_date = date('Y-m-d', strtotime($detail_data['start']));
+            $end_date = date('Y-m-d', strtotime($detail_data['end']));
+        }else{
+            $start_date = date('Y-m-d', strtotime($detail_data['period'] . '-1'));
+            $end_date = date('Y-m-t', strtotime($detail_data['period'] . '-1'));
+        }
+        $id_cabang = $detail_data['id_cabang'];
+        $total = $detail_data['total'];
+
+        // Initialize a hash map to keep track of parent-child relationships
+        $map = [];
+
+        // Loop through the data and build the hierarchy
+        foreach ($data as $item) {
+            $newHeader1 = $item['new_header1'];
+            $newHeader2 = $item['new_header2'];
+            $newHeader3 = $item['new_header3'];
+            $newHeader4 = $item['kode_akun'] . '.' . $item['nama_akun'];
+            $posisi_debet = $item['posisi_debet'];
+            $saldo_awal = $item['saldo_awal'];
+            $debet = $item['debet'];
+            $credit = $item['credit'];
+            $saldo_akhir = $item['saldo_akhir'];
+
+            if ($newHeader1 == "") {
+                $newHeader1 = "00. Header1";
+            }
+
+            if ($newHeader2 == "") {
+                $newHeader2 = "00. Header2";
+            }
+
+            if ($newHeader3 == "") {
+                $newHeader3 = "00. Header3";
+            }
+
+            // Add new_header1 as a parent
+            if (!isset($map[$newHeader1])) {
+                $map[$newHeader1] = [
+                    'header' => $newHeader1,
+                    'saldo_awal' => 0,
+                    'debet' => 0,
+                    'credit' => 0,
+                    'saldo_akhir' => 0,
+                    'children' => [],
+                ];
+            }
+
+            // Add new_header2 as a child of new_header1
+            if (!empty($newHeader2)) {
+                if (!isset($map[$newHeader1]['children'][$newHeader2])) {
+                    $map[$newHeader1]['children'][$newHeader2] = [
+                        'header' => $newHeader2,
+                        'saldo_awal' => 0,
+                        'debet' => 0,
+                        'credit' => 0,
+                        'saldo_akhir' => 0,
+                        'children' => [],
+                    ];
+                }
+
+                // Add new_header3 as a child of new_header2
+                if (!empty($newHeader3)) {
+                    if (!isset($map[$newHeader1]['children'][$newHeader2]['children'][$newHeader3])) {
+                        $map[$newHeader1]['children'][$newHeader2]['children'][$newHeader3] = [
+                            'header' => $newHeader3,
+                            'saldo_awal' => 0,
+                            'debet' => 0,
+                            'credit' => 0,
+                            'saldo_akhir' => 0,
+                            'children' => [],
+                        ];
+                    }
+
+                    // Add new_header4 as a child of new_header3
+                    if (!empty($newHeader4)) {
+                        $map[$newHeader1]['children'][$newHeader2]['children'][$newHeader3]['children'][] = [
+                            'header' => $newHeader4,
+                            'akun' => $item['id_akun'],
+                            'start_date' => $start_date,
+                            'end_date' => $end_date,
+                            'id_cabang' => $id_cabang,
+                            'saldo_awal' => $saldo_awal,
+                            'debet' => $debet,
+                            'credit' => $credit,
+                            'saldo_akhir' => $saldo_akhir,
+                        ];
+
+                        $map[$newHeader1]['children'][$newHeader2]['children'][$newHeader3]['saldo_akhir'] += $saldo_akhir;
+                    }
+
+                    $map[$newHeader1]['children'][$newHeader2]['saldo_akhir'] += $saldo_akhir;
+                } else {
+                    // Add new_header3 as a child of new_header1
+                    if (!empty($newHeader3)) {
+                        $map[$newHeader1]['children'][] = [
+                            'header' => $newHeader3,
+                            'saldo_awal' => $saldo_awal,
+                            'debet' => $debet,
+                            'credit' => $credit,
+                            'saldo_akhir' => $saldo_akhir,
+                        ];
+                        $map[$newHeader1]['children'][$newHeader2]['saldo_akhir'] += $saldo_akhir;
+                    }
+                }
+                $map[$newHeader1]['saldo_akhir'] += $saldo_akhir;
+                $total['grand_total'] += $saldo_akhir;
+            } else {
+                // maybe never execute
+                // Add new_header4 as a child of new_header1
+                if (!empty($newHeader4)) {
+                    $map[$newHeader1]['children'][] = [
+                        'header' => $newHeader4,
+                        'saldo_awal' => $saldo_awal,
+                        'debet' => $debet,
+                        'credit' => $credit,
+                        'saldo_akhir' => $saldo_akhir,
+                    ];
+                    $map[$newHeader1]['saldo_akhir'] += $saldo_akhir;
+                    $total['grand_total'] += $saldo_akhir;
+                }
+            }
+        }
+
+        // Convert the hash map to an array
+        $data = ['map' => array_values($map), 'total' => $total];
+
+        return $data;
     }
 
     public function exportPdf(Request $request) {

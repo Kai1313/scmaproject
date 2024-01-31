@@ -6,12 +6,13 @@
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.min.css" rel="stylesheet">
     <!-- DataTables -->
     <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css') }}">
-    <link rel="stylesheet"
-        href="{{ asset('assets/plugins/jquery-datatables-checkboxes-1.2.12/css/dataTables.checkboxes.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/plugins/jquery-datatables-checkboxes-1.2.12/css/dataTables.checkboxes.css') }}">
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- bootstrap datepicker -->
-    <link rel="stylesheet"
-        href="{{ asset('assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css') }}">
+    <!-- Treetable -->
+    <link rel="stylesheet" href="{{ asset('assets/bower_components/jquery-treetable/css/jquery.treetable.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/bower_components/jquery-treetable/css/jquery.treetable.theme.default.css') }}">
 
     <style>
         .dataTable {
@@ -56,6 +57,20 @@
 
         ul#horizontal-list li {
             display: inline;
+        }
+
+        #table_static_report th,
+        #table_static_report th {
+            text-align: center !important;
+            font-size: 13px !important;
+            border-color: white !important;
+            padding: 0.6rem 0.4rem;
+            font-weight: 800;
+        }
+
+        #table_static_report td,
+        #table_static_report td {
+            padding: 0.5rem !important;
         }
     </style>
 @endsection
@@ -159,6 +174,9 @@
                                         <button id="btn-print" type="button"
                                             class="btn btn-sm btn-danger pull-right mr-1"><i class="fa fa-print"></i>
                                             Print</button>
+                                        <button id="btn-static" type="button"
+                                            class="btn btn-sm btn-primary pull-right mr-1"><i class="fa fa-list-ul"></i>
+                                            Static View</button>
                                         <button id="hidden-btn" style="display:none;" type="submit">HIDDEN</button>
                                     </div>
                                 </div>
@@ -209,6 +227,25 @@
                                             </tfoot>
                                         </table>
                                     </div>
+                                    <div class="col-md-12" id="table_static_div">
+                                        <div class="box-body">
+                                            <div class="table-responsive">
+                                                <table id="table_static_report" class="table table-bordered table-striped">
+                                                    <thead>
+                                                        <tr style="border: 1px solid #f4f4f4;" id="head_row">
+                                                            <th style="background-color: #ffffff;" width="40%"><span id="header_table">Buku Besar</span></th>
+                                                            <th style="background-color: #ffffff;" width="15%">Saldo Awal</th>
+                                                            <th style="background-color: #ffffff;" width="15%">Debet</th>
+                                                            <th style="background-color: #ffffff;" width="15%">Kredit</th>
+                                                            <th style="background-color: #ffffff;" width="15%">Saldo Akhir</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="coa_table">
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </form>
                         </div>
@@ -241,6 +278,8 @@
     <script src="{{ asset('assets/bower_components/fastclick/lib/fastclick.js') }}"></script>
     <!-- Numeral -->
     <script src="//cdnjs.cloudflare.com/ajax/libs/numeral.js/2.0.6/numeral.min.js"></script>
+    <!-- TreeTable -->
+    <script src="{{ asset('assets/bower_components/jquery-treetable/jquery.treetable.js') }}"></script>
 @endsection
 
 @section('externalScripts')
@@ -258,6 +297,8 @@
         var viewButton = document.getElementById("btn-view")
         var excelButton = document.getElementById("btn-excel")
         var printButton = document.getElementById("btn-print")
+        var staticButton = document.getElementById("btn-static")
+        const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
         // Init data from controller
         var ctrlAkun = "<?php echo $id_akun; ?>"
@@ -302,6 +343,9 @@
                             case "print":
                                 print(param)
                                 break;
+                            case "static":
+                                static(param, type, start, end)
+                                break;
 
                             default:
                                 break;
@@ -334,6 +378,7 @@
             checkType(initType)
             $("#table_recap_div").hide()
             $("#table_detail_div").hide()
+            $("#table_static_div").hide()
 
             $(document).on('select2:open', () => {
                 document.querySelector('.select2-search__field').focus()
@@ -373,6 +418,11 @@
                 $("#hidden-btn").click()
             })
 
+            $("#btn-static").on("click", function() {
+                guid = 'static'
+                $("#hidden-btn").click()
+            })
+
         })
 
         function checkType(type) {
@@ -394,6 +444,7 @@
             viewButton.innerHTML = '<i class="fa fa-spinner fa-spin"></i>'
             if (type == "recap") {
                 $("#table_detail_div").hide()
+                $("#table_static_div").hide()
                 $("#table_recap_div").show()
                 $('#table_recap').DataTable().destroy();
                 $('#table_recap').DataTable({
@@ -499,6 +550,7 @@
                 var runningCoa = ""
                 var runningBalance = 0
                 $("#table_recap_div").hide()
+                $("#table_static_div").hide()
                 $("#table_detail_div").show()
                 $('#table_detail').DataTable().destroy();
                 $('#table_detail').DataTable({
@@ -703,6 +755,148 @@
             })
         }
 
+        function static(param, type, start, end) {
+            let route = "{{ Route('report-general-ledger-populate-static-recap') }}"
+            let coa = $("#coa").val()
+
+            let cabangInput = $('#cabang_input').val();
+
+            // Prepare spinner on button
+            staticButton.disabled = true;
+            staticButton.innerHTML = '<i class="fa fa-spinner fa-spin"></i>'
+            if (type == "recap") {
+                $("#table_detail_div").hide()
+                $("#table_recap_div").hide()
+                $("#table_static_div").show()
+                $('#table_static_report').treetable('destroy');
+                $('#table_detail').DataTable().destroy()
+                $('#table_recap').DataTable().destroy()
+                $.ajax({
+                    url: route + param,
+                    type: "GET",
+                    dataType: "JSON",
+                    success: function(data) {
+                        if (data.result) {
+                            let data_coa = data.data.data;
+                            let data_total = data.data.total;
+                            let list_cabang = null;
+                            let route_general_ledger = "{{ route('report-general-ledger') }}";
+                            if ($('#cabang_input').val() == '') {
+                                data_coa = data.data.data;
+                                data_total = data.data.total;
+                                list_cabang = data.data.cabang;
+                            }
+                            body_coa = '';
+                            body_total = '';
+                            if (jQuery.isEmptyObject(data_coa) == false) {
+                                // console.log("data from");
+                                // console.log(data_coa);
+                                let html_thead = '<th style="background-color: #ffffff;" width="40%"><span id="header_table">Buku Besar ' + formatDate(start) + ' s/d ' + formatDate(end) + '</span></th><th style="background-color: #ffffff;" width="15%">Saldo Awal</th><th style="background-color: #ffffff;" width="15%">Debet</th><th style="background-color: #ffffff;" width="15%">Kredit</th><th style="background-color: #ffffff;" width="15%">Saldo Akhir</th>';
+                                $('#head_row').html('');
+                                $('#head_row').html(html_thead);
+                                getTreetable(data_coa, null, 13, 'detail', route_general_ledger);
+                                // getTotal(data_total, route_general_ledger, cabangInput);
+
+                                $('#coa_table').html(body_coa);
+                                $('#coa_table').append(body_total);
+                                $('#table_static_report').treetable({
+                                    expandable: true
+                                }).treetable('expandAll');
+                            } else {
+                                body_coa += '<tr><td colspan="8" class="text-center">Empty Data</td></tr>';
+                                $('#coa_table').html(body_coa);
+                            }
+                        } else {
+                            Swal.fire({
+                                title: 'Error!',
+                                text: data.message,
+                                icon: 'error',
+                                confirmButtonText: 'Close'
+                            })
+                        }
+                    },
+                    complete: function(e){
+                        staticButton.disabled = false
+                        staticButton.innerHTML = '<i class="fa fa-list-ul"></i> Static View'
+                    }
+                })
+            } else {
+                var runningCoa = ""
+                var runningBalance = 0
+                $("#table_static_div").show()
+                $('#table_static_report').treetable('destroy');
+                $("#table_detail_div").hide()
+                $("#table_recap_div").hide()
+                $('#table_detail').DataTable().destroy()
+                $('#table_recap').DataTable().destroy()
+                
+                staticButton.disabled = false
+                staticButton.innerHTML = '<i class="fa fa-list-ul"></i> Static View'
+            }
+        }
+
+        function getTreetable(data, parent, fontSize, reportType, ledgerRoute) {
+            Object.values(data).forEach(element => {
+                if (parent == null) {
+                    body_coa += '<tr data-tt-id="' + element.header + '">';
+                } else {
+                    body_coa += '<tr data-tt-id="' + element.header + '" data-tt-parent-id="' + parent + '">';
+                }
+                if (typeof(element.children) != "undefined") {
+                    body_coa += '<td><b style="font-size:' + fontSize + 'px">' + element.header + '</b></td>';
+                    body_coa += '<td colspan="4"></td>';
+                } else {                    
+                    let debet = parseFloat(element.debet);
+                    let credit = parseFloat(element.credit);
+                    body_coa += '<td style="font-size:' + fontSize + 'px">' + element.header + ' (Rp)</td>';
+                    body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" >' + formatCurr(formatNumberAsFloatFromDB(element.saldo_awal.toFixed(2))) + '</td>';
+                    body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" >' + formatCurr(formatNumberAsFloatFromDB(debet.toFixed(2))) + '</td>';
+                    body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" >' + formatCurr(formatNumberAsFloatFromDB(credit.toFixed(2))) + '</td>';
+                    if (reportType.includes("detail") && reportType.includes('awal') == false) {
+                        body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" ><a href="' + ledgerRoute + '?id_akun=' + element.akun + '&cabang=' + element.id_cabang + '&startdate=' + element.start_date + '&enddate=' + element.end_date + '&type=detail" target="_blank">' + formatCurr(formatNumberAsFloatFromDB(element.saldo_akhir.toFixed(2))) + '</a></td>';
+                    } else {
+                        if (element.saldo_akhir.toFixed(2) < 0) {
+                            fontColor = '#FA0202'
+                        } else {
+                            fontColor = '#000000'
+                        }
+                        body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px; color: ' + fontColor + '" >' + formatCurr(formatNumberAsFloatFromDB(element.saldo_akhir.toFixed(2))) + '</td>';
+                    }
+                }
+                body_coa += '</tr>';
+                if (typeof(element.children) != "undefined") {
+                    getTreetable(element.children, element.header, fontSize, reportType, ledgerRoute);
+                    if (parent == null) {
+                        body_coa += '<tr>';
+                    } else {
+                        body_coa += '<tr data-tt-id="saldo_akhir-' + element.header + '" data-tt-parent-id="' + parent + '">';
+                    }
+                    if (element.saldo_akhir.toFixed(2) < 0) {
+                        fontColor = '#FA0202'
+                    } else {
+                        fontColor = '#000000'
+                    }
+                    body_coa += '<td><b style="font-size:' + fontSize + 'px">Total ' + element.header + ' (Rp)</b></td><td colspan="3"></td>';
+                    body_coa += '<td class="text-right"><b style="font-size:' + fontSize + 'px; color: ' + fontColor + '" >' + formatCurr(formatNumberAsFloatFromDB(element.saldo_akhir.toFixed(2))) + '</b></td>';
+                    body_coa += '</tr>';
+                }
+            });
+        }
+
+        function getTotal(total, ledgerRoute, cabang) {
+            body_total += '<tr><td><b style="font-size:13px">LABA(RUGI) BERSIH</b></td></td>'
+
+            if (total['grand_total'].toFixed(2) < 0) {
+                fontColor = '#FA0202'
+            } else {
+                fontColor = '#000000'
+            }
+
+            body_total += '<td class="text-right"><b style="font-size:13px; color: ' + fontColor + '" ">' + formatCurr(formatNumberAsFloatFromDB(total['grand_total'].toFixed(2))) + '</b></td>';
+
+            body_total += '</tr>';
+        }
+
         function getCoa() {
             let id_cabang = ($("#cabang_input").val() == "")?"all":$("#cabang_input").val()
             let current_coa_route = coa_by_cabang_route.replace(':id', id_cabang);
@@ -753,6 +947,14 @@
             num = num.replace('.', ',');
             // console.log(num)
             return num;
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const day = date.getDate();
+            const month = date.getMonth();
+            const year = date.getFullYear();
+            return day + ' ' + monthNames[month] + ' ' + year;
         }
     </script>
 @endsection
