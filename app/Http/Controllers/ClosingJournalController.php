@@ -98,7 +98,7 @@ class ClosingJournalController extends Controller
                 ]);
             }
 
-            $jurnal_header = JurnalHeader::whereRaw("id_transaksi LIKE '%Closing%'")->whereYear('tanggal_jurnal', $year)->whereMonth("tanggal_jurnal", $month)->get();
+            $jurnal_header = JurnalHeader::whereRaw("id_transaksi LIKE '%Closing%'")->whereYear('tanggal_jurnal', $year)->whereMonth("tanggal_jurnal", $month)->where("id_cabang", $id_cabang)->get();
             // dd(count($jurnal_header));
             foreach ($jurnal_header as $jurnal) {
                 JurnalDetail::where("id_jurnal", $jurnal->id_jurnal)->delete();
