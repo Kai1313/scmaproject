@@ -37,9 +37,6 @@
 @section('main-section')
     <div class="content container-fluid">
         <div class="box">
-            <div class="box-header">
-                Lokasi
-            </div>
             <div class="box-body" style="padding:0px;">
                 <table class="table table-bordered">
                     <tr>
@@ -56,6 +53,11 @@
                         <td style="width:100px;font-weight:bold;">Karyawan</td>
                         <td>:</td>
                         <td>{{ $data->nama_pengguna }}</td>
+                    </tr>
+                    <tr>
+                        <td style="width:100px;font-weight:bold;">Checklist</td>
+                        <td>:</td>
+                        <td>{{ $data->nama_objek_kerja }}</td>
                     </tr>
                 </table>
                 <table class="table table-bordered" style="margin-top:20px;">

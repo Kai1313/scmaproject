@@ -118,6 +118,7 @@ class LaporanChecklistController extends Controller
         $data = DB::table('jawaban_checklist_pekerjaan as jcp')
             ->join('grup_pengguna as gp', 'jcp.id_grup_pengguna', 'gp.id_grup_pengguna')
             ->join('pengguna as p', 'jcp.user_jawaban_checklist_pekerjaan', 'p.id_pengguna')
+            ->join('objek_kerja as ok', 'jcp.id_objek_kerja', 'ok.id_objek_kerja')
             ->where('id_jawaban_checklist_pekerjaan', $id)
             ->first();
 
