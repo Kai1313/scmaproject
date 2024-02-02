@@ -248,6 +248,15 @@ Route::namespace('Report')->group(function () {
         Route::get('print', 'LaporanPiutangCurrentController@print')->name('report_receiveable-print');
         Route::get('excel', 'LaporanPiutangCurrentController@getExcel')->name('report_receiveable-excel');
     });
+
+    Route::prefix('laporan_checklist')->group(function () {
+        Route::get('index/{user_id?}', 'LaporanChecklistController@index')->name('report_checklist');
+        Route::get('get-location', 'LaporanChecklistController@getLocation')->name('checklist-location');
+        Route::get('get-user-group', 'LaporanChecklistController@getUserGroup')->name('checklist-user-group');
+        Route::get('print', 'LaporanChecklistController@print')->name('checklist-print');
+        Route::get('excel', 'LaporanChecklistController@getExcel')->name('checklist-excel');
+        Route::get('view/{id}', 'LaporanChecklistController@viewData')->name('checklist-view');
+    });
 });
 
 // Master
