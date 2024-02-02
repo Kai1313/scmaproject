@@ -122,16 +122,24 @@ class LaporanChecklistController extends Controller
             ->first();
 
         if (!$data) {
-            return response()->json(['status' => 'error', 'message' => 'Data tidak ditemukan'], 500);
+            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
         $medias = DB::table('media_jawaban')->where('id_jawaban_checklist_pekerjaan', $id)->get();
-        // $jobs = DB::table('')
+        $groupMedia = [];
+        foreach ($medias as $media) {
+            $groupMedia[$media->id_pekerjaan][] = [
+                'id' => $media->id_media_jawaban,
+                'image' => env('OLD_URL_ROOT') . 'uploads/' . $media->lokasi_media_jawaban,
+            ];
+        }
+        $jobs = DB::table('pekerjaan')->where('status_pekerjaan', '1')->pluck('nama_pekerjaan', 'id_pekerjaan');
 
         return view('report_ops.laporanChecklist.view', [
             "pageTitle" => "SCA OPS | Laporan Checklist | View",
             'data' => $data,
-            'medias' => $medias,
+            'medias' => $groupMedia,
+            'jobs' => $jobs,
         ]);
     }
 }
