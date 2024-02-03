@@ -37,9 +37,11 @@
                     <div class="col-md-2">
                         <label>Cabang</label>
                         <div class="form-group">
-                            <select name="id_cabang" class="form-control select2 trigger-change">
+                            <select name="id_cabang" class="form-control select2 trigger-change" style="width:100%;">
                                 @foreach (getCabangForReport() as $branch)
-                                    <option value="{{ $branch['id'] }}">{{ $branch['text'] }}</option>
+                                    <option value="{{ $branch['id'] }}"
+                                        {{ request()->id_cabang == $branch['id'] ? 'selected' : '' }}>{{ $branch['text'] }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
@@ -48,15 +50,17 @@
                         <label>Tanggal</label>
                         <div class="form-group">
                             <input type="date" name="dateReport" class="form-control trigger-change"
-                                value="{{ date('Y-m-d') }}">
+                                value="{{ request()->date ?? date('Y-m-d') }}">
                         </div>
                     </div>
                     <div class="col-md-4">
                         <label>Pelanggan</label>
                         <div class="form-group">
-                            <select name="id_pelanggan" class="form-control select2 trigger-change">
-                                @foreach (getPelangganForReport() as $branch)
-                                    <option value="{{ $branch['id'] }}">{{ $branch['text'] }}</option>
+                            <select name="id_pelanggan" class="form-control select2 trigger-change" style="width:100%;">
+                                @foreach (getPelangganForReport() as $customer)
+                                    <option value="{{ $customer['id'] }}"
+                                        {{ request()->id_pelanggan == $customer['id'] ? 'selected' : '' }}>
+                                        {{ $customer['text'] }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -228,7 +232,6 @@
                     data: 'tanggal_jurnal',
                     name: 'tanggal_jurnal',
                     render: function(data) {
-                        console.log(data)
                         let html = ''
                         if (data) {
                             let split = data.split(" | ");
@@ -249,4 +252,9 @@
         }
     </script>
     <script src="{{ asset('js/for-report.js') }}"></script>
+    <script>
+        @if (request()->action == '1')
+            $('.btn-view-action').click()
+        @endif
+    </script>
 @endsection

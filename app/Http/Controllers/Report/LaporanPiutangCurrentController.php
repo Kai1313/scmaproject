@@ -27,7 +27,8 @@ class LaporanPiutangCurrentController extends Controller
         ]);
     }
 
-    public function print(Request $request) {
+    public function print(Request $request)
+    {
         if (checkAccessMenu('laporan_piutang_current', 'print') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
@@ -46,7 +47,7 @@ class LaporanPiutangCurrentController extends Controller
         foreach (session()->get('access_cabang') as $c) {
             $arrayCabang[$c['id']] = $c['text'];
         }
-        // dd($data);
+
         $eCabang = explode(',', $request->id_cabang);
         $sCabang = [];
         foreach ($eCabang as $e) {

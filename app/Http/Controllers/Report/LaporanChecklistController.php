@@ -131,7 +131,7 @@ class LaporanChecklistController extends Controller
         foreach ($medias as $media) {
             $groupMedia[$media->id_pekerjaan][] = [
                 'id' => $media->id_media_jawaban,
-                'image' => env('OLD_URL_ROOT') . 'uploads/' . $media->lokasi_media_jawaban,
+                'image' => env('OLD_URL_ROOT') . 'uploads/checklist_pekerjaan/' . $media->lokasi_media_jawaban,
             ];
         }
         $jobs = DB::table('pekerjaan')->where('status_pekerjaan', '1')->pluck('nama_pekerjaan', 'id_pekerjaan');
