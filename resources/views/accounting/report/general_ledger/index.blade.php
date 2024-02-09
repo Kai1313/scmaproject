@@ -492,7 +492,7 @@
                                 let startdate = $("#start_date").val()
                                 let enddate = $("#end_date").val()
                                 let customRoute = "{{ route('report-general-ledger') }}"
-                                customRoute += '?id_akun=' + row["id_akun"] + '&cabang=' + cabang +
+                                customRoute += ((cabang == '')?'?kode_akun=' + row['kode_akun'] : '?id_akun=' + row["id_akun"]) + '&cabang=' + cabang +
                                     '&startdate=' + startdate + '&enddate=' + enddate + '&type=detail'
                                 let namaAkun = '<a href="' + customRoute + '" target="__blank">' + data +
                                     '</a>'

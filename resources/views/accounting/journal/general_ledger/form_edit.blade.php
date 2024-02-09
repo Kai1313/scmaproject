@@ -1133,6 +1133,10 @@
     })
 
     function save_data() {
+        // Prepare spinner on button
+        var saveButton = document.getElementById("btn-save")
+        saveButton.disabled = true;
+        saveButton.innerHTML = '<i class="fa fa-spinner fa-spin"></i>'
         let header = []
         let token = $("[name='_token']").val()
         console.log(token)
@@ -1168,11 +1172,14 @@
                     Swal.fire("Sorry, Can't save data. ", data.message, 'error')
                     getToken()
                 }
-
+                saveButton.disabled = false
+                saveButton.innerHTML = '<span class="glyphicon glyphicon-floppy-saved" aria-hidden="true"></span> Simpan Data'
             },
             error: function(data) {
                 Swal.fire("Sorry, Can't save data. ", data.responseJSON.message, 'error')
                 getToken()
+                saveButton.disabled = false
+                saveButton.innerHTML = '<span class="glyphicon glyphicon-floppy-saved" aria-hidden="true"></span> Simpan Data'
             }
         })
     }
