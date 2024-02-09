@@ -283,6 +283,7 @@
             scrollX: true,
             data: details,
             ordering: false,
+            paging: false,
             columns: [{
                 data: 'kode_barang',
                 name: 'kode_barang'

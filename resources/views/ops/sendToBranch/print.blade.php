@@ -66,12 +66,12 @@
         }
 
         @page {
-            margin: 180px 25px 25px 25px;
+            margin: 190px 25px 25px 25px;
         }
 
         header {
             position: fixed;
-            top: -150px;
+            top: -170px;
             left: 0px;
             right: 0px;
         }
@@ -88,9 +88,9 @@
                 <th style="width:150px;" class="text-center">Surat Jalan <br>Pindah Cabang</th>
             </tr>
         </table>
-        <table class="table-subheader">
+        <table class="table-subheader" style="margin-bottom:10px;">
             <tr>
-                <td valign="top" style="width:67%;">
+                <td valign="top" style="width:54%;">
                     <table class='table-subheader'>
                         <tr>
                             <td width="70"><b>Cabang Asal</b></td>
@@ -135,8 +135,6 @@
                 </td>
             </tr>
         </table>
-    </header>
-    <main>
         <table class="table">
             <tr>
                 <th width="15">No</th>
@@ -147,17 +145,21 @@
                 {{-- <th width="70">Kadaluarsa</th> --}}
                 <th width="60">Keterangan</th>
             </tr>
+        </table>
+    </header>
+    <main>
+        <table class="table">
             @foreach ($data->formatDetailGroupBy as $key => $detail)
                 <tr>
-                    <td class="text-center">{{ $key + 1 }}</td>
+                    <td class="text-center" width="15">{{ $key + 1 }}</td>
                     <td>{{ $detail->nama_barang }}</td>
-                    <td class="text-center">{{ $detail->nama_satuan_barang }}</td>
-                    <td class="text-right">{{ formatNumber($detail->qty) }}</td>
-                    <td class="text-center">{{ $detail->batch }}</td>
+                    <td class="text-center" width="50">{{ $detail->nama_satuan_barang }}</td>
+                    <td class="text-right" width="50">{{ formatNumber($detail->qty) }}</td>
+                    <td class="text-center" width="70">{{ $detail->batch }}</td>
                     {{-- <td>
                         {{ $detail->tanggal_kadaluarsa == '0000-00-00' ? '' : $detail->tanggal_kadaluarsa }}
                     </td> --}}
-                    <td class="text-center">
+                    <td class="text-center" width="60">
                         @if ($detail->keterangan_sj)
                             {{ $detail->keterangan_sj }}
                         @else
@@ -177,17 +179,12 @@
         </table>
         <table class="table-signature">
             <tr>
-                <td style="height:70px;">Pembuat</td>
-                <td>Disetujui</td>
-                <td>Pengirim</td>
-                <td>Penerima</td>
+                <td>Pembuat <div style="height:70px;width:100%;border-bottom:1px solid black;"></div>Tgl:</td>
+                <td>Disetujui <div style="height:70px;width:100%;border-bottom:1px solid black;"></div>Tgl:</td>
+                <td>Pengirim <div style="height:70px;width:100%;border-bottom:1px solid black;"></div>Tgl:</td>
+                <td>Penerima <div style="height:70px;width:100%;border-bottom:1px solid black;"></div>Tgl:</td>
             </tr>
-            <tr>
-                <td style="border-top:1px solid black;">Tgl:</td>
-                <td style="border-top:1px solid black;">Tgl:</td>
-                <td style="border-top:1px solid black;">Tgl:</td>
-                <td style="border-top:1px solid black;">Tgl:</td>
-            </tr>
+
         </table>
     </main>
 </body>
