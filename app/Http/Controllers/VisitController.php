@@ -54,9 +54,18 @@ class VisitController extends Controller
             return DataTables::of($data)
                 ->addColumn('action', function ($data) use ($idGrupUser) {
                     $btn = '';
-                    $btn .= '<a href="' . route('visit-entry', $data->id) . '" class="btn btn-warning btn-sm mr-1"><i class="glyphicon glyphicon-pencil"></i></a>';
-                    if ($idGrupUser == 1) {
-                        $btn .= '<a href="' . route('visit-delete', $data->id) . '" class="action-delete btn btn-danger btn-sm"><i class="glyphicon glyphicon-trash"></i></a>';
+                    if (checkAccessMenu('marketing-tool/visit', 'show')) {
+                        $btn .= '<a href="' . route('visit-view', $data->id) . '" class="btn btn-info btn-sm mr-1"><i class="fa fa-file-text"></i></a>';
+                    }
+
+                    if (checkAccessMenu('marketing-tool/visit', 'edit')) {
+                        $btn .= '<a href="' . route('visit-entry', $data->id) . '" class="btn btn-warning btn-sm mr-1"><i class="glyphicon glyphicon-pencil"></i></a>';
+                    }
+
+                    if (checkAccessMenu('marketing-tool/visit', 'delete')) {
+                        if ($idGrupUser == 1) {
+                            $btn .= '<a href="' . route('visit-delete', $data->id) . '" class="action-delete btn btn-danger btn-sm"><i class="glyphicon glyphicon-trash"></i></a>';
+                        }
                     }
 
                     return $btn;
@@ -101,8 +110,47 @@ class VisitController extends Controller
         ]);
     }
 
+    public function viewData($id)
+    {
+        if (checkAccessMenu('marketing-tool/visit', 'show') == false) {
+            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+        }
+
+        $data = Visit::find($id);
+        if (!$data) {
+            $data = '';
+            if ($id != 0) {
+                return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+            }
+        }
+
+        $cabang = DB::table('cabang')
+            ->select('id_cabang as id', DB::raw('concat(kode_cabang," - ",nama_cabang) as text'))
+            ->where('status_cabang', '1')
+            ->get();
+        $progress = Visit::$progressIndicator;
+        $methods = Visit::$visitMethod;
+        $categories = DB::table('kategori_kunjungan')->where('status_kategori_kunjungan', '1')->get();
+        $salesman = Salesman::where('pengguna_id', session()->get('user')->id_pengguna)->first();
+        $listStatus = Visit::$listStatus;
+        return view('ops.visit.view', [
+            'cabang' => $cabang,
+            "pageTitle" => "SCA OPS | Kunjungan | Lihat",
+            'salesman' => $salesman,
+            'data' => $data,
+            'progress' => $progress,
+            'categories' => $categories,
+            'methods' => $methods,
+            'listStatus' => $listStatus,
+        ]);
+    }
+
     public function entry($id = 0)
     {
+        if (checkAccessMenu('marketing-tool/visit', $id == 0 ? 'create' : 'edit') == false) {
+            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+        }
+
         $data = Visit::find($id);
         if (!$data) {
             $data = '';
@@ -147,6 +195,10 @@ class VisitController extends Controller
 
     public function saveEntry(Request $request, $id)
     {
+        if (checkAccessMenu('marketing-tool/visit', $id == 0 ? 'create' : 'edit') == false) {
+            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+        }
+
         DB::beginTransaction();
         try {
             $data = Visit::find($id);
@@ -232,6 +284,10 @@ class VisitController extends Controller
 
     public function saveReportEntry(Request $request, $id)
     {
+        if (checkAccessMenu('marketing-tool/visit', 'edit') == false) {
+            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+        }
+
         $data = Visit::find($id);
         if (!$data) {
             return response()->json(['result' => false, 'message' => 'Data kunjungan tidak ditemukan'], 500);
@@ -372,6 +428,10 @@ class VisitController extends Controller
 
     public function removeEntry($id)
     {
+        if (checkAccessMenu('marketing-tool/visit', 'delete') == false) {
+            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+        }
+
         $data = Visit::find($id);
         if (!$data) {
             return response()->json(['result' => false, 'message' => 'Kunjungan tidak ditemukan'], 500);

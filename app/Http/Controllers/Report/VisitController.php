@@ -58,7 +58,7 @@ class VisitController extends Controller
             $data = $data->where('visit.id_salesman', $request->id_salesman);
         }
 
-        $data = $data->get()->unique('id_pelanggan');
+        $data = $data->get();
         $ac_values = [];
         foreach ($data as $d) {
             $prog = explode(', ', $d->progress_ind);

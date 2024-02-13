@@ -5,6 +5,7 @@
     <link rel="stylesheet"
         href="{{ asset('assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/bower_components/select2/dist/css/select2.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/fancybox.css') }}" />
     <style>
         ul.horizontal-list {
             min-width: 200px;
@@ -381,7 +382,7 @@
                                     <div class="container-media">
                                         @foreach ($data->medias as $media)
                                             <div class="item-media">
-                                                <a href="javascript:void(0)">
+                                                <a data-src="{{ asset($media->image) }}" data-fancybox="gallery">
                                                     <img src="{{ asset($media->image) }}" style="width:100%;">
                                                 </a>
                                                 <a href="javascript:void(0)"
@@ -572,6 +573,7 @@
     <script src="{{ asset('assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js') }}"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/custom.js') }}"></script>
+    <script src="{{ asset('js/fancybox.min.js') }}"></script>
 @endsection
 
 @section('externalScripts')
@@ -582,6 +584,8 @@
             title: '{{ $data ? $data->pelanggan->nama_pelaggan : '' }}',
             address: '{{ str_replace(["\n", "\r"], '', $data ? $data->pelanggan->alamat_pelanggan : '') }}'
         }
+
+        Fancybox.bind('[data-fancybox="gallery"]');
 
         function formatData(data) {
             if (!data.id) {

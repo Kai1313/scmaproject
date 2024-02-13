@@ -16,6 +16,16 @@
                 </td>
             @endforeach
             <td>
+                @foreach ($data->medias as $media)
+                    <div style="display: inline">
+                        <a data-src="{{ asset($media->image) }}" data-fancybox="gallery">
+                            <img src="{{ asset($media->image) }}" alt=""
+                                style="width:100px;height:100px;object-fit:cover;border-radius:10px;">
+                        </a>
+                    </div>
+                @endforeach
+                <br>
+                {{ $data->alasan_ubah_tanggal }}
                 <b>Hasil kunjungan</b> : {{ $data->visit_title }} <br><br>
                 <b>Masalah</b> : {{ $data->visit_desc }} <br><br>
                 <b>Solusi</b> : {{ $data->solusi }}

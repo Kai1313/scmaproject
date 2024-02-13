@@ -4,7 +4,7 @@
     <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables-responsive/css/responsive.dataTables.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/bower_components/select2/dist/css/select2.min.css') }}">
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
-
+    <link rel="stylesheet" href="{{ asset('css/fancybox.css') }}" />
     <style>
         ul.horizontal-list {
             min-width: 200px;
@@ -174,6 +174,7 @@
     <script src="{{ asset('js/custom.js') }}"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <script src="{{ asset('js/fancybox.min.js') }}"></script>
 @endsection
 
 @section('externalScripts')
@@ -203,6 +204,7 @@
                         if (res.result) {
                             $('#main-data').find('tbody').html(res.htmlMainData)
                             $('#recap-data').html(res.htmlRecapData)
+                            Fancybox.bind('[data-fancybox="gallery"]');
                         }
 
                         $('#cover-spin').hide()

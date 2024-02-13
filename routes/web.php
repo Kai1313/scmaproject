@@ -154,7 +154,7 @@ Route::prefix('marketing-tool')->group(function () {
         Route::get('/entry/{id?}', 'VisitController@entry')->name('visit-entry');
         Route::get('customer', 'VisitController@getCustomer')->name('visit-customer');
         Route::post('/save_entry/{id}', 'VisitController@saveEntry')->name('visit-save-entry');
-        // Route::get('/view/{id}', 'VisitController@viewData')->name('visit-view');
+        Route::get('/view/{id}', 'VisitController@viewData')->name('visit-view');
         // Route::get('/report-entry/{id}', 'VisitController@reportEntry')->name('visit-report-entry');
         Route::post('/cancel-visit/{id}', 'VisitController@cancelVisit')->name('cancel-visit');
         route::post('/save_report_entry/{id}', 'VisitController@saveReportEntry')->name('visit-save-report-entry');
