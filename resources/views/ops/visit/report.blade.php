@@ -72,21 +72,30 @@
                             <input type="text" class="form-control trigger-change" name="date" />
                         </div>
                     </div>
-                    @if ($groupUser != 6)
-                        <div class="col-md-2 filter-div">
-                            <label>Sales</label>
-                            <div class="form-group">
-                                <select class="form-control select2 trigger-change" name="id_salesman">
-                                    <option value="">Semua Sales</option>
-                                    @foreach ($salesmans as $sales)
-                                        <option value="{{ $sales->id }}">{{ $sales->text }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
+                    {{-- @if ($groupUser != 6) --}}
+                    <div class="col-md-2 filter-div">
+                        <label>Sales</label>
+                        <div class="form-group">
+                            <select class="form-control select2 trigger-change" name="id_salesman">
+                                <option value="">Semua Sales</option>
+                                @foreach ($salesmans as $sales)
+                                    <option value="{{ $sales->id }}">{{ $sales->text }}</option>
+                                @endforeach
+                            </select>
                         </div>
-                    @else
+                    </div>
+                    <div class="col-md-2 filter-div">
+                        <label>Pelanggan</label>
+                        <div class="form-group">
+                            <select class="form-control select2 trigger-change" name="id_pelanggan">
+                                <option value="">Semua Pelanggan</option>
+
+                            </select>
+                        </div>
+                    </div>
+                    {{-- @else
                         <input type="hidden" name="id_salesman" value="{{ $idUser }}" class="trigger-change">
-                    @endif
+                    @endif --}}
                     <div class="col-md-2 filter-div">
                         <label>Jenis Laporan</label>
                         <div class="form-group">
@@ -260,4 +269,25 @@
         }
     </script>
     <script src="{{ asset('js/for-report.js') }}"></script>
+    <script>
+        $('[name="id_pelanggan"]').select2({
+            ajax: {
+                url: '{{ route('visit_report_customer') }}',
+                dataType: 'json',
+                data: function(params) {
+                    return {
+                        search: params.term
+                    }
+                },
+                processResults: function(data) {
+                    return {
+                        results: [{
+                            'id': '',
+                            'text': 'Semua Pelanggan'
+                        }, ...data.datas]
+                    };
+                }
+            }
+        })
+    </script>
 @endsection

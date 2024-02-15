@@ -6,6 +6,7 @@ use App\Exports\ReportVisit;
 use App\Http\Controllers\Controller;
 use App\Salesman;
 use App\Visit;
+use DB;
 use Excel;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
@@ -58,6 +59,10 @@ class VisitController extends Controller
             $data = $data->where('visit.id_salesman', $request->id_salesman);
         }
 
+        if ($request->id_pelanggan) {
+            $data = $data->where('visit.id_pelanggan', $request->id_pelanggan);
+        }
+
         $data = $data->get();
         $ac_values = [];
         foreach ($data as $d) {
@@ -107,6 +112,10 @@ class VisitController extends Controller
             $data = $data->where('visit.id_salesman', $request->id_salesman);
         }
 
+        if ($request->id_pelanggan) {
+            $data = $data->where('visit.id_pelanggan', $request->id_pelanggan);
+        }
+
         if ($request->date) {
             $explode = explode(' - ', $request->date);
             $data = $data->whereBetween('visit_date', $explode);
@@ -140,5 +149,15 @@ class VisitController extends Controller
         ];
 
         return Excel::download(new ReportVisit('ops.visit.report_excel', $array), 'laporan kunjungan.xlsx');
+    }
+
+    public function getCustomer(Request $request)
+    {
+        $customerId = $request->search;
+        $datas = DB::table('pelanggan')->select('nama_pelanggan as text', 'id_pelanggan as id')
+            ->where(DB::raw('concat(nama_pelanggan," - ",alamat_pelanggan)'), 'like', '%' . $customerId . '%')
+            ->get();
+
+        return response()->json(['status' => 'success', 'datas' => $datas], 200);
     }
 }
