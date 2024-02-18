@@ -22,6 +22,7 @@ class VisitController extends Controller
         $idGrupUser = session()->get('user')['id_grup_pengguna'];
         $sales = Salesman::where('pengguna_id', session()->get('user')['id_pengguna'])->first();
         $activities = Visit::$progressIndicator;
+        $initialActivities = Visit::$initialProgressIndicator;
         if ($request->ajax()) {
             if ($request->report_type == 'rekap') {
                 return $this->getDataRecap('view', $request, $activities);
@@ -39,6 +40,7 @@ class VisitController extends Controller
             'activities' => $activities,
             'groupUser' => $idGrupUser,
             'idUser' => $sales ? $sales->id_salesman : '0',
+            'initialActivities' => $initialActivities,
         ]);
     }
 
