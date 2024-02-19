@@ -198,6 +198,7 @@
                                     <th>Batch</th>
                                     <th>Kadaluarsa</th>
                                     <th>Status</th>
+                                    <th></th>
                                 </tr>
                             </thead>
                         </table>
@@ -232,6 +233,8 @@
         let arrayQRCode = {!! $data ? $data->getDetailQRCode->pluck('qr_code') : '[]' !!};
         let oldDetails = {!! $data && $data->parent ? $data->parent->formatdetail2 : '[]' !!};
         let details = {!! $data ? $data->formatdetail2 : '[]' !!}
+        let token = '{{ session('token') }}'
+        let baseUrl = '{{ env('OLD_ASSET_ROOT') }}'
         let html5QrcodeScanner = new Html5QrcodeScanner("reader", {
             fps: 10,
             qrbox: 250
@@ -281,7 +284,22 @@
             }, {
                 data: 'status_akhir',
                 name: 'status_akhir',
-            }, ]
+            }, {
+                data: 'id_pindah_barang_detail',
+                name: 'id_pindah_barang_detail',
+                render: function(data, type, row) {
+                    let html = ''
+                    if (row.status_diterima == '1') {
+                        html +=
+                            '<a href="javascript:void(0)" class="btn btn-primary btn-xs btn-print" data-id="' +
+                            row.qr_code +
+                            '"><i class="fa fa-print"></i></a>'
+                    }
+
+                    return html;
+                },
+                width: '30px'
+            }]
         });
 
         $('.btn-search').click(function() {
@@ -351,5 +369,20 @@
                 $('.btn-search').click()
             }
         });
+
+        $('.btn-print').click(function() {
+            let id = $(this).data('id')
+            cetak_qr_code(id)
+        })
+
+        function cetak_qr_code(a) {
+            var newwindow = window.open(baseUrl + '/actions/cetak_kartu_stok3.php?id=' + a +
+                '&token_pengguna=' + token, 'name',
+                'height=130,width=374,top=70,left=550,menubar=no,location=no,directories=no,resizable=no,scrollbars=yes,toolbar=no,status=no'
+            );
+            if (window.focus) {
+                newwindow.focus()
+            }
+        }
     </script>
 @endsection
