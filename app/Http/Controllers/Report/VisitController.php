@@ -106,7 +106,7 @@ class VisitController extends Controller
         $data = Visit::select('visit.*', 'salesman.nama_salesman', 'pelanggan.nama_pelanggan')
             ->leftJoin('salesman', 'visit.id_salesman', 'salesman.id_salesman')
             ->leftJoin('pelanggan', 'visit.id_pelanggan', 'pelanggan.id_pelanggan')
-            ->where('visit.status', 2);
+            ->where('visit.status', '!=', 0);
 
         if ($request->id_salesman) {
             $data = $data->where('visit.id_salesman', $request->id_salesman);
