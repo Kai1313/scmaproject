@@ -2,7 +2,13 @@
     @foreach ($datas as $data)
         <tr>
             <td class="no-wrap">{{ $data->nama_salesman }}</td>
-            <td class="no-wrap">{{ $data->visit_date }} <br> <b>Tanggal Buat :</b> <br>{{ $data->created_at }}</td>
+            <td class="no-wrap">
+                {{ $data->visit_date }} <br>
+                <b>Tanggal Buat :</b> <br>
+                {{ $data->created_at }} <br>
+                <b>Tanggal Update :</b> <br>
+                {{ $data->updated_at }}
+            </td>
             <td style="min-width:150px;max-width:200px;">{{ $data->nama_pelanggan }}</td>
             <td class="no-wrap">{{ $data->status_pelanggan }}</td>
             @php
