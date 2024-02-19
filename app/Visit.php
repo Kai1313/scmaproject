@@ -45,6 +45,10 @@ class Visit extends Model
         'VISIT', 'TERIMA SAMPLE', 'TRIAL SAMPLE', 'APPROVAL SAMPLE', 'QUOTATION', 'APPROVAL QUOTATION', 'ISSUED PO',
     ];
 
+    public static $initialProgressIndicator = [
+        'V', 'TS', 'T', 'AS', 'Q', 'AQ', 'IP',
+    ];
+
     public static $visitMethod = ['LOKASI', 'WHATSAPP', 'TELEPON'];
 
     public static $kategoriPelanggan = ['EXISTING CUSTOMER', 'NEW CUSTOMER', 'OLD CUSTOMER'];

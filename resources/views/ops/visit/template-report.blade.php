@@ -2,7 +2,7 @@
     @foreach ($datas as $data)
         <tr>
             <td>{{ $data->nama_salesman }}</td>
-            <td>{{ $data->visit_date }}</td>
+            <td>{{ $data->visit_date }} <br> <b>Tanggal Buat :</b> <br>{{ $data->created_at }}</td>
             <td>{{ $data->nama_pelanggan }}</td>
             <td>{{ $data->status_pelanggan }}</td>
             @php
@@ -25,7 +25,10 @@
                     </div>
                 @endforeach
                 <br>
-                {{ $data->alasan_ubah_tanggal }}
+                @if ($data->alasan_ubah_tanggal != '')
+                    <b>Hasil kunjungan</b> : {{ $data->alasan_ubah_tanggal }}
+                    <br><br>
+                @endif
                 <b>Hasil kunjungan</b> : {{ $data->visit_title }} <br><br>
                 <b>Masalah</b> : {{ $data->visit_desc }} <br><br>
                 <b>Solusi</b> : {{ $data->solusi }}

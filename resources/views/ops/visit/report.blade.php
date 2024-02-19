@@ -45,6 +45,15 @@
             border-bottom: 1px solid #777;
             padding: 5px;
         }
+
+        .desc-column {}
+
+        #header-fixed-main-data {
+            position: fixed;
+            top: 50px;
+            display: none;
+            background-color: white;
+        }
     </style>
 @endsection
 
@@ -118,20 +127,24 @@
                 </div>
             </div>
             <div class="box-body target-recap" style="display:none;">
+                @foreach ($initialActivities as $key => $init)
+                    <span style="margin-right:10px;"><b>{{ $init }}</b> = {{ $activities[$key] }}</span>
+                @endforeach
                 <div class="table-responsive">
+                    <table id="header-fixed-main-data" class="table table-bordered"></table>
                     <table class="table table-bordered" id="main-data">
                         <thead>
                             <tr>
-                                <th rowspan="2" width="110">Sales Name</th>
-                                <th rowspan="2" width="110">Date</th>
+                                <th rowspan="2" width="100">Sales Name</th>
+                                <th rowspan="2" width="90">Date</th>
                                 <th rowspan="2" width="220">Customer</th>
-                                <th rowspan="2" width="220">Category</th>
+                                <th rowspan="2" width="100">Category</th>
                                 <th colspan="{{ count($activities) }}">Activity</th>
-                                <th rowspan="2">Description</th>
+                                <th rowspan="2" class="desc-column">Description</th>
                             </tr>
                             <tr>
-                                @foreach ($activities as $activity)
-                                    <th width="50">{{ $activity }}</th>
+                                @foreach ($initialActivities as $activity)
+                                    <th width="40">{{ $activity }}</th>
                                 @endforeach
                             </tr>
                         </thead>
@@ -215,6 +228,22 @@
                             $('#recap-data').html(res.htmlRecapData)
                             Fancybox.bind('[data-fancybox="gallery"]');
                         }
+
+                        let tableOffset = $("#main-data").offset().top;
+                        let $header = $("#main-data > thead").clone();
+                        let $fixedHeader = $("#header-fixed-main-data").append($header);
+
+                        $(window).bind("scroll", function() {
+                            var offset = $(this).scrollTop();
+
+                            console.log(offset)
+                            console.log(Math.round(tableOffset))
+                            if (offset >= tableOffset && $fixedHeader.is(":hidden")) {
+                                $fixedHeader.show();
+                            } else if (offset < tableOffset) {
+                                $fixedHeader.hide();
+                            }
+                        });
 
                         $('#cover-spin').hide()
                     },
