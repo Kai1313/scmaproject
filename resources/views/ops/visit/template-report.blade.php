@@ -1,21 +1,21 @@
 @if ($type == 'main-data')
     @foreach ($datas as $data)
         <tr>
-            <td>{{ $data->nama_salesman }}</td>
-            <td>{{ $data->visit_date }} <br> <b>Tanggal Buat :</b> <br>{{ $data->created_at }}</td>
-            <td>{{ $data->nama_pelanggan }}</td>
-            <td>{{ $data->status_pelanggan }}</td>
+            <td class="no-wrap">{{ $data->nama_salesman }}</td>
+            <td class="no-wrap">{{ $data->visit_date }} <br> <b>Tanggal Buat :</b> <br>{{ $data->created_at }}</td>
+            <td style="min-width:150px;max-width:200px;">{{ $data->nama_pelanggan }}</td>
+            <td class="no-wrap">{{ $data->status_pelanggan }}</td>
             @php
                 $progress = explode(', ', $data->progress_ind);
             @endphp
             @foreach ($activities as $activity)
-                <td class="text-center">
+                <td class="text-center no-wrap">
                     @if (in_array($activity, $progress))
                         <i class="fa fa-check"></i>
                     @endif
                 </td>
             @endforeach
-            <td>
+            <td style="min-width:400px;max-width:800px;">
                 @foreach ($data->medias as $media)
                     <div style="display: inline">
                         <a data-src="{{ asset($media->image) }}" data-fancybox="gallery">
