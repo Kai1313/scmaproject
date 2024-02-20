@@ -399,7 +399,7 @@ class PurchaseRequestController extends Controller
     public function sendToWa($targetNumber, $message)
     {
         $token_pengguna = "fb176fda94ad70ec8cc65456d1d5906a";
-        $url = "https://wa.scasda.my.id/actions/aaa_api_kirim_webhook.php";
+        $url = "https://wa.ptscma.co.id/actions/aaa_api_kirim_webhook.php";
         $data = array(
             "id_jenis_kirim" => 4,
             "nomor_pengirim_kirim" => '*',
