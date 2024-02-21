@@ -1139,56 +1139,56 @@ class ReportGeneralLedgerController extends Controller
         try {
             // Start the queries
             $mainQuery = DB::table("master_akun AS ma")
-            ->select(
-                'jl.id_jurnal',
-                'jl.id_akun',
-                'ma.kode_akun',
-                'ma.nama_akun',
-                'ma.posisi_debet',
-                DB::raw('IFNULL(SUM(jl.debet), 0) AS debet'),
-                DB::raw('IFNULL(SUM(jl.credit), 0) AS credit'),
-                DB::raw('IFNULL(sb.debet, 0) AS saldo_debet'),
-                DB::raw('IFNULL(sb.credit, 0) AS saldo_credit'),
-                DB::raw('0 AS trx_debet'),
-                DB::raw('0 AS trx_credit')
-            )->leftJoin('saldo_balance as sb', function ($join) use ($month, $year) {
-                    $join->on('sb.id_akun', '=', 'ma.id_akun')
-                        ->where('sb.bulan', '=', $month)
-                        ->where('sb.tahun', '=', $year);
-                }
-            )->leftJoin(
-                DB::raw('
-                    (SELECT 
-                        jd.id_jurnal,
-                        jd.id_akun,
-                        jd.debet,
-                        jd.credit
-                    FROM 
-                        jurnal_detail jd
-                        JOIN jurnal_header jh ON jh.id_jurnal = jd.id_jurnal
-                        JOIN master_akun mal ON mal.id_akun = jd.id_akun
-                    WHERE
-                        jh.tanggal_jurnal >= "'.$start_date.'" 
-                        AND jh.tanggal_jurnal <= "'.$end_date.'"
-                        AND jh.void = 0
-                        AND (
-                            CASE 
-                                WHEN MONTH("'.$start_date.'") = 12 THEN
-                                    COALESCE(jh.id_transaksi, "") NOT LIKE
-                                        CASE WHEN mal.tipe_akun = 1 THEN "Closing 1%" ELSE "--" END
-                                    AND COALESCE(jh.id_transaksi, "") NOT LIKE
-                                        CASE WHEN mal.tipe_akun = 1 THEN "Closing 2%" ELSE "--" END
-                                    AND COALESCE(jh.id_transaksi, "") NOT LIKE 
-                                        CASE WHEN mal.tipe_akun = 0 THEN "Closing 3%" ELSE "--" END
-                                ELSE 
-                                    COALESCE(jh.id_transaksi, "") NOT LIKE
-                                        CASE WHEN mal.tipe_akun = 1 THEN "Closing 1%" ELSE "--" END
-                                    AND COALESCE(jh.id_transaksi, "") NOT LIKE
-                                        CASE WHEN mal.tipe_akun = 1 THEN "Closing 2%" ELSE "--" END
-                            END
-                        )
-                ) jl'), 'jl.id_akun', '=', 'ma.id_akun'
-            )->groupBy('ma.kode_akun');
+                ->select(
+                    'jl.id_jurnal',
+                    'jl.id_akun',
+                    'ma.kode_akun',
+                    'ma.nama_akun',
+                    'ma.posisi_debet',
+                    DB::raw('IFNULL(SUM(jl.debet), 0) AS debet'),
+                    DB::raw('IFNULL(SUM(jl.credit), 0) AS credit'),
+                    DB::raw('IFNULL(sb.debet, 0) AS saldo_debet'),
+                    DB::raw('IFNULL(sb.credit, 0) AS saldo_credit'),
+                    DB::raw('0 AS trx_debet'),
+                    DB::raw('0 AS trx_credit')
+                )->leftJoin('saldo_balance as sb', function ($join) use ($month, $year) {
+                        $join->on('sb.id_akun', '=', 'ma.id_akun')
+                            ->where('sb.bulan', '=', $month)
+                            ->where('sb.tahun', '=', $year);
+                    }
+                )->leftJoin(
+                    DB::raw('
+                        (SELECT 
+                            jd.id_jurnal,
+                            jd.id_akun,
+                            jd.debet,
+                            jd.credit
+                        FROM 
+                            jurnal_detail jd
+                            JOIN jurnal_header jh ON jh.id_jurnal = jd.id_jurnal
+                            JOIN master_akun mal ON mal.id_akun = jd.id_akun
+                        WHERE
+                            jh.tanggal_jurnal >= "'.$start_date.'" 
+                            AND jh.tanggal_jurnal <= "'.$end_date.'"
+                            AND jh.void = 0
+                            AND (
+                                CASE 
+                                    WHEN MONTH("'.$start_date.'") = 12 THEN
+                                        COALESCE(jh.id_transaksi, "") NOT LIKE
+                                            CASE WHEN mal.tipe_akun = 1 THEN "Closing 1%" ELSE "--" END
+                                        AND COALESCE(jh.id_transaksi, "") NOT LIKE
+                                            CASE WHEN mal.tipe_akun = 1 THEN "Closing 2%" ELSE "--" END
+                                        AND COALESCE(jh.id_transaksi, "") NOT LIKE 
+                                            CASE WHEN mal.tipe_akun = 0 THEN "Closing 3%" ELSE "--" END
+                                    ELSE 
+                                        COALESCE(jh.id_transaksi, "") NOT LIKE
+                                            CASE WHEN mal.tipe_akun = 1 THEN "Closing 1%" ELSE "--" END
+                                        AND COALESCE(jh.id_transaksi, "") NOT LIKE
+                                            CASE WHEN mal.tipe_akun = 1 THEN "Closing 2%" ELSE "--" END
+                                END
+                            )
+                    ) jl'), 'jl.id_akun', '=', 'ma.id_akun'
+                )->groupBy('ma.kode_akun');
         
             $secondQuery = DB::table("master_akun AS ma")
                 ->select(
@@ -1447,6 +1447,190 @@ class ReportGeneralLedgerController extends Controller
         $data = ['map' => array_values($map), 'total' => $total];
 
         return $data;
+    }
+
+    public function populateStaticDetail(Request $request){
+        // Init Data
+        $id_cabang = $request->id_cabang;
+        $start_date = $request->start_date;
+        $end_date = $request->end_date;
+        $type = $request->type;
+        $coa = $request->coa;
+        $month = date("m", strtotime("$start_date"));
+        $endMonth = date("m", strtotime("$end_date"));
+        $year = date("Y", strtotime($start_date));
+        $start_of_the_month = date("Y-m-01", strtotime($start_date));
+        $saldo_date = date("Y-m-d", strtotime($start_date . " -1 day"));
+
+        try {
+            $mainQuery = DB::table("master_akun AS ma")
+                ->select(
+                    DB::raw('"'.$saldo_date.'" AS tanggal_jurnal'),
+                    DB::raw('"-" AS id_jurnal'),
+                    DB::raw('"-" AS kode_jurnal'),
+                    DB::raw('"-" AS jenis_jurnal'),
+                    DB::raw('"-" AS id_transaksi'),
+                    DB::raw('"-" AS id_cabang'),
+                    DB::raw('"-" AS nama_cabang'),
+                    'sb.id_akun',
+                    'ma.kode_akun',
+                    'ma.nama_akun',
+                    'ma.posisi_debet',
+                    DB::raw('"Saldo Awal" AS keterangan'),
+                    DB::raw('IFNULL(SUM(sb.debet), 0) AS debet'),
+                    DB::raw('IFNULL(SUM(sb.credit), 0) AS credit'),
+                    DB::raw('IFNULL(SUM(trx.trx_debet), 0) AS trx_debet'),
+                    DB::raw('IFNULL(SUM(trx.trx_credit), 0) AS trx_credit')
+                )->leftJoin('saldo_balance as sb', function ($join) use ($month, $year) {
+                    $join->on('sb.id_akun', '=', 'ma.id_akun')
+                        ->where('sb.bulan', '=', $month)
+                        ->where('sb.tahun', '=', $year);
+                    }
+                )->leftJoin(
+                    DB::raw('
+                        (SELECT
+                            jh.tanggal_jurnal, 
+                            jd.id_jurnal, 
+                            jh.kode_jurnal,
+                            jh.id_cabang,
+                            ma.id_akun, 
+                            ma.kode_akun, 
+                            IFNULL(SUM(jd.debet), 0) AS trx_debet, 
+                            IFNULL(SUM(jd.credit), 0) AS trx_credit
+                        FROM
+                            jurnal_detail jd
+                        JOIN jurnal_header jh ON jh.id_jurnal = jd.id_jurnal
+                        JOIN master_akun ma ON ma.id_akun = jd.id_akun
+                        JOIN cabang cb ON cb.id_cabang = jh.id_cabang
+                        WHERE
+                            jh.tanggal_jurnal >= "'.$start_of_the_month.'"
+                            AND jh.tanggal_jurnal < "'.$start_date.'"
+                            AND jh.void = 0
+                            AND (
+                                    CASE 
+                                        WHEN MONTH("'.$start_date.'") = 12 THEN
+                                            COALESCE(jh.id_transaksi, "") NOT LIKE
+                                                CASE WHEN ma.tipe_akun = 1 THEN "Closing 1%" ELSE "--" END
+                                            AND COALESCE(jh.id_transaksi, "") NOT LIKE
+                                                CASE WHEN ma.tipe_akun = 1 THEN "Closing 2%" ELSE "--" END
+                                            AND COALESCE(jh.id_transaksi, "") NOT LIKE 
+                                                CASE WHEN ma.tipe_akun = 0 THEN "Closing 3%" ELSE "--" END
+                                        ELSE 
+                                            COALESCE(jh.id_transaksi, "") NOT LIKE
+                                                CASE WHEN ma.tipe_akun = 1 THEN "Closing 1%" ELSE "--" END
+                                            AND COALESCE(jh.id_transaksi, "") NOT LIKE
+                                                CASE WHEN ma.tipe_akun = 1 THEN "Closing 2%" ELSE "--" END
+                                        END
+                            )
+                        GROUP BY
+                            ma.kode_akun
+                    ) trx'), 'trx.id_akun', '=', 'ma.id_akun'
+                )->groupBy('ma.kode_akun');
+
+            $secondQuery = DB::table("jurnal_detail AS jd")
+                ->select(
+                    'jh.tanggal_jurnal', 
+                    'jd.id_jurnal', 
+                    'jh.kode_jurnal',
+                    'jh.jenis_jurnal',
+                    'jh.id_transaksi',
+                    'jh.id_cabang', 
+                    'cb.nama_cabang',
+                    'jd.id_akun', 
+                    'ma.kode_akun', 
+                    'ma.nama_akun',
+                    'ma.posisi_debet', 
+                    'jd.keterangan',
+                    'jd.debet', 
+                    'jd.credit',
+                    DB::raw('0 AS trx_debet'),
+                    DB::raw('0 AS trx_credit')
+                )->join('jurnal_header AS jh', 'jh.id_jurnal', '=', 'jd.id_jurnal')
+                ->join('master_akun AS ma', 'ma.id_akun', '=', 'jd.id_akun')
+                ->join('cabang AS cb', 'cb.id_cabang', '=', 'jh.id_cabang')
+                ->where('jh.tanggal_jurnal', '>=', $start_date)
+                ->where('jh.tanggal_jurnal', '<=', $end_date)
+                ->where('jh.void', '=', 0)
+                ->whereRaw(
+                    '(CASE 
+                        WHEN MONTH("'.$start_date.'") = 12 THEN
+                            COALESCE(jh.id_transaksi, "") NOT LIKE
+                                CASE WHEN ma.tipe_akun = 1 THEN "Closing 1%" ELSE "--" END
+                            AND COALESCE(jh.id_transaksi, "") NOT LIKE
+                                CASE WHEN ma.tipe_akun = 1 THEN "Closing 2%" ELSE "--" END
+                            AND COALESCE(jh.id_transaksi, "") NOT LIKE 
+                                CASE WHEN ma.tipe_akun = 0 THEN "Closing 3%" ELSE "--" END
+                        ELSE 
+                            COALESCE(jh.id_transaksi, "") NOT LIKE
+                                CASE WHEN ma.tipe_akun = 1 THEN "Closing 1%" ELSE "--" END
+                            AND COALESCE(jh.id_transaksi, "") NOT LIKE
+                                CASE WHEN ma.tipe_akun = 1 THEN "Closing 2%" ELSE "--" END
+                    END)'
+                );
+            
+            if ($id_cabang != "all" && $id_cabang != "") {
+                $mainQuery = $mainQuery->where('ma.id_cabang', '=', $id_cabang);
+                $secondQuery = $secondQuery->where('jh.id_cabang', '=', $id_cabang);
+            }
+
+            if ($coa != "all" && $coa != "") {
+                if ($id_cabang != "all" && $id_cabang != "") {
+                    $mainQuery = $mainQuery->where('ma.id_akun', '=', $coa);
+                    $secondQuery = $secondQuery->where('ma.id_akun', '=', $coa);
+                }
+                else {
+                    $checkAkun = Akun::where('id_akun', $coa)->first();
+                    $kodeAkun = ($checkAkun)?$checkAkun->kode_akun:"--";
+                    $mainQuery = $mainQuery->where('ma.kode_akun', '=', $kodeAkun);
+                    $secondQuery = $secondQuery->where('ma.kode_akun', '=', $kodeAkun);
+                }
+            }
+
+            $combinedQuery = $secondQuery->union($mainQuery);
+            DB::statement("SET @running_balance = 0");
+            $results = DB::query()
+            ->fromSub($combinedQuery, "fQ")
+            ->select(
+                'tanggal_jurnal',
+                'jd.id_jurnal',
+                'kode_jurnal',
+                'jenis_jurnal',
+                'jd.id_transaksi',
+                'fQ.id_cabang',
+                'nama_cabang',
+                'jd.id_akun',
+                'ma.kode_akun',
+                'ma.nama_akun',
+                'jd.keterangan',
+                DB::raw('IFNULL(jd.debet, 0) + IFNULL(trx_debet, 0) AS debet'),
+                DB::raw('IFNULL(jd.credit, 0) + IFNULL(trx_credit, 0) AS credit'),
+                'trx_debet',
+                'trx_credit',
+                'ma.posisi_debet'
+            )
+            ->join('jurnal_detail AS jd', 'fQ.id_jurnal', '=', 'jd.id_jurnal')
+            ->join('master_akun AS ma', 'jd.id_akun', '=', 'ma.id_akun')
+            ->orderBy('tanggal_jurnal', 'ASC');
+
+            $datas = $results->get();
+
+            // Log::debug(json_encode($datas));
+    
+            // dd($datas);
+    
+            return response()->json([
+                "result" => true,
+                "data" => $datas,
+            ]);
+        } catch (\Exception $e) {
+            $message = "Failed to get populate profit and loss for view";
+            Log::error($message);
+            Log::error($e);
+            return response()->json([
+                "result" => false,
+                "message" => $message,
+            ]);
+        }
     }
 
     public function exportPdf(Request $request) {
