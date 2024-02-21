@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Report;
 
 use App\Exports\ReportVisit;
 use App\Http\Controllers\Controller;
+use App\Models\Master\Pelanggan;
 use App\Salesman;
 use App\Visit;
 use DB;
@@ -161,5 +162,16 @@ class VisitController extends Controller
             ->get();
 
         return response()->json(['status' => 'success', 'datas' => $datas], 200);
+    }
+
+    public function getFirstCustomer(Request $request)
+    {
+        $id = $request->id;
+        $data = Pelanggan::where('id_pelanggan', $id)->first();
+        if (!$data) {
+            return response()->json(['status' => 'error', 'message' => 'Data pelanggan tidak ditemukan'], 500);
+        }
+
+        return response()->json(['status' => 'success', 'data' => $data], 200);
     }
 }

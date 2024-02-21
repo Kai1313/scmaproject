@@ -176,6 +176,7 @@ Route::prefix('marketing-tool')->group(function () {
         Route::get('/index/{user_id?}', 'VisitController@index')->name('visit_report');
         Route::get('/excel', 'VisitController@getExcel')->name('visit_report_excel');
         Route::get('customer', 'VisitController@getCustomer')->name('visit_report_customer');
+        Route::get('find-customer', 'VisitController@getFirstCustomer')->name('visit_report_find_customer');
     });
 
     Route::get('/progress-visit/index/show/{show}', 'ProgressVisitController@show')->name('visit.progress-visit.show');

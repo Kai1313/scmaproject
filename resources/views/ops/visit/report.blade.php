@@ -186,6 +186,82 @@
             </div>
         </div>
     </div>
+
+    <div id="modal-customer" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            {{-- <form action="" method="post" class="post-action"> --}}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Data Pelanggan</h4>
+                </div>
+                <div class="modal-body">
+                    <table class="table">
+                        <tr>
+                            <td style="width:150px;">Pelanggan</td>
+                            <td style="width:30px;">:</td>
+                            <td id="target_nama_pelanggan"></td>
+                        </tr>
+                        <tr>
+                            <td>Alamat</td>
+                            <td>:</td>
+                            <td id="target_alamat_pelanggan"></td>
+                        </tr>
+                        <tr>
+                            <td>Bidang Usaha</td>
+                            <td>:</td>
+                            <td id="target_bidang_usaha_pelanggan"></td>
+                        </tr>
+                        <tr>
+                            <td>Kota</td>
+                            <td>:</td>
+                            <td id="target_kota_pelanggan"></td>
+                        </tr>
+                        <tr>
+                            <td>Telepon</td>
+                            <td>:</td>
+                            <td id="target_telepon1_pelanggan"></td>
+                        </tr>
+                        <tr>
+                            <td>Kapasitas Pelanggan</td>
+                            <td>:</td>
+                            <td id="target_kapasitas_pelanggan"></td>
+                        </tr>
+                        <tr>
+                            <td>Orang yang dihubungi</td>
+                            <td>:</td>
+                            <td id="target_kontak_person_pelanggan"></td>
+                        </tr>
+                        <tr>
+                            <td>Posisi orang yang dihubungi</td>
+                            <td>:</td>
+                            <td id="target_posisi_kontak_person_pelanggan"></td>
+                        </tr>
+                        <tr>
+                            <td>Aset</td>
+                            <td>:</td>
+                            <td id="target_aset_pelanggan"></td>
+                        </tr>
+                        <tr>
+                            <td>Status</td>
+                            <td>:</td>
+                            <td id="target_status_aktif_pelanggan"></td>
+                        </tr>
+                        <tr>
+                            <td>Keterangan</td>
+                            <td>:</td>
+                            <td id="target_ketarangan_pelanggan"></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    {{-- <button type="submit" class="btn btn-primary btn-sm btn-flat">Simpan</button> --}}
+                    <button type="button" class="btn btn-default btn-sm btn-flat" data-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+            {{-- </form> --}}
+        </div>
+    </div>
 @endsection
 @section('addedScripts')
     <script src="{{ asset('assets/bower_components/datatables.net/js/jquery.dataTables.min.js') }}"></script>
@@ -301,6 +377,29 @@
                     };
                 }
             }
+        })
+
+        $('body').on('click', '.show-customer', function() {
+            let id = $(this).data('id')
+            $.ajax({
+                url: '{{ route('visit_report_find_customer') }}',
+                type: 'get',
+                data: {
+                    'id': id
+                },
+                success: function(res) {
+                    Object.keys(res.data).forEach(key => {
+                        $('#target_' + key).text(res.data[key])
+                    });
+
+                    $('#modal-customer').modal()
+                },
+                error: function(error) {
+                    console.log(error)
+                }
+            })
+
+            console.log(id)
         })
     </script>
 @endsection

@@ -9,7 +9,8 @@
                 <b>Tanggal Update :</b> <br>
                 {{ $data->updated_at }}
             </td>
-            <td style="min-width:150px;max-width:200px;">{{ $data->nama_pelanggan }}</td>
+            <td style="min-width:150px;max-width:200px;"><a href="javascript:void(0)" class="show-customer"
+                    data-id="{{ $data->id_pelanggan }}">{{ $data->nama_pelanggan }}</a></td>
             <td class="no-wrap">{{ $data->status_pelanggan }}</td>
             @php
                 $progress = explode(', ', $data->progress_ind);
