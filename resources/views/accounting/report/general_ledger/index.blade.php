@@ -233,11 +233,11 @@
                                                 <table id="table_static_report" class="table table-bordered table-striped">
                                                     <thead>
                                                         <tr style="border: 1px solid #f4f4f4;" id="head_row">
-                                                            <th style="background-color: #ffffff;" width="40%"><span id="header_table">Buku Besar</span></th>
+                                                            <!-- <th style="background-color: #ffffff;" width="40%"><span id="header_table">Buku Besar</span></th>
                                                             <th style="background-color: #ffffff;" width="15%">Saldo Awal</th>
                                                             <th style="background-color: #ffffff;" width="15%">Debet</th>
                                                             <th style="background-color: #ffffff;" width="15%">Kredit</th>
-                                                            <th style="background-color: #ffffff;" width="15%">Saldo Akhir</th>
+                                                            <th style="background-color: #ffffff;" width="15%">Saldo Akhir</th> -->
                                                         </tr>
                                                     </thead>
                                                     <tbody id="coa_table">
@@ -757,6 +757,7 @@
 
         function static(param, type, start, end) {
             let route = "{{ Route('report-general-ledger-populate-static-recap') }}"
+            let routeDetail = "{{ Route('report-general-ledger-populate-static-detail') }}"
             let coa = $("#coa").val()
 
             let cabangInput = $('#cabang_input').val();
@@ -830,8 +831,101 @@
                 $('#table_detail').DataTable().destroy()
                 $('#table_recap').DataTable().destroy()
                 
-                staticButton.disabled = false
-                staticButton.innerHTML = '<i class="fa fa-list-ul"></i> Static View'
+                $.ajax({
+                    url: routeDetail + param,
+                    type: "GET",
+                    dataType: "JSON",
+                    success: function(data) {
+                        if (data.result) {
+                            let data_coa = data.data;
+                            let list_cabang = null;
+                            let route_general_ledger = "{{ route('report-general-ledger') }}";
+                            body_coa = '';
+                            body_total = '';
+
+                            let previousIdJurnal = null;
+                            let nextIdJurnal = null;
+                            let journalSummaries = {};
+
+                            if (jQuery.isEmptyObject(data_coa) == false) {
+                                // console.log("data from");
+                                // console.log(data_coa);
+                                let html_thead = '<th style="background-color: #ffffff;" width="20%"><span id="header_table">No Akun</span></th><th style="background-color: #ffffff;" width="50%">Nama Akun</th><th style="background-color: #ffffff;" width="15%">Debet</th><th style="background-color: #ffffff;" width="15%">Kredit</th>';
+                                $('#head_row').html('');
+                                $('#head_row').html(html_thead);      
+                                let fontSize = 13;                          
+
+                                for (let jurnal of data_coa) {  
+                                    let route = '';
+                                    let detail_route = (jurnal.jenis_jurnal == "ME") ?
+                                        "{{ route('transaction-adjustment-ledger-edit') }}" :
+                                        "{{ route('transaction-general-ledger-edit') }}"
+
+                                    if (jurnal.id_jurnal) {
+                                        route = '<a href="' + detail_route + '/' + jurnal.id_jurnal +
+                                            '" target="_blank">' + jurnal.kode_jurnal + '</a>'
+                                    } else {
+                                        route = '';
+                                    }
+
+                                    if (nextIdJurnal !== null && jurnal.id_jurnal !== nextIdJurnal) {
+                                        body_coa += '<tr data-tt-id="' + jurnal.id_jurnal + 'Total" data-tt-parent-id="' + jurnal.id_jurnal + '">';
+                                        body_coa += '<td colspan = 2" style="font-size:' + fontSize + 'px" ><b>Total</b></td>';
+                                        body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" ><b>' + formatCurr(formatNumberAsFloatFromDB(journalSummaries[previousIdJurnal].debet.toFixed(2))) + '</b></td>';
+                                        body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" ><b>' + formatCurr(formatNumberAsFloatFromDB(journalSummaries[previousIdJurnal].debet.toFixed(2))) + '</b></td>';
+                                        body_coa += '</tr>';
+                                    }
+
+                                    if (jurnal.id_jurnal !== previousIdJurnal) {  
+                                        body_coa += '<tr data-tt-id="' + jurnal.id_jurnal + '">';    
+                                        body_coa += '<td><b style="font-size:' + fontSize + 'px">' + jurnal.tanggal_jurnal + '</b></td>';                
+                                        body_coa += '<td colspan="3"><b style="font-size:' + fontSize + 'px">' + route + ' </b></td>';         
+                                        body_coa += '</tr>';
+                                    }  
+
+                                    body_coa += '<tr data-tt-id="' + jurnal.id_akun + '" data-tt-parent-id="' + jurnal.id_jurnal + '">';
+                                    let debet = parseFloat(jurnal.debet);
+                                    let credit = parseFloat(jurnal.credit);
+                                    body_coa += '<td style="font-size:' + fontSize + 'px">' + jurnal.kode_akun + '</td>';
+                                    body_coa += '<td style="font-size:' + fontSize + 'px">' + jurnal.nama_akun + '</td>';
+                                    body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" >' + formatCurr(formatNumberAsFloatFromDB(debet.toFixed(2))) + '</td>';
+                                    body_coa += '<td class="text-right" style="font-size:' + fontSize + 'px" >' + formatCurr(formatNumberAsFloatFromDB(credit.toFixed(2))) + '</td>';
+                                    body_coa += '</tr>';
+
+                                    if (!journalSummaries[jurnal.id_jurnal]) {
+                                        journalSummaries[jurnal.id_jurnal] = { debet: 0, credit: 0 };
+                                    }
+
+                                    journalSummaries[jurnal.id_jurnal].debet += parseFloat(jurnal.debet) || 0;
+                                    journalSummaries[jurnal.id_jurnal].credit += parseFloat(jurnal.credit) || 0;
+
+                                    previousIdJurnal = jurnal.id_jurnal;
+                                    nextIdJurnal = jurnal.id_jurnal;
+                                }
+
+                                $('#coa_table').html(body_coa);
+                                $('#coa_table').append(body_total);
+                                $('#table_static_report').treetable({
+                                    expandable: true
+                                }).treetable('expandAll');
+                            } else {
+                                body_coa += '<tr><td colspan="8" class="text-center">Empty Data</td></tr>';
+                                $('#coa_table').html(body_coa);
+                            }
+                        } else {
+                            Swal.fire({
+                                title: 'Error!',
+                                text: data.message,
+                                icon: 'error',
+                                confirmButtonText: 'Close'
+                            })
+                        }
+                    },
+                    complete: function(e){
+                        staticButton.disabled = false
+                        staticButton.innerHTML = '<i class="fa fa-list-ul"></i> Static View'
+                    }
+                })
             }
         }
 
