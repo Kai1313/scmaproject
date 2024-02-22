@@ -9,8 +9,15 @@
                 <b>Tanggal Update :</b> <br>
                 {{ $data->updated_at }}
             </td>
-            <td style="min-width:150px;max-width:200px;"><a href="javascript:void(0)" class="show-customer"
-                    data-id="{{ $data->id_pelanggan }}">{{ $data->nama_pelanggan }}</a></td>
+            <td style="min-width:150px;max-width:200px;">
+                @if (in_array(session('user')->id_grup_pengguna, [15, 1, 13]) || session('user')->id_pengguna == $data->user_created)
+                    <a href="javascript:void(0)" class="show-customer" data-id="{{ $data->id_pelanggan }}">
+                        {{ $data->nama_pelanggan }}
+                    </a>
+                @else
+                    {{ $data->nama_pelanggan }}
+                @endif
+            </td>
             <td class="no-wrap">{{ $data->status_pelanggan }}</td>
             @php
                 $progress = explode(', ', $data->progress_ind);

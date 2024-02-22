@@ -198,8 +198,8 @@
                 <div class="modal-body">
                     <table class="table">
                         <tr>
-                            <td style="width:150px;">Pelanggan</td>
-                            <td style="width:30px;">:</td>
+                            <td style="width:120px;">Pelanggan</td>
+                            <td style="width:10px;">:</td>
                             <td id="target_nama_pelanggan"></td>
                         </tr>
                         <tr>
@@ -381,6 +381,7 @@
 
         $('body').on('click', '.show-customer', function() {
             let id = $(this).data('id')
+            $('#cover-spin').show()
             $.ajax({
                 url: '{{ route('visit_report_find_customer') }}',
                 type: 'get',
@@ -391,15 +392,14 @@
                     Object.keys(res.data).forEach(key => {
                         $('#target_' + key).text(res.data[key])
                     });
-
+                    $('#cover-spin').hide()
                     $('#modal-customer').modal()
                 },
                 error: function(error) {
-                    console.log(error)
+                    $('#cover-spin').hide()
+                    Swal.fire("Gagal Menyimpan Data. ", data.responseJSON.message, 'error')
                 }
             })
-
-            console.log(id)
         })
     </script>
 @endsection
