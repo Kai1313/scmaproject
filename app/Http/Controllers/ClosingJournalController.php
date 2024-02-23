@@ -674,10 +674,7 @@ class ClosingJournalController extends Controller
             $data_hasil = $data_production_results['data_results'];
             $id_transaksi_hasil_produksi = $data_production_results['nama_hasil_produksi'];
             $tanggal_hasil_produksi = $data_production_results['tanggal_hasil_produksi'];
-            // $user_data = Auth::guard('api')->user();
-            $user_data = [
-                'id_pengguna' => 1
-            ];
+            $user_data = Auth::guard('api')->user();
 
             if (count($data_hasil) < 1) {
                 DB::rollBack();
