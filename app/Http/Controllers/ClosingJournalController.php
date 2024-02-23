@@ -358,8 +358,8 @@ class ClosingJournalController extends Controller
         $avg_gaji = ($biaya_operator->total_gaji && $data_beban_produksi->tenaga) ? $biaya_operator->total_gaji / $data_beban_produksi->tenaga : 0;
 
         $data = [
-            'listrik' => $avg_listrik,
-            'gaji' => $avg_gaji,
+            'listrik' => round($avg_listrik, 2),
+            'gaji' => round($avg_gaji, 2),
         ];
 
         return $data;
@@ -1244,8 +1244,8 @@ class ClosingJournalController extends Controller
             Log::debug(json_encode($sum_biaya_operator_otomatis));
             Log::debug('-----------------------------------');
 
-            $selisih_listrik = $sum_biaya_listrik_otomatis->value - $sum_biaya_listrik_manual->value;
-            $selisih_tenaga = $sum_biaya_operator_otomatis->value - $sum_biaya_operator_manual->value;
+            $selisih_listrik = round($sum_biaya_listrik_otomatis->value, 2) - round($sum_biaya_listrik_manual->value, 2);
+            $selisih_tenaga = round($sum_biaya_operator_otomatis->value, 2) - round($sum_biaya_operator_manual->value, 2);
 
             Log::debug('selisih----');
             Log::debug('listrik : ' . $selisih_listrik);
@@ -1293,11 +1293,11 @@ class ClosingJournalController extends Controller
                     $detail->id_akun = $get_akun_biaya_listrik->value2;
                     $detail->keterangan = "Selisih Produksi Biaya Listrik " . date('Y m', strtotime($end_date));
                     if ($selisih_listrik > 0) {
-                        $detail->debet = floatval($selisih_listrik);
+                        $detail->debet = floatval(round($selisih_listrik, 2));
                         $detail->credit = 0;
                     } else {
                         $detail->debet = 0;
-                        $detail->credit = floatval(abs($selisih_listrik));
+                        $detail->credit = floatval(abs(round($selisih_listrik, 2)));
                     }
                     $detail->user_created = null;
                     $detail->user_modified = null;
@@ -1328,11 +1328,11 @@ class ClosingJournalController extends Controller
                     $detail->id_akun = $get_akun_biaya_operator->value2;
                     $detail->keterangan = "Selisih Produksi Biaya Pegawai " . date('Y m', strtotime($end_date));
                     if ($selisih_tenaga > 0) {
-                        $detail->debet = floatval($selisih_tenaga);
+                        $detail->debet = floatval(round($selisih_tenaga, 2));
                         $detail->credit = 0;
                     } else {
                         $detail->debet = 0;
-                        $detail->credit = floatval(abs($selisih_tenaga));
+                        $detail->credit = floatval(abs(round($selisih_tenaga, 2)));
                     }
                     $detail->user_created = null;
                     $detail->user_modified = null;
