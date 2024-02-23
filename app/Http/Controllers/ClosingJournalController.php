@@ -494,7 +494,7 @@ class ClosingJournalController extends Controller
         return $data;
     }
 
-    public function productionCost($production_id, $id_cabang)
+    public function productionCost($production_id, $data_biaya)
     {
         $hasil_produksi = DB::table('produksi')->where('nomor_referensi_produksi', $production_id)->first();
         if (empty($hasil_produksi)) {
@@ -515,6 +515,9 @@ class ClosingJournalController extends Controller
             return false;
         }
 
+        $tenaga = ($data_production_cost->tenaga_kerja_beban_produksi * $data_production_cost->listrik_beban_produksi) * $data_biaya['gaji'];
+        $listrik = $data_production_cost->kwh_beban_produksi * $data_biaya['listrik'];
+
         // init beban listrik dan pegawai
         $beban_listrik = round($data_production_cost->kwh_beban_produksi, 2);
         $beban_pegawai = round(($data_production_cost->tenaga_kerja_beban_produksi * $data_production_cost->listrik_beban_produksi), 2);
@@ -528,6 +531,8 @@ class ClosingJournalController extends Controller
             'daya_mesin' => $daya_mesin,
             'tenaga_kerja' => $listrik_pegawai,
             'jumlah_pegawai' => $jumlah_pegawai,
+            'nominal_listrik' => $listrik,
+            'nominal_gaji' => $tenaga
         ];
 
         return $data;
@@ -636,7 +641,7 @@ class ClosingJournalController extends Controller
             }
 
             // tahap 2 dan 3
-            $data_production_cost = $this->productionCost($id_produksi, $cabang);
+            $data_production_cost = $this->productionCost($id_produksi, $biaya_produksi);
 
             if ($data_production_cost == false) {
                 DB::rollBack();
@@ -658,10 +663,10 @@ class ClosingJournalController extends Controller
             $daya_mesin = $data_production_cost['daya_mesin'];
             $tenaga_kerja = $data_production_cost['tenaga_kerja'];
             $jumlah_pegawai = $data_production_cost['jumlah_pegawai'];
-            // $biaya_listrik = $data_production_cost['biaya_listrik'];
-            // $biaya_operator = $data_production_cost['biaya_operator'];
-            $nominal_listrik = round($biaya_produksi['listrik'], 2);
-            $nominal_gaji =  round($biaya_produksi['gaji'], 2);
+            $biaya_listrik = $biaya_produksi['listrik'];
+            $biaya_operator = $biaya_produksi['gaji'];
+            $nominal_listrik = round($data_production_cost['nominal_listrik'], 2);
+            $nominal_gaji =  round($data_production_cost['nominal_gaji'], 2);
 
             // tahap 4
             $data_production_results = $this->productionResults($id_produksi, $total_supplies, $cabang);
@@ -694,8 +699,8 @@ class ClosingJournalController extends Controller
                 'id_transaksi' => $id_transaksi,
                 'cabang' => $cabang,
                 'data_pemakaian' => $data_pemakaian,
-                // 'biaya_listrik' => $biaya_listrik,
-                // 'biaya_operator' => $biaya_operator,
+                'biaya_listrik' => $biaya_listrik,
+                'biaya_operator' => $biaya_operator,
                 'kwh_listrik' => $kwh_listrik,
                 'daya_mesin' => $daya_mesin,
                 'tenaga_kerja' => $tenaga_kerja,
@@ -703,7 +708,7 @@ class ClosingJournalController extends Controller
                 'nominal_listrik' => $nominal_listrik,
                 'nominal_gaji' => $nominal_gaji,
                 'data_hasil' => $data_hasil,
-                'user_data' => (object) $user_data,
+                'user_data' => $user_data,
                 'void' => 0,
                 'note' => $id_transaksi . ' ==> ' . $id_transaksi_hasil_produksi,
                 'tanggal_hasil_produksi' => $tanggal_hasil_produksi,
@@ -747,8 +752,8 @@ class ClosingJournalController extends Controller
             $id_transaksi = $data['id_transaksi']; // Diisi dengan ID/Nomor transaksi produksi
             $pemakaian = $data['data_pemakaian']; // Diisi dengan data pemakaian
             $hasil_produksi = $data['data_hasil']; // Diisi dengan data hasil produksi
-            // $biaya_listrik = $data['biaya_listrik']; // Diisi dengan data biaya listrik
-            // $biaya_operator = $data['biaya_operator']; // Diisi dengan data biaya operator
+            $biaya_listrik = $data['biaya_listrik']; // Diisi dengan data biaya listrik
+            $biaya_operator = $data['biaya_operator']; // Diisi dengan data biaya operator
             $kwh_listrik = $data['kwh_listrik']; // Diisi dengan data biaya listrik
             $daya_mesin = $data['daya_mesin']; // Diisi dengan data daya mesin
             $tenaga_kerja = $data['tenaga_kerja']; // Diisi dengan data biaya operator
@@ -844,7 +849,7 @@ class ClosingJournalController extends Controller
                 $detail->id_jurnal = $header->id_jurnal;
                 $detail->index = $index;
                 $detail->id_akun = $get_akun_biaya_listrik->value2;
-                $detail->keterangan = "Biaya Listrik - " . $daya_mesin . ' Watt - ' . $kwh_listrik . ' kWh - WPH ' . $nominal_listrik;
+                $detail->keterangan = "Biaya Listrik - " . $daya_mesin . ' Watt - ' . $kwh_listrik . ' kWh - WPH ' . $biaya_listrik;
                 $detail->id_transaksi = "Biaya Listrik";
                 $detail->debet = 0;
                 $detail->credit = floatval($nominal_listrik);
@@ -867,7 +872,7 @@ class ClosingJournalController extends Controller
                 $detail->id_jurnal = $header->id_jurnal;
                 $detail->index = $index;
                 $detail->id_akun = $get_akun_biaya_operator->value2;
-                $detail->keterangan = "Biaya Operator Produksi - " . $jumlah_pegawai . ' Orang - ' . $tenaga_kerja . ' Menit - GPM ' . $nominal_gaji;
+                $detail->keterangan = "Biaya Operator Produksi - " . $jumlah_pegawai . ' Orang - ' . $tenaga_kerja . ' Menit - GPM ' . $biaya_operator;
                 $detail->id_transaksi = "Biaya Operator";
                 $detail->debet = 0;
                 $detail->credit = floatval($nominal_gaji);
