@@ -358,8 +358,8 @@ class ClosingJournalController extends Controller
         $avg_gaji = ($biaya_operator->total_gaji && $data_beban_produksi->tenaga) ? $biaya_operator->total_gaji / $data_beban_produksi->tenaga : 0;
 
         $data = [
-            'listrik' => round($avg_listrik, 2),
-            'gaji' => round($avg_gaji, 2),
+            'listrik' => $avg_listrik,
+            'gaji' => $avg_gaji,
         ];
 
         return $data;
