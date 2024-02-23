@@ -849,7 +849,7 @@ class ClosingJournalController extends Controller
                 $detail->id_jurnal = $header->id_jurnal;
                 $detail->index = $index;
                 $detail->id_akun = $get_akun_biaya_listrik->value2;
-                $detail->keterangan = "Biaya Listrik - " . $daya_mesin . ' Watt - ' . $kwh_listrik . ' kWh - WPH ' . $biaya_listrik;
+                $detail->keterangan = "Biaya Listrik - " . $daya_mesin . ' Watt - ' . $kwh_listrik . ' kWh - WPH ' . round($biaya_listrik, 2);
                 $detail->id_transaksi = "Biaya Listrik";
                 $detail->debet = 0;
                 $detail->credit = floatval($nominal_listrik);
@@ -872,7 +872,7 @@ class ClosingJournalController extends Controller
                 $detail->id_jurnal = $header->id_jurnal;
                 $detail->index = $index;
                 $detail->id_akun = $get_akun_biaya_operator->value2;
-                $detail->keterangan = "Biaya Operator Produksi - " . $jumlah_pegawai . ' Orang - ' . $tenaga_kerja . ' Menit - GPM ' . $biaya_operator;
+                $detail->keterangan = "Biaya Operator Produksi - " . $jumlah_pegawai . ' Orang - ' . $tenaga_kerja . ' Menit - GPM ' . round($biaya_operator, 2);
                 $detail->id_transaksi = "Biaya Operator";
                 $detail->debet = 0;
                 $detail->credit = floatval($nominal_gaji);
