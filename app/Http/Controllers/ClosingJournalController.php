@@ -1766,8 +1766,9 @@ class ClosingJournalController extends Controller
     public function stockCorrection(Request $request)
     {
         try {
+            // dd("disini");
             // Init data
-            $id_cabang = $request->id_cabang;
+            $id_cabang = 1;//$request->id_cabang;
             $journal_type = "ME";
             $month = $request->month;
             $year = $request->year;
@@ -1790,7 +1791,8 @@ class ClosingJournalController extends Controller
 
             // Get data koreksi stok
             $data_header = StockCorrectionHeader::where("status_koreksi_stok", $status)->where("id_cabang", $id_cabang)->whereBetween("tanggal_koreksi_stok", [$start_date, $end_date])->get();
-            // dd(count($data_header));
+            // $data_header = StockCorrectionHeader::where("status_koreksi_stok", $status)->where("id_koreksi_stok", 306)->get();
+            // dd(json_encode($data_header));
             // dd(json_encode($data_header));
             DB::beginTransaction();
             foreach ($data_header as $key => $header) {
@@ -1798,8 +1800,6 @@ class ClosingJournalController extends Controller
                 $transaction_date = $header->tanggal_koreksi_stok;
                 $details = [];
                 // Delete detail and header existing first
-                // JurnalDetail::where("id_transaksi", $id_transaksi)->where("keterangan", "Koreksi Stok ".$id_transaksi)->delete();
-                // JurnalHeader::where("id_transaksi", "Closing ".$id_transaksi)->where("catatan", "Koreksi Stok")->delete();
                 $getHeaderDelete = JurnalDetail::join("jurnal_header", "jurnal_header.id_jurnal", "jurnal_detail.id_jurnal")
                     ->where("jurnal_header.id_transaksi", "Closing " . $id_transaksi)
                     ->delete();
@@ -1895,7 +1895,7 @@ class ClosingJournalController extends Controller
                         $format_akun = 'id_akun' . $id_cabang;
                         $akun_persediaan = $barang->$format_akun;
                     }
-
+                    Log::info("out foreach : ".round($out, 2));
                     // Log::info(json_encode($barang->id_barang));
                     $detail = new JurnalDetail();
                     $detail->id_jurnal = $header->id_jurnal;
@@ -1937,6 +1937,7 @@ class ClosingJournalController extends Controller
                 $detail->user_modified = null;
                 $detail->dt_created = $end_date;
                 $detail->dt_modified = $end_date;
+                Log::info("sum val akhir : ".$sum_val);
                 // dd(json_encode($detail));
                 if (!$detail->save()) {
                     DB::rollback();
@@ -1952,7 +1953,7 @@ class ClosingJournalController extends Controller
                 }
 
             }
-            DB::commit();
+            // DB::commit();
             return response()->json([
                 "result" => true,
                 "message" => "Successfully proceed closing journal stock correction",
@@ -2950,13 +2951,13 @@ class ClosingJournalController extends Controller
 
             DB::beginTransaction();
             // Delete all journal before transaction
-            $jurnal_header = JurnalHeader::where("id_transaksi", "Closing 1 $noteDate")->where('tanggal_jurnal', $end_date)->where("catatan", "Closing 1 $noteDate")->get();
+            $jurnal_header = JurnalHeader::where("id_transaksi", "Closing 1 $noteDate")->where('tanggal_jurnal', $end_date)->where("catatan", "Closing 1 $noteDate")->where("id_cabang", $id_cabang)->get();
             // dd(count($jurnal_header));
             foreach ($jurnal_header as $jurnal) {
                 JurnalDetail::where("id_jurnal", $jurnal->id_jurnal)->delete();
                 JurnalHeader::where("id_jurnal", $jurnal->id_jurnal)->delete();
             }
-            $jurnal_header2 = JurnalHeader::where("id_transaksi", "Closing 2 $noteDate")->where('tanggal_jurnal', $end_date)->where("catatan", "Closing 2 $noteDate")->get();
+            $jurnal_header2 = JurnalHeader::where("id_transaksi", "Closing 2 $noteDate")->where('tanggal_jurnal', $end_date)->where("catatan", "Closing 2 $noteDate")->where("id_cabang", $id_cabang)->get();
             // dd(count($jurnal_header2));
             foreach ($jurnal_header2 as $jurnal2) {
                 JurnalDetail::where("id_jurnal", $jurnal2->id_jurnal)->delete();
@@ -2964,7 +2965,7 @@ class ClosingJournalController extends Controller
             }
 
             if($month == 12){
-                $jurnal_header3 = JurnalHeader::where("id_transaksi", "Closing 3 $noteDate")->where('tanggal_jurnal', $end_date)->where("catatan", "Closing 3 $noteDate")->get();
+                $jurnal_header3 = JurnalHeader::where("id_transaksi", "Closing 3 $noteDate")->where('tanggal_jurnal', $end_date)->where("catatan", "Closing 3 $noteDate")->where("id_cabang", $id_cabang)->get();
                 // dd(count($jurnal_header2));
                 foreach ($jurnal_header3 as $jurnal3) {
                     JurnalDetail::where("id_jurnal", $jurnal3->id_jurnal)->delete();
@@ -3020,7 +3021,7 @@ class ClosingJournalController extends Controller
                 // Calculate sum
                 $sum = $sumBalance + $value->debet - $value->kredit;
                 // Log::info("closing sum ".$closingSum." debet ".$value->debet." kredit ".$value->kredit);
-                $closingSum = (float) $closingSum + (float) $sum;
+                $closingSum = round((float) $closingSum, 2) + round((float) $sum, 2);
                 $detail = new JurnalDetail();
                 $detail->id_jurnal = $header->id_jurnal;
                 $detail->index = $i + 1;
