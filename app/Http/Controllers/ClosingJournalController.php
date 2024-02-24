@@ -443,8 +443,9 @@ class ClosingJournalController extends Controller
 
     public function productionSupplies($production_id, $cabang_id)
     {
-        // cari data produksi input
-        $data_production_supplies = DB::table("produksi_detail")
+        try{
+            // cari data produksi input
+            $data_production_supplies = DB::table("produksi_detail")
             ->join('produksi', 'produksi.id_produksi', 'produksi_detail.id_produksi')
             ->join('barang', 'barang.id_barang', 'produksi_detail.id_barang')
             ->join('master_qr_code', 'master_qr_code.kode_batang_master_qr_code', 'produksi_detail.kode_batang_lama_produksi_detail')
@@ -465,16 +466,16 @@ class ClosingJournalController extends Controller
             ->orderBy('produksi_detail.id_barang', 'ASC')
             ->get();
 
-        if (count($data_production_supplies) < 1) {
+            if (count($data_production_supplies) < 1) {
             return false;
-        }
+            }
 
-        // init array kosong untuk memasukkan data persediaan dan total persediaan
-        $data_supplies = [];
-        $total_supplies = 0;
+            // init array kosong untuk memasukkan data persediaan dan total persediaan
+            $data_supplies = [];
+            $total_supplies = 0;
 
-        // input persediaan dan jumlahkan total persediaan
-        foreach ($data_production_supplies as $production) {
+            // input persediaan dan jumlahkan total persediaan
+            foreach ($data_production_supplies as $production) {
             $total = ($production->beli + $production->biaya + $production->produksi + $production->listrik + $production->pegawai);
             $total_supplies += $total;
 
@@ -484,130 +485,155 @@ class ClosingJournalController extends Controller
                 'debet' => 0,
                 'kredit' => round($total, 2),
             ]);
-        }
+            }
 
-        // data yang direturn
-        $data = [
+            // data yang direturn
+            $data = [
             'data_supplies' => $data_supplies,
             'total_supplies' => $total_supplies,
-        ];
-        return $data;
+            ];
+            return $data;
+        }catch(\Exception $e){
+            DB::rollback();
+            Log::error($e);
+
+            $data = [
+                'result' => false,
+            ];
+
+            return $data;
+        }
     }
 
     public function productionCost($production_id, $data_biaya)
     {
-        $hasil_produksi = DB::table('produksi')->where('nomor_referensi_produksi', $production_id)->first();
-        if (empty($hasil_produksi)) {
-            return false;
-        }
-
-        $id_hasil_produksi = $hasil_produksi->id_produksi;
-
-        // cari beban produksi dari produksi yang diinput
-        $data_production_cost = DB::table("beban_produksi")
+       try{
+            $hasil_produksi = DB::table('produksi')->where('nomor_referensi_produksi', $production_id)->first();
+            if (empty($hasil_produksi)) {
+                return false;
+            }
+            $id_hasil_produksi = $hasil_produksi->id_produksi;
+            // cari beban produksi dari produksi yang diinput
+            $data_production_cost = DB::table("beban_produksi")
             ->join('produksi', 'produksi.id_produksi', 'beban_produksi.id_produksi')
             ->join('master_mesin', 'master_mesin.id_mesin', 'produksi.id_mesin')
             ->where('beban_produksi.id_produksi', $id_hasil_produksi)
             ->select('beban_produksi.id_produksi', 'beban_produksi.kwh_beban_produksi', 'beban_produksi.tenaga_kerja_beban_produksi', 'beban_produksi.listrik_beban_produksi', 'master_mesin.daya')
             ->first();
 
-        if (empty($data_production_cost)) {
-            return false;
-        }
+            if (empty($data_production_cost)) {
+                return false;
+            }
 
-        $tenaga = ($data_production_cost->tenaga_kerja_beban_produksi * $data_production_cost->listrik_beban_produksi) * $data_biaya['gaji'];
-        $listrik = $data_production_cost->kwh_beban_produksi * $data_biaya['listrik'];
+            $tenaga = ($data_production_cost->tenaga_kerja_beban_produksi * $data_production_cost->listrik_beban_produksi) * $data_biaya['gaji'];
+            $listrik = $data_production_cost->kwh_beban_produksi * $data_biaya['listrik'];
 
-        // init beban listrik dan pegawai
-        $beban_listrik = round($data_production_cost->kwh_beban_produksi, 2);
-        $beban_pegawai = round(($data_production_cost->tenaga_kerja_beban_produksi * $data_production_cost->listrik_beban_produksi), 2);
-        $jumlah_pegawai = round(($data_production_cost->tenaga_kerja_beban_produksi), 2);
-        $listrik_pegawai = round($data_production_cost->listrik_beban_produksi, 2);
-        $daya_mesin = round($data_production_cost->daya, 2);
-
-        // data return biaya listrik dan pegawai
-        $data = [
-            'kwh_listrik' => $beban_listrik,
-            'daya_mesin' => $daya_mesin,
-            'tenaga_kerja' => $listrik_pegawai,
-            'jumlah_pegawai' => $jumlah_pegawai,
-            'nominal_listrik' => $listrik,
-            'nominal_gaji' => $tenaga
-        ];
-
-        return $data;
+            // init beban listrik dan pegawai
+            $beban_listrik = round($data_production_cost->kwh_beban_produksi, 2);
+            $beban_pegawai = round(($data_production_cost->tenaga_kerja_beban_produksi * $data_production_cost->listrik_beban_produksi), 2);
+            $jumlah_pegawai = round(($data_production_cost->tenaga_kerja_beban_produksi), 2);
+            $listrik_pegawai = round($data_production_cost->listrik_beban_produksi, 2);
+            $daya_mesin = round($data_production_cost->daya, 2);
+            // data return biaya listrik dan pegawai
+            $data = [
+                'kwh_listrik' => $beban_listrik,
+                'daya_mesin' => $daya_mesin,
+                'tenaga_kerja' => $listrik_pegawai,
+                'jumlah_pegawai' => $jumlah_pegawai,
+                'nominal_listrik' => $listrik,
+                'nominal_gaji' => $tenaga
+            ];
+            return $data;
+       }catch(\Exception $e){
+            DB::rollBack();
+            Log::error($e);
+            $data = [
+                'result' => false,
+            ];
+            return $data;
+       }
     }
 
     public function productionResults($production_id, $total_supplies, $id_cabang)
     {
-        // cari hasil produksi dari input produksi yang berlangsung
-        $data_production_results = DB::table("produksi_detail")
-            ->join('produksi', 'produksi.id_produksi', 'produksi_detail.id_produksi')
-            ->join('barang', 'barang.id_barang', 'produksi_detail.id_barang')
-            ->join('master_qr_code', 'master_qr_code.kode_batang_master_qr_code', 'produksi_detail.kode_batang_produksi_detail')
-            ->select('produksi_detail.*', 'produksi.nama_produksi', 'produksi.tanggal_produksi')
-            ->where('produksi.nomor_referensi_produksi', $production_id)
-            ->orderBy('produksi_detail.id_barang', 'ASC')
-            ->get();
+        try{
+            // cari hasil produksi dari input produksi yang berlangsung
+                $data_production_results = DB::table("produksi_detail")
+                ->join('produksi', 'produksi.id_produksi', 'produksi_detail.id_produksi')
+                ->join('barang', 'barang.id_barang', 'produksi_detail.id_barang')
+                ->join('master_qr_code', 'master_qr_code.kode_batang_master_qr_code', 'produksi_detail.kode_batang_produksi_detail')
+                ->select('produksi_detail.*', 'produksi.nama_produksi', 'produksi.tanggal_produksi')
+                ->where('produksi.nomor_referensi_produksi', $production_id)
+                ->orderBy('produksi_detail.id_barang', 'ASC')
+                ->get();
 
-        // hitung total kredit hasil produksi
-        $total_kredit_produksi = 0;
+            // hitung total kredit hasil produksi
+            $total_kredit_produksi = 0;
 
-        foreach ($data_production_results as $production) {
-            $total_kredit_produksi += $production->debit_produksi_detail;
-        }
+            foreach ($data_production_results as $production) {
+                $total_kredit_produksi += $production->debit_produksi_detail;
+            }
 
-        // hitung harga produksi, listrik dan pegawai
-        $harga_produksi = round(($total_supplies / $total_kredit_produksi), 2);
+            // hitung harga produksi, listrik dan pegawai
+            $harga_produksi = round(($total_supplies / $total_kredit_produksi), 2);
 
-        // update beban biaya dari tiap produksi detail
-        foreach ($data_production_results as $production) {
-            DB::table("master_qr_code")
-                ->where('id_barang', $production->id_barang)
-                ->where('kode_batang_master_qr_code', $production->kode_batang_produksi_detail)
-                ->update([
-                    'produksi_master_qr_code' => $harga_produksi,
+            // update beban biaya dari tiap produksi detail
+            foreach ($data_production_results as $production) {
+                DB::table("master_qr_code")
+                    ->where('id_barang', $production->id_barang)
+                    ->where('kode_batang_master_qr_code', $production->kode_batang_produksi_detail)
+                    ->update([
+                        'produksi_master_qr_code' => $harga_produksi,
+                    ]);
+            }
+
+            // cari total hasil produksi detail
+            $data_production_results_groupby_barang = DB::table("produksi_detail")
+                ->join('produksi', 'produksi.id_produksi', 'produksi_detail.id_produksi')
+                ->join('barang', 'barang.id_barang', 'produksi_detail.id_barang')
+                ->join('master_qr_code', 'master_qr_code.kode_batang_master_qr_code', 'produksi_detail.kode_batang_produksi_detail')
+                ->leftJoin('satuan_barang', 'satuan_barang.id_satuan_barang', 'produksi_detail.id_satuan_barang')
+                ->selectRaw('produksi_detail.id_barang,
+                                                    produksi.nama_produksi,
+                                                    barang.nama_barang,
+                                                    IFNULL(satuan_barang.nama_satuan_barang, "") as nama_satuan,
+                                                    ROUND(SUM(debit_produksi_detail),2) as debit_produksi,
+                                                    CASE WHEN ' . $id_cabang . ' = 1 THEN barang.id_akun ELSE barang.id_akun2 END as id_akun,
+                                                    ROUND(SUM(ROUND(master_qr_code.listrik_master_qr_code * produksi_detail.debit_produksi_detail, 2) + ROUND(master_qr_code.pegawai_master_qr_code * produksi_detail.debit_produksi_detail, 2) + ROUND(master_qr_code.produksi_master_qr_code * produksi_detail.debit_produksi_detail, 2)), 2) as total')
+                ->where('produksi.nomor_referensi_produksi', $production_id)
+                ->groupBy('produksi_detail.id_barang')
+                ->orderBy('produksi_detail.id_barang', 'ASC')
+                ->get();
+
+            $data_results = [];
+
+            foreach ($data_production_results_groupby_barang as $production) {
+                array_push($data_results, [
+                    'akun' => $production->id_akun,
+                    'notes' => $production->nama_barang . ' - ' . $production->debit_produksi . ' ' . $production->nama_satuan,
+                    'id_barang' => $production->id_barang,
+                    'debet' => round($production->total, 2),
+                    'kredit' => 0,
                 ]);
+            }
+
+            // data yang direturn
+            $data = [
+                'data_results' => $data_results,
+                'nama_hasil_produksi' => $data_production_results[0]->nama_produksi,
+                'tanggal_hasil_produksi' => $data_production_results[0]->tanggal_produksi,
+            ];
+
+            return $data;
+        }catch(\Exception $e){
+            Log::error("masuk error result");
+            Log::error($e);
+            $data = [
+                'result' => false,
+            ];
+
+            return $data;
         }
-
-        // cari total hasil produksi detail
-        $data_production_results_groupby_barang = DB::table("produksi_detail")
-            ->join('produksi', 'produksi.id_produksi', 'produksi_detail.id_produksi')
-            ->join('barang', 'barang.id_barang', 'produksi_detail.id_barang')
-            ->join('master_qr_code', 'master_qr_code.kode_batang_master_qr_code', 'produksi_detail.kode_batang_produksi_detail')
-            ->leftJoin('satuan_barang', 'satuan_barang.id_satuan_barang', 'produksi_detail.id_satuan_barang')
-            ->selectRaw('produksi_detail.id_barang,
-                                                produksi.nama_produksi,
-                                                barang.nama_barang,
-                                                IFNULL(satuan_barang.nama_satuan_barang, "") as nama_satuan,
-                                                ROUND(SUM(debit_produksi_detail),2) as debit_produksi,
-                                                CASE WHEN ' . $id_cabang . ' = 1 THEN barang.id_akun ELSE barang.id_akun2 END as id_akun,
-                                                ROUND(SUM(ROUND(master_qr_code.listrik_master_qr_code * produksi_detail.debit_produksi_detail, 2) + ROUND(master_qr_code.pegawai_master_qr_code * produksi_detail.debit_produksi_detail, 2) + ROUND(master_qr_code.produksi_master_qr_code * produksi_detail.debit_produksi_detail, 2)), 2) as total')
-            ->where('produksi.nomor_referensi_produksi', $production_id)
-            ->groupBy('produksi_detail.id_barang')
-            ->orderBy('produksi_detail.id_barang', 'ASC')
-            ->get();
-
-        $data_results = [];
-
-        foreach ($data_production_results_groupby_barang as $production) {
-            array_push($data_results, [
-                'akun' => $production->id_akun,
-                'notes' => $production->nama_barang . ' - ' . $production->debit_produksi . ' ' . $production->nama_satuan,
-                'id_barang' => $production->id_barang,
-                'debet' => round($production->total, 2),
-                'kredit' => 0,
-            ]);
-        }
-
-        // data yang direturn
-        $data = [
-            'data_results' => $data_results,
-            'nama_hasil_produksi' => $data_production_results[0]->nama_produksi,
-            'tanggal_hasil_produksi' => $data_production_results[0]->tanggal_produksi,
-        ];
-
-        return $data;
     }
 
     public function journalHpp($id_produksi, $month, $year, $biaya_produksi)
@@ -627,10 +653,10 @@ class ClosingJournalController extends Controller
                     $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $cabang)->delete();
                 }
                 Log::error("Error can not find Produksi " . $nama_produksi . " while closing production");
-                return response()->json([
+                return $data = [
                     "result" => false,
                     "message" => "Error can not find Produksi " . $nama_produksi . " while closing production",
-                ]);
+                ];
             }
 
             // tahap 1
@@ -640,10 +666,24 @@ class ClosingJournalController extends Controller
                 return;
             }
 
+            if(isset($data_production_supplies["result"])){
+                $message = "Error when get production source " . $nama_produksi;
+                Log::error($message);
+                $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $cabang)->first();
+                if ($check) {
+                    $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $cabang)->delete();
+                }
+                return $data = [
+                    "result" => false,
+                    "code" => 400,
+                    "message" => $message,
+                ];
+            }
+
             // tahap 2 dan 3
             $data_production_cost = $this->productionCost($id_produksi, $biaya_produksi);
 
-            if ($data_production_cost == false) {
+            if (isset($data_production_cost["result"])) {
                 DB::rollBack();
 
                 $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $cabang)->first();
@@ -651,11 +691,11 @@ class ClosingJournalController extends Controller
                     $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $cabang)->delete();
                 }
 
-                return response()->json([
+                return $data = [
                     "result" => false,
                     "code" => 400,
-                    "message" => "Error when rejournal hpp store Jurnal Hpp data. Data Beban Produksi " . $nama_produksi . " not found ",
-                ], 400);
+                    "message" => "Error when rejournal hpp store Jurnal Hpp data. Error when get Beban Produksi " . $nama_produksi,
+                ];
             }
 
             $total_supplies = $data_production_supplies['total_supplies'];
@@ -670,6 +710,22 @@ class ClosingJournalController extends Controller
 
             // tahap 4
             $data_production_results = $this->productionResults($id_produksi, $total_supplies, $cabang);
+
+
+            if(isset($data_production_results["result"]) && $data_production_results["result"] == false){
+                DB::rollBack();
+
+                $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $cabang)->first();
+                if ($check) {
+                    $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $cabang)->delete();
+                }
+
+                return $data = [
+                    "result" => false,
+                    "code" => 400,
+                    "message" => "Error when rejournal hpp store Jurnal Hpp data. Error when get Hasil Produksi " . $nama_produksi,
+                ];
+            }
 
             // init data jurnal
             $data_production = DB::table('produksi')->where('id_produksi', $id_produksi)->first();
@@ -688,11 +744,11 @@ class ClosingJournalController extends Controller
                     $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $cabang)->delete();
                 }
 
-                return response()->json([
+                return $data = [
                     "result" => false,
                     "code" => 400,
                     "message" => "Error when rejournal hpp store Jurnal Hpp data. Data Hasil Produksi empty",
-                ], 400);
+                ];
             }
 
             $data = [
@@ -718,15 +774,16 @@ class ClosingJournalController extends Controller
             $store_data = $this->storeHppJournal($data);
 
             if ($store_data == false)  {
+            if (isset($store_data["result"]) && $store_data["result"] == false)  {
                 $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $cabang)->first();
                 if ($check) {
                     $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $cabang)->delete();
                 }
-                return response()->json([
+                return $data = [
                     "result" => false,
                     "code" => 400,
                     "message" => "Error when rejournal hpp store Jurnal Hpp data",
-                ], 400);
+                ];
             }
         }catch (\Exception $e) {
             DB::rollback();
@@ -737,11 +794,11 @@ class ClosingJournalController extends Controller
             if ($check) {
                 $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $cabang)->delete();
             }
-            return response()->json([
+            return $data = [
                 "result" => false,
                 "code" => 400,
                 "message" => $message,
-            ], 400);
+            ];
         }
     }
 
@@ -786,7 +843,11 @@ class ClosingJournalController extends Controller
                 if (!$jurnal_header->save()) {
                     DB::rollback();
                     Log::error("Error when update journal header on storeHppJournal");
-                    return false;
+                    return $data = [
+                        "result" => false,
+                        "code" => 400,
+                        "message" => "Error when update journal header on storeHppJournal " . $id_transaksi,
+                    ];
                 }
             } else {
                 // Posting jurnal
@@ -808,7 +869,11 @@ class ClosingJournalController extends Controller
                 if (!$header->save()) {
                     DB::rollback();
                     Log::error("Error when storing journal header on storeHppJournal");
-                    return false;
+                    return $data = [
+                        "result" => false,
+                        "code" => 400,
+                        "message" => "Error when update journal header on storeHppJournal " . $id_transaksi,
+                    ];
                 }
 
                 if (!empty($jurnal_header)) {
@@ -837,7 +902,11 @@ class ClosingJournalController extends Controller
                     if (!$detail->save()) {
                         DB::rollback();
                         Log::error("Error when storing journal detail on storeHppJournal");
-                        return false;
+                        return $data = [
+                            "result" => false,
+                            "code" => 400,
+                            "message" => "Error when update journal detail on storeHppJournal " . $id_transaksi,
+                        ];
                     }
                     $total_debet += $detail->debet;
                     $total_credit += $detail->credit;
@@ -861,7 +930,11 @@ class ClosingJournalController extends Controller
                 if (!$detail->save()) {
                     DB::rollback();
                     Log::error("Error when storing journal detail on storeHppJournal");
-                    return false;
+                    return $data = [
+                        "result" => false,
+                        "code" => 400,
+                        "message" => "Error when update journal detail biaya listrik on storeHppJournal " . $id_transaksi,
+                    ];
                 }
                 $total_debet += $detail->debet;
                 $total_credit += $detail->credit;
@@ -884,7 +957,11 @@ class ClosingJournalController extends Controller
                 if (!$detail->save()) {
                     DB::rollback();
                     Log::error("Error when storing journal detail on storeHppJournal");
-                    return false;
+                    return $data = [
+                        "result" => false,
+                        "code" => 400,
+                        "message" => "Error when update journal detail biaya operator on storeHppJournal " . $id_transaksi,
+                    ];
                 }
                 $total_debet += $detail->debet;
                 $total_credit += $detail->credit;
@@ -908,7 +985,11 @@ class ClosingJournalController extends Controller
                     if (!$detail->save()) {
                         DB::rollback();
                         Log::error("Error when storing journal detail on storeHppJournal");
-                        return false;
+                        return $data = [
+                            "result" => false,
+                            "code" => 400,
+                            "message" => "Error when update journal detail " . "HP - " . $val['notes'] . " on storeHppJournal " . $id_transaksi,
+                        ];
                     }
                     $total_debet += round($detail->debet, 2);
                     $total_credit += round($detail->credit, 2);
@@ -940,19 +1021,26 @@ class ClosingJournalController extends Controller
                     if (!$detail->save()) {
                         DB::rollback();
                         Log::error("Error when storing journal detail on storeHppJournal");
-                        return false;
+                        return $data = [
+                            "result" => false,
+                            "code" => 400,
+                            "message" => "Error when update journal detail pembulatan on storeHppJournal " . $id_transaksi,
+                        ];
                     }
                 }
             }
 
             DB::commit();
-            return true;
         } catch (\Exception $e) {
             DB::rollback();
             $message = "Error when storing HPP Journal";
             Log::error($message);
             Log::error($e);
-            return false;
+            return $data = [
+                "result" => false,
+                "code" => 400,
+                "message" => "Error when storing HPP Journal",
+            ];
         }
     }
 
@@ -1179,9 +1267,21 @@ class ClosingJournalController extends Controller
 
                 foreach ($data_produksi as $produksi_rejournal) {
                     if($produksi_rejournal->id_produksi != $produksi->id_produksi){
-                        $this->journalHpp($sumber_produksi->id_produksi, $month, $year, $biaya_produksi);
+                        $checkRejournal = $this->journalHpp($sumber_produksi->id_produksi, $month, $year, $biaya_produksi);
+
+                        if(isset($checkRejournal['result']) && $checkRejournal['result'] == false){
+                            Log::debug('error rejournal');
+                            DB::rollback();
+                            $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
+                            if ($check) {
+                                $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
+                            }
+                            return response()->json($checkRejournal);
+                        }
                     }
                 }
+
+                Log::debug('finisih closing');
             }
 
             $jurnal_header = JurnalHeader::where('id_transaksi', "Selisih HPP Produksi " . date('Y m', strtotime($end_date)))->first();
