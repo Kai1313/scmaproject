@@ -774,7 +774,6 @@ class ClosingJournalController extends Controller
             // tahap 5
             $store_data = $this->storeHppJournal($data);
 
-            if ($store_data == false)  {
             if (isset($store_data["result"]) && $store_data["result"] == false)  {
                 $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $cabang)->first();
                 if ($check) {
@@ -1268,7 +1267,8 @@ class ClosingJournalController extends Controller
 
                 foreach ($data_produksi as $produksi_rejournal) {
                     if($produksi_rejournal->id_produksi != $produksi->id_produksi){
-                        $checkRejournal = $this->journalHpp($sumber_produksi->id_produksi, $month, $year, $biaya_produksi);
+                        $sumber_produksi_rejournal = Production::where('id_produksi', $produksi_rejournal->nomor_referensi_produksi)->first();
+                        $checkRejournal = $this->journalHpp($sumber_produksi_rejournal->id_produksi, $month, $year, $biaya_produksi);
 
                         if(isset($checkRejournal['result']) && $checkRejournal['result'] == false){
                             Log::debug('error rejournal');
