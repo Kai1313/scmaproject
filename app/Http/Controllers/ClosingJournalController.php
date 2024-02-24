@@ -1085,19 +1085,19 @@ class ClosingJournalController extends Controller
                         'credit' => $data_hpp_biaya['listrik'],
                         'keterangan' => $keterangan_listrik . 'WPH ' . round($biaya_produksi['listrik'], 2),
                     ]);
-                    if ($update_jurnal_listrik == 0) {
-                        DB::rollback();
-                        // Revert post closing
-                        $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
-                        if ($check) {
-                            $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
-                        }
-                        Log::error("Error when updating journal detail on update jurnal biaya listrik hpp produksi");
-                        return response()->json([
-                            "result" => false,
-                            "message" => "Error when updating journal detail on update jurnal biaya listrik hpp produksi. Kode Produksi " . $sumber_produksi->nama_produksi,
-                        ]);
-                    }
+                    // if ($update_jurnal_listrik == 0) {
+                    //     DB::rollback();
+                    //     // Revert post closing
+                    //     $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
+                    //     if ($check) {
+                    //         $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
+                    //     }
+                    //     Log::error("Error when updating journal detail on update jurnal biaya listrik hpp produksi");
+                    //     return response()->json([
+                    //         "result" => false,
+                    //         "message" => "Error when updating journal detail on update jurnal biaya listrik hpp produksi. Kode Produksi " . $sumber_produksi->nama_produksi,
+                    //     ]);
+                    // }
                 } else {
                     DB::rollback();
                     // Revert post closing
@@ -1125,19 +1125,19 @@ class ClosingJournalController extends Controller
                         'credit' => $data_hpp_biaya['tenaga'],
                         'keterangan' => $keterangan_operator . 'GPM ' . round($biaya_produksi['gaji'], 2),
                     ]);
-                    if ($update_jurnal_operator == 0) {
-                        DB::rollback();
-                        // Revert post closing
-                        $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
-                        if ($check) {
-                            $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
-                        }
-                        Log::error("Error when updating journal detail on update jurnal biaya operator hpp produksi");
-                        return response()->json([
-                            "result" => false,
-                            "message" => "Error when updating journal detail on update jurnal biaya operator hpp produksi. Kode Produksi " . $sumber_produksi->nama_produksi,
-                        ]);
-                    }
+                    // if ($update_jurnal_operator == 0) {
+                    //     DB::rollback();
+                    //     // Revert post closing
+                    //     $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
+                    //     if ($check) {
+                    //         $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
+                    //     }
+                    //     Log::error("Error when updating journal detail on update jurnal biaya operator hpp produksi");
+                    //     return response()->json([
+                    //         "result" => false,
+                    //         "message" => "Error when updating journal detail on update jurnal biaya operator hpp produksi. Kode Produksi " . $sumber_produksi->nama_produksi,
+                    //     ]);
+                    // }
                 } else {
                     DB::rollback();
                     // Revert post closing
@@ -1161,18 +1161,18 @@ class ClosingJournalController extends Controller
                         ->update([
                             'debet' => $kredit_hasil['value'],
                         ]);
-                    if ($update_jurnal_hasil == 0) {
-                        DB::rollback();
-                        $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
-                        if ($check) {
-                            $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
-                        }
-                        Log::error("Error when updating journal detail on update jurnal hasil produksi " . $sumber_produksi->nama_produksi . " barang " . $kredit_hasil['id_barang'] . " hpp produksi");
-                        return response()->json([
-                            "result" => false,
-                            "message" => "Error when updating journal detail on update jurnal hasil produksi " . $sumber_produksi->nama_produksi . " barang " . $kredit_hasil['id_barang'] . " hpp produksi",
-                        ]);
-                    }
+                    // if ($update_jurnal_hasil == 0) {
+                    //     DB::rollback();
+                    //     $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
+                    //     if ($check) {
+                    //         $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
+                    //     }
+                    //     Log::error("Error when updating journal detail on update jurnal hasil produksi " . $sumber_produksi->nama_produksi . " barang " . $kredit_hasil['id_barang'] . " hpp produksi");
+                    //     return response()->json([
+                    //         "result" => false,
+                    //         "message" => "Error when updating journal detail on update jurnal hasil produksi " . $sumber_produksi->nama_produksi . " barang " . $kredit_hasil['id_barang'] . " hpp produksi",
+                    //     ]);
+                    // }
                 }
 
                 $jurnal_detail = JurnalDetail::select("jurnal_detail.*")
@@ -1250,19 +1250,21 @@ class ClosingJournalController extends Controller
                             ]);
                         }
 
-                        if ($update_jurnal_pembulatan == 0) {
-                            DB::rollback();
-                            $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
-                            if ($check) {
-                                $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
-                            }
-                            Log::error("Error when update journal detail on update jurnal pembulatan hpp produksi");
-                            return response()->json([
-                                "result" => false,
-                                "message" => "Error when update journal detail on update jurnal pembulatan hpp produksi " . $sumber_produksi->nama_produksi,
-                            ]);
-                        }
+                        // if ($update_jurnal_pembulatan == 0) {
+                        //     DB::rollback();
+                        //     $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
+                        //     if ($check) {
+                        //         $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
+                        //     }
+                        //     Log::error("Error when update journal detail on update jurnal pembulatan hpp produksi");
+                        //     return response()->json([
+                        //         "result" => false,
+                        //         "message" => "Error when update journal detail on update jurnal pembulatan hpp produksi " . $sumber_produksi->nama_produksi,
+                        //     ]);
+                        // }
                     }
+                }else{
+                    $delete_jurnal_pembulatan = JurnalDetail::where('id_jurnal', $jurnal_header->id_jurnal)->where('id_transaksi', 'Pembulatan')->delete();
                 }
 
                 foreach ($data_produksi as $produksi_rejournal) {
