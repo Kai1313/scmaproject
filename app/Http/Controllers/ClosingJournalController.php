@@ -1922,7 +1922,7 @@ class ClosingJournalController extends Controller
                             "message" => "Jurnal Closing Koreksi Stok Gagal. Error when store Jurnal data on table detail",
                         ]);
                     }
-                    $sum_val += $out;
+                    $sum_val += round($out, 2);
                     $i++;
                 }
                 $detail = new JurnalDetail();
