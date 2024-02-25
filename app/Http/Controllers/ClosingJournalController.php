@@ -1059,7 +1059,7 @@ class ClosingJournalController extends Controller
 
             $biaya_produksi = $this->getProductionCost($end_date, $id_cabang);
 
-            $data_produksi = Production::whereMonth("tanggal_produksi", $month)->whereYear('tanggal_produksi', $year)->where('id_jenis_transaksi', 17)->where('id_cabang', $id_cabang)->get();
+            $data_produksi = Production::whereMonth("tanggal_produksi", $month)->whereYear('tanggal_produksi', $year)->where('id_jenis_transaksi', 17)->where('id_cabang', $id_cabang)->OrderBy("tanggal_produksi", "ASC")->OrderBy("id_produksi", "ASC")->get();
 
             DB::beginTransaction();
             foreach ($data_produksi as $produksi) {
@@ -1068,6 +1068,277 @@ class ClosingJournalController extends Controller
                 $data_hpp_kredit_hasil = $data_hpp['kredit_produksi'];
 
                 $sumber_produksi = Production::where('id_produksi', $produksi->nomor_referensi_produksi)->first();
+                Log::debug('start closing ' . $sumber_produksi->nama_produksi);
+
+                $checkRejournal = $this->journalHpp($sumber_produksi->id_produksi, $month, $year, $biaya_produksi);
+
+                if(isset($checkRejournal['result']) && $checkRejournal['result'] == false){
+                    Log::debug('error rejournal');
+                    DB::rollback();
+                    $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
+                    if ($check) {
+                        $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
+                    }
+                    return response()->json($checkRejournal);
+                }
+
+                Log::debug('finisih closing');
+            }
+
+            $jurnal_header = JurnalHeader::where('id_transaksi', "Selisih HPP Produksi " . date('Y m', strtotime($end_date)))->first();
+            if (!empty($jurnal_header)) {
+                JurnalDetail::where('id_jurnal', $jurnal_header->id_jurnal)->delete();
+                JurnalHeader::where('id_jurnal', $jurnal_header->id_jurnal)->delete();
+            }
+
+            $get_akun_biaya_listrik = Setting::where("id_cabang", $id_cabang)->where("code", "Biaya Listrik")->first();
+            $get_akun_biaya_operator = Setting::where("id_cabang", $id_cabang)->where("code", "Biaya Operator")->first();
+
+            $sum_biaya_listrik_manual = JurnalHeader::join('jurnal_detail', 'jurnal_detail.id_jurnal', 'jurnal_header.id_jurnal')
+                ->whereMonth('tanggal_jurnal', $month)
+                ->whereYear('tanggal_jurnal', $year)
+                ->where('id_cabang', $id_cabang)
+                ->where('void', 0)
+                ->whereNull('jurnal_header.id_transaksi')
+                ->where('jurnal_detail.id_akun', $get_akun_biaya_listrik->value2)
+                ->selectRaw('ROUND(SUM(debet-credit), 2) as value')
+                ->first();
+
+            $sum_biaya_operator_manual = JurnalHeader::join('jurnal_detail', 'jurnal_detail.id_jurnal', 'jurnal_header.id_jurnal')
+                ->whereMonth('tanggal_jurnal', $month)
+                ->whereYear('tanggal_jurnal', $year)
+                ->where('id_cabang', $id_cabang)
+                ->where('void', 0)
+                ->whereNull('jurnal_header.id_transaksi')
+                ->where('jurnal_detail.id_akun', $get_akun_biaya_operator->value2)
+                ->selectRaw('ROUND(SUM(debet-credit), 2) as value')
+                ->first();
+
+            $sum_biaya_listrik_otomatis = JurnalHeader::join('jurnal_detail', 'jurnal_detail.id_jurnal', 'jurnal_header.id_jurnal')
+                ->whereMonth('tanggal_jurnal', $month)
+                ->whereYear('tanggal_jurnal', $year)
+                ->where('id_cabang', $id_cabang)
+                ->where('void', 0)
+                ->whereNotNull('jurnal_header.id_transaksi')
+                ->whereRaw('jurnal_header.id_transaksi NOT LIKE "%Closing%"')
+                ->whereRaw('jurnal_header.id_transaksi NOT LIKE "%Selisih HPP Produksi%"')
+                ->where('jurnal_detail.id_akun', $get_akun_biaya_listrik->value2)
+                ->selectRaw('ROUND(SUM(credit-debet), 2) as value')
+                ->first();
+
+            $sum_biaya_operator_otomatis = JurnalHeader::join('jurnal_detail', 'jurnal_detail.id_jurnal', 'jurnal_header.id_jurnal')
+                ->whereMonth('tanggal_jurnal', $month)
+                ->whereYear('tanggal_jurnal', $year)
+                ->where('id_cabang', $id_cabang)
+                ->where('void', 0)
+                ->whereNotNull('jurnal_header.id_transaksi')
+                ->whereRaw('jurnal_header.id_transaksi NOT LIKE "%Closing%"')
+                ->whereRaw('jurnal_header.id_transaksi NOT LIKE "%Selisih HPP Produksi%"')
+                ->where('jurnal_detail.id_akun', $get_akun_biaya_operator->value2)
+                ->selectRaw('ROUND(SUM(credit-debet), 2) as value')
+                ->first();
+
+            Log::debug('testing selisih');
+            Log::debug(json_encode($sum_biaya_listrik_manual));
+            Log::debug(json_encode($sum_biaya_operator_manual));
+            Log::debug(json_encode($sum_biaya_listrik_otomatis));
+            Log::debug(json_encode($sum_biaya_operator_otomatis));
+            Log::debug('-----------------------------------');
+
+            $selisih_listrik = round($sum_biaya_listrik_otomatis->value, 2) - round($sum_biaya_listrik_manual->value, 2);
+            $selisih_tenaga = round($sum_biaya_operator_otomatis->value, 2) - round($sum_biaya_operator_manual->value, 2);
+
+            Log::debug('selisih----');
+            Log::debug('listrik : ' . $selisih_listrik);
+            Log::debug('tenaga : ' . $selisih_tenaga);
+
+            if ($selisih_listrik != 0 || $selisih_tenaga != 0) {
+                Log::debug('mulai buat header selisih');
+                Log::debug('listrik : ' . $selisih_listrik);
+                Log::debug('tenaga : ' . $selisih_tenaga);
+                Log::debug('-----');
+                // Create journal memorial
+                // Store Header
+                $header = new JurnalHeader();
+                $header->id_cabang = $id_cabang;
+                $header->jenis_jurnal = $journal_type;
+                $header->id_transaksi = "Selisih HPP Produksi " . date('Y m', strtotime($end_date));
+                $header->void = 0;
+                $header->tanggal_jurnal = $end_date;
+                $header->user_created = null;
+                $header->user_modified = null;
+                $header->dt_created = $end_date;
+                $header->dt_modified = $end_date;
+                $header->kode_jurnal = $this->generateJournalCode($id_cabang, $journal_type);
+                // dd($header);
+                if (!$header->save()) {
+                    DB::rollback();
+                    $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
+                    if ($check) {
+                        $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
+                    }
+                    return response()->json([
+                        "result" => false,
+                        "message" => "Error when store Jurnal data on table header",
+                    ]);
+                }
+
+                $sum_selisih_debet = 0;
+                $sum_selisih_credit = 0;
+                $index = 1;
+
+                if ($selisih_listrik != 0) {
+                    $detail = new JurnalDetail();
+                    $detail->id_jurnal = $header->id_jurnal;
+                    $detail->index = $index;
+                    $detail->id_akun = $get_akun_biaya_listrik->value2;
+                    $detail->keterangan = "Selisih Produksi Biaya Listrik " . date('Y m', strtotime($end_date));
+                    if ($selisih_listrik > 0) {
+                        $detail->debet = floatval(round($selisih_listrik, 2));
+                        $detail->credit = 0;
+                    } else {
+                        $detail->debet = 0;
+                        $detail->credit = floatval(abs(round($selisih_listrik, 2)));
+                    }
+                    $detail->user_created = null;
+                    $detail->user_modified = null;
+                    $detail->dt_created = $end_date;
+                    $detail->dt_modified = $end_date;
+                    // Log::info(json_encode($detail));
+                    if (!$detail->save()) {
+                        DB::rollback();
+                        $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
+                        if ($check) {
+                            $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
+                        }
+                        return response()->json([
+                            "result" => false,
+                            "message" => "Error when store Jurnal data on table detail",
+                        ]);
+                    }
+
+                    $sum_selisih_debet += $detail->debet;
+                    $sum_selisih_credit += $detail->credit;
+                    $index++;
+                }
+
+                if ($selisih_tenaga != 0) {
+                    $detail = new JurnalDetail();
+                    $detail->id_jurnal = $header->id_jurnal;
+                    $detail->index = $index;
+                    $detail->id_akun = $get_akun_biaya_operator->value2;
+                    $detail->keterangan = "Selisih Produksi Biaya Pegawai " . date('Y m', strtotime($end_date));
+                    if ($selisih_tenaga > 0) {
+                        $detail->debet = floatval(round($selisih_tenaga, 2));
+                        $detail->credit = 0;
+                    } else {
+                        $detail->debet = 0;
+                        $detail->credit = floatval(abs(round($selisih_tenaga, 2)));
+                    }
+                    $detail->user_created = null;
+                    $detail->user_modified = null;
+                    $detail->dt_created = $end_date;
+                    $detail->dt_modified = $end_date;
+                    // Log::info(json_encode($detail));
+                    if (!$detail->save()) {
+                        DB::rollback();
+                        $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
+                        if ($check) {
+                            $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
+                        }
+                        return response()->json([
+                            "result" => false,
+                            "message" => "Error when store Jurnal data on table detail",
+                        ]);
+                    }
+
+                    $sum_selisih_debet += $detail->debet;
+                    $sum_selisih_credit += $detail->credit;
+                    $index++;
+                }
+
+                if ($sum_selisih_debet != $sum_selisih_credit) {
+                    $get_akun_pembulatan = Setting::where("id_cabang", $id_cabang)->where("code", "Pembulatan")->first();
+
+                    $selisih_pembulatan = $sum_selisih_credit - $sum_selisih_debet;
+                    // Detail Biaya Listrik
+                    $detail = new JurnalDetail();
+                    $detail->id_jurnal = $header->id_jurnal;
+                    $detail->index = $index;
+                    $detail->id_akun = $get_akun_pembulatan->value2;
+                    $detail->keterangan = "Pembulatan Produksi " . date('Y m', strtotime($end_date));
+                    if ($selisih_pembulatan > 0) {
+                        $detail->debet = floatval($selisih_pembulatan);
+                        $detail->credit = 0;
+                    } else {
+                        $detail->debet = 0;
+                        $detail->credit = floatval(abs($selisih_pembulatan));
+                    }
+                    $detail->dt_created = $end_date;
+                    $detail->dt_modified = $end_date;
+
+                    if (!$detail->save()) {
+                        DB::rollback();
+                        $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
+                        if ($check) {
+                            $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
+                        }
+                        Log::error("Error when storing journal detail on table detail");
+                        return response()->json([
+                            "result" => false,
+                            "message" => "Error when storing journal detail on table detail",
+                        ]);
+                    }
+                }
+            }
+
+            DB::commit();
+            return response()->json([
+                "result" => true,
+                "message" => "Successfully proceed closing journal Hpp Production",
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            $month = $request->month;
+            $year = $request->year;
+            $check = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->first();
+            if ($check) {
+                $delete = Closing::where("month", $month)->where("year", $year)->where("id_cabang", $id_cabang)->delete();
+            }
+            $message = "Error when closing journal Hpp Production";
+            Log::error($message);
+            Log::error($e);
+            return response()->json([
+                "result" => false,
+                "message" => $message,
+            ]);
+        }
+    }
+
+    public function productionBackup(Request $request){
+        try {
+            // Init data
+            $id_cabang = $request->id_cabang;
+            $journal_type = "ME";
+            $month = $request->month;
+            $year = $request->year;
+            $start_date = date("Y-m-d", strtotime("$year-$month-1"));
+            $end_date = date("Y-m-t", strtotime("$year-$month-1"));
+            $void = 0;
+            $status = 1;
+
+            $biaya_produksi = $this->getProductionCost($end_date, $id_cabang);
+
+            $data_produksi = Production::whereMonth("tanggal_produksi", $month)->whereYear('tanggal_produksi', $year)->where('id_jenis_transaksi', 17)->where('id_cabang', $id_cabang)->OrderBy("id_produksi", "ASC")->OrderBy("tanggal_produksi", "ASC")->get();
+
+            DB::beginTransaction();
+            foreach ($data_produksi as $produksi) {
+                $data_hpp = $this->updateProductionCredit($produksi->id_produksi, $biaya_produksi);
+                $data_hpp_biaya = $data_hpp['biaya'];
+                $data_hpp_kredit_hasil = $data_hpp['kredit_produksi'];
+
+                $sumber_produksi = Production::where('id_produksi', $produksi->nomor_referensi_produksi)->first();
+                Log::debug('start closing ' . $sumber_produksi->nama_produksi);
 
                 $jurnal_header = JurnalHeader::where('id_transaksi', $sumber_produksi->nama_produksi)->where('jenis_jurnal', 'ME')->where('void', 0)->first();
                 // $jurnal_biaya_listrik = JurnalDetail::where('id_jurnal', $jurnal_header->id_jurnal)->where('id_transaksi', 'Biaya Listrik')->first();
