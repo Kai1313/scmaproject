@@ -224,7 +224,6 @@ class ReportGeneralLedgerController extends Controller
                             ->orWhere("jurnal_header.kode_jurnal", "LIKE", "%$keyword%")
                             ->orWhere("jurnal_detail.id_transaksi", "LIKE", "%$keyword%")
                             ->orWhere("jurnal_detail.keterangan", "LIKE", "%$keyword%");
-
                     }
                 });
             }
