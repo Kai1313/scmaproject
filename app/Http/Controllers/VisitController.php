@@ -345,7 +345,7 @@ class VisitController extends Controller
             'status_aktif_pelanggan',
             'keterangan_pelanggan'
         )
-            ->where('id_pelanggan', $customerid)->first();
+            ->where('id_pelanggan', $customerid)->where('status_pelanggan', '1')->first();
 
         return $data;
     }
