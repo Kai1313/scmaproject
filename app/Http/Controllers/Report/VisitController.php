@@ -172,6 +172,8 @@ class VisitController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Data pelanggan tidak ditemukan'], 500);
         }
 
-        return response()->json(['status' => 'success', 'data' => $data], 200);
+        $map = '<iframe src="https://www.google.com/maps?q=' . $data->nama_pelanggan . ' ' . $data->alamat_pelanggan . '&output=embed" width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade""></iframe>';
+
+        return response()->json(['status' => 'success', 'data' => $data, 'map' => $map], 200);
     }
 }

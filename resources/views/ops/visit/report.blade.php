@@ -253,6 +253,9 @@
                             <td id="target_ketarangan_pelanggan"></td>
                         </tr>
                     </table>
+                    <div id="target-maps">
+
+                    </div>
                 </div>
                 <div class="modal-footer">
                     {{-- <button type="submit" class="btn btn-primary btn-sm btn-flat">Simpan</button> --}}
@@ -389,9 +392,20 @@
                     'id': id
                 },
                 success: function(res) {
+                    let statusActive = {
+                        '0': '',
+                        '1': 'Aktif',
+                        '2': 'Pindah',
+                        '3': 'Tutup'
+                    }
                     Object.keys(res.data).forEach(key => {
-                        $('#target_' + key).text(res.data[key])
+                        if (key == 'status_aktif_pelanggan') {
+                            $('#target_' + key).text(statusActive[res.data[key]])
+                        } else {
+                            $('#target_' + key).text(res.data[key])
+                        }
                     });
+                    $('#target-maps').html(res.map)
                     $('#cover-spin').hide()
                     $('#modal-customer').modal()
                 },
