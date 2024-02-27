@@ -159,7 +159,7 @@ class VisitController extends Controller
         $customerId = $request->search;
         $datas = DB::table('pelanggan')->select('nama_pelanggan as text', 'id_pelanggan as id')
             ->where(DB::raw('concat(nama_pelanggan," - ",alamat_pelanggan)'), 'like', '%' . $customerId . '%')
-            ->get();
+            ->where('status_pelanggan', '1')->get();
 
         return response()->json(['status' => 'success', 'datas' => $datas], 200);
     }
