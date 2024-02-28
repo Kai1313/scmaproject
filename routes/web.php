@@ -256,8 +256,10 @@ Route::namespace('Report')->group(function () {
         Route::get('get-location', 'LaporanChecklistController@getLocation')->name('checklist-location');
         Route::get('get-user-group', 'LaporanChecklistController@getUserGroup')->name('checklist-user-group');
         Route::get('print', 'LaporanChecklistController@print')->name('checklist-print');
-        Route::get('excel', 'LaporanChecklistController@getExcel')->name('checklist-excel');
+        Route::get('excel', 'LaporanChecklistController@getDataExport')->name('checklist-excel');
         Route::get('view/{id}', 'LaporanChecklistController@viewData')->name('checklist-view');
+        Route::post('send-checker', 'LaporanChecklistController@sendChecker')->name('checklist-checker');
+        Route::post('send-comment-checker', 'LaporanChecklistController@sendCommentChecker')->name('checklist-comment-checker');
     });
 });
 

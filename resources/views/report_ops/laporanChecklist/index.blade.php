@@ -33,30 +33,38 @@
                         <label>Lokasi</label>
                         <div class="form-group">
                             <select name="location" class="form-control select2 trigger-change" style="width:100%;">
-
+                                <option value="">Pilih Lokasi</option>
+                                @foreach ($locations as $location)
+                                    <option value="{{ $location->alamat_objek_kerja }}">{{ $location->alamat_objek_kerja }}
+                                    </option>
+                                @endforeach
                             </select>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <label>Tanggal</label>
                         <div class="form-group">
-                            <input type="text" name="date" class="form-control trigger-change">
+                            <input type="date" name="date" class="form-control trigger-change"
+                                value="{{ date('Y-m-d') }}">
                         </div>
                     </div>
                     <div class="col-md-3">
                         <label>Grup Pengguna</label>
                         <div class="form-group">
                             <select name="user_group" class="form-control select2 trigger-change" style="width:100%;">
-
+                                <option value="">Pilih Pengguna</option>
+                                @foreach ($users as $user)
+                                    <option value="{{ $user['id'] }}">{{ $user['text'] }}</option>
+                                @endforeach
                             </select>
                         </div>
                     </div>
                 </div>
                 <div class="pull-right">
-                    <a href="{{ route('checklist-print') }}" target="_blank"
+                    {{-- <a href="{{ route('checklist-print') }}" target="_blank"
                         class="btn btn-danger btn-sm btn-flat btn-action" style="display: none">
                         <i class="glyphicon glyphicon-print"></i> Print
-                    </a>
+                    </a> --}}
                     <a href="{{ route('checklist-excel') }}" class="btn btn-success btn-sm btn-flat btn-action"
                         style="display: none;">
                         <i class="fa fa-file-excel-o"></i> Excel
@@ -71,11 +79,7 @@
                     <table class="table table-bordered data-table display nowrap" width="100%">
                         <thead>
                             <tr>
-                                <th>Tanggal</th>
-                                {{-- <th>Qrcode</th> --}}
-                                <th>Lokasi</th>
-                                <th>Departemen</th>
-                                <th>Pengguna</th>
+                                <th>Detail Lokasi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -109,74 +113,8 @@
         let table = ''
 
         $('.select2').select2()
-        $('[name="date"]').daterangepicker({
-            timePicker: false,
-            startDate: moment().subtract(1, 'days'),
-            endDate: moment(),
-            locale: {
-                format: 'YYYY-MM-DD'
-            }
-        });
-
         $('.btn-action').each(function(i, v) {
             defaultUrlPrint.push($(v).prop('href'))
-        })
-
-        console.log(defaultUrlIndex)
-
-        $('[name="location"]').select2({
-            placeholder: 'Pilih Lokasi',
-            ajax: {
-                url: urlGetLocation,
-                dataType: 'json',
-                data: function(params) {
-                    return {
-                        search: params.term
-                    }
-                },
-                processResults: function(data) {
-                    return {
-                        results: data.datas
-                    };
-                }
-            }
-        }).on('select2:select', function(e) {
-            let dataselect = e.params.data
-            if ($('[name="date"]').val()) {
-                getUserGroup()
-            }
-        });
-
-        function getUserGroup() {
-            $('#cover-spin').show()
-            $.ajax({
-                url: urlGetUserGroup,
-                type: 'get',
-                data: {
-                    date: $('[name="date"]').val(),
-                    location: $('[name="location"]').val()
-                },
-                success: function(res) {
-                    $('#cover-spin').hide()
-                    $('[name="user_group"]').empty()
-                    $('[name="user_group"]').select2({
-                        data: [{
-                                'id': '',
-                                'text': 'Pilih Grup'
-                            },
-                            ...res.datas
-                        ]
-                    })
-                },
-                error: function(data) {
-                    $('#cover-spin').hide()
-                    Swal.fire("Gagal Proses Data.", data.responseJSON.message, 'error')
-                }
-            })
-        }
-
-        $('[name="date"]').change(function() {
-            getUserGroup()
         })
 
         $('.trigger-change').change(function() {
@@ -185,10 +123,21 @@
 
         function getParam() {
             param = ''
+            let s = 0
             $('.trigger-change').each(function(i, v) {
                 param += (i == 0) ? '?' : '&'
                 param += $(v).prop('name') + '=' + $(v).val()
+                if ($(v).val() == '') {
+                    s++;
+                    return false
+                }
             })
+
+            if (s == 0) {
+                $('.btn-action').show()
+            } else {
+                $('.btn-action').hide()
+            }
 
             $('.btn-action').each(function(i, v) {
                 $(v).prop('href', defaultUrlPrint[i] + param)
@@ -223,31 +172,16 @@
                 serverSide: true,
                 ajax: defaultUrlIndex + param,
                 columns: [{
-                        data: 'tanggal_jawaban_checklist_pekerjaan',
-                        name: 'jcp.tanggal_jawaban_checklist_pekerjaan'
-                    },
-                    // {
-                    //     data: 'kode_jawaban_checklist_pekerjaan',
-                    //     name: 'jcp.kode_jawaban_checklist_pekerjaan'
-                    // },
-                    {
-                        data: 'nama_objek_kerja',
-                        name: 'ok.nama_objek_kerja',
-                        render: function(data, type, row) {
-                            let split = defaultUrlIndex.split('/index')
-                            return '<a href="' + split[0] + '/view/' + row.id_jawaban_checklist_pekerjaan +
-                                '" >' + data + '</a>'
-                        }
-                    }, {
-                        data: 'nama_grup_pengguna',
-                        name: 'gp.nama_grup_pengguna',
-                    }, {
-                        data: 'nama_pengguna',
-                        name: 'p.nama_pengguna',
+                    data: 'nama_objek_kerja',
+                    name: 'nama_objek_kerja',
+                    render: function(data, type, row) {
+                        let split = defaultUrlIndex.split('/index')
+                        return '<a href="' + split[0] + '/view/' + row.id_objek_kerja +
+                            '?date=' + $('[name="date"]').val() +
+                            '&grup=' + $('[name="user_group"]').val() + '" >' + data + '</a>'
                     }
-                ]
+                }]
             });
         }
     </script>
-    {{-- <script src="{{ asset('js/for-report.js') }}"></script> --}}
 @endsection

@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers\Report;
 
+use App\Exports\ChecklistExport;
 use App\Http\Controllers\Controller;
+use App\JawabanChecklistPekerjaan;
 use DB;
+use Excel;
 use Illuminate\Http\Request;
+use Log;
 use Yajra\DataTables\DataTables;
 
 class LaporanChecklistController extends Controller
@@ -19,57 +23,37 @@ class LaporanChecklistController extends Controller
             return $this->getData($request, 'datatable');
         }
 
+        $locations = DB::table('objek_kerja')
+            ->select('alamat_objek_kerja')
+            ->where('status_objek_kerja', '1')->distinct()->get();
+
+        $groups = DB::table('grup_pengguna')->where('status_grup_pengguna', '1')->pluck('nama_grup_pengguna', 'id_grup_pengguna');
+        $userGroups = DB::table('checklist_pekerjaan')->select('id_grup_pengguna')->where('status_checklist_pekerjaan', '1')->distinct()->get();
+        $array = [];
+        foreach ($userGroups as $ug) {
+            $array[] = [
+                'id' => $ug->id_grup_pengguna,
+                'text' => isset($groups[$ug->id_grup_pengguna]) ? $groups[$ug->id_grup_pengguna] : '',
+            ];
+        }
+
         return view('report_ops.laporanChecklist.index', [
             "pageTitle" => "SCA OPS | Laporan Checklist | List",
-            // 'typeReport' => ['Rekap', 'Detail'],
+            'locations' => $locations,
+            'users' => collect($array),
         ]);
-    }
-
-    public function getLocation(Request $request)
-    {
-        $search = $request->search;
-        $datas = DB::table('objek_kerja')
-            ->select('id_objek_kerja as id', DB::raw('concat(kode_objek_kerja," - ",nama_objek_kerja) as text'))
-            ->where(DB::raw('concat(kode_objek_kerja," - ",nama_objek_kerja)'), 'like', '%' . $search . '%')
-            ->where('status_objek_kerja', '1')->get();
-        return response()->json(['status' => 'success', 'datas' => $datas], 200);
-    }
-
-    public function getUserGroup(Request $request)
-    {
-        $date = $request->date;
-        $rangeDate = explode(' - ', $date);
-        $location = $request->location;
-
-        $datas = DB::table('jawaban_checklist_pekerjaan as jcp')
-            ->select('nama_grup_pengguna as text', 'jcp.id_grup_pengguna as id')
-            ->join('grup_pengguna as gp', 'jcp.id_grup_pengguna', 'gp.id_grup_pengguna')
-            ->whereBetween('tanggal_jawaban_checklist_pekerjaan', $rangeDate)
-            ->where('id_objek_kerja', $location)
-            ->groupBy('jcp.id_grup_pengguna')
-            ->get();
-
-        return response()->json(['status' => 'success', 'datas' => $datas], 200);
     }
 
     public function getData($request, $type)
     {
-        $date = explode(' - ', $request->date);
+        $date = $request->date;
+        $location = $request->location;
+        $userGroup = $request->user_grup;
 
-        $data = DB::table('jawaban_checklist_pekerjaan as jcp')->select(
-            'jcp.tanggal_jawaban_checklist_pekerjaan',
-            'jcp.kode_jawaban_checklist_pekerjaan',
-            'ok.nama_objek_kerja',
-            'nama_pengguna',
-            'gp.nama_grup_pengguna',
-            'id_jawaban_checklist_pekerjaan'
-        )
-            ->join('objek_kerja as ok', 'jcp.id_objek_kerja', 'ok.id_objek_kerja')
-            ->join('grup_pengguna as gp', 'jcp.id_grup_pengguna', 'gp.id_grup_pengguna')
-            ->join('pengguna as p', 'jcp.user_jawaban_checklist_pekerjaan', 'p.id_pengguna')
-            ->whereBetween('jcp.tanggal_jawaban_checklist_pekerjaan', $date)
-            ->where('jcp.id_objek_kerja', $request->location)
-            ->where('jcp.id_grup_pengguna', $request->user_group);
+        $data = DB::table('objek_kerja')
+            ->select('nama_objek_kerja', 'id_objek_kerja')
+            ->where('alamat_objek_kerja', $location)
+            ->where('status_objek_kerja', '1');
 
         if ($type == 'datatable') {
             return Datatables::of($data)
@@ -113,20 +97,26 @@ class LaporanChecklistController extends Controller
         return Excel::download(new ReportPurchaseDownPaymentExport('report_ops.laporanChecklist.excel', $array), 'laporan checklist pekerjaan.xlsx');
     }
 
-    public function viewData($id)
+    public function viewData(Request $request, $id)
     {
+        $idObjekKerja = $id;
+        $date = $request->date;
+        $group = $request->grup;
+
         $data = DB::table('jawaban_checklist_pekerjaan as jcp')
             ->join('grup_pengguna as gp', 'jcp.id_grup_pengguna', 'gp.id_grup_pengguna')
             ->join('pengguna as p', 'jcp.user_jawaban_checklist_pekerjaan', 'p.id_pengguna')
             ->join('objek_kerja as ok', 'jcp.id_objek_kerja', 'ok.id_objek_kerja')
-            ->where('id_jawaban_checklist_pekerjaan', $id)
+            ->where('jcp.id_objek_kerja', $idObjekKerja)
+            ->where('tanggal_jawaban_checklist_pekerjaan', $date)
+            ->where('jcp.id_grup_pengguna', $group)
             ->first();
 
         if (!$data) {
-            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+            return view('exceptions.forbidden', ["pageTitle" => "Belum Dikerjakan"]);
         }
 
-        $medias = DB::table('media_jawaban')->where('id_jawaban_checklist_pekerjaan', $id)->get();
+        $medias = DB::table('media_jawaban')->where('id_jawaban_checklist_pekerjaan', $data->id_jawaban_checklist_pekerjaan)->get();
         $groupMedia = [];
         foreach ($medias as $media) {
             $groupMedia[$media->id_pekerjaan][] = [
@@ -134,6 +124,7 @@ class LaporanChecklistController extends Controller
                 'image' => env('OLD_ASSET_ROOT') . 'uploads/checklist_pekerjaan/' . $media->lokasi_media_jawaban,
             ];
         }
+
         $jobs = DB::table('pekerjaan')->where('status_pekerjaan', '1')->pluck('nama_pekerjaan', 'id_pekerjaan');
 
         return view('report_ops.laporanChecklist.view', [
@@ -142,5 +133,86 @@ class LaporanChecklistController extends Controller
             'medias' => $groupMedia,
             'jobs' => $jobs,
         ]);
+    }
+
+    public function sendChecker(Request $request)
+    {
+        $id = $request->id;
+        $seq = $request->seq;
+        $val = $request->val == '1' ? '1' : '0';
+        $input = 'checker' . $seq . '_jawaban_checklist_pekerjaan';
+        try {
+            $data = JawabanChecklistPekerjaan::where('id_jawaban_checklist_pekerjaan', $id)->first();
+            $array = [];
+            if (!$data->checker_jawaban_checklist_pekerjaan) {
+                $array['checker_jawaban_checklist_pekerjaan'] = session()->get('user')['id_pengguna'];
+            }
+
+            $array[$input] = $val;
+            DB::table('jawaban_checklist_pekerjaan')->where('id_jawaban_checklist_pekerjaan', $id)
+                ->update($array);
+
+            return response()->json(['status' => 'success', 'message' => 'Data berhasil di update'], 200);
+        } catch (\Exception $th) {
+            Log::error($th);
+            return response()->json(['status' => 'error', 'message' => 'Terdapat masalah ketika checklist'], 500);
+        }
+    }
+
+    public function sendCommentChecker(Request $request)
+    {
+        $note = $request->note;
+        $id = $request->id;
+        try {
+            $data = JawabanChecklistPekerjaan::where('id_jawaban_checklist_pekerjaan', $id)->first();
+            $array = [];
+            if (!$data->checker_jawaban_checklist_pekerjaan) {
+                $array['checker_jawaban_checklist_pekerjaan'] = session()->get('user')['id_pengguna'];
+            }
+
+            $array['keterangan_checker_jawaban_checklist_pekerjaan'] = $note;
+            DB::table('jawaban_checklist_pekerjaan')->where('id_jawaban_checklist_pekerjaan', $id)
+                ->update($array);
+
+            return response()->json(['status' => 'success', 'message' => 'Berhasil di perbarui'], 200);
+        } catch (\Exception $th) {
+            Log::error($th);
+            return response()->json(['status' => 'error', 'message' => 'Terdapat masalah ketika update catatan'], 500);
+        }
+    }
+
+    public function getDataExport(Request $request)
+    {
+        if (checkAccessMenu('laporan_checklist', 'print') == false) {
+            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+        }
+
+        $location = $request->location;
+        $date = $request->date;
+        $userGroup = $request->user_group;
+
+        $group = DB::table('grup_pengguna')->where('id_grup_pengguna', $userGroup)->first();
+
+        $locations = DB::table('objek_kerja')->select('id_objek_kerja', 'nama_objek_kerja')
+            ->where('status_objek_kerja', '1')->where('alamat_objek_kerja', $location)->orderBy('nama_objek_kerja', 'asc')->get();
+        $pluckId = $locations->pluck('id_objek_kerja');
+
+        $jobs = DB::table('checklist_pekerjaan')
+            ->join('pekerjaan', 'checklist_pekerjaan.id_pekerjaan', 'pekerjaan.id_pekerjaan')
+            ->whereIn('id_objek_kerja', $pluckId)->where('id_grup_pengguna', $userGroup)
+            ->pluck('nama_pekerjaan', 'checklist_pekerjaan.id_pekerjaan');
+
+        $answers = DB::table('jawaban_checklist_pekerjaan')
+            ->whereIn('id_objek_kerja', $pluckId)->where('id_grup_pengguna', $userGroup)->where('tanggal_jawaban_checklist_pekerjaan', $date)->get();
+
+        $array = [
+            'locations' => $locations,
+            'req' => $request,
+            'jobs' => $jobs,
+            'answers' => $answers,
+            'group' => $group,
+        ];
+
+        return Excel::download(new ChecklistExport('report_ops.laporanChecklist.excel', $array), 'laporan checklist pekerjaan.xlsx');
     }
 }
