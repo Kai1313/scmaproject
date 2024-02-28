@@ -31,8 +31,9 @@
     <table>
         <tr>
             <th colspan="2" style="text-align:center;vertical-align:middle;">Lokasi</th>
-            <th>Checklist<br>Pengguna</th>
-            <th>Checklist<br>Pemeriksa</th>
+            <th style="text-align:center;vertical-align:middle;">Keterangan</th>
+            <th style="text-align:center;">Checklist<br>Pengguna</th>
+            <th style="text-align:center;">Checklist<br>Pemeriksa</th>
         </tr>
         @foreach ($locations as $location)
             <tr>
@@ -43,8 +44,11 @@
                     @if (isset($jobs[$ans->{'pekerjaan' . $i . '_jawaban_checklist_pekerjaan'}]))
                         <tr>
                             <td width="5">{{ $i }}.</td>
-                            <td width="50">
+                            <td width="40" style="word-wrap: break-word">
                                 {{ $jobs[$ans->{'pekerjaan' . $i . '_jawaban_checklist_pekerjaan'}] }}
+                            </td>
+                            <td width="30" style="word-wrap: break-word">
+                                {{ $ans->{'keterangan' . $i . '_jawaban_checklist_pekerjaan'} }}
                             </td>
                             <td style="text-align:center;">
                                 @if ($ans->{'jawaban' . $i . '_jawaban_checklist_pekerjaan'})

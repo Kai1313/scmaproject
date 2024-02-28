@@ -69,9 +69,9 @@
                         style="display: none;">
                         <i class="fa fa-file-excel-o"></i> Excel
                     </a>
-                    <a href="javascript:void(0)" class="btn btn-default btn-sm btn-flat btn-view-action">
+                    <button class="btn btn-default btn-sm btn-flat btn-view-action" disabled>
                         <i class="glyphicon glyphicon-eye-open"></i> View
-                    </a>
+                    </button>
                 </div>
             </div>
             <div class="box-body">
@@ -80,6 +80,7 @@
                         <thead>
                             <tr>
                                 <th>Detail Lokasi</th>
+                                <th width="100"></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -135,8 +136,10 @@
 
             if (s == 0) {
                 $('.btn-action').show()
+                $('.btn-view-action').attr('disabled', false)
             } else {
                 $('.btn-action').hide()
+                $('.btn-view-action').attr('disabled', true)
             }
 
             $('.btn-action').each(function(i, v) {
@@ -170,15 +173,28 @@
                 scrollX: true,
                 processing: true,
                 serverSide: true,
+                pageLength: 50,
                 ajax: defaultUrlIndex + param,
                 columns: [{
                     data: 'nama_objek_kerja',
                     name: 'nama_objek_kerja',
                     render: function(data, type, row) {
-                        let split = defaultUrlIndex.split('/index')
-                        return '<a href="' + split[0] + '/view/' + row.id_objek_kerja +
-                            '?date=' + $('[name="date"]').val() +
-                            '&grup=' + $('[name="user_group"]').val() + '" >' + data + '</a>'
+                        if (row.id_jawaban_checklist_pekerjaan) {
+                            let split = defaultUrlIndex.split('/index')
+                            return '<a href="' + split[0] + '/view/' + row.id_objek_kerja +
+                                '?date=' + $('[name="date"]').val() +
+                                '&grup=' + $('[name="user_group"]').val() + '" target="_blank">' +
+                                data + '</a>'
+                        } else {
+                            return data;
+                        }
+                    }
+                }, {
+                    data: 'id_jawaban_checklist_pekerjaan',
+                    name: 'id_jawaban_checklist_pekerjaan',
+                    className: 'text-center',
+                    render: function(data, type, row) {
+                        return !data ? 'Belum Dikerjakan' : '';
                     }
                 }]
             });

@@ -152,6 +152,11 @@
                         <td>{{ $data->nama_objek_kerja }}</td>
                     </tr>
                     <tr>
+                        <td style="width:100px;font-weight:bold;">Pemeriksa</td>
+                        <td>:</td>
+                        <td>{{ $data->nama_pengguna_checker }}</td>
+                    </tr>
+                    <tr>
                         <td style="width:100px;font-weight:bold;">Tanggapan Pemeriksa</td>
                         <td style="vertical-align: middle;">:</td>
                         <td style="vertical-align: middle;">
@@ -189,11 +194,13 @@
                                         @endif
                                     </td>
                                     <td style="width:50px;text-align:center;">
-                                        <label class="form-control2">
-                                            <input type="checkbox" name="checklist_checker"
-                                                data-sequence="{{ $i }}"
-                                                {{ $data->{'checker' . $i . '_jawaban_checklist_pekerjaan'} ? 'checked' : '' }} />
-                                        </label>
+                                        @if ($data->{'jawaban' . $i . '_jawaban_checklist_pekerjaan'} == '1')
+                                            <label class="form-control2">
+                                                <input type="checkbox" name="checklist_checker"
+                                                    data-sequence="{{ $i }}"
+                                                    {{ $data->{'checker' . $i . '_jawaban_checklist_pekerjaan'} ? 'checked' : '' }} />
+                                            </label>
+                                        @endif
                                     </td>
                                 </tr>
                                 <tr>

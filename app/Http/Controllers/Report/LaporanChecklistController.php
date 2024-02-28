@@ -48,20 +48,27 @@ class LaporanChecklistController extends Controller
     {
         $date = $request->date;
         $location = $request->location;
-        $userGroup = $request->user_grup;
+        $userGroup = $request->user_group;
 
-        $data = DB::table('objek_kerja')
-            ->select('nama_objek_kerja', 'id_objek_kerja')
-            ->where('alamat_objek_kerja', $location)
-            ->where('status_objek_kerja', '1');
+        $datas = DB::table('checklist_pekerjaan as cp')
+            ->select('nama_objek_kerja', 'cp.id_objek_kerja', 'id_jawaban_checklist_pekerjaan')
+            ->join('objek_kerja as ok', 'cp.id_objek_kerja', 'ok.id_objek_kerja')
+            ->leftJoin('jawaban_checklist_pekerjaan as jcp', function ($q) use ($date, $userGroup) {
+                $q->on('ok.id_objek_kerja', 'jcp.id_objek_kerja')
+                    ->where('jcp.tanggal_jawaban_checklist_pekerjaan', $date);
+            })
+            ->where('cp.id_grup_pengguna', $userGroup)
+            ->where('ok.alamat_objek_kerja', $location)
+            ->where('ok.status_objek_kerja', '1')
+            ->groupBy('ok.id_objek_kerja');
 
         if ($type == 'datatable') {
-            return Datatables::of($data)
+            return Datatables::of($datas)
                 ->toJson();
         }
 
-        $data = $data->get();
-        return $data;
+        $datas = $datas->get();
+        return $datas;
     }
 
     public function print(Request $request)
@@ -104,8 +111,10 @@ class LaporanChecklistController extends Controller
         $group = $request->grup;
 
         $data = DB::table('jawaban_checklist_pekerjaan as jcp')
+            ->select('jcp.*', 'nama_grup_pengguna', 'p.nama_pengguna', 'nama_objek_kerja', 'pc.nama_pengguna as nama_pengguna_checker')
             ->join('grup_pengguna as gp', 'jcp.id_grup_pengguna', 'gp.id_grup_pengguna')
             ->join('pengguna as p', 'jcp.user_jawaban_checklist_pekerjaan', 'p.id_pengguna')
+            ->leftJoin('pengguna as pc', 'jcp.checker_jawaban_checklist_pekerjaan', 'pc.id_pengguna')
             ->join('objek_kerja as ok', 'jcp.id_objek_kerja', 'ok.id_objek_kerja')
             ->where('jcp.id_objek_kerja', $idObjekKerja)
             ->where('tanggal_jawaban_checklist_pekerjaan', $date)
