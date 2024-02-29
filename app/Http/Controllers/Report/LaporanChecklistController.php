@@ -125,12 +125,16 @@ class LaporanChecklistController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Belum Dikerjakan"]);
         }
 
-        $medias = DB::table('media_jawaban')->where('id_jawaban_checklist_pekerjaan', $data->id_jawaban_checklist_pekerjaan)->get();
+        $medias = DB::table('media_jawaban')
+            ->join('pengguna', 'media_jawaban.user_media_jawaban', 'pengguna.id_pengguna')
+            ->where('id_jawaban_checklist_pekerjaan', $data->id_jawaban_checklist_pekerjaan)
+            ->get();
         $groupMedia = [];
         foreach ($medias as $media) {
             $groupMedia[$media->id_pekerjaan][] = [
                 'id' => $media->id_media_jawaban,
                 'image' => env('OLD_ASSET_ROOT') . 'uploads/checklist_pekerjaan/' . $media->lokasi_media_jawaban,
+                'user_name' => $media->nama_pengguna,
             ];
         }
 

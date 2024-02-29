@@ -211,7 +211,8 @@
                                         <div class="item-media">
                                             @if (isset($medias[$data->{'pekerjaan' . $i . '_jawaban_checklist_pekerjaan'}]))
                                                 @foreach ($medias[$data->{'pekerjaan' . $i . '_jawaban_checklist_pekerjaan'}] as $media)
-                                                    <a data-src="{{ $media['image'] }}" data-fancybox="gallery">
+                                                    <a data-src="{{ $media['image'] }}" data-fancybox="gallery"
+                                                        data-caption="Diinput oleh {{ $media['user_name'] }}">
                                                         <img src="{{ $media['image'] }}">
                                                     </a>
                                                 @endforeach
