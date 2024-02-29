@@ -39,29 +39,35 @@
             <tr>
                 <th colspan="4">{{ $location->nama_objek_kerja }}</th>
             </tr>
-            @foreach ($answers->where('id_objek_kerja', $location->id_objek_kerja) as $ans)
-                @for ($i = 1; $i < 26; $i++)
-                    @if (isset($jobs[$ans->{'pekerjaan' . $i . '_jawaban_checklist_pekerjaan'}]))
-                        <tr>
-                            <td width="5">{{ $i }}.</td>
-                            <td width="40" style="word-wrap: break-word">
-                                {{ $jobs[$ans->{'pekerjaan' . $i . '_jawaban_checklist_pekerjaan'}] }}
-                            </td>
-                            <td width="30" style="word-wrap: break-word">
-                                {{ $ans->{'keterangan' . $i . '_jawaban_checklist_pekerjaan'} }}
-                            </td>
-                            <td style="text-align:center;">
-                                @if ($ans->{'jawaban' . $i . '_jawaban_checklist_pekerjaan'})
-                                    OK
-                                @endif
-                            </td>
-                            <td></td>
-                        </tr>
+            @php
+                $counter = 1;
+            @endphp
+            @foreach ($jobs->where('id_objek_kerja', $location->id_objek_kerja) as $i => $job)
+                <tr>
+                    <td width="5">{{ $counter }}</td>
+                    <td width="40" style="word-wrap: break-word;">{{ $job->nama_pekerjaan }}</td>
+                    @if (isset($answers[$location->id_objek_kerja . '-' . $job->id_pekerjaan]))
+                        <td width="30" style="word-wrap: break-word">
+                            {{ $answers[$location->id_objek_kerja . '-' . $job->id_pekerjaan]['keterangan'] }}
+                        </td>
+                        <td style="text-align:center;">
+                            @if ($answers[$location->id_objek_kerja . '-' . $job->id_pekerjaan]['jawaban'] == '1')
+                                OK
+                            @endif
+                        </td>
+                    @else
+                        <td width="30"></td>
+                        <td></td>
                     @endif
-                @endfor
+                    <td></td>
+
+                </tr>
+                @php
+                    $counter++;
+                @endphp
             @endforeach
             <tr>
-                <td colspan="2"></td>
+                <td colspan="5"></td>
             </tr>
         @endforeach
     </table>

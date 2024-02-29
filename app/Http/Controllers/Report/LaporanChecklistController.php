@@ -208,17 +208,33 @@ class LaporanChecklistController extends Controller
 
         $jobs = DB::table('checklist_pekerjaan')
             ->join('pekerjaan', 'checklist_pekerjaan.id_pekerjaan', 'pekerjaan.id_pekerjaan')
-            ->whereIn('id_objek_kerja', $pluckId)->where('id_grup_pengguna', $userGroup)
-            ->pluck('nama_pekerjaan', 'checklist_pekerjaan.id_pekerjaan');
+            ->whereIn('id_objek_kerja', $pluckId)
+            ->where('id_grup_pengguna', $userGroup)
+            ->get();
 
         $answers = DB::table('jawaban_checklist_pekerjaan')
-            ->whereIn('id_objek_kerja', $pluckId)->where('id_grup_pengguna', $userGroup)->where('tanggal_jawaban_checklist_pekerjaan', $date)->get();
+            ->whereIn('id_objek_kerja', $pluckId)
+            ->where('id_grup_pengguna', $userGroup)
+            ->where('tanggal_jawaban_checklist_pekerjaan', $date)->get();
+        $arrayAns = [];
+        foreach ($answers as $a => $ans) {
+            for ($i = 1; $i < 26; $i++) {
+                if ($ans->{'pekerjaan' . ($i) . '_jawaban_checklist_pekerjaan'}) {
+                    $arrayAns[$ans->id_objek_kerja . '-' . $ans->{'pekerjaan' . ($i) . '_jawaban_checklist_pekerjaan'}] = [
+                        'keterangan' => $ans->{'keterangan' . ($i) . '_jawaban_checklist_pekerjaan'},
+                        'jawaban' => $ans->{'jawaban' . ($i) . '_jawaban_checklist_pekerjaan'},
+                    ];
+                } else {
+                    break;
+                }
+            }
+        }
 
         $array = [
             'locations' => $locations,
             'req' => $request,
             'jobs' => $jobs,
-            'answers' => $answers,
+            'answers' => $arrayAns,
             'group' => $group,
         ];
 

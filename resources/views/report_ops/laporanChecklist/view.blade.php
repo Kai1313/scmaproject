@@ -198,7 +198,7 @@
                                             <label class="form-control2">
                                                 <input type="checkbox" name="checklist_checker"
                                                     data-sequence="{{ $i }}"
-                                                    {{ $data->{'checker' . $i . '_jawaban_checklist_pekerjaan'} ? 'checked' : '' }} />
+                                                    {{ $data->{'checker' . $i . '_jawaban_checklist_pekerjaan'} == '1' ? 'checked' : '' }} />
                                             </label>
                                         @endif
                                     </td>
