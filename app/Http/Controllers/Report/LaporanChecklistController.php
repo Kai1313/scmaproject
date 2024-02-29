@@ -25,7 +25,7 @@ class LaporanChecklistController extends Controller
 
         $locations = DB::table('objek_kerja')
             ->select('alamat_objek_kerja')
-            ->where('status_objek_kerja', '1')->distinct()->get();
+            ->where('status_objek_kerja', '1')->distinct()->orderBy('kota_objek_kerja', 'asc')->orderBy('alamat_objek_kerja', 'asc')->get();
 
         $groups = DB::table('grup_pengguna')->where('status_grup_pengguna', '1')->pluck('nama_grup_pengguna', 'id_grup_pengguna');
         $userGroups = DB::table('checklist_pekerjaan')->select('id_grup_pengguna')->where('status_checklist_pekerjaan', '1')->distinct()->get();
