@@ -134,7 +134,7 @@
                     <tr>
                         <td style="width:100px;font-weight:bold;">Tanggal</td>
                         <td style="width:10px;">:</td>
-                        <td>{{ $data->tanggal_jawaban_checklist_pekerjaan }}</td>
+                        <td>{{ $status == '1' ? $data->tanggal_jawaban_checklist_pekerjaan : date('Y-m-d') }}</td>
                     </tr>
                     <tr>
                         <td style="width:100px;font-weight:bold;">Grup</td>
@@ -144,30 +144,31 @@
                     <tr>
                         <td style="width:100px;font-weight:bold;">Karyawan</td>
                         <td>:</td>
-                        <td>{{ $data->nama_pengguna }}</td>
+                        <td>{{ $status == '1' ? $data->nama_pengguna : '' }}</td>
                     </tr>
                     <tr>
                         <td style="width:100px;font-weight:bold;">Checklist</td>
                         <td>:</td>
-                        <td>{{ $data->nama_objek_kerja }}</td>
+                        <td>{{ $status == '1' ? $data->nama_objek_kerja : '' }}</td>
                     </tr>
                     <tr>
                         <td style="width:100px;font-weight:bold;">Pemeriksa</td>
                         <td>:</td>
-                        <td>{{ $data->nama_pengguna_checker }}</td>
+                        <td>{{ $status == '1' ? $data->nama_pengguna_checker : '' }}</td>
                     </tr>
                     <tr>
                         <td style="width:100px;font-weight:bold;">Tanggapan Pemeriksa</td>
                         <td style="vertical-align: middle;">:</td>
                         <td style="vertical-align: middle;">
-                            <div class="input-group">
-                                <textarea name="keterangan_checker_jawaban_checklist_pekerjaan" class="form-control" rows="3"
-                                    placeholder="Masukkan Tanggapan Anda">{!! $data->keterangan_checker_jawaban_checklist_pekerjaan !!}</textarea>
-                                <div class="input-group-btn">
-                                    <button class="btn btn-primary btn-note-save" style="height:74px;">Simpan</button>
+                            @if ($status == '1')
+                                <div class="input-group">
+                                    <textarea name="keterangan_checker_jawaban_checklist_pekerjaan" class="form-control" rows="3"
+                                        placeholder="Masukkan Tanggapan Anda">{!! $data->keterangan_checker_jawaban_checklist_pekerjaan !!}</textarea>
+                                    <div class="input-group-btn">
+                                        <button class="btn btn-primary btn-note-save" style="height:74px;">Simpan</button>
+                                    </div>
                                 </div>
-                            </div>
-
+                            @endif
                         </td>
                     </tr>
                 </table>
@@ -183,45 +184,56 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @for ($i = 1; $i <= 25; $i++)
-                            @if ($data->{'pekerjaan' . $i . '_jawaban_checklist_pekerjaan'})
-                                <tr>
-                                    <td style="width:30px;">{{ $i }}.</td>
-                                    <td>{{ $jobs[$data->{'pekerjaan' . $i . '_jawaban_checklist_pekerjaan'}] }}</td>
-                                    <td style="width:50px;text-align:center;">
-                                        @if ($data->{'jawaban' . $i . '_jawaban_checklist_pekerjaan'} == '1')
-                                            <i class="glyphicon glyphicon-check" style="font-size:20px;"></i>
-                                        @endif
-                                    </td>
-                                    <td style="width:50px;text-align:center;">
-                                        @if ($data->{'jawaban' . $i . '_jawaban_checklist_pekerjaan'} == '1')
-                                            <label class="form-control2">
-                                                <input type="checkbox" name="checklist_checker"
-                                                    data-sequence="{{ $i }}"
-                                                    {{ $data->{'checker' . $i . '_jawaban_checklist_pekerjaan'} == '1' ? 'checked' : '' }} />
-                                            </label>
-                                        @endif
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td colspan="5">
-                                        @if ($data->{'keterangan' . $i . '_jawaban_checklist_pekerjaan'})
-                                            <b>Keterangan</b> : {!! $data->{'keterangan' . $i . '_jawaban_checklist_pekerjaan'} !!}
-                                        @endif
-                                        <div class="item-media">
-                                            @if (isset($medias[$data->{'pekerjaan' . $i . '_jawaban_checklist_pekerjaan'}]))
-                                                @foreach ($medias[$data->{'pekerjaan' . $i . '_jawaban_checklist_pekerjaan'}] as $media)
-                                                    <a data-src="{{ $media['image'] }}" data-fancybox="gallery"
-                                                        data-caption="Diinput oleh {{ $media['user_name'] }}">
-                                                        <img src="{{ $media['image'] }}">
-                                                    </a>
-                                                @endforeach
+                        @if ($status == '1')
+                            @for ($i = 1; $i <= 25; $i++)
+                                @if ($data->{'pekerjaan' . $i . '_jawaban_checklist_pekerjaan'})
+                                    <tr>
+                                        <td style="width:30px;">{{ $i }}.</td>
+                                        <td>{{ $jobs[$data->{'pekerjaan' . $i . '_jawaban_checklist_pekerjaan'}] }}</td>
+                                        <td style="width:50px;text-align:center;">
+                                            @if ($data->{'jawaban' . $i . '_jawaban_checklist_pekerjaan'} == '1')
+                                                <i class="glyphicon glyphicon-check" style="font-size:20px;"></i>
                                             @endif
-                                        </div>
-                                    </td>
+                                        </td>
+                                        <td style="width:50px;text-align:center;">
+                                            @if ($data->{'jawaban' . $i . '_jawaban_checklist_pekerjaan'} == '1')
+                                                <label class="form-control2">
+                                                    <input type="checkbox" name="checklist_checker"
+                                                        data-sequence="{{ $i }}"
+                                                        {{ $data->{'checker' . $i . '_jawaban_checklist_pekerjaan'} == '1' ? 'checked' : '' }} />
+                                                </label>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="5">
+                                            @if ($data->{'keterangan' . $i . '_jawaban_checklist_pekerjaan'})
+                                                <b>Keterangan</b> : {!! $data->{'keterangan' . $i . '_jawaban_checklist_pekerjaan'} !!}
+                                            @endif
+                                            <div class="item-media">
+                                                @if (isset($medias[$data->{'pekerjaan' . $i . '_jawaban_checklist_pekerjaan'}]))
+                                                    @foreach ($medias[$data->{'pekerjaan' . $i . '_jawaban_checklist_pekerjaan'}] as $media)
+                                                        <a data-src="{{ $media['image'] }}" data-fancybox="gallery"
+                                                            data-caption="Diinput oleh {{ $media['user_name'] }}">
+                                                            <img src="{{ $media['image'] }}">
+                                                        </a>
+                                                    @endforeach
+                                                @endif
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endif
+                            @endfor
+                        @else
+                            @foreach ($datas as $kd => $d)
+                                <tr>
+                                    <td style="width:30px;">{{ $kd + 1 }}.</td>
+                                    <td>{{ $d->nama_pekerjaan }}</td>
+                                    <td style="width:50px;text-align:center;"></td>
+                                    <td style="width:50px;text-align:center;"></td>
                                 </tr>
-                            @endif
-                        @endfor
+                            @endforeach
+                        @endif
                     </tbody>
                 </table>
             </div>
@@ -242,43 +254,44 @@
         $(window).on("resize", function() {
             $('.item-media').width($('.box-body').width() - 18)
         });
-
-        $('[name="checklist_checker"]').change(function() {
-            let seq = $(this).data('sequence')
-            let val = $(this).is(':checked') ? '1' : 0
-            $.ajax({
-                url: '{{ route('checklist-checker') }}',
-                type: 'post',
-                data: {
-                    seq: seq,
-                    id: '{{ $data->id_jawaban_checklist_pekerjaan }}',
-                    val: val
-                },
-                success: function(res) {
-                    console.log(res)
-                },
-                error: function(data) {
-                    Swal.fire("Bermasalah. ", data.responseJSON.message, 'error')
-                }
+        @if ($status == '1')
+            $('[name="checklist_checker"]').change(function() {
+                let seq = $(this).data('sequence')
+                let val = $(this).is(':checked') ? '1' : 0
+                $.ajax({
+                    url: '{{ route('checklist-checker') }}',
+                    type: 'post',
+                    data: {
+                        seq: seq,
+                        id: '{{ $data->id_jawaban_checklist_pekerjaan }}',
+                        val: val
+                    },
+                    success: function(res) {
+                        console.log(res)
+                    },
+                    error: function(data) {
+                        Swal.fire("Bermasalah. ", data.responseJSON.message, 'error')
+                    }
+                })
             })
-        })
 
-        $('.btn-note-save').click(function() {
-            let val = $('[name="keterangan_checker_jawaban_checklist_pekerjaan"]').val()
-            $.ajax({
-                url: '{{ route('checklist-comment-checker') }}',
-                type: 'post',
-                data: {
-                    id: '{{ $data->id_jawaban_checklist_pekerjaan }}',
-                    note: val
-                },
-                success: function(res) {
-                    console.log(res)
-                },
-                error: function(data) {
-                    Swal.fire("Bermasalah. ", data.responseJSON.message, 'error')
-                }
+            $('.btn-note-save').click(function() {
+                let val = $('[name="keterangan_checker_jawaban_checklist_pekerjaan"]').val()
+                $.ajax({
+                    url: '{{ route('checklist-comment-checker') }}',
+                    type: 'post',
+                    data: {
+                        id: '{{ $data->id_jawaban_checklist_pekerjaan }}',
+                        note: val
+                    },
+                    success: function(res) {
+                        console.log(res)
+                    },
+                    error: function(data) {
+                        Swal.fire("Bermasalah. ", data.responseJSON.message, 'error')
+                    }
+                })
             })
-        })
+        @endif
     </script>
 @endsection

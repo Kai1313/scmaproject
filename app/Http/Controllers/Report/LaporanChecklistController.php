@@ -55,7 +55,8 @@ class LaporanChecklistController extends Controller
             ->join('objek_kerja as ok', 'cp.id_objek_kerja', 'ok.id_objek_kerja')
             ->leftJoin('jawaban_checklist_pekerjaan as jcp', function ($q) use ($date, $userGroup) {
                 $q->on('ok.id_objek_kerja', 'jcp.id_objek_kerja')
-                    ->where('jcp.tanggal_jawaban_checklist_pekerjaan', $date);
+                    ->where('jcp.tanggal_jawaban_checklist_pekerjaan', $date)
+                    ->where('jcp.id_grup_pengguna', $userGroup);
             })
             ->where('cp.id_grup_pengguna', $userGroup)
             ->where('ok.alamat_objek_kerja', $location)
@@ -121,30 +122,45 @@ class LaporanChecklistController extends Controller
             ->where('jcp.id_grup_pengguna', $group)
             ->first();
 
-        if (!$data) {
-            return view('exceptions.forbidden', ["pageTitle" => "Belum Dikerjakan"]);
-        }
-
-        $medias = DB::table('media_jawaban')
-            ->join('pengguna', 'media_jawaban.user_media_jawaban', 'pengguna.id_pengguna')
-            ->where('id_jawaban_checklist_pekerjaan', $data->id_jawaban_checklist_pekerjaan)
-            ->get();
         $groupMedia = [];
-        foreach ($medias as $media) {
-            $groupMedia[$media->id_pekerjaan][] = [
-                'id' => $media->id_media_jawaban,
-                'image' => env('OLD_ASSET_ROOT') . 'uploads/checklist_pekerjaan/' . $media->lokasi_media_jawaban,
-                'user_name' => $media->nama_pengguna,
-            ];
+        $jobs = [];
+        $status = '0';
+        $datas = [];
+        if ($data) {
+            $status = '1';
+            $medias = DB::table('media_jawaban')
+                ->join('pengguna', 'media_jawaban.user_media_jawaban', 'pengguna.id_pengguna')
+                ->where('id_jawaban_checklist_pekerjaan', $data->id_jawaban_checklist_pekerjaan)
+                ->get();
+            $groupMedia = [];
+            foreach ($medias as $media) {
+                $groupMedia[$media->id_pekerjaan][] = [
+                    'id' => $media->id_media_jawaban,
+                    'image' => env('OLD_ASSET_ROOT') . 'uploads/checklist_pekerjaan/' . $media->lokasi_media_jawaban,
+                    'user_name' => $media->nama_pengguna,
+                ];
+            }
+
+            $jobs = DB::table('pekerjaan')->where('status_pekerjaan', '1')->pluck('nama_pekerjaan', 'id_pekerjaan');
         }
 
-        $jobs = DB::table('pekerjaan')->where('status_pekerjaan', '1')->pluck('nama_pekerjaan', 'id_pekerjaan');
+        $datas = DB::table('checklist_pekerjaan as cp')
+            ->join('pekerjaan as p', 'cp.id_pekerjaan', 'p.id_pekerjaan')
+            ->where('cp.id_objek_kerja', $idObjekKerja)
+            ->where('cp.id_grup_pengguna', $group)
+            ->where('status_checklist_pekerjaan', '1')
+            ->orderBy('cp.urut_checklist_pekerjaan', 'asc')
+            ->get();
+
+        $data = DB::table('grup_pengguna')->where('id_grup_pengguna', $group)->first();
 
         return view('report_ops.laporanChecklist.view', [
             "pageTitle" => "SCA OPS | Laporan Checklist | View",
             'data' => $data,
             'medias' => $groupMedia,
             'jobs' => $jobs,
+            'status' => $status,
+            'datas' => $datas,
         ]);
     }
 

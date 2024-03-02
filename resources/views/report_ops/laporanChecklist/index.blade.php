@@ -179,15 +179,11 @@
                     data: 'nama_objek_kerja',
                     name: 'nama_objek_kerja',
                     render: function(data, type, row) {
-                        if (row.id_jawaban_checklist_pekerjaan) {
-                            let split = defaultUrlIndex.split('/index')
-                            return '<a href="' + split[0] + '/view/' + row.id_objek_kerja +
-                                '?date=' + $('[name="date"]').val() +
-                                '&grup=' + $('[name="user_group"]').val() + '" target="_blank">' +
-                                data + '</a>'
-                        } else {
-                            return data;
-                        }
+                        let split = defaultUrlIndex.split('/index')
+                        return '<a href="' + split[0] + '/view/' + row.id_objek_kerja +
+                            '?date=' + $('[name="date"]').val() +
+                            '&grup=' + $('[name="user_group"]').val() + '" target="_blank">' +
+                            data + '</a>'
                     }
                 }, {
                     data: 'id_jawaban_checklist_pekerjaan',
