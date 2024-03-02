@@ -142,17 +142,17 @@ class LaporanChecklistController extends Controller
             }
 
             $jobs = DB::table('pekerjaan')->where('status_pekerjaan', '1')->pluck('nama_pekerjaan', 'id_pekerjaan');
+        } else {
+            $datas = DB::table('checklist_pekerjaan as cp')
+                ->join('pekerjaan as p', 'cp.id_pekerjaan', 'p.id_pekerjaan')
+                ->where('cp.id_objek_kerja', $idObjekKerja)
+                ->where('cp.id_grup_pengguna', $group)
+                ->where('status_checklist_pekerjaan', '1')
+                ->orderBy('cp.urut_checklist_pekerjaan', 'asc')
+                ->get();
+
+            $data = DB::table('grup_pengguna')->where('id_grup_pengguna', $group)->first();
         }
-
-        $datas = DB::table('checklist_pekerjaan as cp')
-            ->join('pekerjaan as p', 'cp.id_pekerjaan', 'p.id_pekerjaan')
-            ->where('cp.id_objek_kerja', $idObjekKerja)
-            ->where('cp.id_grup_pengguna', $group)
-            ->where('status_checklist_pekerjaan', '1')
-            ->orderBy('cp.urut_checklist_pekerjaan', 'asc')
-            ->get();
-
-        $data = DB::table('grup_pengguna')->where('id_grup_pengguna', $group)->first();
 
         return view('report_ops.laporanChecklist.view', [
             "pageTitle" => "SCA OPS | Laporan Checklist | View",
