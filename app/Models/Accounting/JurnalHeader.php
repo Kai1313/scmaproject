@@ -51,7 +51,7 @@ class JurnalHeader extends Model
                     $code = $prefix . "." . sprintf("%04s", $max);
                     // echo 'ini code : ' . $max . '<br>';
                 } else {
-                    $code = $prefix . ".00001";
+                    $code = $prefix . ".0001";
                 }
                 // echo 'in while : ' . $code . '<br>';
                 $ex++;
@@ -95,7 +95,7 @@ class JurnalHeader extends Model
                     $code = $prefix . "." . sprintf("%04s", $max);
                     // echo 'ini code : ' . $max . '<br>';
                 } else {
-                    $code = $prefix . ".00001";
+                    $code = $prefix . ".0001";
                 }
                 // echo 'in while : ' . $code . '<br>';
                 $ex++;
