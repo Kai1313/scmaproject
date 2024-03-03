@@ -146,8 +146,16 @@ class GeneralLedgerController extends Controller
             $header->user_modified = $userModified;
             $header->dt_created = $dateRecord;
             $header->dt_modified = $dateRecord;
-            $header->kode_jurnal = $this->generateJournalCode($cabangID, $journalType, $slipID);
+            // $header->kode_jurnal = $this->generateJournalCode($cabangID, $journalType, $slipID);
+            $header->kode_jurnal = JurnalHeader::generateJournalCodeWithSlip($cabangID, $journalType, $slipID);
             // dd($header);
+            if ($header->kode_jurnal == "error") {
+                DB::rollback();
+                return response()->json([
+                    "result" => false,
+                    "message" => "Error when store Jurnal data on table header. Kode Jurnal result is error",
+                ]);
+            }
             if (!$header->save()) {
                 DB::rollback();
                 return response()->json([
