@@ -341,6 +341,7 @@ Route::prefix('transaction')->group(function () {
         Route::get('/depreciation', 'ClosingJournalController@depreciation')->name('transaction-closing-journal-depreciation');
         Route::get('/closingJournal', 'ClosingJournalController@closingJournal')->name('transaction-closing-journal-closing-journal');
         Route::get('/saldo_transfer', 'ClosingJournalController@saldoTransfer')->name('transaction-closing-journal-saldo-transfer');
+        Route::get('/generate/{for?}/{cabang?}/{jenis?}', 'ClosingJournalController@testGenerateJournalCode')->name('transaction-closing-journal-generate');
     });
 
     Route::prefix('transfer_balance')->group(function () {

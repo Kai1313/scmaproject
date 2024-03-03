@@ -865,7 +865,7 @@ class ClosingJournalController extends Controller
                     $header->dt_created = $dateRecord;
                 }
                 $header->dt_modified = $dateRecord;
-                $header->kode_jurnal = $this->generateJournalCode($cabangID, $journalType);
+                $header->kode_jurnal = JurnalHeader::generateJournalCode($cabangID, $journalType);
                 if (!$header->save()) {
                     DB::rollback();
                     Log::error("Error when storing journal header on storeHppJournal");
@@ -1169,7 +1169,7 @@ class ClosingJournalController extends Controller
                 $header->user_modified = null;
                 $header->dt_created = $end_date;
                 $header->dt_modified = $end_date;
-                $header->kode_jurnal = $this->generateJournalCode($id_cabang, $journal_type);
+                $header->kode_jurnal = JurnalHeader::generateJournalCode($id_cabang, $journal_type);
                 // dd($header);
                 if (!$header->save()) {
                     DB::rollback();
@@ -1642,7 +1642,7 @@ class ClosingJournalController extends Controller
                 $header->user_modified = null;
                 $header->dt_created = $end_date;
                 $header->dt_modified = $end_date;
-                $header->kode_jurnal = $this->generateJournalCode($id_cabang, $journal_type);
+                $header->kode_jurnal = JurnalHeader::generateJournalCode($id_cabang, $journal_type);
                 // dd($header);
                 if (!$header->save()) {
                     DB::rollback();
@@ -1869,7 +1869,7 @@ class ClosingJournalController extends Controller
                     $header->user_modified = null;
                     $header->dt_created = $end_date;
                     $header->dt_modified = $end_date;
-                    $header->kode_jurnal = $this->generateJournalCode($id_cabang, $journal_type);
+                    $header->kode_jurnal = JurnalHeader::generateJournalCode($id_cabang, $journal_type);
                     // dd($header);
                     if (!$header->save()) {
                         DB::rollback();
@@ -2012,7 +2012,7 @@ class ClosingJournalController extends Controller
                     $header->user_modified = null;
                     $header->dt_created = $end_date;
                     $header->dt_modified = $end_date;
-                    $header->kode_jurnal = $this->generateJournalCode($id_cabang, $journal_type);
+                    $header->kode_jurnal = JurnalHeader::generateJournalCode($id_cabang, $journal_type);
                     // dd($header);
                     if (!$header->save()) {
                         DB::rollback();
@@ -2227,7 +2227,7 @@ class ClosingJournalController extends Controller
                 $header->user_modified = null;
                 $header->dt_created = $end_date;
                 $header->dt_modified = $end_date;
-                $header->kode_jurnal = $this->generateJournalCode($id_cabang, $journal_type);
+                $header->kode_jurnal = JurnalHeader::generateJournalCode($id_cabang, $journal_type);
                 // dd($header);
                 if (!$header->save()) {
                     // Revert post closing
@@ -2437,7 +2437,7 @@ class ClosingJournalController extends Controller
                 $header->user_modified = null;
                 $header->dt_created = $end_date;
                 $header->dt_modified = $end_date;
-                $header->kode_jurnal = $this->generateJournalCode($id_cabang, $journal_type);
+                $header->kode_jurnal = JurnalHeader::generateJournalCode($id_cabang, $journal_type);
                 // dd($header);
                 if (!$header->save()) {
                     DB::rollback();
@@ -2726,7 +2726,7 @@ class ClosingJournalController extends Controller
                 $header->user_modified = null;
                 $header->dt_created = $end_date;
                 $header->dt_modified = $end_date;
-                $header->kode_jurnal = $this->generateJournalCode($id_cabang, $journal_type);
+                $header->kode_jurnal = JurnalHeader::generateJournalCode($id_cabang, $journal_type);
 
                 if (!$header->save()) {
                     DB::rollback();
@@ -2938,7 +2938,7 @@ class ClosingJournalController extends Controller
                 $header->user_modified = null;
                 $header->dt_created = $end_date;
                 $header->dt_modified = $end_date;
-                $header->kode_jurnal = $this->generateJournalCode($id_cabang, $journal_type);
+                $header->kode_jurnal = JurnalHeader::generateJournalCode($id_cabang, $journal_type);
                 // dd($header);
                 if (!$header->save()) {
                     DB::rollback();
@@ -3147,7 +3147,7 @@ class ClosingJournalController extends Controller
                 $header->tanggal_jurnal = $end_date;
                 $header->dt_created = $end_date;
                 $header->dt_modified = $end_date;
-                $header->kode_jurnal = $this->generateJournalCode($id_cabang, $journal_type);
+                $header->kode_jurnal = JurnalHeader::generateJournalCode($id_cabang, $journal_type);
                 // dd($header);
                 Log::info("jurnaling");
                 Log::info($header->kode_jurnal);
@@ -3368,7 +3368,7 @@ class ClosingJournalController extends Controller
             $header->user_modified = null;
             $header->dt_created = $end_date;
             $header->dt_modified = $end_date;
-            $header->kode_jurnal = $this->generateJournalCode($id_cabang, $journal_type);
+            $header->kode_jurnal = JurnalHeader::generateJournalCode($id_cabang, $journal_type);
             // Log::info(json_encode($header));
             if (!$header->save()) {
                 DB::rollback();
@@ -3463,7 +3463,7 @@ class ClosingJournalController extends Controller
             $header2->user_modified = null;
             $header2->dt_created = $end_date;
             $header2->dt_modified = $end_date;
-            $header2->kode_jurnal = $this->generateJournalCode($id_cabang, $journal_type);
+            $header2->kode_jurnal = JurnalHeader::generateJournalCode($id_cabang, $journal_type);
             // Log::info(json_encode($header2));
             if (!$header2->save()) {
                 DB::rollback();
@@ -3545,7 +3545,7 @@ class ClosingJournalController extends Controller
                 $header3->user_modified = null;
                 $header3->dt_created = $end_date;
                 $header3->dt_modified = $end_date;
-                $header3->kode_jurnal = $this->generateJournalCode($id_cabang, $journal_type);
+                $header3->kode_jurnal = JurnalHeader::generateJournalCode($id_cabang, $journal_type);
                 // Log::info(json_encode($header3));
                 if (!$header3->save()) {
                     DB::rollback();
@@ -3638,6 +3638,11 @@ class ClosingJournalController extends Controller
                 "message" => $message,
             ]);
         }
+    }
+
+    public function testGenerateJournalCode($num, $cabang, $jenis){
+        $test = JurnalHeader::generateJournalCode($cabang, $jenis);
+        echo $test;
     }
 
     public function generateJournalCode($cabang, $jenis)
