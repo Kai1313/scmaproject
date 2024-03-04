@@ -60,6 +60,10 @@ class LaporanChecklistController extends Controller
             })
             ->where('cp.id_grup_pengguna', $userGroup)
             ->where('ok.alamat_objek_kerja', $location)
+            ->where(function ($a) use ($date) {
+                $a->where('tahun_checklist_pekerjaan', '*')
+                    ->orWhere('tahun_checklist_pekerjaan', 'like', '%' . date('w', strtotime($date)) . '%');
+            })
             ->where('ok.status_objek_kerja', '1')
             ->groupBy('ok.id_objek_kerja');
 
@@ -237,6 +241,10 @@ class LaporanChecklistController extends Controller
             ->join('pekerjaan', 'checklist_pekerjaan.id_pekerjaan', 'pekerjaan.id_pekerjaan')
             ->whereIn('id_objek_kerja', $pluckId)
             ->where('id_grup_pengguna', $userGroup)
+            ->where(function ($a) use ($date) {
+                $a->where('tahun_checklist_pekerjaan', '*')
+                    ->orWhere('tahun_checklist_pekerjaan', 'like', '%' . date('w', strtotime($date)) . '%');
+            })
             ->get();
 
         $answers = DB::table('jawaban_checklist_pekerjaan')
