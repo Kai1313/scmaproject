@@ -198,7 +198,6 @@ class ApiController extends Controller
                 }
                 $header = new JurnalHeader();
                 $header->id_cabang = $id_cabang;
-                $header->kode_jurnal = $this->generateJournalCode($id_cabang, $jurnal_type, $id_slip);
                 $header->id_transaksi = $id_transaksi;
                 $header->id_slip = $id_slip;
                 $header->jenis_jurnal = $jurnal_type;
@@ -209,6 +208,15 @@ class ApiController extends Controller
                 $header->dt_created = date('Y-m-d h:i:s');
                 $header->user_modified = $user_created;
                 $header->dt_created = date('Y-m-d h:i:s');
+                // $header->kode_jurnal = $this->generateJournalCode($id_cabang, $jurnal_type, $id_slip);
+                $header->kode_jurnal = JurnalHeader::generateJournalCodeWithSlip($id_cabang, $jurnal_type, $id_slip);
+                if ($header->kode_jurnal == "error") {
+                    DB::rollback();
+                    return response()->json([
+                        "result" => false,
+                        "message" => "Error when store Jurnal data on table header. Kode Jurnal result is error",
+                    ]);
+                }
             }
 
             if (!$header->save()) {
@@ -414,7 +422,6 @@ class ApiController extends Controller
                 }
                 $header = new JurnalHeader();
                 $header->id_cabang = $id_cabang;
-                $header->kode_jurnal = $this->generateJournalCode($id_cabang, $jurnal_type, $id_slip);
                 $header->id_transaksi = $id_transaksi;
                 $header->id_slip = $id_slip;
                 $header->jenis_jurnal = $jurnal_type;
@@ -425,6 +432,15 @@ class ApiController extends Controller
                 $header->dt_created = date('Y-m-d h:i:s');
                 $header->user_modified = $user_created;
                 $header->dt_created = date('Y-m-d h:i:s');
+                // $header->kode_jurnal = $this->generateJournalCode($id_cabang, $jurnal_type, $id_slip);
+                $header->kode_jurnal = JurnalHeader::generateJournalCodeWithSlip($id_cabang, $jurnal_type, $id_slip);
+                if ($header->kode_jurnal == "error") {
+                    DB::rollback();
+                    return response()->json([
+                        "result" => false,
+                        "message" => "Error when store Jurnal data on table header. Kode Jurnal result is error",
+                    ]);
+                }
             }
 
             if (!$header->save()) {
@@ -735,7 +751,6 @@ class ApiController extends Controller
             } else {
                 $header_me = new JurnalHeader();
                 $header_me->id_cabang = $id_cabang;
-                $header_me->kode_jurnal = $this->generateJournalCode($id_cabang, 'ME');
                 $header_me->id_transaksi = $id_transaksi;
                 $header_me->jenis_jurnal = 'ME';
                 $header_me->tanggal_jurnal = $tanggal_jurnal;
@@ -745,6 +760,15 @@ class ApiController extends Controller
                 $header_me->dt_created = date('Y-m-d h:i:s');
                 $header_me->user_modified = $user_created;
                 $header_me->dt_created = date('Y-m-d h:i:s');
+                // $header_me->kode_jurnal = $this->generateJournalCode($id_cabang, 'ME');
+                $header_me->kode_jurnal = JurnalHeader::generateJournalCode($id_cabang, 'ME');
+                if ($header_me->kode_jurnal == "error") {
+                    DB::rollback();
+                    return response()->json([
+                        "result" => false,
+                        "message" => "Error when store Jurnal data on table header. Kode Jurnal result is error",
+                    ]);
+                }
             }
 
             if (!$header_me->save()) {
@@ -864,7 +888,6 @@ class ApiController extends Controller
                     }
                     $header = new JurnalHeader();
                     $header->id_cabang = $id_cabang;
-                    $header->kode_jurnal = $this->generateJournalCode($id_cabang, $jurnal_type, $id_slip);
                     $header->id_transaksi = $id_transaksi;
                     $header->jenis_jurnal = $jurnal_type;
                     $header->id_slip = $id_slip;
@@ -875,6 +898,15 @@ class ApiController extends Controller
                     $header->dt_created = date('Y-m-d h:i:s');
                     $header->user_modified = $user_created;
                     $header->dt_created = date('Y-m-d h:i:s');
+                    // $header->kode_jurnal = $this->generateJournalCode($id_cabang, $jurnal_type, $id_slip);
+                    $header->kode_jurnal = JurnalHeader::generateJournalCodeWithSlip($id_cabang, $jurnal_type, $id_slip);
+                    if ($header->kode_jurnal == "error") {
+                        DB::rollback();
+                        return response()->json([
+                            "result" => false,
+                            "message" => "Error when store Jurnal data on table header. Kode Jurnal result is error",
+                        ]);
+                    }
                 }
 
                 if (!$header->save()) {
@@ -1190,7 +1222,6 @@ class ApiController extends Controller
             } else {
                 $header_me = new JurnalHeader();
                 $header_me->id_cabang = $id_cabang;
-                $header_me->kode_jurnal = $this->generateJournalCode($id_cabang, 'ME');
                 $header_me->id_transaksi = $id_transaksi;
                 $header_me->jenis_jurnal = 'ME';
                 $header_me->tanggal_jurnal = $tanggal_jurnal;
@@ -1200,6 +1231,15 @@ class ApiController extends Controller
                 $header_me->dt_created = date('Y-m-d h:i:s');
                 $header_me->user_modified = $user_created;
                 $header_me->dt_created = date('Y-m-d h:i:s');
+                // $header_me->kode_jurnal = $this->generateJournalCode($id_cabang, 'ME');
+                $header_me->kode_jurnal = JurnalHeader::generateJournalCode($id_cabang, 'ME');
+                if ($header_me->kode_jurnal == "error") {
+                    DB::rollback();
+                    return response()->json([
+                        "result" => false,
+                        "message" => "Error when store Jurnal data on table header. Kode Jurnal result is error",
+                    ]);
+                }
             }
 
             if (!$header_me->save()) {
@@ -1489,7 +1529,6 @@ class ApiController extends Controller
             } else {
                 $header_me = new JurnalHeader();
                 $header_me->id_cabang = $id_cabang;
-                $header_me->kode_jurnal = $this->generateJournalCode($id_cabang, 'ME');
                 $header_me->id_transaksi = $id_transaksi;
                 $header_me->jenis_jurnal = 'ME';
                 $header_me->tanggal_jurnal = $tanggal_jurnal;
@@ -1499,6 +1538,15 @@ class ApiController extends Controller
                 $header_me->dt_created = date('Y-m-d h:i:s');
                 $header_me->user_modified = $user_created;
                 $header_me->dt_created = date('Y-m-d h:i:s');
+                // $header_me->kode_jurnal = $this->generateJournalCode($id_cabang, 'ME');
+                $header_me->kode_jurnal = JurnalHeader::generateJournalCode($id_cabang, 'ME');
+                if ($header_me->kode_jurnal == "error") {
+                    DB::rollback();
+                    return response()->json([
+                        "result" => false,
+                        "message" => "Error when store Jurnal data on table header. Kode Jurnal result is error",
+                    ]);
+                }
             }
 
             if (!$header_me->save()) {
@@ -1768,7 +1816,6 @@ class ApiController extends Controller
             } else {
                 $header_me = new JurnalHeader();
                 $header_me->id_cabang = $id_cabang;
-                $header_me->kode_jurnal = $this->generateJournalCode($id_cabang, 'ME');
                 $header_me->id_transaksi = $id_transaksi;
                 $header_me->jenis_jurnal = 'ME';
                 $header_me->tanggal_jurnal = $tanggal_jurnal;
@@ -1778,6 +1825,15 @@ class ApiController extends Controller
                 $header_me->dt_created = date('Y-m-d h:i:s');
                 $header_me->user_modified = $user_created;
                 $header_me->dt_created = date('Y-m-d h:i:s');
+                // $header_me->kode_jurnal = $this->generateJournalCode($id_cabang, 'ME');
+                $header_me->kode_jurnal = JurnalHeader::generateJournalCode($id_cabang, 'ME');
+                if ($header_me->kode_jurnal == "error") {
+                    DB::rollback();
+                    return response()->json([
+                        "result" => false,
+                        "message" => "Error when store Jurnal data on table header. Kode Jurnal result is error",
+                    ]);
+                }
             }
 
             if (!$header_me->save()) {
@@ -1897,7 +1953,6 @@ class ApiController extends Controller
                     }
                     $header = new JurnalHeader();
                     $header->id_cabang = $id_cabang;
-                    $header->kode_jurnal = $this->generateJournalCode($id_cabang, $jurnal_type, $id_slip);
                     $header->id_transaksi = $id_transaksi;
                     $header->jenis_jurnal = $jurnal_type;
                     $header->id_slip = $id_slip;
@@ -1908,6 +1963,15 @@ class ApiController extends Controller
                     $header->dt_created = date('Y-m-d h:i:s');
                     $header->user_modified = $user_created;
                     $header->dt_created = date('Y-m-d h:i:s');
+                    // $header->kode_jurnal = $this->generateJournalCode($id_cabang, $jurnal_type, $id_slip);
+                    $header->kode_jurnal = JurnalHeader::generateJournalCodeWithSlip($id_cabang, $jurnal_type, $id_slip);
+                    if ($header->kode_jurnal == "error") {
+                        DB::rollback();
+                        return response()->json([
+                            "result" => false,
+                            "message" => "Error when store Jurnal data on table header. Kode Jurnal result is error",
+                        ]);
+                    }
                 }
 
                 if (!$header->save()) {
@@ -2111,7 +2175,6 @@ class ApiController extends Controller
             } else {
                 $header_me = new JurnalHeader();
                 $header_me->id_cabang = $id_cabang;
-                $header_me->kode_jurnal = $this->generateJournalCode($id_cabang, 'ME');
                 $header_me->id_transaksi = $id_transaksi;
                 $header_me->jenis_jurnal = 'ME';
                 $header_me->tanggal_jurnal = $tanggal_jurnal;
@@ -2121,6 +2184,15 @@ class ApiController extends Controller
                 $header_me->dt_created = date('Y-m-d h:i:s');
                 $header_me->user_modified = $user_created;
                 $header_me->dt_created = date('Y-m-d h:i:s');
+                // $header_me->kode_jurnal = $this->generateJournalCode($id_cabang, 'ME');
+                $header_me->kode_jurnal = JurnalHeader::generateJournalCode($id_cabang, 'ME');
+                if ($header_me->kode_jurnal == "error") {
+                    DB::rollback();
+                    return response()->json([
+                        "result" => false,
+                        "message" => "Error when store Jurnal data on table header. Kode Jurnal result is error",
+                    ]);
+                }
             }
 
             if (!$header_me->save()) {
@@ -2239,7 +2311,6 @@ class ApiController extends Controller
                     }
                     $header = new JurnalHeader();
                     $header->id_cabang = $id_cabang;
-                    $header->kode_jurnal = $this->generateJournalCode($id_cabang, $jurnal_type, $id_slip);
                     $header->id_transaksi = $id_transaksi;
                     $header->jenis_jurnal = $jurnal_type;
                     $header->id_slip = $id_slip;
@@ -2250,6 +2321,15 @@ class ApiController extends Controller
                     $header->dt_created = date('Y-m-d h:i:s');
                     $header->user_modified = $user_created;
                     $header->dt_created = date('Y-m-d h:i:s');
+                    // $header->kode_jurnal = $this->generateJournalCode($id_cabang, $jurnal_type, $id_slip);
+                    $header->kode_jurnal = JurnalHeader::generateJournalCode($id_cabang, $jurnal_type, $id_slip);
+                    if ($header->kode_jurnal == "error") {
+                        DB::rollback();
+                        return response()->json([
+                            "result" => false,
+                            "message" => "Error when store Jurnal data on table header. Kode Jurnal result is error",
+                        ]);
+                    }
                 }
 
                 if (!$header->save()) {
@@ -2435,7 +2515,6 @@ class ApiController extends Controller
             } else {
                 $header_me = new JurnalHeader();
                 $header_me->id_cabang = $id_cabang;
-                $header_me->kode_jurnal = $this->generateJournalCode($id_cabang, 'ME');
                 $header_me->id_transaksi = $id_transaksi;
                 $header_me->jenis_jurnal = 'ME';
                 $header_me->tanggal_jurnal = $tanggal_jurnal;
@@ -2445,6 +2524,15 @@ class ApiController extends Controller
                 $header_me->dt_created = date('Y-m-d h:i:s');
                 $header_me->user_modified = $user_created;
                 $header_me->dt_created = date('Y-m-d h:i:s');
+                // $header_me->kode_jurnal = $this->generateJournalCode($id_cabang, 'ME');
+                $header_me->kode_jurnal = JurnalHeader::generateJournalCode($id_cabang, 'ME');
+                if ($header_me->kode_jurnal == "error") {
+                    DB::rollback();
+                    return response()->json([
+                        "result" => false,
+                        "message" => "Error when store Jurnal data on table header. Kode Jurnal result is error",
+                    ]);
+                }
             }
 
             if (!$header_me->save()) {
@@ -2563,7 +2651,6 @@ class ApiController extends Controller
                     }
                     $header = new JurnalHeader();
                     $header->id_cabang = $id_cabang;
-                    $header->kode_jurnal = $this->generateJournalCode($id_cabang, $jurnal_type, $id_slip);
                     $header->id_transaksi = $id_transaksi;
                     $header->jenis_jurnal = $jurnal_type;
                     $header->id_slip = $id_slip;
@@ -2574,6 +2661,15 @@ class ApiController extends Controller
                     $header->dt_created = date('Y-m-d h:i:s');
                     $header->user_modified = $user_created;
                     $header->dt_created = date('Y-m-d h:i:s');
+                    // $header->kode_jurnal = $this->generateJournalCode($id_cabang, $jurnal_type, $id_slip);
+                    $header->kode_jurnal = JurnalHeader::generateJournalCodeWithSlip($id_cabang, $jurnal_type, $id_slip);
+                    if ($header->kode_jurnal == "error") {
+                        DB::rollback();
+                        return response()->json([
+                            "result" => false,
+                            "message" => "Error when store Jurnal data on table header. Kode Jurnal result is error",
+                        ]);
+                    }
                 }
 
                 if (!$header->save()) {
@@ -2997,7 +3093,16 @@ class ApiController extends Controller
                     $header->dt_created = $dateRecord;
                 }
                 $header->dt_modified = $dateRecord;
-                $header->kode_jurnal = $this->generateJournalCode($cabangID, $journalType);
+                // $header->kode_jurnal = $this->generateJournalCode($cabangID, $journalType);
+                $header->kode_jurnal = JurnalHeader::generateJournalCode($cabangID, $journalType);
+                if ($header->kode_jurnal == "error") {
+                    DB::rollback();
+                    return response()->json([
+                        "result" => false,
+                        "message" => "Error when store Jurnal data on table header. Kode Jurnal result is error",
+                    ]);
+                }
+
                 if (!$header->save()) {
                     DB::rollback();
                     Log::error("Error when storing journal header on storeHppJournal");
@@ -3557,7 +3662,16 @@ class ApiController extends Controller
             $header->user_modified = $userModified;
             $header->dt_created = $dateRecord;
             $header->dt_modified = $dateRecord;
-            $header->kode_jurnal = $this->generateJournalCode($cabangID, $journalType);
+            // $header->kode_jurnal = $this->generateJournalCode($cabangID, $journalType);
+            $header->kode_jurnal = JurnalHeader::generateJournalCode($cabangID, $journalType);
+            if ($header->kode_jurnal == "error") {
+                DB::rollback();
+                return response()->json([
+                    "result" => false,
+                    "message" => "Error when store Jurnal data on table header. Kode Jurnal result is error",
+                ]);
+            }
+
             if (!$header->save()) {
                 DB::rollback();
                 Log::error("Error when storing journal header.");
@@ -3749,7 +3863,16 @@ class ApiController extends Controller
             $header->user_modified = $userModified;
             $header->dt_created = $dateRecord;
             $header->dt_modified = $dateRecord;
-            $header->kode_jurnal = $this->generateJournalCode($cabangID, $journalType);
+            // $header->kode_jurnal = $this->generateJournalCode($cabangID, $journalType);
+            $header->kode_jurnal = JurnalHeader::generateJournalCode($cabangID, $journalType);
+            if ($header->kode_jurnal == "error") {
+                DB::rollback();
+                return response()->json([
+                    "result" => false,
+                    "message" => "Error when store Jurnal data on table header. Kode Jurnal result is error",
+                ]);
+            }
+
             if (!$header->save()) {
                 DB::rollback();
                 Log::error("Error when storing journal header.");
