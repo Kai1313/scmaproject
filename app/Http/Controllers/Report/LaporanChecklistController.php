@@ -126,6 +126,7 @@ class LaporanChecklistController extends Controller
         $jobs = [];
         $status = '0';
         $datas = [];
+        $obj = '';
         if ($data) {
             $status = '1';
             $medias = DB::table('media_jawaban')
@@ -147,11 +148,13 @@ class LaporanChecklistController extends Controller
                 ->join('pekerjaan as p', 'cp.id_pekerjaan', 'p.id_pekerjaan')
                 ->where('cp.id_objek_kerja', $idObjekKerja)
                 ->where('cp.id_grup_pengguna', $group)
+                ->where('tahun_checklist_pekerjaan', 'like', date('w', strtotime($date)))
                 ->where('status_checklist_pekerjaan', '1')
                 ->orderBy('cp.urut_checklist_pekerjaan', 'asc')
                 ->get();
 
             $data = DB::table('grup_pengguna')->where('id_grup_pengguna', $group)->first();
+            $obj = DB::table('objek_kerja')->where('id_objek_kerja', $id)->first();
         }
 
         return view('report_ops.laporanChecklist.view', [
@@ -161,6 +164,7 @@ class LaporanChecklistController extends Controller
             'jobs' => $jobs,
             'status' => $status,
             'datas' => $datas,
+            'obj' => $obj,
         ]);
     }
 

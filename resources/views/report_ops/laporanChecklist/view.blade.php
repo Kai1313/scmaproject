@@ -149,7 +149,7 @@
                     <tr>
                         <td style="width:100px;font-weight:bold;">Checklist</td>
                         <td>:</td>
-                        <td>{{ $status == '1' ? $data->nama_objek_kerja : '' }}</td>
+                        <td>{{ $status == '1' ? $data->nama_objek_kerja : $obj->nama_objek_kerja }}</td>
                     </tr>
                     <tr>
                         <td style="width:100px;font-weight:bold;">Pemeriksa</td>
