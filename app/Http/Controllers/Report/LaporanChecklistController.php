@@ -148,7 +148,10 @@ class LaporanChecklistController extends Controller
                 ->join('pekerjaan as p', 'cp.id_pekerjaan', 'p.id_pekerjaan')
                 ->where('cp.id_objek_kerja', $idObjekKerja)
                 ->where('cp.id_grup_pengguna', $group)
-                ->where('tahun_checklist_pekerjaan', 'like', date('w', strtotime($date)))
+                ->where(function ($q) use ($date) {
+                    $q->where('tahun_checklist_pekerjaan', '*')
+                        ->orWhere('tahun_checklist_pekerjaan', 'like', '%' . date('w', strtotime($date)) . '%');
+                })
                 ->where('status_checklist_pekerjaan', '1')
                 ->orderBy('cp.urut_checklist_pekerjaan', 'asc')
                 ->get();

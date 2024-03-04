@@ -233,6 +233,11 @@
                                     <td style="width:50px;text-align:center;"></td>
                                 </tr>
                             @endforeach
+                            @if (count($datas) == 0)
+                                <tr>
+                                    <td colspan="4">Tidak ada checklist pekerjaan</td>
+                                </tr>
+                            @endif
                         @endif
                     </tbody>
                 </table>
