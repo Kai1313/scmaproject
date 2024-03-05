@@ -320,7 +320,7 @@ class PurchaseDownPaymentController extends Controller
             ->whereBetween('tanggal_permintaan_pembelian', [$startDate, $endDate])
             ->where('permintaan_pembelian.id_cabang', $idCabang)
             ->groupBy('id_permintaan_pembelian')
-            ->havingRaw('mtotal_permintaan_pembelian <> if(sum(total) ,sum(total) , 0)')
+            // ->havingRaw('mtotal_permintaan_pembelian <> if(sum(total) ,sum(total) , 0)')
             ->orderBy('tanggal_permintaan_pembelian', 'desc')
             ->orderBy('nama_permintaan_pembelian', 'desc')
             ->get();
