@@ -12,7 +12,7 @@ class QualityControl extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'id_cabang', 'id_pembelian', 'id_barang', 'id_satuan_barang', 'jumlah_pembelian_detail', 'tanggal_qc', 'status_qc', 'reeason', 'sg_pembelian_detail', 'be_pembelian_detail', 'ph_pembelian_detail', 'warna_pembelian_detail', 'keterangan_pembelian_detail', 'bentuk_pembelian_detail', 'approval_date', 'approval_reason', 'approval_user_id', 'path', 'path2',
+        'id_cabang', 'id_pembelian', 'id_barang', 'id_satuan_barang', 'jumlah_pembelian_detail', 'tanggal_qc', 'status_qc', 'reason', 'sg_pembelian_detail', 'be_pembelian_detail', 'ph_pembelian_detail', 'warna_pembelian_detail', 'keterangan_pembelian_detail', 'bentuk_pembelian_detail', 'approval_date', 'approval_reason', 'approval_user_id', 'path', 'path2',
     ];
 
     public function cabang()
@@ -43,7 +43,7 @@ class QualityControl extends Model
             'ph_pembelian_detail' => $this->ph_pembelian_detail,
             'warna_pembelian_detail' => $this->warna_pembelian_detail,
             'bentuk_pembelian_detail' => $this->bentuk_pembelian_detail,
-            'keterangan_pembelian_detail' => $this->keterangan_pembelian_detail,
+            'keterangan_qc_pembelian_detail' => $this->keterangan_pembelian_detail,
         ];
 
         DB::table('pembelian_detail')->where('id_pembelian', $this->id_pembelian)
@@ -56,7 +56,7 @@ class QualityControl extends Model
             'ph_master_qr_code' => $this->ph_pembelian_detail,
             'warna_master_qr_code' => $this->warna_pembelian_detail,
             'bentuk_master_qr_code' => $this->bentuk_pembelian_detail,
-            'keterangan_master_qr_code' => $this->keterangan_pembelian_detail,
+            'keterangan_qc_master_qr_code' => $this->keterangan_pembelian_detail,
             'status_qc_qr_code' => $this->status_qc,
         ]);
 
