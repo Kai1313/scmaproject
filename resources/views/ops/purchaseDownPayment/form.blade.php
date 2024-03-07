@@ -150,9 +150,12 @@
                             <label>Nominal <span>*</span></label>
                             <div class="form-group">
                                 <input type="text" name="nominal" class="form-control handle-number-2"
+                                    value="{{ old('nominal', $data ? $data->nominal : '') }}" data-validation="[NOTEMPTY]"
+                                    data-validation-message="Nominal tidak boleh kosong">
+                                {{-- <input type="text" name="nominal" class="form-control handle-number-2"
                                     value="{{ old('nominal', $data ? $data->nominal : '') }}"
                                     data-max="{{ $maxPayment }}" data-validation="[NOTEMPTY]"
-                                    data-validation-message="Nominal tidak boleh kosong">
+                                    data-validation-message="Nominal tidak boleh kosong"> --}}
                                 <input type="hidden" name="konversi_nominal"
                                     value="{{ old('konversi_nominal', $data ? $data->konversi_nominal : '') }}"
                                     class="handle-number-2">
@@ -252,9 +255,9 @@
                     id: '{{ $data ? $data->id_uang_muka_pembelian : 0 }}'
                 },
                 success: function(res) {
-                    $('[name="nominal"]').val(formatNumber(res.nominal, 2)).attr(
-                        'data-max', res
-                        .nominal)
+                    // $('[name="nominal"]').val(formatNumber(res.nominal, 2)).attr(
+                    //     'data-max', res
+                    //     .nominal)
                     $('[name="total"]').val(formatNumber(res.total, 2))
                     $('[name="konversi_total"]').val(formatNumber(res.total * res.nilai_mata_uang, 2))
                     $('[name="id_mata_uang"]').val(res.id_mata_uang)
