@@ -372,6 +372,7 @@ class VisitController extends Controller
                 $data->user_pelanggan = session()->get('user')['id_pengguna'];
                 $data->plafon_pelanggan = 10000000;
                 $data->plafon_hari_pelanggan = 1;
+                $data->kode_pelanggan = $this->generateCodeCustomer();
             }
 
             $data->nama_pelanggan = $request->nama_pelanggan;
@@ -398,6 +399,19 @@ class VisitController extends Controller
             Log::error($th);
             return response()->json(["result" => false, "message" => 'Pelanggan gagal disimpan'], 500);
         }
+    }
+
+    public function generateCodeCustomer()
+    {
+        $data = \App\Models\Master\Pelanggan::orderBy('kode_pelanggan', 'desc')->first();
+        $string = substr($data->kode_pelanggan, 9, 6);
+        $num = (int) $string + 1;
+        $zero = '';
+        for ($i = 0; $i < (6 - strlen((string) $num)); $i++) {
+            $zero .= '0';
+        }
+
+        return 'CUST-SCA-' . $zero . $num;
     }
 
     public function saveDateChange(Request $request, $id)
