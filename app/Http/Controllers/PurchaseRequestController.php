@@ -155,23 +155,27 @@ class PurchaseRequestController extends Controller
             $data->save();
             $data->savedetails($request->details);
 
-            if ($id == 0) {
-                $access = DB::table('setting')->where('id_cabang', $request->id_cabang)->where('code', 'PR Send WA')->first();
-                if ($access && $access->value1 == '1') {
-                    $userSendWa = DB::table('pengguna')
-                        ->select('nama_pengguna', 'telepon1_pengguna')
-                        ->whereIn('id_grup_pengguna', [7, 13])
-                        ->where('status_pengguna', 1)->get();
-                    $settingMessage = DB::table('setting')->where('code', 'Pesan Permintaan Beli')->first();
-                    $strParam = [
-                        '[[pembuat]]' => $data->pengguna->nama_pengguna,
-                        '[[code]]' => $data->purchase_request_code,
-                        '[[date]]' => date('d/m/Y'),
-                    ];
-                    foreach ($userSendWa as $user) {
-                        $messageText = replaceMessage($strParam, $settingMessage->value1);
-                        $this->sendToWa($user->telepon1_pengguna, $messageText);
-                    }
+            $access = DB::table('setting')->where('code', 'PR Send WA')->first();
+            if ($access && $access->value1 == '1') {
+                $group = DB::table('setting')->where('code', 'PR Notice')->first();
+                if (!$group) {
+                    return response()->json(['status' => 'error', 'message' => 'Grup belum di seting'], 500);
+                }
+
+                $expolodeGroup = explode(',', $group->value1);
+                $userSendWa = DB::table('pengguna')
+                    ->select('nama_pengguna', 'telepon1_pengguna')
+                    ->whereIn('id_grup_pengguna', $expolodeGroup)
+                    ->where('status_pengguna', 1)->get();
+                $settingMessage = DB::table('setting')->where('code', 'Pesan Permintaan Beli')->first();
+                $strParam = [
+                    '[[pembuat]]' => $data->pengguna->nama_pengguna,
+                    '[[code]]' => $data->purchase_request_code,
+                    '[[date]]' => date('d/m/Y'),
+                ];
+                foreach ($userSendWa as $user) {
+                    $messageText = replaceMessage($strParam, $settingMessage->value1);
+                    $this->sendToWa($user->telepon1_pengguna, $messageText);
                 }
             }
 
