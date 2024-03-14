@@ -358,7 +358,8 @@
                                                 @php
                                                     $extra = '';
                                                     if ($key == 0) {
-                                                        $extra = 'data-validation=[NOTEMPTY] data-validation-message=Hasil_kunjungan_tidak_boleh_kosong';
+                                                        $extra =
+                                                            'data-validation=[NOTEMPTY] data-validation-message=Hasil_kunjungan_tidak_boleh_kosong';
                                                     }
                                                 @endphp
                                                 <input type="checkbox" name="progress_ind[]" value="{{ $pro }}"
@@ -578,6 +579,7 @@
 
 @section('externalScripts')
     <script>
+        var visit = {!! $data ? json_encode($data->visit_title) : '' !!}
         $('.select2').select2()
         let customer = {
             id: '{{ $data ? $data->id_pelanggan : '' }}',
@@ -658,6 +660,10 @@
 
         $('.edit-header').click(function() {
             let arrayFormHeader = ['id_pelanggan', 'pre_visit_desc'];
+            if (visit) {
+                arrayFormHeader = []
+            }
+
             for (let i = 0; i < arrayFormHeader.length; i++) {
                 $('[name="' + arrayFormHeader[i] + '"]').attr('readonly', false)
             }
