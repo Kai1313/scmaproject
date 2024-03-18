@@ -163,20 +163,20 @@ class PurchaseRequestController extends Controller
                 }
 
                 $expolodeGroup = explode(',', $group->value1);
-                $userSendWa = DB::table('pengguna')
+                $user = DB::table('pengguna')
                     ->select('nama_pengguna', 'telepon1_pengguna')
                     ->whereIn('id_grup_pengguna', $expolodeGroup)
-                    ->where('status_pengguna', 1)->get();
+                    ->where('status_pengguna', 1)->first();
                 $settingMessage = DB::table('setting')->where('code', 'Pesan Permintaan Beli')->first();
                 $strParam = [
                     '[[pembuat]]' => $data->pengguna->nama_pengguna,
                     '[[code]]' => $data->purchase_request_code,
                     '[[date]]' => date('d/m/Y'),
                 ];
-                foreach ($userSendWa as $user) {
-                    $messageText = replaceMessage($strParam, $settingMessage->value1);
-                    $this->sendToWa($user->telepon1_pengguna, $messageText);
-                }
+                // foreach ($userSendWa as $user) {
+                $messageText = replaceMessage($strParam, $settingMessage->value1);
+                $this->sendToWa($user->telepon1_pengguna, $messageText);
+                // }
             }
 
             DB::commit();
@@ -353,10 +353,10 @@ class PurchaseRequestController extends Controller
 
             $access = DB::table('setting')->where('id_cabang', $data->id_cabang)->where('code', 'PR Send WA')->first();
             if ($access && $access->value1 == '1') {
-                $userSendWa = DB::table('pengguna')
+                $user = DB::table('pengguna')
                     ->select('nama_pengguna', 'telepon1_pengguna')
                     ->where('id_pengguna', $data->user_created)
-                    ->where('status_pengguna', 1)->get();
+                    ->where('status_pengguna', 1)->first();
                 $settingMessage = DB::table('setting')->where('code', 'Pesan Persetujuan Beli')->first();
                 $strParam = [
                     '[[pembuat]]' => $data->pengguna->nama_pengguna,
@@ -364,10 +364,10 @@ class PurchaseRequestController extends Controller
                     '[[date]]' => date('d/m/Y'),
                     '[[status]]' => $type == 'approval' ? 'disetujui' : 'ditolak',
                 ];
-                foreach ($userSendWa as $user) {
-                    $messageText = replaceMessage($strParam, $settingMessage->value1);
-                    $this->sendToWa($user->telepon1_pengguna, $messageText);
-                }
+                // foreach ($userSendWa as $user) {
+                $messageText = replaceMessage($strParam, $settingMessage->value1);
+                $this->sendToWa($user->telepon1_pengguna, $messageText);
+                // }
             }
 
             DB::commit();
@@ -517,10 +517,10 @@ class PurchaseRequestController extends Controller
 
             $access = DB::table('setting')->where('id_cabang', $parent->id_cabang)->where('code', 'PR Send WA')->first();
             if ($access && $access->value1 == '1') {
-                $userSendWa = DB::table('pengguna')
+                $user = DB::table('pengguna')
                     ->select('nama_pengguna', 'telepon1_pengguna')
                     ->where('id_pengguna', $parent->user_created)
-                    ->where('status_pengguna', 1)->get();
+                    ->where('status_pengguna', 1)->first();
                 $settingMessage = DB::table('setting')->where('code', 'Pesan Persetujuan Beli')->first();
                 $strParam = [
                     '[[pembuat]]' => $parent->pengguna->nama_pengguna,
@@ -528,10 +528,10 @@ class PurchaseRequestController extends Controller
                     '[[date]]' => date('d/m/Y'),
                     '[[status]]' => $parent->approval_status == '1' ? 'disetujui' : 'ditolak',
                 ];
-                foreach ($userSendWa as $user) {
-                    $messageText = replaceMessage($strParam, $settingMessage->value1);
-                    $this->sendToWa($user->telepon1_pengguna, $messageText);
-                }
+                // foreach ($userSendWa as $user) {
+                $messageText = replaceMessage($strParam, $settingMessage->value1);
+                $this->sendToWa($user->telepon1_pengguna, $messageText);
+                // }
             }
         }
 
