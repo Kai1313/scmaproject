@@ -36,15 +36,6 @@ class QualityControl extends Model
 
     public function updatePembelianDetail()
     {
-        $array = [
-            'sg_pembelian_detail' => $this->sg_pembelian_detail,
-            'be_pembelian_detail' => $this->be_pembelian_detail,
-            'ph_pembelian_detail' => $this->ph_pembelian_detail,
-            'warna_pembelian_detail' => $this->warna_pembelian_detail,
-            'bentuk_pembelian_detail' => $this->bentuk_pembelian_detail,
-            'keterangan_qc_pembelian_detail' => $this->keterangan_pembelian_detail,
-        ];
-
         $purchase = PurchaseDetail::where('id_pembelian', $this->id_pembelian)->where('id_barang', $this->id_barang)->get();
         foreach ($purchase as $p) {
             $p->sg_pembelian_detail = $this->sg_pembelian_detail;
