@@ -32,7 +32,8 @@
                     <div class="col-md-3">
                         <label>Lokasi</label>
                         <div class="form-group">
-                            <select name="location" class="form-control select2 trigger-change" style="width:100%;">
+                            <select name="location" class="form-control select2 trigger-change change-filter"
+                                style="width:100%;">
                                 <option value="">Pilih Lokasi</option>
                                 @foreach ($locations as $location)
                                     <option value="{{ $location->alamat_objek_kerja }}">{{ $location->alamat_objek_kerja }}
@@ -44,14 +45,15 @@
                     <div class="col-md-3">
                         <label>Tanggal</label>
                         <div class="form-group">
-                            <input type="date" name="date" class="form-control trigger-change"
+                            <input type="date" name="date" class="form-control trigger-change change-filter"
                                 value="{{ date('Y-m-d') }}">
                         </div>
                     </div>
                     <div class="col-md-3">
                         <label>Grup Pengguna</label>
                         <div class="form-group">
-                            <select name="user_group" class="form-control select2 trigger-change" style="width:100%;">
+                            <select name="user_group" class="form-control select2 trigger-change change-filter"
+                                style="width:100%;">
                                 <option value="">Pilih Pengguna</option>
                                 @foreach ($users as $user)
                                     <option value="{{ $user['id'] }}">{{ $user['text'] }}</option>
@@ -112,7 +114,13 @@
         let defaultUrlPrint = []
         let param = ''
         let table = ''
+        var defaultFilter = sessionStorage.getItem('report_checklist_filter') ? JSON.parse(sessionStorage.getItem(
+            'report_checklist_filter')) : {};
+        for (const key in defaultFilter) {
+            $('[name="' + key + '"]').val(defaultFilter[key])
+        }
 
+        getParam()
         $('.select2').select2()
         $('.btn-action').each(function(i, v) {
             defaultUrlPrint.push($(v).prop('href'))
@@ -120,6 +128,7 @@
 
         $('.trigger-change').change(function() {
             getParam()
+            changeFilter()
         })
 
         function getParam() {
@@ -137,6 +146,9 @@
             if (s == 0) {
                 $('.btn-action').show()
                 $('.btn-view-action').attr('disabled', false)
+                setTimeout(() => {
+                    $('.btn-view-action').click()
+                }, 100);
             } else {
                 $('.btn-action').hide()
                 $('.btn-view-action').attr('disabled', true)
@@ -182,7 +194,7 @@
                         let split = defaultUrlIndex.split('/index')
                         return '<a href="' + split[0] + '/view/' + row.id_objek_kerja +
                             '?date=' + $('[name="date"]').val() +
-                            '&grup=' + $('[name="user_group"]').val() + '" target="_blank">' +
+                            '&grup=' + $('[name="user_group"]').val() + '">' +
                             data + '</a>'
                     }
                 }, {
@@ -194,6 +206,14 @@
                     }
                 }]
             });
+        }
+
+        function changeFilter() {
+            $('.change-filter').each(function(i, v) {
+                defaultFilter[$(v).prop('name')] = $(v).val()
+            })
+
+            sessionStorage.setItem('report_checklist_filter', JSON.stringify(defaultFilter));
         }
     </script>
 @endsection

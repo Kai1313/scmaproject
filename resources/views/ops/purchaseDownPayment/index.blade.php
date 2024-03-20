@@ -58,7 +58,7 @@
                     <div class="col-md-4">
                         <label>Cabang</label>
                         <div class="form-group">
-                            <select name="id_cabang" class="form-control select2">
+                            <select name="id_cabang" class="form-control select2 change-filter">
                                 @foreach ($cabang as $branch)
                                     <option value="{{ $branch['id'] }}">{{ $branch['text'] }}
                                     </option>
@@ -120,6 +120,12 @@
 
 @section('externalScripts')
     <script>
+        var defaultFilter = sessionStorage.getItem('purchase_down_payment_filter') ? JSON.parse(sessionStorage.getItem(
+            'purchase_down_payment_filter')) : {};
+        for (const key in defaultFilter) {
+            $('[name="' + key + '"]').val(defaultFilter[key])
+        }
+
         $('.select2').select2()
         var table = $('.data-table').DataTable({
             scrollX: true,
@@ -214,11 +220,20 @@
         $('[name="id_cabang"]').change(function() {
             table.ajax.url("?c=" + $('[name="id_cabang"]').val() + '&show_void=' + $('[name="show_void"]').is(
                 ':checked')).load()
+            changeFilter()
         })
 
         $('[name="show_void"]').change(function() {
             table.ajax.url("?c=" + $('[name="id_cabang"]').val() + '&show_void=' + $('[name="show_void"]').is(
                 ':checked')).load()
         })
+
+        function changeFilter() {
+            $('.change-filter').each(function(i, v) {
+                defaultFilter[$(v).prop('name')] = $(v).val()
+            })
+
+            sessionStorage.setItem('purchase_down_payment_filter', JSON.stringify(defaultFilter));
+        }
     </script>
 @endsection

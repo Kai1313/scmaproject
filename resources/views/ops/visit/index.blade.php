@@ -64,7 +64,7 @@
                     <div class="col-md-2 filter-div">
                         <label>Cabang</label>
                         <div class="form-group">
-                            <select id="id_cabang" class="form-control select2" name="id_cabang">
+                            <select id="id_cabang" class="form-control select2 change-filter" name="id_cabang">
                                 <option value="">Semua Cabang</option>
                                 @foreach ($cabang as $branch)
                                     <option value="{{ $branch['id'] }}">{{ $branch['text'] }}</option>
@@ -75,14 +75,15 @@
                     <div class="col-md-2 filter-div">
                         <label>Tanggal</label>
                         <div class="form-group">
-                            <input type="text" id="daterangepicker" class="form-control" name="daterangepicker" />
+                            <input type="text" id="daterangepicker" class="form-control change-filter"
+                                name="daterangepicker" />
                         </div>
                     </div>
                     @if ($groupUser != 6)
                         <div class="col-md-2 filter-div">
                             <label>Sales</label>
                             <div class="form-group">
-                                <select id="id_salesman" class="form-control select2" name="id_salesman">
+                                <select id="id_salesman" class="form-control select2 change-filter" name="id_salesman">
                                     <option value="">Semua Sales</option>
                                     @foreach ($salesmans as $sales)
                                         <option value="{{ $sales->id }}">{{ $sales->text }}</option>
@@ -96,7 +97,7 @@
                     <div class="col-md-2 filter-div">
                         <label>Status</label>
                         <div class="form-group">
-                            <select id="status" class="form-control select2" name="status">
+                            <select id="status" class="form-control select2 change-filter" name="status">
                                 <option value="">Semua Status</option>
                                 <option value="1">Belum Visit</option>
                                 <option value="2">Sudah Visit</option>
@@ -107,7 +108,8 @@
                     <div class="col-md-2 filter-div">
                         <label>Kategori Pelanggan</label>
                         <div class="form-group">
-                            <select id="status_pelanggan" class="form-control select2" name="status_pelanggan">
+                            <select id="status_pelanggan" class="form-control select2 change-filter"
+                                name="status_pelanggan">
                                 <option value="">Semua Kategori</option>
                                 @foreach ($customerCategory as $category)
                                     <option value="{{ $category }}">{{ $category }}</option>
@@ -169,6 +171,12 @@
 
 @section('externalScripts')
     <script>
+        var defaultFilter = sessionStorage.getItem('visit_filter') ? JSON.parse(sessionStorage.getItem(
+            'visit_filter')) : {};
+        for (const key in defaultFilter) {
+            $('[name="' + key + '"]').val(defaultFilter[key])
+        }
+
         var salesman = {!! json_encode($salesmans) !!}
         $('.select2').select2();
 
@@ -291,6 +299,18 @@
                     Swal.fire("Gagal Hapus Data. ", data.responseJSON.message, 'error')
                 }
             })
+        }
+
+        $('.change-filter').change(function() {
+            changeFilter()
+        })
+
+        function changeFilter() {
+            $('.change-filter').each(function(i, v) {
+                defaultFilter[$(v).prop('name')] = $(v).val()
+            })
+
+            sessionStorage.setItem('visit_filter', JSON.stringify(defaultFilter));
         }
     </script>
 @endsection

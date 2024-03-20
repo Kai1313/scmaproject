@@ -64,7 +64,7 @@
                     <div class="col-md-4">
                         <label>Cabang</label>
                         <div class="form-group">
-                            <select name="id_cabang" class="form-control select2">
+                            <select name="id_cabang" class="form-control select2 change-filter">
                                 @foreach ($cabang as $branch)
                                     <option value="{{ $branch['id'] }}">{{ $branch['text'] }}</option>
                                 @endforeach
@@ -74,14 +74,14 @@
                     <div class="col-md-2">
                         <label>Tanggal Awal</label>
                         <div class="form-group">
-                            <input type="text" name="start_date" class="form-control datepicker"
+                            <input type="text" name="start_date" class="form-control datepicker change-filter"
                                 value="{{ $startDate }}">
                         </div>
                     </div>
                     <div class="col-md-2">
                         <label>Tanggal Akhir</label>
                         <div class="form-group">
-                            <input type="text" name="end_date" class="form-control datepicker"
+                            <input type="text" name="end_date" class="form-control datepicker change-filter"
                                 value="{{ $endDate }}">
                         </div>
                     </div>
@@ -188,6 +188,12 @@
 
 @section('externalScripts')
     <script>
+        var defaultFilter = sessionStorage.getItem('qc_filter') ? JSON.parse(sessionStorage.getItem(
+            'qc_filter')) : {};
+        for (const key in defaultFilter) {
+            $('[name="' + key + '"]').val(defaultFilter[key])
+        }
+
         $('.select2').select2()
         $('.datepicker').datepicker({
             format: 'yyyy-mm-dd',
@@ -275,6 +281,7 @@
             table.ajax.url("?c=" + $('[name="id_cabang"]').val() + '&start_date=' + $('[name="start_date"]').val() +
                 '&end_date=' + $('[name="end_date"]').val() + '&show_img=' + $('[name="show_image"]').is(
                     ':checked')).load()
+            changeFilter()
         })
 
         $('body').on('click', '.btn-revision', function() {
@@ -303,5 +310,13 @@
                 '&end_date=' + $('[name="end_date"]').val() + '&show_img=' + $('[name="show_image"]').is(
                     ':checked')).load()
         })
+
+        function changeFilter() {
+            $('.change-filter').each(function(i, v) {
+                defaultFilter[$(v).prop('name')] = $(v).val()
+            })
+
+            sessionStorage.setItem('qc_filter', JSON.stringify(defaultFilter));
+        }
     </script>
 @endsection

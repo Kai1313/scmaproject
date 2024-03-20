@@ -114,7 +114,7 @@
 
 @section('externalScripts')
     <script>
-        var defaultFilter = localStorage.getItem('material_usage_filter') ? JSON.parse(localStorage.getItem(
+        var defaultFilter = sessionStorage.getItem('material_usage_filter') ? JSON.parse(sessionStorage.getItem(
             'material_usage_filter')) : {};
         for (const key in defaultFilter) {
             $('[name="' + key + '"]').val(defaultFilter[key])
@@ -177,7 +177,7 @@
                 defaultFilter[$(v).prop('name')] = $(v).val()
             })
 
-            localStorage.setItem('material_usage_filter', JSON.stringify(defaultFilter));
+            sessionStorage.setItem('material_usage_filter', JSON.stringify(defaultFilter));
         }
     </script>
 @endsection

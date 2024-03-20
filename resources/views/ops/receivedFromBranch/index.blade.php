@@ -58,7 +58,7 @@
                     <div class="col-md-4">
                         <label>Cabang Penerima</label>
                         <div class="form-group">
-                            <select name="id_cabang" class="form-control select2">
+                            <select name="id_cabang" class="form-control select2 change-filter">
                                 @foreach ($cabang as $branch)
                                     <option value="{{ $branch['id'] }}">{{ $branch['text'] }}</option>
                                 @endforeach
@@ -109,11 +109,18 @@
 
 @section('externalScripts')
     <script>
+        var defaultFilter = sessionStorage.getItem('received_from_branch_filter') ? JSON.parse(sessionStorage.getItem(
+            'received_from_branch_filter')) : {};
+        for (const key in defaultFilter) {
+            $('[name="' + key + '"]').val(defaultFilter[key])
+        }
+
         $('.select2').select2()
         var table = $('.data-table').DataTable({
             scrollX: true,
             processing: true,
             serverSide: true,
+            pageLength: 50,
             ajax: "{{ route('received_from_branch') }}?c=" + $('[name="id_cabang"]').val(),
             columns: [{
                 data: 'tanggal_pindah_barang',
@@ -150,6 +157,15 @@
 
         $('[name="id_cabang"]').change(function() {
             table.ajax.url("?c=" + $('[name="id_cabang"]').val()).load()
+            changeFilter()
         })
+
+        function changeFilter() {
+            $('.change-filter').each(function(i, v) {
+                defaultFilter[$(v).prop('name')] = $(v).val()
+            })
+
+            sessionStorage.setItem('received_from_branch_filter', JSON.stringify(defaultFilter));
+        }
     </script>
 @endsection

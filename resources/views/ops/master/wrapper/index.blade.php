@@ -51,7 +51,7 @@
                     <div class="col-md-4">
                         <label>Cabang</label>
                         <div class="form-group">
-                            <select name="id_cabang" class="form-control select2">
+                            <select name="id_cabang" class="form-control select2 change-filter">
                                 @foreach ($cabang as $branch)
                                     <option value="{{ $branch['id'] }}">{{ $branch['text'] }}</option>
                                 @endforeach
@@ -112,12 +112,19 @@
 
 @section('externalScripts')
     <script>
+        var defaultFilter = sessionStorage.getItem('master_wrapper_filter') ? JSON.parse(sessionStorage.getItem(
+            'master_wrapper_filter')) : {};
+        for (const key in defaultFilter) {
+            $('[name="' + key + '"]').val(defaultFilter[key])
+        }
+
         $('.select2').select2()
         var table = $('.data-table').DataTable({
             scrollX: true,
             processing: true,
             serverSide: true,
             order: [],
+            pageLength: 50,
             ajax: "{{ route('master-wrapper') }}" + "?c=" + $('[name="id_cabang"]').val() + '&show_img=' + $(
                 '[name="show_image"]').is(':checked'),
             columns: [{
@@ -152,11 +159,20 @@
         $('[name="id_cabang"]').change(function() {
             table.ajax.url("?c=" + $('[name="id_cabang"]').val() + '&show_img=' + $('[name="show_image"]').is(
                 ':checked')).load()
+            changeFilter()
         })
 
         $('[name="show_image"]').change(function() {
             table.ajax.url("?c=" + $('[name="id_cabang"]').val() + '&show_img=' + $('[name="show_image"]').is(
                 ':checked')).load()
         })
+
+        function changeFilter() {
+            $('.change-filter').each(function(i, v) {
+                defaultFilter[$(v).prop('name')] = $(v).val()
+            })
+
+            sessionStorage.setItem('master_wrapper_filter', JSON.stringify(defaultFilter));
+        }
     </script>
 @endsection
