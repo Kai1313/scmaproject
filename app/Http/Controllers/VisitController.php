@@ -216,6 +216,7 @@ class VisitController extends Controller
 
             if ($id == 0) {
                 $data->fill($request->all());
+                $data->visit_type = 'LOKASI';
                 $data->status = '1';
                 $data->visit_code = Visit::createcode($request->id_cabang);
                 $data->user_created = session()->get('user')['id_pengguna'];

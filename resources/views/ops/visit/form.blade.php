@@ -315,19 +315,6 @@
                         <div class="box-body">
                             <div class="row">
                                 <div class="col-md-4">
-                                    <label for="">Metode Kunjungan <span>*</span></label>
-                                    <div class="form-group">
-                                        <select name="visit_type" class="form-control select2"
-                                            data-validation="[NOTEMPTY]"
-                                            data-validation-message="Metode tidak boleh kosong">
-                                            <option value="">Pilih Metode</option>
-                                            @foreach ($methods as $method)
-                                                <option value="{{ $method }}"
-                                                    {{ $data->visit_type == $method ? 'selected' : '' }}>
-                                                    {{ $method }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
                                     <label for="">Kategori Kunjungan <span>*</span></label>
                                     <div class="form-group">
                                         <select name="kategori_kunjungan" class="form-control select2"

@@ -50,7 +50,7 @@ class VisitController extends Controller
         $data = Visit::select('visit.*', 'salesman.nama_salesman', 'pelanggan.nama_pelanggan')
             ->leftJoin('salesman', 'visit.id_salesman', 'salesman.id_salesman')
             ->leftJoin('pelanggan', 'visit.id_pelanggan', 'pelanggan.id_pelanggan')
-            ->where('visit.status', 2)
+        // ->where('visit.status', 2)
             ->orderBy('visit.visit_date', 'desc');
 
         if ($request->date) {
@@ -75,6 +75,14 @@ class VisitController extends Controller
                     $ac_values[$ac] = in_array($ac, $prog) ? $ac_values[$ac] += 1 : $ac_values[$ac] += 0;
                 } else {
                     $ac_values[$ac] = in_array($ac, $prog) ? 1 : 0;
+                }
+            }
+
+            if (!$d->progress_ind) {
+                if (isset($ac_values['BELUM VISIT'])) {
+                    $ac_values['BELUM VISIT'] = $ac_values['BELUM VISIT'] += 1;
+                } else {
+                    $ac_values['BELUM VISIT'] = 1;
                 }
             }
         }
