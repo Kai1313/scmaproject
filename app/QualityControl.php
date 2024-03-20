@@ -49,17 +49,15 @@ class QualityControl extends Model
             $data = MasterQrCode::where(function ($w) use ($p) {
                 $w->where('kode_batang_lama_master_qr_code', $p->kode_batang_pembelian_detail)
                     ->orWhere('kode_batang_master_qr_code', $p->kode_batang_pembelian_detail);
-            })->where('id_barang', $this->id_barang)->first();
-            if ($data) {
-                $data->sg_master_qr_code = $this->sg_pembelian_detail;
-                $data->be_master_qr_code = $this->be_pembelian_detail;
-                $data->ph_master_qr_code = $this->ph_pembelian_detail;
-                $data->warna_master_qr_code = $this->warna_pembelian_detail;
-                $data->bentuk_master_qr_code = $this->bentuk_pembelian_detail;
-                $data->keterangan_qc_master_qr_code = $this->keterangan_pembelian_detail;
-                $data->status_qc_qr_code = $this->status_qc;
-                $data->save();
-            }
+            })->where('id_barang', $this->id_barang)->update([
+                'sg_master_qr_code' => $this->sg_pembelian_detail,
+                'be_master_qr_code' => $this->be_pembelian_detail,
+                'ph_master_qr_code' => $this->ph_pembelian_detail,
+                'warna_master_qr_code' => $this->warna_pembelian_detail,
+                'bentuk_master_qr_code' => $this->bentuk_pembelian_detail,
+                'keterangan_qc_master_qr_code' => $this->keterangan_pembelian_detail,
+                'status_qc_qr_code' => $this->status_qc,
+            ]);
         }
 
         return true;
