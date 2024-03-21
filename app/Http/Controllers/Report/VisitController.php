@@ -33,7 +33,7 @@ class VisitController extends Controller
         }
 
         $cabang = session()->get('access_cabang');
-        $salesmans = Salesman::select('id_salesman as id', 'nama_salesman as text')->where('status_salesman', '1')->get();
+        $salesmans = Salesman::select('id_salesman as id', 'nama_salesman as text')->get();
         return view('ops.visit.report', [
             "pageTitle" => "SCA OPS | Laporan Kunjungan | List",
             "cabang" => $cabang,
