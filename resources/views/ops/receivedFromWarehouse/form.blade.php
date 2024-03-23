@@ -257,7 +257,7 @@
             scrollX: true,
             paging: false,
             data: details,
-            ordering: false,
+            ordering: true,
             columns: [{
                 data: 'qr_code',
                 name: 'qr_code'
