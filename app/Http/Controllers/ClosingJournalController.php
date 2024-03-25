@@ -2139,7 +2139,7 @@ class ClosingJournalController extends Controller
     public function stockCorrection(Request $request)
     {
         try {
-            // dd("disini");
+            // dd($request->all());
             // Init data
             $id_cabang = 1;//$request->id_cabang;
             $journal_type = "ME";
@@ -2165,7 +2165,7 @@ class ClosingJournalController extends Controller
             // Get data koreksi stok
             $data_header = StockCorrectionHeader::where("status_koreksi_stok", $status)->where("id_cabang", $id_cabang)->whereBetween("tanggal_koreksi_stok", [$start_date, $end_date])->get();
             // $data_header = StockCorrectionHeader::where("status_koreksi_stok", $status)->where("id_koreksi_stok", 306)->get();
-            // dd(json_encode($data_header));
+            // dd(count($data_header));
             // dd(json_encode($data_header));
             DB::beginTransaction();
             foreach ($data_header as $key => $header) {
@@ -2326,7 +2326,7 @@ class ClosingJournalController extends Controller
                 }
 
             }
-            // DB::commit();
+            DB::commit();
             return response()->json([
                 "result" => true,
                 "message" => "Successfully proceed closing journal stock correction",
