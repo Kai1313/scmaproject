@@ -2141,7 +2141,7 @@ class ClosingJournalController extends Controller
         try {
             // dd($request->all());
             // Init data
-            $id_cabang = 1;//$request->id_cabang;
+            $id_cabang = $request->id_cabang;
             $journal_type = "ME";
             $month = $request->month;
             $year = $request->year;
