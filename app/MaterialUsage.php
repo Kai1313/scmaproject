@@ -148,6 +148,7 @@ class MaterialUsage extends Model
             }
 
             DB::table('kartu_stok')->insert([
+                'id_cabang' => $this->id_cabang,
                 'id_gudang' => $this->id_gudang,
                 'id_jenis_transaksi' => $idJenisTransaksi,
                 'kode_kartu_stok' => $this->kode_pemakaian,
@@ -177,6 +178,9 @@ class MaterialUsage extends Model
                 'zak' => $store->jumlah_zak,
                 'id_wrapper_zak' => $master->id_wrapper_zak,
                 'weight_zak' => $store->weight_zak,
+                'id_wrapper' => $master->id_wrapper,
+                'weight' => $master->weight,
+                'nett' => $store->jumlah - $master->weight - $store->weight_zak,
             ]);
             // }
             return ['result' => true];
