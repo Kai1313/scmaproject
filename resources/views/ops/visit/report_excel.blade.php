@@ -63,9 +63,18 @@
                             </td>
                         @endforeach
                         <td>
-                            Hasil kunjungan : {{ $data->visit_title }} <br><br>
-                            Masalah : {{ $data->visit_desc }} <br><br>
-                            Solusi : {{ $data->solusi }}
+                            @if ($data->visit_title)
+                                Hasil kunjungan : {{ $data->visit_title }} <br><br>
+                            @endif
+                            @if ($data->visit_desc)
+                                Masalah : {{ $data->visit_desc }} <br><br>
+                            @endif
+                            @if ($data->solusi)
+                                Solusi : {{ $data->solusi }} <br><br>
+                            @endif
+                            @if ($data->alasan_pembatalan)
+                                Alasan batal : {{ $data->alasan_pembatalan }} <br><br>
+                            @endif
                         </td>
                     </tr>
                 @endforeach

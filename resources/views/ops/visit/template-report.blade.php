@@ -38,14 +38,26 @@
                         </a>
                     </div>
                 @endforeach
-                <br>
                 @if ($data->alasan_ubah_tanggal != '')
-                    <b>Hasil kunjungan</b> : {{ $data->alasan_ubah_tanggal }}
                     <br><br>
+                    <b>Hasil kunjungan</b> : {{ $data->alasan_ubah_tanggal }}
                 @endif
-                <b>Hasil kunjungan</b> : {{ $data->visit_title }} <br><br>
-                <b>Masalah</b> : {{ $data->visit_desc }} <br><br>
-                <b>Solusi</b> : {{ $data->solusi }}
+                @if ($data->visit_title)
+                    <br><br>
+                    <b>Hasil kunjungan</b> : {{ $data->visit_title }}
+                @endif
+                @if ($data->visit_desc)
+                    <br><br>
+                    <b>Masalah</b> : {{ $data->visit_desc }}
+                @endif
+                @if ($data->solusi)
+                    <br><br>
+                    <b>Solusi</b> : {{ $data->solusi }}
+                @endif
+                @if ($data->alasan_pembatalan)
+                    <br><br>
+                    <b>Alasan Batal</b> : {{ $data->alasan_pembatalan }}
+                @endif
             </td>
         </tr>
     @endforeach
