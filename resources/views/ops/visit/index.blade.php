@@ -179,11 +179,10 @@
 
         var salesman = {!! json_encode($salesmans) !!}
         $('.select2').select2();
-
         $('#daterangepicker').daterangepicker({
             timePicker: false,
-            startDate: moment().subtract(30, 'days'),
-            endDate: moment().add(30, 'days'),
+            // startDate: moment().subtract(30, 'days'),
+            // endDate: moment().add(30, 'days'),
             locale: {
                 format: 'YYYY-MM-DD'
             }
