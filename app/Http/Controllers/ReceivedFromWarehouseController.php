@@ -86,6 +86,14 @@ class ReceivedFromWarehouseController extends Controller
     public function saveEntry(Request $request, $id = 0)
     {
         $data = MoveBranch::find($id);
+        $detail = json_decode($request->details);
+        if (count($detail) <= 0) {
+            return response()->json([
+                "result" => false,
+                "message" => "List barang tidak ditemukan",
+            ], 500);
+        }
+
         try {
             DB::beginTransaction();
             if (!$data) {
