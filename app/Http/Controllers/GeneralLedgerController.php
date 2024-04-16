@@ -845,6 +845,25 @@ class GeneralLedgerController extends Controller
                 }
             }
 
+            // Check for Giro mode
+            if ($header) {
+                // Check already use on other transaction
+                $other_trx = JurnalDetail::where("jurnal_detail.id_transaksi", $header->kode_jurnal)->where("jurnal_header.void", "!=", 1)->join("jurnal_header", "jurnal_header.id_jurnal", "jurnal_detail.id_jurnal")->get();
+                if (count($other_trx) > 0) {
+                    DB::rollback();
+                    return response()->json([
+                        "result" => false,
+                        "message" => "Error void journal, Giro Journal already in use on other transaction",
+                    ]);
+                }
+
+                // Delete saldo transaction record
+                $trx_saldo = TrxSaldo::where("id_transaksi", $header->kode_jurnal)->first();
+                if ($trx_saldo) {
+                    TrxSaldo::where("id_transaksi", $header->kode_jurnal)->delete();
+                }
+            }
+
             $header->void = 1;
             $header->user_void = $userVoid;
             $header->dt_void = $dateVoid;
@@ -918,6 +937,41 @@ class GeneralLedgerController extends Controller
                         return response()->json([
                             "result" => false,
                             "message" => "Error when store Jurnal data on update saldo transaksi",
+                        ]);
+                    }
+                }
+            }
+
+            if ($header) {
+                // Insert trx saldo if jenis_jurnal PG|HG
+                if ($header->jenis_jurnal == "PG" || $header->jenis_jurnal == "HG") {
+                    $sum = 0;
+                    foreach ($data_detail as $key => $item) {
+                        $debet = str_replace('.', '', $item['debet']);
+                        $debet = str_replace(',', '.', $debet);
+    
+                        $kredit = str_replace('.', '', $item['kredit']);
+                        $kredit = str_replace(',', '.', $kredit);
+                        $sum += ($header->jenis_jurnal == "PG") ? $debet : $kredit;
+                    }
+                    $trx_saldo = new TrxSaldo;
+                    $trx_saldo->tipe_transaksi = ($header->jenis_jurnal == "PG") ? "Piutang Giro" : "Hutang Giro";
+                    $trx_saldo->id_transaksi = $header->kode_jurnal;
+                    $trx_saldo->tanggal = $header->tanggal_jurnal;
+                    $trx_saldo->total = $sum;
+                    $trx_saldo->bayar = 0;
+                    $trx_saldo->sisa = $sum;
+                    $trx_saldo->id_jurnal = $header->id_jurnal;
+                    $trx_saldo->id_slip2 = $header->id_slip2;
+                    $trx_saldo->no_giro = $header->no_giro;
+                    $trx_saldo->tanggal_giro = $header->tanggal_giro;
+                    $trx_saldo->tanggal_giro_jt = $header->tanggal_giro_jt;
+                    $trx_saldo->status_giro = 0;
+                    if (!$trx_saldo->save()) {
+                        DB::rollback();
+                        return response()->json([
+                            "result" => false,
+                            "message" => "Error when store trx saldo after table header",
                         ]);
                     }
                 }
