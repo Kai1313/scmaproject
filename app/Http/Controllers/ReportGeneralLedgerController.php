@@ -755,15 +755,15 @@ class ReportGeneralLedgerController extends Controller
                 DB::raw('SUM(trx_credit) AS trx_credit'),
                 DB::raw('CASE 
                     WHEN IFNULL(posisi_debet, 1) != 0 THEN
-                        SUM(saldo_debet) - SUM(saldo_credit) + SUM(trx_debet) - SUM(trx_credit)
+                        ROUND((SUM(saldo_debet) - SUM(saldo_credit) + SUM(trx_debet) - SUM(trx_credit)), 2)
                     ELSE
-                        SUM(saldo_credit) - SUM(saldo_debet) + SUM(trx_credit) - SUM(trx_debet)
+                        ROUND((SUM(saldo_credit) - SUM(saldo_debet) + SUM(trx_credit) - SUM(trx_debet)), 2)
                 END AS saldo_start'),
                 DB::raw('CASE 
                     WHEN IFNULL(posisi_debet, 1) != 0 THEN
-                        SUM(saldo_debet) - SUM(saldo_credit) + SUM(trx_debet) - SUM(trx_credit) + SUM(debet) - SUM(credit)
+                        ROUND((SUM(saldo_debet) - SUM(saldo_credit) + SUM(trx_debet) - SUM(trx_credit) + SUM(debet) - SUM(credit)), 2)
                     ELSE
-                        SUM(saldo_credit) - SUM(saldo_debet) + SUM(trx_credit) - SUM(trx_debet) + SUM(credit) - SUM(debet)
+                        ROUND((SUM(saldo_credit) - SUM(saldo_debet) + SUM(trx_credit) - SUM(trx_debet) + SUM(credit) - SUM(debet)), 2)
                 END AS saldo_balance')
             )->groupBy("kode_akun")
             ->havingRaw("debet <> 0 OR credit <> 0 OR saldo_debet <> 0 OR saldo_credit <> 0 OR saldo_balance <> 0");
