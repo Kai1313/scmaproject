@@ -1015,7 +1015,7 @@ class GeneralLedgerController extends Controller
                     // Log::info("slip here");
                     $data_saldo = $data_saldo->where("saldo_transaksi.id_slip2", $slip);
                 }
-                $data_saldo = $data_saldo->where("saldo_transaksi.tanggal_giro_jt", "<=", date("Y-m-d"))->join("jurnal_header", "jurnal_header.id_jurnal", "saldo_transaksi.id_jurnal")->join("master_slip", "master_slip.id_slip", "jurnal_header.id_slip")->join("master_akun", "master_akun.id_akun", "master_slip.id_akun")->select("saldo_transaksi.*", "pelanggan.nama_pelanggan as nama_pelanggan", "pemasok.nama_pemasok as nama_pemasok", "master_akun.nama_akun as nama_akun", "master_akun.kode_akun as kode_akun", "master_akun.id_akun as id_akun");
+                $data_saldo = $data_saldo->where("saldo_transaksi.tanggal_giro_jt", "<=", date("Y-m-d"))->where("jurnal_header.void", "!=", 1)->join("jurnal_header", "jurnal_header.id_jurnal", "saldo_transaksi.id_jurnal")->join("master_slip", "master_slip.id_slip", "jurnal_header.id_slip")->join("master_akun", "master_akun.id_akun", "master_slip.id_akun")->select("saldo_transaksi.*", "pelanggan.nama_pelanggan as nama_pelanggan", "pemasok.nama_pemasok as nama_pemasok", "master_akun.nama_akun as nama_akun", "master_akun.kode_akun as kode_akun", "master_akun.id_akun as id_akun");
             } else {
                 $data_saldo = $data_saldo->select("saldo_transaksi.*", "pelanggan.nama_pelanggan as nama_pelanggan", "pemasok.nama_pemasok as nama_pemasok");
             }
