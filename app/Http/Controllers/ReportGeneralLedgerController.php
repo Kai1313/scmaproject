@@ -660,11 +660,27 @@ class ReportGeneralLedgerController extends Controller
                     DB::raw('IFNULL(sb.credit, 0) AS saldo_credit'),
                     DB::raw('0 AS trx_debet'),
                     DB::raw('0 AS trx_credit')
-                )->leftJoin('saldo_balance as sb', function ($join) use ($month, $year) {
-                        $join->on('sb.id_akun', '=', 'ma.id_akun')
-                            ->where('sb.bulan', '=', $month)
-                            ->where('sb.tahun', '=', $year);
-                    }
+                // )->leftJoin('saldo_balance as sb', function ($join) use ($month, $year) {
+                //         $join->on('sb.id_akun', '=', 'ma.id_akun')
+                //             ->where('sb.bulan', '=', $month)
+                //             ->where('sb.tahun', '=', $year);
+                //     }
+                )->leftJoin(
+                    DB::raw('
+                        (SELECT 
+                            sbs.id_akun, 
+                            IFNULL(SUM(sbs.debet), 0) as debet, 
+                            IFNULL(SUM(sbs.credit), 0) as credit, 
+                            mas.kode_akun 
+                        FROM 
+                            saldo_balance sbs
+                        JOIN master_akun mas ON mas.id_akun = sbs.id_akun
+                        WHERE
+                            sbs.bulan = "'.$month.'"
+                            AND sbs.tahun = "'.$year.'"
+                            AND mas.id_cabang LIKE "%'.$id_cabang.'%"
+                        GROUP BY mas.kode_akun) 
+                    sb'), 'sb.kode_akun', '=', 'ma.kode_akun'
                 )->leftJoin(
                     DB::raw('
                         (SELECT 
@@ -1150,11 +1166,27 @@ class ReportGeneralLedgerController extends Controller
                     DB::raw('IFNULL(sb.credit, 0) AS saldo_credit'),
                     DB::raw('0 AS trx_debet'),
                     DB::raw('0 AS trx_credit')
-                )->leftJoin('saldo_balance as sb', function ($join) use ($month, $year) {
-                        $join->on('sb.id_akun', '=', 'ma.id_akun')
-                            ->where('sb.bulan', '=', $month)
-                            ->where('sb.tahun', '=', $year);
-                    }
+                // )->leftJoin('saldo_balance as sb', function ($join) use ($month, $year) {
+                //         $join->on('sb.id_akun', '=', 'ma.id_akun')
+                //             ->where('sb.bulan', '=', $month)
+                //             ->where('sb.tahun', '=', $year);
+                //     }
+                )->leftJoin(
+                    DB::raw('
+                        (SELECT 
+                            sbs.id_akun, 
+                            IFNULL(SUM(sbs.debet), 0) as debet, 
+                            IFNULL(SUM(sbs.credit), 0) as credit, 
+                            mas.kode_akun 
+                        FROM 
+                            saldo_balance sbs
+                        JOIN master_akun mas ON mas.id_akun = sbs.id_akun
+                        WHERE
+                            sbs.bulan = "'.$month.'"
+                            AND sbs.tahun = "'.$year.'"
+                            AND mas.id_cabang LIKE "%'.$id_cabang.'%"
+                        GROUP BY mas.kode_akun) 
+                    sb'), 'sb.kode_akun', '=', 'ma.kode_akun'
                 )->leftJoin(
                     DB::raw('
                         (SELECT 
@@ -1664,11 +1696,27 @@ class ReportGeneralLedgerController extends Controller
                         DB::raw('IFNULL(sb.credit, 0) AS saldo_credit'),
                         DB::raw('0 AS trx_debet'),
                         DB::raw('0 AS trx_credit')
-                    )->leftJoin('saldo_balance as sb', function ($join) use ($month, $year) {
-                            $join->on('sb.id_akun', '=', 'ma.id_akun')
-                                ->where('sb.bulan', '=', $month)
-                                ->where('sb.tahun', '=', $year);
-                        }
+                    // )->leftJoin('saldo_balance as sb', function ($join) use ($month, $year) {
+                    //         $join->on('sb.id_akun', '=', 'ma.id_akun')
+                    //             ->where('sb.bulan', '=', $month)
+                    //             ->where('sb.tahun', '=', $year);
+                    //     }
+                    )->leftJoin(
+                        DB::raw('
+                            (SELECT 
+                                sbs.id_akun, 
+                                IFNULL(SUM(sbs.debet), 0) as debet, 
+                                IFNULL(SUM(sbs.credit), 0) as credit, 
+                                mas.kode_akun 
+                            FROM 
+                                saldo_balance sbs
+                            JOIN master_akun mas ON mas.id_akun = sbs.id_akun
+                            WHERE
+                                sbs.bulan = "'.$month.'"
+                                AND sbs.tahun = "'.$year.'"
+                                AND mas.id_cabang LIKE "%'.$id_cabang.'%"
+                            GROUP BY mas.kode_akun) 
+                        sb'), 'sb.kode_akun', '=', 'ma.kode_akun'
                     )->leftJoin(
                         DB::raw('
                             (SELECT 
@@ -2023,11 +2071,27 @@ class ReportGeneralLedgerController extends Controller
                         DB::raw('IFNULL(sb.credit, 0) AS saldo_credit'),
                         DB::raw('0 AS trx_debet'),
                         DB::raw('0 AS trx_credit')
-                    )->leftJoin('saldo_balance as sb', function ($join) use ($month, $year) {
-                            $join->on('sb.id_akun', '=', 'ma.id_akun')
-                                ->where('sb.bulan', '=', $month)
-                                ->where('sb.tahun', '=', $year);
-                        }
+                    // )->leftJoin('saldo_balance as sb', function ($join) use ($month, $year) {
+                    //         $join->on('sb.id_akun', '=', 'ma.id_akun')
+                    //             ->where('sb.bulan', '=', $month)
+                    //             ->where('sb.tahun', '=', $year);
+                    //     }
+                    )->leftJoin(
+                        DB::raw('
+                            (SELECT 
+                                sbs.id_akun, 
+                                IFNULL(SUM(sbs.debet), 0) as debet, 
+                                IFNULL(SUM(sbs.credit), 0) as credit, 
+                                mas.kode_akun 
+                            FROM 
+                                saldo_balance sbs
+                            JOIN master_akun mas ON mas.id_akun = sbs.id_akun
+                            WHERE
+                                sbs.bulan = "'.$month.'"
+                                AND sbs.tahun = "'.$year.'"
+                                AND mas.id_cabang LIKE "%'.$id_cabang.'%"
+                            GROUP BY mas.kode_akun) 
+                        sb'), 'sb.kode_akun', '=', 'ma.kode_akun'
                     )->leftJoin(
                         DB::raw('
                             (SELECT 
