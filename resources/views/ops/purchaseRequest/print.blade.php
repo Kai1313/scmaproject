@@ -80,12 +80,14 @@
 
 <body>
     <header>
+        <div style="font-size:13px;text-align:right;margin-top:-16px;">{{ $data->purchase_request_code }}</div>
         <table class="table-header">
             <tr>
-                <th style="width:80px;"><img src="{{ asset('images/logo2.jpg') }}" alt="logo" style="width:70px;">
+                <th style="width:80px;">
+                    <img src="{{ asset('images/logo2.jpg') }}" alt="logo" style="width:70px;">
                 </th>
                 <th style="width:100%;text-align:center;">PT. SINAR CEMARAMAS ABADI</th>
-                <th style="width:150px;" class="text-center">Bukti Permintaan Pembelian</th>
+                <th style="width:150px;" class="text-right">Bukti Permintaan Pembelian</th>
             </tr>
         </table>
         <table class="table-subheader">
@@ -116,11 +118,6 @@
                 </td>
                 <td valign="top">
                     <table class='table-subheader'>
-                        <tr>
-                            <td width="70"><b>Kode Permintaan</b></td>
-                            <td width="5">:</td>
-                            <td>{{ $data->purchase_request_code }}</td>
-                        </tr>
                         <tr>
                             <td><b>Pemohon</b></td>
                             <td>:</td>
@@ -163,7 +160,7 @@
             </tr>
         </table>
 
-        <table class="table-subheader">
+        {{-- <table class="table-subheader">
             <tr>
                 <td>
                     <table class="table-signature">
@@ -180,7 +177,7 @@
                     </table>
                 </td>
             </tr>
-        </table>
+        </table> --}}
 
     </main>
 </body>
