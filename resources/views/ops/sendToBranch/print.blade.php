@@ -170,14 +170,17 @@
                 </tr>
             @endforeach
         </table>
-        <table class='table-subheader'>
+        {{-- <table class='table-subheader'>
             <tr>
                 <td valign="top" style="width:70px;"><b>Keterangan</b></td>
                 <td style="width:10px;" valign="top">:</td>
                 <td>{{ $data->keterangan_pindah_barang }}</td>
             </tr>
-        </table>
+        </table> --}}
         <table class="table-signature">
+            <tr>
+                <td colspan="4"><b>Keterangan</b> : {{ $data->keterangan_pindah_barang }}</td>
+            </tr>
             <tr>
                 <td>Pembuat <div style="height:70px;width:100%;border-bottom:1px solid black;"></div>Tgl:</td>
                 <td>Disetujui <div style="height:70px;width:100%;border-bottom:1px solid black;"></div>Tgl:</td>

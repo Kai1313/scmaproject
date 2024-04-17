@@ -121,16 +121,30 @@ class PurchaseRequest extends Model
 
     public static function createcode($id_cabang)
     {
-        $branchCode = DB::table('cabang')->where('id_cabang', $id_cabang)->first();
-        $string = 'PR.' . $branchCode->kode_cabang . '.' . date('ym');
-        $check = DB::table('purchase_request_header')->where('purchase_request_code', 'like', $string . '%')->count();
+        $arrayMonth = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
+        $startString = 'PR/SCMA' . ($id_cabang == 1 ? '-SBY' : '-JKT') . '/';
+        $endString = '/' . ($arrayMonth[date('n')]) . '/' . date('Y');
+
+        $check = \DB::table('purchase_request_header')->where('id_cabang', $id_cabang)->where('purchase_request_code', 'like', '%' . $endString . '%')->count();
         $check += 1;
         $nol = '';
         for ($i = 0; $i < (4 - strlen((string) $check)); $i++) {
             $nol .= '0';
         }
 
-        return $string . '.' . $nol . $check;
+        $string = $startString . $nol . $check . $endString;
+
+        return $string;
+        // $branchCode = DB::table('cabang')->where('id_cabang', $id_cabang)->first();
+        // $string = 'PR.' . $branchCode->kode_cabang . '.' . date('ym');
+        // $check = DB::table('purchase_request_header')->where('purchase_request_code', 'like', $string . '%')->count();
+        // $check += 1;
+        // $nol = '';
+        // for ($i = 0; $i < (4 - strlen((string) $check)); $i++) {
+        //     $nol .= '0';
+        // }
+
+        // return $string . '.' . $nol . $check;
     }
 
     public function saveStatusDetail()
