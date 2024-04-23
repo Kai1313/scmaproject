@@ -267,6 +267,7 @@
                         return data ? formatNumber(data, 2) : 0
                     },
                 }],
+                order: [],
                 footerCallback: function(row, data, start, end, display) {
                     var api = this.api(),
                         data;

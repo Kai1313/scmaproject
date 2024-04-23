@@ -119,16 +119,16 @@
                                     </div>
                                     <div class="form-group">
                                         <label>Nomor Giro</label>
-                                        <input type="text" name="nomor_giro" id="nomor_giro" class="form-control comp-giro" data-validation="[NOTEMPTY]" data-validation-message="Nomor giro tidak boleh kosong" {{ ($jurnal_header->jenis_jurnal == "PG" || $jurnal_header->jenis_jurnal == "HG")? 'value='.$jurnal_header->no_giro.'':'disabled' }}>
+                                        <input type="text" name="nomor_giro" id="nomor_giro" class="form-control" data-validation="[NOTEMPTY]" data-validation-message="Nomor giro tidak boleh kosong" {{ ($jurnal_header->jenis_jurnal == "PG" || $jurnal_header->jenis_jurnal == "HG")? 'value='.$jurnal_header->no_giro.'':'' }}>
                                     </div>
                                     <div class="form-group">
                                         <label>Tanggal Giro</label>
-                                        <input type="text" class="form-control comp-giro datepicker" id="tanggal_giro" name="tanggal_giro" placeholder="Masukkan tanggal giro" data-validation="[NOTEMPTY]" data-validation-message="Tanggal Giro tidak boleh kosong" {{ ($jurnal_header->jenis_jurnal == "PG" || $jurnal_header->jenis_jurnal == "HG")? 'value='.$jurnal_header->tanggal_giro.'':'disabled' }}>
+                                        <input type="text" class="form-control datepicker" id="tanggal_giro" name="tanggal_giro" placeholder="Masukkan tanggal giro" data-validation="[NOTEMPTY]" data-validation-message="Tanggal Giro tidak boleh kosong" {{ ($jurnal_header->jenis_jurnal == "PG" || $jurnal_header->jenis_jurnal == "HG")? 'value='.$jurnal_header->tanggal_giro.'':'' }}>
                                     </div>
                                     <div class="form-group">
                                         </div>
                                         <label>Tanggal JT Giro</label>
-                                        <input type="text" class="form-control comp-giro datepicker" id="tanggal_jt_giro" name="tanggal_jt_giro" placeholder="Masukkan tanggal jatuh tempo giro" data-validation="[NOTEMPTY]" data-validation-message="Tanggal JT Giro tidak boleh kosong" {{ ($jurnal_header->jenis_jurnal == "PG" || $jurnal_header->jenis_jurnal == "HG")? 'value='.$jurnal_header->tanggal_giro_jt.'':'disabled' }}>
+                                        <input type="text" class="form-control datepicker" id="tanggal_jt_giro" name="tanggal_jt_giro" placeholder="Masukkan tanggal jatuh tempo giro" data-validation="[NOTEMPTY]" data-validation-message="Tanggal JT Giro tidak boleh kosong" {{ ($jurnal_header->jenis_jurnal == "PG" || $jurnal_header->jenis_jurnal == "HG")? 'value='.$jurnal_header->tanggal_giro_jt.'':'' }}>
                                     </div>
                                     <button id="hidden-btn" style="display:none;" type="submit">HIDDEN</button>
                                 </div>

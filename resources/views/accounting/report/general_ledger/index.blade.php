@@ -109,7 +109,7 @@
                                     <div class="col-md-2">
                                         <div class="form-group">
                                             <label>Cabang</label>
-                                            <select name="cabang_input" id="cabang_input" class="form-control select2"
+                                            <select name="cabang_input" id="cabang_input" class="form-control select2 comp-param"
                                                 style="width: 100%;">
                                                 @foreach ($data_cabang as $cb)
                                                     <option value="{{ $cb->id_cabang }}"
@@ -123,7 +123,7 @@
                                     <div class="col-md-2">
                                         <div class="form-group">
                                             <label>Tanggal Awal</label>
-                                            <input type="text" class="form-control datepicker" id="start_date"
+                                            <input type="text" class="form-control datepicker comp-param" id="start_date"
                                                 name="start_date" placeholder="Masukkan tanggal awal"
                                                 value="{{ isset($startdate) ? $startdate : date('Y-m-d') }}"
                                                 data-validation="[NOTEMPTY]"
@@ -133,7 +133,7 @@
                                     <div class="col-md-2">
                                         <div class="form-group">
                                             <label>Tanggal Akhir</label>
-                                            <input type="text" class="form-control datepicker" id="end_date"
+                                            <input type="text" class="form-control datepicker comp-param" id="end_date"
                                                 name="end_date" placeholder="Masukkan tanggal akhir"
                                                 value="{{ isset($enddate) ? $enddate : date('Y-m-d') }}"
                                                 data-validation="[NOTEMPTY]"
@@ -143,7 +143,7 @@
                                     <div class="col-md-2">
                                         <div class="form-group">
                                             <label>Tipe</label>
-                                            <select name="type" id="type" class="form-control select2">
+                                            <select name="type" id="type" class="form-control select2 comp-param">
                                                 <option value="recap" {{ $type == 'recap' ? 'selected' : '' }}>Rekap
                                                 </option>
                                                 <option value="detail" {{ $type == 'detail' ? 'selected' : '' }}>Detail
@@ -442,6 +442,7 @@
             // Prepare spinner on button
             viewButton.disabled = true;
             viewButton.innerHTML = '<i class="fa fa-spinner fa-spin"></i>'
+            $(".comp-param").attr("disabled", true)
             if (type == "recap") {
                 $("#table_detail_div").hide()
                 $("#table_static_div").hide()
@@ -465,12 +466,14 @@
                             alert("Error loading data. Exception: " + ThrownException + '\n' + textStatus)
                             viewButton.disabled = false
                             viewButton.innerHTML = '<i class="fa fa-eye"></i> View'
+                            $(".comp-param").attr("disabled", false)
                         }
                     },
                     "initComplete": function() {
                         console.log("init complete recap");
                         viewButton.disabled = false
                         viewButton.innerHTML = '<i class="fa fa-eye"></i> View'
+                        $(".comp-param").attr("disabled", false)
                     },
                     columns: [
                         {
@@ -571,12 +574,14 @@
                             alert("Error loading data. Exception: " + ThrownException + '\n' + textStatus)
                             viewButton.disabled = false
                             viewButton.innerHTML = '<i class="fa fa-eye"></i> View'
+                            $(".comp-param").attr("disabled", false)
                         }
                     },
                     "initComplete": function() {
                         console.log("init complete recap");
                         viewButton.disabled = false
                         viewButton.innerHTML = '<i class="fa fa-eye"></i> View'
+                        $(".comp-param").attr("disabled", false)
                     },
                     drawCallback: function(settings) {
                         $($('#table_detail').find('tbody tr')[0]).css('background-color', 'rgb(238, 238, 238)')
