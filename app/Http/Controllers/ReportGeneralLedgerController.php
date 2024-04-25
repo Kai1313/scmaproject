@@ -1073,7 +1073,7 @@ class ReportGeneralLedgerController extends Controller
             } 
             else {
                 $results->orderBy('kode_akun', 'ASC')
-                ->orderBy('tanggal_jurnal', 'ASC');
+                ->orderBy('tanggal_jurnal', 'ASC')->orderBy('kode_jurnal', 'ASC');
             }
 
             // pagination
@@ -1967,7 +1967,7 @@ class ReportGeneralLedgerController extends Controller
                         'trx_credit',
                         'posisi_debet'
                     )->orderBy('kode_akun', 'ASC')
-                    ->orderBy('tanggal_jurnal', 'ASC');
+                    ->orderBy('tanggal_jurnal', 'ASC')->orderBy('kode_jurnal', 'ASC');
             }
 
             // dd(count($groupByQuery->get()));
@@ -2342,7 +2342,7 @@ class ReportGeneralLedgerController extends Controller
                         'trx_credit',
                         'posisi_debet'
                     )->orderBy('kode_akun', 'ASC')
-                    ->orderBy('tanggal_jurnal', 'ASC');
+                    ->orderBy('tanggal_jurnal', 'ASC')->orderBy('kode_jurnal', 'ASC');
             }
 
             // dd(count($groupByQuery->get()));
