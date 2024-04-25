@@ -446,7 +446,7 @@
             if (type == "recap") {
                 $("#table_detail_div").hide()
                 $("#table_static_div").hide()
-                $("#table_recap_div").show()
+                $("#table_recap_div").hide()
                 $('#table_recap').DataTable().destroy();
                 $('#table_recap').DataTable({
                     processing: true,
@@ -467,6 +467,7 @@
                             viewButton.disabled = false
                             viewButton.innerHTML = '<i class="fa fa-eye"></i> View'
                             $(".comp-param").attr("disabled", false)
+                            $("#table_recap_div").show()
                         }
                     },
                     "initComplete": function() {
@@ -474,6 +475,7 @@
                         viewButton.disabled = false
                         viewButton.innerHTML = '<i class="fa fa-eye"></i> View'
                         $(".comp-param").attr("disabled", false)
+                        $("#table_recap_div").show()
                     },
                     columns: [
                         {
@@ -554,7 +556,7 @@
                 var runningBalance = 0
                 $("#table_recap_div").hide()
                 $("#table_static_div").hide()
-                $("#table_detail_div").show()
+                $("#table_detail_div").hide()
                 $('#table_detail').DataTable().destroy();
                 $('#table_detail').DataTable({
                     processing: true,
@@ -575,6 +577,7 @@
                             viewButton.disabled = false
                             viewButton.innerHTML = '<i class="fa fa-eye"></i> View'
                             $(".comp-param").attr("disabled", false)
+                            $("#table_detail_div").show()
                         }
                     },
                     "initComplete": function() {
@@ -582,6 +585,7 @@
                         viewButton.disabled = false
                         viewButton.innerHTML = '<i class="fa fa-eye"></i> View'
                         $(".comp-param").attr("disabled", false)
+                        $("#table_detail_div").show()
                     },
                     drawCallback: function(settings) {
                         $($('#table_detail').find('tbody tr')[0]).css('background-color', 'rgb(238, 238, 238)')
