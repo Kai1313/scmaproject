@@ -1817,8 +1817,6 @@ class ClosingJournalController extends Controller
 
             // Get data pindah barang
             $data_header = InventoryTransferHeader::where("id_cabang2", "<>", $id_cabang)->whereBetween("tanggal_pindah_barang", [$start_date, $end_date])->where("void", 0)->where("status_pindah_barang", 1)->whereIn('id_jenis_transaksi', [21, 22])->get();
-            $details_out = [];
-            $details_in = [];
             // Log::info("jumlah data header");
             // Log::info(count($data_header));
             DB::beginTransaction();
@@ -1831,6 +1829,10 @@ class ClosingJournalController extends Controller
                 JurnalHeader::where("id_transaksi", "Closing " . $id_transaksi)->where("catatan", "Closing Transfer Barang Keluar")->delete();
                 JurnalDetail::where("id_transaksi", $id_transaksi)->where("keterangan", "HPP Transfer Cabang Masuk " . $id_transaksi)->delete();
                 JurnalHeader::where("id_transaksi", "Closing " . $id_transaksi)->where("catatan", "Closing Transfer Barang Masuk")->delete();
+
+                $details_out = [];
+                $details_in = [];
+                
                 if ($header->type == 0) {
                     // Get header out detail
                     $data_detail = InventoryTransferDetail::select("pindah_barang_detail.id_barang", "pindah_barang_detail.qr_code", "master_qr_code.beli_master_qr_code", "master_qr_code.biaya_beli_master_qr_code", "master_qr_code.jumlah_master_qr_code", "master_qr_code.produksi_master_qr_code", "master_qr_code.listrik_master_qr_code", "master_qr_code.pegawai_master_qr_code")->join("master_qr_code", "kode_batang_master_qr_code", "pindah_barang_detail.qr_code")->where("pindah_barang_detail.id_pindah_barang", $header->id_pindah_barang)->get();
