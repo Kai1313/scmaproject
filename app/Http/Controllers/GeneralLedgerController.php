@@ -689,6 +689,10 @@ class GeneralLedgerController extends Controller
     {
         $cabang = $request->cabang;
         $void = $request->void;
+        $startDate = $request->startDate ?? date('Y-m-d');
+        $endDate = $request->endDate ?? date('Y-m-t');
+        Log::info("start date ".$request->startDate." end date ".$request->endDate);
+        Log::info("start date ".$startDate." end date ".$endDate);
         $offset = $request->start;
         $limit = $request->length;
         $keyword = $request->search['value'];
@@ -706,39 +710,64 @@ class GeneralLedgerController extends Controller
         $draw = $request->draw;
         $current_page = $offset / $limit + 1;
 
-        $data_general_ledger = JurnalHeader::join('master_slip', 'jurnal_header.id_slip', 'master_slip.id_slip')
-            ->leftJoin('jurnal_detail', 'jurnal_detail.id_jurnal', 'jurnal_header.id_jurnal')
-            ->leftJoin('saldo_transaksi', 'saldo_transaksi.id_transaksi', 'jurnal_detail.id_transaksi')
-            ->select('jurnal_header.*', DB::raw('GROUP_CONCAT(CONCAT(jurnal_detail.id_transaksi, "-", saldo_transaksi.ref_id) SEPARATOR \', \') AS concat_id_transaksi'), 'master_slip.kode_slip', DB::raw('
-                    (CASE
-                        WHEN jenis_jurnal = "KK" THEN "Kas Keluar"
-                        WHEN jenis_jurnal = "KM" THEN "Kas Masuk"
-                        WHEN jenis_jurnal = "BK" THEN "Bank Keluar"
-                        WHEN jenis_jurnal = "BM" THEN "Bank Masuk"
-                        WHEN jenis_jurnal = "PG" THEN "Piutang Giro"
-                        WHEN jenis_jurnal = "HG" THEN "Hutang Giro"
-                        WHEN jenis_jurnal = "ME" THEN "Memorial"
-                    END) as jenis_name')
-            )
-            ->groupBy('jurnal_header.id_jurnal');
-        $data_general_ledger_table = DB::table(DB::raw('(' . $data_general_ledger->toSql() . ') as jurnal_header'))
-            ->join('jurnal_detail', 'jurnal_detail.id_jurnal', 'jurnal_header.id_jurnal')
-            ->where('jurnal_header.void', $void)
-            ->where('jurnal_header.jenis_jurnal', '<>', 'ME')
-            ->where('id_cabang', $cabang)
-            ->groupBy('jurnal_header.id_jurnal', 'jurnal_header.tanggal_jurnal')
-        // ->select('jurnal_header.*', DB::raw("GROUP_CONCAT(jurnal_detail.id_transaksi SEPARATOR ', ') AS id_transaksi"), DB::raw('SUM(jurnal_detail.credit) as jumlah'));
-            ->select('jurnal_header.*', DB::raw('SUM(jurnal_detail.credit) as jumlah'));
+        // $data_general_ledger = JurnalHeader::join('master_slip', 'jurnal_header.id_slip', 'master_slip.id_slip')
+        //     ->leftJoin('jurnal_detail', 'jurnal_detail.id_jurnal', 'jurnal_header.id_jurnal')
+        //     ->leftJoin('saldo_transaksi', 'saldo_transaksi.id_transaksi', 'jurnal_detail.id_transaksi')
+        //     ->select('jurnal_header.*', DB::raw('GROUP_CONCAT(CONCAT(jurnal_detail.id_transaksi, "-", saldo_transaksi.ref_id) SEPARATOR \', \') AS concat_id_transaksi'), 'master_slip.kode_slip', DB::raw('
+        //             (CASE
+        //                 WHEN jenis_jurnal = "KK" THEN "Kas Keluar"
+        //                 WHEN jenis_jurnal = "KM" THEN "Kas Masuk"
+        //                 WHEN jenis_jurnal = "BK" THEN "Bank Keluar"
+        //                 WHEN jenis_jurnal = "BM" THEN "Bank Masuk"
+        //                 WHEN jenis_jurnal = "PG" THEN "Piutang Giro"
+        //                 WHEN jenis_jurnal = "HG" THEN "Hutang Giro"
+        //                 WHEN jenis_jurnal = "ME" THEN "Memorial"
+        //             END) as jenis_name')
+        //     )
+        //     ->groupBy('jurnal_header.id_jurnal');
+        // $data_general_ledger_table = DB::table(DB::raw('(' . $data_general_ledger->toSql() . ') as jurnal_header'))
+        //     ->join('jurnal_detail', 'jurnal_detail.id_jurnal', 'jurnal_header.id_jurnal')
+        //     ->where('jurnal_header.void', $void)
+        //     ->where('jurnal_header.jenis_jurnal', '<>', 'ME')
+        //     ->where('id_cabang', $cabang)
+        //     ->where('tanggal_jurnal', '>=', $startDate)
+        //     ->where('tanggal_jurnal', '<=', $endDate)
+        //     ->groupBy('jurnal_header.id_jurnal', 'jurnal_header.tanggal_jurnal')
+        //     // ->select('jurnal_header.*', DB::raw("GROUP_CONCAT(jurnal_detail.id_transaksi SEPARATOR ', ') AS id_transaksi"), DB::raw('SUM(jurnal_detail.credit) as jumlah'));
+        //     ->select('jurnal_header.*', DB::raw('SUM(jurnal_detail.credit) as jumlah'));
+
+        $data_general_ledger = JurnalDetail::join("jurnal_header", "jurnal_header.id_jurnal", "jurnal_detail.id_jurnal")
+            ->leftJoin("master_slip", "master_slip.id_slip", "jurnal_header.id_slip")
+            ->where("jurnal_header.void", $void)
+            ->where("jurnal_header.jenis_jurnal", "<>", "ME")
+            ->where("jurnal_header.id_cabang", $cabang)
+            ->where("jurnal_header.tanggal_jurnal", ">=", $startDate)
+            ->where("jurnal_header.tanggal_jurnal", "<=", $endDate)
+            ->groupBy("jurnal_header.kode_jurnal")
+            ->select("jurnal_header.*", "master_slip.kode_slip", DB::raw('CASE
+                WHEN jurnal_header.jenis_jurnal = "KK" THEN "Kas Keluar"
+                WHEN jurnal_header.jenis_jurnal = "KM" THEN "Kas Masuk"
+                WHEN jurnal_header.jenis_jurnal = "BK" THEN "Bank Keluar"
+                WHEN jurnal_header.jenis_jurnal = "BM" THEN "Bank Masuk"
+                WHEN jurnal_header.jenis_jurnal = "PG" THEN "Piutang Giro"
+                WHEN jurnal_header.jenis_jurnal = "HG" THEN "Hutang Giro"
+                WHEN jurnal_header.jenis_jurnal = "ME" THEN "Memorial"
+                END AS jenis_name'), DB::raw('GROUP_CONCAT(jurnal_detail.id_transaksi ORDER BY jurnal_detail.id_transaksi SEPARATOR \', \') AS concat_id_transaksi'), DB::raw('SUM(jurnal_detail.credit) AS jumlah'));
+
+            $data_general_ledger_table = DB::table(DB::raw('(' . $data_general_ledger->toSql() . ') as jurnal_header'))
+                ->mergeBindings($data_general_ledger->getQuery())
+                ->select("jurnal_header.*");
 
         if (isset($keyword)) {
             $data_general_ledger_table->where(function ($query) use ($keyword) {
-                $query->orWhere('kode_jurnal', 'LIKE', "%$keyword%")
-                    ->orWhere('tanggal_jurnal', 'LIKE', "%$keyword%")
+                $query->orWhere('jurnal_header.kode_jurnal', 'LIKE', "%$keyword%")
+                    ->orWhere('jurnal_header.tanggal_jurnal', 'LIKE', "%$keyword%")
                     ->orWhere('jenis_name', 'LIKE', "%$keyword%")
                     ->orWhere('concat_id_transaksi', 'LIKE', "%$keyword%")
-                    ->orWhere('catatan', 'LIKE', "%$keyword%")
-                    ->orWhere('kode_slip', 'LIKE', "%$keyword%");
+                    ->orWhere('jurnal_header.catatan', 'LIKE', "%$keyword%")
+                    ->orWhere('jurnal_header.kode_slip', 'LIKE', "%$keyword%");
             });
+            // ->havingRaw('jenis_name LIKE ? OR concat_id_transaksi LIKE ?', ["%$keyword%", "%$keyword%"]);
         }
 
         $filtered_data = $data_general_ledger_table->get();
