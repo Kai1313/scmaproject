@@ -207,7 +207,7 @@
         // Prepare spinner on button
         viewButton.disabled = true;
         viewButton.innerHTML = '<i class="fa fa-spinner fa-spin"></i>'
-        get_data_url += '?cabang=' + $("#cabang_table").val() + '&void=' + status + '&startDate=' + startDate + '&endDate=' +endDate
+        get_data_url += '?cabang=' + $("#cabang_table").val() + '&void=' + status + '&startDate=' + startDate + '&endDate=' + endDate
         $(".comp-param").attr("disabled", true)
         $("#main-table").hide()
         $('#table_general_ledger').DataTable({

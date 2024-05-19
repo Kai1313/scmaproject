@@ -691,8 +691,6 @@ class GeneralLedgerController extends Controller
         $void = $request->void;
         $startDate = $request->startDate ?? date('Y-m-d');
         $endDate = $request->endDate ?? date('Y-m-t');
-        Log::info("start date ".$request->startDate." end date ".$request->endDate);
-        Log::info("start date ".$startDate." end date ".$endDate);
         $offset = $request->start;
         $limit = $request->length;
         $keyword = $request->search['value'];
@@ -754,9 +752,9 @@ class GeneralLedgerController extends Controller
                 WHEN jurnal_header.jenis_jurnal = "ME" THEN "Memorial"
                 END AS jenis_name'), DB::raw('GROUP_CONCAT(jurnal_detail.id_transaksi ORDER BY jurnal_detail.id_transaksi SEPARATOR \', \') AS concat_id_transaksi'), DB::raw('SUM(jurnal_detail.credit) AS jumlah'));
 
-            $data_general_ledger_table = DB::table(DB::raw('(' . $data_general_ledger->toSql() . ') as jurnal_header'))
-                ->mergeBindings($data_general_ledger->getQuery())
-                ->select("jurnal_header.*");
+        $data_general_ledger_table = DB::table(DB::raw('(' . $data_general_ledger->toSql() . ') as jurnal_header'))
+            ->mergeBindings($data_general_ledger->getQuery())
+            ->select("jurnal_header.*");
 
         if (isset($keyword)) {
             $data_general_ledger_table->where(function ($query) use ($keyword) {

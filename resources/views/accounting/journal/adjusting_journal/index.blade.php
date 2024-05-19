@@ -6,6 +6,8 @@
     <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables-responsive/css/responsive.dataTables.css') }}">
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- bootstrap datepicker -->
+    <link rel="stylesheet" href="{{ asset('assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css') }}">
     <style>
         .dataTables_scrollHeadInner {
             width: 100% !important;
@@ -67,7 +69,7 @@
                                 </button>
                             </div>
                             @endif
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="form-group">
                                     <label>Cabang</label>
                                     <select name="cabang_table" id="cabang_table" class="form-control select2"
@@ -81,7 +83,32 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-8">
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label>Tanggal Awal</label>
+                                    <input type="text" class="form-control datepicker comp-param" id="start_date"
+                                        name="start_date" placeholder="Masukkan tanggal awal"
+                                        value="{{ isset($startdate) ? $startdate : date('Y-m-d') }}"
+                                        data-validation="[NOTEMPTY]"
+                                        data-validation-message="Tanggal awal tidak boleh kosong">
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label>Tanggal Akhir</label>
+                                    <input type="text" class="form-control datepicker comp-param" id="end_date"
+                                        name="end_date" placeholder="Masukkan tanggal awal"
+                                        value="{{ isset($enddate) ? $enddate : date('Y-m-t') }}"
+                                        data-validation="[NOTEMPTY]"
+                                        data-validation-message="Tanggal akhir tidak boleh kosong">
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <button id="btn-view" type="button" class="btn btn-sm btn-default mr-1">
+                                    <i class="fa fa-eye"></i> View
+                                </button>
+                            </div>
+                            <div class="col-md-3">
                                 <span class="badge badge-default rounded-0 pull-right">
                                     <input class="form-check-input" type="checkbox" id="void">
                                     <label class="form-check-label" for="void">
@@ -111,7 +138,7 @@
                             </button>
                         </div>
                     @endif
-                    <div class="box-body">
+                    <div id="main-table" class="box-body">
                         <table id="table_general_ledger"
                             class="table table-bordered table-striped display responsive nowrap" width="100%">
                             <thead width="100%">
@@ -142,6 +169,8 @@
     <script src="{{ asset('assets/bower_components/datatables.net/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js') }}"></script>
     <script src="{{ asset('assets/bower_components/datatables-responsive/js/dataTables.responsive.js') }}"></script>
+    <!-- bootstrap datepicker -->
+    <script src="{{ asset('assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js') }}"></script>
     <!-- SlimScroll -->
     <script src="{{ asset('assets/bower_components/jquery-slimscroll/jquery.slimscroll.min.js') }}"></script>
     <!-- FastClick -->
@@ -150,12 +179,22 @@
 
 @section('externalScripts')
     <script>
+        var viewButton = document.getElementById("btn-view")
         $(function() {
             $('.select2').select2();
             populate_table(0)
 
+            $(".datepicker").datepicker({
+                format: "yyyy-mm-dd"
+            })
+
             $("#cabang_table").on("change", function() {
                 populate_table(0)
+            })
+
+            $("#btn-view").on("click", function () {
+                let voidStatus = ($(this).is(':checked'))? 1 : 0
+                populate_table(voidStatus)
             })
 
             $('#void').change(function() {
@@ -170,7 +209,14 @@
         function populate_table(status) {
             $('#table_general_ledger').DataTable().destroy();
             let get_data_url = "{{ route('transaction-adjustment-ledger-populate') }}"
-            get_data_url += '?cabang=' + $("#cabang_table").val() + '&void=' + status
+            let startDate = $("#start_date").val()
+            let endDate = $("#end_date").val()
+            // Prepare spinner on button
+            viewButton.disabled = true;
+            viewButton.innerHTML = '<i class="fa fa-spinner fa-spin"></i>'
+            get_data_url += '?cabang=' + $("#cabang_table").val() + '&void=' + status + '&startDate=' + startDate + '&endDate=' + endDate
+            $(".comp-param").attr("disabled", true)
+            $("#main-table").hide()
             $('#table_general_ledger').DataTable({
                 processing: true,
                 serverSide: true,
@@ -187,7 +233,17 @@
                     'dataType': 'JSON',
                     'error': function(xhr, textStatus, ThrownException) {
                         alert('Error loading data. Exception: ' + ThrownException + '\n' + textStatus);
+                        viewButton.disabled = false
+                        viewButton.innerHTML = '<i class="fa fa-eye"></i> View'
+                        $(".comp-param").attr("disabled", false)
+                        $("#main-table").show()
                     }
+                },
+                "initComplete": function () {
+                    viewButton.disabled = false
+                    viewButton.innerHTML = '<i class="fa fa-eye"></i> View'
+                    $(".comp-param").attr("disabled", false)
+                    $("#main-table").show()
                 },
                 columns: [
                     {
