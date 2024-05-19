@@ -72,7 +72,7 @@
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label>Cabang</label>
-                                <select name="cabang_table" id="cabang_table" class="form-control select2" style="width: 100%;">
+                                <select name="cabang_table" id="cabang_table" class="form-control select2 comp-param" style="width: 100%;">
                                     @foreach ($data_cabang as $cabang)
                                     <option value="{{ $cabang->id_cabang }}" {{ isset($data_slip->id_cabang) ? ($data_slip->id_cabang == $cabang->id_cabang ? 'selected' : '') : '' }}>
                                         {{ $cabang->kode_cabang . ' - ' . $cabang->nama_cabang }}
@@ -131,7 +131,7 @@
                     </button>
                 </div>
                 @endif
-                <div class="box-body">
+                <div id="main-table" class="box-body">
                     <table id="table_general_ledger" class="table table-bordered table-striped display responsive nowrap" width="100%">
                         <thead width="100%">
                             <tr>
@@ -208,6 +208,8 @@
         viewButton.disabled = true;
         viewButton.innerHTML = '<i class="fa fa-spinner fa-spin"></i>'
         get_data_url += '?cabang=' + $("#cabang_table").val() + '&void=' + status + '&startDate=' + startDate + '&endDate=' +endDate
+        $(".comp-param").attr("disabled", true)
+        $("#main-table").hide()
         $('#table_general_ledger').DataTable({
             processing: true,
             serverSide: true,
@@ -226,11 +228,15 @@
                     alert('Error loading data. Exception: ' + ThrownException + '\n' + textStatus);
                     viewButton.disabled = false
                     viewButton.innerHTML = '<i class="fa fa-eye"></i> View'
+                    $(".comp-param").attr("disabled", false)
+                    $("#main-table").show()
                 }
             },
             "initComplete": function () {
                 viewButton.disabled = false
                 viewButton.innerHTML = '<i class="fa fa-eye"></i> View'
+                $(".comp-param").attr("disabled", false)
+                $("#main-table").show()
             },
             columns: [
                 {
