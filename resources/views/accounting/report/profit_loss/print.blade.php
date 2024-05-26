@@ -86,8 +86,32 @@
             @endphp
             @if ($nama_cabang == 'all')
                 @include('accounting.report.profit_loss.profit_loss-list-konsolidasi',['data' => $data, 'fontSize' => $fontSize, 'space' => ($space), 'list_cabang' => $list_cabang])
+                <tr>
+                    <td>
+                        <b style="font-size:12px">LABA (RUGI) BERSIH</b>
+                    </td>        
+                    @foreach ($list_cabang as $cabang)
+                        @php
+                            $format = 'grand_total_' . $cabang->new_nama_cabang;
+                        @endphp
+                        <td style="text-align:right;">
+                            <b style="font-size:12px">{{number_format($total[$format], 2, ",", ".")}}</b>
+                        </td>
+                    @endforeach
+                    <td style="text-align:right;">
+                        <b style="font-size:12px">{{number_format($total['grand_total'], 2, ",", ".")}}</b>
+                    </td>
+                </tr>
             @else
                 @include('accounting.report.profit_loss.profit_loss-list',['data' => $data, 'fontSize' => $fontSize, 'space' => ($space)])
+                <tr>
+                    <td>
+                        <b style="font-size:12px">LABA (RUGI) BERSIH</b>
+                    </td>        
+                    <td style="text-align:right;">
+                        <b style="font-size:12px">{{number_format($total['grand_total'], 2, ",", ".")}}</b>
+                    </td>
+                </tr>
             @endif
         </tbody>
     </table>

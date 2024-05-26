@@ -55,8 +55,32 @@
 
         @if($data['nama_cabang'] == 'all')
             @include('accounting.report.profit_loss.profit_loss_list_excel_konsolidasi',['data' => $data['data'], 'type' => $data["type"], 'space' => $space, 'list_cabang' => $data["list_cabang"]])
+            <tr>
+                <td colspan="{{ $data['type'] == 'recap' || $data['type'] == 'awal' ? 3 : 4 }}" style="border: #000000 solid thin; font-size:10px;">
+                    <b>LABA (RUGI) BERSIH</b>
+                </td>        
+                @foreach ($data["list_cabang"] as $cabang)
+                    @php
+                        $format = 'grand_total_' . $cabang->new_nama_cabang;
+                    @endphp
+                    <td style="border: #000000 solid thin; text-align:right;font-size:10px;">
+                        <b>{{ round($data['total'][$format], 2) }}</b>
+                    </td>
+                @endforeach
+                <td style="border: #000000 solid thin; text-align:right;font-size:10px;">
+                    <b>{{ round($data['total']['grand_total'], 2) }}</b>
+                </td>
+            </tr>
         @else
             @include('accounting.report.profit_loss.profit_loss_list_excel',['data' => $data['data'], 'type' => $data["type"], 'space' => $space])
+            <tr>
+                <td colspan="{{ $data['type'] == 'recap' || $data['type'] == 'awal' ? 3 : 4 }}" style="border: #000000 solid thin; font-size:10px;">
+                    <b>LABA (RUGI) BERSIH</b>
+                </td>        
+                <td style="border: #000000 solid thin; text-align:right;font-size:10px;">
+                    <b>{{ round($data['total']['grand_total'], 2) }}</b>
+                </td>
+            </tr>
         @endif
     </table>
 </body>

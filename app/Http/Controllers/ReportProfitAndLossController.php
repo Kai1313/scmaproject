@@ -86,10 +86,13 @@ class ReportProfitAndLossController extends Controller
             if ($id_cabang == null) {
                 $nama_cabang = 'all';
                 $list_cabang = $data_profit_loss['cabang'];
+                $total_profit_loss = $data_profit_loss['total'];
                 $data_profit_loss = $data_profit_loss['data'];
             } else {
                 $data_cabang = Cabang::find($id_cabang);
                 $nama_cabang = $data_cabang->nama_cabang;
+                $total_profit_loss = $data_profit_loss['total'];
+                $data_profit_loss = $data_profit_loss['data'];
                 $list_cabang = null;
             }
 
@@ -103,6 +106,7 @@ class ReportProfitAndLossController extends Controller
                 'periode' => $periode,
                 'type' => ucwords(str_replace('_', ' ', $type)),
                 'data' => $data_profit_loss,
+                'total' => $total_profit_loss
             ];
 
             if (!empty($data["data"])) {
@@ -151,10 +155,13 @@ class ReportProfitAndLossController extends Controller
             if ($id_cabang == null) {
                 $nama_cabang = 'all';
                 $list_cabang = $data_profit_loss['cabang'];
+                $total_profit_loss = $data_profit_loss['total'];
                 $data_profit_loss = $data_profit_loss['data'];
             } else {
                 $data_cabang = Cabang::find($id_cabang);
                 $nama_cabang = $data_cabang->nama_cabang;
+                $total_profit_loss = $data_profit_loss['total'];
+                $data_profit_loss = $data_profit_loss['data'];
                 $list_cabang = null;
             }
 
@@ -169,6 +176,7 @@ class ReportProfitAndLossController extends Controller
                 'periode' => $periode,
                 'type' => str_replace('_', ' ', $type),
                 'data' => $data_profit_loss,
+                'total' => $total_profit_loss
             ];
 
             // dd(count($data["data"]));
