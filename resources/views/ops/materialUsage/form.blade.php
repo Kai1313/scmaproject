@@ -186,9 +186,11 @@
                                         @php
                                             $val = str_replace('HPP Pemakaian ', '', $dType->code);
                                         @endphp
-                                        <option value="{{ $val }}"
-                                            {{ $data && $data->jenis_pemakaian == $val ? 'selected' : '' }}>
-                                            {{ $val }}</option>
+                                        @if (in_array(session('user')->id_grup_pengguna, explode(',', $dType->description)))
+                                            <option value="{{ $val }}"
+                                                {{ $data && $data->jenis_pemakaian == $val ? 'selected' : '' }}>
+                                                {{ $val }}</option>
+                                        @endif
                                     @endforeach
                                 </select>
                             </div>
