@@ -144,11 +144,14 @@ class SendToBranchController extends Controller
                     ->where(function ($w) use ($idCabang) {
                         $w->whereIn('pb.id_cabang', $idCabang)->orWhereIn('pb.id_cabang2', $idCabang);
                     })
-                    ->whereIn('pb.id_gudang', $idGudang)
                     ->orderBy('pb.tanggal_pindah_barang', 'asc');
 
                 if ($status != 'all') {
                     $data = $data->where('pb.status_pindah_barang', $status);
+                }
+
+                if ($request->id_gudang) {
+                    $data = $data->whereIn('pb.id_gudang', $idGudang);
                 }
 
                 $data = $data->orderBy('pb.tanggal_pindah_barang', 'asc');
@@ -182,11 +185,14 @@ class SendToBranchController extends Controller
                     ->where(function ($w) use ($idCabang) {
                         $w->whereIn('pb.id_cabang', $idCabang)->orWhereIn('pb.id_cabang2', $idCabang);
                     })
-                    ->whereIn('pb.id_gudang', $idGudang)
                     ->orderBy('pb.tanggal_pindah_barang', 'asc');
 
                 if ($status != 'all') {
                     $data = $data->where('pb.status_pindah_barang', $status);
+                }
+
+                if ($request->id_gudang) {
+                    $data = $data->whereIn('pb.id_gudang', $idGudang);
                 }
 
                 $data = $data->orderBy('pb.tanggal_pindah_barang', 'asc');
@@ -220,12 +226,15 @@ class SendToBranchController extends Controller
                     ->where(function ($w) use ($idCabang) {
                         $w->whereIn('pb.id_cabang', $idCabang)->orWhereIn('pb.id_cabang2', $idCabang);
                     })
-                    ->whereIn('pb.id_gudang', $idGudang)
                     ->where('status_diterima', 0)
                     ->orderBy('pb.tanggal_pindah_barang', 'asc');
 
                 if ($status != 'all') {
                     $data = $data->where('pb.status_pindah_barang', $status);
+                }
+
+                if ($request->id_gudang) {
+                    $data = $data->whereIn('pb.id_gudang', $idGudang);
                 }
 
                 $data = $data->orderBy('pb.tanggal_pindah_barang', 'asc');

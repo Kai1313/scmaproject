@@ -3,6 +3,11 @@ let param = ''
 let gArray = [];
 let table = ''
 let reportType = 'Rekap'
+let pageActive = $('.content-header').find('h1').text().trim().toLowerCase().replaceAll(' ', '_')
+let typeSelectWarehouse = 1;
+if (pageActive == 'laporan_kirim_ke_cabang') {
+    typeSelectWarehouse = 0
+}
 
 $('.btn-action').each(function (i, v) {
     defaultUrlPrint.push($(v).prop('href'))
@@ -85,7 +90,7 @@ function getWarehouse(arrayGudang) {
     gArray = []
     if (arrayGudang.length > 0) {
         gArray.push({
-            'id': arrayGudang.map(s => s.id).join(','),
+            'id': typeSelectWarehouse == 1 ? arrayGudang.map(s => s.id).join(',') : '',
             'text': 'Semua Gudang'
         })
     }
@@ -114,7 +119,7 @@ function clearWarehouse() {
     $('[name="id_gudang"]').empty()
     $('[name="id_gudang"]').select2({
         data: [{
-            'id': tempId.join(','),
+            'id': typeSelectWarehouse == 1 ? tempId.join(',') : '',
             'text': 'Semua Gudang'
         }]
     })
