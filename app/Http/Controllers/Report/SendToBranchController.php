@@ -30,7 +30,8 @@ class SendToBranchController extends Controller
         ]);
     }
 
-    function print(Request $request) {
+    public function print(Request $request)
+    {
         if (checkAccessMenu('laporan_kirim_ke_cabang', 'print') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
@@ -140,7 +141,10 @@ class SendToBranchController extends Controller
                     ->join('cabang as c2', 'pb.id_cabang2', 'c2.id_cabang')
                     ->where('id_jenis_transaksi', '21')->where('void', 0)
                     ->whereBetween('pb.tanggal_pindah_barang', $date)
-                    ->whereIn('pb.id_cabang', $idCabang)->whereIn('pb.id_gudang', $idGudang)
+                    ->where(function ($w) use ($idCabang) {
+                        $w->whereIn('pb.id_cabang', $idCabang)->orWhereIn('pb.id_cabang2', $idCabang);
+                    })
+                    ->whereIn('pb.id_gudang', $idGudang)
                     ->orderBy('pb.tanggal_pindah_barang', 'asc');
 
                 if ($status != 'all') {
@@ -175,7 +179,10 @@ class SendToBranchController extends Controller
                     ->join('satuan_barang as sb', 'pbd.id_satuan_barang', 'sb.id_satuan_barang')
                     ->where('id_jenis_transaksi', '21')->where('void', 0)
                     ->whereBetween('pb.tanggal_pindah_barang', $date)
-                    ->whereIn('pb.id_cabang', $idCabang)->whereIn('pb.id_gudang', $idGudang)
+                    ->where(function ($w) use ($idCabang) {
+                        $w->whereIn('pb.id_cabang', $idCabang)->orWhereIn('pb.id_cabang2', $idCabang);
+                    })
+                    ->whereIn('pb.id_gudang', $idGudang)
                     ->orderBy('pb.tanggal_pindah_barang', 'asc');
 
                 if ($status != 'all') {
@@ -210,7 +217,10 @@ class SendToBranchController extends Controller
                     ->join('satuan_barang as sb', 'pbd.id_satuan_barang', 'sb.id_satuan_barang')
                     ->where('id_jenis_transaksi', '21')->where('void', 0)
                     ->whereBetween('pb.tanggal_pindah_barang', $date)
-                    ->whereIn('pb.id_cabang', $idCabang)->whereIn('pb.id_gudang', $idGudang)
+                    ->where(function ($w) use ($idCabang) {
+                        $w->whereIn('pb.id_cabang', $idCabang)->orWhereIn('pb.id_cabang2', $idCabang);
+                    })
+                    ->whereIn('pb.id_gudang', $idGudang)
                     ->where('status_diterima', 0)
                     ->orderBy('pb.tanggal_pindah_barang', 'asc');
 
