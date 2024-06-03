@@ -211,7 +211,10 @@ class SendToWarehouseController extends Controller
                     ->join('satuan_barang as sb', 'pbd.id_satuan_barang', 'sb.id_satuan_barang')
                     ->where('id_jenis_transaksi', '23')->where('void', 0)
                     ->whereBetween('pb.tanggal_pindah_barang', $date)
-                    ->whereIn('pb.id_cabang', $idCabang)->whereIn('pb.id_gudang', $idGudang)
+                    ->whereIn('pb.id_cabang', $idCabang)
+                    ->where(function ($w) use ($idGudang) {
+                        $w->whereIn('pb.id_gudang', $idGudang)->orWhereIn('pb.id_gudang2', $idGudang);
+                    })
                     ->where('status_diterima', 0)
                     ->orderBy('pb.tanggal_pindah_barang', 'asc');
 
