@@ -116,6 +116,7 @@ class MaterialUsageController extends Controller
         switch ($reportType) {
             case 'Rekap':
                 $data = DB::table('pemakaian_header as mu')->select(
+                    'mu.id_pemakaian',
                     'tanggal',
                     'kode_pemakaian',
                     'c.nama_cabang',
@@ -131,6 +132,7 @@ class MaterialUsageController extends Controller
                 break;
             case 'Detail':
                 $data = DB::table('pemakaian_detail as pd')->select(
+                    'ph.id_pemakaian',
                     'ph.tanggal',
                     'ph.kode_pemakaian',
                     'c.nama_cabang',
@@ -162,6 +164,10 @@ class MaterialUsageController extends Controller
 
         if ($type == 'datatable') {
             return Datatables::of($data)
+                ->editColumn('kode_pemakaian', function ($row) {
+                    return '<a href="' . route('material_usage-view', $row->id_pemakaian) . '">' . $row->kode_pemakaian . '</a>';
+                })
+                ->rawColumns(['kode_pemakaian'])
                 ->toJson();
         }
 

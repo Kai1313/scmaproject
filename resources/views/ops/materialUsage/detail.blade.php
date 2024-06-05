@@ -37,10 +37,10 @@
                     class="btn btn-sm btn-default btn-flat pull-right">
                     <span class="glyphicon glyphicon-print mr-1"></span> Cetak
                 </a> --}}
-                <a href="{{ route('material_usage') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right"
+                {{-- <a href="{{ route('material_usage') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right"
                     style="margin-right:10px;">
                     <span class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali
-                </a>
+                </a> --}}
             </div>
             <div class="box-body">
                 <div class="row">
