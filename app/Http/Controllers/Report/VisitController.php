@@ -51,7 +51,7 @@ class VisitController extends Controller
             ->leftJoin('salesman', 'visit.id_salesman', 'salesman.id_salesman')
             ->leftJoin('pelanggan', 'visit.id_pelanggan', 'pelanggan.id_pelanggan')
         // ->where('visit.status', 2)
-            ->orderBy('visit.visit_date', 'desc');
+            ->orderBy('visit.visit_date', 'asc');
 
         if ($request->date) {
             $explode = explode(' - ', $request->date);
@@ -132,7 +132,7 @@ class VisitController extends Controller
             $data = $data->whereBetween('visit_date', $explode);
         }
 
-        $data = $data->orderBy('visit_date', 'desc')->orderBy('visit_code', 'desc');
+        $data = $data->orderBy('visit_date', 'asc')->orderBy('visit_code', 'asc');
         if ($type == 'view') {
             return DataTables::of($data)->make(true);
         } else {
