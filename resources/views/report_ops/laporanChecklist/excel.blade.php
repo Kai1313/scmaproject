@@ -60,8 +60,18 @@
                         <td></td>
                     @endif
                     <td></td>
-
                 </tr>
+                @if (isset($answers[$location->id_objek_kerja . '-' . $job->id_pekerjaan]) &&
+                        $answers[$location->id_objek_kerja . '-' . $job->id_pekerjaan]['keterangan'] != '')
+                    <tr>
+                        <td></td>
+                        <td colspan="4">
+                            @foreach ($answers[$location->id_objek_kerja . '-' . $job->id_pekerjaan]['media'] as $me)
+                                <img src="{{ $me }}" alt="" width="100">
+                            @endforeach
+                        </td>
+                    </tr>
+                @endif
                 @php
                     $counter++;
                 @endphp
