@@ -120,12 +120,12 @@
             $('[name="' + key + '"]').val(defaultFilter[key])
         }
 
-        getParam()
         $('.select2').select2()
         $('.btn-action').each(function(i, v) {
             defaultUrlPrint.push($(v).prop('href'))
         })
 
+        getParam()
         $('.trigger-change').change(function() {
             getParam()
             changeFilter()
