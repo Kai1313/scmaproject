@@ -253,23 +253,24 @@ class LaporanChecklistController extends Controller
             ->where('tanggal_jawaban_checklist_pekerjaan', $date)->get();
 
         $pluckIdAnswer = $answers->pluck('id_jawaban_checklist_pekerjaan');
-        $media = DB::table('media_jawaban')->select('id_jawaban_checklist_pekerjaan', 'lokasi_media_jawaban')
+        $media = DB::table('media_jawaban')->select('id_jawaban_checklist_pekerjaan', 'lokasi_media_jawaban', 'id_pekerjaan')
             ->whereIn('id_jawaban_checklist_pekerjaan', $pluckIdAnswer)->get();
-
-        $arrayMedia = [];
-
-        foreach ($media as $me) {
-            $arrayMedia[$me->id_jawaban_checklist_pekerjaan][] = '/var/www/html/uploads/checklist_pekerjaan/' . $me->lokasi_media_jawaban;
-        }
 
         $arrayAns = [];
         foreach ($answers as $a => $ans) {
             for ($i = 1; $i < 26; $i++) {
                 if ($ans->{'pekerjaan' . ($i) . '_jawaban_checklist_pekerjaan'}) {
+                    $arrayMedia = [];
+                    foreach ($media as $me) {
+                        if ($ans->{'pekerjaan' . ($i) . '_jawaban_checklist_pekerjaan'} == $me->id_pekerjaan) {
+                            $arrayMedia[] = '/var/www/html/uploads/checklist_pekerjaan/' . $me->lokasi_media_jawaban;
+                        }
+                    }
+
                     $arrayAns[$ans->id_objek_kerja . '-' . $ans->{'pekerjaan' . ($i) . '_jawaban_checklist_pekerjaan'}] = [
                         'keterangan' => $ans->{'keterangan' . ($i) . '_jawaban_checklist_pekerjaan'},
                         'jawaban' => $ans->{'jawaban' . ($i) . '_jawaban_checklist_pekerjaan'},
-                        'media' => $arrayMedia[$ans->id_jawaban_checklist_pekerjaan],
+                        'media' => $arrayMedia,
                     ];
                 } else {
                     break;
