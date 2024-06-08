@@ -139,6 +139,13 @@ class PurchaseRequestController extends Controller
                 if ($period['result'] == false) {
                     return response()->json($period, 500);
                 }
+
+                if ($data->approval_status != 0) {
+                    return response()->json([
+                        "result" => false,
+                        "message" => "Permintaan tidak bisa diperbarui karena telah disetujui / ditolak",
+                    ]);
+                }
             }
 
             $data->fill($request->all());
