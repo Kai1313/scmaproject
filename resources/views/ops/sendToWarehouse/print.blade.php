@@ -17,7 +17,7 @@
         }
 
         .table td {
-            font-size: 12px;
+            font-size: 12px !important;
             border: #000000 solid thin;
         }
 
