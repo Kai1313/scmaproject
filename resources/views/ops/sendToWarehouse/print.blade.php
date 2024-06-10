@@ -7,6 +7,10 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Surat jalan pindah cabang {{ $data->kode_pindah_barang }}</title>
     <style type="text/css">
+        * {
+            font-family: Arial;
+        }
+
         .table {
             border-collapse: collapse;
             width: 100%;
