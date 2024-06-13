@@ -1001,6 +1001,7 @@ class ApiController extends Controller
     public function journalPenjualanAsset(Request $request)
     {
         try {
+            Log::info($request->all());
             // init data
             // header
             $id_transaksi = $request->no_transaksi;
@@ -1111,16 +1112,16 @@ class ApiController extends Controller
             foreach ($array_inventory as $d_inv) {
                 $barang = Barang::find($d_inv['id_barang']);
                 if ($id_cabang == 1) {
-                    $akun_penyusutan_barang = $barang->id_akun_biaya;
+                    $akun_penyusutan_barang = $barang->id_akun;
                 } else {
-                    $format_akun = 'id_akun_biaya' . $id_cabang;
+                    $format_akun = 'id_akun' . $id_cabang;
                     $akun_penyusutan_barang = $barang->$format_akun;
                 }
 
                 if ($id_cabang == 1) {
-                    $akun_asset_barang = $barang->id_akun;
+                    $akun_asset_barang = $barang->id_akun_aset;
                 } else {
-                    $format_akun = 'id_akun' . $id_cabang;
+                    $format_akun = 'id_akun_aset' . $id_cabang;
                     $akun_asset_barang = $barang->$format_akun;
                 }
 
@@ -1242,6 +1243,8 @@ class ApiController extends Controller
                 }
             }
 
+            Log::info("sebelum save header");
+            Log::info(json_encode($header_me));
             if (!$header_me->save()) {
                 DB::rollback();
                 return response()->json([
@@ -1272,6 +1275,8 @@ class ApiController extends Controller
                         $check_balance_debit += $jd['debet'];
                         $check_balance_credit += $jd['credit'];
 
+                        Log::info("sebelum save journal detail ".$index);
+                        Log::info(json_encode($detail_me));
                         if (!$detail_me->save()) {
                             DB::rollback();
                             return response()->json([
