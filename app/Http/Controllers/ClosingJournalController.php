@@ -2687,7 +2687,7 @@ class ClosingJournalController extends Controller
 
                 $details = [];
                 foreach ($data_detail as $key => $detail) {
-                    $qty = $detail->jumlah_master_qr_code;
+                    $qty = $detail->jumlah;
                     $sum = ($qty * $detail->beli_master_qr_code) + ($qty * $detail->biaya_beli_master_qr_code) + ($qty * $detail->produksi_master_qr_code) + ($qty * $detail->listrik_master_qr_code) + ($qty * $detail->pegawai_master_qr_code);
                     $details[] = [
                         "qr_code" => $detail->kode_batang,
