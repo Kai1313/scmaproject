@@ -288,4 +288,56 @@ class LaporanChecklistController extends Controller
 
         return Excel::download(new ChecklistExport('report_ops.laporanChecklist.excel', $array), 'laporan checklist pekerjaan.xlsx');
     }
+
+    public function getViewDataExport(Request $request)
+    {
+        $date = $request->date;
+        $grup = $request->grup;
+        $objek = $request->objek;
+
+        $data = DB::table('jawaban_checklist_pekerjaan as jcp')
+            ->select('jcp.*', 'nama_grup_pengguna', 'p.nama_pengguna', 'nama_objek_kerja', 'pc.nama_pengguna as nama_pengguna_checker')
+            ->join('grup_pengguna as gp', 'jcp.id_grup_pengguna', 'gp.id_grup_pengguna')
+            ->join('pengguna as p', 'jcp.user_jawaban_checklist_pekerjaan', 'p.id_pengguna')
+            ->leftJoin('pengguna as pc', 'jcp.checker_jawaban_checklist_pekerjaan', 'pc.id_pengguna')
+            ->join('objek_kerja as ok', 'jcp.id_objek_kerja', 'ok.id_objek_kerja')
+            ->where('jcp.id_objek_kerja', $objek)
+            ->where('tanggal_jawaban_checklist_pekerjaan', $date)
+            ->where('jcp.id_grup_pengguna', $grup)
+            ->first();
+
+        $groupMedia = [];
+        $jobs = [];
+        $status = '0';
+        $datas = [];
+        $obj = '';
+        if ($data) {
+            $medias = DB::table('media_jawaban')
+                ->join('pengguna', 'media_jawaban.user_media_jawaban', 'pengguna.id_pengguna')
+                ->where('id_jawaban_checklist_pekerjaan', $data->id_jawaban_checklist_pekerjaan)
+                ->get();
+            $groupMedia = [];
+            foreach ($medias as $media) {
+                $groupMedia[$media->id_pekerjaan][] = [
+                    'id' => $media->id_media_jawaban,
+                    'image' => env('OLD_ASSET_ROOT') . 'uploads/checklist_pekerjaan/' . $media->lokasi_media_jawaban,
+                    'user_name' => $media->nama_pengguna,
+                ];
+            }
+
+            $checklist = DB::table('checklist_pekerjaan')->where('id_objek_kerja', $objek)->pluck('id_pekerjaan');
+            $jobs = DB::table('pekerjaan')->where('status_pekerjaan', '1')->whereIn('id_pekerjaan', $checklist)
+                ->pluck('nama_pekerjaan', 'id_pekerjaan');
+        }
+
+        $array = [
+            'data' => $data,
+            'medias' => $groupMedia,
+            'jobs' => $jobs,
+        ];
+
+        return Excel::download(new ChecklistExport('report_ops.laporanChecklist.detail-excel', $array), 'laporan checklist pekerjaan.xlsx');
+
+        return view('report_ops.laporanChecklist.detail-excel', $array);
+    }
 }

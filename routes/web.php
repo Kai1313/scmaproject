@@ -260,6 +260,7 @@ Route::namespace('Report')->group(function () {
         Route::get('view/{id}', 'LaporanChecklistController@viewData')->name('checklist-view');
         Route::post('send-checker', 'LaporanChecklistController@sendChecker')->name('checklist-checker');
         Route::post('send-comment-checker', 'LaporanChecklistController@sendCommentChecker')->name('checklist-comment-checker');
+        Route::get('view-excel', 'laporanChecklistController@getViewDataExport')->name('checklist-view-excel');
     });
 });
 

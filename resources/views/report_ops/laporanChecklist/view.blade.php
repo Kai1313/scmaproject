@@ -130,6 +130,12 @@
     <div class="content container-fluid">
         <div class="box">
             <div class="box-body" style="padding:0px;">
+                @if ($status == '1')
+                    <div class="text-right" style="padding-right:10px;padding-top:10px;">
+                        <a href="{{ route('checklist-view-excel') }}?date={{ $data->tanggal_jawaban_checklist_pekerjaan }}&grup={{ $data->id_grup_pengguna }}&objek={{ $data->id_objek_kerja }}"
+                            class="btn btn-success ">Export Excel</a>
+                    </div>
+                @endif
                 <table class="table table-bordered">
                     <tr>
                         <td style="width:100px;font-weight:bold;">Tanggal</td>
