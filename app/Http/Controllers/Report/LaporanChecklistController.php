@@ -337,7 +337,5 @@ class LaporanChecklistController extends Controller
         ];
 
         return Excel::download(new ChecklistExport('report_ops.laporanChecklist.detail-excel', $array), 'laporan checklist pekerjaan.xlsx');
-
-        return view('report_ops.laporanChecklist.detail-excel', $array);
     }
 }
