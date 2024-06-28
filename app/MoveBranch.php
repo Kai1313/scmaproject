@@ -232,10 +232,13 @@ class MoveBranch extends Model
     {
         $idJenisTransaksi = $this->id_jenis_transaksi;
         $detail = json_decode($details);
-
+        $arrayNew = [];
         foreach ($detail as $data) {
-            $check = MoveBranchDetail::where('id_pindah_barang', $this->id_pindah_barang)->where('qr_code', $data->qr_code)->first();
-            if (!$check) {
+            if ($data->id_pindah_barang_detail == '') {
+                $arrayNew[] = $data->qr_code;
+                // }
+                // $check = MoveBranchDetail::where('id_pindah_barang', $this->id_pindah_barang)->where('qr_code', $data->qr_code)->first();
+                // if (!$check) {
                 $array = [
                     'id_pindah_barang' => $this->id_pindah_barang,
                     'id_barang' => $data->id_barang,
@@ -308,27 +311,30 @@ class MoveBranch extends Model
                         'weight_zak' => $data->weight_zak,
                     ]);
                 }
-            } else {
-                $check->keterangan = $data->keterangan;
-                $check->save();
-
-                DB::table('kartu_stok')
-                    ->where('id_jenis_transaksi', $idJenisTransaksi)
-                    ->where('kode_batang_kartu_stok', $data->qr_code)->update([
-                    'keterangan_kartu_stok' => $data->keterangan,
-                ]);
             }
+            // else {
+            //     $check->keterangan = $data->keterangan;
+            //     $check->save();
+
+            //     DB::table('kartu_stok')
+            //         ->where('id_jenis_transaksi', $idJenisTransaksi)
+            //         ->where('kode_batang_kartu_stok', $data->qr_code)->update([
+            //         'keterangan_kartu_stok' => $data->keterangan,
+            //     ]);
+            // }
 
             if (in_array($idJenisTransaksi, ['24'])) {
-                DB::table('kartu_stok')
-                    ->where('id_jenis_transaksi', $idJenisTransaksi)
-                    ->where('kode_batang_kartu_stok', $data->qr_code)
-                    ->where('nama_kartu_stok', $this->id_pindah_barang2)
-                    ->update([
-                        'status_kartu_stok' => 1,
-                        'kode_kartu_stok' => $this->kode_pindah_barang,
-                        'tanggal_kartu_stok' => $this->tanggal_pindah_barang,
-                    ]);
+                foreach ($arrayNew as $qr) {
+                    DB::table('kartu_stok')
+                        ->where('id_jenis_transaksi', $idJenisTransaksi)
+                        ->where('kode_batang_kartu_stok', $qr)
+                        ->where('nama_kartu_stok', $this->id_pindah_barang2)
+                        ->update([
+                            'status_kartu_stok' => 1,
+                            'kode_kartu_stok' => $this->kode_pindah_barang,
+                            'tanggal_kartu_stok' => $this->tanggal_pindah_barang,
+                        ]);
+                }
             }
         }
 
