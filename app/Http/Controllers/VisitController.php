@@ -39,6 +39,14 @@ class VisitController extends Controller
 
             if ($request->daterangepicker) {
                 $explode = explode(' - ', $request->daterangepicker);
+                for ($i = 0; $i < count($explode); $i++) {
+                    if ($i == 0) {
+                        $explode[$i] = $explode[$i] . ' 00:00:00';
+                    } else {
+                        $explode[$i] = $explode[$i] . ' 23:59:59';
+                    }
+                }
+
                 $data = $data->whereBetween('visit_date', $explode);
             }
 
@@ -70,6 +78,9 @@ class VisitController extends Controller
 
                     return $btn;
                 })
+                ->editColumn('pre_visit_desc', function ($data) {
+                    return strip_tags($data->pre_visit_desc);
+                })
                 ->editColumn('status', function ($data) {
                     switch ($data->status) {
                         case '0':
@@ -93,7 +104,7 @@ class VisitController extends Controller
                     }
                 })
 
-                ->rawColumns(['action', 'status'])
+                ->rawColumns(['action', 'status', 'pre_visit_desc'])
                 ->make(true);
         }
 
@@ -243,6 +254,10 @@ class VisitController extends Controller
             }
 
             $data->save();
+            if ($id == 0) {
+                $this->callApiPermission($data);
+            }
+
             DB::commit();
             return response()->json([
                 'result' => true,
@@ -253,6 +268,46 @@ class VisitController extends Controller
             DB::rollback();
             Log::error($th);
             return response()->json(['result' => false, 'message' => 'Kunjungan gagal disimpan'], 500);
+        }
+    }
+
+    public function callApiPermission($data)
+    {
+        try {
+            $datas = [
+                'id_perizinan' => 0,
+                'id_kategori_perizinan' => 1,
+                'nama_perizinan' => "",
+                'pengguna_perizinan' => $data->salesman->pengguna->username,
+                'tanggal_perizinan' => $data->visit_date,
+                'lokasi_perizinan' => $data->pelanggan->nama_pelanggan . ' - ' . $data->pelanggan->alamat_pelanggan,
+                'keperluan_perizinan' => 'Kunjungan ke ' . $data->pelanggan->nama_pelanggan,
+                'bukti_perizinan' => '',
+                'keterangan_perizinan' => "",
+                'status_perizinan' => '1',
+                'user_perizinan' => 1,
+                'date_perizinan' => date('Y-m-d H:i:s'),
+                'token_pengguna' => 'a86e8a8d8dabd4f6e7eddd914fd3fd0b',
+            ];
+
+            $encodedData = json_encode($datas);
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, env('OLD_API_ROOT') . "actions/perizinan_tambah.php");
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $encodedData);
+            $output = curl_exec($ch);
+            curl_close($ch);
+
+            Log::info($output);
+            return json_decode($output);
+        } catch (\Exception $th) {
+            Log::error("Bermasalah ketika akses api permintaan izin");
+            Log::error($th);
+            return [
+                "result" => false,
+                "message" => "Data gagal tersimpan",
+            ];
         }
     }
 

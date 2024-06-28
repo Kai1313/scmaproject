@@ -5,6 +5,7 @@
     <link rel="stylesheet"
         href="{{ asset('assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/bower_components/select2/dist/css/select2.min.css') }}">
+    <link href="{{ asset('css/quill.snow.css') }}" rel="stylesheet" />
     <link rel="stylesheet" href="{{ asset('css/fancybox.css') }}" />
     <style>
         ul.horizontal-list {
@@ -129,6 +130,15 @@
         .add-image:hover {
             cursor: pointer;
         }
+
+        .form-group {
+            margin-bottom: 5px;
+        }
+
+        .ql-editor {
+            overflow-y: scroll;
+            min-height: 150px;
+        }
     </style>
 @endsection
 
@@ -158,7 +168,15 @@
                 </div>
                 <div class="box-body">
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-6">
+                            <div class="row">
+                                <label class="col-md-4">Kode Kunjungan</label>
+                                <div class="form-group col-md-8">
+                                    <input type="text" name="visit_code"
+                                        value="{{ old('visit_code', $data ? $data->visit_code : '') }}"
+                                        class="form-control" readonly placeholder="Otomatis">
+                                </div>
+                            </div>
                             <div class="row">
                                 <label class="col-md-4">Cabang <span>*</span></label>
                                 <div class="form-group col-md-8">
@@ -174,38 +192,12 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <label class="col-md-4">Tanggal Kunjungan <span>*</span></label>
-                                <div class="form-group col-md-8">
-                                    <input type="date" name="visit_date"
-                                        value="{{ old('visit_date', $data ? $data->visit_date : date('Y-m-d')) }}"
-                                        class="form-control datepicker" data-validation="[NOTEMPTY]"
-                                        data-validation-message="Tanggal tidak boleh kosong" {{ $data ? 'readonly' : '' }}>
-                                </div>
-                            </div>
-                            @if ($data && $data->alasan_ubah_tanggal)
-                                <div class="row">
-                                    <label class="col-md-4">Alasan Perubahan Tanggal</label>
-                                    <div class="form-group col-md-8">
-                                        <textarea name="alasan_ubah_tanggal" class="form-control" readonly>{{ $data->alasan_ubah_tanggal }}</textarea>
-                                    </div>
-                                </div>
-                            @endif
-                        </div>
-                        <div class="col-md-4">
-                            <div class="row">
-                                <label class="col-md-4">Kode Kunjungan</label>
-                                <div class="form-group col-md-8">
-                                    <input type="text" name="visit_code"
-                                        value="{{ old('visit_code', $data ? $data->visit_code : '') }}"
-                                        class="form-control" readonly placeholder="Otomatis">
-                                </div>
-                            </div>
-                            <div class="row">
                                 <label class="col-md-4">Salesman <span>*</span></label>
                                 <div class="form-group col-md-8">
                                     <select name="id_salesman" class="form-control select2" readonly
                                         data-validation="[NOTEMPTY]" data-validation-message="Sales tidak boleh kosong">
                                         <option value="">Pilih Salesman</option>
+                                        <option value="14">Pilih</option>
                                         @if ($data && $data->id_salesman)
                                             <option value="{{ $data->id_salesman }}" selected>
                                                 {{ $data->salesman->nama_salesman }}
@@ -220,28 +212,24 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <label class="col-md-4">Status</label>
+                                <label class="col-md-4">Tanggal Kunjungan <span>*</span></label>
                                 <div class="form-group col-md-8">
-                                    <select name="status" class="form-control select2" readonly>
-                                        @foreach ($listStatus as $ks => $status)
-                                            <option value="{{ $status['text'] }}"
-                                                {{ $data ? ($data->status == $ks ? 'selected' : '') : ($ks == 1 ? 'selected' : '') }}>
-                                                {{ $status['text'] }}</option>
-                                        @endforeach
-                                    </select>
+                                    <input type="datetime-local" name="visit_date"
+                                        value="{{ old('visit_date', $data ? $data->visit_date : date('Y-m-d H:i')) }}"
+                                        class="form-control datepicker" data-validation="[NOTEMPTY]"
+                                        data-validation-message="Tanggal tidak boleh kosong" {{ $data ? 'readonly' : '' }}>
                                 </div>
                             </div>
-
-                            @if ($data && $data->status == 0)
+                            @if ($data && $data->alasan_ubah_tanggal)
                                 <div class="row">
-                                    <label class="col-md-4">Alasan Pembatalan</label>
+                                    <label class="col-md-4">Alasan Perubahan Tanggal</label>
                                     <div class="form-group col-md-8">
-                                        <textarea name="alasan_pembatalan" class="form-control" readonly>{{ $data->alasan_pembatalan }}</textarea>
+                                        <textarea name="alasan_ubah_tanggal" class="form-control" readonly>{{ $data->alasan_ubah_tanggal }}</textarea>
                                     </div>
                                 </div>
                             @endif
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <div class="row">
                                 <label class="col-md-4">Pelanggan <span>*</span></label>
                                 <div class="form-group col-md-8">
@@ -267,11 +255,35 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <label class="col-md-4">Catatan</label>
+                                <label class="col-md-4">Status</label>
                                 <div class="form-group col-md-8">
-                                    <textarea name="pre_visit_desc" class="form-control" rows="3" {{ $data ? 'readonly' : '' }}>{{ old('pre_visit_desc', $data ? $data->pre_visit_desc : '') }}</textarea>
+                                    <select name="status" class="form-control select2" readonly>
+                                        @foreach ($listStatus as $ks => $status)
+                                            <option value="{{ $status['text'] }}"
+                                                {{ $data ? ($data->status == $ks ? 'selected' : '') : ($ks == 1 ? 'selected' : '') }}>
+                                                {{ $status['text'] }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
+                            <div class="row">
+                                <label class="col-md-4">Catatan</label>
+                            </div>
+                            <div style="margin-bottom:20px;" id="pre_visit_desc" class="quill-editor"
+                                data-read="{{ $data ? 'readonly' : '' }}">
+                                {!! old('pre_visit_desc', $data ? $data->pre_visit_desc : '') !!}
+                            </div>
+                            <textarea name="pre_visit_desc" class="form-control" rows="3" {{ $data ? 'readonly' : '' }}
+                                style="display:none;">{{ old('pre_visit_desc', $data ? $data->pre_visit_desc : '') }}</textarea>
+
+                            @if ($data && $data->status == 0)
+                                <div class="row">
+                                    <label class="col-md-4">Alasan Pembatalan</label>
+                                    <div class="form-group col-md-8">
+                                        <textarea name="alasan_pembatalan" class="form-control" readonly>{{ $data->alasan_pembatalan }}</textarea>
+                                    </div>
+                                </div>
+                            @endif
                         </div>
                     </div>
                     <div class="pull-right">
@@ -306,7 +318,7 @@
                     </a>
                 </div>
             @endif
-            @if (date('Y-m-d') >= $data->visit_date)
+            @if (date('Y-m-d H:i:s') >= $data->visit_date)
                 <div class="box">
                     <form action="{{ route('visit-save-report-entry', $data->id) }}" method="post" class="post-action">
                         <div class="box-header">
@@ -314,27 +326,32 @@
                         </div>
                         <div class="box-body">
                             <div class="row">
-                                <div class="col-md-4">
-                                    <label for="">Kategori Kunjungan <span>*</span></label>
-                                    <div class="form-group">
-                                        <select name="kategori_kunjungan" class="form-control select2"
-                                            data-validation="[NOTEMPTY]"
-                                            data-validation-message="Kategori tidak boleh kosong">
-                                            <option value="">Pilih Kategori</option>
-                                            @foreach ($categories as $category)
-                                                <option value="{{ $category->nama_kategori_kunjungan }}"
-                                                    {{ $data->kategori_kunjungan == $category->nama_kategori_kunjungan ? 'selected' : '' }}>
-                                                    {{ $category->nama_kategori_kunjungan }}</option>
-                                            @endforeach
-                                        </select>
+                                <div class="col-md-6">
+                                    <div class="row">
+                                        <label for="" class="col-md-4">Kategori Kunjungan <span>*</span></label>
+                                        <div class="form-group col-md-8">
+                                            <select name="kategori_kunjungan" class="form-control select2"
+                                                data-validation="[NOTEMPTY]"
+                                                data-validation-message="Kategori tidak boleh kosong">
+                                                <option value="">Pilih Kategori</option>
+                                                @foreach ($categories as $category)
+                                                    <option value="{{ $category->nama_kategori_kunjungan }}"
+                                                        {{ $data->kategori_kunjungan == $category->nama_kategori_kunjungan ? 'selected' : '' }}>
+                                                        {{ $category->nama_kategori_kunjungan }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
                                     </div>
                                     <label for="">Hasil Kunjungan <span>*</span></label>
                                     <div class="form-group">
+                                        <div style="margin-bottom:20px;" id="visit_title" class="quill-editor"
+                                            data-read="">
+                                            {!! old('visit_title', $data ? nl2br($data->visit_title) : '') !!}
+                                        </div>
+
                                         <textarea name="visit_title" class="form-control" rows="3" data-validation="[NOTEMPTY]"
-                                            data-validation-message="Hasil kunjungan tidak boleh kosong">{{ $data->visit_title }}</textarea>
+                                            data-validation-message="Hasil kunjungan tidak boleh kosong" style="display: none;">{{ $data->visit_title }}</textarea>
                                     </div>
-                                </div>
-                                <div class="col-md-4">
                                     <label for="">Progres <span>*</span></label>
                                     <div class="form-group">
                                         @php
@@ -356,16 +373,6 @@
                                             </span>
                                         @endforeach
                                     </div>
-                                    <label for="">Kendala</label>
-                                    <div class="form-group">
-                                        <textarea name="visit_desc" class="form-control" rows="3">{{ $data->visit_desc }}</textarea>
-                                    </div>
-                                    <label for="">Solusi</label>
-                                    <div class="form-group">
-                                        <textarea name="solusi" class="form-control" rows="3">{{ $data->solusi }}</textarea>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
                                     <label for="">Gambar</label>
                                     <div class="container-media">
                                         @foreach ($data->medias as $media)
@@ -388,6 +395,24 @@
                                     <input type="hidden" name="upload_base64"
                                         value="{{ $data->medias ? json_encode($data->medias) : [] }}">
                                     <input type="hidden" name="remove_base64" value="[]">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="">Kendala</label>
+                                    <div class="form-group">
+                                        <div style="margin-bottom:20px;" id="visit_desc" class="quill-editor"
+                                            data-read="">
+                                            {!! old('visit_desc', $data ? nl2br($data->visit_desc) : '') !!}
+                                        </div>
+                                        <textarea name="visit_desc" class="form-control" rows="3" style="display: none;">{{ $data->visit_desc }}</textarea>
+                                    </div>
+                                    <label for="">Solusi</label>
+                                    <div class="form-group">
+                                        <div style="margin-bottom:20px;" id="solusi" class="quill-editor"
+                                            data-read="">
+                                            {!! old('solusi', $data ? nl2br($data->solusi) : '') !!}
+                                        </div>
+                                        <textarea name="solusi" class="form-control" rows="3" style="display: none;">{{ $data->solusi }}</textarea>
+                                    </div>
                                 </div>
                             </div>
                             <div class="pull-right">
@@ -535,7 +560,7 @@
                     <div class="modal-body">
                         <label for="">Tanggal <span>*</span></label>
                         <div class="form-group">
-                            <input type="date" class="form-control" data-validation="[NOTEMPTY]"
+                            <input type="datetime-local" class="form-control" data-validation="[NOTEMPTY]"
                                 data-validation-message="Tanggal tidak boleh kosong" name="new_date">
                         </div>
                         <label for="">Alasan Ubah Tanggal <span>*</span></label>
@@ -562,6 +587,25 @@
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/custom.js') }}"></script>
     <script src="{{ asset('js/fancybox.min.js') }}"></script>
+    <script src="{{ asset('js/quill.js') }}"></script>
+    <script>
+        $('.quill-editor').each(function() {
+            window[$(this).prop('id')] = new Quill('#' + $(this).prop('id'), {
+                theme: 'snow'
+            });
+
+            let read = $(this).data('read')
+            if (read != '') {
+                window[$(this).prop('id')].disable();
+            }
+
+            window[$(this).prop('id')].on('editor-change', (eventName, ...args) => {
+                if (eventName === 'selection-change') {
+                    $('[name="' + $(this).prop('id') + '"]').val(window[$(this).prop('id')].root.innerHTML)
+                }
+            });
+        })
+    </script>
 @endsection
 
 @section('externalScripts')
@@ -659,6 +703,7 @@
             $('.edit-header').css('display', 'none')
             $('.cancel-edit-header').css('display', 'inline')
             $('.customer-action').css('display', 'inline')
+            window['pre_visit_desc'].enable();
         })
 
         $('.cancel-edit-header').click(function() {
@@ -671,6 +716,7 @@
             $('.edit-header').css('display', 'inline')
             $('.cancel-edit-header').css('display', 'none')
             $('.customer-action').css('display', 'none')
+            window['pre_visit_desc'].disable();
         })
 
         $('.change-date').click(function(e) {

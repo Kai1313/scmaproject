@@ -24,9 +24,13 @@ class Salesman extends Model
         'pengguna_id',
     ];
 
-
     public function visit()
     {
         return $this->hasMany(Visit::class, 'id_salesman', 'id_salesman');
+    }
+
+    public function pengguna()
+    {
+        return $this->belongsTo(Pengguna::class, 'pengguna_id', 'id_pengguna');
     }
 }

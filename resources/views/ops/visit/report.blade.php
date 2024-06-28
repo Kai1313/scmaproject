@@ -54,6 +54,14 @@
         .no-wrap {
             white-space: nowrap;
         }
+
+        p {
+            margin: 0px !important;
+        }
+
+        ol {
+            margin-bottom: 0px !important;
+        }
     </style>
 @endsection
 

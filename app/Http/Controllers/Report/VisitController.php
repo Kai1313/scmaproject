@@ -55,6 +55,14 @@ class VisitController extends Controller
 
         if ($request->date) {
             $explode = explode(' - ', $request->date);
+            for ($i = 0; $i < count($explode); $i++) {
+                if ($i == 0) {
+                    $explode[$i] = $explode[$i] . ' 00:00:00';
+                } else {
+                    $explode[$i] = $explode[$i] . ' 23:59:59';
+                }
+            }
+
             $data = $data->whereBetween('visit_date', $explode);
         }
 

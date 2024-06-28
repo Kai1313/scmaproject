@@ -40,23 +40,23 @@
                 @endforeach
                 @if ($data->alasan_ubah_tanggal != '')
                     <br><br>
-                    <b>Hasil kunjungan</b> : {{ $data->alasan_ubah_tanggal }}
+                    <b><u>Hasil kunjungan</u></b> : {{ $data->alasan_ubah_tanggal }}
                 @endif
-                @if ($data->visit_title)
+                @if (strip_tags($data->visit_title))
                     <br><br>
-                    <b>Hasil kunjungan</b> : {{ $data->visit_title }}
+                    <b><u>Hasil kunjungan</u></b> : {!! nl2br($data->visit_title) !!}
                 @endif
-                @if ($data->visit_desc)
+                @if (strip_tags($data->visit_desc))
                     <br><br>
-                    <b>Masalah</b> : {{ $data->visit_desc }}
+                    <b><u>Masalah</u></b> : {!! nl2br($data->visit_desc) !!}
                 @endif
-                @if ($data->solusi)
+                @if (strip_tags($data->solusi))
                     <br><br>
-                    <b>Solusi</b> : {{ $data->solusi }}
+                    <b><u>Solusi</u></b> : {!! nl2br($data->solusi) !!}
                 @endif
                 @if ($data->alasan_pembatalan)
                     <br><br>
-                    <b>Alasan Batal</b> : {{ $data->alasan_pembatalan }}
+                    <b><u>Alasan Batal</u></b> : {{ $data->alasan_pembatalan }}
                 @endif
             </td>
         </tr>

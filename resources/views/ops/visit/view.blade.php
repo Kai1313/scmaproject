@@ -129,6 +129,13 @@
         .add-image:hover {
             cursor: pointer;
         }
+
+        .content-textarea {
+            border: 1px solid grey;
+            padding: 5px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
     </style>
 @endsection
 
@@ -157,10 +164,18 @@
             </div>
             <div class="box-body">
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-6">
+                        <div class="row">
+                            <label class="col-md-4">Kode Kunjungan</label>
+                            <div class="col-md-8">: {{ $data->visit_code }}</div>
+                        </div>
                         <div class="row">
                             <label class="col-md-4">Cabang </label>
                             <div class="col-md-8">: {{ $data->cabang->nama_cabang }}</div>
+                        </div>
+                        <div class="row">
+                            <label class="col-md-4">Salesman</label>
+                            <div class="col-md-8">: {{ $data->salesman->nama_salesman }}</div>
                         </div>
                         <div class="row">
                             <label class="col-md-4">Tanggal Kunjungan</label>
@@ -173,31 +188,7 @@
                             </div>
                         @endif
                     </div>
-                    <div class="col-md-4">
-                        <div class="row">
-                            <label class="col-md-4">Kode Kunjungan</label>
-                            <div class="col-md-8">: {{ $data->visit_code }}</div>
-                        </div>
-                        <div class="row">
-                            <label class="col-md-4">Salesman</label>
-                            <div class="col-md-8">: {{ $data->salesman->nama_salesman }}</div>
-                        </div>
-                        <div class="row">
-                            <label class="col-md-4">Status</label>
-                            <div class="col-md-8"> :
-                                {{ isset($listStatus[$data->status]) ? $listStatus[$data->status]['text'] : '' }}</div>
-                        </div>
-
-                        @if ($data && $data->status == 0)
-                            <div class="row">
-                                <label class="col-md-4">Alasan Pembatalan</label>
-                                <div class="form-group col-md-8">
-                                    <textarea name="alasan_pembatalan" class="form-control" readonly>{{ $data->alasan_pembatalan }}</textarea>
-                                </div>
-                            </div>
-                        @endif
-                    </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <div class="row">
                             <label class="col-md-4">Pelanggan</label>
                             <div class="col-md-8"> : {{ $data->pelanggan ? $data->pelanggan->nama_pelanggan : '' }}</div>
@@ -207,9 +198,26 @@
                             <div class="col-md-8"> : {{ $data->pelanggan ? $data->pelanggan->alamat_pelanggan : '' }}</div>
                         </div>
                         <div class="row">
-                            <label class="col-md-4">Catatan</label>
-                            <div class="col-md-8">: {{ $data->pre_visit_desc }}</div>
+                            <label class="col-md-4">Status</label>
+                            <div class="col-md-8"> :
+                                {{ isset($listStatus[$data->status]) ? $listStatus[$data->status]['text'] : '' }}</div>
                         </div>
+                        @if ($data && $data->status == 0)
+                            <div class="row">
+                                <label class="col-md-4">Alasan Pembatalan</label>
+                                <div class="form-group col-md-8">
+                                    <textarea name="alasan_pembatalan" class="form-control" readonly>{{ $data->alasan_pembatalan }}</textarea>
+                                </div>
+                            </div>
+                        @endif
+                        <div class="row">
+                            <label class="col-md-4">Catatan </label>
+                            <div class=" col-md-8">: </div>
+                        </div>
+                        @if (strip_tags($data->pre_visit_desc))
+                            <div class="content-textarea">
+                                {!! nl2br($data->pre_visit_desc) !!}</div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -223,37 +231,50 @@
                     </div>
                     <div class="box-body">
                         <div class="row">
-                            <div class="col-md-4">
-                                <div class="row">
+                            <div class="col-md-6">
+                                {{-- <div class="row">
                                     <label for="" class="col-md-4">Metode Kunjungan</label>
                                     <div class="col-md-8">
                                         :{{ isset($methods[$data->visit_type]) ? $methods[$data->visit_type]['text'] : '' }}
                                     </div>
-                                </div>
+                                </div> --}}
                                 <div class="row">
                                     <label for="" class="col-md-4">Kategori Kunjungan</label>
                                     <div class="col-md-8">: {{ $data->kategori_kunjungan }}</div>
                                 </div>
                                 <div class="row">
                                     <label for="" class="col-md-4">Hasil Kunjungan</label>
-                                    <div class="col-md-8">: {{ $data->visit_title }}</div>
+                                    <div class="col-md-8">: </div>
                                 </div>
+                                @if (strip_tags($data->visit_title))
+                                    <div class="content-textarea">
+                                        {!! nl2br($data->visit_title) !!}
+                                    </div>
+                                @endif
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <div class="row">
                                     <label for="" class="col-md-4">Progres</label>
                                     <div class="col-md-8"> : {{ $data->progress_ind }}</div>
                                 </div>
                                 <div class="row">
                                     <label for="" class="col-md-4">Kendala</label>
-                                    <div class="col-md-8"> : {{ $data->visit_desc }}</div>
+                                    <div class="col-md-8"> : </div>
                                 </div>
+                                @if (strip_tags($data->visit_desc))
+                                    <div class="content-textarea">
+                                        {!! nl2br($data->visit_desc) !!}
+                                    </div>
+                                @endif
                                 <div class="row">
                                     <label for="" class="col-md-4">Solusi</label>
-                                    <div class="col-md-8">: {{ $data->solusi }}</div>
+                                    <div class="col-md-8">:</div>
                                 </div>
-                            </div>
-                            <div class="col-md-4">
+                                @if (strip_tags($data->solusi))
+                                    <div class="content-textarea">
+                                        {!! nl2br($data->solusi) !!}
+                                    </div>
+                                @endif
                                 <label for="">Gambar</label>
                                 <div class="container-media">
                                     @foreach ($data->medias as $media)
