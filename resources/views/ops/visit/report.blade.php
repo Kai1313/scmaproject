@@ -122,6 +122,26 @@
                             </select>
                         </div>
                     </div>
+                    <div class="col-md-3 filter-div" style="border:1px solid grey;">
+                        <label>Pengurutan</label>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-7">
+                                    <select class="form-control select2 trigger-change" name="sort">
+                                        <option value="date">Tanggal</option>
+                                        <option value="sales">Sales</option>
+                                        <option value="customer">Pelanggan</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-5">
+                                    <select name="orderby" class="form-control trigger-change select2">
+                                        <option value="desc">Z - A</option>
+                                        <option value="asc">A - Z</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="col-md-2 filter-div" style="padding-top:27px;">
                         <a href="{{ route('visit_report_excel') }}" class="btn btn-success btn-action btn-sm btn-flat"
                             style="margin-bottom:5px;">

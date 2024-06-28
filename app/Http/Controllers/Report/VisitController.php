@@ -47,11 +47,12 @@ class VisitController extends Controller
 
     public function getDataRecap($type, $request, $activities)
     {
+        $arrayF = ['sales' => 'salesman.nama_salesman', 'date' => 'visit.visit_date', 'customer' => 'pelanggan.nama_pelanggan'];
         $data = Visit::select('visit.*', 'salesman.nama_salesman', 'pelanggan.nama_pelanggan')
             ->leftJoin('salesman', 'visit.id_salesman', 'salesman.id_salesman')
             ->leftJoin('pelanggan', 'visit.id_pelanggan', 'pelanggan.id_pelanggan')
         // ->where('visit.status', 2)
-            ->orderBy('visit.visit_date', 'asc');
+            ->orderBy($arrayF[$request->sort], $request->orderby);
 
         if ($request->date) {
             $explode = explode(' - ', $request->date);
@@ -122,6 +123,7 @@ class VisitController extends Controller
 
     public function getDataDetail($type, $request)
     {
+        $arrayF = ['sales' => 'salesman.nama_salesman', 'date' => 'visit.visit_date', 'customer' => 'pelanggan.nama_pelanggan'];
         $data = Visit::select('visit.*', 'salesman.nama_salesman', 'pelanggan.nama_pelanggan')
             ->leftJoin('salesman', 'visit.id_salesman', 'salesman.id_salesman')
             ->leftJoin('pelanggan', 'visit.id_pelanggan', 'pelanggan.id_pelanggan')
@@ -140,7 +142,7 @@ class VisitController extends Controller
             $data = $data->whereBetween('visit_date', $explode);
         }
 
-        $data = $data->orderBy('visit_date', 'asc')->orderBy('visit_code', 'asc');
+        $data = $data->orderBy($arrayF[$request->sort], $request->orderby)->orderBy('visit_code', $request->orderby);
         if ($type == 'view') {
             return DataTables::of($data)->make(true);
         } else {
