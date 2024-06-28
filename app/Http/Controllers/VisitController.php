@@ -255,7 +255,12 @@ class VisitController extends Controller
 
             $data->save();
             if ($id == 0) {
-                $this->callApiPermission($data);
+                $resAPi = $this->callApiPermission($data);
+                if ($resAPi[0]->hasil == '0') {
+                    DB::rollback();
+                    Log::error($resAPi);
+                    return response()->json(['result' => false, 'message' => $resAPi[0]->pesan_hasil], 500);
+                }
             }
 
             DB::commit();
@@ -295,11 +300,10 @@ class VisitController extends Controller
             curl_setopt($ch, CURLOPT_URL, env('OLD_API_ROOT') . "actions/perizinan_tambah.php");
             curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $encodedData);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $datas);
             $output = curl_exec($ch);
             curl_close($ch);
 
-            Log::info($output);
             return json_decode($output);
         } catch (\Exception $th) {
             Log::error("Bermasalah ketika akses api permintaan izin");

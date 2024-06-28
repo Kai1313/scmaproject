@@ -197,7 +197,6 @@
                                     <select name="id_salesman" class="form-control select2" readonly
                                         data-validation="[NOTEMPTY]" data-validation-message="Sales tidak boleh kosong">
                                         <option value="">Pilih Salesman</option>
-                                        <option value="14">Pilih</option>
                                         @if ($data && $data->id_salesman)
                                             <option value="{{ $data->id_salesman }}" selected>
                                                 {{ $data->salesman->nama_salesman }}
