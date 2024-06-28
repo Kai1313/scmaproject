@@ -311,6 +311,20 @@ class MoveBranch extends Model
                         'weight_zak' => $data->weight_zak,
                     ]);
                 }
+
+                if (in_array($idJenisTransaksi, ['24'])) {
+                    // foreach ($arrayNew as $qr) {
+                    DB::table('kartu_stok')
+                        ->where('id_jenis_transaksi', $idJenisTransaksi)
+                        ->where('kode_batang_kartu_stok', $data->qr_code)
+                        ->where('nama_kartu_stok', $this->id_pindah_barang2)
+                        ->update([
+                            'status_kartu_stok' => 1,
+                            'kode_kartu_stok' => $this->kode_pindah_barang,
+                            'tanggal_kartu_stok' => $this->tanggal_pindah_barang,
+                        ]);
+                    // }
+                }
             }
             // else {
             //     $check->keterangan = $data->keterangan;
@@ -322,20 +336,6 @@ class MoveBranch extends Model
             //         'keterangan_kartu_stok' => $data->keterangan,
             //     ]);
             // }
-
-            if (in_array($idJenisTransaksi, ['24'])) {
-                foreach ($arrayNew as $qr) {
-                    DB::table('kartu_stok')
-                        ->where('id_jenis_transaksi', $idJenisTransaksi)
-                        ->where('kode_batang_kartu_stok', $qr)
-                        ->where('nama_kartu_stok', $this->id_pindah_barang2)
-                        ->update([
-                            'status_kartu_stok' => 1,
-                            'kode_kartu_stok' => $this->kode_pindah_barang,
-                            'tanggal_kartu_stok' => $this->tanggal_pindah_barang,
-                        ]);
-                }
-            }
         }
 
         return ['status' => 'success', 'result' => true];
