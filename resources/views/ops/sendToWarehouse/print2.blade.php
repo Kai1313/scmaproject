@@ -174,9 +174,11 @@
                         <tr>
                             <td style="height:70px;">Pembuat</td>
                             <td>Disetujui</td>
+                            <td>Pengirim</td>
                             <td>Penerima</td>
                         </tr>
                         <tr>
+                            <td style="border-top:1px solid black;">Tgl:</td>
                             <td style="border-top:1px solid black;">Tgl:</td>
                             <td style="border-top:1px solid black;">Tgl:</td>
                             <td style="border-top:1px solid black;">Tgl:</td>
