@@ -51,7 +51,10 @@ class LaporanChecklistController extends Controller
         $userGroup = $request->user_group;
 
         $datas = DB::table('checklist_pekerjaan as cp')
-            ->select('nama_objek_kerja', 'cp.id_objek_kerja', 'id_jawaban_checklist_pekerjaan')
+            ->select(
+                'nama_objek_kerja',
+                'jcp.*'
+            )
             ->join('objek_kerja as ok', 'cp.id_objek_kerja', 'ok.id_objek_kerja')
             ->leftJoin('jawaban_checklist_pekerjaan as jcp', function ($q) use ($date, $userGroup) {
                 $q->on('ok.id_objek_kerja', 'jcp.id_objek_kerja')

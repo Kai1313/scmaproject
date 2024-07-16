@@ -202,7 +202,28 @@
                     name: 'id_jawaban_checklist_pekerjaan',
                     className: 'text-center',
                     render: function(data, type, row) {
-                        return !data ? 'Belum Dikerjakan' : '';
+                        if (!data) {
+                            return 'Belum dikerjakan'
+                        }
+
+                        let countTanya = 0
+                        let countCheck = 0
+                        for (let i = 1; i <= 25; i++) {
+                            if (row['pekerjaan' + i + '_jawaban_checklist_pekerjaan']) {
+                                countTanya++;
+                            }
+
+                            if (row['jawaban' + i + '_jawaban_checklist_pekerjaan'] && row['jawaban' +
+                                    i + '_jawaban_checklist_pekerjaan'] != 0) {
+                                countCheck++;
+                            }
+                        }
+
+                        if (countTanya == countCheck) {
+                            return 'Semua sudah dikerjalan'
+                        } else {
+                            return countCheck + ' dari ' + countTanya + ' sudah dikerjakan'
+                        }
                     }
                 }]
             });
