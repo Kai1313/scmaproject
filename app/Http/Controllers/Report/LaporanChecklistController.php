@@ -249,7 +249,6 @@ class LaporanChecklistController extends Controller
                     ->orWhere('tahun_checklist_pekerjaan', 'like', '%' . date('w', strtotime($date)) . '%');
             })
             ->get();
-
         $answers = DB::table('jawaban_checklist_pekerjaan')
             ->whereIn('id_objek_kerja', $pluckId)
             ->where('id_grup_pengguna', $userGroup)
@@ -390,5 +389,43 @@ class LaporanChecklistController extends Controller
         ];
 
         return view('report_ops.laporanChecklist.detail-excel', $array);
+    }
+
+    public function printMonth(Request $request)
+    {
+        $year = date('Y', strtotime($request->date));
+        $month = date('m', strtotime($request->date));
+        $monthName = ['januari', 'Februari', 'Meret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+        $group = DB::table('grup_pengguna')->where('id_grup_pengguna', $request->user_group)->first();
+
+        $locations = DB::table('objek_kerja')->select('id_objek_kerja', 'nama_objek_kerja')
+            ->where('status_objek_kerja', '1')->where('alamat_objek_kerja', $request->location)->orderBy('nama_objek_kerja', 'asc')->get();
+        $pluckId = $locations->pluck('id_objek_kerja');
+
+        $jobs = DB::table('checklist_pekerjaan')
+            ->join('pekerjaan', 'checklist_pekerjaan.id_pekerjaan', 'pekerjaan.id_pekerjaan')
+            ->whereIn('id_objek_kerja', $pluckId)
+            ->where('id_grup_pengguna', $request->user_group)
+            ->where(function ($a) use ($request) {
+                $a->where('tahun_checklist_pekerjaan', '*')
+                    ->orWhere('tahun_checklist_pekerjaan', 'like', '%' . date('w', strtotime($request->date)) . '%');
+            })
+            ->groupBy('pekerjaan.id_pekerjaan')->get();
+        // return $jobs;
+        // $answers = DB::table('jawaban_checklist_pekerjaan')
+        //     ->whereIn('id_objek_kerja', $pluckId)
+        //     ->where('id_grup_pengguna', $userGroup)
+        //     ->where('tanggal_jawaban_checklist_pekerjaan', $date)->get();
+
+        $array = [
+            'month' => $monthName[(int) $month],
+            'year' => $year,
+            'count_date' => cal_days_in_month(CAL_GREGORIAN, $month, $year),
+            'group' => $group,
+            'location' => $request->location,
+            'jobs' => $jobs,
+        ];
+
+        return view('report_ops.laporanChecklist.print_month', $array);
     }
 }
