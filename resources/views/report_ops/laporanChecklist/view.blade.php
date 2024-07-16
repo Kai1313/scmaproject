@@ -213,23 +213,26 @@
                                             @endif
                                         </td>
                                     </tr>
-                                    <tr>
-                                        <td colspan="5">
-                                            @if ($data->{'keterangan' . $i . '_jawaban_checklist_pekerjaan'})
-                                                <b>Keterangan</b> : {!! $data->{'keterangan' . $i . '_jawaban_checklist_pekerjaan'} !!}
-                                            @endif
-                                            <div class="item-media">
-                                                @if (isset($medias[$data->{'pekerjaan' . $i . '_jawaban_checklist_pekerjaan'}]))
-                                                    @foreach ($medias[$data->{'pekerjaan' . $i . '_jawaban_checklist_pekerjaan'}] as $media)
-                                                        <a data-src="{{ $media['image'] }}" data-fancybox="gallery"
-                                                            data-caption="Diinput oleh {{ $media['user_name'] }}">
-                                                            <img src="{{ $media['image'] }}">
-                                                        </a>
-                                                    @endforeach
+                                    @if (isset($medias[$data->{'pekerjaan' . $i . '_jawaban_checklist_pekerjaan'}]) ||
+                                            $data->{'keterangan' . $i . '_jawaban_checklist_pekerjaan'})
+                                        <tr>
+                                            <td colspan="5">
+                                                @if ($data->{'keterangan' . $i . '_jawaban_checklist_pekerjaan'})
+                                                    <b>Keterangan</b> : {!! $data->{'keterangan' . $i . '_jawaban_checklist_pekerjaan'} !!}
                                                 @endif
-                                            </div>
-                                        </td>
-                                    </tr>
+                                                <div class="item-media">
+                                                    @if (isset($medias[$data->{'pekerjaan' . $i . '_jawaban_checklist_pekerjaan'}]))
+                                                        @foreach ($medias[$data->{'pekerjaan' . $i . '_jawaban_checklist_pekerjaan'}] as $media)
+                                                            <a data-src="{{ $media['image'] }}" data-fancybox="gallery"
+                                                                data-caption="Diinput oleh {{ $media['user_name'] }}">
+                                                                <img src="{{ $media['image'] }}">
+                                                            </a>
+                                                        @endforeach
+                                                    @endif
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endif
                                 @endif
                             @endfor
                         @else
