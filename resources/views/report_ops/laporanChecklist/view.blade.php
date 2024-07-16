@@ -142,7 +142,7 @@
                     <tr>
                         <td style="width:100px;font-weight:bold;">Tanggal</td>
                         <td style="width:10px;">:</td>
-                        <td>{{ $status == '1' ? $data->tanggal_jawaban_checklist_pekerjaan : date('Y-m-d') }}</td>
+                        <td>{{ $status == '1' ? $data->tanggal_jawaban_checklist_pekerjaan : request()->date }}</td>
                     </tr>
                     <tr>
                         <td style="width:100px;font-weight:bold;">Grup</td>
