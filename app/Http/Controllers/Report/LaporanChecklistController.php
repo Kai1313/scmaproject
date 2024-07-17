@@ -397,13 +397,12 @@ class LaporanChecklistController extends Controller
         $grup = $request->grup;
         $objek = $request->objek;
 
-        // return $object;
         $year = date('Y', strtotime($date));
         $month = date('m', strtotime($date));
         $monthName = ['januari', 'Februari', 'Meret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
         $group = DB::table('grup_pengguna')->where('id_grup_pengguna', $grup)->first();
         $count_date = cal_days_in_month(CAL_GREGORIAN, $month, $year);
-        $object = DB::table('objek_kerja')->where('id_objek_kerja', $grup)->first();
+        $object = DB::table('objek_kerja')->where('id_objek_kerja', $objek)->first();
 
         $datas = DB::table('jawaban_checklist_pekerjaan as jcp')
             ->select('jcp.*', 'nama_grup_pengguna', 'p.nama_pengguna', 'nama_objek_kerja', 'pc.nama_pengguna as nama_pengguna_checker')
