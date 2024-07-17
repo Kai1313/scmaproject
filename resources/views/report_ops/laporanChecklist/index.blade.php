@@ -67,10 +67,6 @@
                         class="btn btn-danger btn-sm btn-flat btn-action" style="display: none">
                         <i class="glyphicon glyphicon-print"></i> Print
                     </a> --}}
-                    <a href="{{ route('checklist-print-month') }}" class="btn btn-info btn-sm btn-flat btn-action"
-                        style="display: none;">
-                        <i class="fa fa-print"></i> Cetak Dalam 1 Bulan
-                    </a>
                     <a href="{{ route('checklist-excel') }}" class="btn btn-success btn-sm btn-flat btn-action"
                         style="display: none;">
                         <i class="fa fa-file-excel-o"></i> Excel

@@ -62,18 +62,21 @@
     <table class="table">
         <tr>
             <td rowspan="3" class="header" style="width:150px;">
-                <img src="{{ asset('img/logo_scma.png') }}" alt="" width="70">
+                <img src="{{ asset('images/logo.png') }}" alt="" width="70">
             </td>
             <td class="header">PT SINAR CEMARAMAS ABADI</td>
-            <td class="header left" style="width:171px;">No Dokumen : </td>
+            <td class="header left right-white" style="width:90px;">No Dokumen </td>
+            <td style="width:100px;">: </td>
         </tr>
         <tr>
-            <td class="header"></td>
-            <td class="header left">Revisi : </td>
+            <td class="header">LAPORAN CHECKLIST PEKERJAAN</td>
+            <td class="header left right-white">Revisi </td>
+            <td>: 00</td>
         </tr>
-        <tr class="header">
-            <td>Bulan : {{ $month }}</td>
-            <td class="header left">Tgl. Berlaku : </td>
+        <tr>
+            <td class="header">Bulan : {{ $month }} {{ $year }} </td>
+            <td class="header left right-white">Tgl. Berlaku </td>
+            <td>: 03 Juni 2024</td>
         </tr>
     </table>
     <table class="no-border-horizontal">
@@ -81,7 +84,7 @@
             <td></td>
         </tr>
     </table>
-    <div>Lokasi : {{ $location }}, Pengguna : {{ $group->nama_grup_pengguna }}</div>
+    <div style="font-weight:bold;margin-top:5px;margin-bottom:10px;">Lokasi : {{ $object->nama_objek_kerja }}</div>
     <table class="table">
         <tr>
             <td style="width:30px;" class="header" rowspan="2">No</td>
@@ -93,39 +96,27 @@
                 <td class="header" style="width:15px;">{{ $i }}</td>
             @endfor
         </tr>
+        @php
+            $counter = 0;
+        @endphp
         @foreach ($jobs as $key => $job)
+            @php
+                $counter++;
+            @endphp
             <tr>
-                <td class="center">{{ $key + 1 }}</td>
-                <td>{{ $job->nama_pekerjaan }} {{ $job->id_pekerjaan }}</td>
+                <td class="center">{{ $counter }}</td>
+                <td>{{ $job }}</td>
                 @for ($i = 1; $i <= $count_date; $i++)
                     <td class="center">
-
+                        @if ($answers[$key . '-' . $i])
+                            <img src="{{ asset('images/check-icon.png') }}" alt="" style="width:15px;">
+                        @endif
                     </td>
                 @endfor
             </tr>
         @endforeach
     </table>
-    {{-- @php
-        $counter = 0;
-    @endphp
-    @foreach ($groupJobs as $ck => $cat)
-        <div style="float:left;width:200px;margin-top:10px;">
-            <b>Jenis Perawatan {{ isset($alpa[$ck]) ? $alpa[$ck] : '' }}</b>
-            <ol style="margin-left:-25px;">
-                @foreach ($cat as $k => $c)
-                    <li>{{ $c->job_desc }}</li>
-                @endforeach
-            </ol>
-        </div>
-        @if ($counter % 5 == 4)
-            <br clear="all" />
-        @endif
-
-        @php
-            $counter++;
-        @endphp
-    @endforeach --}}
-    <table style="width:100%">
+    <table style="width:100%;margin-top:20px;">
         <tr>
             <td></td>
             <td class="center"><b>Dibuat oleh,</b></td>
@@ -134,8 +125,10 @@
         </tr>
         <tr>
             <td style="height:70px;width:30px;"></td>
-            <td style="border-bottom:1px solid black"></td>
-            <td style="width:50%;"></td>
+            <td style="border-bottom:1px solid black;vertical-align:bottom;text-align:center;">
+                {{ session()->get('user')->nama_pengguna }}
+            </td>
+            <td style="width:70%;"></td>
             <td style="border-bottom:1px solid black"></td>
         </tr>
     </table>

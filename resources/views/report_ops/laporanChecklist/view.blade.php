@@ -135,6 +135,9 @@
                         {{-- <a href="{{ route('checklist-view-excel') }}?date={{ $data->tanggal_jawaban_checklist_pekerjaan }}&grup={{ $data->id_grup_pengguna }}&objek={{ $data->id_objek_kerja }}"
                             class="btn btn-success ">Export Excel</a> --}}
                         <button onclick="history.back()" class="btn btn-default btn-flat">Kembali</button>
+                        <a href="{{ route('checklist-print-month') }}?date={{ $data->tanggal_jawaban_checklist_pekerjaan }}&grup={{ $data->id_grup_pengguna }}&objek={{ $data->id_objek_kerja }}"
+                            class="btn btn-info" target="_blank"> Cetak Dalam 1 Bulan
+                        </a>
                         <a href="{{ route('checklist-view-print') }}?date={{ $data->tanggal_jawaban_checklist_pekerjaan }}&grup={{ $data->id_grup_pengguna }}&objek={{ $data->id_objek_kerja }}"
                             class="btn btn-success " target="_blank">Cetak</a>
                     </div>
