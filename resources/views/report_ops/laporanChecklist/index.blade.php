@@ -182,10 +182,11 @@
         function loadDatatable() {
             $('#target-table').show()
             table = $('.data-table').DataTable({
+                searching: false,
                 scrollX: true,
                 processing: true,
                 serverSide: true,
-                pageLength: 50,
+                paging: false,
                 ajax: defaultUrlIndex + param,
                 columns: [{
                     data: 'nama_objek_kerja',

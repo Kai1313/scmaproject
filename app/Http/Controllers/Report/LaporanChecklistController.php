@@ -53,7 +53,58 @@ class LaporanChecklistController extends Controller
         $datas = DB::table('checklist_pekerjaan as cp')
             ->select(
                 'nama_objek_kerja',
-                'jcp.*'
+                'cp.id_objek_kerja',
+                'id_jawaban_checklist_pekerjaan',
+                'pekerjaan1_jawaban_checklist_pekerjaan',
+                'pekerjaan2_jawaban_checklist_pekerjaan',
+                'pekerjaan3_jawaban_checklist_pekerjaan',
+                'pekerjaan4_jawaban_checklist_pekerjaan',
+                'pekerjaan5_jawaban_checklist_pekerjaan',
+                'pekerjaan6_jawaban_checklist_pekerjaan',
+                'pekerjaan7_jawaban_checklist_pekerjaan',
+                'pekerjaan8_jawaban_checklist_pekerjaan',
+                'pekerjaan9_jawaban_checklist_pekerjaan',
+                'pekerjaan10_jawaban_checklist_pekerjaan',
+                'pekerjaan11_jawaban_checklist_pekerjaan',
+                'pekerjaan12_jawaban_checklist_pekerjaan',
+                'pekerjaan13_jawaban_checklist_pekerjaan',
+                'pekerjaan14_jawaban_checklist_pekerjaan',
+                'pekerjaan15_jawaban_checklist_pekerjaan',
+                'pekerjaan16_jawaban_checklist_pekerjaan',
+                'pekerjaan17_jawaban_checklist_pekerjaan',
+                'pekerjaan18_jawaban_checklist_pekerjaan',
+                'pekerjaan19_jawaban_checklist_pekerjaan',
+                'pekerjaan20_jawaban_checklist_pekerjaan',
+                'pekerjaan21_jawaban_checklist_pekerjaan',
+                'pekerjaan22_jawaban_checklist_pekerjaan',
+                'pekerjaan23_jawaban_checklist_pekerjaan',
+                'pekerjaan24_jawaban_checklist_pekerjaan',
+                'pekerjaan25_jawaban_checklist_pekerjaan',
+                'jawaban1_jawaban_checklist_pekerjaan',
+                'jawaban2_jawaban_checklist_pekerjaan',
+                'jawaban3_jawaban_checklist_pekerjaan',
+                'jawaban4_jawaban_checklist_pekerjaan',
+                'jawaban5_jawaban_checklist_pekerjaan',
+                'jawaban6_jawaban_checklist_pekerjaan',
+                'jawaban7_jawaban_checklist_pekerjaan',
+                'jawaban8_jawaban_checklist_pekerjaan',
+                'jawaban9_jawaban_checklist_pekerjaan',
+                'jawaban10_jawaban_checklist_pekerjaan',
+                'jawaban11_jawaban_checklist_pekerjaan',
+                'jawaban12_jawaban_checklist_pekerjaan',
+                'jawaban13_jawaban_checklist_pekerjaan',
+                'jawaban14_jawaban_checklist_pekerjaan',
+                'jawaban15_jawaban_checklist_pekerjaan',
+                'jawaban16_jawaban_checklist_pekerjaan',
+                'jawaban17_jawaban_checklist_pekerjaan',
+                'jawaban18_jawaban_checklist_pekerjaan',
+                'jawaban19_jawaban_checklist_pekerjaan',
+                'jawaban20_jawaban_checklist_pekerjaan',
+                'jawaban21_jawaban_checklist_pekerjaan',
+                'jawaban22_jawaban_checklist_pekerjaan',
+                'jawaban23_jawaban_checklist_pekerjaan',
+                'jawaban24_jawaban_checklist_pekerjaan',
+                'jawaban25_jawaban_checklist_pekerjaan'
             )
             ->join('objek_kerja as ok', 'cp.id_objek_kerja', 'ok.id_objek_kerja')
             ->leftJoin('jawaban_checklist_pekerjaan as jcp', function ($q) use ($date, $userGroup) {
@@ -427,11 +478,11 @@ class LaporanChecklistController extends Controller
             }
         }
 
-        $checklist = DB::table('checklist_pekerjaan')->where('id_objek_kerja', $objek)->pluck('id_pekerjaan');
+        $checklist = DB::table('checklist_pekerjaan')->where('id_objek_kerja', $objek)->where('id_grup_pengguna', $grup)->pluck('id_pekerjaan');
         $jobs = DB::table('pekerjaan')->where('status_pekerjaan', '1')->whereIn('id_pekerjaan', $checklist)
             ->pluck('nama_pekerjaan', 'id_pekerjaan');
         $array = [
-            'month' => $monthName[(int) $month],
+            'month' => $monthName[(int) $month - 1],
             'year' => $year,
             'count_date' => $count_date,
             'group' => $group,
