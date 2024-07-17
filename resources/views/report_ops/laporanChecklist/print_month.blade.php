@@ -65,18 +65,13 @@
                 <img src="{{ asset('images/logo.png') }}" alt="" width="70">
             </td>
             <td class="header">PT SINAR CEMARAMAS ABADI</td>
-            <td class="header left right-white" style="width:90px;">No Dokumen </td>
-            <td style="width:100px;">: </td>
         </tr>
         <tr>
             <td class="header">LAPORAN CHECKLIST PEKERJAAN</td>
-            <td class="header left right-white">Revisi </td>
-            <td>: 00</td>
         </tr>
         <tr>
             <td class="header">Bulan : {{ $month }} {{ $year }} </td>
-            <td class="header left right-white">Tgl. Berlaku </td>
-            <td>: 03 Juni 2024</td>
+
         </tr>
     </table>
     <table class="no-border-horizontal">
@@ -84,7 +79,8 @@
             <td></td>
         </tr>
     </table>
-    <div style="font-weight:bold;margin-top:5px;margin-bottom:10px;">Lokasi : {{ $object->nama_objek_kerja }}</div>
+    <div style="font-weight:bold;margin-top:5px;margin-bottom:10px;">Lokasi : {{ $object->alamat_objek_kerja }} | Area :
+        {{ $object->nama_objek_kerja }} | Grup : {{ $group->nama_grup_pengguna }}</div>
     <table class="table">
         <tr>
             <td style="width:30px;" class="header" rowspan="2">No</td>
