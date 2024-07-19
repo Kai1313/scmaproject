@@ -263,6 +263,7 @@ Route::namespace('Report')->group(function () {
         Route::get('view-excel', 'LaporanChecklistController@getViewDataExport')->name('checklist-view-excel');
         Route::get('view-cetak', 'LaporanChecklistController@getViewDataPrint')->name('checklist-view-print');
         Route::get('print_month', 'LaporanChecklistController@printMonth')->name('checklist-print-month');
+        Route::get('tes', 'LaporanChecklistController@tes');
     });
 });
 

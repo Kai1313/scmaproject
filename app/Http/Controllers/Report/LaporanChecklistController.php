@@ -493,4 +493,42 @@ class LaporanChecklistController extends Controller
 
         return view('report_ops.laporanChecklist.print_month', $array);
     }
+
+    public function tes(Request $request)
+    {
+        $objek = $request->objek;
+        $grup = $request->grup;
+        $arrayIdObjectKerja = [8, 71, 72, 7, 69, 70, 80, 77, 78, 79, 82, 75, 76, 83, 74, 73, 85, 86, 5, 84, 81, 150, 151,
+            152, 154, 155, 156, 92, 165, 93, 97, 98, 94, 95, 96, 6, 146, 147, 4, 19, 18, 3, 12, 13, 9, 11, 10,
+        ];
+        $datas = JawabanChecklistPekerjaan::select('jawaban_checklist_pekerjaan.*', 'nama_objek_kerja', 'nama_grup_pengguna')
+            ->join('objek_kerja', 'jawaban_checklist_pekerjaan.id_objek_kerja', 'objek_kerja.id_objek_kerja')
+            ->join('grup_pengguna', 'jawaban_checklist_pekerjaan.id_grup_pengguna', 'grup_pengguna.id_grup_pengguna')
+            ->whereIn('jawaban_checklist_pekerjaan.id_objek_kerja', $arrayIdObjectKerja)
+            ->whereBetween('tanggal_jawaban_checklist_pekerjaan', ['2024-06-08', '2024-07-18'])
+            ->where('checker_jawaban_checklist_pekerjaan', null)
+            ->get();
+
+        $array = [];
+        foreach ($datas as $data) {
+            $detail['id_jawaban_checklist_pekerjaan'] = $data->id_jawaban_checklist_pekerjaan;
+            $detail['id_objek_kerja'] = $data->id_objek_kerja;
+            $detail['id_grup_pengguna'] = $data->id_grup_pengguna;
+            $detail['nama_objek_kerja'] = $data->nama_objek_kerja;
+            $detail['nama_grup_pengguna'] = $data->nama_grup_pengguna;
+            $detail['tanggal_jawaban_checklist_pekerjaan'] = $data->tanggal_jawaban_checklist_pekerjaan;
+            $detail['checker_jawaban_checklist_pekerjaan'] = $data->checker_jawaban_checklist_pekerjaan;
+            for ($i = 1; $i <= 25; $i++) {
+                if ($data->{'pekerjaan' . $i . '_jawaban_checklist_pekerjaan'} && $data->{'jawaban' . $i . '_jawaban_checklist_pekerjaan'} == '1') {
+                    $detail['pekerjaan' . $i . '_jawaban_checklist_pekerjaan'] = $data->{'pekerjaan' . $i . '_jawaban_checklist_pekerjaan'};
+                } else {
+                    break;
+                }
+
+            }
+            $array[] = $detail;
+        }
+
+        return $array;
+    }
 }
