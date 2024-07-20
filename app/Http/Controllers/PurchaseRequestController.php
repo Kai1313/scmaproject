@@ -662,7 +662,8 @@ class PurchaseRequestController extends Controller
     public function linkToPo(Request $request)
     {
         $id = $request->id;
-        $data = DB::table('permintaan_pembelian_detail')->where('purchase_request_id', $id)->first();
+        $index = $request->index;
+        $data = DB::table('permintaan_pembelian_detail')->where('purchase_request_id', $id)->where('index', $index)->first();
         if ($data) {
             return redirect()->to(env('OLD_URL_ROOT') . '#permintaan_pembelian&data_master2=' . $data->id_permintaan_pembelian);
         }

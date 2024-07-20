@@ -309,8 +309,9 @@
                 data: 'notes',
                 name: 'notes',
                 render: function(data, type, row) {
-                    return '<a href="' + urlToPo + '?id=' + row.purchase_request_id +
-                        '" target="_blank">' + data +
+                    console.log(row)
+                    return '<a href="' + urlToPo + '?id=' + row.purchase_request_id + '&index=' + row
+                        .index + '" target="_blank">' + data +
                         '</a>'
                 }
             }, {
