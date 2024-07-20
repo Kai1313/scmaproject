@@ -279,6 +279,7 @@
         let changeStatusDetail = '{{ route('purchase-request-change-status-detail') }}';
         let urlGetStock = '{{ route('purchase-request-stock') }}'
         let urlShowImage = '{{ route('purchase-request-show-image') }}';
+        let urlToPo = '{{ route('purchase-request-linktopo') }}';
         var resDataTable = $('#table-detail').DataTable({
             scrollX: true,
             data: details,
@@ -306,7 +307,12 @@
                 name: 'nama_satuan_barang'
             }, {
                 data: 'notes',
-                name: 'notes'
+                name: 'notes',
+                render: function(data, type, row) {
+                    return '<a href="' + urlToPo + '?id=' + row.purchase_request_id +
+                        '" target="_blank">' + data +
+                        '</a>'
+                }
             }, {
                 data: 'stok',
                 name: 'stok',

@@ -59,6 +59,7 @@ Route::prefix('purchase_requisitions')->group(function () {
     Route::get('/stock-with-production', 'PurchaseRequestController@getStockWithProduction')->name('purchase-request-stock');
     Route::get('show-image-upload', 'PurchaseRequestController@getFileUpload')->name('purchase-request-show-image');
     Route::post('post-image-upload', 'PurchaseRequestController@postFileUpload')->name('purchase-request-post-image');
+    Route::get('link-to-po', 'PurchaseRequestController@linkToPo')->name('purchase-request-linktopo');
 });
 
 Route::prefix('uang_muka_pembelian')->group(function () {

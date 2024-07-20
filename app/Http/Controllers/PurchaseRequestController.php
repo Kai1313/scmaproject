@@ -658,4 +658,15 @@ class PurchaseRequestController extends Controller
 
         return response()->json(['result' => true, 'message' => 'Gambar berhasil diproses'], 200);
     }
+
+    public function linkToPo(Request $request)
+    {
+        $id = $request->id;
+        $data = DB::table('permintaan_pembelian_detail')->where('purchase_request_id', $id)->first();
+        if ($data) {
+            return redirect()->to(env('OLD_URL_ROOT') . '#permintaan_pembelian&data_master2=' . $data->id_permintaan_pembelian);
+        }
+
+        return abort(404);
+    }
 }
