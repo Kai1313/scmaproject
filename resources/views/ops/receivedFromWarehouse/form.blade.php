@@ -191,6 +191,7 @@
                         <table id="table-detail" class="table table-bordered data-table display nowrap" width="100%">
                             <thead>
                                 <tr>
+                                    <th>No</th>
                                     <th>QR Code</th>
                                     <th>Nama Barang</th>
                                     <th>Jumlah</th>
@@ -259,6 +260,13 @@
             data: details,
             ordering: true,
             columns: [{
+                data: 'index',
+                name: 'index',
+                className: 'text-center',
+                "render": function(data, type, full, meta) {
+                    return meta.row + 1;
+                },
+            }, {
                 data: 'qr_code',
                 name: 'qr_code'
             }, {
