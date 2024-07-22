@@ -1007,7 +1007,7 @@ class ReportGeneralLedgerController extends Controller
                 }
             }
 
-            $combinedQuery = $secondQuery->union($mainQuery);
+            $combinedQuery = $secondQuery->unionAll($mainQuery);
             DB::statement("SET @running_balance = 0");
             $results = DB::query()
             ->fromSub($combinedQuery, "fQ")
