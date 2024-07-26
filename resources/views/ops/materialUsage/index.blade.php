@@ -125,7 +125,11 @@
             scrollX: true,
             processing: true,
             serverSide: true,
-            pageLength: 50,
+            oSearch: {
+                sSearch: defaultFilter.search
+            },
+            pageLength: defaultFilter.page_length ? parseInt(defaultFilter.page_length) : 50,
+            displayStart: defaultFilter.page_length * defaultFilter.page,
             ajax: "{{ route('material_usage') }}?c=" + $('[name="id_cabang"]').val() + '&show_void=' + $(
                 '[name="show_void"]').is(':checked'),
             columns: [{
@@ -158,8 +162,34 @@
                 className: 'text-center',
                 orderable: false,
                 searchable: false
-            }, ]
+            }, ],
+            drawCallback: function(settings) {
+                var api = this.api();
+                defaultFilter.page = api.page()
+                changeFilter()
+            }
         });
+
+        var keyupTimer;
+        table.on('search.dt', function() {
+            clearTimeout(keyupTimer);
+            keyupTimer = setTimeout(function() {
+                if ($('[type="search"]').val() != defaultFilter.search) {
+                    defaultFilter.search = $('[type="search"]').val()
+                    changeFilter()
+                }
+            }, 1000);
+        });
+
+        table.on('length.dt', function(e, settings, len) {
+            defaultFilter.page_length = len
+            changeFilter()
+        });
+
+        table.on('page.dt', function(e, settings) {
+            defaultFilter.page = table.page.info().page
+            changeFilter()
+        })
 
         $('.change-filter').change(function() {
             table.ajax.url("?c=" + $('[name="id_cabang"]').val() + '&show_void=' + $('[name="show_void"]').is(
