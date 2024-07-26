@@ -63,7 +63,7 @@
         <div class="box">
             <div class="box-header">
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label>Cabang</label>
                         <div class="form-group">
                             <select name="id_cabang" class="form-control select2 change-filter">
@@ -74,7 +74,19 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-8">
+                    <div class="col-md-3">
+                        <label>Status</label>
+                        <div class="form-group">
+                            <select name="approval_status" class="form-control select2 change-filter">
+                                @foreach ($statuses as $status)
+                                    <option value="{{ $status['id'] }}">{{ $status['text'] }}
+                                    </option>
+                                @endforeach
+                                <option value="all">Semua</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
                         <span class="badge badge-default rounded-0 pull-right">
                             <input class="form-check-input" type="checkbox" id="void" name="show_void">
                             <label class="form-check-label" for="void">
@@ -139,7 +151,8 @@
             serverSide: true,
             pageLength: 25,
             ajax: "{{ route('purchase-request') }}?c=" + $('[name="id_cabang"]').val() + '&show_void=' + $(
-                '[name="show_void"]').is(':checked'),
+                    '[name="show_void"]').is(':checked') + '&approval_status=' + $('[name="approval_status"]')
+                .val(),
             columnDefs: [{
                 render: function(data, type, full, meta) {
                     return "<div class='text-wrap width-200'>" + data + "</div>";
@@ -188,13 +201,19 @@
 
         $('[name="id_cabang"]').change(function() {
             table.ajax.url("?c=" + $('[name="id_cabang"]').val() + '&show_void=' + $('[name="show_void"]').is(
-                ':checked')).load()
+                ':checked') + '&approval_status=' + $('[name="approval_status"]').val()).load()
+            changeFilter()
+        })
+
+        $('[name="approval_status"]').change(function() {
+            table.ajax.url("?c=" + $('[name="id_cabang"]').val() + '&show_void=' + $('[name="show_void"]').is(
+                ':checked') + '&approval_status=' + $('[name="approval_status"]').val()).load()
             changeFilter()
         })
 
         $('[name="show_void"]').change(function() {
             table.ajax.url("?c=" + $('[name="id_cabang"]').val() + '&show_void=' + $('[name="show_void"]').is(
-                ':checked')).load()
+                ':checked') + '&approval_status=' + $('[name="approval_status"]').val()).load()
         })
 
         $('body').on('click', '.btn-change-status', function(e) {

@@ -57,6 +57,10 @@ class PurchaseRequestController extends Controller
                 $data = $data->where('prh.void', '0');
             }
 
+            if ($request->approval_status != 'all') {
+                $data = $data->where('prh.approval_status', $request->approval_status);
+            }
+
             $data = $data->groupBy('prh.purchase_request_id')->orderBy('prh.dt_created', 'desc');
             $access = DB::table('setting')->where('id_cabang', $request->c)->where('code', 'PR Approval')->first();
             $arrayAccess = explode(',', $access->value1);
@@ -101,9 +105,11 @@ class PurchaseRequestController extends Controller
         }
 
         $cabang = session()->get('access_cabang');
+        $statuses = [['text' => 'Pending', 'id' => '0'], ['text' => 'Approve', 'id' => '1'], ['text' => 'Reject', 'id' => '2']];
         return view('ops.purchaseRequest.index', [
             'cabang' => $cabang,
             "pageTitle" => "SCA OPS | Permintaan Pembelian | List",
+            'statuses' => $statuses,
         ]);
     }
 
