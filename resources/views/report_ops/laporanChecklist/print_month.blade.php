@@ -55,6 +55,12 @@
         .center {
             text-align: center;
         }
+
+        @media print {
+            #btn-keterangan {
+                display: none !important;
+            }
+        }
     </style>
 </head>
 
@@ -116,20 +122,45 @@
         <tr>
             <td></td>
             <td class="center"><b>Dibuat oleh,</b></td>
-            <td></td>
+            <td rowspan="3" style="width:70%;vertical-align:top;">
+                <div id="target-keterangan" style="padding-left:100px;">
+
+                </div>
+            </td>
             <td class="center"><b>Mengetahui,</b></td>
         </tr>
         <tr>
             <td style="height:70px;width:30px;"></td>
+            <td></td>
+
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
             <td style="border-bottom:1px solid black;vertical-align:bottom;text-align:center;">
                 {{ session()->get('user')->nama_pengguna }}
             </td>
-            <td style="width:70%;"></td>
             <td style="border-bottom:1px solid black"></td>
         </tr>
     </table>
+    <button type="button" id="btn-keterangan">Tambah Keterangan</button>
+    <div id="row-keterangan" style="display:none;">
+        <textarea name="input_keterangan" cols="100" rows="10"></textarea>
+        <button type="button" id="save-keterangan">Simpan Keterangan</button>
+    </div>
 </body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script>
+    $('#btn-keterangan').click(function() {
+        $('#row-keterangan').show()
+        $(this).hide()
+    })
+
+    $('#save-keterangan').click(function() {
+        $('#target-keterangan').html($('[name="input_keterangan"]').val().replace(/\r?\n/g, '<br />'))
+        $('#row-keterangan').hide()
+        $('#btn-keterangan').show()
+    })
     // window.print()
     // window.addEventListener('afterprint', (e) => {
     //     window.close()
