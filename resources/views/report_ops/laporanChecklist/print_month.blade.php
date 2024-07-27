@@ -123,9 +123,7 @@
             <td></td>
             <td class="center"><b>Dibuat oleh,</b></td>
             <td rowspan="3" style="width:70%;vertical-align:top;">
-                <div id="target-keterangan" style="padding-left:100px;">
 
-                </div>
             </td>
             <td class="center"><b>Mengetahui,</b></td>
         </tr>
@@ -143,6 +141,9 @@
             <td style="border-bottom:1px solid black"></td>
         </tr>
     </table>
+    <div id="target-keterangan" style="padding-left:5px;margin-top:20px;">
+
+    </div>
     <button type="button" id="btn-keterangan">Tambah Keterangan</button>
     <div id="row-keterangan" style="display:none;">
         <textarea name="input_keterangan" cols="100" rows="10"></textarea>
@@ -157,7 +158,9 @@
     })
 
     $('#save-keterangan').click(function() {
-        $('#target-keterangan').html($('[name="input_keterangan"]').val().replace(/\r?\n/g, '<br />'))
+        $('#target-keterangan').html('<b>Keterangan</b> :<br>' + $('[name="input_keterangan"]').val().replace(
+            /\r?\n/g,
+            '<br />'))
         $('#row-keterangan').hide()
         $('#btn-keterangan').show()
     })
