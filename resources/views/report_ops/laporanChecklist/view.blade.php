@@ -281,7 +281,7 @@
         @if ($status == '1')
             $('[name="checklist_checker"]').change(function() {
                 let seq = $(this).data('sequence')
-                let val = $(this).is(':checked') ? '1' : 0
+                let val = $(this).is(':checked') ? '1' : '0'
                 $.ajax({
                     url: '{{ route('checklist-checker') }}',
                     type: 'post',

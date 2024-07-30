@@ -82,7 +82,8 @@
                         <thead>
                             <tr>
                                 <th>Detail Lokasi</th>
-                                <th width="100"></th>
+                                <th width="100">Status Dikerjakan</th>
+                                <th width="100">Status Diperiksa</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -212,6 +213,8 @@
                         for (let i = 1; i <= 25; i++) {
                             if (row['pekerjaan' + i + '_jawaban_checklist_pekerjaan']) {
                                 countTanya++;
+                            } else {
+                                break
                             }
 
                             if (row['jawaban' + i + '_jawaban_checklist_pekerjaan'] && row['jawaban' +
@@ -224,6 +227,35 @@
                             return 'Semua sudah dikerjalan'
                         } else {
                             return countCheck + ' dari ' + countTanya + ' sudah dikerjakan'
+                        }
+                    }
+                }, {
+                    data: 'id_jawaban_checklist_pekerjaan',
+                    name: 'id_jawaban_checklist_pekerjaan',
+                    className: 'text-center',
+                    render: function(data, type, row) {
+                        if (!data) {
+                            return 'Belum diperiksa'
+                        }
+
+                        let countTanya = 0
+                        let countCheck = 0
+                        for (let i = 1; i <= 25; i++) {
+                            if (row['pekerjaan' + i + '_jawaban_checklist_pekerjaan']) {
+                                countTanya++;
+                            } else {
+                                break;
+                            }
+
+                            if (row['checker' + i + '_jawaban_checklist_pekerjaan']) {
+                                countCheck++;
+                            }
+                        }
+
+                        if (countTanya == countCheck) {
+                            return 'Semua sudah diperiksa'
+                        } else {
+                            return countCheck + ' dari ' + countTanya + ' sudah diperiksa'
                         }
                     }
                 }]

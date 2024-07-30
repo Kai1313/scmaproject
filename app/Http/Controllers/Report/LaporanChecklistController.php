@@ -50,61 +50,19 @@ class LaporanChecklistController extends Controller
         $location = $request->location;
         $userGroup = $request->user_group;
 
+        $arraySelect = [];
+        for ($i = 1; $i <= 25; $i++) {
+            $arraySelect[] = 'pekerjaan' . $i . '_jawaban_checklist_pekerjaan';
+            $arraySelect[] = 'jawaban' . $i . '_jawaban_checklist_pekerjaan';
+            $arraySelect[] = 'checker' . $i . '_jawaban_checklist_pekerjaan';
+        }
+
         $datas = DB::table('checklist_pekerjaan as cp')
             ->select(
                 'nama_objek_kerja',
                 'cp.id_objek_kerja',
                 'id_jawaban_checklist_pekerjaan',
-                'pekerjaan1_jawaban_checklist_pekerjaan',
-                'pekerjaan2_jawaban_checklist_pekerjaan',
-                'pekerjaan3_jawaban_checklist_pekerjaan',
-                'pekerjaan4_jawaban_checklist_pekerjaan',
-                'pekerjaan5_jawaban_checklist_pekerjaan',
-                'pekerjaan6_jawaban_checklist_pekerjaan',
-                'pekerjaan7_jawaban_checklist_pekerjaan',
-                'pekerjaan8_jawaban_checklist_pekerjaan',
-                'pekerjaan9_jawaban_checklist_pekerjaan',
-                'pekerjaan10_jawaban_checklist_pekerjaan',
-                'pekerjaan11_jawaban_checklist_pekerjaan',
-                'pekerjaan12_jawaban_checklist_pekerjaan',
-                'pekerjaan13_jawaban_checklist_pekerjaan',
-                'pekerjaan14_jawaban_checklist_pekerjaan',
-                'pekerjaan15_jawaban_checklist_pekerjaan',
-                'pekerjaan16_jawaban_checklist_pekerjaan',
-                'pekerjaan17_jawaban_checklist_pekerjaan',
-                'pekerjaan18_jawaban_checklist_pekerjaan',
-                'pekerjaan19_jawaban_checklist_pekerjaan',
-                'pekerjaan20_jawaban_checklist_pekerjaan',
-                'pekerjaan21_jawaban_checklist_pekerjaan',
-                'pekerjaan22_jawaban_checklist_pekerjaan',
-                'pekerjaan23_jawaban_checklist_pekerjaan',
-                'pekerjaan24_jawaban_checklist_pekerjaan',
-                'pekerjaan25_jawaban_checklist_pekerjaan',
-                'jawaban1_jawaban_checklist_pekerjaan',
-                'jawaban2_jawaban_checklist_pekerjaan',
-                'jawaban3_jawaban_checklist_pekerjaan',
-                'jawaban4_jawaban_checklist_pekerjaan',
-                'jawaban5_jawaban_checklist_pekerjaan',
-                'jawaban6_jawaban_checklist_pekerjaan',
-                'jawaban7_jawaban_checklist_pekerjaan',
-                'jawaban8_jawaban_checklist_pekerjaan',
-                'jawaban9_jawaban_checklist_pekerjaan',
-                'jawaban10_jawaban_checklist_pekerjaan',
-                'jawaban11_jawaban_checklist_pekerjaan',
-                'jawaban12_jawaban_checklist_pekerjaan',
-                'jawaban13_jawaban_checklist_pekerjaan',
-                'jawaban14_jawaban_checklist_pekerjaan',
-                'jawaban15_jawaban_checklist_pekerjaan',
-                'jawaban16_jawaban_checklist_pekerjaan',
-                'jawaban17_jawaban_checklist_pekerjaan',
-                'jawaban18_jawaban_checklist_pekerjaan',
-                'jawaban19_jawaban_checklist_pekerjaan',
-                'jawaban20_jawaban_checklist_pekerjaan',
-                'jawaban21_jawaban_checklist_pekerjaan',
-                'jawaban22_jawaban_checklist_pekerjaan',
-                'jawaban23_jawaban_checklist_pekerjaan',
-                'jawaban24_jawaban_checklist_pekerjaan',
-                'jawaban25_jawaban_checklist_pekerjaan'
+                ...$arraySelect
             )
             ->join('objek_kerja as ok', 'cp.id_objek_kerja', 'ok.id_objek_kerja')
             ->leftJoin('jawaban_checklist_pekerjaan as jcp', function ($q) use ($date, $userGroup) {
@@ -180,6 +138,15 @@ class LaporanChecklistController extends Controller
             ->where('jcp.id_grup_pengguna', $group)
             ->first();
 
+        $jobsId = [];
+        for ($i = 1; $i <= 25; $i++) {
+            if ($data->{'pekerjaan' . $i . '_jawaban_checklist_pekerjaan'} == null) {
+                break;
+            }
+
+            $jobsId[] = $data->{'pekerjaan' . $i . '_jawaban_checklist_pekerjaan'};
+        }
+
         $groupMedia = [];
         $jobs = [];
         $status = '0';
@@ -193,14 +160,16 @@ class LaporanChecklistController extends Controller
                 ->get();
             $groupMedia = [];
             foreach ($medias as $media) {
-                $groupMedia[$media->id_pekerjaan][] = [
-                    'id' => $media->id_media_jawaban,
-                    'image' => env('OLD_ASSET_ROOT') . 'uploads/checklist_pekerjaan/' . $media->lokasi_media_jawaban,
-                    'user_name' => $media->nama_pengguna,
-                ];
+                if ($media->lokasi_media_jawaban) {
+                    $groupMedia[$media->id_pekerjaan][] = [
+                        'id' => $media->id_media_jawaban,
+                        'image' => env('OLD_ASSET_ROOT') . 'uploads/checklist_pekerjaan/' . $media->lokasi_media_jawaban,
+                        'user_name' => $media->nama_pengguna,
+                    ];
+                }
             }
 
-            $jobs = DB::table('pekerjaan')->where('status_pekerjaan', '1')->pluck('nama_pekerjaan', 'id_pekerjaan');
+            $jobs = DB::table('pekerjaan')->where('status_pekerjaan', '1')->whereIn('id_pekerjaan', $jobsId)->pluck('nama_pekerjaan', 'id_pekerjaan');
         } else {
             $datas = DB::table('checklist_pekerjaan as cp')
                 ->join('pekerjaan as p', 'cp.id_pekerjaan', 'p.id_pekerjaan')
