@@ -1275,7 +1275,7 @@ class ApiController extends Controller
                         $check_balance_debit += $jd['debet'];
                         $check_balance_credit += $jd['credit'];
 
-                        Log::info("sebelum save journal detail ".$index);
+                        Log::info("sebelum save journal detail " . $index);
                         Log::info(json_encode($detail_me));
                         if (!$detail_me->save()) {
                             DB::rollback();
@@ -3006,19 +3006,16 @@ class ApiController extends Controller
                 'tanggal_jatuh_tempo' => $req->tanggal_jatuh_tempo,
             ];
 
-            $newTipePembayaran = $req->tipe_pembayaran;
             if (!$data) {
                 $data = new transactionBalance;
-                $payment = $newTipePembayaran == '1' ? $total : 0;
-                $remaining = $newTipePembayaran == '1' ? 0 : ($total - $payment);
+                $remaining = $total;
 
                 $array['tipe_transaksi'] = $req->tipe_transaksi;
                 $array['id_transaksi'] = $req->id_transaksi;
-                $array['bayar'] = $payment;
                 $array['sisa'] = $remaining;
             } else {
                 $payment = $data->bayar;
-                $remaining = $newTipePembayaran == '1' ? 0 : ($total - $payment);
+                $remaining = $total - $payment;
                 $array['sisa'] = $remaining;
             }
 
