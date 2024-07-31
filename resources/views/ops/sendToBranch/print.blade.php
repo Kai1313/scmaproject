@@ -8,25 +8,30 @@
     <title>Surat jalan pindah cabang {{ $data->kode_pindah_barang }}</title>
     <style type="text/css">
         * {
-            font-family: Arial;
+            font-family: Arial, Helvetica, sans-serif;
         }
 
         .table {
             border-collapse: collapse;
             width: 100%;
+            border-bottom: #000000 solid thin;
         }
 
         .table td {
-            font-size: 12px !important;
+            font-size: 11px !important;
             border: #000000 solid thin;
+            padding: 1px 4px 1px 4px;
+            border-top: 0px;
+            border-bottom: 0px;
         }
 
         .table th {
-            font-size: 13px;
+            font-size: 11px;
             border: #000000 solid thin;
             max-width: 150px;
             text-align: center;
             font-weight: bold;
+            padding: 4px;
         }
 
         .number {
@@ -47,7 +52,7 @@
         }
 
         .table-subheader td {
-            font-size: 12px;
+            font-size: 11px !important;
         }
 
         .table-signature {
@@ -55,7 +60,7 @@
         }
 
         .table-signature td {
-            font-size: 12px;
+            font-size: 11px !important;
             vertical-align: top;
             width: 100px;
             padding: 0px 5px 0px 5px;
@@ -75,7 +80,7 @@
 
         header {
             position: fixed;
-            top: -170px;
+            top: -171px;
             left: 0px;
             right: 0px;
         }
