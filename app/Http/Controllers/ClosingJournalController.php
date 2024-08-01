@@ -530,11 +530,11 @@ class ClosingJournalController extends Controller
             $listrik = $data_production_cost->kwh_beban_produksi * $data_biaya['listrik'];
 
             // init beban listrik dan pegawai
-            $beban_listrik = round($data_production_cost->kwh_beban_produksi, 2);
-            $beban_pegawai = round(($data_production_cost->tenaga_kerja_beban_produksi * $data_production_cost->listrik_beban_produksi), 2);
-            $jumlah_pegawai = round(($data_production_cost->tenaga_kerja_beban_produksi), 2);
-            $listrik_pegawai = round($data_production_cost->listrik_beban_produksi, 2);
-            $daya_mesin = round($data_production_cost->daya, 2);
+            $beban_listrik = $data_production_cost->kwh_beban_produksi;
+            $beban_pegawai = $data_production_cost->tenaga_kerja_beban_produksi * $data_production_cost->listrik_beban_produksi;
+            $jumlah_pegawai = $data_production_cost->tenaga_kerja_beban_produksi;
+            $listrik_pegawai = $data_production_cost->listrik_beban_produksi;
+            $daya_mesin = $data_production_cost->daya;
             // data return biaya listrik dan pegawai
             $data = [
                 'kwh_listrik' => $beban_listrik,
