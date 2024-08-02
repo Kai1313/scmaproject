@@ -1928,7 +1928,7 @@ class ClosingJournalController extends Controller
                         $detail->keterangan = "HPP Transfer Cabang Keluar " . $id_transaksi;
                         $detail->id_transaksi = $id_transaksi;
                         $detail->debet = 0;
-                        $detail->credit = $out;
+                        $detail->credit = round($out, 2);
                         $detail->user_created = null;
                         $detail->user_modified = null;
                         $detail->dt_created = $end_date;
@@ -1946,7 +1946,7 @@ class ClosingJournalController extends Controller
                                 "message" => "Jurnal Closing Transfer Cabang Gagal. Error when store Jurnal data on table detail",
                             ]);
                         }
-                        $sum_debet += $out;
+                        $sum_debet += round($out, 2);
                         $i++;
                     }
                     $detail = new JurnalDetail();
@@ -2064,7 +2064,7 @@ class ClosingJournalController extends Controller
                         $detail->id_akun = $akun_persediaan;
                         $detail->keterangan = "HPP Transfer Cabang Masuk " . $id_transaksi;
                         $detail->id_transaksi = $id_transaksi;
-                        $detail->debet = $in;
+                        $detail->debet = round($in, 2);
                         $detail->credit = 0;
                         $detail->user_created = null;
                         $detail->user_modified = null;
@@ -2083,7 +2083,7 @@ class ClosingJournalController extends Controller
                                 "message" => "Jurnal Closing Transfer Cabang Gagal. Error when store Jurnal data on table detail",
                             ]);
                         }
-                        $sum_kredit += $in;
+                        $sum_kredit += round($in, 2);
                         $i++;
                     }
                     $detail = new JurnalDetail();
@@ -2312,7 +2312,7 @@ class ClosingJournalController extends Controller
                 $detail->user_modified = null;
                 $detail->dt_created = $end_date;
                 $detail->dt_modified = $end_date;
-                Log::info("sum val akhir : ".$sum_val);
+                // Log::info("sum val akhir : ".$sum_val);
                 // dd(json_encode($detail));
                 if (!$detail->save()) {
                     DB::rollback();
