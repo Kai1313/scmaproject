@@ -3515,8 +3515,8 @@ class ClosingJournalController extends Controller
             $detailClosing21->id_akun = $closing_account->value2;
             $detailClosing21->keterangan = "Jurnal Closing 2 $noteDate";
             $detailClosing21->id_transaksi = null;
-            $detailClosing21->debet = ($closingSum < 0) ? 0 : abs($closingSum);
-            $detailClosing21->credit = ($closingSum < 0) ? $closingSum : 0;
+            $detailClosing21->debet = ($closingSum < 0) ? 0 : $closingSum;
+            $detailClosing21->credit = ($closingSum < 0) ? abs($closingSum) : 0;
             $detailClosing21->user_created = null;
             $detailClosing21->user_modified = null;
             $detailClosing21->dt_created = $end_date;
