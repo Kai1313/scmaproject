@@ -2270,7 +2270,7 @@ class ClosingJournalController extends Controller
                         $format_akun = 'id_akun' . $id_cabang;
                         $akun_persediaan = $barang->$format_akun;
                     }
-                    Log::info("out foreach : ".round($out, 2));
+                    // Log::info("out foreach : ".round($out, 2));
                     // Log::info(json_encode($barang->id_barang));
                     $detail = new JurnalDetail();
                     $detail->id_jurnal = $header->id_jurnal;
@@ -2278,8 +2278,8 @@ class ClosingJournalController extends Controller
                     $detail->id_akun = $akun_persediaan;
                     $detail->keterangan = "Koreksi Stok " . $id_transaksi . " " . $barang->nama_barang;
                     $detail->id_transaksi = $id_transaksi;
-                    $detail->debet = ($out > 0) ? 0 : abs($out);
-                    $detail->credit = ($out > 0) ? $out : 0;
+                    $detail->debet = ($out > 0) ? 0 : round(abs($out), 2);
+                    $detail->credit = ($out > 0) ? round($out, 2) : 0;
                     $detail->user_created = null;
                     $detail->user_modified = null;
                     $detail->dt_created = $end_date;
