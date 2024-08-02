@@ -3432,8 +3432,8 @@ class ClosingJournalController extends Controller
                 $detail->id_akun = $value->id_akun;
                 $detail->keterangan = "Jurnal Closing 1 $noteDate";
                 $detail->id_transaksi = null;
-                $detail->debet = ($sum < 0) ? abs($sum) : 0;
-                $detail->credit = ($sum < 0) ? 0 : $sum;
+                $detail->debet = ($sum < 0) ? round(abs($sum), 2) : 0;
+                $detail->credit = ($sum < 0) ? 0 : round($sum, 2);
                 $detail->user_created = null;
                 $detail->user_modified = null;
                 $detail->dt_created = $end_date;
@@ -3461,8 +3461,8 @@ class ClosingJournalController extends Controller
             $detailClosing1->id_akun = $closing_account->value2;
             $detailClosing1->keterangan = "Jurnal Closing 1 $noteDate";
             $detailClosing1->id_transaksi = null;
-            $detailClosing1->debet = ($closingSum < 0) ? abs($closingSum) : 0;
-            $detailClosing1->credit = ($closingSum < 0) ? 0 : $closingSum;
+            $detailClosing1->debet = ($closingSum < 0) ? round(abs($closingSum), 2) : 0;
+            $detailClosing1->credit = ($closingSum < 0) ? 0 : round($closingSum, 2);
             $detailClosing1->user_created = null;
             $detailClosing1->user_modified = null;
             $detailClosing1->dt_created = $end_date;
@@ -3515,8 +3515,8 @@ class ClosingJournalController extends Controller
             $detailClosing21->id_akun = $closing_account->value2;
             $detailClosing21->keterangan = "Jurnal Closing 2 $noteDate";
             $detailClosing21->id_transaksi = null;
-            $detailClosing21->debet = ($closingSum < 0) ? 0 : $closingSum;
-            $detailClosing21->credit = ($closingSum < 0) ? abs($closingSum) : 0;
+            $detailClosing21->debet = ($closingSum < 0) ? 0 : round($closingSum, 2);
+            $detailClosing21->credit = ($closingSum < 0) ? round(abs($closingSum), 2) : 0;
             $detailClosing21->user_created = null;
             $detailClosing21->user_modified = null;
             $detailClosing21->dt_created = $end_date;
@@ -3542,8 +3542,8 @@ class ClosingJournalController extends Controller
             $detailClosing22->id_akun = $profitloss_account->value2;
             $detailClosing22->keterangan = "Jurnal Closing 2 $noteDate";
             $detailClosing22->id_transaksi = null;
-            $detailClosing22->debet = ($closingSum < 0) ? abs($closingSum) : 0;
-            $detailClosing22->credit = ($closingSum < 0) ? 0 : $closingSum;
+            $detailClosing22->debet = ($closingSum < 0) ? round(abs($closingSum), 2) : 0;
+            $detailClosing22->credit = ($closingSum < 0) ? 0 : round($closingSum);
             $detailClosing22->user_created = null;
             $detailClosing22->user_modified = null;
             $detailClosing22->dt_created = $end_date;
@@ -3597,8 +3597,8 @@ class ClosingJournalController extends Controller
                 $detailClosing31->id_akun = $profitloss_account->value2;
                 $detailClosing31->keterangan = "Jurnal Closing 3 $noteDate";
                 $detailClosing31->id_transaksi = null;
-                $detailClosing31->debet = ($closingSum < 0) ? abs($closingSum) : 0;
-                $detailClosing31->credit = ($closingSum < 0) ? 0 : $closingSum;
+                $detailClosing31->debet = ($closingSum < 0) ? round(abs($closingSum), 2) : 0;
+                $detailClosing31->credit = ($closingSum < 0) ? 0 : round($closingSum, 2);
                 $detailClosing31->user_created = null;
                 $detailClosing31->user_modified = null;
                 $detailClosing31->dt_created = $end_date;
@@ -3624,8 +3624,8 @@ class ClosingJournalController extends Controller
                 $detailClosing32->id_akun = $profitlosshold_account->value2;
                 $detailClosing32->keterangan = "Jurnal Closing 3 $noteDate";
                 $detailClosing32->id_transaksi = null;
-                $detailClosing32->debet = ($closingSum < 0) ? 0 : abs($closingSum);
-                $detailClosing32->credit = ($closingSum < 0) ? $closingSum : 0;
+                $detailClosing32->debet = ($closingSum < 0) ? 0 : round(abs($closingSum), 2);
+                $detailClosing32->credit = ($closingSum < 0) ? round($closingSum, 2) : 0;
                 $detailClosing32->user_created = null;
                 $detailClosing32->user_modified = null;
                 $detailClosing32->dt_created = $end_date;
