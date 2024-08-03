@@ -3383,6 +3383,7 @@ class ClosingJournalController extends Controller
                 ->join("master_akun", "master_akun.id_akun", "jurnal_detail.id_akun")
                 ->where("jurnal_header.void", "0")
                 ->where("master_akun.tipe_akun", "1")
+                ->where("jurnal_header.id_cabang", $id_cabang)
                 ->where("master_akun.id_cabang", $id_cabang)
                 ->whereRaw("((jurnal_header.id_transaksi <> 'Closing 1 $noteDate' AND jurnal_header.id_transaksi <> 'Closing 2 $noteDate' AND jurnal_header.id_transaksi <> 'Closing 3 $noteDate') OR jurnal_header.id_transaksi IS NULL)")
                 ->whereBetween("jurnal_header.tanggal_jurnal", [$start_date, $end_date])
