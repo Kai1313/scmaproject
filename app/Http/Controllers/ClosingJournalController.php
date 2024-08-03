@@ -3313,6 +3313,7 @@ class ClosingJournalController extends Controller
     public function closingJournal(Request $request)
     {
         try {
+            // dd("haha");
             // Init data
             $id_cabang = $request->id_cabang;
             $journal_type = "ME";
@@ -3424,7 +3425,7 @@ class ClosingJournalController extends Controller
 
                 // Calculate sum
                 $sum = $sumBalance + $value->debet - $value->kredit;
-                // Log::info("closing sum ".$closingSum." debet ".$value->debet." kredit ".$value->kredit);
+                Log::info("closing sum ".$closingSum." debet ".$value->debet." kredit ".$value->kredit);
                 $closingSum = round((float) $closingSum, 2) + round((float) $sum, 2);
                 $detail = new JurnalDetail();
                 $detail->id_jurnal = $header->id_jurnal;
@@ -3438,8 +3439,9 @@ class ClosingJournalController extends Controller
                 $detail->user_modified = null;
                 $detail->dt_created = $end_date;
                 $detail->dt_modified = $end_date;
-                // Log::info(json_encode($detail));
-                // Log::info($closingSum);
+                Log::info("closing detail");
+                Log::info(json_encode($detail));
+                Log::info($closingSum);
                 if (!$detail->save()) {
                     DB::rollback();
                     // Revert post closing
@@ -3455,6 +3457,8 @@ class ClosingJournalController extends Controller
                 $i++;
             }
             // Detail end closing 1
+            Log::info("closing 1 sub before abs");
+            Log::info($closingSum);
             $detailClosing1 = new JurnalDetail();
             $detailClosing1->id_jurnal = $header->id_jurnal;
             $detailClosing1->index = $i + 1;
@@ -3467,8 +3471,9 @@ class ClosingJournalController extends Controller
             $detailClosing1->user_modified = null;
             $detailClosing1->dt_created = $end_date;
             $detailClosing1->dt_modified = $end_date;
-            // Log::info(json_encode($detailClosing1));
-            // Log::info($closingSum);
+            Log::info("closing 1");
+            Log::info(json_encode($detailClosing1));
+            Log::info($closingSum);
             if (!$detailClosing1->save()) {
                 DB::rollback();
                 // Revert post closing
@@ -3521,8 +3526,9 @@ class ClosingJournalController extends Controller
             $detailClosing21->user_modified = null;
             $detailClosing21->dt_created = $end_date;
             $detailClosing21->dt_modified = $end_date;
-            // Log::info(json_encode($detailClosing21));
-            // Log::info($closingSum);
+            Log::info("closing 2.1");
+            Log::info(json_encode($detailClosing21));
+            Log::info($closingSum);
             if (!$detailClosing21->save()) {
                 DB::rollback();
                 // Revert post closing
@@ -3543,13 +3549,14 @@ class ClosingJournalController extends Controller
             $detailClosing22->keterangan = "Jurnal Closing 2 $noteDate";
             $detailClosing22->id_transaksi = null;
             $detailClosing22->debet = ($closingSum < 0) ? round(abs($closingSum), 2) : 0;
-            $detailClosing22->credit = ($closingSum < 0) ? 0 : round($closingSum);
+            $detailClosing22->credit = ($closingSum < 0) ? 0 : round($closingSum, 2);
             $detailClosing22->user_created = null;
             $detailClosing22->user_modified = null;
             $detailClosing22->dt_created = $end_date;
             $detailClosing22->dt_modified = $end_date;
-            // Log::info(json_encode($detailClosing22));
-            // Log::info($closingSum);
+            Log::info("closing 2.2");
+            Log::info(json_encode($detailClosing22));
+            Log::info($closingSum);
             if (!$detailClosing22->save()) {
                 DB::rollback();
                 // Revert post closing
@@ -3645,7 +3652,7 @@ class ClosingJournalController extends Controller
                     ]);
                 }
             }
-
+            // dd("stop dulu");
             DB::commit();
             return response()->json([
                 "result" => true,
