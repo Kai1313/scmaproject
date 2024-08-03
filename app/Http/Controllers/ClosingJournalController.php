@@ -3417,6 +3417,9 @@ class ClosingJournalController extends Controller
             }
             $closingSum = 0;
             $i = 0;
+
+            $sum_debet = 0;
+            $sum_credit = 0;
             foreach ($data_ledgers as $key => $value) {
                 // Get saldo balance if exist
                 $saldoBalance = SaldoBalance::where("id_cabang", $id_cabang)->where("bulan", $month)->where("tahun", $year)->where("id_akun", $value->id_akun)->first();
@@ -3427,7 +3430,15 @@ class ClosingJournalController extends Controller
                 // Calculate sum
                 $sum = $sumBalance + $value->debet - $value->kredit;
                 Log::info("closing sum ".$closingSum." debet ".$value->debet." kredit ".$value->kredit);
-                $closingSum = round((float) $closingSum, 2) + round((float) $sum, 2);
+                // $closingSum = (float) $closingSum + (float) $sum;
+
+                if($sum < 0){
+                    $sum_debet = $sum_debet + abs($sum);
+                }else{
+                    $sum_credit = $sum_credit + $sum;
+                }
+
+
                 $detail = new JurnalDetail();
                 $detail->id_jurnal = $header->id_jurnal;
                 $detail->index = $i + 1;
@@ -3457,6 +3468,9 @@ class ClosingJournalController extends Controller
                 }
                 $i++;
             }
+
+            $closingSum = round($sum_debet, 2) - round($sum_credit, 2);
+
             // Detail end closing 1
             Log::info("closing 1 sub before abs");
             Log::info($closingSum);
