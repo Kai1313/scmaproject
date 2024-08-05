@@ -3429,7 +3429,7 @@ class ClosingJournalController extends Controller
 
                 // Calculate sum
                 $sum = $sumBalance + $value->debet - $value->kredit;
-                Log::info("closing sum ".$closingSum." debet ".$value->debet." kredit ".$value->kredit);
+                // Log::info("closing sum ".$closingSum." debet ".$value->debet." kredit ".$value->kredit);
                 // $closingSum = (float) $closingSum + (float) $sum;
 
                 if($sum < 0){
@@ -3451,9 +3451,9 @@ class ClosingJournalController extends Controller
                 $detail->user_modified = null;
                 $detail->dt_created = $end_date;
                 $detail->dt_modified = $end_date;
-                Log::info("closing detail");
-                Log::info(json_encode($detail));
-                Log::info($closingSum);
+                // Log::info("closing detail");
+                // Log::info(json_encode($detail));
+                // Log::info($closingSum);
                 if (!$detail->save()) {
                     DB::rollback();
                     // Revert post closing
@@ -3472,8 +3472,8 @@ class ClosingJournalController extends Controller
             $closingSum = round($sum_debet, 2) - round($sum_credit, 2);
 
             // Detail end closing 1
-            Log::info("closing 1 sub before abs");
-            Log::info($closingSum);
+            // Log::info("closing 1 sub before abs");
+            // Log::info($closingSum);
             $detailClosing1 = new JurnalDetail();
             $detailClosing1->id_jurnal = $header->id_jurnal;
             $detailClosing1->index = $i + 1;
@@ -3486,9 +3486,9 @@ class ClosingJournalController extends Controller
             $detailClosing1->user_modified = null;
             $detailClosing1->dt_created = $end_date;
             $detailClosing1->dt_modified = $end_date;
-            Log::info("closing 1");
-            Log::info(json_encode($detailClosing1));
-            Log::info($closingSum);
+            // Log::info("closing 1");
+            // Log::info(json_encode($detailClosing1));
+            // Log::info($closingSum);
             if (!$detailClosing1->save()) {
                 DB::rollback();
                 // Revert post closing
@@ -3541,9 +3541,9 @@ class ClosingJournalController extends Controller
             $detailClosing21->user_modified = null;
             $detailClosing21->dt_created = $end_date;
             $detailClosing21->dt_modified = $end_date;
-            Log::info("closing 2.1");
-            Log::info(json_encode($detailClosing21));
-            Log::info($closingSum);
+            // Log::info("closing 2.1");
+            // Log::info(json_encode($detailClosing21));
+            // Log::info($closingSum);
             if (!$detailClosing21->save()) {
                 DB::rollback();
                 // Revert post closing
@@ -3569,9 +3569,9 @@ class ClosingJournalController extends Controller
             $detailClosing22->user_modified = null;
             $detailClosing22->dt_created = $end_date;
             $detailClosing22->dt_modified = $end_date;
-            Log::info("closing 2.2");
-            Log::info(json_encode($detailClosing22));
-            Log::info($closingSum);
+            // Log::info("closing 2.2");
+            // Log::info(json_encode($detailClosing22));
+            // Log::info($closingSum);
             if (!$detailClosing22->save()) {
                 DB::rollback();
                 // Revert post closing
@@ -3586,7 +3586,9 @@ class ClosingJournalController extends Controller
             }
 
             // create closing 3
+            Log::info("month ".$month);
             if($month == 12){
+                Log::info("month ini ".$month);
                 $header3 = new JurnalHeader();
                 $header3->id_cabang = $id_cabang;
                 $header3->jenis_jurnal = $journal_type;
@@ -3625,8 +3627,8 @@ class ClosingJournalController extends Controller
                 $detailClosing31->user_modified = null;
                 $detailClosing31->dt_created = $end_date;
                 $detailClosing31->dt_modified = $end_date;
-                // Log::info(json_encode($detailClosing31));
-                // Log::info($closingSum);
+                Log::info(json_encode($detailClosing31));
+                // Log::info($detailClosing31);
                 if (!$detailClosing31->save()) {
                     DB::rollback();
                     // Revert post closing
@@ -3646,14 +3648,14 @@ class ClosingJournalController extends Controller
                 $detailClosing32->id_akun = $profitlosshold_account->value2;
                 $detailClosing32->keterangan = "Jurnal Closing 3 $noteDate";
                 $detailClosing32->id_transaksi = null;
-                $detailClosing32->debet = ($closingSum < 0) ? 0 : round(abs($closingSum), 2);
-                $detailClosing32->credit = ($closingSum < 0) ? round($closingSum, 2) : 0;
+                $detailClosing32->debet = ($closingSum < 0) ? 0 : round($closingSum, 2);
+                $detailClosing32->credit = ($closingSum < 0) ? round(abs($closingSum), 2) : 0;
                 $detailClosing32->user_created = null;
                 $detailClosing32->user_modified = null;
                 $detailClosing32->dt_created = $end_date;
                 $detailClosing32->dt_modified = $end_date;
-                // Log::info(json_encode($detailClosing32));
-                // Log::info($closingSum);
+                Log::info(json_encode($detailClosing32));
+                // Log::info($detailClosing32);
                 if (!$detailClosing32->save()) {
                     DB::rollback();
                     // Revert post closing
