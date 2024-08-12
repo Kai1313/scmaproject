@@ -194,17 +194,27 @@
                             <div class="row">
                                 <label class="col-md-4">Salesman <span>*</span></label>
                                 <div class="form-group col-md-8">
-                                    <select name="id_salesman" class="form-control select2" readonly
-                                        data-validation="[NOTEMPTY]" data-validation-message="Sales tidak boleh kosong">
+                                    <select name="id_salesman" class="form-control select2"
+                                        {{ count($salesmans) > 0 ? '' : 'readonly' }} data-validation="[NOTEMPTY]"
+                                        data-validation-message="Sales tidak boleh kosong">
                                         <option value="">Pilih Salesman</option>
-                                        @if ($data && $data->id_salesman)
-                                            <option value="{{ $data->id_salesman }}" selected>
-                                                {{ $data->salesman->nama_salesman }}
-                                            </option>
+                                        @if (count($salesmans) > 0)
+                                            @foreach ($salesmans as $sales)
+                                                <option value="{{ $sales->id_salesman }}"
+                                                    {{ $data && $data->id_salesman == $sales->id_salesman ? 'selected' : '' }}>
+                                                    {{ $sales->nama_salesman }}
+                                                </option>
+                                            @endforeach
                                         @else
-                                            @if ($salesman)
-                                                <option value="{{ $salesman->id_salesman }}" selected>
-                                                    {{ $salesman->nama_salesman }}</option>
+                                            @if ($data && $data->id_salesman)
+                                                <option value="{{ $data->id_salesman }}" selected>
+                                                    {{ $data->salesman->nama_salesman }}
+                                                </option>
+                                            @else
+                                                @if ($salesman)
+                                                    <option value="{{ $salesman->id_salesman }}" selected>
+                                                        {{ $salesman->nama_salesman }}</option>
+                                                @endif
                                             @endif
                                         @endif
                                     </select>

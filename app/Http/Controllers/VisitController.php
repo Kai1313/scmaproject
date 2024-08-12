@@ -178,6 +178,11 @@ class VisitController extends Controller
         $methods = Visit::$visitMethod;
         $categories = DB::table('kategori_kunjungan')->where('status_kategori_kunjungan', '1')->get();
         $salesman = Salesman::where('pengguna_id', session()->get('user')->id_pengguna)->first();
+        $salesmans = [];
+        if (session()->get('user')->id_grup_pengguna == 1) {
+            $salesmans = Salesman::where('status_salesman', '1')->get();
+        }
+
         $listStatus = Visit::$listStatus;
         return view('ops.visit.form', [
             'cabang' => $cabang,
@@ -188,6 +193,7 @@ class VisitController extends Controller
             'categories' => $categories,
             'methods' => $methods,
             'listStatus' => $listStatus,
+            'salesmans' => $salesmans,
         ]);
     }
 
