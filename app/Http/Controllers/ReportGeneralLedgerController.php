@@ -1023,8 +1023,8 @@ class ReportGeneralLedgerController extends Controller
                 'kode_akun',
                 'nama_akun',
                 'keterangan',
-                DB::raw('IFNULL(debet, 0) + IFNULL(trx_debet, 0) AS debet'),
-	            DB::raw('IFNULL(credit, 0) + IFNULL(trx_credit, 0) AS credit'),
+                DB::raw('ROUND(IFNULL(debet, 0) + IFNULL(trx_debet, 0), 2) AS debet'),
+	            DB::raw('ROUND(IFNULL(credit, 0) + IFNULL(trx_credit, 0), 2) AS credit'),
                 'trx_debet',
                 'trx_credit',
                 'posisi_debet'
@@ -1633,8 +1633,8 @@ class ReportGeneralLedgerController extends Controller
                 'ma.kode_akun',
                 'ma.nama_akun',
                 'jd.keterangan',
-                DB::raw('IFNULL(jd.debet, 0) + IFNULL(trx_debet, 0) AS debet'),
-                DB::raw('IFNULL(jd.credit, 0) + IFNULL(trx_credit, 0) AS credit'),
+                DB::raw('ROUND(IFNULL(jd.debet, 0) + IFNULL(trx_debet, 0), 2) AS debet'),
+                DB::raw('ROUND(IFNULL(jd.credit, 0) + IFNULL(trx_credit, 0), 2) AS credit'),
                 'trx_debet',
                 'trx_credit',
                 'ma.posisi_debet'
@@ -1961,8 +1961,8 @@ class ReportGeneralLedgerController extends Controller
                         'kode_akun',
                         'nama_akun',
                         'keterangan',
-                        DB::raw('IFNULL(debet, 0) + IFNULL(trx_debet, 0) AS debet'),
-                        DB::raw('IFNULL(credit, 0) + IFNULL(trx_credit, 0) AS credit'),
+                        DB::raw('ROUND(IFNULL(debet, 0) + IFNULL(trx_debet, 0), 2) AS debet'),
+                        DB::raw('ROUND(IFNULL(credit, 0) + IFNULL(trx_credit, 0), 2) AS credit'),
                         'trx_debet',
                         'trx_credit',
                         'posisi_debet'
@@ -2336,8 +2336,8 @@ class ReportGeneralLedgerController extends Controller
                         'kode_akun',
                         'nama_akun',
                         'keterangan',
-                        DB::raw('IFNULL(debet, 0) + IFNULL(trx_debet, 0) AS debet'),
-                        DB::raw('IFNULL(credit, 0) + IFNULL(trx_credit, 0) AS credit'),
+                        DB::raw('ROUND(IFNULL(debet, 0) + IFNULL(trx_debet, 0), 2) AS debet'),
+                        DB::raw('ROUND(IFNULL(credit, 0) + IFNULL(trx_credit, 0), 2) AS credit'),
                         'trx_debet',
                         'trx_credit',
                         'posisi_debet'
