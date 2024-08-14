@@ -64,10 +64,12 @@
                                 <label>Kategori Pembungkus <span>*</span></label>
                                 <select name="id_kategori_wrapper" class="form-control select2">
                                     <option value="">Pilih Kategori Pembungkus</option>
-                                    <option value="1" {{ old('id_kategori_wrapper') == '1' ? 'selected' : '' }}>
+                                    <option value="1"
+                                        {{ old('id_kategori_wrapper', $data ? $data->id_kategori_wrapper : '') == '1' ? 'selected' : '' }}>
                                         Palet
                                     </option>
-                                    <option value="2" {{ old('id_kategori_wrapper') == '2' ? 'selected' : '' }}>
+                                    <option value="2"
+                                        {{ old('id_kategori_wrapper', $data ? $data->id_kategori_wrapper : '') == '2' ? 'selected' : '' }}>
                                         Wadah
                                     </option>
                                 </select>
