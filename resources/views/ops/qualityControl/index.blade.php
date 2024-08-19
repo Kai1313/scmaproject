@@ -61,7 +61,7 @@
         <div class="box">
             <div class="box-header">
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-2">
                         <label>Cabang</label>
                         <div class="form-group">
                             <select name="id_cabang" class="form-control select2 change-filter">
@@ -83,6 +83,14 @@
                         <div class="form-group">
                             <input type="text" name="end_date" class="form-control datepicker change-filter"
                                 value="{{ $endDate }}">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <label>Barang</label>
+                        <div class="form-group">
+                            <select name="id_barang" class="form-control select2 change-filter">
+                                <option value="">Pilih Semua</option>
+                            </select>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -140,7 +148,7 @@
                 <form action="" class="post-action" method="post">
                     <div class="modal-body">
                         <div class="alert alert-danger" style="display:none;" id="alertModal">
-                            asd
+                            {{-- asd --}}
                         </div>
                         <table style="margin-bottom:10px;">
                             <tr>
@@ -199,10 +207,33 @@
             format: 'yyyy-mm-dd',
         });
 
+        $('[name="id_barang"]').select2({
+            ajax: {
+                url: "{{ route('qc_receipt-get-item') }}",
+                dataType: 'json',
+                delay: 100,
+                data: function(params) {
+                    let query = {
+                        search: params.term
+                    }
+                    return query;
+                },
+                processResults: function(data) {
+                    return {
+                        results: [{
+                            'text': 'Pilih Semua',
+                            'id': ''
+                        }, ...data]
+                    };
+                }
+            }
+        })
+
         var table = $('.data-table').DataTable({
             scrollX: true,
             processing: true,
             serverSide: true,
+            pageLength: 25,
             ajax: "{{ route('qc_receipt') }}?c=" + $('[name="id_cabang"]').val() + '&start_date=' + $(
                 '[name="start_date"]').val() + '&end_date=' + $('[name="end_date"]').val(),
             columns: [{
@@ -277,9 +308,10 @@
             }, ]
         });
 
-        $('[name="id_cabang"],[name="start_date"],[name="end_date"]').change(function() {
+        $('[name="id_cabang"],[name="start_date"],[name="end_date"],[name="id_barang"]').change(function() {
             table.ajax.url("?c=" + $('[name="id_cabang"]').val() + '&start_date=' + $('[name="start_date"]').val() +
-                '&end_date=' + $('[name="end_date"]').val() + '&show_img=' + $('[name="show_image"]').is(
+                '&end_date=' + $('[name="end_date"]').val() + '&id_barang=' + $('[name="id_barang"]').val() +
+                '&show_img=' + $('[name="show_image"]').is(
                     ':checked')).load()
             changeFilter()
         })
@@ -307,7 +339,8 @@
 
         $('[name="show_image"]').change(function() {
             table.ajax.url("?c=" + $('[name="id_cabang"]').val() + '&start_date=' + $('[name="start_date"]').val() +
-                '&end_date=' + $('[name="end_date"]').val() + '&show_img=' + $('[name="show_image"]').is(
+                '&end_date=' + $('[name="end_date"]').val() + '&id_barang=' + $('[name="id_barang"]').val() +
+                '&show_img=' + $('[name="show_image"]').is(
                     ':checked')).load()
         })
 

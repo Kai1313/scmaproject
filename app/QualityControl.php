@@ -11,7 +11,7 @@ class QualityControl extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'id_cabang', 'id_pembelian', 'id_barang', 'id_satuan_barang', 'jumlah_pembelian_detail', 'tanggal_qc', 'status_qc', 'reason', 'sg_pembelian_detail', 'be_pembelian_detail', 'ph_pembelian_detail', 'warna_pembelian_detail', 'keterangan_pembelian_detail', 'bentuk_pembelian_detail', 'approval_date', 'approval_reason', 'approval_user_id', 'path', 'path2',
+        'id_cabang', 'id_pembelian', 'id_barang', 'id_satuan_barang', 'jumlah_pembelian_detail', 'tanggal_qc', 'status_qc', 'reason', 'sg_pembelian_detail', 'be_pembelian_detail', 'ph_pembelian_detail', 'warna_pembelian_detail', 'keterangan_pembelian_detail', 'bentuk_pembelian_detail', 'approval_date', 'approval_reason', 'approval_user_id', 'path', 'path2', 'user_id',
     ];
 
     public function cabang()
