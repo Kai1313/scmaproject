@@ -58,6 +58,10 @@ class QcReceiptController extends Controller
                 $data = $data->where('pembelian.id_cabang', $request->c);
             }
 
+            if ($request->id_barang) {
+                $data = $data->where('pembelian_detail.id_barang', $request->id_barang);
+            }
+
             $data = $data->groupBy('pembelian_detail.id_pembelian', 'pembelian_detail.id_barang')
                 ->orderBy('pembelian.tanggal_pembelian', 'desc');
 
@@ -132,7 +136,7 @@ class QcReceiptController extends Controller
                     $data = QualityControl::where('id_pembelian', $request->id_pembelian)->where('id_barang', $value->id_barang)->first();
                     if (!$data) {
                         $data = new QualityControl;
-                        $data->tanggal_qc = date('Y-m-d');
+                        $data->tanggal_qc = $value->tanggal_qc;
                         $data->id_cabang = $request->id_cabang;
                         $data->id_pembelian = $request->id_pembelian;
                         $data->id_barang = $value->id_barang;
@@ -146,6 +150,7 @@ class QcReceiptController extends Controller
                         $data->ph_pembelian_detail = $value->ph_pembelian_detail;
                         $data->warna_pembelian_detail = $value->checkbox_warna == 1 ? $value->warna_pembelian_detail : '';
                         $data->keterangan_pembelian_detail = $value->keterangan_pembelian_detail;
+                        $data->user_id = session()->get('user')['id_pengguna'];
                         $data->save();
 
                         $data->uploadfile($value, $data);
@@ -291,11 +296,23 @@ class QcReceiptController extends Controller
         } catch (\Exception $th) {
             DB::rollback();
             Log::error("Error when change save qc receipt");
-            Log::error($e);
+            Log::error($th);
             return response()->json([
                 "result" => false,
                 "message" => "Data gagal tersimpan",
             ], 500);
         }
+    }
+
+    public function getItem(Request $request)
+    {
+        $datas = [];
+        if ($request->search) {
+            $datas = DB::table('barang')->select('nama_barang as text', 'id_barang as id')
+                ->where('status_barang', '1')
+                ->where('nama_barang', 'like', '%' . $request->search . '%')->limit(20)->get();
+        }
+
+        return $datas;
     }
 }

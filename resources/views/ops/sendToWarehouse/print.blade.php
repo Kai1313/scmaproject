@@ -14,20 +14,20 @@
         .table {
             border-collapse: collapse;
             width: 100%;
-            border-bottom: #000000 solid thin;
+            border-bottom: 1px solid #000000;
         }
 
         .table td {
             font-size: 11px !important;
-            border: #000000 solid thin;
-            padding: 1px 4px 1px 4px;
-            border-top: 0px;
-            border-bottom: 0px;
+            padding: 4px;
+            border-bottom: 1px dotted #000000;
+            border-right: 1px solid #000000;
+            border-left: 1px solid #000000;
         }
 
         .table th {
             font-size: 11px;
-            border: #000000 solid thin;
+            border: 1px solid #000000;
             max-width: 150px;
             text-align: center;
             font-weight: bold;
@@ -75,12 +75,12 @@
         }
 
         @page {
-            margin: 160px 25px 25px 25px;
+            margin: 170px 25px 25px 25px;
         }
 
         header {
             position: fixed;
-            top: -130px;
+            top: -144px;
             left: 0px;
             right: 0px;
         }
@@ -142,8 +142,6 @@
                 </td>
             </tr>
         </table>
-    </header>
-    <main>
         <table class="table">
             <tr>
                 <th width="15">No</th>
@@ -154,15 +152,19 @@
                 <th width="70">Batch</th>
                 <th width="70">Kadaluarsa</th>
             </tr>
+        </table>
+    </header>
+    <main>
+        <table class="table">
             @foreach ($data->formatdetail2 as $key => $detail)
                 <tr>
-                    <td class="text-center">{{ $key + 1 }}</td>
-                    <td>{{ $detail->qr_code }}</td>
+                    <td class="text-center" width="15">{{ $key + 1 }}</td>
+                    <td width="60">{{ $detail->qr_code }}</td>
                     <td>{{ $detail->nama_barang }}</td>
-                    <td class="text-center">{{ $detail->nama_satuan_barang }}</td>
-                    <td class="text-right">{{ formatNumber($detail->qty) }}</td>
-                    <td class="text-center">{{ $detail->batch }}</td>
-                    <td>
+                    <td class="text-center" width="50">{{ $detail->nama_satuan_barang }}</td>
+                    <td class="text-right" width="50">{{ formatNumber($detail->qty) }}</td>
+                    <td class="text-center" width="70">{{ $detail->batch }}</td>
+                    <td width="70">
                         {{ $detail->tanggal_kadaluarsa == '0000-00-00' ? '' : $detail->tanggal_kadaluarsa }}
                     </td>
                 </tr>

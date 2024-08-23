@@ -212,7 +212,6 @@
                                     </div>
                                     <input type="hidden" name="nama_satuan_barang" class="validate">
                                     <input type="hidden" name="id_satuan_barang" class="validate">
-                                    <input type="hidden" name="tanggal_qc" value="{{ date('Y-m-d') }}">
                                 </div>
                                 <div class="row">
                                     <label class="col-md-4">Status</label>
@@ -228,6 +227,10 @@
                                 <label>Alasan</label>
                                 <div class="form-group">
                                     <textarea name="reason" class="form-control" readonly></textarea>
+                                </div>
+                                <label>Tanggal QC</label>
+                                <div class="form-group">
+                                    <input type="date" name="tanggal_qc" class="form-control" value="">
                                 </div>
                                 <label>Upload Foto</label>
                                 <input id="f_image" type="file" class="form-control" name="file_upload"
@@ -310,6 +313,7 @@
     <script>
         let branch = {!! json_encode($cabang) !!}
         let arrayStatus = {!! json_encode($arrayStatus) !!};
+        let dateNow = '{{ date('Y-m-d') }}'
         let items = []
         let details = [];
         let detailSelect = []
@@ -468,6 +472,7 @@
                         $('[name="id_satuan_barang"]').val(dataselect.id_satuan_barang)
                         $('[name="warna_pembelian_detail"]').val(dataselect.warna_qc_barang)
                         $('[name="bentuk_pembelian_detail"]').val(dataselect.bentuk_qc_barang)
+                        $('[name="tanggal_qc"]').val(dateNow).prop('max', dateNow)
                         checkRangeQc()
 
                         if (dataselect.id) {

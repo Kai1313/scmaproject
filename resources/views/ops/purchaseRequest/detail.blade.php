@@ -416,7 +416,7 @@
             $('#type_item').text(type == 1 ? 'terima' : 'tolak')
             $('[name="index"]').val($(this).data('index'))
             $('[name="approval_status"]').val(type)
-            $('[name="revised_qty"]').val(formatRupiah(tempData.qty))
+            $('[name="revised_qty"]').val(formatNumber(tempData.qty, 4))
             $('.save-change-status-detail').attr('data-url', url)
             if (type == '2') {
                 $('.input-qty').hide()

@@ -14,20 +14,20 @@
         .table {
             border-collapse: collapse;
             width: 100%;
-            border-bottom: #000000 solid thin;
+            border-bottom: 1px solid #000000;
         }
 
         .table td {
             font-size: 11px !important;
-            border: #000000 solid thin;
-            padding: 1px 4px 1px 4px;
-            border-top: 0px;
-            border-bottom: 0px;
+            padding: 4px;
+            border-bottom: 1px dotted #000000;
+            border-right: 1px solid #000000;
+            border-left: 1px solid #000000;
         }
 
         .table th {
             font-size: 11px;
-            border: #000000 solid thin;
+            border: 1px solid #000000;
             max-width: 150px;
             text-align: center;
             font-weight: bold;
