@@ -52,14 +52,12 @@
     <table width="100%" class="table">
         <thead>
             <tr>
-                <th>Tanggal Pembelian
-                </th>
-                <th>Kode Pembelian
-                </th>
+                <th>Tanggal Pembelian</th>
+                <th>Tanggal QC</th>
+                <th>Kode Pembelian</th>
                 <th>Nama Barang</th>
                 <th>Satuan</th>
                 <th>Jumlah</th>
-                <th>Tanggal QC</th>
                 <th>Status</th>
                 <th>Alasan</th>
                 <th>SG</th>
@@ -74,11 +72,11 @@
             @foreach ($datas as $key => $data)
                 <tr>
                     <td>{{ $data->tanggal_pembelian }}</td>
+                    <td>{{ $data->tanggal_qc }}</td>
                     <td>{{ $data->nama_pembelian }}</td>
                     <td>{{ $data->nama_barang }}</td>
                     <td>{{ $data->nama_satuan_barang }}</td>
                     <td class="number">{{ formatNumber($data->total_jumlah_purchase) }}</td>
-                    <td>{{ $data->tanggal_qc }}</td>
                     <td>{{ $data->status_qc }}</td>
                     <td>{{ $data->reason }}</td>
                     <td class="number">{{ formatNumber($data->sg_pembelian_detail) }}</td>

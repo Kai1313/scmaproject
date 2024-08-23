@@ -35,12 +35,12 @@
             <tr>
                 <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Tanggal Pembelian
                 </th>
+                <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Tanggal QC</th>
                 <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Kode Pembelian
                 </th>
                 <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Nama Barang</th>
                 <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Satuan</th>
                 <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Jumlah</th>
-                <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Tanggal QC</th>
                 <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Status</th>
                 <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Alasan</th>
                 <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">SG</th>
@@ -55,11 +55,11 @@
             @foreach ($datas as $key => $data)
                 <tr>
                     <td style="border: #000000 solid thin;">{{ $data->tanggal_pembelian }}</td>
+                    <td style="border: #000000 solid thin;">{{ $data->tanggal_qc }}</td>
                     <td style="border: #000000 solid thin;">{{ $data->nama_pembelian }}</td>
                     <td style="border: #000000 solid thin;">{{ $data->nama_barang }}</td>
                     <td style="border: #000000 solid thin;">{{ $data->nama_satuan_barang }}</td>
                     <td style="border: #000000 solid thin;text-align:right;">{{ $data->total_jumlah_purchase }}</td>
-                    <td style="border: #000000 solid thin;">{{ $data->tanggal_qc }}</td>
                     <td style="border: #000000 solid thin;">{{ $data->status_qc }}</td>
                     <td style="border: #000000 solid thin;">{{ $data->reason }}</td>
                     <td style="border: #000000 solid thin;text-align:right;">{{ $data->sg_pembelian_detail }}</td>

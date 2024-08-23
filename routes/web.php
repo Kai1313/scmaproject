@@ -196,6 +196,7 @@ Route::namespace('Report')->group(function () {
         Route::get('index/{user_id?}', 'QcReceivedController@index')->name('report_qc-index');
         Route::get('print', 'QcReceivedController@print')->name('report_qc-print');
         Route::get('excel', 'QcReceivedController@getExcel')->name('report_qc-excel');
+        Route::get('autocomplete-item', 'QcReceivedController@autocompleteItem')->name('report_qc-item');
     });
 
     Route::prefix('laporan_pemakaian')->group(function () {

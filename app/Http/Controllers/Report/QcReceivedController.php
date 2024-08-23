@@ -97,6 +97,7 @@ class QcReceivedController extends Controller
         $date = explode(' - ', $request->date);
         $idCabang = explode(',', $request->id_cabang);
         $statusQc = $request->status_qc;
+        $idBarang = $request->id_barang;
 
         $data = DB::table('pembelian_detail as pd')
             ->select(
@@ -122,14 +123,22 @@ class QcReceivedController extends Controller
             ->leftJoin('pembelian as p', 'pd.id_pembelian', '=', 'p.id_pembelian')
             ->leftJoin('barang as b', 'pd.id_barang', '=', 'b.id_barang')
             ->leftJoin('satuan_barang as sb', 'pd.id_satuan_barang', '=', 'sb.id_satuan_barang')
-            ->whereBetween('p.tanggal_pembelian', [$date])
+            ->where('b.status_stok_barang', '1')
             ->whereIn('p.id_cabang', $idCabang);
         if ($statusQc != 'all') {
             $data = $data->where('qc.status_qc', $statusQc);
         }
 
+        if (count($date) > 1) {
+            $data = $data->whereBetween('p.tanggal_pembelian', [$date]);
+        }
+
+        if ($idBarang) {
+            $data = $data->where('b.id_barang', $idBarang);
+        }
+
         $data = $data->groupBy('pd.id_pembelian', 'pd.id_barang', 'status_qc')
-            ->orderBy('p.tanggal_pembelian', 'asc');
+            ->orderBy('p.tanggal_pembelian', 'desc');
 
         if ($type == 'datatable') {
             return Datatables::of($data)
@@ -138,5 +147,18 @@ class QcReceivedController extends Controller
 
         $data = $data->get();
         return $data;
+    }
+
+    public function autocompleteItem(Request $request)
+    {
+        $search = $request->search;
+        $datas = DB::table('barang')->select('nama_barang as text', 'id_barang as id');
+        if ($search) {
+            $datas = $datas->where('nama_barang', 'like', '%' . $search . '%');
+        }
+
+        $datas = $datas->where('status_barang', '1')
+            ->where('status_stok_barang', '1')->limit(20)->get();
+        return response()->json($datas);
     }
 }

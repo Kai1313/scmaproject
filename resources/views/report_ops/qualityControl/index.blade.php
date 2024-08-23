@@ -42,7 +42,20 @@
                     <div class="col-md-3">
                         <label>Tanggal QC</label>
                         <div class="form-group">
-                            <input type="text" name="date" class="form-control trigger-change">
+                            <div class="input-group">
+                                <input type="text" name="date" class="form-control trigger-change">
+                                <div class="input-group-btn">
+                                    <a href="javascript:void(0)" class="btn btn-default clear-daterange">x</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <label>Nama Barang</label>
+                        <div class="form-group">
+                            <select name="id_barang" class="form-control select2 trigger-change">
+                                <option value="">Pilih Barang</option>
+                            </select>
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -76,18 +89,18 @@
                         <thead>
                             <tr>
                                 <th>Tanggal Pembelian</th>
+                                <th>Tanggal QC</th>
                                 <th>Kode Pembelian</th>
                                 <th>Nama Barang</th>
                                 <th>Satuan</th>
                                 <th>Jumlah</th>
+                                <th>Status</th>
                                 <th>SG</th>
                                 <th>BE</th>
                                 <th>PH</th>
                                 <th>Warna</th>
                                 <th>Bentuk</th>
-                                <th>Status</th>
                                 <th>Keterangan</th>
-                                <th>Tanggal QC</th>
                                 <th>Alasan</th>
                             </tr>
                         </thead>
@@ -141,6 +154,9 @@
                     data: 'tanggal_pembelian',
                     name: 'p.tanggal_pembelian',
                 }, {
+                    data: 'tanggal_qc',
+                    name: 'qc.tanggal_qc',
+                }, {
                     data: 'nama_pembelian',
                     name: 'p.nama_pembelian'
                 }, {
@@ -156,6 +172,17 @@
                         return data ? formatNumber(data, 2) : 0
                     },
                     className: 'text-right'
+                }, {
+                    data: 'status_qc',
+                    name: 'qc.status_qc',
+                    render: function(data) {
+                        if (arrayStatus.hasOwnProperty(data)) {
+                            return '<label class="' + arrayStatus[data].class + '">' + arrayStatus[data]
+                                .text + '</label>'
+                        } else {
+                            return '<label class="label label-default">Pending</label>'
+                        }
+                    }
                 }, {
                     data: 'sg_pembelian_detail',
                     name: 'qc.sg_pembelian_detail',
@@ -184,22 +211,8 @@
                     data: 'bentuk_pembelian_detail',
                     name: 'qc.bentuk_pembelian_detail',
                 }, {
-                    data: 'status_qc',
-                    name: 'qc.status_qc',
-                    render: function(data) {
-                        if (arrayStatus.hasOwnProperty(data)) {
-                            return '<label class="' + arrayStatus[data].class + '">' + arrayStatus[data]
-                                .text + '</label>'
-                        } else {
-                            return '<label class="label label-default">Pending</label>'
-                        }
-                    }
-                }, {
                     data: 'keterangan_pembelian_detail',
                     name: 'qc.keterangan_pembelian_detail',
-                }, {
-                    data: 'tanggal_qc',
-                    name: 'qc.tanggal_qc',
                 }, {
                     data: 'reason',
                     name: 'qc.reason',
@@ -208,4 +221,32 @@
         }
     </script>
     <script src="{{ asset('js/for-report.js') }}"></script>
+    <script>
+        $('.clear-daterange').click(function() {
+            $('[name="date"]').val('').change()
+        })
+
+        $('[name="id_barang"]').select2({
+            ajax: {
+                url: '{{ route('report_qc-item') }}',
+                dataType: 'json',
+                delay: 100,
+                data: function(params) {
+                    let query = {
+                        search: params.term
+                    }
+                    return query;
+                },
+                processResults: function(data) {
+                    console.log(data)
+                    return {
+                        results: [{
+                            'id': '',
+                            'text': 'Pilih Barang'
+                        }, ...data]
+                    };
+                }
+            }
+        })
+    </script>
 @endsection
