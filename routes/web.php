@@ -127,6 +127,15 @@ Route::prefix('terima_dari_gudang')->group(function () {
     Route::get('/auto-qrcode', 'ReceivedFromWarehouseController@autoQRCode')->name('received_from_warehouse-qrcode');
 });
 
+Route::prefix('surat_jalan_umum')->group(function () {
+    Route::get('/index/{user_id?}', 'SuratJalanController@index')->name('surat_jalan_umum');
+    Route::get('/entry/{id?}', 'SuratJalanController@entry')->name('surat_jalan_umum-entry');
+    Route::post('/save_entry/{id}', 'SuratJalanController@saveEntry')->name('surat_jalan_umum-save-entry');
+    Route::get('/view/{id}', 'SuratJalanController@viewData')->name('surat_jalan_umum-view');
+    Route::get('/delete/{id}', 'SuratJalanController@destroy')->name('surat_jalan_umum-delete');
+    // Route::get('/auto-qrcode', 'SuratJalanController@autoQRCode')->name('surat_jalan-qrcode');
+});
+
 Route::prefix('pemakaian')->group(function () {
     Route::get('/index/{user_id?}', 'MaterialUsageController@index')->name('material_usage');
     Route::get('/entry/{id?}', 'MaterialUsageController@entry')->name('material_usage-entry');
