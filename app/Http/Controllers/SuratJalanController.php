@@ -53,7 +53,7 @@ class SuratJalanController extends Controller
         }
 
         $data = SuratJalan::find($id);
-        return view('ops.sendToBranch.form', [
+        return view('ops.SuratJalan.form', [
             'data' => $data,
             "pageTitle" => "SCA OPS | Surat Jalan Umum | " . ($id == 0 ? 'Create' : 'Edit'),
         ]);
