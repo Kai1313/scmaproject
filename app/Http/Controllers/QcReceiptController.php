@@ -53,7 +53,8 @@ class QcReceiptController extends Controller
                 ->leftJoin('barang', 'pembelian_detail.id_barang', '=', 'barang.id_barang')
                 ->leftJoin('satuan_barang', 'pembelian_detail.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
                 ->leftJoin('pengguna', 'approval_user_id', '=', 'pengguna.id_pengguna')
-                ->whereBetween('pembelian.tanggal_pembelian', [$request->start_date, $request->end_date]);
+                ->whereBetween('pembelian.tanggal_pembelian', [$request->start_date, $request->end_date])
+                ->where('barang.status_stok_barang', '1')->where('barang.needqc', '1');
             if (isset($request->c)) {
                 $data = $data->where('pembelian.id_cabang', $request->c);
             }
@@ -180,15 +181,16 @@ class QcReceiptController extends Controller
 
     public function autoPurchasing(Request $request)
     {
-        $cabang = $request->cabang;
-        $duration = DB::table('setting')->where('code', 'QC Duration')->first();
-        $startDate = date('Y-m-d', strtotime('-' . intval($duration->value2) . ' days'));
-        $endDate = date('Y-m-d');
+        $cabang = $request->cabang_id;
+        $search = $request->search;
         $datas = DB::table('pembelian')->select('nama_pembelian as text', 'id_pembelian as id', 'nama_pemasok', 'tanggal_pembelian', 'nomor_po_pembelian')
             ->leftJoin('pemasok', 'pembelian.id_pemasok', '=', 'pemasok.id_pemasok')
-            ->whereBetween('tanggal_pembelian', [$startDate, $endDate])
-            ->where('id_cabang', $cabang)
-            ->orderBy('tanggal_pembelian', 'desc')->get();
+            ->where('id_cabang', $cabang);
+        if ($search) {
+            $datas = $datas->where('nama_pembelian', 'like', '%' . $search . '%');
+        }
+
+        $datas = $datas->orderBy('tanggal_pembelian', 'desc')->limit(20)->get();
 
         return response()->json([
             'result' => true,

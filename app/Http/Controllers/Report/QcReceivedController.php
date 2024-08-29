@@ -123,7 +123,7 @@ class QcReceivedController extends Controller
             ->leftJoin('pembelian as p', 'pd.id_pembelian', '=', 'p.id_pembelian')
             ->leftJoin('barang as b', 'pd.id_barang', '=', 'b.id_barang')
             ->leftJoin('satuan_barang as sb', 'pd.id_satuan_barang', '=', 'sb.id_satuan_barang')
-            ->where('b.status_stok_barang', '1')
+            ->where('b.status_stok_barang', '1')->where('b.needqc', '1')
             ->whereIn('p.id_cabang', $idCabang);
         if ($statusQc != 'all') {
             $data = $data->where('qc.status_qc', $statusQc);

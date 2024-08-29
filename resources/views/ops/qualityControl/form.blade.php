@@ -412,39 +412,63 @@
             data: branch
         }).on('select2:select', function(e) {
             let dataselect = e.params.data
-            getPurchasingNumber()
+            // getPurchasingNumber()
             $('[name="id_barang"]').empty()
         });
 
-
-        function getPurchasingNumber() {
-            $('#cover-spin').show()
-            $.ajax({
+        $('[name="id_pembelian"]').select2({
+            ajax: {
                 url: '{{ route('qc_receipt-auto-purchasing') }}',
-                data: {
-                    cabang: $('[name="id_cabang"]').val(),
+                dataType: 'json',
+                delay: 100,
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        cabang_id: $('[name="id_cabang"]').val()
+                    }
                 },
-                success: function(res) {
-                    $('[name="id_pembelian"]').empty()
-                    $('[name="id_pembelian"]').select2({
-                        data: [{
-                            'id': "",
-                            'text': 'Pilih No Bukti Penerimaan'
-                        }, ...res.data]
-                    }).on('select2:select', function(e) {
-                        let dataselect = e.params.data
-                        $('[name="pemasok"]').val(dataselect.nama_pemasok)
-                        $('[name="tanggal"]').val(dataselect.tanggal_pembelian)
-                        $('[name="po"]').val(dataselect.nomor_po_pembelian)
-                        getItem(dataselect.id)
-                    });
-                    $('#cover-spin').hide()
-                },
-                error: function(error) {
-                    $('#cover-spin').hide()
+                processResults: function(data) {
+                    return {
+                        results: data.data
+                    };
                 }
-            })
-        }
+            }
+        }).on('select2:select', function(e) {
+            let dataselect = e.params.data
+            $('[name="pemasok"]').val(dataselect.nama_pemasok)
+            $('[name="tanggal"]').val(dataselect.tanggal_pembelian)
+            $('[name="po"]').val(dataselect.nomor_po_pembelian)
+            getItem(dataselect.id)
+        });
+
+        // function getPurchasingNumber() {
+        //     $('#cover-spin').show()
+        //     $.ajax({
+        //         url: '{{ route('qc_receipt-auto-purchasing') }}',
+        //         data: {
+        //             cabang: $('[name="id_cabang"]').val(),
+        //         },
+        //         success: function(res) {
+        //             $('[name="id_pembelian"]').empty()
+        //             $('[name="id_pembelian"]').select2({
+        //                 data: [{
+        //                     'id': "",
+        //                     'text': 'Pilih No Bukti Penerimaan'
+        //                 }, ...res.data]
+        //             }).on('select2:select', function(e) {
+        //                 let dataselect = e.params.data
+        //                 $('[name="pemasok"]').val(dataselect.nama_pemasok)
+        //                 $('[name="tanggal"]').val(dataselect.tanggal_pembelian)
+        //                 $('[name="po"]').val(dataselect.nomor_po_pembelian)
+        //                 getItem(dataselect.id)
+        //             });
+        //             $('#cover-spin').hide()
+        //         },
+        //         error: function(error) {
+        //             $('#cover-spin').hide()
+        //         }
+        //     })
+        // }
 
         function getItem(param) {
             $('#cover-spin').show()
