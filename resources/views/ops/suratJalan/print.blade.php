@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Surat jalan pindah cabang {{ $data->kode_pindah_barang }}</title>
+    <style type="text/css">
+        * {
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .table {
+            border-collapse: collapse;
+            width: 100%;
+            border-bottom: 1px solid #000000;
+        }
+
+        .table td {
+            font-size: 11px !important;
+            padding: 4px;
+            border-bottom: 1px dotted #000000;
+            border-right: 1px solid #000000;
+            border-left: 1px solid #000000;
+        }
+
+        .table th {
+            font-size: 11px;
+            border: 1px solid #000000;
+            max-width: 150px;
+            text-align: center;
+            font-weight: bold;
+            padding: 4px;
+        }
+
+        .number {
+            text-align: right;
+        }
+
+        .table-header {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table-header th {
+            font-size: 11px;
+            font-weight: bold;
+            border: 1px solid black;
+            font-weight: normal;
+            padding: 2px;
+        }
+
+        .table-subheader {
+            width: 100%;
+        }
+
+        .table-subheader td {
+            font-size: 11px !important;
+        }
+
+        .table-signature {
+            width: 100%;
+            border-spacing: 0.5em 0.5em;
+        }
+
+        .table-signature td {
+            font-size: 11px !important;
+            vertical-align: top;
+            padding: 0px 5px 0px 5px;
+            text-align: center;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .text-left {
+            text-align: left;
+        }
+
+        @page {
+            margin: 261px 25px 25px 25px;
+        }
+
+        header {
+            position: fixed;
+            top: -241px;
+            left: 0px;
+            right: 0px;
+        }
+
+        .pagenum:before {
+            content: counter(page);
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <table class="table-header">
+            <tr>
+                <th style="width:80px;" rowspan="4">
+                    <img src="{{ asset('images/logo.png') }}" alt="logo" style="width:70px;">
+                </th>
+                <th style="width:100%;text-align:center;" rowspan="4">
+                    <span style="font-size:17px;margin-bottom:5px;font-weight:bold;">PT. SINAR CEMARAMAS ABADI</span>
+                    <br>
+                    <span style="font-weight:normal">Pergudangan Meiko Abadi 1, Blok B No. 17-19, Wedi, Kec. Gedangan,
+                        Kabupaten Sidoarjo, Jawa Timur
+                        61254</span>
+                    <br>
+                    <span style="font-weight:normal">(031) 8015320 / (031) 8014717</span>
+                </th>
+                <th style="width:100px;" class="text-left">No. Dokumen</th>
+                <th style="width:80px;" class="text-left">: FR-WH-04</th>
+            </tr>
+            <tr>
+                <th class="text-left">Status Revisi</th>
+                <th class="text-left">: 00</th>
+            </tr>
+            <tr>
+                <th class="text-left">Tanggal Berlaku</th>
+                <th class="text-left">: 3 Juni 2024</th>
+            </tr>
+            <tr>
+                <th class="text-left">Halaman</th>
+                <th class="text-left">: </th>
+            </tr>
+        </table>
+        <table style="width:100%;">
+            <tr>
+                <th><span style="font-size:17px;">SURAT JALAN</span></th>
+            </tr>
+        </table>
+        <table class="table-subheader">
+            <tr>
+                <td width="80"><b>Tanggal</b></td>
+                <td width="5">:</td>
+                <td> {{ $data->tanggal }}</td>
+            </tr>
+            <tr>
+                <td><b>No. Surat Jalan</b></td>
+                <td>:</td>
+                <td>{{ $data->no_surat_jalan }}</td>
+            </tr>
+            <tr>
+                <td><b>No. Dokumen Lain</b></td>
+                <td>:</td>
+                <td>{{ $data->no_dokumen_lain }}</td>
+            </tr>
+            <tr>
+                <td><b>Penerima</b></td>
+                <td>:</td>
+                <td>{{ $data->penerima }}</td>
+            </tr>
+            <tr>
+                <td><b>Alamat Penerima</b></td>
+                <td>:</td>
+                <td>{{ $data->alamat_penerima }}</td>
+            </tr>
+        </table>
+        <br>
+        <table class="table">
+            <tr>
+                <th width="15">No</th>
+                <th>Nama Barang</th>
+                <th width="50">Jumlah</th>
+                <th width="50">Satuan</th>
+                <th width="60">Keterangan</th>
+            </tr>
+        </table>
+    </header>
+    <main>
+        <table class="table">
+            @foreach ($data->details as $key => $detail)
+                <tr>
+                    <td class="text-center" width="15">{{ $key + 1 }}</td>
+                    <td>{{ $detail->nama_barang }}</td>
+                    <td class="text-center" width="50">{{ $detail->jumlah }}</td>
+                    <td class="text-right" width="50">{{ $detail->satuan }}</td>
+                    <td class="text-center" width="60">{{ $detail->keterangan }}</td>
+                </tr>
+            @endforeach
+        </table>
+        <table class="table-signature">
+            <tr>
+                <td style="height:70px;vertical-align:top;">Dibuat,</td>
+                <td></td>
+                <td>Mengetahui,</td>
+                <td></td>
+                <td>Pengirim,</td>
+                <td></td>
+                <td>Penerima,</td>
+            </tr>
+            <tr>
+                <td style="vertical-align:bottom;">
+                    (&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)
+                </td>
+                <td></td>
+                <td style="vertical-align:bottom;">
+                    (&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)
+                </td>
+                <td></td>
+                <td style="vertical-align:bottom;">
+                    (&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)
+                </td>
+                <td></td>
+                <td style="vertical-align:bottom;">
+                    (&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)
+                </td>
+            </tr>
+        </table>
+    </main>
+</body>
+
+</html>

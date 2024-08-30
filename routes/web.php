@@ -133,6 +133,7 @@ Route::prefix('surat_jalan_umum')->group(function () {
     Route::post('/save_entry/{id}', 'SuratJalanController@saveEntry')->name('surat_jalan_umum-save-entry');
     Route::get('/view/{id}', 'SuratJalanController@viewData')->name('surat_jalan_umum-view');
     Route::get('/delete/{id}', 'SuratJalanController@destroy')->name('surat_jalan_umum-delete');
+    Route::get('/print/{id}', 'SuratJalanController@printData')->name('surat_jalan_umum-print-data');
     // Route::get('/auto-qrcode', 'SuratJalanController@autoQRCode')->name('surat_jalan-qrcode');
 });
 

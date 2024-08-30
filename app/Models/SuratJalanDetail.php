@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class SuratJalanDetail extends Model
 {
     protected $table = "surat_jalan_detail";
+    protected $primaryKey = 'id';
 
     protected $fillable = [
         'id_surat_jalan', 'nama_barang', 'jumlah', 'satuan', 'keterangan',

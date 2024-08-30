@@ -133,7 +133,7 @@
 @section('main-section')
     <div class="content container-fluid">
         <form action="{{ route('surat_jalan_umum-save-entry', $data ? $data->id : 0) }}" method="post"
-            class="post-acton-custom">
+            class="post-action-custom">
             <div class="box">
                 <div class="box-header">
                     <h3 class="box-title">{{ $data ? 'Ubah' : 'Tambah' }} Surat Jalan Umum</h3>
@@ -148,7 +148,8 @@
                                 <label class="col-md-3">Tanggal <span>*</span></label>
                                 <div class="form-group col-md-9">
                                     <div class="form-group">
-                                        <input type="date" value="{{ old('tanggal', $data ? $data->tanggal : '') }}"
+                                        <input type="date"
+                                            value="{{ old('tanggal', $data ? $data->tanggal : date('Y-m-d')) }}"
                                             name="tanggal" class="form-control">
                                     </div>
                                 </div>
@@ -250,15 +251,15 @@
                         </div>
                     </div>
                     <div class="row">
-                        <label for="" class="col-md-3">Satuan</label>
-                        <div class="col-md-9 form-group">
-                            <input type="text" class="form-control" name="satuan">
-                        </div>
-                    </div>
-                    <div class="row">
                         <label for="" class="col-md-3">Jumlah</label>
                         <div class="col-md-9 form-group">
                             <input type="text" class="form-control" name="jumlah">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label for="" class="col-md-3">Satuan</label>
+                        <div class="col-md-9 form-group">
+                            <input type="text" class="form-control" name="satuan">
                         </div>
                     </div>
                     <div class="row">
@@ -290,9 +291,14 @@
 
 @section('externalScripts')
     <script>
-        let details = {!! $data ? $data->formatdetail : '[]' !!};
+        let details = {!! $data ? $data->details : '[]' !!};
+        let deleteDetails = []
+        let detailSelect = []
+        let statusModal = 'create'
         $('.add-entry').click(function() {
             $('#modalEntry').modal('show')
+            statusModal == 'create'
+            $('#modalEntry').find('input,textarea').val('')
         })
 
         $('.btn-save').click(function() {
@@ -303,7 +309,12 @@
             })
 
             let newObj = Object.assign({}, array)
-            details.push(newObj)
+            if (statusModal == 'create') {
+                details.push(newObj)
+            } else if (statusModal == 'edit') {
+                details[newObj.index - 1] = newObj
+            }
+
             table.clear().rows.add(details).draw()
             $('[name="details"]').val(JSON.stringify(details))
 
@@ -313,17 +324,19 @@
 
         var table = $('#table-detail').DataTable({
             data: details,
-            pageLength: 50,
+            paging: false,
             ordering: false,
             columns: [{
                 data: 'nama_barang',
                 name: 'nama_barang'
             }, {
                 data: 'jumlah',
-                name: 'jumlah'
+                name: 'jumlah',
+                width: 100
             }, {
                 data: 'satuan',
-                name: 'satuan'
+                name: 'satuan',
+                width: 0
             }, {
                 data: 'keterangan',
                 name: 'keterangan',
@@ -331,9 +344,85 @@
                 data: 'id',
                 name: 'id',
                 className: 'text-center',
+                render: function(data, type, row, meta) {
+                    let btn = '';
+                    btn +=
+                        '<a href="javascript:void(0)" class="btn btn-warning btn-xs mr-1 mb-1 edit-entry"><i class="glyphicon glyphicon-pencil"></i></a>';
+                    btn +=
+                        '<a href="javascript:void(0)" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1 delete-entry"><i class="glyphicon glyphicon-trash"></i></a>';
+
+                    return btn;
+                },
                 orderable: false,
-                searchable: false
+                searchable: false,
+                width: 87
             }, ]
         });
+
+        $.extend($.validator.messages, {
+            required: "Tidak boleh kosong",
+            email: "Pastikan format email sudah benar",
+            number: "Pastikan hanya angka",
+        });
+
+        let validateForm = $(".post-action-custom").validate({
+            rules: {
+                date: "required",
+                penerima: "required",
+                alamat_penerima: 'required',
+            },
+            errorClass: 'has-error',
+            highlight: function(element, errorClass, validClass) {
+                $(element).parents("div.form-group").addClass('error');
+            },
+            unhighlight: function(element, errorClass, validClass) {
+                $(element).parents(".error").removeClass('error');
+            },
+            submitHandler: function(form, e) {
+                e.preventDefault()
+                saveData($(form))
+                return false;
+            }
+        });
+
+        $('#table-detail').on('click', '.edit-entry', function() {
+            let index = $(this).parents('tr').index()
+            let selData = details[index]
+            let modal = $('#modalEntry')
+            modal.find('input,textarea').each(function(i, v) {
+                let nameInput = $(v).prop('name')
+                $(v).val(selData[nameInput])
+            })
+
+            modal.modal('show')
+            statusModal = 'edit'
+        })
+
+        $('body').on('click', '.delete-entry', function() {
+            let targetElement = $(this).parents('tr')
+            Swal.fire({
+                title: 'Anda yakin ingin menghapus data ini?',
+                icon: 'info',
+                showDenyButton: true,
+                confirmButtonText: 'Yes',
+                denyButtonText: 'No',
+                reverseButtons: true,
+                customClass: {
+                    actions: 'my-actions',
+                    confirmButton: 'order-1',
+                    denyButton: 'order-3',
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    deleteDetails.push(details[targetElement.index()])
+
+                    details.splice(targetElement.index(), 1);
+                    table.clear().rows.add(details).draw()
+
+                    $('[name="details"]').val(JSON.stringify(details))
+                    $('[name="detele_details"]').val(JSON.stringify(deleteDetails))
+                }
+            })
+        })
     </script>
 @endsection

@@ -6,6 +6,7 @@ use App\Models\SuratJalan;
 use DB;
 use Illuminate\Http\Request;
 use Log;
+use PDF;
 use Yajra\DataTables\DataTables;
 
 class SuratJalanController extends Controller
@@ -17,27 +18,29 @@ class SuratJalanController extends Controller
         }
 
         if ($request->ajax()) {
-            $data = DB::table('surat_jalan')->where('jenis', 'surat_jalan_umum');
-            $data = $data->orderBy('tanggal', 'desc')->orderBy('no_surat_jalan', 'desc');
+            $data = DB::table('surat_jalan')->select('surat_jalan.*', 'pengguna.nama_pengguna')
+                ->join('pengguna', 'surat_jalan.id_pengguna', '=', 'pengguna.id_pengguna')
+                ->where('jenis', 'surat_jalan_umum')
+                ->orderBy('tanggal', 'desc')
+                ->orderBy('no_surat_jalan', 'desc');
 
             return Datatables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
                     $btn = '';
+                    $btn .= '<a href="' . route('surat_jalan_umum-print-data', $row->id) . '" class="btn btn-primary btn-xs mr-1 mb-1" target="_blank"><i class="fa fa-print"></i> Cetak</a>';
                     $btn .= '<a href="' . route('surat_jalan_umum-view', $row->id) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a>';
-                    $btn .= '<a href="' . route('surat_jalan_umum-entry', $row->id) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a>';
-                    $btn .= '<a href="' . route('surat_jalan_umum-delete', $row->id) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Void</a>';
+                    if ($row->id_pengguna == session()->get('user')['id_pengguna']) {
+                        $btn .= '<a href="' . route('surat_jalan_umum-entry', $row->id) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a>';
+                    }
+
+                    if ($row->id_pengguna == session()->get('user')['id_pengguna'] && date('Y-m-d', strtotime($row->created_at)) == date('Y-m-d')) {
+                        $btn .= '<a href="' . route('surat_jalan_umum-delete', $row->id) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Hapus</a>';
+                    }
+
                     return $btn;
                 })
-                ->editColumn('status', function ($row) {
-                    $array = [
-                        '0' => '<label class="label label-default">Batal</label>',
-                        '1' => '<label class="label label-primary">Aktif</label>',
-                    ];
-
-                    return isset($array[$row->status]) ? $array[$row->status] : '';
-                })
-                ->rawColumns(['action', 'status'])
+                ->rawColumns(['action'])
                 ->make(true);
         }
 
@@ -64,6 +67,13 @@ class SuratJalanController extends Controller
         $data = SuratJalan::find($id);
         if (!$data) {
             $data = new SuratJalan;
+        } else {
+            if ($data->id_pengguna != session()->get('user')['id_pengguna']) {
+                return response()->json([
+                    "result" => false,
+                    "message" => "Tidak mendapat akses",
+                ], 500);
+            }
         }
 
         DB::beginTransaction();
@@ -81,6 +91,12 @@ class SuratJalanController extends Controller
             if ($resSave['result'] == false) {
                 DB::rollback();
                 return response()->json($resSave, 500);
+            }
+
+            $resDelete = $data->deletedetails($request->detele_details);
+            if ($resDelete['result'] == false) {
+                DB::rollback();
+                return response()->json($resDelete, 500);
             }
 
             DB::commit();
@@ -102,34 +118,27 @@ class SuratJalanController extends Controller
 
     public function viewData($id)
     {
-        if (checkAccessMenu('kirim_ke_cabang', 'show') == false) {
+        if (checkAccessMenu('surat_jalan_umum', 'show') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        $data = MoveBranch::where('type', 0)->where('id_pindah_barang', $id)->first();
-        $groupPengguna = DB::table('pengguna')->select(DB::raw('distinct(id_grup_pengguna)'))->where('id_pengguna', $data->user_created)->orWhere('id_grup_pengguna', 1)->get()->toArray();
-        $groups = [];
-        foreach ($groupPengguna as $grup) {
-            $groups[] = $grup->id_grup_pengguna;
-        }
-
-        return view('ops.sendToBranch.detail', [
+        $data = SuratJalan::find($id);
+        return view('ops.suratJalan.detail', [
             'data' => $data,
-            "pageTitle" => "SCA OPS | Kirim Ke Cabang | Lihat",
-            'isEdit' => in_array(session()->get('user')['id_grup_pengguna'], $groups),
+            "pageTitle" => "SCA OPS | Surat Jalan Umum | Lihat",
         ]);
     }
 
     public function destroy($id)
     {
-        if (checkAccessMenu('kirim_ke_cabang', 'delete') == false) {
+        if (checkAccessMenu('surat_jalan_umum', 'delete') == false) {
             return response()->json([
                 "result" => false,
                 "message" => "Tidak mendapatkan akses halaman",
             ], 500);
         }
 
-        $data = MoveBranch::find($id);
+        $data = SuratJalan::find($id);
         if (!$data) {
             return response()->json([
                 "result" => false,
@@ -137,56 +146,61 @@ class SuratJalanController extends Controller
             ], 500);
         }
 
-        $period = $this->checkPeriod($data->tanggal_pindah_barang);
-        if ($period['result'] == false) {
-            return response()->json($period, 500);
+        if (date('Y-m-d', strtotime($data->created_at)) != date('Y-m-d')) {
+            return response()->json([
+                "result" => false,
+                "message" => "Hapus surat jalan bisa dihapus di hari yang sama dengan pembuatan",
+            ], 500);
+        }
+
+        if ($data->id_pengguna != session()->get('user')['id_pengguna']) {
+            return response()->json([
+                "result" => false,
+                "message" => "Tidak mendapat akses",
+            ], 500);
         }
 
         try {
             DB::beginTransaction();
-            $data->void = 1;
-            $data->void_user_id = session()->get('user')['id_pengguna'];
-            $data->save();
-            $data->voidDetails();
+            SuratJalanDetail::where('id_surat_jalan', $id)->delete();
 
+            $data->delete();
             DB::commit();
             return response()->json([
                 "result" => true,
-                "message" => "Data berhasil dibatalkan",
-                "redirect" => route('send_to_branch'),
+                "message" => "Data berhasil dihapus",
+                "redirect" => route('surat_jalan_umum'),
             ], 200);
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error("Error when void pindah barang");
+            Log::error("Error ketika hapus surat jalan");
             Log::error($e);
             return response()->json([
                 "result" => false,
-                "message" => "Data gagal dibatalkan",
+                "message" => "Data gagal dihapus",
             ], 500);
         }
     }
 
     public function printData($id)
     {
-        if (checkAccessMenu('kirim_ke_cabang', 'print') == false) {
+        if (checkAccessMenu('surat_jalan_umum', 'print') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        $dataSatuan = DB::table('isi_satuan_barang')->select(DB::raw('distinct(isi_satuan_barang.id_satuan_barang)'), 'id_barang', 'nama_satuan_barang')
-            ->leftJoin('satuan_barang', 'isi_satuan_barang.id_satuan_barang', 'satuan_barang.id_satuan_barang')
-            ->where('satuan_wadah_isi_satuan_barang', '1')->get();
-        $arraySatuan = [];
-        foreach ($dataSatuan as $satuan) {
-            $arraySatuan[$satuan->id_barang] = $satuan->nama_satuan_barang;
-        }
-
-        $data = MoveBranch::where('id_jenis_transaksi', 21)->where('id_pindah_barang', $id)->first();
+        $data = SuratJalan::find($id);
         if (!$data) {
             return 'data tidak ditemukan';
         }
 
-        $pdf = PDF::loadView('ops.sendToBranch.print', ['data' => $data, 'arraySatuan' => $arraySatuan]);
+        $pdf = PDF::loadView('ops.SuratJalan.print', ['data' => $data]);
         $pdf->setPaper('a5', 'landscape');
-        return $pdf->stream('Surat jalan pindah cabang ' . $data->kode_pindah_barang . '.pdf');
+        $pdf->output();
+        $dom_pdf = $pdf->getDomPDF();
+        $font = $dom_pdf->getFontMetrics()->get_font("sans-serif", "normal");
+        $canvas = $dom_pdf->get_canvas();
+        $canvas->page_text(518, 64, "{PAGE_NUM} dari {PAGE_COUNT}", $font, 9, array(0, 0, 0));
+
+        return $pdf->stream('Surat Jalan Umum ' . $data->no_surat_jalan . '.pdf');
     }
 }

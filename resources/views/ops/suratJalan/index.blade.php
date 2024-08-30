@@ -71,11 +71,10 @@
                     <table class="table table-bordered data-table display nowrap" width="100%">
                         <thead>
                             <tr>
-                                <th>Tanggal</th>
                                 <th>No Surat Jalan</th>
+                                <th>Tanggal</th>
                                 <th>No Dokumen Lain</th>
                                 <th>Penerima</th>
-                                <th>Status</th>
                                 <th>Pembuat</th>
                                 <th>Keterangan</th>
                                 <th>Action</th>
@@ -116,22 +115,24 @@
             ajax: "{{ route('surat_jalan_umum') }}",
             columns: [{
                 data: 'no_surat_jalan',
-                name: 'no_surat_jalan'
+                name: 'no_surat_jalan',
+                width: 130
             }, {
                 data: 'tanggal',
-                name: 'tanggal'
+                name: 'tanggal',
+                width: 100
             }, {
                 data: 'no_dokumen_lain',
-                name: 'no_dokumen_lain'
+                name: 'no_dokumen_lain',
+                width: 150
             }, {
                 data: 'penerima',
                 name: 'penerima',
+                width: 150
             }, {
-                data: 'status',
-                name: 'status',
-            }, {
-                data: 'id_pengguna',
-                name: 'id_pengguna',
+                data: 'nama_pengguna',
+                name: 'nama_pengguna',
+                width: 100
             }, {
                 data: 'keterangan',
                 name: 'keterangan',
@@ -140,7 +141,8 @@
                 name: 'action',
                 className: 'text-center',
                 orderable: false,
-                searchable: false
+                searchable: false,
+                width: 150
             }, ]
         });
 
