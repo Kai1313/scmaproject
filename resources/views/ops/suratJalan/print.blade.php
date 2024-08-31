@@ -105,7 +105,7 @@
         <table class="table-header">
             <tr>
                 <th style="width:80px;" rowspan="4">
-                    <img src="{{ asset('images/logo.png') }}" alt="logo" style="width:70px;">
+                    <img src="{{ asset('images/logo.jpg') }}" alt="logo" style="width:70px;">
                 </th>
                 <th style="width:100%;text-align:center;" rowspan="4">
                     <span style="font-size:17px;margin-bottom:5px;font-weight:bold;">PT. SINAR CEMARAMAS ABADI</span>

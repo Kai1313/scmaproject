@@ -135,7 +135,11 @@
         <div class="box">
             <div class="box-header">
                 <h3 class="box-title">Detail Surat Jalan Umum</h3>
-                <a href="{{ route('surat_jalan_umum') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right">
+                <a href="{{ route('surat_jalan_umum-print-data', $data->id) }}" target="_blank"
+                    class="btn btn-default btn-flat btn-sm pull-right">
+                    <i class="fa fa-print mr-1"></i> Cetak
+                </a>
+                <a href="{{ route('surat_jalan_umum') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right mr-1">
                     <span class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali
                 </a>
             </div>
@@ -192,11 +196,6 @@
                     </table>
                 </div>
             </div>
-        </div>
-        <div class="text-right">
-            <a href="{{ route('surat_jalan_umum-print-data', $data->id) }}" class="btn btn-info btn-flat btn-sm">
-                <i class="fa fa-print mr-1"></i> Cetak
-            </a>
         </div>
     </div>
 @endsection

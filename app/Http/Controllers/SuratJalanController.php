@@ -28,7 +28,7 @@ class SuratJalanController extends Controller
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
                     $btn = '';
-                    $btn .= '<a href="' . route('surat_jalan_umum-print-data', $row->id) . '" class="btn btn-primary btn-xs mr-1 mb-1" target="_blank"><i class="fa fa-print"></i> Cetak</a>';
+                    $btn .= '<a href="' . route('surat_jalan_umum-print-data', $row->id) . '" class="btn btn-default btn-xs mr-1 mb-1" target="_blank"><i class="fa fa-print"></i> Cetak</a>';
                     $btn .= '<a href="' . route('surat_jalan_umum-view', $row->id) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a>';
                     if ($row->id_pengguna == session()->get('user')['id_pengguna']) {
                         $btn .= '<a href="' . route('surat_jalan_umum-entry', $row->id) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a>';

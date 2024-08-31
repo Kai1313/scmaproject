@@ -137,7 +137,14 @@
             <div class="box">
                 <div class="box-header">
                     <h3 class="box-title">{{ $data ? 'Ubah' : 'Tambah' }} Surat Jalan Umum</h3>
-                    <a href="{{ route('surat_jalan_umum') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right">
+                    @if ($data)
+                        <a href="{{ route('surat_jalan_umum-print-data', $data->id) }}" target="_blank"
+                            class="btn btn-default btn-flat btn-sm pull-right">
+                            <i class="fa fa-print mr-1"></i> Cetak
+                        </a>
+                    @endif
+                    <a href="{{ route('surat_jalan_umum') }}"
+                        class="btn bg-navy btn-sm btn-default btn-flat pull-right mr-1">
                         <span class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali
                     </a>
                 </div>
@@ -231,11 +238,6 @@
                 </div>
             </div>
             <div class="text-right">
-                @if ($data)
-                    <a href="{{ route('surat_jalan_umum-print-data', $data->id) }}" class="btn btn-info btn-flat btn-sm">
-                        <i class="fa fa-print mr-1"></i> Cetak
-                    </a>
-                @endif
                 <button class="btn btn-primary btn-flat btn-sm" type="submit">
                     <i class="glyphicon glyphicon-floppy-saved mr-1"></i> Simpan Data
                 </button>
