@@ -124,7 +124,7 @@
         </h1>
         <ol class="breadcrumb">
             <li><a href="#"><i class="fa fa-dashboard"></i> Dashboard</a></li>
-            <li><a href="javascript:history.back()">Surat Jalan Umum</a></li>
+            <li><a href="{{ route('surat_jalan_umum') }}">Surat Jalan Umum</a></li>
             <li class="active">Form</li>
         </ol>
     </section>
@@ -137,7 +137,7 @@
             <div class="box">
                 <div class="box-header">
                     <h3 class="box-title">{{ $data ? 'Ubah' : 'Tambah' }} Surat Jalan Umum</h3>
-                    <a href="javascript:history.back()" class="btn bg-navy btn-sm btn-default btn-flat pull-right">
+                    <a href="{{ route('surat_jalan_umum') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right">
                         <span class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali
                     </a>
                 </div>
@@ -231,7 +231,12 @@
                 </div>
             </div>
             <div class="text-right">
-                <button class="btn btn-primary btn-flat pull-right btn-sm" type="submit">
+                @if ($data)
+                    <a href="{{ route('surat_jalan_umum-print-data', $data->id) }}" class="btn btn-info btn-flat btn-sm">
+                        <i class="fa fa-print mr-1"></i> Cetak
+                    </a>
+                @endif
+                <button class="btn btn-primary btn-flat btn-sm" type="submit">
                     <i class="glyphicon glyphicon-floppy-saved mr-1"></i> Simpan Data
                 </button>
             </div>

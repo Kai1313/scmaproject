@@ -193,7 +193,7 @@ class SuratJalanController extends Controller
             return 'data tidak ditemukan';
         }
 
-        $pdf = PDF::loadView('ops.SuratJalan.print', ['data' => $data]);
+        $pdf = PDF::loadView('ops.suratJalan.print', ['data' => $data]);
         $pdf->setPaper('a5', 'landscape');
         $pdf->output();
         $dom_pdf = $pdf->getDomPDF();
