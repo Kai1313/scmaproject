@@ -186,9 +186,10 @@
                                     value="{{ old('purchase_request_code', $data ? $data->purchase_request_code : '') }}"
                                     class="form-control" readonly placeholder="Otomatis">
                             </div>
-                            <label>Catatan</label>
+                            <label>Catatan <span>*</span></label>
                             <div class="form-group">
-                                <textarea name="catatan" class="form-control" rows="3">{{ old('catatan', $data ? $data->catatan : '') }}</textarea>
+                                <textarea name="catatan" class="form-control" rows="3" data-validation="[NOTEMPTY]"
+                                    data-validation-message="Catatan tidak boleh kosong">{{ old('catatan', $data ? $data->catatan : '') }}</textarea>
                             </div>
                         </div>
                     </div>
