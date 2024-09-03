@@ -28,7 +28,7 @@
         .table th {
             font-size: 11px;
             border: 1px solid #000000;
-            max-width: 150px;
+            /* max-width: 150px; */
             text-align: center;
             font-weight: bold;
             padding: 4px;
@@ -84,7 +84,7 @@
         }
 
         @page {
-            margin: 261px 25px 25px 25px;
+            margin: 280px 25px 25px 25px;
         }
 
         header {
@@ -96,6 +96,11 @@
 
         .pagenum:before {
             content: counter(page);
+        }
+
+        .upper-bold {
+            text-transform: uppercase;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -141,37 +146,43 @@
             <tr>
                 <td width="80"><b>Tanggal</b></td>
                 <td width="5">:</td>
-                <td> {{ $data->tanggal }}</td>
+                <td class="upper-bold">
+                    @php
+                        $date = $data->tanggal;
+                        $exp = explode('-', $date);
+                    @endphp
+                    {{ $exp[2] }} {{ $month[(int) $exp[1] - 1] }} {{ $exp[0] }}
+                </td>
             </tr>
             <tr>
                 <td><b>No. Surat Jalan</b></td>
                 <td>:</td>
-                <td>{{ $data->no_surat_jalan }}</td>
+                <td class="upper-bold">{{ $data->no_surat_jalan }}</td>
             </tr>
             <tr>
                 <td><b>No. Dokumen Lain</b></td>
                 <td>:</td>
-                <td>{{ $data->no_dokumen_lain }}</td>
+                <td class="upper-bold">{{ $data->no_dokumen_lain }}</td>
             </tr>
             <tr>
                 <td><b>Penerima</b></td>
                 <td>:</td>
-                <td>{{ $data->penerima }}</td>
+                <td class="upper-bold">{{ $data->penerima }}</td>
             </tr>
             <tr>
                 <td><b>Alamat Penerima</b></td>
                 <td>:</td>
-                <td>{{ $data->alamat_penerima }}</td>
+                <td class="upper-bold">{{ $data->alamat_penerima }}</td>
             </tr>
         </table>
         <br>
         <table class="table">
             <tr>
-                <th width="15">No</th>
-                <th>Nama Barang</th>
-                <th width="50">Jumlah</th>
-                <th width="50">Satuan</th>
-                <th width="60">Keterangan</th>
+                <th style="width:15px;">No</th>
+                <th style="width:200px;">Nama Barang</th>
+                <th style="width:50px;">Jumlah</th>
+                <th style="width:50px;">Satuan</th>
+                <th>Keterangan</th>
             </tr>
         </table>
     </header>
@@ -179,11 +190,11 @@
         <table class="table">
             @foreach ($data->details as $key => $detail)
                 <tr>
-                    <td class="text-center" width="15">{{ $key + 1 }}</td>
-                    <td>{{ $detail->nama_barang }}</td>
-                    <td class="text-center" width="50">{{ $detail->jumlah }}</td>
-                    <td class="text-right" width="50">{{ $detail->satuan }}</td>
-                    <td class="text-center" width="60">{{ $detail->keterangan }}</td>
+                    <td class="text-center" style="width:15px;">{{ $key + 1 }}</td>
+                    <td style="width:200px;">{{ $detail->nama_barang }}</td>
+                    <td class="text-center" style="width:50px;">{{ $detail->jumlah }}</td>
+                    <td class="text-center" style="width:50px;">{{ $detail->satuan }}</td>
+                    <td>{{ $detail->keterangan }}</td>
                 </tr>
             @endforeach
         </table>

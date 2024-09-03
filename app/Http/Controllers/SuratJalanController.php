@@ -192,14 +192,14 @@ class SuratJalanController extends Controller
         if (!$data) {
             return 'data tidak ditemukan';
         }
-
-        $pdf = PDF::loadView('ops.suratJalan.print', ['data' => $data]);
+        $month = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+        $pdf = PDF::loadView('ops.suratJalan.print', ['data' => $data, 'month' => $month]);
         $pdf->setPaper('a5', 'landscape');
         $pdf->output();
         $dom_pdf = $pdf->getDomPDF();
         $font = $dom_pdf->getFontMetrics()->get_font("sans-serif", "normal");
         $canvas = $dom_pdf->get_canvas();
-        $canvas->page_text(518, 64, "{PAGE_NUM} dari {PAGE_COUNT}", $font, 9, array(0, 0, 0));
+        $canvas->page_text(518, 78, "{PAGE_NUM} dari {PAGE_COUNT}", $font, 9, array(0, 0, 0));
 
         return $pdf->stream('Surat Jalan Umum ' . $data->no_surat_jalan . '.pdf');
     }
