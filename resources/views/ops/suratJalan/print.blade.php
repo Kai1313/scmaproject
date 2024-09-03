@@ -178,11 +178,11 @@
         <br>
         <table class="table">
             <tr>
-                <th style="width:15px;">No</th>
-                <th style="width:200px;">Nama Barang</th>
-                <th style="width:50px;">Jumlah</th>
-                <th style="width:50px;">Satuan</th>
-                <th>Keterangan</th>
+                <th style="width:5%;">No</th>
+                <th style="width:32.5%">Nama Barang</th>
+                <th style="width:10%;">Jumlah</th>
+                <th style="width:10%;">Satuan</th>
+                <th style="width:32.5%;">Keterangan</th>
             </tr>
         </table>
     </header>
@@ -190,11 +190,11 @@
         <table class="table">
             @foreach ($data->details as $key => $detail)
                 <tr>
-                    <td class="text-center" style="width:15px;">{{ $key + 1 }}</td>
-                    <td style="width:200px;">{{ $detail->nama_barang }}</td>
-                    <td class="text-center" style="width:50px;">{{ $detail->jumlah }}</td>
-                    <td class="text-center" style="width:50px;">{{ $detail->satuan }}</td>
-                    <td>{{ $detail->keterangan }}</td>
+                    <td class="text-center" style="width:5%;">{{ $key + 1 }}</td>
+                    <td style="width:32.5%">{{ $detail->nama_barang }}</td>
+                    <td class="text-center" style="width:10%">{{ $detail->jumlah }}</td>
+                    <td class="text-center" style="width:10%;">{{ $detail->satuan }}</td>
+                    <td style="width:32.5%;">{{ $detail->keterangan }}</td>
                 </tr>
             @endforeach
         </table>
