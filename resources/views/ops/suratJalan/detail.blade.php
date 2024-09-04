@@ -3,9 +3,7 @@
 @section('addedStyles')
     <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables-responsive/css/responsive.dataTables.css') }}">
-    <link rel="stylesheet"
-        href="{{ asset('assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/bower_components/select2/dist/css/select2.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/fancybox.css') }}" />
     <style>
         ul.horizontal-list {
             min-width: 200px;
@@ -135,13 +133,17 @@
         <div class="box">
             <div class="box-header">
                 <h3 class="box-title">Detail Surat Jalan Umum</h3>
-                <a href="{{ route('surat_jalan_umum-print-data', $data->id) }}" target="_blank"
-                    class="btn btn-default btn-flat btn-sm pull-right">
-                    <i class="fa fa-print mr-1"></i> Cetak
-                </a>
                 <a href="{{ route('surat_jalan_umum') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right mr-1">
                     <span class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali
                 </a>
+                <a href="javascript:void(0)" class="btn btn-default btn-flat btn-sm pull-right mr-1 show-media">
+                    <i class="fa fa-image mr-1"></i> Dokumentasi
+                </a>
+                <a href="{{ route('surat_jalan_umum-print-data', $data->id) }}" target="_blank"
+                    class="btn btn-default btn-flat btn-sm pull-right mr-1">
+                    <i class="fa fa-print mr-1"></i> Cetak
+                </a>
+
             </div>
             <div class="box-body">
                 <div class="row">
@@ -198,50 +200,46 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="modalEntryCamera" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Dokumentasi</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="show-res-camera" style="overflow-x: scroll;overflow-y: hidden;white-space: nowrap;">
+                        @if ($data)
+                            @foreach ($data->medias as $media)
+                                <div style="display:inline-block;margin:5px;">
+                                    <div style="margin-bottom:10px;">
+                                        <a data-fancybox="lightbox" href="{{ asset($media->lokasi_media) }}">
+                                            <img src="{{ asset($media->lokasi_media) }}" alt=""
+                                                style="width:100px;height:100px;object-fit:cover;border-radius:5px;"
+                                                loading="lazy">
+                                        </a>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('addedScripts')
-    <script src="{{ asset('js/jquery.validate.min.js') }}"></script>
     <script src="{{ asset('assets/bower_components/datatables.net/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js') }}"></script>
     <script src="{{ asset('assets/bower_components/datatables-responsive/js/dataTables.responsive.js') }}"></script>
-    <script src="{{ asset('assets/bower_components/select2/dist/js/select2.min.js') }}"></script>
-    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/custom.js') }}?t={{ time() }}"></script>
+    <script src="{{ asset('js/fancybox.min.js') }}"></script>
 @endsection
 
 @section('externalScripts')
     <script>
         let details = {!! $data ? $data->details : '[]' !!};
-        let deleteDetails = []
-        let detailSelect = []
-        let statusModal = 'create'
-        $('.add-entry').click(function() {
-            $('#modalEntry').modal('show')
-            statusModal == 'create'
-            $('#modalEntry').find('input,textarea').val('')
-        })
-
-        $('.btn-save').click(function() {
-            let modal = $('#modalEntry')
-            let array = []
-            modal.find('input,textarea').each(function(i, v) {
-                array[$(v).prop('name')] = $(v).val()
-            })
-
-            let newObj = Object.assign({}, array)
-            if (statusModal == 'create') {
-                details.push(newObj)
-            } else if (statusModal == 'edit') {
-                details[newObj.index - 1] = newObj
-            }
-
-            table.clear().rows.add(details).draw()
-            $('[name="details"]').val(JSON.stringify(details))
-
-            modal.find('input,textarea').val('')
-            modal.modal('hide')
-        })
 
         var table = $('#table-detail').DataTable({
             data: details,
@@ -264,70 +262,10 @@
             }]
         });
 
-        $.extend($.validator.messages, {
-            required: "Tidak boleh kosong",
-            email: "Pastikan format email sudah benar",
-            number: "Pastikan hanya angka",
-        });
-
-        let validateForm = $(".post-action-custom").validate({
-            rules: {
-                date: "required",
-                penerima: "required",
-                alamat_penerima: 'required',
-            },
-            errorClass: 'has-error',
-            highlight: function(element, errorClass, validClass) {
-                $(element).parents("div.form-group").addClass('error');
-            },
-            unhighlight: function(element, errorClass, validClass) {
-                $(element).parents(".error").removeClass('error');
-            },
-            submitHandler: function(form, e) {
-                e.preventDefault()
-                saveData($(form))
-                return false;
-            }
-        });
-
-        $('#table-detail').on('click', '.edit-entry', function() {
-            let index = $(this).parents('tr').index()
-            let selData = details[index]
-            let modal = $('#modalEntry')
-            modal.find('input,textarea').each(function(i, v) {
-                let nameInput = $(v).prop('name')
-                $(v).val(selData[nameInput])
-            })
-
-            modal.modal('show')
-            statusModal = 'edit'
+        $('.show-media').click(function() {
+            $('#modalEntryCamera').modal('show')
         })
 
-        $('body').on('click', '.delete-entry', function() {
-            let targetElement = $(this).parents('tr')
-            Swal.fire({
-                title: 'Anda yakin ingin menghapus data ini?',
-                icon: 'info',
-                showDenyButton: true,
-                confirmButtonText: 'Yes',
-                denyButtonText: 'No',
-                reverseButtons: true,
-                customClass: {
-                    actions: 'my-actions',
-                    confirmButton: 'order-1',
-                    denyButton: 'order-3',
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    deleteDetails.push(details[targetElement.index()])
-
-                    details.splice(targetElement.index(), 1);
-                    table.clear().rows.add(details).draw()
-
-                    $('[name="details"]').val(JSON.stringify(details))
-                    $('[name="detele_details"]').val(JSON.stringify(deleteDetails))
-                }
-            })
-        })
+        Fancybox.bind('[data-fancybox="lightbox"]');
     </script>
 @endsection
