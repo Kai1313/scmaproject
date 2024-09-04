@@ -11,7 +11,7 @@ class LaporanPrController extends Controller
 {
     public function index(Request $request)
     {
-        if (checkUserSession($request, 'report_pr-index', 'show') == false) {
+        if (checkUserSession($request, 'laporan_pr', 'show') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
