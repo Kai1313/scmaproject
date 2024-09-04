@@ -6,6 +6,7 @@
     <link rel="stylesheet"
         href="{{ asset('assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/bower_components/select2/dist/css/select2.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/fancybox.css') }}" />
     <style>
         ul.horizontal-list {
             min-width: 200px;
@@ -113,6 +114,22 @@
         .form-group {
             margin-bottom: 5px;
         }
+
+        video {
+            width: 60%;
+        }
+
+        @media screen and (max-width: 1024px) {
+            video {
+                width: 100%;
+            }
+        }
+
+        .snap {
+            position: absolute;
+            bottom: 25px;
+            right: 10px;
+        }
     </style>
 @endsection
 
@@ -181,6 +198,14 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="row">
+                                <label class="col-md-3">Keterangan</label>
+                                <div class="form-group col-md-9">
+                                    <div class="form-group">
+                                        <textarea name="keterangan" class="form-control">{{ old('keterangan', $data ? $data->keterangan : '') }}</textarea>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="col-md-6">
                             <div class="row">
@@ -201,11 +226,12 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <label class="col-md-3">Keterangan</label>
+                                <div class="col-md-3">
+                                    <label for="">Dokumentasi</label>
+                                </div>
                                 <div class="form-group col-md-9">
-                                    <div class="form-group">
-                                        <textarea name="keterangan" class="form-control">{{ old('keterangan', $data ? $data->keterangan : '') }}</textarea>
-                                    </div>
+                                    <a href="javascript:void(0)" class="btn btn-default show-modal-camera">Dokumentasi
+                                        Foto</a>
                                 </div>
                             </div>
                         </div>
@@ -284,6 +310,59 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="modalEntryCamera" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Ambil Gambar</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="show-camera" style="margin-top:10px">
+                        <div class="text-center" style="position: relative;">
+                            <video autoplay style="border:1px solid black;margin-bottom: 10px;"></video>
+                            <button type="button" class="take-image btn btn-danger hide-camera-item btn-rounded"
+                                style="position: absolute; bottom: 25px; left: 10px;"><i class="fa fa-close"
+                                    style="font-size: 30px;"></i></button>
+                            <button type="button" class="take-image btn btn-primary snap btn-rounded">
+                                <i class="fa fa-image" style="font-size: 30px;"></i>
+                            </button>
+                        </div>
+                        <canvas class="d-none" style="display: none;"></canvas>
+                        <div style="margin-bottom:20px;">
+                            <select name="option-camera" id="optionCamera" class="form-control">
+                                <option value="">Select camera</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="show-res-camera" style="overflow-x: scroll;overflow-y: hidden;white-space: nowrap;">
+                        @if ($data)
+                            @foreach ($data->medias as $media)
+                                <div style="display:inline-block;margin:5px;">
+                                    <div style="margin-bottom:10px;">
+                                        <a data-fancybox="lightbox" href="{{ asset($media->lokasi_media) }}">
+                                            <img src="{{ asset($media->lokasi_media) }}" alt=""
+                                                style="width:100px;height:100px;object-fit:cover;border-radius:5px;"
+                                                loading="lazy">
+                                        </a>
+                                    </div>
+                                    @if (date('Y-m-d', strtotime($media->date_media)) == date('Y-m-d'))
+                                        <a href="javascript:void(0)" class="remove-image" style="color:red;"
+                                            data-id="{{ $media->id_media }}">
+                                            <i class="fa fa-trash" style="font-size:20px"></i>
+                                        </a>
+                                    @else
+                                        <a href="javascript:void(0)"><i class="fa fa-lock"> </i></a>
+                                    @endif
+                                </div>
+                            @endforeach
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('addedScripts')
@@ -294,6 +373,8 @@
     <script src="{{ asset('assets/bower_components/select2/dist/js/select2.min.js') }}"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/custom.js') }}?t={{ time() }}"></script>
+    <script src="{{ asset('js/fancybox.min.js') }}"></script>
+    <script src="{{ asset('js/camera.js') }}?t={{ time() }}"></script>
 @endsection
 
 @section('externalScripts')
@@ -302,6 +383,16 @@
         let deleteDetails = []
         let detailSelect = []
         let statusModal = 'create'
+        @if ($data)
+            var urlPhoto = "{{ route('surat_jalan_umum-save_image', $data->id) }}";
+            var urlPhotoDelete = "{{ route('surat_jalan_umum-rm_image', $data->id) }}";
+        @else
+            var urlPhoto = "";
+            var urlPhotoDelete = "";
+        @endif
+
+        Fancybox.bind('[data-fancybox="lightbox"]');
+
         $('.add-entry').click(function() {
             $('#modalEntry').modal('show')
             statusModal == 'create'

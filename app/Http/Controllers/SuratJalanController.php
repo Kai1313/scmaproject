@@ -203,4 +203,34 @@ class SuratJalanController extends Controller
 
         return $pdf->stream('Surat Jalan Umum ' . $data->no_surat_jalan . '.pdf');
     }
+
+    public function saveImage(Request $request, $id)
+    {
+        $data = SuratJalan::find($id);
+        if (!$data) {
+            return response()->json(['result' => false, 'message' => 'Data tidak ditemukan'], 500);
+        }
+
+        $res = $data->uploadfile($request->data_url);
+        if ($res['result'] == false) {
+            return response()->json($res, 500);
+        }
+
+        return response()->json(['result' => false, 'message' => 'Berhasil upload foto', 'id' => $res['data']->id_media], 200);
+    }
+
+    public function rmImage(Request $request, $id)
+    {
+        $data = SuratJalan::find($id);
+        if (!$data) {
+            return response()->json(['result' => false, 'message' => 'Data tidak ditemukan'], 500);
+        }
+
+        $res = $data->removefile($request->id_media);
+        if ($res['result'] == false) {
+            return response()->json($res, 500);
+        }
+
+        return response()->json(['result' => false, 'message' => 'Berhasil Berhasil dihapus'], 200);
+    }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Media;
+use DB;
 use Illuminate\Database\Eloquent\Model;
 use Log;
 
@@ -17,6 +19,11 @@ class SuratJalan extends Model
     public function details()
     {
         return $this->hasMany(SuratJalanDetail::class, 'id_surat_jalan');
+    }
+
+    public function medias()
+    {
+        return $this->hasMany(Media::class, 'id');
     }
 
     public static function createcode()
@@ -76,6 +83,50 @@ class SuratJalan extends Model
         } catch (\Exception $th) {
             Log::error($th);
             return ["result" => false, "message" => "Data gagal diproses"];
+        }
+    }
+
+    public function uploadfile($media)
+    {
+        try {
+            if (is_string($media)) {
+                $explode = explode(";base64,", $media);
+                $findExt = explode("image/", $explode[0]);
+
+                $ext = $findExt[1];
+                $name = uniqid();
+
+                $media = base64_decode($explode[1]);
+                $mainpath = $name . '.' . $ext;
+
+                $img = \Image::make($media);
+                $img->save('asset/surat_jalan_umum/' . $mainpath);
+
+                $m = new Media;
+                $m->id = $this->id;
+                $m->lokasi_media = 'asset/surat_jalan_umum/' . $mainpath;
+                $m->status_media = 1;
+                $m->tipe_media = 'surat_jalan_umum';
+                $m->date_media = date('Y-m-d');
+                $m->user_media = session()->get('user')['id_pengguna'];
+                $m->save();
+            }
+
+            return ['result' => true, 'data' => $m];
+        } catch (\Exception $th) {
+            return ['result' => false, 'message' => $th->getMessage()];
+        }
+    }
+
+    public function removefile($id)
+    {
+        try {
+            $data = Media::where('id_media', $id)->first();
+            unlink(public_path($data->lokasi_media));
+            $data->delete();
+            return ['result' => true];
+        } catch (\Exception $th) {
+            return ['result' => false, 'message' => $th->getMessage()];
         }
     }
 }
