@@ -283,6 +283,10 @@ Route::namespace('Report')->group(function () {
         Route::get('print_month', 'LaporanChecklistController@printMonth')->name('checklist-print-month');
         Route::get('tes', 'LaporanChecklistController@tes');
     });
+
+    Route::prefix('laporan_pr')->group(function () {
+        Route::get('index/{user_id?}', 'LaporanPrController@index')->name('report_pr-index');
+    });
 });
 
 // Master
