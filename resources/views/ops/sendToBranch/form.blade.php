@@ -6,6 +6,7 @@
     <link rel="stylesheet"
         href="{{ asset('assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/bower_components/select2/dist/css/select2.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/fancybox.css') }}" />
     <style>
         ul.horizontal-list {
             min-width: 200px;
@@ -115,6 +116,22 @@
         .error textarea {
             border-color: #fb434a;
         }
+
+        video {
+            width: 60%;
+        }
+
+        @media screen and (max-width: 1024px) {
+            video {
+                width: 100%;
+            }
+        }
+
+        .snap {
+            position: absolute;
+            bottom: 25px;
+            right: 10px;
+        }
     </style>
 @endsection
 
@@ -214,6 +231,10 @@
                     </div>
                     <input name="id_jenis_transaksi" type="hidden"
                         value="{{ old('id_jenis_transaksi', $data ? $data->id_jenis_transaksi : '21') }}">
+                    @if ($data)
+                        <a href="javascript:void(0)" class="btn btn-default btn-flat btn-sm show-modal-camera"><i
+                                class="fa fa-camera mr-1"></i>Dokumentasi</a>
+                    @endif
                     <button class="btn btn-primary btn-flat pull-right btn-sm" type="submit">
                         <i class="glyphicon glyphicon-floppy-saved"></i> Simpan Data
                     </button>
@@ -389,6 +410,60 @@
             </div>
         </div>
     </div>
+    @if ($data)
+        <div class="modal fade" id="modalEntryCamera" role="dialog" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Ambil Gambar</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="show-camera" style="margin-top:10px">
+                            <div class="text-center" style="position: relative;">
+                                <video autoplay style="border:1px solid black;margin-bottom: 10px;"></video>
+                                <button type="button" class="take-image btn btn-danger hide-camera-item btn-rounded"
+                                    style="position: absolute; bottom: 25px; left: 10px;"><i class="fa fa-close"
+                                        style="font-size: 30px;"></i></button>
+                                <button type="button" class="take-image btn btn-primary snap btn-rounded">
+                                    <i class="fa fa-image" style="font-size: 30px;"></i>
+                                </button>
+                            </div>
+                            <canvas class="d-none" style="display: none;"></canvas>
+                            <div style="margin-bottom:20px;">
+                                <select name="option-camera" id="optionCamera" class="form-control">
+                                    <option value="">Select camera</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="show-res-camera" style="overflow-x: scroll;overflow-y: hidden;white-space: nowrap;">
+                            @if ($data)
+                                @foreach ($data->medias as $media)
+                                    <div style="display:inline-block;margin:5px;">
+                                        <div style="margin-bottom:10px;">
+                                            <a data-fancybox="lightbox" href="{{ asset($media->lokasi_media) }}">
+                                                <img src="{{ asset($media->lokasi_media) }}" alt=""
+                                                    style="width:100px;height:100px;object-fit:cover;border-radius:5px;"
+                                                    loading="lazy">
+                                            </a>
+                                        </div>
+                                        @if (date('Y-m-d', strtotime($media->date_media)) == date('Y-m-d'))
+                                            <a href="javascript:void(0)" class="remove-image" style="color:red;"
+                                                data-id="{{ $media->id_media }}">
+                                                <i class="fa fa-trash" style="font-size:20px"></i>
+                                            </a>
+                                        @else
+                                            <a href="javascript:void(0)"><i class="fa fa-lock"> </i></a>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
 @endsection
 
 @section('addedScripts')
@@ -400,6 +475,7 @@
     <script src="{{ asset('assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js') }}"></script>
     <script src="{{ asset('js/html5-qrcode.min.js') }}"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ asset('js/fancybox.min.js') }}"></script>
     <script src="{{ asset('js/custom.js') }}"></script>
 @endsection
 
@@ -412,6 +488,16 @@
         let urlSearchQrcode = "{{ route('send_to_branch-qrcode') }}"
         let sendId = {{ $data ? $data->id_pindah_barang : 0 }}
         let urlDeleteDetail = '{{ route('send_to_branch-delete-detail', [$data ? $data->id_pindah_barang : 0, 0]) }}'
+        @if ($data)
+            var urlPhoto = "{{ route('send_to_branch-save_image', $data->id_pindah_barang) }}";
+            var urlPhotoDelete = "{{ route('send_to_branch-rm_image', $data->id_pindah_barang) }}";
+        @else
+            var urlPhoto = "";
+            var urlPhotoDelete = "";
+        @endif
+
+        Fancybox.bind('[data-fancybox="lightbox"]');
     </script>
     <script src="{{ asset('js/send-to-branch.js') }}"></script>
+    <script src="{{ asset('js/camera.js') }}?t={{ time() }}"></script>
 @endsection

@@ -310,59 +310,60 @@
             </div>
         </div>
     </div>
-
-    <div class="modal fade" id="modalEntryCamera" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Ambil Gambar</h4>
-                </div>
-                <div class="modal-body">
-                    <div class="show-camera" style="margin-top:10px">
-                        <div class="text-center" style="position: relative;">
-                            <video autoplay style="border:1px solid black;margin-bottom: 10px;"></video>
-                            <button type="button" class="take-image btn btn-danger hide-camera-item btn-rounded"
-                                style="position: absolute; bottom: 25px; left: 10px;"><i class="fa fa-close"
-                                    style="font-size: 30px;"></i></button>
-                            <button type="button" class="take-image btn btn-primary snap btn-rounded">
-                                <i class="fa fa-image" style="font-size: 30px;"></i>
-                            </button>
-                        </div>
-                        <canvas class="d-none" style="display: none;"></canvas>
-                        <div style="margin-bottom:20px;">
-                            <select name="option-camera" id="optionCamera" class="form-control">
-                                <option value="">Select camera</option>
-                            </select>
-                        </div>
+    @if ($data)
+        <div class="modal fade" id="modalEntryCamera" role="dialog" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Ambil Gambar</h4>
                     </div>
-                    <div class="show-res-camera" style="overflow-x: scroll;overflow-y: hidden;white-space: nowrap;">
-                        @if ($data)
-                            @foreach ($data->medias as $media)
-                                <div style="display:inline-block;margin:5px;">
-                                    <div style="margin-bottom:10px;">
-                                        <a data-fancybox="lightbox" href="{{ asset($media->lokasi_media) }}">
-                                            <img src="{{ asset($media->lokasi_media) }}" alt=""
-                                                style="width:100px;height:100px;object-fit:cover;border-radius:5px;"
-                                                loading="lazy">
-                                        </a>
+                    <div class="modal-body">
+                        <div class="show-camera" style="margin-top:10px">
+                            <div class="text-center" style="position: relative;">
+                                <video autoplay style="border:1px solid black;margin-bottom: 10px;"></video>
+                                <button type="button" class="take-image btn btn-danger hide-camera-item btn-rounded"
+                                    style="position: absolute; bottom: 25px; left: 10px;"><i class="fa fa-close"
+                                        style="font-size: 30px;"></i></button>
+                                <button type="button" class="take-image btn btn-primary snap btn-rounded">
+                                    <i class="fa fa-image" style="font-size: 30px;"></i>
+                                </button>
+                            </div>
+                            <canvas class="d-none" style="display: none;"></canvas>
+                            <div style="margin-bottom:20px;">
+                                <select name="option-camera" id="optionCamera" class="form-control">
+                                    <option value="">Select camera</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="show-res-camera" style="overflow-x: scroll;overflow-y: hidden;white-space: nowrap;">
+                            @if ($data)
+                                @foreach ($data->medias as $media)
+                                    <div style="display:inline-block;margin:5px;">
+                                        <div style="margin-bottom:10px;">
+                                            <a data-fancybox="lightbox" href="{{ asset($media->lokasi_media) }}">
+                                                <img src="{{ asset($media->lokasi_media) }}" alt=""
+                                                    style="width:100px;height:100px;object-fit:cover;border-radius:5px;"
+                                                    loading="lazy">
+                                            </a>
+                                        </div>
+                                        @if (date('Y-m-d', strtotime($media->date_media)) == date('Y-m-d'))
+                                            <a href="javascript:void(0)" class="remove-image" style="color:red;"
+                                                data-id="{{ $media->id_media }}">
+                                                <i class="fa fa-trash" style="font-size:20px"></i>
+                                            </a>
+                                        @else
+                                            <a href="javascript:void(0)"><i class="fa fa-lock"> </i></a>
+                                        @endif
                                     </div>
-                                    @if (date('Y-m-d', strtotime($media->date_media)) == date('Y-m-d'))
-                                        <a href="javascript:void(0)" class="remove-image" style="color:red;"
-                                            data-id="{{ $media->id_media }}">
-                                            <i class="fa fa-trash" style="font-size:20px"></i>
-                                        </a>
-                                    @else
-                                        <a href="javascript:void(0)"><i class="fa fa-lock"> </i></a>
-                                    @endif
-                                </div>
-                            @endforeach
-                        @endif
+                                @endforeach
+                            @endif
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    @endif
 @endsection
 
 @section('addedScripts')

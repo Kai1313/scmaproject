@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\SuratJalan;
+use App\Models\SuratJalanDetail;
 use DB;
 use Illuminate\Http\Request;
 use Log;

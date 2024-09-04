@@ -80,6 +80,11 @@ class MoveBranch extends Model
         return $this->belongsTo(Production::class, 'id_produksi');
     }
 
+    public function medias()
+    {
+        return $this->hasMany(Media::class, 'id', 'id_pindah_barang');
+    }
+
     public function formatDetailGroupBy()
     {
         return $this->hasMany(MoveBranchDetail::class, 'id_pindah_barang')
@@ -382,5 +387,49 @@ class MoveBranch extends Model
         return response()->json([
             'status' => 'success',
         ]);
+    }
+
+    public function uploadfile($media)
+    {
+        try {
+            if (is_string($media)) {
+                $explode = explode(";base64,", $media);
+                $findExt = explode("image/", $explode[0]);
+
+                $ext = $findExt[1];
+                $name = uniqid();
+
+                $media = base64_decode($explode[1]);
+                $mainpath = $name . '.' . $ext;
+
+                $img = \Image::make($media);
+                $img->save('asset/pindah_barang/' . $mainpath);
+
+                $m = new Media;
+                $m->id = $this->id_pindah_barang;
+                $m->lokasi_media = 'asset/pindah_barang/' . $mainpath;
+                $m->status_media = 1;
+                $m->tipe_media = 'pindah_barang';
+                $m->date_media = date('Y-m-d');
+                $m->user_media = session()->get('user')['id_pengguna'];
+                $m->save();
+            }
+
+            return ['result' => true, 'data' => $m];
+        } catch (\Exception $th) {
+            return ['result' => false, 'message' => $th->getMessage()];
+        }
+    }
+
+    public function removefile($id)
+    {
+        try {
+            $data = Media::where('id_media', $id)->first();
+            unlink(public_path($data->lokasi_media));
+            $data->delete();
+            return ['result' => true];
+        } catch (\Exception $th) {
+            return ['result' => false, 'message' => $th->getMessage()];
+        }
     }
 }

@@ -455,4 +455,34 @@ class SendToBranchController extends Controller
             "redirect" => route('send_to_branch-entry', $parent),
         ], 200);
     }
+
+    public function saveImage(Request $request, $id)
+    {
+        $data = MoveBranch::find($id);
+        if (!$data) {
+            return response()->json(['result' => false, 'message' => 'Data tidak ditemukan'], 500);
+        }
+
+        $res = $data->uploadfile($request->data_url);
+        if ($res['result'] == false) {
+            return response()->json($res, 500);
+        }
+
+        return response()->json(['result' => false, 'message' => 'Berhasil upload foto', 'id' => $res['data']->id_media], 200);
+    }
+
+    public function rmImage(Request $request, $id)
+    {
+        $data = MoveBranch::find($id);
+        if (!$data) {
+            return response()->json(['result' => false, 'message' => 'Data tidak ditemukan'], 500);
+        }
+
+        $res = $data->removefile($request->id_media);
+        if ($res['result'] == false) {
+            return response()->json($res, 500);
+        }
+
+        return response()->json(['result' => false, 'message' => 'Berhasil Berhasil dihapus'], 200);
+    }
 }

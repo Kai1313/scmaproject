@@ -3,6 +3,7 @@
 @section('addedStyles')
     <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables-responsive/css/responsive.dataTables.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/fancybox.css') }}" />
     <style>
         th {
             text-align: center;
@@ -43,6 +44,9 @@
                 <a href="{{ route('send_to_branch-print-data', $data->id_pindah_barang) }}" target="_blank"
                     class="btn btn-sm btn-default btn-flat pull-right">
                     <span class="glyphicon glyphicon-print mr-1"></span> Cetak
+                </a>
+                <a href="javascript:void(0)" class="btn btn-default btn-flat btn-sm pull-right mr-1 show-media">
+                    <i class="fa fa-image mr-1"></i> Dokumentasi
                 </a>
                 <a href="{{ route('send_to_branch') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right"
                     style="margin-right:10px;">
@@ -160,6 +164,33 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="modalEntryCamera" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Dokumentasi</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="show-res-camera" style="overflow-x: scroll;overflow-y: hidden;white-space: nowrap;">
+                        @if ($data)
+                            @foreach ($data->medias as $media)
+                                <div style="display:inline-block;margin:5px;">
+                                    <div style="margin-bottom:10px;">
+                                        <a data-fancybox="lightbox" href="{{ asset($media->lokasi_media) }}">
+                                            <img src="{{ asset($media->lokasi_media) }}" alt=""
+                                                style="width:100px;height:100px;object-fit:cover;border-radius:5px;"
+                                                loading="lazy">
+                                        </a>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('addedScripts')
@@ -167,6 +198,7 @@
     <script src="{{ asset('assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js') }}"></script>
     <script src="{{ asset('assets/bower_components/datatables-responsive/js/dataTables.responsive.js') }}"></script>
     <script src="{{ asset('js/custom.js') }}"></script>
+    <script src="{{ asset('js/fancybox.min.js') }}"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 @endsection
 
@@ -311,5 +343,11 @@
                 }
             })
         }
+
+        $('.show-media').click(function() {
+            $('#modalEntryCamera').modal('show')
+        })
+
+        Fancybox.bind('[data-fancybox="lightbox"]');
     </script>
 @endsection
