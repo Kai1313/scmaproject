@@ -199,7 +199,7 @@ class SuratJalanController extends Controller
         $dom_pdf = $pdf->getDomPDF();
         $font = $dom_pdf->getFontMetrics()->get_font("sans-serif", "normal");
         $canvas = $dom_pdf->get_canvas();
-        $canvas->page_text(518, 78, "{PAGE_NUM} dari {PAGE_COUNT}", $font, 9, array(0, 0, 0));
+        $canvas->page_text(518, 74, "{PAGE_NUM} dari {PAGE_COUNT}", $font, 9, array(0, 0, 0));
 
         return $pdf->stream('Surat Jalan Umum ' . $data->no_surat_jalan . '.pdf');
     }

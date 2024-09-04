@@ -200,6 +200,7 @@ Route::prefix('marketing-tool')->group(function () {
 
 Route::get('kirim_ke_gudang/print2/{id}', 'SendToWarehouseController@print2')->name('send_to_warehouse-print2');
 Route::get('kirim_ke_gudang/print/{id}', 'SendToWarehouseController@print')->name('send_to_warehouse-print');
+Route::get('delivery_order/print-npb/{id}', 'DeliveryOrderController@printNpb')->name('delivery_order-print-npb');
 Route::get('stok_minimal/excel/{id}/{id_cabang}', 'StokMinHistoryController@getExcel')->name('stok_minimal-excel');
 
 Route::namespace('Report')->group(function () {

@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Surat jalan pindah cabang {{ $data->kode_pindah_barang }}</title>
+    <title>Nota Pengeluaran barang {{ $data->nomor_npb_penjualan }}</title>
     <style type="text/css">
         * {
             font-family: Arial, Helvetica, sans-serif;
@@ -148,7 +148,7 @@
                 <td width="5">:</td>
                 <td class="upper-bold">
                     @php
-                        $date = $data->tanggal;
+                        $date = $data->tanggal_penjualan;
                         $exp = explode('-', $date);
                     @endphp
                     {{ $exp[2] }} {{ $month[(int) $exp[1] - 1] }} {{ $exp[0] }}
@@ -157,22 +157,24 @@
             <tr>
                 <td><b>No. Surat Jalan</b></td>
                 <td>:</td>
-                <td class="upper-bold">{{ $data->no_surat_jalan }}</td>
+                <td class="upper-bold">{{ $data->nomor_npb_penjualan }}</td>
             </tr>
             <tr>
                 <td><b>No. Dokumen Lain</b></td>
                 <td>:</td>
-                <td class="upper-bold">{{ $data->no_dokumen_lain }}</td>
+                <td class="upper-bold">{{ $data->nama_penjualan }}</td>
             </tr>
             <tr>
                 <td><b>Penerima</b></td>
                 <td>:</td>
-                <td class="upper-bold">{{ $data->penerima }}</td>
+                <td class="upper-bold">{{ $data->nama_pelanggan }}</td>
             </tr>
             <tr>
                 <td style="vertical-align:top;"><b>Alamat Penerima</b></td>
                 <td style="vertical-align:top;">:</td>
-                <td class="upper-bold" style="height:30px;vertical-align:top;">{{ $data->alamat_penerima }}</td>
+                <td class="upper-bold" style="height:30px;vertical-align:top;">
+                    {{ $data->alamat_pelanggan }}
+                </td>
             </tr>
         </table>
         <table class="table">
@@ -187,15 +189,28 @@
     </header>
     <main>
         <table class="table">
-            @foreach ($data->details as $key => $detail)
+            @foreach ($details as $key => $detail)
                 <tr>
                     <td class="text-center" style="width:5%;">{{ $key + 1 }}</td>
                     <td style="width:32.5%">{{ $detail->nama_barang }}</td>
-                    <td class="text-center" style="width:10%">{{ $detail->jumlah }}</td>
-                    <td class="text-center" style="width:10%;">{{ $detail->satuan }}</td>
-                    <td style="width:32.5%;">{{ $detail->keterangan }}</td>
+                    <td class="text-center" style="width:10%">{{ $detail->sum_total_weight }}</td>
+                    <td class="text-center" style="width:10%;">{{ $detail->nama_satuan_barang }}</td>
+                    <td style="width:32.5%;">{{ $detail->total }} {{ $detail->nama_satuan_baru }} @
+                        {{ $detail->jumlah_penjualan_detail }}
+                        {{ $detail->nama_satuan_barang }}</td>
                 </tr>
             @endforeach
+        </table>
+        <table class="table-subheader">
+            <tr>
+                <td width="40"><b>Catatan</b></td>
+                <td width="5">:</td>
+                <td>
+                    @if ($data->nama_ekspedisi)
+                        Dikirim Via {{ $data->nama_ekspedisi }}
+                    @endif
+                </td>
+            </tr>
         </table>
         <table class="table-signature">
             <tr>
