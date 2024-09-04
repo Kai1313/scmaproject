@@ -39,7 +39,7 @@ class LaporanPrController extends Controller
             'qty',
             'tanggal_permintaan_pembelian',
             'nama_permintaan_pembelian',
-            'jumlah_permintaan_pembelian_detail',
+            'jumlah_permintaan_pembelian_detail'
         )
             ->join('purchase_request_header as ph', 'pd.purchase_request_id', 'ph.purchase_request_id')
             ->leftJoin('permintaan_pembelian_detail as ppd', function ($i) {
