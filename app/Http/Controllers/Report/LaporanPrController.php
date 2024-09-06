@@ -29,6 +29,7 @@ class LaporanPrController extends Controller
         $date = explode(' - ', $request->date);
         $idCabang = explode(',', $request->id_cabang);
         $idGudang = explode(',', $request->id_gudang);
+        $poStatus = $request->po_status;
         $data = DB::table('purchase_request_detail as pd')->select(
             'g.nama_gudang',
             'purchase_request_date',
@@ -51,8 +52,16 @@ class LaporanPrController extends Controller
             ->join('satuan_barang as sb', 'pd.id_satuan_barang', 'sb.id_satuan_barang')
             ->whereBetween('purchase_request_date', $date)
             ->whereIn('ph.id_cabang', $idCabang)
-            ->whereIn('ph.id_gudang', $idGudang)
-            ->orderBy('ph.purchase_request_date', 'desc');
+            ->whereIn('ph.id_gudang', $idGudang);
+        if ($poStatus != 'all') {
+            if ($poStatus == '1') {
+                $data = $data->where('nama_permintaan_pembelian', '!=', null);
+            } else {
+                $data = $data->where('nama_permintaan_pembelian', null);
+            }
+        }
+
+        $data = $data->orderBy('ph.purchase_request_date', 'desc');
 
         if ($type == 'datatable') {
             return Datatables::of($data)

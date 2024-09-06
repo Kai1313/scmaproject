@@ -53,6 +53,16 @@
                             <input type="text" name="date" class="form-control trigger-change">
                         </div>
                     </div>
+                    <div class="col-md-3">
+                        <label>Status PO</label>
+                        <div class="form-group">
+                            <select name="po_status" class="form-control select2 trigger-change">
+                                <option value="all">Semua Status</option>
+                                <option value="0">Belum PO</option>
+                                <option value="1">Sudah PO</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
                 <div class="pull-right">
                     {{-- <a href="{{ route('report_material_usage-print') }}" target="_blank"
