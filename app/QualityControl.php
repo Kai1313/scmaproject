@@ -2,6 +2,7 @@
 
 namespace App;
 
+use DB;
 use Illuminate\Database\Eloquent\Model;
 
 class QualityControl extends Model
@@ -57,7 +58,7 @@ class QualityControl extends Model
                 'bentuk_master_qr_code' => $this->bentuk_pembelian_detail,
                 'keterangan_qc_master_qr_code' => $this->keterangan_pembelian_detail,
                 'status_qc_qr_code' => $this->status_qc,
-                'tanggal_qr_master_qr_code' => $this->tanggal_qc,
+                'tanggal_qc_master_qr_code' => $this->tanggal_qc,
             ]);
 
             DB::table('kartu_stok')
