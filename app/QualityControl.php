@@ -57,7 +57,19 @@ class QualityControl extends Model
                 'bentuk_master_qr_code' => $this->bentuk_pembelian_detail,
                 'keterangan_qc_master_qr_code' => $this->keterangan_pembelian_detail,
                 'status_qc_qr_code' => $this->status_qc,
+                'tanggal_qr_master_qr_code' => $this->tanggal_qc,
             ]);
+
+            DB::table('kartu_stok')
+                ->where('kode_batang_lama_kartu_stok', $p->kode_batang_pembelian_detail)
+                ->orWhere('kode_batang_kartu_stok', $p->kode_batang_pembelian_detail)
+                ->update([
+                    'sg_kartu_stok' => $this->sg_pembelian_detail,
+                    'be_kartu_stok' => $this->be_pembelian_detail,
+                    'ph_kartu_stok' => $this->ph_pembelian_detail,
+                    'warna_kartu_stok' => $this->warna_pembelian_detail,
+                    'bentuk_kartu_stok' => $this->bentuk_pembelian_detail,
+                ]);
         }
 
         return true;
