@@ -54,7 +54,7 @@ class LaporanPrController extends Controller
             ->join('barang as b', 'pd.id_barang', 'b.id_barang')
             ->join('satuan_barang as sb', 'pd.id_satuan_barang', 'sb.id_satuan_barang')
             ->join('pengguna', 'ph.purchase_request_user_id', 'pengguna.id_pengguna');
-        if (count($date) > 0) {
+        if (count($date) > 1) {
             $data = $data->whereBetween('purchase_request_date', $date);
         }
 

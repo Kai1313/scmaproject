@@ -196,7 +196,7 @@
                         bDestroy: true,
                         processing: true,
                         serverSide: true,
-                        pagelength: 100,
+                        pageLength: 100,
                         ajax: defaultUrlIndex + param,
                         columns: [{
                             data: 'tanggal',
@@ -221,7 +221,7 @@
                             name: 'b.nama_barang',
                         }, {
                             data: 'nama_satuan_barang',
-                            name: 'nama_satuan_barang'
+                            name: 'sb.nama_satuan_barang'
                         }, {
                             data: 'jumlah',
                             name: 'pd.jumlah',
