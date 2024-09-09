@@ -50,7 +50,12 @@
                     <div class="col-md-3">
                         <label>Tanggal</label>
                         <div class="form-group">
-                            <input type="text" name="date" class="form-control trigger-change">
+                            <div class="input-group">
+                                <input type="text" name="date" class="form-control trigger-change">
+                                <div class="input-group-btn">
+                                    <a href="javascript:void(0)" class="btn btn-default clear-daterange">x</a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -172,6 +177,10 @@
                 }]
             });
         }
+
+        $('.clear-daterange').click(function() {
+            $('[name="date"]').val('').change()
+        })
     </script>
     <script src="{{ asset('js/for-report.js') }}"></script>
 @endsection

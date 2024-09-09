@@ -195,9 +195,7 @@
                     <td style="width:32.5%">{{ $detail->nama_barang }}</td>
                     <td class="text-center" style="width:10%">{{ $detail->sum_total_weight }}</td>
                     <td class="text-center" style="width:10%;">{{ $detail->nama_satuan_barang }}</td>
-                    <td style="width:32.5%;">{{ $detail->total }} {{ $detail->nama_satuan_baru }} @
-                        {{ $detail->jumlah_penjualan_detail }}
-                        {{ $detail->nama_satuan_barang }}</td>
+                    <td style="width:32.5%;">{{ $detail->total }} {{ $detail->nama_satuan_baru }}</td>
                 </tr>
             @endforeach
         </table>
