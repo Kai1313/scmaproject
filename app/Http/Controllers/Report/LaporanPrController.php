@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Report;
 
+use App\Exports\ReportPurchaseRequestExport;
 use App\Http\Controllers\Controller;
 use DB;
+use Excel;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 
@@ -32,15 +34,16 @@ class LaporanPrController extends Controller
         $poStatus = $request->po_status;
         $data = DB::table('purchase_request_detail as pd')->select(
             'g.nama_gudang',
-            'purchase_request_date',
-            'purchase_request_code',
+            'ph.purchase_request_date',
+            'ph.purchase_request_code',
             'b.nama_barang',
-            'notes',
+            'pd.notes',
             'sb.nama_satuan_barang',
-            'qty',
-            'tanggal_permintaan_pembelian',
-            'nama_permintaan_pembelian',
-            'jumlah_permintaan_pembelian_detail'
+            'pd.qty',
+            'pph.tanggal_permintaan_pembelian',
+            'pph.nama_permintaan_pembelian',
+            'ppd.jumlah_permintaan_pembelian_detail',
+            'pengguna.nama_pengguna'
         )
             ->join('purchase_request_header as ph', 'pd.purchase_request_id', 'ph.purchase_request_id')
             ->leftJoin('permintaan_pembelian_detail as ppd', function ($i) {
@@ -50,6 +53,7 @@ class LaporanPrController extends Controller
             ->join('gudang as g', 'ph.id_gudang', 'g.id_gudang')
             ->join('barang as b', 'pd.id_barang', 'b.id_barang')
             ->join('satuan_barang as sb', 'pd.id_satuan_barang', 'sb.id_satuan_barang')
+            ->join('pengguna', 'ph.purchase_request_user_id', 'pengguna.id_pengguna')
             ->whereBetween('purchase_request_date', $date)
             ->whereIn('ph.id_cabang', $idCabang)
             ->whereIn('ph.id_gudang', $idGudang);
@@ -70,5 +74,30 @@ class LaporanPrController extends Controller
 
         $data = $data->get();
         return $data;
+    }
+
+    public function getExcel(Request $request)
+    {
+        if (checkAccessMenu('laporan_pr', 'print') == false) {
+            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+        }
+
+        $data = $this->getData($request, 'print');
+
+        $date = explode(' - ', $request->date);
+        $idCabang = explode(',', $request->id_cabang);
+        $idGudang = explode(',', $request->id_gudang);
+        $poStatus = $request->po_status;
+
+        $array = [
+            "datas" => $data,
+            'date' => $request->date,
+            'cabang' => $request->id_cabang,
+            'gudang' => $request->id_gudang,
+            'po_status' => $request->po_status,
+        ];
+
+        // return view('report_ops.laporanPr.excel', $array);
+        return Excel::download(new ReportPurchaseRequestExport('report_ops.laporanPr.excel', $array), 'laporan purchase request.xlsx');
     }
 }

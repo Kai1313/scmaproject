@@ -68,10 +68,10 @@
                     {{-- <a href="{{ route('report_material_usage-print') }}" target="_blank"
                         class="btn btn-danger btn-sm btn-flat btn-action">
                         <i class="glyphicon glyphicon-print"></i> Print
-                    </a>
-                    <a href="{{ route('report_material_usage-excel') }}" class="btn btn-success btn-sm btn-flat btn-action">
-                        <i class="fa fa-file-excel-o"></i> Excel
                     </a> --}}
+                    <a href="{{ route('report_pr-excel') }}" class="btn btn-success btn-sm btn-flat btn-action">
+                        <i class="fa fa-file-excel-o"></i> Excel
+                    </a>
                     <a href="javascript:void(0)" class="btn btn-default btn-sm btn-flat btn-view-action">
                         <i class="glyphicon glyphicon-eye-open"></i> View
                     </a>
@@ -85,6 +85,7 @@
                                 <th>Gudang</th>
                                 <th>Tanggal PR</th>
                                 <th>Kode PR</th>
+                                <th>Pemohon</th>
                                 <th>Barang</th>
                                 <th>Satuan</th>
                                 <th>Jumlah PR</th>
@@ -137,34 +138,37 @@
                 ajax: defaultUrlIndex + param,
                 columns: [{
                     data: 'nama_gudang',
-                    name: 'nama_gudang',
+                    name: 'g.nama_gudang',
                 }, {
                     data: 'purchase_request_date',
-                    name: 'purchase_request_date'
+                    name: 'ph.purchase_request_date'
                 }, {
                     data: 'purchase_request_code',
-                    name: 'purchase_request_code'
+                    name: 'ph.purchase_request_code'
+                }, {
+                    data: 'nama_pengguna',
+                    name: 'pengguna.nama_pengguna'
                 }, {
                     data: 'nama_barang',
-                    name: 'nama_barang',
+                    name: 'b.nama_barang',
                 }, {
                     data: 'nama_satuan_barang',
-                    name: 'nama_satuan_barang',
+                    name: 'sb.nama_satuan_barang',
                 }, {
                     data: 'qty',
-                    name: 'qty',
+                    name: 'pd.qty',
                 }, {
                     data: 'tanggal_permintaan_pembelian',
-                    name: 'tanggal_permintaan_pembelian'
+                    name: 'pph.tanggal_permintaan_pembelian'
                 }, {
                     data: 'nama_permintaan_pembelian',
-                    name: 'nama_permintaan_pembelian',
+                    name: 'pph.nama_permintaan_pembelian',
                 }, {
                     data: 'jumlah_permintaan_pembelian_detail',
-                    name: 'jumlah_permintaan_pembelian_detail',
+                    name: 'ppd.jumlah_permintaan_pembelian_detail',
                 }, {
                     data: 'notes',
-                    name: 'notes',
+                    name: 'pd.notes',
                 }]
             });
         }

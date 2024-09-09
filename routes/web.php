@@ -286,6 +286,7 @@ Route::namespace('Report')->group(function () {
 
     Route::prefix('laporan_pr')->group(function () {
         Route::get('index/{user_id?}', 'LaporanPrController@index')->name('report_pr-index');
+        Route::get('excel', 'LaporanPrController@getExcel')->name('report_pr-excel');
     });
 });
 
