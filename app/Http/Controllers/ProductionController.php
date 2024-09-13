@@ -29,7 +29,7 @@ class ProductionController extends Controller
                 'sisa_master_qr_code',
                 'sg_master_qr_code',
                 'batch_master_qr_code',
-                DB::raw('weight_zak + weight as total_tare'),
+                DB::raw('weight_zak + weight as total_tare')
             )
             ->join('master_qr_code', 'kode_batang_produksi_detail', 'kode_batang_master_qr_code')
             ->join('barang', 'master_qr_code.id_barang', 'barang.id_barang')
