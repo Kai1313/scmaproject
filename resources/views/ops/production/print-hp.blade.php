@@ -37,7 +37,11 @@
         <table style="border:1px solid black;">
             <tr>
                 <td style="padding:5px;vertical-align:top;">
-                    {!! DNS2D::getBarcodeHTML($detail->kode_batang_master_qr_code, 'QRCODE', 4, 4) !!}
+                    @php
+                        $svg = DNS2D::getBarcodeSVG($detail->kode_batang_master_qr_code, 'QRCODE', 4, 4);
+                    @endphp
+                    <img src="data:image/svg+xml;base64,'{{ base64_encode($svg) }}.'" width="85" height="85" />
+
                 </td>
                 <td>
                     <div style="margin:5px; font-size:12px;">

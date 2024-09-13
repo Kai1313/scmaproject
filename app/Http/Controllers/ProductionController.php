@@ -49,8 +49,6 @@ class ProductionController extends Controller
             return $mpdf->stream('Qrcode Hasil Produksi ' . $data->nama_produksi . '.pdf');
         }
 
-        return view('ops.production.print-hp', ['data' => $data, 'details' => $details]);
-
         return abort(404);
     }
 }
