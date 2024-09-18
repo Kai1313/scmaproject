@@ -75,17 +75,17 @@
             </div>
             <div class="box-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered data-table display nowrap" width="100%">
+                    <table class="table table-bordered data-table display" width="100%">
                         <thead>
                             <tr>
-                                <th>Tanggal</th>
-                                <th>Kode Pindah Gudang</th>
-                                <th>Kode Referensi</th>
-                                <th>Gudang Penerima</th>
-                                <th>Gudang Asal</th>
-                                <th>Status</th>
-                                <th>Keterangan</th>
-                                <th>Action</th>
+                                <th style="width:49px;">Tanggal</th>
+                                <th style="width:140px;">Kode Pindah Gudang</th>
+                                <th style="width:120px;">Kode Referensi</th>
+                                <th style="width:120px;">Gudang Penerima</th>
+                                <th style="width:116px;">Gudang Asal</th>
+                                <th style="width:60px;">Status</th>
+                                <th class="min-width:300px;">Keterangan</th>
+                                <th style="width:141px;">Action</th>
                             </tr>
                         </thead>
                         <tbody>

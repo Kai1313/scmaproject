@@ -190,8 +190,12 @@ function formatNumber($number, $prefix = 0)
             }
         } else {
             $newNumber = normalizeNumber($explode[0]) . '.' . $koma;
-            return number_format($newNumber, 2, ',', '.');
+            return number_format($newNumber, $prefix, ',', '.');
         }
+    }
+
+    if ($explode[0] == '0' && (float) $koma == 0) {
+        return $explode[0];
     }
 
     if ($koma != '') {
