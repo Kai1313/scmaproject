@@ -163,5 +163,11 @@
 
             sessionStorage.setItem('received_from_warehouse_filter', JSON.stringify(defaultFilter));
         }
+
+        $('.sidebar-toggle').on('click', () => {
+            setTimeout(() => {
+                table.columns.adjust().draw();
+            }, 400);
+        });
     </script>
 @endsection
