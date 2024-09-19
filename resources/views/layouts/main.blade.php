@@ -372,10 +372,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                     sg_kartu_stok + sg_kartu_stok2 + '<hr />';
                             });
 
-                            \
-                            'laporan_kartu_stok_all\', \'patokan_pencarian_qr_code\', \'' +
-                            nama_gudang2 + '\', \'' + nama_barang2 + ' ' + nama_gudang2 + '\'
-
                             let modal = $("#modal_custom")
                             modal.modal("show");
                             modal.find(".modal-title").html("Cek Rak");
