@@ -235,6 +235,28 @@ scratch. This page gets rid of all links and provides the needed markup only.
         </div>
     </div>
 
+    <div class="modal" id="modal_custom" tabindex="-1" role="dialog" data-backdrop="static">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <!--
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        -->
+                    <h4 class="modal-title" id="modal_header_text">
+                        <!-- model_header_text -->
+                    </h4>
+                </div>
+                <div class="modal-body" id="modal_body_text">
+                    <!-- model_body_text -->
+                </div>
+                <div class="modal-footer" id="modal_footer_text">
+                    <!-- model_footer_text -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     @yield('addedScripts')
     <!-- AdminLTE App -->
     <script src="{{ asset('assets/dist/js/adminlte.js') }}"></script>
@@ -360,6 +382,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                     sg_kartu_stok + sg_kartu_stok2 + '<hr />';
                             });
                             // kursor_buka();
+                            $("#modal_custom").modal("show");
                             //alert(data_rak);
                             $("#modal_header_text").html("Cek Rak");
                             if (hasil == 0) {
@@ -457,6 +480,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                     nama_gudang2 + '\');">Lacak QR Code</a>';
                             });
                             // kursor_buka();
+                            $("#modal_custom").modal("show");
                             //alert(data_rak);
                             $("#modal_header_text").html("Cek Barang");
                             $("#modal_body_text").html(data_barang);
