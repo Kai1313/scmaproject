@@ -319,6 +319,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         });
 
         $('#kotak_pencarian3').keyup(delay(function(e) {
+            $('#cover-spin').show()
             if (this.value != "") {
                 if (this.value.length == 5) {
                     $.ajax({
@@ -371,6 +372,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                     sg_kartu_stok + sg_kartu_stok2 + '<hr />';
                             });
 
+                            \
+                            'laporan_kartu_stok_all\', \'patokan_pencarian_qr_code\', \'' +
+                            nama_gudang2 + '\', \'' + nama_barang2 + ' ' + nama_gudang2 + '\'
+
                             let modal = $("#modal_custom")
                             modal.modal("show");
                             modal.find(".modal-title").html("Cek Rak");
@@ -383,6 +388,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
                             modal.find(".modal-footer").html(
                                 "<button type=\"button\" class=\"btn btn-primary\" data-dismiss=\"modal\">OK!</button>"
                             );
+
+                            $('#cover-spin').hide()
+                        },
+                        error: function(error) {
+                            console.log(error)
+                            $('#cover-spin').hide()
                         }
                     });
                     //} else if (this.value.length == 10 && !isNaN(this.value)) {
@@ -475,6 +486,11 @@ scratch. This page gets rid of all links and provides the needed markup only.
                             modal.find(".modal-footer").html(
                                 "<button type=\"button\" class=\"btn btn-primary\" data-dismiss=\"modal\">OK!</button>"
                             );
+                            $('#cover-spin').hide()
+                        },
+                        error: function(error) {
+                            console.log(error)
+                            $('#cover-spin').hide()
                         }
                     });
                     //cetak_kartu_stok(this.value.replace(/^0+/, ''));
@@ -495,6 +511,36 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     callback.apply(context, args);
                 }, ms || 0);
             };
+        }
+
+        function data_master2_umum_new_tab(detail_view, primary_key, id, title_text) {
+            //var win = window.open(protocol + '://' + host + '/' + directory + '/', '_blank');
+            var win = window.open('{{ env('OLD_ASSET_ROOT') }}v2/#laporan_kartu_stok_all', '_blank');
+            win.test = function() {
+                win.focus();
+                setTimeout(function() {
+                    win.data_master2_umum(detail_view, primary_key, id, title_text);
+                }, 2000);
+
+            }
+            win.test();
+        }
+
+        function data_master2_umum(detail_view, primary_key, id, title_text) {
+            //kursor_buka();
+            document.title = title_text;
+            $.ajax({
+                url: "{{ env('OLD_ASSET_ROOT') }}views/" + detail_view + ".html?nc=" + (
+                    new Date()).getTime(),
+                success: function(pesan) {
+                    $("#content").html(pesan + "<script type=\"text/javascript\">var " + primary_key + "='" +
+                        id + "';$('#" + primary_key + "').append(new Option('PROTECTED', '" + id +
+                        "'));$('#" + primary_key + "').val('" + id + "');<\/script>");
+                },
+                error: function(pesan) {
+                    alert("ERROR redirect ke data_master2_umum");
+                }
+            });
         }
     </script>
     @yield('externalScripts')
