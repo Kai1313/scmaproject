@@ -375,9 +375,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
                             modal.modal("show");
                             modal.find(".modal-title").html("Cek Rak");
                             if (hasil == 0) {
-                                modal.(".modal-body").html("Tidak Barang Pada Rak");
+                                modal.find(".modal-body").html("Tidak Barang Pada Rak");
                             } else {
-                                modal.(".modal-body").html(data_rak);
+                                modal.find(".modal-body").html(data_rak);
                             }
 
                             modal.find(".modal-footer").html(
@@ -472,9 +472,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
                             modal.modal("show");
                             modal.find(".modal-title").html("Cek Barang");
                             if (hasil == 0) {
-                                modal.(".modal-body").html("Tidak Barang Pada Rak");
+                                modal.find(".modal-body").html("Tidak Barang Pada Rak");
                             } else {
-                                modal.(".modal-body").html(data_barang);
+                                modal.find(".modal-body").html(data_barang);
                             }
 
                             modal.find(".modal-footer").html(
