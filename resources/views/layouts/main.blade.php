@@ -221,7 +221,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
-                    <h4 class="modal-title" id="modal_header_text">
+                    <h4 class="modal-title">
                         Scan QR Code
                     </h4>
                 </div>
@@ -239,23 +239,13 @@ scratch. This page gets rid of all links and provides the needed markup only.
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <!--
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        -->
-                    <h4 class="modal-title" id="modal_header_text">
-                        <!-- model_header_text -->
-                    </h4>
+                    <h4 class="modal-title"></h4>
                 </div>
-                <div class="modal-body" id="modal_body_text">
-                    <!-- model_body_text -->
-                </div>
-                <div class="modal-footer" id="modal_footer_text">
-                    <!-- model_footer_text -->
-                </div>
+                <div class="modal-body"></div>
+                <div class="modal-footer"></div>
             </div>
         </div>
     </div>
-
 
     @yield('addedScripts')
     <!-- AdminLTE App -->
@@ -329,7 +319,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
         });
 
         $('#kotak_pencarian3').keyup(delay(function(e) {
-            //console.log('Time elapsed!', this.value);
             if (this.value != "") {
                 if (this.value.length == 5) {
                     $.ajax({
@@ -381,20 +370,19 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                     rak_kartu_stok + rak_kartu_stok2 + '<br />' +
                                     sg_kartu_stok + sg_kartu_stok2 + '<hr />';
                             });
-                            // kursor_buka();
-                            $("#modal_custom").modal("show");
-                            //alert(data_rak);
-                            $("#modal_header_text").html("Cek Rak");
+
+                            let modal = $("#modal_custom")
+                            modal.modal("show");
+                            modal.find(".modal-title").html("Cek Rak");
                             if (hasil == 0) {
-                                $("#modal_body_text").html("Tidak Barang Pada Rak");
+                                modal.(".modal-body").html("Tidak Barang Pada Rak");
                             } else {
-                                $("#modal_body_text").html(data_rak);
+                                modal.(".modal-body").html(data_rak);
                             }
-                            //$("#modal_footer_text").html("<button type=\"button\" class=\"btn btn-primary\" onclick=\"\$('#kotak_pencarian3').val('');\$('#kotak_pencarian3').focus()\" data-dismiss=\"modal\">OK!</button>");
-                            $("#modal_footer_text").html(
+
+                            modal.find(".modal-footer").html(
                                 "<button type=\"button\" class=\"btn btn-primary\" data-dismiss=\"modal\">OK!</button>"
                             );
-                            $("html").removeClass("wait");
                         }
                     });
                     //} else if (this.value.length == 10 && !isNaN(this.value)) {
@@ -479,16 +467,19 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                     nama_gudang2 + '\', \'' + nama_barang2 + ' ' +
                                     nama_gudang2 + '\');">Lacak QR Code</a>';
                             });
-                            // kursor_buka();
-                            $("#modal_custom").modal("show");
-                            //alert(data_rak);
-                            $("#modal_header_text").html("Cek Barang");
-                            $("#modal_body_text").html(data_barang);
-                            //$("#modal_footer_text").html("<button type=\"button\" class=\"btn btn-primary\" onclick=\"\$('#kotak_pencarian3').val('');\$('#kotak_pencarian3').focus()\" data-dismiss=\"modal\">OK!</button>");
-                            $("#modal_footer_text").html(
-                                "<button type=\"button\" class=\"btn btn-primary\" onclick=\"\" data-dismiss=\"modal\">OK!</button>"
+
+                            let modal = $("#modal_custom")
+                            modal.modal("show");
+                            modal.find(".modal-title").html("Cek Barang");
+                            if (hasil == 0) {
+                                modal.(".modal-body").html("Tidak Barang Pada Rak");
+                            } else {
+                                modal.(".modal-body").html(data_barang);
+                            }
+
+                            modal.find(".modal-footer").html(
+                                "<button type=\"button\" class=\"btn btn-primary\" data-dismiss=\"modal\">OK!</button>"
                             );
-                            $("html").removeClass("wait");
                         }
                     });
                     //cetak_kartu_stok(this.value.replace(/^0+/, ''));
