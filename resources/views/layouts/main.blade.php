@@ -474,9 +474,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                     status_qc_master_qr_code2 + '<br />' + weight +
                                     weight2 + '<br />' + zak + zak2 + '<br />' +
                                     weight_zak + weight_zak2 +
-                                    '<br /><br /><a href="javascript:void(null)" data-dismiss=\"modal\" onclick="data_master2_umum_new_tab(\'laporan_kartu_stok_all\', \'patokan_pencarian_qr_code\', \'' +
-                                    nama_gudang2 + '\', \'' + nama_barang2 + ' ' +
-                                    nama_gudang2 + '\');">Lacak QR Code</a>';
+                                    '<br /><br /><a href="javascript:void(null)" data-dismiss=\"modal\" id="lacak_qrcode" data-namagudang="' +
+                                    nama_gudang2 + '" data-namabarang="' + nama_barang2 +
+                                    '">Lacak QR Code</a>';
                             });
 
                             let modal = $("#modal_custom")
@@ -542,6 +542,13 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 }
             });
         }
+
+        $('#lacal_qrocde').click(function() {
+            let nama_gudang2 = $(this).data('namagudang')
+            let nama_barang2 = $(this).data('namabarang')
+            data_master2_umum_new_tab('laporan_kartu_stok_all', 'patokan_pencarian_qr_code', nama_gudang2,
+                nama_barang2 + ' ' + nama_gudang2);
+        })
     </script>
     @yield('externalScripts')
 </body>
