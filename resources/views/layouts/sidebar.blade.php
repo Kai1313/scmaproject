@@ -16,7 +16,7 @@
                         $active = '';
                         if ($data1->route_laravel_menu) {
                             $link = route($data1->route_laravel_menu);
-                            $active = $routeName == $data1->route_laravel_menu ? 'active' : '';
+                            $active = menuActiveSidebar($data1, $routeName);
                         } else {
                             $link = count($data1->childs) > 0 ? '#' : env('OLD_URL_ROOT') . '#' . $data1->alias_menu;
                         }
@@ -40,8 +40,7 @@
                                             $active = '';
                                             if ($data2->route_laravel_menu) {
                                                 $link2 = route($data2->route_laravel_menu);
-                                                $ex2 = explode(',', $data2->active_page_laravel_menu);
-                                                $active = in_array($routeName, $ex2) ? 'active' : '';
+                                                $active = menuActiveSidebar($data2, $routeName);
                                             } else {
                                                 $link2 =
                                                     count($data2->childs) > 0
@@ -68,13 +67,7 @@
                                                                 $active = '';
                                                                 if ($data3->route_laravel_menu) {
                                                                     $link3 = route($data3->route_laravel_menu);
-                                                                    $ex3 = explode(
-                                                                        ',',
-                                                                        $data3->active_page_laravel_menu,
-                                                                    );
-                                                                    $active = in_array($routeName, $ex3)
-                                                                        ? 'active'
-                                                                        : '';
+                                                                    $active = menuActiveSidebar($data3, $routeName);
                                                                 } else {
                                                                     $link3 =
                                                                         count($data3->childs) > 0

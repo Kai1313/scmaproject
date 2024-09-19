@@ -248,6 +248,12 @@ function menuActive($url, $currentUrl)
     return 0;
 }
 
+function menuActiveSidebar($data, $routeName)
+{
+    $ex3 = explode(',', $data->active_page_laravel_menu);
+    return in_array($routeName, $ex3) ? 'active' : '';
+}
+
 function checkPenjualan($idBarang = null, $idCabang = null, $tanggalMin = null, $tanggalMax = null)
 {
     $data = PenjualanDetail::where(function ($q) use ($idBarang, $tanggalMin, $tanggalMax) {
