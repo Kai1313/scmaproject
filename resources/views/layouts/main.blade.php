@@ -510,7 +510,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
         }
 
         function data_master2_umum_new_tab(detail_view, primary_key, id, title_text) {
-            console.log('asd')
             //var win = window.open(protocol + '://' + host + '/' + directory + '/', '_blank');
             var win = window.open('{{ env('OLD_ASSET_ROOT') }}v2/#laporan_kartu_stok_all', '_blank');
             win.test = function() {
