@@ -135,11 +135,11 @@
             justify-content: space-between;
         }
 
-        .align-items-center{
+        .align-items-center {
             align-items: center;
         }
 
-        .select2{
+        .select2 {
             width: 100% !important;
         }
     </style>
@@ -206,205 +206,7 @@
         <div class="content-wrapper">
             <div class="container-custom" id="content">
                 @yield('content')
-                {{-- <div class="row">
-                    <div class="col-md-4">
-                        <a href="javascript:void(0)" onclick="laporan_kesalahan();">
-                            <div class="info-box bg-blue">
-                                <span class="info-box-icon">
-                                    <i class="fa fa-cubes"></i>
-                                </span>
-                                <div class="info-box-content">
-                                    <span class="info-box-text">Barang Belum Masuk Rak</span>
-                                    <span class="info-box-number" id="barang_belum_masuk_rak"
-                                        style="font-size:40px;">0</span>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                    <div class="col-md-4">
-                        <a href="javascript:void(0)" onclick="laporan_stok_minimal_custom(3);">
-                            <div class="info-box bg-yellow">
-                                <span class="info-box-icon">
-                                    <i class="fa fa-tags"></i>
-                                </span>
-
-                                <div class="info-box-content">
-                                    <span class="info-box-text">Barang Siap Jual Menyentuh Stok Minimal</span>
-                                    <span class="info-box-number" id="barang_menyentuh_stok_minimal"
-                                        style="font-size:40px;">0</span>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                    <div class="col-md-4">
-                        <a href="javascript:void(0)" onclick="laporan_stok_minimal_custom(2);">
-                            <div class="info-box bg-green">
-                                <span class="info-box-icon">
-                                    <i class="fa fa-bookmark"></i>
-                                </span>
-
-                                <div class="info-box-content">
-                                    <span class="info-box-text">Bahan Baku Menyentuh Stok Minimal</span>
-                                    <span class="info-box-number" id="barang_menyentuh_stok_minimal2"
-                                        style="font-size:40px;">0</span>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-
-                <br><br>
-                <div style="display:inline-block">
-                    <div class="btn-index" id="tombol_rak_masuk_index">
-                        <button class="btn btn-success" onclick="rak_masuk()">
-                            <i class="glyphicon glyphicon-log-in"></i>
-                            Rak Masuk
-                        </button>
-                    </div>
-                    <div class="btn-index" id="tombol_rak_keluar_index">
-                        <button class="btn btn-danger" onclick="rak_keluar()">
-                            <i class="glyphicon glyphicon-log-out"></i>
-                            Rak Keluar
-                        </button>
-                    </div>
-                    <div class="btn-index" id="tombol_gabung_barang_index">
-                        <button class="btn btn-info" onclick="gabung_barang()">
-                            <i class="glyphicon glyphicon-resize-small"></i>
-                            Gabung Barang
-                        </button>
-                    </div>
-                    <br />
-                    <div class="btn-index" id="tombol_pembelian_index">
-                        <button class="btn btn-primary" onclick="pembelian()">
-                            <i class="glyphicon glyphicon-inbox"></i>
-                            Penerimaan Barang dari Supplier
-                        </button>
-                    </div>
-                    <div class="btn-index" id="tombol_pindah_gudang_index">
-                        <button class="btn btn-primary" onclick="pindah_gudang2()">
-                            <i class="glyphicon glyphicon-resize-full"></i>
-                            Pisah Barang (QNT)
-                        </button>
-                    </div>
-                    <div class="btn-index" id="tombol_produksi_index">
-                        <button class="btn btn-primary" onclick="produksi2()">
-                            <i class="fa fa-bath position-left"></i>
-                            Produksi (QNT)
-                        </button>
-                    </div>
-                    <div class="btn-index" id="tombol_penjualan_index">
-                        <button class="btn btn-primary" onclick="penjualan()">
-                            <i class="fa fa-sellsy position-left"></i>
-                            Surat Jalan ke Customer
-                        </button>
-                    </div>
-                    <div class="btn-index" id="tombol_penyesuaian_stok_index">
-                        <button class="btn btn-primary" onclick="koreksi_stok()">
-                            <i class="fa fa-pencil-square-o position-left"></i>
-                            Koreksi Stok / Penyesuaian Stok
-                        </button>
-                    </div>
-                    <br />
-                    <div class="btn-index" id="tombol_laporan_stok_index">
-                        <button class="btn btn-warning" onclick="laporan_stok()">
-                            <i class="fa fa-line-chart position-left"></i>
-                            Laporan Stok
-                        </button>
-                    </div>
-                    <div class="btn-index" id="tombol_laporan_stok_index">
-                        <button class="btn btn-warning" onclick="laporan_outstanding_barang()">
-                            <i class="fa fa-qrcode position-left"></i>
-                            Outstanding QR Code Barang Per Gudang
-                        </button>
-                    </div>
-                    <div class="btn-index" id="tombol_kartu_stok_per_barang_index">
-                        <button class="btn btn-warning" onclick="laporan_kartu_stok()">
-                            <i class="fa fa-tag position-left"></i>
-                            Kartu Stok Per Barang
-                        </button>
-                    </div>
-                    <div class="btn-index">
-                        <button class="btn btn-warning" onclick="laporan_kartu_stok_all()">
-                            <i class="fa fa-rocket position-left"></i>
-                            Lacak QR Code
-                        </button>
-                    </div>
-                    <br />
-                    <div class="btn-index">
-                        <button class="btn btn-default"
-                            onclick="window.open(protocol+'://'+host+'/'+directory+'/map/index.html','_blank')">
-                            <i class="fa fa-map-o position-left"></i>
-                            Peta
-                        </button>
-                    </div>
-                    <div class="btn-index">
-                        <button class="btn btn-default"
-                            onclick="window.open(protocol+'://'+host+'/'+directory+'/layout/','_blank')">
-                            <i class="fa fa-map-signs position-left"></i>
-                            Layout Peta Rak
-                        </button>
-                    </div>
-                    <div class="btn-index">
-                        <button class="btn btn-default"
-                            onclick="window.open(protocol+'://'+host+'/'+directory+'/map/qrcode-generator/custom.php','_blank')">
-                            <i class="fa fa-print position-left"></i>
-                            QR Code Rak Generator
-                        </button>
-                    </div>
-                    <div class="btn-index">
-                        <button class="btn btn-default"
-                            onclick="window.open(protocol+'://'+host+'/'+directory+'/images/rencana_peta_rak.png','_blank')">
-                            <i class="fa fa-paper-plane position-left"></i>
-                            Rencana Peta Rak
-                        </button>
-                    </div>
-                    <div class="btn-index">
-                        <button class="btn btn-default"
-                            onclick="window.open(protocol+'://'+host+'/'+directory+'/images/peta_kosongan.png','_blank')">
-                            <i class="fa fa-map position-left"></i>
-                            Peta Kosongan
-                        </button>
-                    </div>
-                    <hr>
-                    <textarea class="form-control" id="cetak_tulisan_bebas" name="cetak_tulisan_bebas"
-                        placeholder="Masukkan Pesan Anda" rows="4"></textarea>
-                    <br>
-                    <button type="button" class="btn btn-default pull-right"
-                        onclick="cetak_tulisan_bebas($('#cetak_tulisan_bebas').val().replace(/\r?\n/g, '<br />'));">
-                        Cetak Tulisan Bebas
-                    </button>
-                </div> --}}
             </div>
-
-            {{-- <div class="container-custom" id="halaman_login">
-                <h4 class="modal-title">Halaman Masuk</h4>
-                <form>
-                    <div class="form-group">
-                        <label for="username">Username</label>
-                        <input type="text" class="form-control" id="username" placeholder="Masukkan Username Anda"
-                            value="">
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <input type="password" class="form-control" id="password"
-                            placeholder="Masukkan Password / Kata Sandi / Kata Kunci Anda" value="">
-                    </div>
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" id="ingatkan_aku"> Ingatkan Aku
-                        </label>
-                    </div>
-                    <div class="form-group">
-                        <button type="reset" id="tombol_reset" class="btn btn-default pull-left">
-                            <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span> Kosongkan
-                        </button>
-                        <button type="submit" id="tombol_masuk" class="btn btn-primary pull-right">
-                            <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span> Masuk
-                        </button>
-                    </div>
-                    <br /><br />
-                </form>
-            </div> --}}
         </div>
         <footer class="main-footer">
             <div class="pull-right hidden-xs">v2</div>
@@ -415,29 +217,21 @@
             </strong> All rights
             reserved.
         </footer>
-        <!-- Customs Modal -->
         <div class="modal" id="modal_custom" tabindex="-1" role="dialog" data-backdrop="static">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <!--
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                            -->
                         <h4 class="modal-title" id="modal_header_text">
-                            <!-- model_header_text -->
                         </h4>
                     </div>
                     <div class="modal-body" id="modal_body_text">
-                        <!-- model_body_text -->
                     </div>
                     <div class="modal-footer" id="modal_footer_text">
-                        <!-- model_footer_text -->
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Customs Modal Masuk/LogIn -->
         <div class="modal" id="masuk" tabindex="-1" role="dialog">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -479,7 +273,6 @@
             </div>
         </div>
 
-        <!-- Customs Modal Ganti Profil -->
         <div class="modal" id="ganti_profil" tabindex="-1" role="dialog">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -627,7 +420,6 @@
             </div>
         </div>
 
-        <!-- Customs Modal Ganti Password -->
         <div class="modal" id="ganti_password" tabindex="-1" role="dialog">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -686,11 +478,8 @@
     </script>
     <script src="/assets/bower_components/bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js"></script>
     <script src="/assets/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
-    {{-- <script src="../extensions/typeahead.js"></script>
-    <script src="../extensions/shortcut.js"></script> --}}
     <script src="/assets/bower_components/select2/dist/js/select2.full.min.js"></script>
     <script src="https://code.responsivevoice.org/responsivevoice.js?key=Od43k81C"></script>
-    {{-- <script src="../js/configs.js"></script> --}}
     <script src="/custom/menu.js"></script>
     <script src="/assets/dist/js/demo.js"></script>
 

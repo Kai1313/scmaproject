@@ -210,6 +210,31 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <div id="cover-spin" style="display: none;"><img src="{{ asset('images/833.gif') }}" alt=""></div>
     @include('layouts.modal-change-password')
     @include('includes.scripts')
+
+    <div class="modal" id="modal_camera" tabindex="-1" role="dialog" data-backdrop="static"
+        style="overflow-x: hidden;overflow-y: auto;">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button"
+                        onclick="$('#html5-qrcode-button-camera-stop').click();$('#modal_camera').modal('hide');"
+                        class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="modal_header_text">
+                        Scan QR Code
+                    </h4>
+                </div>
+                <div class="modal-body" id="modal_body_text">
+                    <div id="qr-reader" style="width:100%"></div>
+                    <div id="qr-reader-results"></div>
+                </div>
+                <div class="modal-footer" id="modal_footer_text">
+                </div>
+            </div>
+        </div>
+    </div>
+
     @yield('addedScripts')
     <!-- AdminLTE App -->
     <script src="{{ asset('assets/dist/js/adminlte.js') }}"></script>
@@ -223,6 +248,245 @@ scratch. This page gets rid of all links and provides the needed markup only.
         <script src="{{ asset('js/firebaseinit.js') }}"></script>
         <script src="https://code.responsivevoice.org/responsivevoice.js?key=Od43k81C"></script>
     @endif
+    <script src="{{ asset('js/html5-qrcode.min.js') }}"></script>
+    <script>
+        $('#modal-scanner-main').click(function() {
+            $('#modal_camera').modal('show')
+            jalankan_scanner()
+        })
+
+        function docReady(fn) {
+            // see if DOM is already available
+            if (document.readyState === "complete" ||
+                document.readyState === "interactive") {
+                // call on next available tick
+                setTimeout(fn, 1);
+            } else {
+                document.addEventListener("DOMContentLoaded", fn);
+            }
+        }
+
+        function jalankan_scanner() {
+            docReady(function() {
+                var resultContainer = document.getElementById('qr-reader-results');
+                var lastResult, countResults = 0;
+
+                function onScanSuccess(decodedText, decodedResult) {
+                    if (decodedText !== lastResult) {
+                        ++countResults;
+                        lastResult = decodedText;
+                        // Handle on success condition with the decoded message.
+                        //console.log(`Scan result ${decodedText}`, decodedResult);
+                        $('#kotak_pencarian3').val(`${decodedText}`);
+                        $('#html5-qrcode-button-camera-stop').click();
+                        $('#modal_camera').modal('hide');
+                        $('#kotak_pencarian3').keyup();
+                        /*
+                        html5QrCode.stop().then((ignore) => {
+                            // QR Code scanning is stopped.
+                            $('#modal_camera').modal('hide');
+                        }).catch((err) => {
+                            // Stop failed, handle it.
+                            alert('Gagal Stop Kamera');
+                        });
+                        */
+                    }
+                }
+
+                var html5QrcodeScanner = new Html5QrcodeScanner(
+                    "qr-reader", {
+                        fps: 10,
+                        qrbox: 250
+                    });
+                html5QrcodeScanner.render(onScanSuccess);
+            });
+        }
+
+        $('#kotak_pencarian3').on('paste', function() {
+            $('#kotak_pencarian3').keyup();
+        });
+
+        $('#kotak_pencarian3').keyup(delay(function(e) {
+            //console.log('Time elapsed!', this.value);
+            if (this.value != "") {
+                if (this.value.length == 5) {
+                    $.ajax({
+                        url: '{{ env('OLD_ASSET_ROOT') }}actions/cek_rak.php?id=' +
+                            this.value.replace(/^0+/, '') +
+                            "&token_pengguna={{ session()->get('token') }}&nc=" + (new Date())
+                            .getTime(),
+                        type: "GET",
+                        success: function(pesan) {
+                            var hasil = "";
+                            var data_combobox = "";
+                            var data_rak = "";
+                            $.each(pesan, function(i, n) {
+                                hasil = n["hasil"];
+                                nama_gudangX = n["nama_gudangX"];
+                                nama_gudang2X = n["nama_gudang2X"];
+                                nama_gudang = n["nama_gudang"];
+                                nama_gudang2 = n["nama_gudang2"];
+                                nama_barang = n["nama_barang"];
+                                nama_barang2 = n["nama_barang2"];
+                                nama_satuan_barang = n["nama_satuan_barang"];
+                                nama_satuan_barang2 = n["nama_satuan_barang2"];
+                                debit_kartu_stok = n["debit_kartu_stok"];
+                                debit_kartu_stok2 = n["debit_kartu_stok2"];
+                                kredit_kartu_stok = n["kredit_kartu_stok"];
+                                kredit_kartu_stok2 = n["kredit_kartu_stok2"];
+                                total_kartu_stok = n["total_kartu_stok"];
+                                total_kartu_stok2 = n["total_kartu_stok2"];
+                                rak_kartu_stok = n["rak_kartu_stok"];
+                                rak_kartu_stok2 = n["rak_kartu_stok2"];
+                                //mtotal_debit_kartu_stok = n["mtotal_debit_kartu_stok"];
+                                //mtotal_debit_kartu_stok2 = n["mtotal_debit_kartu_stok2"];
+                                //mtotal_kredit_kartu_stok = n["mtotal_kredit_kartu_stok"];
+                                //mtotal_kredit_kartu_stok2 = n["mtotal_kredit_kartu_stok2"];
+                                sg_kartu_stok = n["sg_kartu_stok"];
+                                sg_kartu_stok2 = n["sg_kartu_stok2"];
+                                batch_kartu_stok = n["batch_kartu_stok"];
+                                batch_kartu_stok2 = n["batch_kartu_stok2"];
+                                //alert(nama_gudang + nama_gudang2 + '\n' + nama_barang + nama_barang2 + '\n' + nama_satuan_barang + nama_satuan_barang2 + '\n' + debit_kartu_stok + debit_kartu_stok2 + '\n' + kredit_kartu_stok + kredit_kartu_stok2 + '\n' + total_kartu_stok + total_kartu_stok2 + '\n' + rak_kartu_stok + rak_kartu_stok2 + '\n' + mtotal_debit_kartu_stok + mtotal_debit_kartu_stok2 + '\n' + mtotal_kredit_kartu_stok + mtotal_kredit_kartu_stok2 + '\n' + sg_kartu_stok + sg_kartu_stok2);
+
+                                //data_rak = data_rak + nama_gudangX + nama_gudang2X + '<br />' + nama_gudang + nama_gudang2 + '<br />' + nama_barang + nama_barang2 + '<br />' + nama_satuan_barang + nama_satuan_barang2 + '<br />' + debit_kartu_stok + debit_kartu_stok2 + '<br />' + kredit_kartu_stok + kredit_kartu_stok2 + '<br />' + total_kartu_stok + total_kartu_stok2 + '<br />' + rak_kartu_stok + rak_kartu_stok2 + '<br />' + mtotal_debit_kartu_stok + mtotal_debit_kartu_stok2 + '<br />' + mtotal_kredit_kartu_stok + mtotal_kredit_kartu_stok2 + '<br />' + sg_kartu_stok + sg_kartu_stok2 + '<hr />';
+                                //data_rak = data_rak + nama_gudang + nama_gudang2 + '<br />' + nama_barang + nama_barang2 + '<br />' + nama_satuan_barang + nama_satuan_barang2 + '<br />' + debit_kartu_stok + debit_kartu_stok2 + '<br />' + kredit_kartu_stok + kredit_kartu_stok2 + '<br />' + total_kartu_stok + total_kartu_stok2 + '<br />' + rak_kartu_stok + rak_kartu_stok2 + '<br />' + mtotal_debit_kartu_stok + mtotal_debit_kartu_stok2 + '<br />' + mtotal_kredit_kartu_stok + mtotal_kredit_kartu_stok2 + '<br />' + sg_kartu_stok + sg_kartu_stok2 + '<hr />';
+                                data_rak = data_rak + nama_gudang + nama_gudang2 +
+                                    '<br />' + nama_barang + nama_barang2 + '<br />' +
+                                    nama_satuan_barang + nama_satuan_barang2 + '<br />' +
+                                    debit_kartu_stok + debit_kartu_stok2 + '<br />' +
+                                    kredit_kartu_stok + kredit_kartu_stok2 + '<br />' +
+                                    total_kartu_stok + total_kartu_stok2 + '<br />' +
+                                    rak_kartu_stok + rak_kartu_stok2 + '<br />' +
+                                    sg_kartu_stok + sg_kartu_stok2 + '<hr />';
+                            });
+                            kursor_buka();
+                            //alert(data_rak);
+                            $("#modal_header_text").html("Cek Rak");
+                            if (hasil == 0) {
+                                $("#modal_body_text").html("Tidak Barang Pada Rak");
+                            } else {
+                                $("#modal_body_text").html(data_rak);
+                            }
+                            //$("#modal_footer_text").html("<button type=\"button\" class=\"btn btn-primary\" onclick=\"\$('#kotak_pencarian3').val('');\$('#kotak_pencarian3').focus()\" data-dismiss=\"modal\">OK!</button>");
+                            $("#modal_footer_text").html(
+                                "<button type=\"button\" class=\"btn btn-primary\" data-dismiss=\"modal\">OK!</button>"
+                            );
+                            $("html").removeClass("wait");
+                        }
+                    });
+                    //} else if (this.value.length == 10 && !isNaN(this.value)) {
+                } else if (this.value.length == 10) {
+                    $.ajax({
+                        url: "{{ env('OLD_ASSET_ROOT') }}actions/cek_barang.php?id=" +
+                            this.value.replace(/^0+/, '') +
+                            "&token_pengguna={{ session()->get('token') }}&nc=" + (new Date())
+                            .getTime(),
+                        type: "GET",
+                        success: function(pesan) {
+                            var hasil = "";
+                            var data_combobox = "";
+                            var data_barang = "";
+                            $.each(pesan, function(i, n) {
+                                nama_gudangX = n["nama_gudangX"];
+                                nama_gudang2X = n["nama_gudang2X"];
+                                nama_gudang = n["nama_gudang"];
+                                nama_gudang2 = n["nama_gudang2"];
+                                nama_barang = n["nama_barang"];
+                                nama_barang2 = n["nama_barang2"];
+                                nama_satuan_barang = n["nama_satuan_barang"];
+                                nama_satuan_barang2 = n["nama_satuan_barang2"];
+                                debit_kartu_stok = n["debit_kartu_stok"];
+                                debit_kartu_stok2 = n["debit_kartu_stok2"];
+                                kredit_kartu_stok = n["kredit_kartu_stok"];
+                                kredit_kartu_stok2 = n["kredit_kartu_stok2"];
+                                total_kartu_stok = n["total_kartu_stok"];
+                                total_kartu_stok2 = n["total_kartu_stok2"];
+                                rak_kartu_stok = n["rak_kartu_stok"];
+                                rak_kartu_stok2 = n["rak_kartu_stok2"];
+
+                                //mtotal_debit_kartu_stok = n["mtotal_debit_kartu_stok"];
+                                //mtotal_debit_kartu_stok2 = n["mtotal_debit_kartu_stok2"];
+                                //mtotal_kredit_kartu_stok = n["mtotal_kredit_kartu_stok"];
+                                //mtotal_kredit_kartu_stok2 = n["mtotal_kredit_kartu_stok2"];
+                                //mtotal_kartu_stok = n["mtotal_kartu_stok"];
+                                //mtotal_kartu_stok2 = n["mtotal_kartu_stok2"];
+
+                                batch_kartu_stok = n["batch_kartu_stok"];
+                                batch_kartu_stok2 = n["batch_kartu_stok2"];
+                                sg_kartu_stok = n["sg_kartu_stok"];
+                                sg_kartu_stok2 = n["sg_kartu_stok2"];
+                                be_kartu_stok = n["be_kartu_stok"];
+                                be_kartu_stok2 = n["be_kartu_stok2"];
+                                ph_kartu_stok = n["ph_kartu_stok"];
+                                ph_kartu_stok2 = n["ph_kartu_stok2"];
+                                warna_kartu_stok = n["warna_kartu_stok"];
+                                warna_kartu_stok2 = n["warna_kartu_stok2"];
+                                bentuk_master_qr_code = n["bentuk_master_qr_code"];
+                                bentuk_master_qr_code2 = n["bentuk_master_qr_code2"];
+
+                                status_qc_master_qr_code = n["status_qc_master_qr_code"];
+                                status_qc_master_qr_code2 = n["status_qc_master_qr_code2"];
+
+                                weight = n["weight"];
+                                weight2 = n["weight2"];
+                                zak = n["zak"];
+                                zak2 = n["zak2"];
+                                weight_zak = n["weight_zak"];
+                                weight_zak2 = n["weight_zak2"];
+
+                                data_barang = data_barang + nama_gudangX + nama_gudang2X +
+                                    '<br />' + nama_gudang + nama_gudang2 + '<br />' +
+                                    nama_barang + nama_barang2 + '<br />' +
+                                    nama_satuan_barang + nama_satuan_barang2 + '<br />' +
+                                    debit_kartu_stok + debit_kartu_stok2 + '<br />' +
+                                    kredit_kartu_stok + kredit_kartu_stok2 + '<br />' +
+                                    total_kartu_stok + total_kartu_stok2 + '<br />' +
+                                    rak_kartu_stok + rak_kartu_stok2 + '<br />' +
+                                    sg_kartu_stok + sg_kartu_stok2 + '<br />' +
+                                    batch_kartu_stok + batch_kartu_stok2 + '<br />' +
+                                    be_kartu_stok + be_kartu_stok2 + '<br />' +
+                                    ph_kartu_stok + ph_kartu_stok2 + '<br />' +
+                                    warna_kartu_stok + warna_kartu_stok2 + '<br />' +
+                                    bentuk_master_qr_code + bentuk_master_qr_code2 +
+                                    '<br />' + status_qc_master_qr_code +
+                                    status_qc_master_qr_code2 + '<br />' + weight +
+                                    weight2 + '<br />' + zak + zak2 + '<br />' +
+                                    weight_zak + weight_zak2 +
+                                    '<br /><br /><a href="javascript:void(null)" data-dismiss=\"modal\" onclick="data_master2_umum_new_tab(\'laporan_kartu_stok_all\', \'patokan_pencarian_qr_code\', \'' +
+                                    nama_gudang2 + '\', \'' + nama_barang2 + ' ' +
+                                    nama_gudang2 + '\');">Lacak QR Code</a>';
+                            });
+                            kursor_buka();
+                            //alert(data_rak);
+                            $("#modal_header_text").html("Cek Barang");
+                            $("#modal_body_text").html(data_barang);
+                            //$("#modal_footer_text").html("<button type=\"button\" class=\"btn btn-primary\" onclick=\"\$('#kotak_pencarian3').val('');\$('#kotak_pencarian3').focus()\" data-dismiss=\"modal\">OK!</button>");
+                            $("#modal_footer_text").html(
+                                "<button type=\"button\" class=\"btn btn-primary\" onclick=\"\" data-dismiss=\"modal\">OK!</button>"
+                            );
+                            $("html").removeClass("wait");
+                        }
+                    });
+                    //cetak_kartu_stok(this.value.replace(/^0+/, ''));
+                }
+                //$('#kotak_pencarian').val("");
+                //$('#kotak_pencarian3').val('');
+                //$('#kotak_pencarian3').focus();
+            }
+        }, 500));
+
+        function delay(callback, ms) {
+            var timer = 0;
+            return function() {
+                var context = this,
+                    args = arguments;
+                clearTimeout(timer);
+                timer = setTimeout(function() {
+                    callback.apply(context, args);
+                }, ms || 0);
+            };
+        }
+    </script>
     @yield('externalScripts')
 </body>
 

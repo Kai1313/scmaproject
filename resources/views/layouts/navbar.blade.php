@@ -20,6 +20,15 @@
         <div class="navbar-custom-menu">
             <ul class="nav navbar-nav">
                 <!-- User Account Menu -->
+                <li class="" style="margin-top:7px;">
+                    <button type="button" style="height:35px;width:35px" id="modal-scanner-main">
+                        <span class="glyphicon glyphicon-qrcode" style="font-size: 24px;"></span>
+                    </button>
+                </li>
+                <li class="" style="margin-top:7px;width: 168px">
+                    <input type="text" id="kotak_pencarian3" name="kotak_pencarian3"
+                        class="form-control search-header" placeholder="SCAN QR Code Barang">
+                </li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
                         aria-expanded="true">
