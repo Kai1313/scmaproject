@@ -108,7 +108,7 @@ class VisitController extends Controller
                 ->make(true);
         }
 
-        $salesman = Salesman::select('id_salesman as id', 'nama_salesman as text')->where('status_salesman', '1')->get();
+        $salesman = Salesman::select('id_salesman as id', 'nama_salesman as text')->where('status_salesman', '1')->orderBy('nama_salesman', 'asc')->get();
         $customerCategory = Visit::$kategoriPelanggan;
         $cabang = session()->get('access_cabang');
         return view('ops.visit.index', [
@@ -180,7 +180,7 @@ class VisitController extends Controller
         $salesman = Salesman::where('pengguna_id', session()->get('user')->id_pengguna)->first();
         $salesmans = [];
         if (in_array(session()->get('user')->id_grup_pengguna, [1, 27])) {
-            $salesmans = Salesman::where('status_salesman', '1')->get();
+            $salesmans = Salesman::where('status_salesman', '1')->orderBy('nama_salesman', 'asc')->get();
         }
 
         $listStatus = Visit::$listStatus;
@@ -205,7 +205,7 @@ class VisitController extends Controller
                 $w->where('nama_pelanggan', 'like', '%' . $request->search . '%')
                     ->orWhere('alamat_pelanggan', 'like', '%' . $request->search . '%');
             })
-            ->where('status_pelanggan', '1')
+            ->where('status_pelanggan', '1')->orderBy('nama_pelanggan', 'asc')
             ->limit(20)->get();
         return $datas;
     }

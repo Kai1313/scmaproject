@@ -33,7 +33,7 @@ class VisitController extends Controller
         }
 
         $cabang = session()->get('access_cabang');
-        $salesmans = Salesman::select('id_salesman as id', 'nama_salesman as text')->get();
+        $salesmans = Salesman::select('id_salesman as id', 'nama_salesman as text')->orderBy('nama_salesman', 'asc')->get();
         return view('ops.visit.report', [
             "pageTitle" => "SCA OPS | Laporan Kunjungan | List",
             "cabang" => $cabang,
@@ -177,7 +177,7 @@ class VisitController extends Controller
         $customerId = $request->search;
         $datas = DB::table('pelanggan')->select('nama_pelanggan as text', 'id_pelanggan as id')
             ->where(DB::raw('concat(nama_pelanggan," - ",alamat_pelanggan)'), 'like', '%' . $customerId . '%')
-            ->where('status_pelanggan', '1')->get();
+            ->where('status_pelanggan', '1')->orderBy('nama_pelanggan', 'asc')->limit(20)->get();
 
         return response()->json(['status' => 'success', 'datas' => $datas], 200);
     }
