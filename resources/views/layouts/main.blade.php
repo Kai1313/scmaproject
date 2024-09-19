@@ -374,7 +374,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                             let modal = $("#modal_custom")
                             modal.modal("show");
                             modal.find(".modal-title").html("Cek Rak");
-                            if (hasil.length == 0) {
+                            if (hasil == 0) {
                                 modal.find(".modal-body").html("Tidak Barang Pada Rak");
                             } else {
                                 modal.find(".modal-body").html(data_rak);
@@ -471,12 +471,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                             let modal = $("#modal_custom")
                             modal.modal("show");
                             modal.find(".modal-title").html("Cek Barang");
-                            if (hasil.length == 0) {
-                                modal.find(".modal-body").html("Tidak Barang Pada Rak");
-                            } else {
-                                modal.find(".modal-body").html(data_barang);
-                            }
-
+                            modal.find(".modal-body").html(data_barang);
                             modal.find(".modal-footer").html(
                                 "<button type=\"button\" class=\"btn btn-primary\" data-dismiss=\"modal\">OK!</button>"
                             );
