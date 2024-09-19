@@ -359,7 +359,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                     rak_kartu_stok + rak_kartu_stok2 + '<br />' +
                                     sg_kartu_stok + sg_kartu_stok2 + '<hr />';
                             });
-                            kursor_buka();
+                            // kursor_buka();
                             //alert(data_rak);
                             $("#modal_header_text").html("Cek Rak");
                             if (hasil == 0) {
@@ -456,7 +456,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                     nama_gudang2 + '\', \'' + nama_barang2 + ' ' +
                                     nama_gudang2 + '\');">Lacak QR Code</a>';
                             });
-                            kursor_buka();
+                            // kursor_buka();
                             //alert(data_rak);
                             $("#modal_header_text").html("Cek Barang");
                             $("#modal_body_text").html(data_barang);
