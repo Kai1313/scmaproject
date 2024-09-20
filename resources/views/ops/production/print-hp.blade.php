@@ -61,11 +61,11 @@
                             </tr>
                             <tr>
                                 <td>{{ $detail->nama_satuan_barang }}</td>
-                                <td>{{ formatNumber($detail->jumlah_master_qr_code, 1) }}
+                                <td>{{ formatNumber($detail->jumlah_master_qr_code, 0) }}
                                 </td>
-                                <td>{{ formatNumber($detail->jumlah_master_qr_code - $detail->sisa_master_qr_code, 1) }}
+                                <td>{{ formatNumber($detail->jumlah_master_qr_code - $detail->sisa_master_qr_code, 0) }}
                                 </td>
-                                <td>{{ formatNumber($detail->sisa_master_qr_code, 1) }}
+                                <td>{{ formatNumber($detail->sisa_master_qr_code, 0) }}
                                 </td>
                                 <td>{{ $detail->batch_master_qr_code }}</td>
                             </tr>
@@ -74,8 +74,8 @@
                                 <td class="table-head">NETT</td>
                             </tr>
                             <tr>
-                                <td>{{ formatNumber($detail->total_tare, 1) }}</td>
-                                <td>{{ formatNumber($detail->sisa_master_qr_code, 1) }} </td>
+                                <td>{{ formatNumber($detail->total_tare, 0) }}</td>
+                                <td>{{ formatNumber($detail->sisa_master_qr_code, 0) }} </td>
                             </tr>
                         </table>
                         <div class="label-date">Cetak: {{ date('d-M-Y') }}</div>

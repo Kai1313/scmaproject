@@ -249,5 +249,11 @@
                 newwindow.focus()
             }
         }
+
+        $('.sidebar-toggle').on('click', () => {
+            setTimeout(() => {
+                resDataTable.columns.adjust().draw();
+            }, 400);
+        });
     </script>
 @endsection
