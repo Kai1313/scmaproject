@@ -188,8 +188,19 @@
                         </td>
                     </tr>
                 </table>
-                <label for="" style="margin:10px;border-bottom:1px solid gray;font-size:18px;">HASIL CHECKLIST
-                    PEKERJAAN</label>
+                <div class="target-history" style="display: none;">
+                    <label for="" style="margin:10px;border-bottom:1px solid gray;font-size:18px;">RIWAYAT CHECKLIST
+                        PEMERIKSA</label>
+                    <div class="target-list-history">
+
+                    </div>
+                </div>
+                <div>
+                    <label for="" style="margin:10px;border-bottom:1px solid gray;font-size:18px;">HASIL CHECKLIST
+                        PEKERJAAN</label>
+                    <a href="{{ route('checklist-history', $data->id_jawaban_checklist_pekerjaan) }}"
+                        class="show-history">Lihat Riwayat Pemeriksa</a>
+                </div>
                 <table class="table table-bordered">
                     <thead>
                         <tr>
@@ -216,6 +227,7 @@
                                                 <label class="form-control2">
                                                     <input type="checkbox" name="checklist_checker"
                                                         data-sequence="{{ $i }}"
+                                                        data-pekerjaan="{{ $data->{'pekerjaan' . $i . '_jawaban_checklist_pekerjaan'} }}"
                                                         {{ $data->{'checker' . $i . '_jawaban_checklist_pekerjaan'} == '1' ? 'checked' : '' }} />
                                                 </label>
                                             @endif
@@ -281,19 +293,24 @@
         @if ($status == '1')
             $('[name="checklist_checker"]').change(function() {
                 let seq = $(this).data('sequence')
+                let pekerjaanId = $(this).data('pekerjaan')
                 let val = $(this).is(':checked') ? '1' : '0'
+                $('#cover-spin').show()
                 $.ajax({
                     url: '{{ route('checklist-checker') }}',
                     type: 'post',
                     data: {
                         seq: seq,
                         id: '{{ $data->id_jawaban_checklist_pekerjaan }}',
-                        val: val
+                        val: val,
+                        id_pekerjaan: pekerjaanId
                     },
                     success: function(res) {
+                        $('#cover-spin').hide()
                         console.log(res)
                     },
                     error: function(data) {
+                        $('#cover-spin').hide()
                         Swal.fire("Bermasalah. ", data.responseJSON.message, 'error')
                     }
                 })
@@ -301,6 +318,7 @@
 
             $('.btn-note-save').click(function() {
                 let val = $('[name="keterangan_checker_jawaban_checklist_pekerjaan"]').val()
+                $('#cover-spin').show()
                 $.ajax({
                     url: '{{ route('checklist-comment-checker') }}',
                     type: 'post',
@@ -310,12 +328,43 @@
                     },
                     success: function(res) {
                         console.log(res)
+                        $('#cover-spin').hide()
                     },
                     error: function(data) {
+                        $('#cover-spin').hide()
                         Swal.fire("Bermasalah. ", data.responseJSON.message, 'error')
                     }
                 })
             })
         @endif
+
+        $('.show-history').click(function(e) {
+            e.preventDefault()
+            $('#cover-spin').show()
+            $.ajax({
+                url: '{{ route('checklist-history', $data->id_jawaban_checklist_pekerjaan) }}',
+                type: 'get',
+                success: function(res) {
+                    $('.target-history').show()
+                    let html = ''
+                    if (res.datas.length > 0) {
+                        html += '<ul>'
+                        for (let i = 0; i < res.datas.length; i++) {
+                            html += '<li>' + res.datas[i].desc + '<br><span>' + res.datas[i]
+                                .nama_pengguna + '</span> - ' + res.datas[i].created_at + '</li>'
+                        }
+
+                        html += '</ul>'
+                    }
+
+                    $('.target-list-history').html(html)
+                    $('#cover-spin').hide()
+                },
+                error: function(error) {
+                    $('#cover-spin').hide()
+                    Swal.fire("Bermasalah. ", error.responseJSON.message, 'error')
+                }
+            })
+        })
     </script>
 @endsection

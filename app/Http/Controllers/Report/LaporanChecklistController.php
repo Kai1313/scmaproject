@@ -203,8 +203,10 @@ class LaporanChecklistController extends Controller
         $id = $request->id;
         $seq = $request->seq;
         $val = $request->val == '1' ? '1' : '0';
+        $pekerjaanId = $request->id_pekerjaan;
         $input = 'checker' . $seq . '_jawaban_checklist_pekerjaan';
         try {
+            DB::beginTransaction();
             $data = JawabanChecklistPekerjaan::where('id_jawaban_checklist_pekerjaan', $id)->first();
             $array = [];
             if (!$data->checker_jawaban_checklist_pekerjaan) {
@@ -215,10 +217,18 @@ class LaporanChecklistController extends Controller
             DB::table('jawaban_checklist_pekerjaan')->where('id_jawaban_checklist_pekerjaan', $id)
                 ->update($array);
 
+            $resHistory = $this->makeHistoryChecklist($request, $data);
+            if ($resHistory['status'] == 'error') {
+                DB::rollback();
+                return response()->json($resHistory, 500);
+            }
+
+            DB::commit();
             return response()->json(['status' => 'success', 'message' => 'Data berhasil di update'], 200);
         } catch (\Exception $th) {
             Log::error($th);
-            return response()->json(['status' => 'error', 'message' => 'Terdapat masalah ketika checklist'], 500);
+            DB::rollback();
+            return response()->json(['status' => 'error', 'message' => $th->getMessage()], 500);
         }
     }
 
@@ -550,5 +560,48 @@ class LaporanChecklistController extends Controller
         }
 
         return $array;
+    }
+
+    public function makeHistoryChecklist($request, $data)
+    {
+        $object = DB::table('objek_kerja')->where('id_objek_kerja', $data->id_objek_kerja)->first();
+        if (!$object) {
+            return ['status' => 'error', 'message' => 'Objek kerja tidak ditemukan'];
+        }
+
+        $pekerjaan = DB::table('pekerjaan')->where('id_pekerjaan', $request->id_pekerjaan)->first();
+        if (!$pekerjaan) {
+            return ['status' => 'error', 'message' => 'Pekerjaan tidak ditemukan'];
+        }
+
+        $status = 'sudah dicek';
+        if ($request->val == '0') {
+            $status = 'batal dicek';
+        }
+
+        try {
+            $desc = $object->nama_objek_kerja . ' -- ' . $pekerjaan->nama_pekerjaan . ' -- ' . $status;
+            $array = [
+                'user_id' => session()->get('user')['id_pengguna'],
+                'type' => 'checker',
+                'id_jawaban_checklist_pekerjaan' => $data->id_jawaban_checklist_pekerjaan,
+                'created_at' => date('Y-m-d H:i:s'),
+                'desc' => $desc,
+            ];
+
+            DB::table('riwayat_checklist_pekerjaan')->insert($array);
+            return ['status' => 'success'];
+        } catch (\Exception $th) {
+            return ['status' => 'error', 'message' => $th->getMessage()];
+        }
+    }
+
+    public function showHistoryChecklist($id)
+    {
+        $datas = DB::table('riwayat_checklist_pekerjaan')
+            ->select('riwayat_checklist_pekerjaan.*', 'pengguna.nama_pengguna')
+            ->join('pengguna', 'user_id', 'pengguna.id_pengguna')
+            ->where('id_jawaban_checklist_pekerjaan', $id)->get();
+        return response()->json(['datas' => $datas], 200);
     }
 }
