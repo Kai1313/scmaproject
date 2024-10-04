@@ -198,8 +198,10 @@
                 <div>
                     <label for="" style="margin:10px;border-bottom:1px solid gray;font-size:18px;">HASIL CHECKLIST
                         PEKERJAAN</label>
-                    <a href="{{ route('checklist-history', $data->id_jawaban_checklist_pekerjaan) }}"
-                        class="show-history">Lihat Riwayat Pemeriksa</a>
+                    @if ($status == '1')
+                        <a href="{{ route('checklist-history', $data->id_jawaban_checklist_pekerjaan) }}"
+                            class="show-history">Lihat Riwayat Pemeriksa</a>
+                    @endif
                 </div>
                 <table class="table table-bordered">
                     <thead>
@@ -336,35 +338,35 @@
                     }
                 })
             })
-        @endif
 
-        $('.show-history').click(function(e) {
-            e.preventDefault()
-            $('#cover-spin').show()
-            $.ajax({
-                url: '{{ route('checklist-history', $data->id_jawaban_checklist_pekerjaan) }}',
-                type: 'get',
-                success: function(res) {
-                    $('.target-history').show()
-                    let html = ''
-                    if (res.datas.length > 0) {
-                        html += '<ul>'
-                        for (let i = 0; i < res.datas.length; i++) {
-                            html += '<li>' + res.datas[i].desc + '<br><span>' + res.datas[i]
-                                .nama_pengguna + '</span> - ' + res.datas[i].created_at + '</li>'
+            $('.show-history').click(function(e) {
+                e.preventDefault()
+                $('#cover-spin').show()
+                $.ajax({
+                    url: '{{ route('checklist-history', $data->id_jawaban_checklist_pekerjaan) }}',
+                    type: 'get',
+                    success: function(res) {
+                        $('.target-history').show()
+                        let html = ''
+                        if (res.datas.length > 0) {
+                            html += '<ul>'
+                            for (let i = 0; i < res.datas.length; i++) {
+                                html += '<li>' + res.datas[i].desc + '<br><span>' + res.datas[i]
+                                    .nama_pengguna + '</span> - ' + res.datas[i].created_at + '</li>'
+                            }
+
+                            html += '</ul>'
                         }
 
-                        html += '</ul>'
+                        $('.target-list-history').html(html)
+                        $('#cover-spin').hide()
+                    },
+                    error: function(error) {
+                        $('#cover-spin').hide()
+                        Swal.fire("Bermasalah. ", error.responseJSON.message, 'error')
                     }
-
-                    $('.target-list-history').html(html)
-                    $('#cover-spin').hide()
-                },
-                error: function(error) {
-                    $('#cover-spin').hide()
-                    Swal.fire("Bermasalah. ", error.responseJSON.message, 'error')
-                }
+                })
             })
-        })
+        @endif
     </script>
 @endsection

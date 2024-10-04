@@ -139,20 +139,19 @@ class LaporanChecklistController extends Controller
             ->first();
 
         $jobsId = [];
-        for ($i = 1; $i <= 25; $i++) {
-            if ($data->{'pekerjaan' . $i . '_jawaban_checklist_pekerjaan'} == null) {
-                break;
-            }
-
-            $jobsId[] = $data->{'pekerjaan' . $i . '_jawaban_checklist_pekerjaan'};
-        }
-
         $groupMedia = [];
         $jobs = [];
         $status = '0';
         $datas = [];
         $obj = '';
         if ($data) {
+            for ($i = 1; $i <= 25; $i++) {
+                if ($data->{'pekerjaan' . $i . '_jawaban_checklist_pekerjaan'} == null) {
+                    break;
+                }
+
+                $jobsId[] = $data->{'pekerjaan' . $i . '_jawaban_checklist_pekerjaan'};
+            }
             $status = '1';
             $medias = DB::table('media_jawaban')
                 ->join('pengguna', 'media_jawaban.user_media_jawaban', 'pengguna.id_pengguna')
