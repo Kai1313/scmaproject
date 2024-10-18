@@ -54,17 +54,8 @@ class VisitController extends Controller
         // ->where('visit.status', 2)
             ->orderBy($arrayF[$request->sort], $request->orderby);
 
-        if ($request->date) {
-            $explode = explode(' - ', $request->date);
-            for ($i = 0; $i < count($explode); $i++) {
-                if ($i == 0) {
-                    $explode[$i] = $explode[$i] . ' 00:00:00';
-                } else {
-                    $explode[$i] = $explode[$i] . ' 23:59:59';
-                }
-            }
-
-            $data = $data->whereBetween('visit_date', $explode);
+        if ($request->start_date && $request->end_date) {
+            $data = $data->whereBetween('visit_date', [$request->start_date, $request->end_date]);
         }
 
         if ($request->id_salesman) {
@@ -137,9 +128,8 @@ class VisitController extends Controller
             $data = $data->where('visit.id_pelanggan', $request->id_pelanggan);
         }
 
-        if ($request->date) {
-            $explode = explode(' - ', $request->date);
-            $data = $data->whereBetween('visit_date', $explode);
+        if ($request->start_date && $request->end_date) {
+            $data = $data->whereBetween('visit_date', [$request->start_date, $request->end_date]);
         }
 
         $data = $data->orderBy($arrayF[$request->sort], $request->orderby)->orderBy('visit_code', $request->orderby);

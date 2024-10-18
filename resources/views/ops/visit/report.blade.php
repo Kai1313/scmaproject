@@ -84,9 +84,15 @@
             <div class="box-header">
                 <div class="row">
                     <div class="col-md-2 filter-div">
-                        <label>Tanggal</label>
+                        <label>Tanggal Awal</label>
                         <div class="form-group">
-                            <input type="text" class="form-control trigger-change" name="date" />
+                            <input type="date" class="form-control trigger-change" name="start_date" />
+                        </div>
+                    </div>
+                    <div class="col-md-2 filter-div">
+                        <label>Tanggal Akhir</label>
+                        <div class="form-group">
+                            <input type="date" class="form-control trigger-change" name="end_date" />
                         </div>
                     </div>
                     {{-- @if ($groupUser != 6) --}}
