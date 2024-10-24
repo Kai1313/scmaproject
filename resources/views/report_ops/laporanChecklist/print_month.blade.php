@@ -110,7 +110,7 @@
                 <td>{{ $job }}</td>
                 @for ($i = 1; $i <= $count_date; $i++)
                     <td class="center">
-                        @if ($answers[$key . '-' . $i])
+                        @if (isset($answers[$key . '-' . $i]))
                             <img src="{{ asset('images/check-icon.png') }}" alt="" style="width:15px;">
                         @endif
                     </td>

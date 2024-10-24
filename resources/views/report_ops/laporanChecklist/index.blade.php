@@ -82,8 +82,10 @@
                         <thead>
                             <tr>
                                 <th>Detail Lokasi</th>
+
                                 <th width="100">Status Dikerjakan</th>
                                 <th width="100">Status Diperiksa</th>
+                                <th width="100"></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -257,6 +259,16 @@
                         } else {
                             return countCheck + ' dari ' + countTanya + ' sudah diperiksa'
                         }
+                    }
+                }, {
+                    data: 'id_objek_kerja',
+                    name: 'id_objek_kerja',
+                    className: 'text-center',
+                    render: function(data, type, row) {
+                        return '<a href="{{ route('checklist-print-month') }}?date=' + $(
+                                '[name="date"]').val() + '&grup=' + $('[name="user_group"]').val() +
+                            '&objek=' + data +
+                            '" target="_blank" class="btn btn-info btn-sm">Cetak rekap 1 bulan</a>'
                     }
                 }]
             });
