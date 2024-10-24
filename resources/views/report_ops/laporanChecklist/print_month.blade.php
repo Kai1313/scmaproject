@@ -109,19 +109,29 @@
                 <td class="center">{{ $counter }}</td>
                 <td>{{ $job }}</td>
                 @for ($i = 1; $i <= $count_date; $i++)
-                    <td class="center">
-                        @if (isset($answers[$key . '-' . $i]))
+                    @if (isset($answers[$key . '-' . $i]) && $answers[$key . '-' . $i]['jawaban'] == '1')
+                        <td class="center"
+                            style="{{ $answers[$key . '-' . $i]['checker'] == '1' ? 'background-color:#cbcbcb' : '' }}">
                             <img src="{{ asset('images/check-icon.png') }}" alt="" style="width:15px;">
-                        @endif
-                    </td>
+                        </td>
+                    @else
+                        <td></td>
+                    @endif
                 @endfor
             </tr>
         @endforeach
     </table>
+    <br>
+    <table>
+        <tr>
+            <td style="background-color: #cbcbcb;width:15px;"></td>
+            <td>Sudah diperiksa</td>
+        </tr>
+    </table>
     <table style="width:100%;margin-top:20px;">
         <tr>
             <td></td>
-            <td class="center"><b>Dibuat oleh,</b></td>
+            <td class="center"><b>Dicetak oleh,</b></td>
             <td rowspan="3" style="width:70%;vertical-align:top;">
 
             </td>

@@ -301,6 +301,7 @@ class LaporanChecklistController extends Controller
                     $arrayAns[$ans->id_objek_kerja . '-' . $ans->{'pekerjaan' . ($i) . '_jawaban_checklist_pekerjaan'}] = [
                         'keterangan' => $ans->{'keterangan' . ($i) . '_jawaban_checklist_pekerjaan'},
                         'jawaban' => $ans->{'jawaban' . ($i) . '_jawaban_checklist_pekerjaan'},
+                        'checker' => $ans->{'checker' . ($i) . '_jawaban_checklist_pekerjaan'},
                         'media' => $arrayMedia,
                     ];
                 } else {
@@ -451,7 +452,10 @@ class LaporanChecklistController extends Controller
         foreach ($datas as $data) {
             for ($i = 1; $i <= 25; $i++) {
                 if ($data->{'pekerjaan' . $i . '_jawaban_checklist_pekerjaan'}) {
-                    $ar[$data->{'pekerjaan' . $i . '_jawaban_checklist_pekerjaan'} . '-' . (int) date('d', strtotime($data->tanggal_jawaban_checklist_pekerjaan))] = $data->{'jawaban' . $i . '_jawaban_checklist_pekerjaan'};
+                    $ar[$data->{'pekerjaan' . $i . '_jawaban_checklist_pekerjaan'} . '-' . (int) date('d', strtotime($data->tanggal_jawaban_checklist_pekerjaan))] = [
+                        'jawaban' => $data->{'jawaban' . $i . '_jawaban_checklist_pekerjaan'},
+                        'checker' => $data->{'checker' . $i . '_jawaban_checklist_pekerjaan'},
+                    ];
                 }
             }
         }
