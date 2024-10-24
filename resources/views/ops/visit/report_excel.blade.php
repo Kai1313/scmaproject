@@ -12,11 +12,9 @@
     @if ($req->report_type == 'rekap')
         <table>
             <tr>
-                @php
-                    $explode = explode(' - ', $req->date);
-                @endphp
-                <td style="font-weight:bold;">LAPORAN REKAP KUNJUNGAN TANGGAL {{ $explode[0] }} SAMPAI
-                    {{ $explode[1] }}</td>
+                <td style="font-weight:bold;">LAPORAN REKAP KUNJUNGAN TANGGAL
+                    {{ date('d/m/Y', strtotime($req->start_date)) }} SAMPAI
+                    {{ date('d/m/Y', strtotime($req->end_date)) }}</td>
             </tr>
         </table>
         <table>
@@ -64,13 +62,13 @@
                         @endforeach
                         <td>
                             @if ($data->visit_title)
-                                Hasil kunjungan : {{ $data->visit_title }} <br><br>
+                                Hasil kunjungan : {!! $data->visit_title !!} <br><br>
                             @endif
                             @if ($data->visit_desc)
-                                Masalah : {{ $data->visit_desc }} <br><br>
+                                Masalah : {!! $data->visit_desc !!} <br><br>
                             @endif
                             @if ($data->solusi)
-                                Solusi : {{ $data->solusi }} <br><br>
+                                Solusi : {!! $data->solusi !!} <br><br>
                             @endif
                             @if ($data->alasan_pembatalan)
                                 Alasan batal : {{ $data->alasan_pembatalan }} <br><br>
@@ -95,11 +93,10 @@
     @else
         <table>
             <tr>
-                @php
-                    $explode = explode(' - ', $req->date);
-                @endphp
-                <td style="font-weight:bold;">LAPORAN KUNJUNGAN TANGGAL {{ $explode[0] }} SAMPAI
-                    {{ $explode[1] }}</td>
+                <td style="font-weight:bold;">LAPORAN KUNJUNGAN TANGGAL
+                    {{ date('d/m/Y', strtotime($req->start_date)) }}
+                    SAMPAI
+                    {{ date('d/m/Y', strtotime($req->end_date)) }}</td>
             </tr>
         </table>
         <table>
@@ -121,9 +118,9 @@
                         <td>{{ $res->visit_date }}</td>
                         <td>{{ $res->nama_salesman }}</td>
                         <td>{{ $res->nama_pelanggan }}</td>
-                        <td>{{ $res->visit_title }}</td>
-                        <td>{{ $res->visit_desc }}</td>
-                        <td>{{ $res->solusi }}</td>
+                        <td>{!! $res->visit_title !!}</td>
+                        <td>{!! $res->visit_desc !!}</td>
+                        <td>{!! $res->solusi !!}</td>
                     </tr>
                 @endforeach
             </tbody>
