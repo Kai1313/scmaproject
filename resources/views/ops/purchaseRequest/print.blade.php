@@ -146,8 +146,8 @@
                 <tr>
                     <td align="center">{{ $key + 1 }}</td>
                     <td>{{ $detail->nama_barang }}</td>
-                    <td align="right">{{ formatNumber($detail->qty) }}</td>
-                    <td align="center">{{ $detail->nama_satuan_barang }}</td>
+                    <td align="right">{{ $detail->nama_satuan_barang }}</td>
+                    <td align="center">{{ formatNumber($detail->qty) }}</td>
                     <td>{{ $detail->notes }}</td>
                 </tr>
             @endforeach
