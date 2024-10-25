@@ -70,6 +70,7 @@ class SendToBranchController extends Controller
                     }
 
                     $btn .= '<a href="' . route('send_to_branch-print-data', $row->id_pindah_barang) . '" class="btn btn-default btn-xs mr-1 mb-1" target="_blank"><i class="glyphicon glyphicon-print"></i> Cetak</a>';
+                    $btn .= '<a href="' . route('send_to_branch-show_image', $row->id_pindah_barang) . '" class="btn btn-warning btn-xs mr-1 mb-1 show-modal-camera"><i class="glyphicon glyphicon-camera"></i> Foto</a>';
                     return $btn;
                 })
                 ->editColumn('status_pindah_barang', function ($row) {
@@ -484,5 +485,23 @@ class SendToBranchController extends Controller
         }
 
         return response()->json(['result' => false, 'message' => 'Berhasil Berhasil dihapus'], 200);
+    }
+
+    public function showImage($id)
+    {
+        $data = MoveBranch::find($id);
+        if (!$data) {
+            return response()->json(['result' => false, 'message' => 'Pengiriman tidak ditemukan'], 500);
+        }
+
+        $medias = $data->medias;
+        $urlPhoto = route('send_to_branch-save_image', $data->id_pindah_barang);
+        $urlPhotoDelete = route('send_to_branch-rm_image', $data->id_pindah_barang);
+        return response()->json([
+            'result' => true,
+            'datas' => $medias,
+            'urlPhoto' => $urlPhoto,
+            'urlPhotoDelete' => $urlPhotoDelete,
+        ], 200);
     }
 }

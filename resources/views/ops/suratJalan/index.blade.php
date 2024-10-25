@@ -141,7 +141,7 @@
 
 @section('externalScripts')
     <script>
-        var urlMedia = '{{ asset('') }}'
+        var urlMedia = '{{ asset('') }}';
         var defaultFilter = sessionStorage.getItem('send_to_branch_filter') ? JSON.parse(sessionStorage.getItem(
             'send_to_branch_filter')) : {};
         var urlPhoto = "";
@@ -241,7 +241,7 @@
                     $('#cover-spin').hide()
                 },
                 error: function(error) {
-                    Swal.fire("Gagal Menyimpan Data. ", data.responseJSON.message, 'error')
+                    Swal.fire("Gagal Menyimpan Data. ", error.responseJSON.message, 'error')
                     $('#cover-spin').hide()
                 }
             })

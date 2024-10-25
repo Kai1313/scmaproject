@@ -107,6 +107,7 @@ Route::prefix('kirim_ke_cabang')->group(function () {
     Route::post('/delete-detail/{parent}/{id}', 'SendToBranchController@deleteDetail')->name('send_to_branch-delete-detail');
     Route::post('/save-image/{id}', 'SendToBranchController@saveImage')->name('send_to_branch-save_image');
     Route::get('/rm-image/{id}', 'SendToBranchController@rmImage')->name('send_to_branch-rm_image');
+    Route::get('/show-image/{id}', 'SendToBranchController@showImage')->name('send_to_branch-show_image');
 });
 
 Route::prefix('terima_dari_cabang')->group(function () {

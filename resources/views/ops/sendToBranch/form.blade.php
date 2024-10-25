@@ -126,12 +126,6 @@
                 width: 100%;
             }
         }
-
-        .snap {
-            position: absolute;
-            bottom: 25px;
-            right: 10px;
-        }
     </style>
 @endsection
 
@@ -416,18 +410,16 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
+                        <button type="button" class="btn btn-default pull-right btn-sm"
+                            data-dismiss="modal">Tutup</button>
                         <h4 class="modal-title">Ambil Gambar</h4>
                     </div>
                     <div class="modal-body">
+                        <i class="fa fa-info-circle"></i> <span>Tekan tampilan camera untuk mengambil gambar</span>
                         <div class="show-camera" style="margin-top:10px">
                             <div class="text-center" style="position: relative;">
-                                <video autoplay style="border:1px solid black;margin-bottom: 10px;"></video>
-                                <button type="button" class="take-image btn btn-danger hide-camera-item btn-rounded"
-                                    style="position: absolute; bottom: 25px; left: 10px;"><i class="fa fa-close"
-                                        style="font-size: 30px;"></i></button>
-                                <button type="button" class="take-image btn btn-primary snap btn-rounded">
-                                    <i class="fa fa-image" style="font-size: 30px;"></i>
-                                </button>
+                                <video autoplay style="border:1px solid black;margin-bottom: 10px;"
+                                    class="snap"></video>
                             </div>
                             <canvas class="d-none" style="display: none;"></canvas>
                             <div style="margin-bottom:20px;">

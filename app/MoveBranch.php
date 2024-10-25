@@ -410,7 +410,7 @@ class MoveBranch extends Model
                 $m->lokasi_media = 'asset/pindah_barang/' . $mainpath;
                 $m->status_media = 1;
                 $m->tipe_media = 'pindah_barang';
-                $m->date_media = date('Y-m-d');
+                $m->date_media = date('Y-m-d H:i:s');
                 $m->user_media = session()->get('user')['id_pengguna'];
                 $m->save();
             }
