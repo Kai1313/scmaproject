@@ -29,7 +29,7 @@ class SuratJalan extends Model
     public static function createcode()
     {
         $endString = '/SJ-U/' . date('m') . '/' . date('Y');
-        $check = \DB::table('surat_jalan')->where('no_surat_jalan', 'like', '%' . $endString)->count();
+        $check = DB::table('surat_jalan')->where('no_surat_jalan', 'like', '%' . $endString)->count();
         $check += 1;
         $nol = '';
         for ($i = 0; $i < (3 - strlen((string) $check)); $i++) {
@@ -107,7 +107,7 @@ class SuratJalan extends Model
                 $m->lokasi_media = 'asset/surat_jalan_umum/' . $mainpath;
                 $m->status_media = 1;
                 $m->tipe_media = 'surat_jalan_umum';
-                $m->date_media = date('Y-m-d');
+                $m->date_media = date('Y-m-d H:i:s');
                 $m->user_media = session()->get('user')['id_pengguna'];
                 $m->save();
             }

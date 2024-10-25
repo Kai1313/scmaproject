@@ -6,7 +6,6 @@ var stackStream
 $('.show-modal-camera').click(function () {
     $('#modalEntryCamera').modal('show')
     startCamera()
-
 })
 
 async function startCamera() {
@@ -116,7 +115,6 @@ function snapAjax(url) {
             type: 'base64'
         },
         success: function (result) {
-            console.log(result)
             let html = '<div style="display:inline-block;margin:5px;">'
                 + '<div style="margin-bottom:10px;"><a href="' + url + '" data-fancybox="lightbox">'
                 + '<img src="' + url + '" alt="" style="width:100px;height:100px;object-fit:cover;border-radius:5px;" loading="lazy"></a></div>'
@@ -124,7 +122,6 @@ function snapAjax(url) {
                 + '</div>'
 
             $('.show-res-camera').append(html)
-            console.log($('.show-res-camera'))
             Fancybox.bind('[data-fancybox="lightbox"]');
 
             setTimeout(() => {
@@ -176,6 +173,5 @@ $('#modalEntryCamera').on('hidden.bs.modal', function (e) {
     if (stackStream) {
         stackStream.stop()
     }
-    // $('#modalEntryCamera').modal('hide')
 })
 

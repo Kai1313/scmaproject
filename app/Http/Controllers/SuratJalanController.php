@@ -31,6 +31,7 @@ class SuratJalanController extends Controller
                     $btn = '';
                     $btn .= '<a href="' . route('surat_jalan_umum-print-data', $row->id) . '" class="btn btn-default btn-xs mr-1 mb-1" target="_blank"><i class="fa fa-print"></i> Cetak</a>';
                     $btn .= '<a href="' . route('surat_jalan_umum-view', $row->id) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a>';
+                    $btn .= '<a href="' . route('surat_jalan_umum-show_image', $row->id) . '" class="btn btn-warning btn-xs mr-1 mb-1 show-modal-camera"><i class="glyphicon glyphicon-camera"></i> Foto</a>';
                     if ($row->id_pengguna == session()->get('user')['id_pengguna']) {
                         $btn .= '<a href="' . route('surat_jalan_umum-entry', $row->id) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a>';
                     }
@@ -233,5 +234,23 @@ class SuratJalanController extends Controller
         }
 
         return response()->json(['result' => false, 'message' => 'Berhasil Berhasil dihapus'], 200);
+    }
+
+    public function showImage($id)
+    {
+        $data = SuratJalan::find($id);
+        if (!$data) {
+            return response()->json(['result' => false, 'message' => 'Surat jalan tidak ditemukan'], 500);
+        }
+
+        $medias = $data->medias;
+        $urlPhoto = route('surat_jalan_umum-save_image', $data->id);
+        $urlPhotoDelete = route('surat_jalan_umum-rm_image', $data->id);
+        return response()->json([
+            'result' => true,
+            'datas' => $medias,
+            'urlPhoto' => $urlPhoto,
+            'urlPhotoDelete' => $urlPhotoDelete,
+        ], 200);
     }
 }

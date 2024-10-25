@@ -138,6 +138,7 @@ Route::prefix('surat_jalan_umum')->group(function () {
     Route::get('/print/{id}', 'SuratJalanController@printData')->name('surat_jalan_umum-print-data');
     Route::post('/save-image/{id}', 'SuratJalanController@saveImage')->name('surat_jalan_umum-save_image');
     Route::get('/rm-image/{id}', 'SuratJalanController@rmImage')->name('surat_jalan_umum-rm_image');
+    Route::get('/show-image/{id}', 'SuratJalanController@showImage')->name('surat_jalan_umum-show_image');
     // Route::get('/auto-qrcode', 'SuratJalanController@autoQRCode')->name('surat_jalan-qrcode');
 });
 
