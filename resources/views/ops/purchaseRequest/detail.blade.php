@@ -315,8 +315,8 @@
                         '</a>'
                 }
             }, {
-                data: 'stok',
-                name: 'stok',
+                data: 'stock',
+                name: 'stock',
                 render: function(data) {
                     return formatNumber(data, 4)
                 },

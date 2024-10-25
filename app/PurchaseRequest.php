@@ -62,11 +62,13 @@ class PurchaseRequest extends Model
                 'approval_status',
                 'closed',
                 DB::raw('(case when closed = 0 then "Open" else "Closed" end) as status_data'),
-                DB::raw('(case
-                    when sum(sisa_master_qr_code-weight-weight_zak) > 0 and barang.id_kategori_barang <> 7
-                    then sum(sisa_master_qr_code-weight-weight_zak)
-                    else 0
-                end) as stok')
+                DB::raw('if(barang.status_stok_barang = "1" ,
+                    (case
+                        when barang.id_kategori_barang <> 7
+                        then sum(sisa_master_qr_code)
+                        else 0
+                    end),stock) as stock'),
+                'barang.status_stok_barang'
             )
             ->leftJoin('barang', 'purchase_request_detail.id_barang', '=', 'barang.id_barang')
             ->leftJoin('satuan_barang', 'purchase_request_detail.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
@@ -92,10 +94,18 @@ class PurchaseRequest extends Model
                     $check->id_satuan_barang = $data->id_satuan_barang;
                     $check->qty = $data->qty;
                     $check->notes = $data->notes;
+                    if ($data->status_stok_barang == '0') {
+                        $check->stock = $data->stock;
+                    }
+
                     $array[] = $check;
                 }
             } else {
                 $data->purchase_request_id = $this->purchase_request_id;
+                if ($data->status_stok_barang == '1') {
+                    $data->stock = '0';
+                }
+
                 $array[] = $data;
             }
         }
@@ -114,6 +124,7 @@ class PurchaseRequest extends Model
                 'approval_date' => isset($a->approval_date) ? $a->approval_date : null,
                 'closed' => $a->closed,
                 'approval_notes' => isset($a->approval_notes) ? $a->approval_notes : null,
+                'stock' => $a->stock ? $a->stock : '0',
             ]);
         }
 

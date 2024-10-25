@@ -210,7 +210,7 @@ class PurchaseRequestController extends Controller
             Log::error($e);
             return response()->json([
                 "result" => false,
-                "message" => "Data gagal tersimpan",
+                "message" => $e->getMessage(),
             ], 500);
         }
     }
@@ -293,7 +293,8 @@ class PurchaseRequestController extends Controller
     public function autoItem(Request $request)
     {
         $search = $request->search;
-        $datas = DB::table('barang')->select('id_barang as id', 'nama_barang as text', 'kode_barang')
+        $datas = DB::table('barang')
+            ->select('id_barang as id', 'nama_barang as text', 'kode_barang', 'status_stok_barang')
             ->where('status_barang', 1)
             ->where('nama_barang', 'like', '%' . $search . '%')->orderBy('nama_barang', 'asc')->get();
 
@@ -308,7 +309,8 @@ class PurchaseRequestController extends Controller
         $item = $request->item;
         $cabang = $request->cabang;
         $gudang = $request->gudang;
-        $satuan = DB::table('isi_satuan_barang')->select('satuan_barang.id_satuan_barang as id', 'nama_satuan_barang as text')
+        $satuan = DB::table('isi_satuan_barang')
+            ->select('satuan_barang.id_satuan_barang as id', 'nama_satuan_barang as text')
             ->leftJoin('satuan_barang', 'isi_satuan_barang.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
             ->where('id_barang', $item)
             ->where('status_satuan_barang', 1)
@@ -324,8 +326,8 @@ class PurchaseRequestController extends Controller
             ];
 
             $stok = DB::table('master_qr_code')->select(DB::raw('(case
-                    when sum(sisa_master_qr_code-weight-weight_zak) > 0 and barang.id_kategori_barang <> 7
-                    then sum(sisa_master_qr_code-weight-weight_zak)
+                    when barang.id_kategori_barang <> 7
+                    then sum(sisa_master_qr_code)
                     else 0
                 end) as stok'), 'nama_satuan_barang')
                 ->join('barang', 'master_qr_code.id_barang', 'barang.id_barang')

@@ -207,7 +207,7 @@
                 <div class="box-body">
                     <div class="table-responsive">
                         <input type="hidden" name="details" value="">
-                        <table id="table-detail" class="table table-bordered data-table display nowrap" width="100%">
+                        <table id="table-detail" class="table table-bordered data-table display" width="100%">
                             <thead>
                                 <tr>
                                     <th>Kode Barang</th>
@@ -260,15 +260,27 @@
                         </div>
                         <label>Jumlah <span>*</span></label>
                         <div class="form-group">
-                            <input type="text" name="qty" class="form-control validate handle-number-4"
-                                autocomplete="off">
+                            <div class="input-group">
+                                <input type="text" name="qty" class="form-control validate handle-number-4"
+                                    autocomplete="off">
+                                <span id="unit" class="input-group-addon"></span>
+                            </div>
                         </div>
                         <label>Catatan <span>*</span></label>
                         <div class="form-group">
                             <textarea name="notes" class="form-control validate" rows="5"></textarea>
                         </div>
-                        <input type="hidden" name="stok">
+                        <div class="non-stock" style="display: none;">
+                            <label>Stok <span>*</span></label>
+                            <div class="input-group">
+                                <input type="text" name="stock" class="form-control handle-number-4"
+                                    autocomplete="off">
+                                <span id="unit_stock" class="input-group-addon"></span>
+                            </div>
+
+                        </div>
                         <input type="hidden" name="closed" value="0">
+                        <input type="hidden" name="status_stok_barang">
                         <input type="hidden" name="old_index">
                     </div>
                     <div class="modal-footer">
@@ -367,8 +379,8 @@
                 data: 'notes',
                 name: 'notes'
             }, {
-                data: 'stok',
-                name: 'stok',
+                data: 'stock',
+                name: 'stock',
                 render: function(data) {
                     return formatNumber(data, 4)
                 },
@@ -379,7 +391,6 @@
                 name: 'index',
                 searchable: false,
                 render: function(data, type, row, meta) {
-                    console.log(row)
                     let btn = ''
                     if (row.purchase_request_id) {
                         btn +=
@@ -407,6 +418,7 @@
         }).on('select2:select', function(e) {
             let dataselect = e.params.data
             getGudang(dataselect)
+            cekTambahBarang()
         });
 
         function getGudang(data) {
@@ -417,6 +429,16 @@
                 }, ...data.gudang]
             })
         }
+
+        $('[name="id_gudang"]').select2({
+            data: [{
+                'id': "",
+                'text': 'Pilih Gudang'
+            }]
+        }).on('select2:select', function(e) {
+            let dataselect = e.params.data
+            cekTambahBarang()
+        });
 
         $('[name="id_barang"]').select2({
             ajax: {
@@ -438,14 +460,24 @@
             $('#modalEntry').find('[name="nama_barang"]').val(dataselect.text)
             $('#modalEntry').find('[name="kode_barang"]').val(dataselect.kode_barang)
             $('[name="id_satuan_barang"]').html('')
-            getSatuan(dataselect.id)
-
+            $('[name="qty"]').val('0')
+            getSatuan(dataselect)
         });
 
-        function getSatuan(id) {
+        cekTambahBarang()
+
+        function cekTambahBarang() {
+            if ($('[name="id_cabang"]').val() && $('[name="id_gudang"]').val()) {
+                $('.add-entry').prop('disabled', false)
+            } else {
+                $('.add-entry').prop('disabled', true)
+            }
+        }
+
+        function getSatuan(dataselect) {
             $('#cover-spin').show()
             $.ajax({
-                url: "{{ route('purchase-request-auto-satuan') }}?item=" + id + '&cabang=' + $(
+                url: "{{ route('purchase-request-auto-satuan') }}?item=" + dataselect.id + '&cabang=' + $(
                     '[name="id_cabang"]').val() + '&gudang=' + $('[name="id_gudang"]').val(),
                 type: 'get',
                 success: function(res) {
@@ -464,7 +496,18 @@
                     }
 
                     $('#message-stok').text(formatNumber(res.stok, 4) + ' ' + res.satuan_stok)
-                    $('#modalEntry').find('[name="stok"]').val(res.stok)
+                    if (dataselect.status_stok_barang == '1') {
+                        $('#modalEntry').find('.non-stock').hide()
+                        $('#modalEntry').find('[name="stock"]').removeClass('validate').val(formatNumber(res
+                            .stok, 4))
+                        $('#unit,#unit_stock').text(res.satuan_stok)
+                    } else {
+                        $('#modalEntry').find('.non-stock').show()
+                        $('#modalEntry').find('[name="stock"]').addClass('validate').val(0)
+                        $('#unit,#unit_stock').text(res.satuan[0]['text'])
+                    }
+
+                    $('#modalEntry').find('[name="status_stok_barang"]').val(dataselect.status_stok_barang)
                     $('#modalEntry').find('[name="closed"]').val(0)
                     $('#cover-spin').hide()
                 },
@@ -602,11 +645,12 @@
         })
 
         function validatorModal(id = 0) {
-            let message = 'Lengkapi inputan yang diperlukan'
+            let message = ''
             let valid = true
 
             $('#modalEntry').find('.validate').each(function(i, v) {
                 if ($(v).val() == '') {
+                    message = 'Lengkapi inputan yang diperlukan'
                     valid = false
                 }
             })
