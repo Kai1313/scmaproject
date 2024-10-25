@@ -64,8 +64,10 @@ class PurchaseRequest extends Model
                 DB::raw('(case when closed = 0 then "Open" else "Closed" end) as status_data'),
                 DB::raw('if(barang.status_stok_barang = "1" ,
                     (case
-                        when barang.id_kategori_barang <> 7
+                        when barang.id_kategori_barang <> 7 and sum(sisa_master_qr_code) > 0
                         then sum(sisa_master_qr_code)
+                        when barang.id_kategori_barang <> 7 and sum(sisa_master_qr_code) is null
+                        then 0
                         else 0
                     end),stock) as stock'),
                 'barang.status_stok_barang'
