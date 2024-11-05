@@ -309,6 +309,15 @@ class PurchaseRequestController extends Controller
         $item = $request->item;
         $cabang = $request->cabang;
         $gudang = $request->gudang;
+        $checkAccount = DB::table('barang')->where('id_barang', $item)->first();
+        if (!$checkAccount) {
+            return response()->json(['result' => false, 'message' => 'Barang tidak ditemukan'], 500);
+        }
+
+        if (($checkAccount->id_akun == null || $checkAccount->id_akun == '0') && ($checkAccount->id_akun2 == null || $checkAccount->id_akun == '0')) {
+            return response()->json(['result' => false, 'message' => 'Akun COA barang belum terpasang, info ke accounting'], 500);
+        }
+
         $satuan = DB::table('isi_satuan_barang')
             ->select('satuan_barang.id_satuan_barang as id', 'nama_satuan_barang as text')
             ->leftJoin('satuan_barang', 'isi_satuan_barang.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')

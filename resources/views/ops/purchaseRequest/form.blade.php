@@ -271,7 +271,7 @@
                             <textarea name="notes" class="form-control validate" rows="5"></textarea>
                         </div>
                         <div class="non-stock" style="display: none;">
-                            <label>Stok <span>*</span></label>
+                            <label>Stok akhir <span>*</span></label>
                             <div class="input-group">
                                 <input type="text" name="stock" class="form-control handle-number-4"
                                     autocomplete="off">
@@ -512,6 +512,7 @@
                     $('#cover-spin').hide()
                 },
                 error: function(error) {
+                    Swal.fire("Gagal tambah data. ", error.responseJSON.message, 'error')
                     $('#cover-spin').hide()
                 }
             })
