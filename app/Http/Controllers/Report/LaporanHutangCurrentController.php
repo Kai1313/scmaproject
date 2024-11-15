@@ -28,7 +28,8 @@ class LaporanHutangCurrentController extends Controller
         ]);
     }
 
-    public function print(Request $request) {
+    public function print(Request $request)
+    {
         if (checkAccessMenu('laporan_hutang_current', 'print') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
@@ -109,6 +110,7 @@ class LaporanHutangCurrentController extends Controller
         $date = $request->dateReport;
         $idPemasok = $request->id_pemasok;
         $idCabang = explode(',', $request->id_cabang);
+        $transactionStatus = $request->transaction_status;
 
         $joinJurnal = DB::table('jurnal_header as jh')
             ->select('jd.id_transaksi', DB::raw('ifnull(sum(jd.debet-jd.credit),0) as Total'))
@@ -132,26 +134,58 @@ class LaporanHutangCurrentController extends Controller
             'p2.tanggal_pembelian',
             DB::raw('DATE_ADD(p2.tanggal_pembelian, INTERVAL p2.tempo_hari_pembelian DAY) as top'),
             'a.total as mtotal_pembelian',
-            DB::raw('a.total-ifnull(p.total,0) as sisa'),
+            DB::raw('(a.total+a.uang_muka)-ifnull(p.total,0) as sisa'),
             DB::raw('ifnull(p.Total,0) as bayar'),
-            DB::raw('DATEDIFF("' . $date . '",DATE(DATE_ADD(p2.tanggal_pembelian, INTERVAL p2.tempo_hari_pembelian DAY))) as aging'))
+            DB::raw('DATEDIFF("' . $date . '",DATE(DATE_ADD(p2.tanggal_pembelian, INTERVAL p2.tempo_hari_pembelian DAY))) as aging'),
+            'a.uang_muka')
             ->leftJoinSub($joinJurnal, 'p', function ($join) {
                 $join->on('a.id_transaksi', '=', 'p.id_transaksi');
             })
             ->leftJoin('pemasok as pe', 'pe.id_pemasok', 'a.id_pemasok')
             ->leftJoin('pembelian as p2', 'a.id_transaksi', 'p2.nama_pembelian')
-            ->where('a.tanggal', '<=', $date)
-            ->where(DB::raw('a.total-ifnull(p.total,0)'), '<>', 0)
-            ->whereIn('a.tipe_transaksi', ['Pembelian', 'Retur Pembelian'])
-            ->whereIn('p2.id_cabang', $idCabang)
-            ->orderBy('pe.nama_pemasok', 'asc');
+            ->where('a.tanggal', '<=', $date);
+        if ($transactionStatus != 'all') {
+            if ($transactionStatus == '1') {
+                $data = $data->where(DB::raw('a.total-ifnull(p.total,0)'), 0);
+            } else {
+                $data = $data->where(DB::raw('a.total-ifnull(p.total,0)'), '<>', 0);
+            }
+        }
+
+        $data = $data->whereIn('a.tipe_transaksi', ['Pembelian', 'Retur Pembelian'])
+            ->whereIn('p2.id_cabang', $idCabang);
+
         if ($idPemasok != 'all') {
             $data->where('a.id_pemasok', $idPemasok);
         }
 
+        if ($type == 'print') {
+            $data = $data->orderBy('p2.tanggal_pembelian', 'asc');
+        }
+
         if ($type == 'datatable') {
-            return Datatables::of($data)
-                ->toJson();
+            $datatable = Datatables::of($data);
+            $datatable = $datatable->filterColumn('top', function ($query, $keyword) {
+                $keywords = trim($keyword);
+                $query->whereRaw("DATE_ADD(p2.tanggal_pembelian, INTERVAL p2.tempo_hari_pembelian DAY) like ?", ["%{$keywords}%"]);
+            })->filterColumn('mtotal_pembelian', function ($query, $keyword) {
+                $keywords = trim($keyword);
+                $query->whereRaw("a.total like ?", ["%{$keywords}%"]);
+            })->filterColumn('sisa', function ($query, $keyword) {
+                $keywords = trim($keyword);
+                $query->whereRaw("(a.total+a.uang_muka)-ifnull(p.total,0) like ?", ["%{$keywords}%"]);
+            })->filterColumn('bayar', function ($query, $keyword) {
+                $keywords = trim($keyword);
+                $query->whereRaw("ifnull(p.Total,0) like ?", ["%{$keywords}%"]);
+            })->filterColumn('aging', function ($query, $keyword) use ($date) {
+                $keywords = trim($keyword);
+                $q = "DATEDIFF(" . $date . ",DATE(DATE_ADD(p2.tanggal_pembelian, INTERVAL p2.tempo_hari_pembelian DAY)))";
+                $query->whereRaw($q . ' like ?', ["%{$keywords}%"]);
+            });
+
+            $datatable = $datatable->make(true);
+
+            return $datatable;
         }
 
         $data = $data->get();

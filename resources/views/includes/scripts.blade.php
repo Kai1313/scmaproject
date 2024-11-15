@@ -22,7 +22,7 @@
             token_pengguna: "{{ session('token') }}"
         };
         $.ajax({
-            url: "{{ env('OLD_API_ROOT') }}actions/core/ganti_password.php",
+            url: "{{ env('OLD_ASSET_ROOT') }}actions/core/ganti_password.php",
             type: "POST",
             data: param,
             success: function(res) {

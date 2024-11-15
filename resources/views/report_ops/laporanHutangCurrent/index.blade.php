@@ -51,7 +51,7 @@
                                 value="{{ date('Y-m-d') }}">
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label>Pemasok</label>
                         <div class="form-group">
                             <select name="id_pemasok" class="form-control select2 trigger-change">
@@ -61,7 +61,17 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-2">
+                        <label>Status</label>
+                        <div class="form-group">
+                            <select name="transaction_status" class="form-control select2 trigger-change">
+                                <option value="all">Tampilkan Semua</option>
+                                <option value="1">Lunas</option>
+                                <option value="2">Belum Lunas</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
                         <label style="width:100%;"> &nbsp</label>
                         <div class="form-group pull-right">
                             <a href="{{ route('report_payable-print') }}" target="_blank"
@@ -81,14 +91,14 @@
             </div>
             <div class="box-body">
                 <div class="table-responsive" id="target-table" style="display:none;">
-                    <table class="table table-bordered data-table display responsive nowrap" width="100%">
+                    <table class="table table-bordered data-table display responsive" width="100%">
                         <thead>
                             <tr>
-                                <th>Kode Pemasok</th>
-                                <th>Nama Pemasok</th>
-                                <th>No. Faktur</th>
                                 <th>Tgl Faktur</th>
+                                <th>No. Faktur</th>
+                                <th>Nama Pemasok</th>
                                 <th>Jatuh Tempo</th>
+                                <th>Uang Muka</th>
                                 <th>Nilai Faktur</th>
                                 <th>Total Pembayaran</th>
                                 <th>Hutang</th>
@@ -112,7 +122,7 @@
     <script type="text/javascript" src="{{ asset('assets/bower_components/moment/moment.js') }}"></script>
     <script type="text/javascript"
         src="{{ asset('assets/bower_components/bootstrap-daterangepicker/daterangepicker.js') }}"></script>
-    <script src="https://cdn.datatables.net/rowgroup/1.4.0/js/dataTables.rowGroup.min.js"></script>
+    {{-- <script src="https://cdn.datatables.net/rowgroup/1.4.0/js/dataTables.rowGroup.min.js"></script> --}}
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/custom.js') }}"></script>
 @endsection
@@ -127,82 +137,90 @@
                 processing: true,
                 serverSide: true,
                 ajax: defaultUrlIndex + param,
-                fnDrawCallback: function(oSettings) {
-                    setTimeout(function() {
-                        var xxxx = $('.dtrg-end th');
-                        $.each(xxxx, function(index, value) {
-                            var ccccc = $(value).text().split(" | ");
-                            $(value).parent().html(
-                                "<td colspan='3' style='text-align: left;background-color: #B9B9B9'><b>" +
-                                ccccc[0] +
-                                "</b></td><td style='text-align: right;background-color: #B9B9B9'><b>" +
-                                ccccc[1] +
-                                "</b></td><td style='text-align: right;background-color: #B9B9B9'><b>" +
-                                ccccc[2] +
-                                `</b></td><td style='text-align: right;background-color: #B9B9B9'>${ccccc[3]}</td>` +
-                                "</b></td><td style='text-align: right;background-color: #B9B9B9'></td>"
-                            );
-                        });
-                    }, 100);
-                },
-                rowGroup: {
-                    startRender: function(rows, group) {
-                        return '(' + group + ') ' + rows.data()[0].nama_pemasok;
-                    },
-                    endRender: function(rows, group) {
-                        var nilaiFaktur = rows
-                            .data()
-                            .pluck('mtotal_pembelian')
-                            .reduce(function(a, b) {
-                                return a + b * 1;
-                            }, 0);
+                pageLength: 50,
+                // fnDrawCallback: function(oSettings) {
+                //     setTimeout(function() {
+                //         var xxxx = $('.dtrg-end th');
+                //         $.each(xxxx, function(index, value) {
+                //             var ccccc = $(value).text().split(" | ");
+                //             $(value).parent().html(
+                //                 "<td colspan='3' style='text-align: left;background-color: #B9B9B9'><b>" +
+                //                 ccccc[0] +
+                //                 "</b></td><td style='text-align: right;background-color: #B9B9B9'><b>" +
+                //                 ccccc[1] +
+                //                 "</b></td><td style='text-align: right;background-color: #B9B9B9'><b>" +
+                //                 ccccc[2] +
+                //                 "</b></td><td style='text-align: right;background-color: #B9B9B9'><b>" +
+                //                 ccccc[3] +
+                //                 "</b></td><td style='text-align: right;background-color: #B9B9B9'>" +
+                //                 ccccc[4] + '</td>' +
+                //                 "</b></td><td style='text-align: right;background-color: #B9B9B9'></td>"
+                //             );
+                //         });
+                //     }, 100);
+                // },
+                // rowGroup: {
+                //     startRender: function(rows, group) {
+                //         return '(' + group + ') ' + rows.data()[0].nama_pemasok;
+                //     },
+                //     endRender: function(rows, group) {
+                //         var nilaiFaktur = rows
+                //             .data()
+                //             .pluck('mtotal_pembelian')
+                //             .reduce(function(a, b) {
+                //                 return a + b * 1;
+                //             }, 0);
 
-                        var bayar = rows
-                            .data()
-                            .pluck('bayar')
-                            .reduce(function(a, b) {
-                                return a + b * 1;
-                            }, 0);
+                //         var bayar = rows
+                //             .data()
+                //             .pluck('bayar')
+                //             .reduce(function(a, b) {
+                //                 return a + b * 1;
+                //             }, 0);
 
-                        var hutang = rows
-                            .data()
-                            .pluck('sisa')
-                            .reduce(function(a, b) {
-                                return a + b * 1;
-                            }, 0);
-                        return '' + ' | ' + $.fn.dataTable.render.number('.',
-                            ',', 0, '').display(nilaiFaktur) + ' | ' + $.fn.dataTable.render.number('.',
-                            ',', 0, '').display(bayar) + ' | ' + $.fn.dataTable.render.number('.',
-                            ',', 0, '').display(hutang);
-                    },
-                    dataSrc: 'kode_pemasok'
-                },
+                //         var hutang = rows
+                //             .data()
+                //             .pluck('sisa')
+                //             .reduce(function(a, b) {
+                //                 return a + b * 1;
+                //             }, 0);
+
+                //         var uangMuka = rows
+                //             .data()
+                //             .pluck('uang_muka')
+                //             .reduce(function(a, b) {
+                //                 return a + b * 1;
+                //             }, 0);
+                //         return '' + ' | ' + formatNumber(uangMuka, 2) +
+                //             ' | ' + formatNumber(nilaiFaktur, 2) +
+                //             ' | ' + formatNumber(bayar, 2) +
+                //             ' | ' + formatNumber(hutang, 2);
+                //     },
+                //     dataSrc: 'kode_pemasok'
+                // },
                 columns: [{
-                    data: 'kode_pemasok',
-                    name: 'kode_pemasok',
-                    visible: false
-                }, {
-                    data: 'nama_pemasok',
-                    name: 'nama_pemasok',
-                    visible: false
+                    data: 'tanggal_pembelian',
+                    name: 'p2.tanggal_pembelian',
                 }, {
                     data: 'id_transaksi',
-                    name: 'id_transaksi',
+                    name: 'a.id_transaksi',
                 }, {
-                    data: 'tanggal_pembelian',
-                    name: 'tanggal_pembelian',
-                    render: function(data) {
-                        return data ? formatDate(data) : ''
-                    },
+                    data: 'nama_pemasok',
+                    name: 'pe.nama_pemasok',
+                    visible: true
                 }, {
                     data: 'top',
                     name: 'top',
+                }, {
+                    data: 'uang_muka',
+                    name: 'a.uang_muka',
                     render: function(data) {
-                        return data ? formatDate(data) : ''
+                        return data ? formatNumber(data, 2) : 0
                     },
+                    className: 'text-right'
                 }, {
                     data: 'mtotal_pembelian',
-                    name: 'mtotal_pembelian',
+                    name: 'a.total',
                     render: function(data) {
                         return data ? formatNumber(data, 2) : 0
                     },
