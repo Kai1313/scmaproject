@@ -112,20 +112,20 @@ class LaporanHutangCurrentController extends Controller
         $idCabang = explode(',', $request->id_cabang);
         $transactionStatus = $request->transaction_status;
 
-        $joinJurnal = DB::table('jurnal_header as jh')
-            ->select('jd.id_transaksi', DB::raw('ifnull(sum(jd.debet-jd.credit),0) as Total'))
-            ->leftJoin('jurnal_detail AS jd', function ($join) {
-                $join->on('jh.id_jurnal', '=', 'jd.id_jurnal')
-                    ->on(DB::Raw("ifnull(jd.id_transaksi,'')"), '<>', DB::Raw("''"));
-            })
-            ->leftJoin('saldo_transaksi AS st', 'st.id_transaksi', 'jd.id_transaksi')
-            ->where('jh.void', 0)
-            ->where('jh.tanggal_jurnal', '<=', $date)
-            ->whereIn('st.tipe_transaksi', ['Pembelian', 'Retur Pembelian'])
-            ->groupBy('jd.id_transaksi');
-        if ($idPemasok != 'all') {
-            $joinJurnal->where('st.id_pemasok', $idPemasok);
-        }
+        // $joinJurnal = DB::table('jurnal_header as jh')
+        //     ->select('jd.id_transaksi', DB::raw('ifnull(sum(jd.debet-jd.credit),0) as Total'))
+        //     ->leftJoin('jurnal_detail AS jd', function ($join) {
+        //         $join->on('jh.id_jurnal', '=', 'jd.id_jurnal')
+        //             ->on(DB::Raw("ifnull(jd.id_transaksi,'')"), '<>', DB::Raw("''"));
+        //     })
+        //     ->leftJoin('saldo_transaksi AS st', 'st.id_transaksi', 'jd.id_transaksi')
+        //     ->where('jh.void', 0)
+        //     ->where('jh.tanggal_jurnal', '<=', $date)
+        //     ->whereIn('st.tipe_transaksi', ['Pembelian', 'Retur Pembelian'])
+        //     ->groupBy('jd.id_transaksi');
+        // if ($idPemasok != 'all') {
+        //     $joinJurnal->where('st.id_pemasok', $idPemasok);
+        // }
 
         $data = DB::table('saldo_transaksi as a')->Select(
             'pe.kode_pemasok',
@@ -133,22 +133,23 @@ class LaporanHutangCurrentController extends Controller
             'a.id_transaksi',
             'p2.tanggal_pembelian',
             DB::raw('DATE_ADD(p2.tanggal_pembelian, INTERVAL p2.tempo_hari_pembelian DAY) as top'),
-            'a.total as mtotal_pembelian',
-            DB::raw('(a.total+a.uang_muka)-ifnull(p.total,0) as sisa'),
-            DB::raw('ifnull(p.Total,0) as bayar'),
+            DB::raw('(a.total + a.uang_muka) as mtotal_pembelian'),
+            DB::raw('(a.total+a.uang_muka)-(a.bayar+a.uang_muka) as sisa'),
+            'a.bayar',
             DB::raw('DATEDIFF("' . $date . '",DATE(DATE_ADD(p2.tanggal_pembelian, INTERVAL p2.tempo_hari_pembelian DAY))) as aging'),
-            'a.uang_muka')
-            ->leftJoinSub($joinJurnal, 'p', function ($join) {
-                $join->on('a.id_transaksi', '=', 'p.id_transaksi');
-            })
+            'a.uang_muka',
+            DB::raw('(a.bayar+a.uang_muka) as terbayar'))
+        // ->leftJoinSub($joinJurnal, 'p', function ($join) {
+        //     $join->on('a.id_transaksi', '=', 'p.id_transaksi');
+        // })
             ->leftJoin('pemasok as pe', 'pe.id_pemasok', 'a.id_pemasok')
             ->leftJoin('pembelian as p2', 'a.id_transaksi', 'p2.nama_pembelian')
             ->where('a.tanggal', '<=', $date);
         if ($transactionStatus != 'all') {
             if ($transactionStatus == '1') {
-                $data = $data->where(DB::raw('a.total-ifnull(p.total,0)'), 0);
+                $data = $data->where(DB::raw('(a.total+a.uang_muka)-(a.bayar+a.uang_muka)'), 0);
             } else {
-                $data = $data->where(DB::raw('a.total-ifnull(p.total,0)'), '<>', 0);
+                $data = $data->where(DB::raw('(a.total+a.uang_muka)-(a.bayar+a.uang_muka)'), '<>', 0);
             }
         }
 
@@ -170,13 +171,13 @@ class LaporanHutangCurrentController extends Controller
                 $query->whereRaw("DATE_ADD(p2.tanggal_pembelian, INTERVAL p2.tempo_hari_pembelian DAY) like ?", ["%{$keywords}%"]);
             })->filterColumn('mtotal_pembelian', function ($query, $keyword) {
                 $keywords = trim($keyword);
-                $query->whereRaw("a.total like ?", ["%{$keywords}%"]);
+                $query->whereRaw("(a.total + a.uang_muka) like ?", ["%{$keywords}%"]);
             })->filterColumn('sisa', function ($query, $keyword) {
                 $keywords = trim($keyword);
-                $query->whereRaw("(a.total+a.uang_muka)-ifnull(p.total,0) like ?", ["%{$keywords}%"]);
-            })->filterColumn('bayar', function ($query, $keyword) {
+                $query->whereRaw("(a.total+a.uang_muka)-(a.bayar+a.uang_muka) like ?", ["%{$keywords}%"]);
+            })->filterColumn('terbayar', function ($query, $keyword) {
                 $keywords = trim($keyword);
-                $query->whereRaw("ifnull(p.Total,0) like ?", ["%{$keywords}%"]);
+                $query->whereRaw("(a.bayar+a.uang_muka) like ?", ["%{$keywords}%"]);
             })->filterColumn('aging', function ($query, $keyword) use ($date) {
                 $keywords = trim($keyword);
                 $q = "DATEDIFF(" . $date . ",DATE(DATE_ADD(p2.tanggal_pembelian, INTERVAL p2.tempo_hari_pembelian DAY)))";

@@ -58,7 +58,10 @@
                 <th>Tgl Faktur</th>
                 <th>Jatuh Tempo</th>
                 <th>Nilai Faktur</th>
-                <th>Hutang</th>
+                <th>Uang Muka</th>
+                <th>Pembayaran</th>
+                <th>Total Terbayar</th>
+                <th>Sisa</th>
                 <th>Umur</th>
             </tr>
         </thead>
@@ -71,6 +74,9 @@
                     <td>{{ $data->tanggal_pembelian }}</td>
                     <td>{{ $data->top }}</td>
                     <td class="number">{{ formatNumber($data->mtotal_pembelian, 2) }}</td>
+                    <td class="number">{{ formatNumber($data->uang_muka, 2) }}</td>
+                    <td class="number">{{ formatNumber($data->bayar, 2) }}</td>
+                    <td class="number">{{ formatNumber($data->terbayar, 2) }}</td>
                     <td class="number">{{ formatNumber($data->sisa, 2) }}</td>
                     <td class="number">{{ $data->aging }}</td>
                 </tr>

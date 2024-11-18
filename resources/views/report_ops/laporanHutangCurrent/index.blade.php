@@ -98,10 +98,11 @@
                                 <th>No. Faktur</th>
                                 <th>Nama Pemasok</th>
                                 <th>Jatuh Tempo</th>
-                                <th>Uang Muka</th>
                                 <th>Nilai Faktur</th>
-                                <th>Total Pembayaran</th>
-                                <th>Hutang</th>
+                                <th>Uang Muka</th>
+                                <th>Pembayaran</th>
+                                <th>Total Terbayar</th>
+                                <th>Sisa</th>
                                 <th>Umur</th>
                             </tr>
                         </thead>
@@ -212,13 +213,6 @@
                     data: 'top',
                     name: 'top',
                 }, {
-                    data: 'uang_muka',
-                    name: 'a.uang_muka',
-                    render: function(data) {
-                        return data ? formatNumber(data, 2) : 0
-                    },
-                    className: 'text-right'
-                }, {
                     data: 'mtotal_pembelian',
                     name: 'a.total',
                     render: function(data) {
@@ -226,8 +220,22 @@
                     },
                     className: 'text-right'
                 }, {
+                    data: 'uang_muka',
+                    name: 'a.uang_muka',
+                    render: function(data) {
+                        return data ? formatNumber(data, 2) : 0
+                    },
+                    className: 'text-right'
+                }, {
                     data: 'bayar',
-                    name: 'bayar',
+                    name: 'a.bayar',
+                    render: function(data) {
+                        return data ? formatNumber(data, 2) : 0
+                    },
+                    className: 'text-right'
+                }, {
+                    data: 'terbayar',
+                    name: 'terbayar',
                     render: function(data) {
                         return data ? formatNumber(data, 2) : 0
                     },
