@@ -270,6 +270,7 @@ Route::namespace('Report')->group(function () {
         Route::get('index/{user_id?}', 'LaporanPiutangCurrentController@index')->name('report_receiveable-index');
         Route::get('print', 'LaporanPiutangCurrentController@print')->name('report_receiveable-print');
         Route::get('excel', 'LaporanPiutangCurrentController@getExcel')->name('report_receiveable-excel');
+        Route::get('get-journal', 'LaporanPiutangCurrentController@getJournal')->name('report_receiveable-get_journal');
     });
 
     Route::prefix('laporan_checklist')->group(function () {

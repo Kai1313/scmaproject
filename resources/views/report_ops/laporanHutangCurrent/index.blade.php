@@ -123,7 +123,6 @@
     <script type="text/javascript" src="{{ asset('assets/bower_components/moment/moment.js') }}"></script>
     <script type="text/javascript"
         src="{{ asset('assets/bower_components/bootstrap-daterangepicker/daterangepicker.js') }}"></script>
-    {{-- <script src="https://cdn.datatables.net/rowgroup/1.4.0/js/dataTables.rowGroup.min.js"></script> --}}
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/custom.js') }}"></script>
 @endsection
@@ -139,66 +138,6 @@
                 serverSide: true,
                 ajax: defaultUrlIndex + param,
                 pageLength: 50,
-                // fnDrawCallback: function(oSettings) {
-                //     setTimeout(function() {
-                //         var xxxx = $('.dtrg-end th');
-                //         $.each(xxxx, function(index, value) {
-                //             var ccccc = $(value).text().split(" | ");
-                //             $(value).parent().html(
-                //                 "<td colspan='3' style='text-align: left;background-color: #B9B9B9'><b>" +
-                //                 ccccc[0] +
-                //                 "</b></td><td style='text-align: right;background-color: #B9B9B9'><b>" +
-                //                 ccccc[1] +
-                //                 "</b></td><td style='text-align: right;background-color: #B9B9B9'><b>" +
-                //                 ccccc[2] +
-                //                 "</b></td><td style='text-align: right;background-color: #B9B9B9'><b>" +
-                //                 ccccc[3] +
-                //                 "</b></td><td style='text-align: right;background-color: #B9B9B9'>" +
-                //                 ccccc[4] + '</td>' +
-                //                 "</b></td><td style='text-align: right;background-color: #B9B9B9'></td>"
-                //             );
-                //         });
-                //     }, 100);
-                // },
-                // rowGroup: {
-                //     startRender: function(rows, group) {
-                //         return '(' + group + ') ' + rows.data()[0].nama_pemasok;
-                //     },
-                //     endRender: function(rows, group) {
-                //         var nilaiFaktur = rows
-                //             .data()
-                //             .pluck('mtotal_pembelian')
-                //             .reduce(function(a, b) {
-                //                 return a + b * 1;
-                //             }, 0);
-
-                //         var bayar = rows
-                //             .data()
-                //             .pluck('bayar')
-                //             .reduce(function(a, b) {
-                //                 return a + b * 1;
-                //             }, 0);
-
-                //         var hutang = rows
-                //             .data()
-                //             .pluck('sisa')
-                //             .reduce(function(a, b) {
-                //                 return a + b * 1;
-                //             }, 0);
-
-                //         var uangMuka = rows
-                //             .data()
-                //             .pluck('uang_muka')
-                //             .reduce(function(a, b) {
-                //                 return a + b * 1;
-                //             }, 0);
-                //         return '' + ' | ' + formatNumber(uangMuka, 2) +
-                //             ' | ' + formatNumber(nilaiFaktur, 2) +
-                //             ' | ' + formatNumber(bayar, 2) +
-                //             ' | ' + formatNumber(hutang, 2);
-                //     },
-                //     dataSrc: 'kode_pemasok'
-                // },
                 columns: [{
                     data: 'tanggal_pembelian',
                     name: 'p2.tanggal_pembelian',

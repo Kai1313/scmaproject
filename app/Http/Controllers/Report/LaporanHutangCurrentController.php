@@ -185,7 +185,6 @@ class LaporanHutangCurrentController extends Controller
             });
 
             $datatable = $datatable->make(true);
-
             return $datatable;
         }
 

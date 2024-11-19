@@ -53,7 +53,7 @@
                                 value="{{ request()->date ?? date('Y-m-d') }}">
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label>Pelanggan</label>
                         <div class="form-group">
                             <select name="id_pelanggan" class="form-control select2 trigger-change" style="width:100%;">
@@ -65,7 +65,17 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-2">
+                        <label>Status</label>
+                        <div class="form-group">
+                            <select name="transaction_status" class="form-control select2 trigger-change">
+                                <option value="all">Tampilkan Semua</option>
+                                <option value="1">Lunas</option>
+                                <option value="2">Belum Lunas</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
                         <label style="width:100%;"> &nbsp</label>
                         <div class="form-group pull-right">
                             <a href="{{ route('report_receiveable-print') }}" target="_blank"
@@ -88,15 +98,15 @@
                     <table class="table table-bordered data-table display nowrap" width="100%">
                         <thead>
                             <tr>
-                                <th>Kode Pelanggan</th>
-                                <th>Nama Pelanggan</th>
-                                <th>No. Faktur</th>
                                 <th>Tgl Faktur</th>
+                                <th>No. Faktur</th>
+                                <th>Nama Pelanggan</th>
                                 <th>Jatuh Tempo</th>
                                 <th>Nilai Faktur</th>
-                                <th>Total Pembayaran</th>
-                                <th>Sisa Piutang</th>
-                                <th>Tanggal Bayar</th>
+                                <th>Uang Muka</th>
+                                <th>Pembayaran</th>
+                                <th>Total Terbayar</th>
+                                <th>Sisa</th>
                                 <th>Umur</th>
                             </tr>
                         </thead>
@@ -104,6 +114,29 @@
                         </tbody>
                     </table>
                 </div>
+            </div>
+        </div>
+    </div>
+    <div id="modal-payment" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Daftar Transaksi Pembayaran</h4>
+                </div>
+                <table class="table" style="margin-bottom:20px;">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Transaksi</th>
+                            <th>Tanggal Bayar</th>
+                            <th>Nominal</th>
+                        </tr>
+                    </thead>
+                    <tbody id="target-transaction">
+
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -117,7 +150,7 @@
     <script type="text/javascript" src="{{ asset('assets/bower_components/moment/moment.js') }}"></script>
     <script type="text/javascript"
         src="{{ asset('assets/bower_components/bootstrap-daterangepicker/daterangepicker.js') }}"></script>
-    <script src="https://cdn.datatables.net/rowgroup/1.4.0/js/dataTables.rowGroup.min.js"></script>
+    {{-- <script src="https://cdn.datatables.net/rowgroup/1.4.0/js/dataTables.rowGroup.min.js"></script> --}}
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/custom.js') }}"></script>
 @endsection
@@ -131,76 +164,21 @@
             table = $('.data-table').DataTable({
                 processing: true,
                 serverSide: true,
-                dom: 'lrt',
-                paging: false,
+                pageLength: 50,
                 ajax: defaultUrlIndex + param,
-                fnDrawCallback: function(oSettings) {
-                    setTimeout(function() {
-                        var xxxx = $('.dtrg-end th');
-                        $.each(xxxx, function(index, value) {
-                            var ccccc = $(value).text().split(" | ");
-                            $(value).parent().html(
-                                "<td colspan='3' style='text-align: left;background-color: #B9B9B9'><b>" +
-                                ccccc[0] +
-                                "</b></td><td style='text-align: right;background-color: #B9B9B9'><b>" +
-                                ccccc[1] +
-                                "</b></td><td style='text-align: right;background-color: #B9B9B9'><b>" +
-                                ccccc[2] +
-                                `</b></td><td style='text-align: right;background-color: #B9B9B9'>${ccccc[3]}</td>` +
-                                "</b></td><td style='text-align: right;background-color: #B9B9B9'></td><td style='text-align: right;background-color: #B9B9B9'></td>"
-                            );
-                        });
-                    }, 100);
-                },
-                rowGroup: {
-                    startRender: function(rows, group) {
-                        return '(' + group + ') ' + rows.data()[0].nama_pelanggan;
-                    },
-                    endRender: function(rows, group) {
-                        var nilaiFaktur = rows
-                            .data()
-                            .pluck('mtotal_penjualan')
-                            .reduce(function(a, b) {
-                                return a + b * 1;
-                            }, 0);
-
-                        var bayar = rows
-                            .data()
-                            .pluck('bayar')
-                            .reduce(function(a, b) {
-                                return a + b * 1;
-                            }, 0);
-
-                        var hutang = rows
-                            .data()
-                            .pluck('sisa')
-                            .reduce(function(a, b) {
-                                return a + b * 1;
-                            }, 0);
-                        return '' + ' | ' + $.fn.dataTable.render.number('.',
-                            ',', 0, '').display(nilaiFaktur) + ' | ' + $.fn.dataTable.render.number('.',
-                            ',', 0, '').display(bayar) + ' | ' + $.fn.dataTable.render.number('.',
-                            ',', 0, '').display(hutang);
-                    },
-                    dataSrc: 'kode_pelanggan'
-                },
                 columns: [{
-                    data: 'kode_pelanggan',
-                    name: 'kode_pelanggan',
-                    visible: false
-                }, {
-                    data: 'nama_pelanggan',
-                    name: 'nama_pelanggan',
-                    visible: false
-                }, {
-                    data: 'id_transaksi',
-                    name: 'id_transaksi',
-                }, {
                     data: 'tanggal_penjualan',
-                    name: 'tanggal_penjualan',
+                    name: 'p2.tanggal_penjualan',
                     render: function(data) {
                         return data ? formatDate(data) : ''
                     },
+                }, {
+                    data: 'id_transaksi',
+                    name: 'a.id_transaksi',
+                }, {
+                    data: 'nama_pelanggan',
+                    name: 'pe.nama_pelanggan',
+                    visible: true
                 }, {
                     data: 'top',
                     name: 'top',
@@ -209,14 +187,25 @@
                     },
                 }, {
                     data: 'mtotal_penjualan',
-                    name: 'mtotal_penjualan',
+                    name: 'a.total',
+                    render: function(data) {
+                        return data ? formatNumber(data, 2) : 0
+                    },
+                    className: 'text-right'
+                }, {
+                    data: 'uang_muka',
+                    name: 'a.uang_muka',
                     render: function(data) {
                         return data ? formatNumber(data, 2) : 0
                     },
                     className: 'text-right'
                 }, {
                     data: 'bayar',
-                    name: 'bayar',
+                    name: 'a.bayar',
+                    className: 'text-right'
+                }, {
+                    data: 'terbayar',
+                    name: 'terbayar',
                     render: function(data) {
                         return data ? formatNumber(data, 2) : 0
                     },
@@ -228,21 +217,6 @@
                         return data ? formatNumber(data, 2) : 0
                     },
                     className: 'text-right'
-                }, {
-                    data: 'tanggal_jurnal',
-                    name: 'tanggal_jurnal',
-                    render: function(data) {
-                        let html = ''
-                        if (data) {
-                            let split = data.split(" | ");
-
-                            for (let i = 0; i < split.length; i++) {
-                                html += split[i] + '<br>'
-                            }
-                        }
-
-                        return html
-                    }
                 }, {
                     data: 'aging',
                     name: 'aging',
@@ -256,5 +230,26 @@
         @if (request()->action == '1')
             $('.btn-view-action').click()
         @endif
+
+        $('#target-table').on('click', '.show-payment', function() {
+            $('#cover-spin').show()
+            let idTransaksi = $(this).data('id');
+            $.ajax({
+                url: "{{ route('report_receiveable-get_journal') }}",
+                type: 'get',
+                data: {
+                    id_transaksi: idTransaksi
+                },
+                success: function(res) {
+                    $('#target-transaction').html(res.html)
+                    $('#modal-payment').modal()
+                    $('#cover-spin').hide()
+                },
+                error: function(error) {
+                    $('#cover-spin').hide()
+                    Swal.fire("Gagal proses data. ", error.responseJSON.message, 'error')
+                }
+            })
+        })
     </script>
 @endsection
