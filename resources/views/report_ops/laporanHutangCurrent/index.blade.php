@@ -113,6 +113,29 @@
             </div>
         </div>
     </div>
+    <div id="modal-payment" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Daftar Transaksi Pembayaran</h4>
+                </div>
+                <table class="table" style="margin-bottom:20px;">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Transaksi</th>
+                            <th>Tanggal Bayar</th>
+                            <th>Nominal</th>
+                        </tr>
+                    </thead>
+                    <tbody id="target-transaction">
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('addedScripts')
@@ -168,9 +191,6 @@
                 }, {
                     data: 'bayar',
                     name: 'a.bayar',
-                    render: function(data) {
-                        return data ? formatNumber(data, 2) : 0
-                    },
                     className: 'text-right'
                 }, {
                     data: 'terbayar',
@@ -195,4 +215,30 @@
         }
     </script>
     <script src="{{ asset('js/for-report.js') }}"></script>
+    <script>
+        @if (request()->action == '1')
+            $('.btn-view-action').click()
+        @endif
+
+        $('#target-table').on('click', '.show-payment', function() {
+            $('#cover-spin').show()
+            let idTransaksi = $(this).data('id');
+            $.ajax({
+                url: "{{ route('report_payable-get_journal') }}",
+                type: 'get',
+                data: {
+                    id_transaksi: idTransaksi
+                },
+                success: function(res) {
+                    $('#target-transaction').html(res.html)
+                    $('#modal-payment').modal()
+                    $('#cover-spin').hide()
+                },
+                error: function(error) {
+                    $('#cover-spin').hide()
+                    Swal.fire("Gagal proses data. ", error.responseJSON.message, 'error')
+                }
+            })
+        })
+    </script>
 @endsection

@@ -264,6 +264,7 @@ Route::namespace('Report')->group(function () {
         Route::get('index/{user_id?}', 'LaporanHutangCurrentController@index')->name('report_payable-index');
         Route::get('print', 'LaporanHutangCurrentController@print')->name('report_payable-print');
         Route::get('excel', 'LaporanHutangCurrentController@getExcel')->name('report_payable-excel');
+        Route::get('get-journal', 'LaporanHutangCurrentController@getJournal')->name('report_payable-get_journal');
     });
 
     Route::prefix('laporan_piutang_current')->group(function () {

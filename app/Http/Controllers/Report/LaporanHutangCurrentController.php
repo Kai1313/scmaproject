@@ -112,21 +112,6 @@ class LaporanHutangCurrentController extends Controller
         $idCabang = explode(',', $request->id_cabang);
         $transactionStatus = $request->transaction_status;
 
-        // $joinJurnal = DB::table('jurnal_header as jh')
-        //     ->select('jd.id_transaksi', DB::raw('ifnull(sum(jd.debet-jd.credit),0) as Total'))
-        //     ->leftJoin('jurnal_detail AS jd', function ($join) {
-        //         $join->on('jh.id_jurnal', '=', 'jd.id_jurnal')
-        //             ->on(DB::Raw("ifnull(jd.id_transaksi,'')"), '<>', DB::Raw("''"));
-        //     })
-        //     ->leftJoin('saldo_transaksi AS st', 'st.id_transaksi', 'jd.id_transaksi')
-        //     ->where('jh.void', 0)
-        //     ->where('jh.tanggal_jurnal', '<=', $date)
-        //     ->whereIn('st.tipe_transaksi', ['Pembelian', 'Retur Pembelian'])
-        //     ->groupBy('jd.id_transaksi');
-        // if ($idPemasok != 'all') {
-        //     $joinJurnal->where('st.id_pemasok', $idPemasok);
-        // }
-
         $data = DB::table('saldo_transaksi as a')->Select(
             'pe.kode_pemasok',
             'pe.nama_pemasok',
@@ -138,10 +123,9 @@ class LaporanHutangCurrentController extends Controller
             'a.bayar',
             DB::raw('DATEDIFF("' . $date . '",DATE(DATE_ADD(p2.tanggal_pembelian, INTERVAL p2.tempo_hari_pembelian DAY))) as aging'),
             'a.uang_muka',
-            DB::raw('(a.bayar+a.uang_muka) as terbayar'))
-        // ->leftJoinSub($joinJurnal, 'p', function ($join) {
-        //     $join->on('a.id_transaksi', '=', 'p.id_transaksi');
-        // })
+            DB::raw('(a.bayar+a.uang_muka) as terbayar'),
+            'p2.id_pembelian'
+        )
             ->leftJoin('pemasok as pe', 'pe.id_pemasok', 'a.id_pemasok')
             ->leftJoin('pembelian as p2', 'a.id_transaksi', 'p2.nama_pembelian')
             ->where('a.tanggal', '<=', $date);
@@ -166,7 +150,11 @@ class LaporanHutangCurrentController extends Controller
 
         if ($type == 'datatable') {
             $datatable = Datatables::of($data);
-            $datatable = $datatable->filterColumn('top', function ($query, $keyword) {
+            $datatable = $datatable->editColumn('bayar', function ($row) {
+                return $row->bayar > 0 ? '<a href="javascript:void(0)" data-id="' . $row->id_transaksi . '" class="show-payment">' . formatNumber2($row->bayar, 2) . '</a>' : formatNumber2($row->bayar, 2);
+            })->editColumn('id_transaksi', function ($row) {
+                return '<a href="' . env('OLD_URL_ROOT') . '#pembelian_invoice&data_master=' . $row->id_pembelian . '" target="_blank">' . $row->id_transaksi . '</a>';
+            })->filterColumn('top', function ($query, $keyword) {
                 $keywords = trim($keyword);
                 $query->whereRaw("DATE_ADD(p2.tanggal_pembelian, INTERVAL p2.tempo_hari_pembelian DAY) like ?", ["%{$keywords}%"]);
             })->filterColumn('mtotal_pembelian', function ($query, $keyword) {
@@ -184,11 +172,33 @@ class LaporanHutangCurrentController extends Controller
                 $query->whereRaw($q . ' like ?', ["%{$keywords}%"]);
             });
 
-            $datatable = $datatable->make(true);
+            $datatable = $datatable->rawColumns(['bayar', 'id_transaksi'])->make(true);
             return $datatable;
         }
 
         $data = $data->get();
         return $data;
+    }
+
+    public function getJournal(Request $request)
+    {
+        $idTransaksi = $request->id_transaksi;
+        $datas = DB::table('jurnal_detail as jd')->select('jh.kode_jurnal', 'jh.tanggal_jurnal', 'jd.debet', 'jh.id_jurnal', 'jh.jenis_jurnal')
+            ->join('jurnal_header as jh', 'jd.id_jurnal', 'jh.id_jurnal')
+            ->where('jd.id_transaksi', $idTransaksi)->where('jh.void', '0')->get();
+        $html = '';
+        foreach ($datas as $key => $data) {
+            $link = $data->jenis_jurnal == 'ME' ? route('transaction-adjustment-ledger-show', $data->id_jurnal) : route('transaction-general-ledger-show', $data->id_jurnal);
+            $html .= '<tr><td class="text-center">' . ($key + 1) . '</td>';
+            $html .= '<td><a href="' . $link . '" target="_blank">' . $data->kode_jurnal . '</a></td>';
+            $html .= '<td class="text-center">' . $data->tanggal_jurnal . '</td>';
+            $html .= '<td class="text-right">' . formatNumber2($data->debet, 2) . '</td></tr>';
+        }
+
+        if (count($datas) == 0) {
+            $html .= '<tr><td colspan="4">Pembayaran tidak ditemukan</td></tr>';
+        }
+
+        return response()->json(['html' => $html], 200);
     }
 }

@@ -111,21 +111,6 @@ class LaporanPiutangCurrentController extends Controller
         $idCabang = explode(',', $request->id_cabang);
         $transactionStatus = $request->transaction_status;
 
-        $joinJurnal = DB::table('jurnal_header as jh')
-            ->select('jd.id_transaksi', DB::raw('ifnull(sum(jd.credit-jd.debet),0) as Total'), DB::raw('GROUP_CONCAT(concat(jh.tanggal_jurnal," ",kode_jurnal," Rp ",jd.credit) SEPARATOR " | ") as tanggal_jurnal'))
-            ->leftJoin('jurnal_detail AS jd', function ($join) {
-                $join->on('jh.id_jurnal', '=', 'jd.id_jurnal')
-                    ->on(DB::Raw("ifnull(jd.id_transaksi,'')"), '<>', DB::Raw("''"));
-            })
-            ->leftJoin('saldo_transaksi AS st', 'st.id_transaksi', 'jd.id_transaksi')
-            ->where('jh.void', 0)
-            ->where('jh.tanggal_jurnal', '<=', $date)
-            ->whereIn('st.tipe_transaksi', ['Penjualan', 'Retur Penjualan'])
-            ->groupBy('jd.id_transaksi');
-        if ($idPelanggan != 'all') {
-            $joinJurnal->where('st.id_pelanggan', $idPelanggan);
-        }
-
         $data = DB::table('saldo_transaksi as a')->Select(
             'pe.kode_pelanggan',
             'pe.nama_pelanggan',
@@ -138,13 +123,8 @@ class LaporanPiutangCurrentController extends Controller
             DB::raw('DATEDIFF("' . $date . '",DATE(DATE_ADD(p2.tanggal_penjualan, INTERVAL p2.tempo_hari_penjualan DAY))) as aging'),
             'a.uang_muka',
             DB::raw('(a.bayar+a.uang_muka) as terbayar'),
-            // 'a.tanggal',
-            'p.tanggal_jurnal',
             'p2.id_penjualan'
         )
-            ->leftJoinSub($joinJurnal, 'p', function ($join) {
-                $join->on('a.id_transaksi', '=', 'p.id_transaksi');
-            })
             ->leftJoin('pelanggan as pe', 'pe.id_pelanggan', 'a.id_pelanggan')
             ->leftJoin('penjualan as p2', 'a.id_transaksi', 'p2.nama_penjualan')
             ->where('a.tanggal', '<=', $date);
