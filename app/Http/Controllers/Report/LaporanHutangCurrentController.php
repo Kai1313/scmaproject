@@ -187,13 +187,14 @@ class LaporanHutangCurrentController extends Controller
         $idTransaksi = $request->id_transaksi;
         $datas = DB::table('jurnal_detail as jd')->select('jh.kode_jurnal', 'jh.tanggal_jurnal', 'jd.debet', 'jh.id_jurnal', 'jh.jenis_jurnal', 'jd.keterangan')
             ->join('jurnal_header as jh', 'jd.id_jurnal', 'jh.id_jurnal')
-            ->where('jd.id_transaksi', $idTransaksi)->where('jh.void', '0');
-
-        $datas = $datas->get();
+            ->where('jd.id_transaksi', $idTransaksi)
+            ->where('jh.void', '0')
+            ->where('jh.id_transaksi', null)
+            ->get();
         $html = '';
         $sum = 0;
         foreach ($datas as $key => $data) {
-            $link = $data->jenis_jurnal == 'ME' ? route('transaction-adjustment-ledger-show', $data->id_jurnal) : route('transaction-general-ledger-show', $data->id_jurnal);
+            $link = route('transaction-general-ledger-show', $data->id_jurnal);
             $html .= '<tr><td class="text-center">' . ($key + 1) . '</td>';
             $html .= '<td><a href="' . $link . '" target="_blank">' . $data->kode_jurnal . '</a></td>';
             $html .= '<td class="text-center">' . $data->tanggal_jurnal . '</td>';
