@@ -119,9 +119,9 @@ class LaporanHutangCurrentController extends Controller
             'p2.tanggal_pembelian',
             DB::raw('DATE_ADD(p2.tanggal_pembelian, INTERVAL p2.tempo_hari_pembelian DAY) as top'),
             DB::raw('(a.total + a.uang_muka) as mtotal_pembelian'),
-            DB::raw('ifnull((a.total+a.uang_muka)-(a.bayar+a.uang_muka),0.00) as sisa'),
+            DB::raw('ifnull((a.total+a.uang_muka)-(ifnull(a.bayar,0)+a.uang_muka),0.00) as sisa'),
             'a.bayar',
-            DB::raw('if(sisa <> 0, DATEDIFF("' . $date . '",DATE(DATE_ADD(p2.tanggal_pembelian, INTERVAL p2.tempo_hari_pembelian DAY)))," ") as aging'),
+            DB::raw('if(sisa <> 0, DATEDIFF("' . $date . '",DATE(DATE_ADD(p2.tanggal_pembelian, INTERVAL p2.tempo_hari_pembelian DAY))),0) as aging'),
             'a.uang_muka',
             DB::raw('ifnull(a.bayar+a.uang_muka,0.00) as terbayar'),
             'p2.id_pembelian'
@@ -154,6 +154,8 @@ class LaporanHutangCurrentController extends Controller
                 return $row->bayar > 0 ? '<a href="javascript:void(0)" data-id="' . $row->id_transaksi . '" class="show-payment">' . formatNumber2($row->bayar, 2) . '</a>' : formatNumber2($row->bayar, 2);
             })->editColumn('id_transaksi', function ($row) {
                 return '<a href="' . env('OLD_URL_ROOT') . '#pembelian_invoice&data_master=' . $row->id_pembelian . '" target="_blank">' . $row->id_transaksi . '</a>';
+            })->editColumn('aging', function ($row) {
+                return $row->aging != 0 ? $row->aging : '';
             })->filterColumn('top', function ($query, $keyword) {
                 $keywords = trim($keyword);
                 $query->whereRaw("DATE_ADD(p2.tanggal_pembelian, INTERVAL p2.tempo_hari_pembelian DAY) like ?", ["%{$keywords}%"]);
@@ -168,11 +170,11 @@ class LaporanHutangCurrentController extends Controller
                 $query->whereRaw("ifnull(a.bayar+a.uang_muka,0.00) like ?", ["%{$keywords}%"]);
             })->filterColumn('aging', function ($query, $keyword) use ($date) {
                 $keywords = trim($keyword);
-                $q = "if(sisa <> 0, DATEDIFF(" . $date . ",DATE(DATE_ADD(p2.tanggal_pembelian, INTERVAL p2.tempo_hari_pembelian DAY))),' ')";
+                $q = "if(sisa <> 0, DATEDIFF(" . $date . ",DATE(DATE_ADD(p2.tanggal_pembelian, INTERVAL p2.tempo_hari_pembelian DAY))),0)";
                 $query->whereRaw($q . ' like ?', ["%{$keywords}%"]);
             });
 
-            $datatable = $datatable->rawColumns(['bayar', 'id_transaksi'])->make(true);
+            $datatable = $datatable->rawColumns(['bayar', 'id_transaksi', 'aging'])->make(true);
             return $datatable;
         }
 
