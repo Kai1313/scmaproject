@@ -119,11 +119,11 @@ class LaporanHutangCurrentController extends Controller
             'p2.tanggal_pembelian',
             DB::raw('DATE_ADD(p2.tanggal_pembelian, INTERVAL p2.tempo_hari_pembelian DAY) as top'),
             DB::raw('(a.total + a.uang_muka) as mtotal_pembelian'),
-            DB::raw('(a.total+a.uang_muka)-(a.bayar+a.uang_muka) as sisa'),
+            DB::raw('ifnull((a.total+a.uang_muka)-(a.bayar+a.uang_muka),0.00) as sisa'),
             'a.bayar',
-            DB::raw('DATEDIFF("' . $date . '",DATE(DATE_ADD(p2.tanggal_pembelian, INTERVAL p2.tempo_hari_pembelian DAY))) as aging'),
+            DB::raw('if(sisa <> 0, DATEDIFF("' . $date . '",DATE(DATE_ADD(p2.tanggal_pembelian, INTERVAL p2.tempo_hari_pembelian DAY)))," ") as aging'),
             'a.uang_muka',
-            DB::raw('(a.bayar+a.uang_muka) as terbayar'),
+            DB::raw('ifnull(a.bayar+a.uang_muka,0.00) as terbayar'),
             'p2.id_pembelian'
         )
             ->leftJoin('pemasok as pe', 'pe.id_pemasok', 'a.id_pemasok')
@@ -162,13 +162,13 @@ class LaporanHutangCurrentController extends Controller
                 $query->whereRaw("(a.total + a.uang_muka) like ?", ["%{$keywords}%"]);
             })->filterColumn('sisa', function ($query, $keyword) {
                 $keywords = trim($keyword);
-                $query->whereRaw("(a.total+a.uang_muka)-(a.bayar+a.uang_muka) like ?", ["%{$keywords}%"]);
+                $query->whereRaw("ifnull((a.total+a.uang_muka)-(a.bayar+a.uang_muka),0.00) like ?", ["%{$keywords}%"]);
             })->filterColumn('terbayar', function ($query, $keyword) {
                 $keywords = trim($keyword);
-                $query->whereRaw("(a.bayar+a.uang_muka) like ?", ["%{$keywords}%"]);
+                $query->whereRaw("ifnull(a.bayar+a.uang_muka,0.00) like ?", ["%{$keywords}%"]);
             })->filterColumn('aging', function ($query, $keyword) use ($date) {
                 $keywords = trim($keyword);
-                $q = "DATEDIFF(" . $date . ",DATE(DATE_ADD(p2.tanggal_pembelian, INTERVAL p2.tempo_hari_pembelian DAY)))";
+                $q = "if(sisa <> 0, DATEDIFF(" . $date . ",DATE(DATE_ADD(p2.tanggal_pembelian, INTERVAL p2.tempo_hari_pembelian DAY))),' ')";
                 $query->whereRaw($q . ' like ?', ["%{$keywords}%"]);
             });
 
@@ -183,22 +183,28 @@ class LaporanHutangCurrentController extends Controller
     public function getJournal(Request $request)
     {
         $idTransaksi = $request->id_transaksi;
-        $datas = DB::table('jurnal_detail as jd')->select('jh.kode_jurnal', 'jh.tanggal_jurnal', 'jd.debet', 'jh.id_jurnal', 'jh.jenis_jurnal')
+        $datas = DB::table('jurnal_detail as jd')->select('jh.kode_jurnal', 'jh.tanggal_jurnal', 'jd.debet', 'jh.id_jurnal', 'jh.jenis_jurnal', 'jd.keterangan')
             ->join('jurnal_header as jh', 'jd.id_jurnal', 'jh.id_jurnal')
-            ->where('jd.id_transaksi', $idTransaksi)->where('jh.void', '0')->get();
+            ->where('jd.id_transaksi', $idTransaksi)->where('jh.void', '0');
+
+        $datas = $datas->get();
         $html = '';
+        $sum = 0;
         foreach ($datas as $key => $data) {
             $link = $data->jenis_jurnal == 'ME' ? route('transaction-adjustment-ledger-show', $data->id_jurnal) : route('transaction-general-ledger-show', $data->id_jurnal);
             $html .= '<tr><td class="text-center">' . ($key + 1) . '</td>';
             $html .= '<td><a href="' . $link . '" target="_blank">' . $data->kode_jurnal . '</a></td>';
             $html .= '<td class="text-center">' . $data->tanggal_jurnal . '</td>';
             $html .= '<td class="text-right">' . formatNumber2($data->debet, 2) . '</td></tr>';
+            $sum += $data->debet;
         }
+
+        $html .= '<tr><td colspan="3" class=""text-right>Total</td><td class="text-right">' . formatNumber2($sum, 2) . '</td></tr>';
 
         if (count($datas) == 0) {
             $html .= '<tr><td colspan="4">Pembayaran tidak ditemukan</td></tr>';
         }
 
-        return response()->json(['html' => $html], 200);
+        return response()->json(['html' => $html, 'datas' => $datas], 200);
     }
 }
