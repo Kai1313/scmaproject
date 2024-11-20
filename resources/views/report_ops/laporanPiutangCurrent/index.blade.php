@@ -169,9 +169,6 @@
                 columns: [{
                     data: 'tanggal_penjualan',
                     name: 'p2.tanggal_penjualan',
-                    render: function(data) {
-                        return data ? formatDate(data) : ''
-                    },
                 }, {
                     data: 'id_transaksi',
                     name: 'a.id_transaksi',
@@ -182,9 +179,6 @@
                 }, {
                     data: 'top',
                     name: 'top',
-                    render: function(data) {
-                        return data ? formatDate(data) : ''
-                    },
                 }, {
                     data: 'mtotal_penjualan',
                     name: 'a.total',

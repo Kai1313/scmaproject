@@ -201,7 +201,7 @@ class LaporanHutangCurrentController extends Controller
             $sum += $data->debet;
         }
 
-        $html .= '<tr><td colspan="3" class=""text-right>Total</td><td class="text-right">' . formatNumber2($sum, 2) . '</td></tr>';
+        $html .= '<tr><td colspan="3" class="text-right"><b>Total</b></td><td class="text-right">' . formatNumber2($sum, 2) . '</td></tr>';
 
         if (count($datas) == 0) {
             $html .= '<tr><td colspan="4">Pembayaran tidak ditemukan</td></tr>';
