@@ -119,9 +119,9 @@ class LaporanHutangCurrentController extends Controller
             'p2.tanggal_pembelian',
             DB::raw('DATE_ADD(p2.tanggal_pembelian, INTERVAL p2.tempo_hari_pembelian DAY) as top'),
             DB::raw('(a.total + a.uang_muka) as mtotal_pembelian'),
-            DB::raw('ifnull((a.total+a.uang_muka)-(ifnull(a.bayar,0)+a.uang_muka),0.00) as sisa'),
+            DB::raw('ifnull((a.total+a.uang_muka)-(ifnull(a.bayar,0)+a.uang_muka),1) as sisa'),
             'a.bayar',
-            DB::raw('if(sisa <> 0, DATEDIFF("' . $date . '",DATE(DATE_ADD(p2.tanggal_pembelian, INTERVAL p2.tempo_hari_pembelian DAY))),0) as aging'),
+            DB::raw('if(ifnull((a.total+a.uang_muka)-(ifnull(a.bayar,0)+a.uang_muka),1) <> 0,DATEDIFF("' . $date . '",DATE(DATE_ADD(p2.tanggal_pembelian, INTERVAL p2.tempo_hari_pembelian DAY))),0) as aging'),
             'a.uang_muka',
             DB::raw('ifnull(a.bayar+a.uang_muka,0.00) as terbayar'),
             'p2.id_pembelian'
@@ -170,7 +170,7 @@ class LaporanHutangCurrentController extends Controller
                 $query->whereRaw("ifnull(a.bayar+a.uang_muka,0.00) like ?", ["%{$keywords}%"]);
             })->filterColumn('aging', function ($query, $keyword) use ($date) {
                 $keywords = trim($keyword);
-                $q = "if(sisa <> 0, DATEDIFF(" . $date . ",DATE(DATE_ADD(p2.tanggal_pembelian, INTERVAL p2.tempo_hari_pembelian DAY))),0)";
+                $q = "if(ifnull((a.total+a.uang_muka)-(ifnull(a.bayar,0)+a.uang_muka),1) <> 0, DATEDIFF(" . $date . ",DATE(DATE_ADD(p2.tanggal_pembelian, INTERVAL p2.tempo_hari_pembelian DAY))),0)";
                 $query->whereRaw($q . ' like ?', ["%{$keywords}%"]);
             });
 
