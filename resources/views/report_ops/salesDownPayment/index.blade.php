@@ -131,9 +131,6 @@
                 }, {
                     data: 'nominal',
                     name: 'ump.nominal',
-                    render: function(data) {
-                        return data ? formatNumber(data, 2) : 0
-                    },
                     className: 'text-right'
                 }, ]
             });

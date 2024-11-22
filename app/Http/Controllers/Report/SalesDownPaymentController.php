@@ -28,7 +28,8 @@ class SalesDownPaymentController extends Controller
         ]);
     }
 
-    function print(Request $request) {
+    public function print(Request $request)
+    {
         if (checkAccessMenu('laporan_uang_muka_penjualan', 'print') == false) {
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
@@ -109,11 +110,34 @@ class SalesDownPaymentController extends Controller
             ->orderBy('tanggal', 'asc');
 
         if ($type == 'datatable') {
-            return Datatables::of($data)
-                ->toJson();
+            if ($type == 'datatable') {
+                $datatable = Datatables::of($data);
+                $datatable = $datatable->editColumn('nominal', function ($row) {
+                    return $row->nominal != 0 ? '<a href="' . route('report_sales_down_payment-get_journal') . '?code=' . $row->kode_uang_muka_penjualan . '" target="_blank">' . formatNumber2($row->nominal, 2) . '</a>' : formatNumber2($row->nominal, 2);
+                });
+
+                $datatable = $datatable->rawColumns(['nominal'])->make(true);
+                return $datatable;
+            }
         }
 
         $data = $data->get();
         return $data;
+    }
+
+    public function getJournal(Request $request)
+    {
+        $code = $request->code;
+        $data = DB::table('jurnal_detail as jd')->select('jd.id_jurnal')
+            ->join('jurnal_header as jh', 'jd.id_jurnal', 'jh.id_jurnal')
+            ->where('jd.id_transaksi', $code)
+            ->where('jh.void', '0')
+            ->where('jh.id_transaksi', null)
+            ->first();
+        if (!$data) {
+            return redirect()->back();
+        }
+
+        return redirect()->route('transaction-general-ledger-show', $data->id_jurnal);
     }
 }

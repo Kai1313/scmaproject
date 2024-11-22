@@ -252,12 +252,14 @@ Route::namespace('Report')->group(function () {
         Route::get('index/{user_id?}', 'PurchaseDownPaymentController@index')->name('report_purchase_down_payment-index');
         Route::get('print', 'PurchaseDownPaymentController@print')->name('report_purchase_down_payment-print');
         Route::get('excel', 'PurchaseDownPaymentController@getExcel')->name('report_purchase_down_payment-excel');
+        Route::get('get-journal', 'PurchaseDownPaymentController@getJournal')->name('report_purchase_down_payment-get_journal');
     });
 
     Route::prefix('laporan_uang_muka_penjualan')->group(function () {
         Route::get('index/{user_id?}', 'SalesDownPaymentController@index')->name('report_sales_down_payment-index');
         Route::get('print', 'SalesDownPaymentController@print')->name('report_sales_down_payment-print');
         Route::get('excel', 'SalesDownPaymentController@getExcel')->name('report_sales_down_payment-excel');
+        Route::get('get-journal', 'SalesDownPaymentController@getJournal')->name('report_sales_down_payment-get_journal');
     });
 
     Route::prefix('laporan_hutang_current')->group(function () {
