@@ -149,7 +149,9 @@ class LaporanPiutangCurrentController extends Controller
         if ($type == 'datatable') {
             $datatable = Datatables::of($data);
             $datatable = $datatable->editColumn('bayar', function ($row) {
-                return $row->bayar > 0 ? '<a href="javascript:void(0)" data-id="' . $row->id_transaksi . '" class="show-payment">' . formatNumber2($row->bayar, 2) . '</a>' : formatNumber2($row->bayar, 2);
+                return $row->bayar != 0 ? '<a href="javascript:void(0)" data-id="' . $row->id_transaksi . '" class="show-payment" data-transaksi="payment">' . formatNumber2($row->bayar, 2) . '</a>' : formatNumber2($row->bayar, 2);
+            })->editColumn('uang_muka', function ($row) {
+                return $row->uang_muka != 0 ? '<a href="javascript:void(0)" data-id="' . $row->id_transaksi . '" class="show-payment" data-transaksi="down_payment">' . formatNumber2($row->uang_muka, 2) . '</a>' : formatNumber2($row->uang_muka, 2);
             })->editColumn('id_transaksi', function ($row) {
                 return '<a href="' . env('OLD_URL_ROOT') . '#penjualan_faktur&data_master=' . $row->id_penjualan . '" target="_blank">' . $row->id_transaksi . '</a>';
             })->editColumn('aging', function ($row) {
@@ -172,7 +174,7 @@ class LaporanPiutangCurrentController extends Controller
                 $query->whereRaw($q . ' like ?', ["%{$keywords}%"]);
             });
 
-            $datatable = $datatable->rawColumns(['bayar', 'id_transaksi', 'aging'])->make(true);
+            $datatable = $datatable->rawColumns(['bayar', 'id_transaksi', 'aging', 'uang_muka'])->make(true);
             return $datatable;
         }
 
@@ -183,9 +185,25 @@ class LaporanPiutangCurrentController extends Controller
     public function getJournal(Request $request)
     {
         $idTransaksi = $request->id_transaksi;
+        $transactionType = $request->transaction;
+        if ($transactionType == 'down_payment') {
+            $pembelian = DB::table('penjualan')->select('nomor_so_penjualan')->where('nama_penjualan', $idTransaksi)->first();
+            if (!$pembelian) {
+                return response(['status' => 'error', 'message' => 'Penjualan tidak ditemukan'], 500);
+            }
+
+            $uangMuka = DB::table('uang_muka_penjualan as u')
+                ->join('permintaan_penjualan as p', 'u.id_permintaan_penjualan', 'p.id_permintaan_penjualan')
+                ->where('nama_permintaan_penjualan', $pembelian->nomor_so_penjualan)->pluck('kode_uang_muka_penjualan');
+
+            $idTransaksi = $uangMuka;
+        } else {
+            $idTransaksi = [$idTransaksi];
+        }
+
         $datas = DB::table('jurnal_detail as jd')->select('jh.kode_jurnal', 'jh.tanggal_jurnal', 'jd.credit', 'jh.id_jurnal', 'jh.jenis_jurnal')
             ->join('jurnal_header as jh', 'jd.id_jurnal', 'jh.id_jurnal')
-            ->where('jd.id_transaksi', $idTransaksi)
+            ->whereIn('jd.id_transaksi', $idTransaksi)
             ->where('jh.void', '0')
             ->where('jh.id_transaksi', null)
             ->get();

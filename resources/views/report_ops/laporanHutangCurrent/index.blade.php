@@ -184,9 +184,6 @@
                 }, {
                     data: 'uang_muka',
                     name: 'a.uang_muka',
-                    render: function(data) {
-                        return data ? formatNumber(data, 2) : 0
-                    },
                     className: 'text-right'
                 }, {
                     data: 'bayar',
@@ -223,11 +220,13 @@
         $('#target-table').on('click', '.show-payment', function() {
             $('#cover-spin').show()
             let idTransaksi = $(this).data('id');
+            let transaction = $(this).data('transaksi')
             $.ajax({
                 url: "{{ route('report_payable-get_journal') }}",
                 type: 'get',
                 data: {
-                    id_transaksi: idTransaksi
+                    id_transaksi: idTransaksi,
+                    transaction: transaction
                 },
                 success: function(res) {
                     $('#target-transaction').html(res.html)

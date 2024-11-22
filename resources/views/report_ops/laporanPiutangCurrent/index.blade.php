@@ -228,11 +228,13 @@
         $('#target-table').on('click', '.show-payment', function() {
             $('#cover-spin').show()
             let idTransaksi = $(this).data('id');
+            let transaction = $(this).data('transaksi')
             $.ajax({
                 url: "{{ route('report_receiveable-get_journal') }}",
                 type: 'get',
                 data: {
-                    id_transaksi: idTransaksi
+                    id_transaksi: idTransaksi,
+                    transaction: transaction
                 },
                 success: function(res) {
                     $('#target-transaction').html(res.html)

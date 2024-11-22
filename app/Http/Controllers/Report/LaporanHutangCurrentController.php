@@ -151,7 +151,9 @@ class LaporanHutangCurrentController extends Controller
         if ($type == 'datatable') {
             $datatable = Datatables::of($data);
             $datatable = $datatable->editColumn('bayar', function ($row) {
-                return $row->bayar > 0 ? '<a href="javascript:void(0)" data-id="' . $row->id_transaksi . '" class="show-payment">' . formatNumber2($row->bayar, 2) . '</a>' : formatNumber2($row->bayar, 2);
+                return $row->bayar != 0 ? '<a href="javascript:void(0)" data-id="' . $row->id_transaksi . '" data-transaksi="payment" class="show-payment">' . formatNumber2($row->bayar, 2) . '</a>' : formatNumber2($row->bayar, 2);
+            })->editColumn('uang_muka', function ($row) {
+                return $row->uang_muka != 0 ? '<a href="javascript:void(0)" data-id="' . $row->id_transaksi . '" data-transaksi="down_payment" class="show-payment">' . formatNumber2($row->uang_muka, 2) . '</a>' : formatNumber2($row->uang_muka, 2);
             })->editColumn('id_transaksi', function ($row) {
                 return '<a href="' . env('OLD_URL_ROOT') . '#pembelian_invoice&data_master=' . $row->id_pembelian . '" target="_blank">' . $row->id_transaksi . '</a>';
             })->editColumn('aging', function ($row) {
@@ -174,7 +176,7 @@ class LaporanHutangCurrentController extends Controller
                 $query->whereRaw($q . ' like ?', ["%{$keywords}%"]);
             });
 
-            $datatable = $datatable->rawColumns(['bayar', 'id_transaksi', 'aging'])->make(true);
+            $datatable = $datatable->rawColumns(['bayar', 'id_transaksi', 'aging', 'uang_muka'])->make(true);
             return $datatable;
         }
 
@@ -185,9 +187,25 @@ class LaporanHutangCurrentController extends Controller
     public function getJournal(Request $request)
     {
         $idTransaksi = $request->id_transaksi;
+        $transactionType = $request->transaction;
+        if ($transactionType == 'down_payment') {
+            $pembelian = DB::table('pembelian')->select('nomor_po_pembelian')->where('nama_pembelian', $idTransaksi)->first();
+            if (!$pembelian) {
+                return response(['status' => 'error', 'message' => 'Penerimaan tidak ditemukan'], 500);
+            }
+
+            $uangMuka = DB::table('uang_muka_pembelian as u')
+                ->join('permintaan_pembelian as p', 'u.id_permintaan_pembelian', 'p.id_permintaan_pembelian')
+                ->where('nama_permintaan_pembelian', $pembelian->nomor_po_pembelian)->pluck('kode_uang_muka_pembelian');
+
+            $idTransaksi = $uangMuka;
+        } else {
+            $idTransaksi = [$idTransaksi];
+        }
+
         $datas = DB::table('jurnal_detail as jd')->select('jh.kode_jurnal', 'jh.tanggal_jurnal', 'jd.debet', 'jh.id_jurnal', 'jh.jenis_jurnal', 'jd.keterangan')
             ->join('jurnal_header as jh', 'jd.id_jurnal', 'jh.id_jurnal')
-            ->where('jd.id_transaksi', $idTransaksi)
+            ->whereIn('jd.id_transaksi', $idTransaksi)
             ->where('jh.void', '0')
             ->where('jh.id_transaksi', null)
             ->get();
@@ -208,6 +226,6 @@ class LaporanHutangCurrentController extends Controller
             $html .= '<tr><td colspan="4">Pembayaran tidak ditemukan</td></tr>';
         }
 
-        return response()->json(['html' => $html, 'datas' => $datas], 200);
+        return response()->json(['status' => 'success', 'html' => $html, 'datas' => $datas], 200);
     }
 }
