@@ -179,7 +179,7 @@ class VisitController extends Controller
         $categories = DB::table('kategori_kunjungan')->where('status_kategori_kunjungan', '1')->get();
         $salesman = Salesman::where('pengguna_id', session()->get('user')->id_pengguna)->first();
         $salesmans = [];
-        if (in_array(session()->get('user')->id_grup_pengguna, [1, 27])) {
+        if (in_array(session()->get('user')->id_grup_pengguna, [1, 27, 14])) {
             $salesmans = Salesman::where('status_salesman', '1')->orderBy('nama_salesman', 'asc')->get();
         }
 
