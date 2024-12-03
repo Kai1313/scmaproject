@@ -488,6 +488,9 @@
                         let dataselect = e.params.data
                         $('#modalEntry').find('[name="nama_satuan_barang"]').val(dataselect
                             .text)
+                        $('#unit').text(dataselect.text)
+                        $('#unit_stock').text(dataselect.text)
+
                     });
 
                     if (res.satuan.length > 0) {
