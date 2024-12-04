@@ -34,7 +34,7 @@ class PurchaseReceiveController extends Controller
             ->where('pembelian_detail.id_pembelian', $id);
 
         if (isset($request->start) && isset($request->end)) {
-            $details = $details->skip($request->start)->limit($request->end);
+            $details = $details->skip($request->start - 1)->limit($request->end);
         } else {
             $details = $details->limit(20);
         }
