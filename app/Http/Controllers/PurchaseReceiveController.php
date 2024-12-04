@@ -41,7 +41,7 @@ class PurchaseReceiveController extends Controller
             $details = $details->whereIn('id_pembelian_detail', $param);
         }
 
-        $details = $details->get();
+        $details = $details->limit(20)->get();
 
         if (count($details) > 0) {
             $mpdf = PDF::loadView('ops.purchaseReceive.print', ['data' => $data, 'details' => $details]);
