@@ -10,11 +10,6 @@ class PurchaseReceiveController extends Controller
 {
     public function printQrcode(Request $request, $id)
     {
-        $param = [];
-        if ($request->detail) {
-            $param = json_decode($request->detail);
-        }
-
         $data = DB::table('pembelian')->where('id_pembelian', $id)->first();
         if (!$data) {
             return abort(404);
@@ -37,11 +32,14 @@ class PurchaseReceiveController extends Controller
             ->join('satuan_barang', 'master_qr_code.id_satuan_barang', 'satuan_barang.id_satuan_barang')
             ->leftJoin('rak', 'master_qr_code.id_rak', 'rak.id_rak')
             ->where('pembelian_detail.id_pembelian', $id);
-        if ($param) {
-            $details = $details->whereIn('id_pembelian_detail', $param);
+
+        if (isset($request->start) && isset($request->end)) {
+            $details = $details->skip($request->start)->limit($request->end);
+        } else {
+            $details = $details->limit(20);
         }
 
-        $details = $details->limit(20)->get();
+        $details = $details->get();
 
         if (count($details) > 0) {
             $mpdf = PDF::loadView('ops.purchaseReceive.print', ['data' => $data, 'details' => $details]);
