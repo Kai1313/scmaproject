@@ -79,6 +79,11 @@ class Purchase extends Model
             ->leftJoin('satuan_barang', 'qc.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang');
     }
 
+    public function details()
+    {
+        return $this->hasMany(PurchaseDetail::class, 'id_pembelian');
+    }
+
     public function detailgroup()
     {
         return $this->hasMany(PurchaseDetail::class, 'id_pembelian')

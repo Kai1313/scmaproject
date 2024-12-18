@@ -65,7 +65,7 @@ class PurchaseRequest extends Model
                 DB::raw('if(barang.status_stok_barang = "1" ,
                     (case
                         when barang.id_kategori_barang <> 7 and sum(sisa_master_qr_code) > 0
-                        then sum(sisa_master_qr_code)
+                        then sum(sisa_master_qr_code-weight-weight_zak)
                         when barang.id_kategori_barang <> 7 and sum(sisa_master_qr_code) is null
                         then 0
                         else 0

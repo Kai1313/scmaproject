@@ -209,6 +209,7 @@ Route::get('kirim_ke_gudang/print/{id}', 'SendToWarehouseController@print')->nam
 Route::get('delivery_order/print-npb/{id}', 'DeliveryOrderController@printNpb')->name('delivery_order-print-npb');
 Route::get('production/print-hp/{id}', 'ProductionController@printHp')->name('production-print-hp');
 Route::get('purchase-receive/print-qrcode/{id}', 'PurchaseReceiveController@printQrcode')->name('purchase_receive-print-qrcode');
+Route::get('purchase-receive/print/{id}', 'PurchaseReceiveController@printData')->name('purchase_receive-print');
 Route::get('stok_minimal/excel/{id}/{id_cabang}', 'StokMinHistoryController@getExcel')->name('stok_minimal-excel');
 
 Route::namespace('Report')->group(function () {

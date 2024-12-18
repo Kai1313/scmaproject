@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Purchase;
 use DB;
 use Illuminate\Http\Request;
 use PDF;
@@ -52,5 +53,23 @@ class PurchaseReceiveController extends Controller
         }
 
         return abort(404);
+    }
+
+    public function printData($id)
+    {
+        $data = Purchase::find($id);
+        if (!$data) {
+            return 'data tidak ditemukan';
+        }
+        $month = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+        $pdf = PDF::loadView('ops.purchaseReceive.print_data', ['data' => $data, 'month' => $month]);
+        $pdf->setPaper('a5', 'landscape');
+        $pdf->output();
+        $dom_pdf = $pdf->getDomPDF();
+        $font = $dom_pdf->getFontMetrics()->get_font("sans-serif", "bold");
+        $canvas = $dom_pdf->get_canvas();
+        $canvas->page_text(518, 70.5, "{PAGE_NUM} dari {PAGE_COUNT}", $font, 9, array(0, 0, 0));
+
+        return $pdf->stream('Penerimaan barang.pdf');
     }
 }
