@@ -309,6 +309,7 @@ class PurchaseRequestController extends Controller
         $item = $request->item;
         $cabang = $request->cabang;
         $gudang = $request->gudang;
+        $allStock = $request->all_stock;
         $checkAccount = DB::table('barang')->where('id_barang', $item)->first();
         if (!$checkAccount) {
             return response()->json(['result' => false, 'message' => 'Barang tidak ditemukan'], 500);
@@ -329,15 +330,16 @@ class PurchaseRequestController extends Controller
         $messageStock = '0';
         $messageSatuanStok = '';
         if ($cabang) {
-            $arrayCabang = [
-                '1' => [1],
-                '2' => [5],
-            ];
+            if ($allStock == '1') {
+                $warehouses = DB::table('gudang')->where('id_cabang', $cabang)->where('status_gudang', '1')->pluck('id_gudang')->toArray();
+            } else {
+                $warehouses = [$gudang];
+            }
 
             $stok = DB::table('master_qr_code')->select(DB::raw('sum(sisa_master_qr_code-weight-weight_zak) as stok'), 'nama_satuan_barang')
                 ->join('barang', 'master_qr_code.id_barang', 'barang.id_barang')
                 ->join('satuan_barang', 'master_qr_code.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
-                ->where('master_qr_code.id_barang', $item)->whereIn('master_qr_code.id_gudang', $arrayCabang[$cabang])
+                ->where('master_qr_code.id_barang', $item)->whereIn('master_qr_code.id_gudang', $warehouses)
                 ->groupBy('master_qr_code.id_barang')->first();
             if ($stok) {
                 $messageStock = $stok->stok;

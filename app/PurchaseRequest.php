@@ -12,7 +12,7 @@ class PurchaseRequest extends Model
     protected $primaryKey = 'purchase_request_id';
 
     protected $fillable = [
-        'id_cabang', 'purchase_request_code', 'purchase_request_date', 'id_gudang', 'purchase_request_estimation_date', 'purchase_request_user_id', 'user_created', 'user_modified', 'catatan', 'approval_status', 'approval_user_id', 'approval_date', 'void', 'void_user_id',
+        'id_cabang', 'purchase_request_code', 'purchase_request_date', 'id_gudang', 'purchase_request_estimation_date', 'purchase_request_user_id', 'user_created', 'user_modified', 'catatan', 'approval_status', 'approval_user_id', 'approval_date', 'void', 'void_user_id', 'is_all_stock',
     ];
 
     const CREATED_AT = 'dt_created';
@@ -45,7 +45,12 @@ class PurchaseRequest extends Model
             '2' => [5],
         ];
 
-        $gudang = $arrayCabang[$this->id_cabang];
+        if ($this->is_all_stock == '1') {
+            $gudang = DB::table('gudang')->where('id_cabang', $this->id_cabang)->where('status_gudang', '1')->pluck('id_gudang')->toArray();
+        } else {
+            $gudang = [$this->id_gudang];
+        }
+
         return $this->hasMany(PurchaseRequestDetail::class, 'purchase_request_id')
             ->select(
                 'purchase_request_id',

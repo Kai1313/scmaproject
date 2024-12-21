@@ -167,13 +167,29 @@
             @foreach ($data->details as $key => $detail)
                 <tr>
                     <td class="text-center" style="width:5%;">{{ $key + 1 }}</td>
-                    <td style="width:32.5%">{{ $detail->nama_barang_pembelian_detail }}</td>
-                    <td class="text-center" style="width:8%">{{ $detail->jumlah_purchase }}</td>
-                    <td class="text-center" style="width:8%">{{ $detail->nett }}</td>
+                    <td style="width:32.5%">{{ $detail->text }}</td>
+                    <td class="text-center" style="width:8%">{{ $detail->total_jumlah_purchase }}</td>
+                    <td class="text-center" style="width:8%">{{ $detail->jumlah_pembelian_detail }}</td>
                     <td class="text-center" style="width:8%;">{{ $detail->satuan->nama_satuan_barang }}</td>
-                    <td style="width:28.5%;">{{ $detail->keterangan_pembelian_detail }}</td>
+                    <td style="width:28.5%;">
+                        @if ($detail->jumlah_zak > 0)
+                            {{ $detail->jumlah_zak }} {{ $detail->nama_wrapper }}
+                        @else
+                            {{ $detail->keterangan_pembelian_detail }}
+                        @endif
+                    </td>
                 </tr>
             @endforeach
+            @for ($i = 0; $i < 4 - count($data->details); $i++)
+                <tr>
+                    <td class="text-center" style="width:5%;">&nbsp;</td>
+                    <td style="width:32.5%"></td>
+                    <td class="text-center" style="width:8%"></td>
+                    <td class="text-center" style="width:8%"></td>
+                    <td class="text-center" style="width:8%;"></td>
+                    <td style="width:28.5%;"></td>
+                </tr>
+            @endfor
         </table>
         <table class="table-signature">
             <tr>

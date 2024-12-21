@@ -136,7 +136,6 @@
                                     @endif
                                 </select>
                             </div>
-
                             <label>Gudang <span>*</span></label>
                             <div class="form-group">
                                 <select name="id_gudang" class="form-control select2" data-validation="[NOTEMPTY]"
@@ -149,6 +148,9 @@
                                     @endif
                                 </select>
                             </div>
+                            <label>Tampilkan Stok Semua Gudang <input type="checkbox" name="is_all_stock" value="1"
+                                    style="margin-left:20px;"
+                                    {{ $data && $data->is_all_stock == '1' ? 'checked' : '' }}></label>
                             @if ($data)
                                 <div class="row">
                                     <label class="col-md-3">Status</label>
@@ -476,9 +478,12 @@
 
         function getSatuan(dataselect) {
             $('#cover-spin').show()
+            console.log($('[name="is_all_stock"]').is(":checked"))
+            let isAllStock = $('[name="is_all_stock"]').is(":checked") ? '1' : '0'
             $.ajax({
                 url: "{{ route('purchase-request-auto-satuan') }}?item=" + dataselect.id + '&cabang=' + $(
-                    '[name="id_cabang"]').val() + '&gudang=' + $('[name="id_gudang"]').val(),
+                        '[name="id_cabang"]').val() + '&gudang=' + $('[name="id_gudang"]').val() + '&all_stock=' +
+                    isAllStock,
                 type: 'get',
                 success: function(res) {
                     $('[name="id_satuan_barang"]').empty()
