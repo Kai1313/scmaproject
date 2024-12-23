@@ -46,7 +46,8 @@ class PurchaseRequest extends Model
         ];
 
         if ($this->is_all_stock == '1') {
-            $gudang = DB::table('gudang')->where('id_cabang', $this->id_cabang)->where('status_gudang', '1')->pluck('id_gudang')->toArray();
+            $gudang = DB::table('gudang')->where('id_cabang', $this->id_cabang)->where('status_gudang', '1')
+                ->whereNotIn('id_gundang', [2, 7, 10])->pluck('id_gudang')->toArray();
         } else {
             $gudang = [$this->id_gudang];
         }

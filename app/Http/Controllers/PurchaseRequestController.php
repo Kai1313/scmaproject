@@ -331,7 +331,8 @@ class PurchaseRequestController extends Controller
         $messageSatuanStok = '';
         if ($cabang) {
             if ($allStock == '1') {
-                $warehouses = DB::table('gudang')->where('id_cabang', $cabang)->where('status_gudang', '1')->pluck('id_gudang')->toArray();
+                $warehouses = DB::table('gudang')->where('id_cabang', $cabang)->where('status_gudang', '1')
+                    ->whereNotIn('id_gundang', [2, 7, 10])->pluck('id_gudang')->toArray();
             } else {
                 $warehouses = [$gudang];
             }
@@ -340,6 +341,7 @@ class PurchaseRequestController extends Controller
                 ->join('barang', 'master_qr_code.id_barang', 'barang.id_barang')
                 ->join('satuan_barang', 'master_qr_code.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
                 ->where('master_qr_code.id_barang', $item)->whereIn('master_qr_code.id_gudang', $warehouses)
+                ->where('sisa_master_qr_code', '!=', 0)
                 ->groupBy('master_qr_code.id_barang')->first();
             if ($stok) {
                 $messageStock = $stok->stok;
