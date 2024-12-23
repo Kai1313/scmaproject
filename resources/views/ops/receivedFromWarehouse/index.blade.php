@@ -85,7 +85,7 @@
                                 <th style="width:116px;">Gudang Asal</th>
                                 <th style="width:60px;">Status</th>
                                 <th class="min-width:300px;">Keterangan</th>
-                                <th style="width:141px;">Action</th>
+                                <th style="width:200px;">Action</th>
                             </tr>
                         </thead>
                         <tbody>

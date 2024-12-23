@@ -128,6 +128,7 @@ Route::prefix('terima_dari_gudang')->group(function () {
     Route::get('/view/{id}', 'ReceivedFromWarehouseController@viewData')->name('received_from_warehouse-view');
     // Route::get('/delete/{id}', 'ReceivedFromWarehouseController@destroy')->name('received_from_warehouse-delete');
     Route::get('/auto-qrcode', 'ReceivedFromWarehouseController@autoQRCode')->name('received_from_warehouse-qrcode');
+    Route::get('/print-qrcode/{id}', 'ReceivedFromWarehouseController@printQrcode')->name('receive_from_warehouse-print_qrcode');
 });
 
 Route::prefix('surat_jalan_umum')->group(function () {

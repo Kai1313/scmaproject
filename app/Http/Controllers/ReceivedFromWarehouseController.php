@@ -6,6 +6,7 @@ use App\MoveBranch;
 use DB;
 use Illuminate\Http\Request;
 use Log;
+use PDF;
 use Yajra\DataTables\DataTables;
 
 class ReceivedFromWarehouseController extends Controller
@@ -46,6 +47,7 @@ class ReceivedFromWarehouseController extends Controller
                     $btn = '';
                     $btn .= '<a href="' . route('received_from_warehouse-view', $row->id_pindah_barang) . '" class="btn btn-info btn-xs mr-1 "><i class="glyphicon glyphicon-search"></i> Lihat</a>';
                     $btn .= '<a href="' . route('received_from_warehouse-entry', $row->id_pindah_barang) . '" class="btn btn-warning btn-xs mr-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a>';
+                    $btn .= '<a href="' . route('receive_from_warehouse-print_qrcode', $row->id_pindah_barang) . '" target="_blank" class="btn btn-primary btn-xs mr-1"><i class="glyphicon glyphicon-print"></i> Qrcode</a>';
                     return $btn;
                 })
                 ->editColumn('status_pindah_barang', function ($row) {
@@ -230,5 +232,43 @@ class ReceivedFromWarehouseController extends Controller
         }
 
         return ['result' => true];
+    }
+
+    public function printQrcode(Request $request, $id)
+    {
+        $data = DB::table('pindah_barang')->where('id_pindah_barang', $id)->first();
+        if (!$data) {
+            return abort(404);
+        }
+
+        $details = DB::table('pindah_barang_detail')
+            ->select(
+                'kode_batang_master_qr_code',
+                'nama_barang',
+                'nama_satuan_barang',
+                'jumlah_master_qr_code',
+                'sisa_master_qr_code',
+                'sg_master_qr_code',
+                'batch_master_qr_code',
+                DB::raw('master_qr_code.weight_zak + master_qr_code.weight as total_tare'),
+                'kode_batang_rak'
+            )
+            ->join('master_qr_code', 'pindah_barang_detail.qr_code', 'kode_batang_master_qr_code')
+            ->join('barang', 'master_qr_code.id_barang', 'barang.id_barang')
+            ->join('satuan_barang', 'master_qr_code.id_satuan_barang', 'satuan_barang.id_satuan_barang')
+            ->leftJoin('rak', 'master_qr_code.id_rak', 'rak.id_rak')
+            ->where('pindah_barang_detail.id_pindah_barang', $id);
+
+        $details = $details->get();
+
+        if (count($details) > 0) {
+            $mpdf = PDF::loadView('ops.receivedFromWarehouse.print-qrcode', ['data' => $data, 'details' => $details]);
+            $mpdf->setPaper([0, 0, 283.465, 113.386], 'portrait');
+            $mpdf->output();
+
+            return $mpdf->stream('Qrcode Terima Gudang ' . $data->kode_pindah_barang . '.pdf');
+        }
+
+        return abort(404);
     }
 }
