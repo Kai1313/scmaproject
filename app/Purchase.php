@@ -98,7 +98,7 @@ class Purchase extends Model
             ->join('master_wrapper', function ($w) use ($branch) {
                 $w->on('pembelian_detail.id_wrapper_zak', '=', 'master_wrapper.id_wrapper')->where('master_wrapper.id_cabang', $branch);
             })
-            ->groupBy(['pembelian_detail.id_barang', 'keterangan_pembelian_detail', 'jumlah_pembelian_detail']);
+            ->groupBy(['pembelian_detail.id_barang', 'keterangan_pembelian_detail']);
     }
 
     public function detailgroup()
