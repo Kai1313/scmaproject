@@ -332,7 +332,7 @@ class PurchaseRequestController extends Controller
         if ($cabang) {
             if ($allStock == '1') {
                 $warehouses = DB::table('gudang')->where('id_cabang', $cabang)->where('status_gudang', '1')
-                    ->whereNotIn('id_gundang', [2, 7, 10])->pluck('id_gudang')->toArray();
+                    ->whereNotIn('id_gudang', [2, 7, 10])->pluck('id_gudang')->toArray();
             } else {
                 $warehouses = [$gudang];
             }
