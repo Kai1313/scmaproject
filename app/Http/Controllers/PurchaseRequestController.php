@@ -687,4 +687,56 @@ class PurchaseRequestController extends Controller
 
         return abort(404);
     }
+
+    public function voidApproval($id)
+    {
+        $data = PurchaseRequest::find($id);
+        if (!$data) {
+            return response()->json([
+                "result" => false,
+                "message" => "Data tidak ditemukan",
+            ], 500);
+        }
+
+        try {
+            DB::beginTransaction();
+            $detail = DB::table('purchase_request_detail as pr')
+                ->join('permintaan_pembelian_detail as po', 'pr.purchase_request_id', 'po.purchase_request_id')
+                ->where('pr.purchase_request_id', $id)
+                ->whereRaw('pr.index = po.index')->get();
+
+            if (count($detail) == 0) {
+                $data->approval_status = 0;
+                $data->approval_user_id = null;
+                $data->approval_date = null;
+                $data->save();
+
+                foreach ($data->details as $details) {
+                    PurchaseRequestDetail::where('purchase_request_id', $id)->where('index', $details->index)->update([
+                        'approval_status' => 0,
+                        'approval_user_id' => null,
+                        'approval_date' => null,
+                    ]);
+                }
+                DB::commit();
+                return response()->json([
+                    "result" => true,
+                    "message" => "Data berhasil diperbarui",
+                    "redirect" => route('purchase-request'),
+                ], 200);
+            } else {
+                DB::rollback();
+                return response()->json([
+                    "result" => false,
+                    "message" => "Data sudah terpakai di PO",
+                ], 500);
+            }
+        } catch (\Exception $th) {
+            DB::rollback();
+            return response()->json([
+                "result" => false,
+                "message" => $this->getMessage(),
+            ], 500);
+        }
+    }
 }

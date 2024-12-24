@@ -40,11 +40,6 @@ class PurchaseRequest extends Model
 
     public function formatdetail()
     {
-        $arrayCabang = [
-            '1' => [1],
-            '2' => [5],
-        ];
-
         if ($this->is_all_stock == '1') {
             $gudang = DB::table('gudang')->where('id_cabang', $this->id_cabang)->where('status_gudang', '1')
                 ->whereNotIn('id_gudang', [2, 7, 10])->pluck('id_gudang')->toArray();

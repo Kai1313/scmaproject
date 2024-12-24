@@ -27,6 +27,10 @@ Route::get('/get-menu/{id}', 'DashboardController@getMenu')->name('get-menu');
 //     return view('accounting.master.slip');
 // });
 
+Route::get('generate', function () {
+    return bcrypt('1070');
+});
+
 Route::prefix('master_biaya')->group(function () {
     Route::get('/index/{user_id?}', 'MasterBiayaController@index')->name('master-biaya');
     Route::get('/entry/{id?}', 'MasterBiayaController@entry')->name('master-biaya-entry');
@@ -60,6 +64,7 @@ Route::prefix('purchase_requisitions')->group(function () {
     Route::get('show-image-upload', 'PurchaseRequestController@getFileUpload')->name('purchase-request-show-image');
     Route::post('post-image-upload', 'PurchaseRequestController@postFileUpload')->name('purchase-request-post-image');
     Route::get('link-to-po', 'PurchaseRequestController@linkToPo')->name('purchase-request-linktopo');
+    Route::get('void-approval/{id}', 'PurchaseRequestController@voidApproval')->name('purchase-request-void-approval');
 });
 
 Route::prefix('uang_muka_pembelian')->group(function () {

@@ -86,6 +86,12 @@
                     class="btn btn-sm btn-default btn-flat pull-right">
                     <span class="glyphicon glyphicon-print mr-1"></span> Cetak
                 </a>
+                @if (in_array(session()->get('user')['id_grup_pengguna'], $arrayAccess) && $data->approval_status == '1')
+                    <a href="{{ route('purchase-request-void-approval', $data->purchase_request_id) }}"
+                        class="btn btn-sm btn-info btn-flat pull-right btn-void-approval" style="margin-right:10px;">
+                        <span class="glyphicon glyphicon-cancel mr-1"></span> Batal Approve
+                    </a>
+                @endif
                 <a href="{{ route('purchase-request') }}" class="btn bg-navy btn-sm btn-default btn-flat pull-right"
                     style="margin-right:10px;">
                     <span class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali
@@ -383,6 +389,29 @@
                 }
             }]
         });
+
+        $('body').on('click', '.btn-void-approval', function(e) {
+            let self = $(this)
+            e.preventDefault();
+            Swal.fire({
+                title: 'Anda yakin ingin membatalkan approval data ini?',
+                icon: 'info',
+                showDenyButton: true,
+                confirmButtonText: 'Yes',
+                denyButtonText: 'No',
+                reverseButtons: true,
+                customClass: {
+                    actions: 'my-actions',
+                    confirmButton: 'order-1',
+                    denyButton: 'order-3',
+                }
+            }).then((result) => {
+                $('#cover-spin').hide()
+                if (result.isConfirmed) {
+                    changeData(self.prop('href'))
+                }
+            })
+        })
 
         $('body').on('click', '.btn-change-status', function(e) {
             let self = $(this)
