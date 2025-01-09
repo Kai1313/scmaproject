@@ -27,10 +27,6 @@ Route::get('/get-menu/{id}', 'DashboardController@getMenu')->name('get-menu');
 //     return view('accounting.master.slip');
 // });
 
-Route::get('generate', function () {
-    return bcrypt('1070');
-});
-
 Route::prefix('master_biaya')->group(function () {
     Route::get('/index/{user_id?}', 'MasterBiayaController@index')->name('master-biaya');
     Route::get('/entry/{id?}', 'MasterBiayaController@entry')->name('master-biaya-entry');

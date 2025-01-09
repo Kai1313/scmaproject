@@ -221,6 +221,18 @@
                                 </div>
                             </div>
                             <div class="row">
+                                <label class="col-md-4">Jenis Visit <span>*</span></label>
+                                <div class="form-group col-md-8">
+                                    <select name="visit_type" class="forom-control select2">
+                                        @foreach ($methods as $method)
+                                            <option value="{{ $method }}"
+                                                {{ $data && $data->visit_type == $method ? 'selected' : '' }}>
+                                                {{ $method }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
                                 <label class="col-md-4">Tanggal Kunjungan <span>*</span></label>
                                 <div class="form-group col-md-8">
                                     <input type="datetime-local" name="visit_date"
