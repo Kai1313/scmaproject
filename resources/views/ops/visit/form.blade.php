@@ -380,15 +380,15 @@
                                         @endphp
                                         @foreach ($progress as $key => $pro)
                                             <span style="margin-right:10px;">
-                                                @php
+                                                {{-- @php
                                                     $extra = '';
                                                     if ($key == 0) {
                                                         $extra =
                                                             'data-validation=[NOTEMPTY] data-validation-message=Hasil_kunjungan_tidak_boleh_kosong';
                                                     }
-                                                @endphp
+                                                @endphp --}}
                                                 <input type="checkbox" name="progress_ind[]" value="{{ $pro }}"
-                                                    {{ $extra }}
+                                                    {{-- {{ $extra }} --}}
                                                     {{ in_array($pro, $explodeExtra) ? 'checked' : '' }}>
                                                 {{ $pro }}
                                             </span>
