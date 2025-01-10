@@ -34,6 +34,11 @@
         .rounded-0 {
             border-radius: 0;
         }
+
+        .table>thead>tr>td:last-child,
+        .table>tbody>tr>td:last-child {
+            white-space: nowrap;
+        }
     </style>
 @endsection
 
@@ -146,6 +151,7 @@
                 data: 'action',
                 name: 'action',
                 className: 'text-center',
+                width: '144px',
                 orderable: false,
                 searchable: false
             }, ]
