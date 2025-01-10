@@ -208,6 +208,7 @@ Route::prefix('marketing-tool')->group(function () {
 
 Route::get('kirim_ke_gudang/print2/{id}', 'SendToWarehouseController@print2')->name('send_to_warehouse-print2');
 Route::get('kirim_ke_gudang/print/{id}', 'SendToWarehouseController@print')->name('send_to_warehouse-print');
+Route::get('kirim_ke_gudang/print-qrcode/{id}', 'SendToWarehouseController@printQrcode')->name('send_to_warehouse-print-qrcode');
 Route::get('delivery_order/print-npb/{id}', 'DeliveryOrderController@printNpb')->name('delivery_order-print-npb');
 Route::get('production/print-hp/{id}', 'ProductionController@printHp')->name('production-print-hp');
 Route::get('purchase-receive/print-qrcode/{id}', 'PurchaseReceiveController@printQrcode')->name('purchase_receive-print-qrcode');
