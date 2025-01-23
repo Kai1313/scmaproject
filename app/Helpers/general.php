@@ -24,16 +24,15 @@ function handleNull($number)
 
 function checkUserSession($request, $alias_menu, $type)
 {
-
     $user_id = $request->user_id;
     if ($user_id != '' && session()->has('token') == false || session()->has('token') == true) {
         if (session()->has('token') == true) {
             $user_id = session()->get('user')->id_pengguna;
         }
-        $user = User::where('id_pengguna', $user_id)->first();
+        $user  = User::where('id_pengguna', $user_id)->first();
         $token = UserToken::where('id_pengguna', $user_id)->where('status_token_pengguna', 1)->whereRaw("waktu_habis_token_pengguna > STR_TO_DATE(?, '%Y-%m-%d %H:%i:%s')", \Carbon\Carbon::now()->format('Y-m-d H:i:s'))->first();
 
-        $idGroup = $user->id_grup_pengguna;
+        $idGroup     = $user->id_grup_pengguna;
         $menu_access = DB::table('menu')
             ->select(
                 'menu.id_menu',
@@ -50,6 +49,7 @@ function checkUserSession($request, $alias_menu, $type)
             ->leftJoin('akses_menu', 'menu.id_menu', '=', 'akses_menu.id_menu')
             ->where('akses_menu.id_grup_pengguna', $idGroup)
             ->where('lihat_akses_menu', '1')
+            ->where('alias_menu', '!=', 'beranda')
             ->where('alias_menu', 'not like', '%detail')
             ->get();
 
@@ -78,8 +78,8 @@ function checkUserSession($request, $alias_menu, $type)
                 $arrayCabang[$ac->id_cabang]['gudang'][] = ['id' => $ac->id_gudang, 'text' => $ac->kode_gudang . ' - ' . $ac->nama_gudang];
             } else {
                 $arrayCabang[$ac->id_cabang] = [
-                    'id' => $ac->id_cabang,
-                    'text' => $ac->kode_cabang . ' - ' . $ac->nama_cabang,
+                    'id'     => $ac->id_cabang,
+                    'text'   => $ac->kode_cabang . ' - ' . $ac->nama_cabang,
                     'gudang' => [
                         ['id' => $ac->id_gudang, 'text' => $ac->kode_gudang . ' - ' . $ac->nama_gudang],
                     ],
@@ -107,7 +107,7 @@ function checkUserSession($request, $alias_menu, $type)
 
 function checkAccessMenu($alias_menu = 'home', $type = 'show')
 {
-    $datas = session()->get('access') ? session()->get('access') : [];
+    $datas    = session()->get('access') ? session()->get('access') : [];
     $hasToken = session()->has('token');
     foreach ($datas as $data) {
         if ($hasToken == true && $data->alias_menu == $alias_menu && $data->{$type} == 1) {
@@ -129,8 +129,8 @@ function replaceMessage($array, $message)
 
 function getCabangForReport()
 {
-    $array = [];
-    $cabang = session()->get('access_cabang');
+    $array      = [];
+    $cabang     = session()->get('access_cabang');
     $tempGudang = [];
     if (count($cabang) > 1) {
         foreach ($cabang as $ca) {
@@ -174,12 +174,12 @@ function getPelangganForReport()
 
 function formatNumber($number, $prefix = 0)
 {
-    $number = number_format($number, 4, ',', '.');
+    $number  = number_format($number, 4, ',', '.');
     $explode = explode(',', $number);
-    $koma = '';
+    $koma    = '';
     if (count($explode) > 1) {
         $reverse = (int) strrev($explode[1]);
-        $koma = (string) $reverse > 0 ? strrev($reverse) : '';
+        $koma    = (string) $reverse > 0 ? strrev($reverse) : '';
     }
 
     if ($prefix > 0) {
@@ -207,12 +207,12 @@ function formatNumber($number, $prefix = 0)
 
 function formatNumber2($number, $prefix = 0)
 {
-    $number = number_format($number, 4, ',', '.');
+    $number  = number_format($number, 4, ',', '.');
     $explode = explode(',', $number);
-    $koma = '';
+    $koma    = '';
     if (count($explode) > 1) {
         $reverse = (int) strrev($explode[1]);
-        $koma = (string) $reverse > 0 ? strrev($reverse) : '';
+        $koma    = (string) $reverse > 0 ? strrev($reverse) : '';
     }
 
     if ($prefix > 0) {
@@ -244,7 +244,7 @@ function getSetting($code, $key = 'value1')
 function getCabang()
 {
     $user_id = session()->get('user')->id_pengguna;
-    $cabang = DB::table('pengguna')
+    $cabang  = DB::table('pengguna')
         ->selectRaw('DISTINCT
             gudang.id_cabang,
             cabang.nama_cabang,
