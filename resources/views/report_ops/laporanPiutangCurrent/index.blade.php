@@ -102,12 +102,12 @@
                                 <th>No. Faktur</th>
                                 <th>Nama Pelanggan</th>
                                 <th>Jatuh Tempo</th>
+                                <th>Umur</th>
                                 <th>Nilai Faktur</th>
                                 <th>Uang Muka</th>
                                 <th>Pembayaran</th>
                                 <th>Total Terbayar</th>
                                 <th>Sisa</th>
-                                <th>Umur</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -180,6 +180,10 @@
                     data: 'top',
                     name: 'top',
                 }, {
+                    data: 'aging',
+                    name: 'aging',
+                    className: 'text-right'
+                }, {
                     data: 'mtotal_penjualan',
                     name: 'a.total',
                     render: function(data) {
@@ -211,11 +215,7 @@
                         return data ? formatNumber(data, 2) : 0
                     },
                     className: 'text-right'
-                }, {
-                    data: 'aging',
-                    name: 'aging',
-                    className: 'text-right'
-                }, ]
+                }]
             });
         }
     </script>

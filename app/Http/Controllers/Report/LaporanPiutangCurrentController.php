@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Report;
 
 use App\Exports\ReportLaporanPiutangCurrentExport;
@@ -22,7 +21,7 @@ class LaporanPiutangCurrentController extends Controller
             return $this->getData($request, 'datatable');
         }
         return view('report_ops.laporanPiutangCurrent.index', [
-            "pageTitle" => "SCA OPS | Laporan Piutang Saat Ini | List",
+            "pageTitle"  => "SCA OPS | Laporan Piutang Saat Ini | List",
             'typeReport' => ['Rekap', 'Detail'],
         ]);
     }
@@ -33,13 +32,13 @@ class LaporanPiutangCurrentController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        $data = $this->getData($request, 'print');
-        $date = $request->dateReport;
+        $data        = $this->getData($request, 'print');
+        $date        = $request->dateReport;
         $idPelanggan = $request->id_pelanggan;
-        $pelanggan = 'Semua Pelanggan';
+        $pelanggan   = 'Semua Pelanggan';
         if ($idPelanggan != 'all') {
             $result = DB::table('pelanggan')->where('id_pelanggan', $idPelanggan)->first();
-            if (!empty($result)) {
+            if (! empty($result)) {
                 $pelanggan = "({$result->kode_pelanggan}) {$result->nama_pelanggan}";
             }
         }
@@ -55,11 +54,11 @@ class LaporanPiutangCurrentController extends Controller
         }
 
         $array = [
-            "datas" => $data,
-            'cabang' => implode(', ', $sCabang),
-            'date' => $date,
+            "datas"     => $data,
+            'cabang'    => implode(', ', $sCabang),
+            'date'      => $date,
             'pelanggan' => $pelanggan,
-            'type' => $request->type,
+            'type'      => $request->type,
         ];
 
         $pdf = PDF::loadView('report_ops.laporanPiutangCurrent.print', $array);
@@ -73,13 +72,13 @@ class LaporanPiutangCurrentController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        $data = $this->getData($request, 'print');
-        $date = $request->dateReport;
+        $data        = $this->getData($request, 'print');
+        $date        = $request->dateReport;
         $idPelanggan = $request->id_pelanggan;
-        $pelanggan = 'Semua Pelanggan';
+        $pelanggan   = 'Semua Pelanggan';
         if ($idPelanggan != 'all') {
             $result = DB::table('pelanggan')->where('id_pelanggan', $idPelanggan)->first();
-            if (!empty($result)) {
+            if (! empty($result)) {
                 $pelanggan = "({$result->kode_pelanggan}) {$result->nama_pelanggan}";
             }
         }
@@ -95,20 +94,20 @@ class LaporanPiutangCurrentController extends Controller
         }
 
         $array = [
-            "datas" => $data,
-            'cabang' => implode(', ', $sCabang),
-            'date' => $date,
+            "datas"     => $data,
+            'cabang'    => implode(', ', $sCabang),
+            'date'      => $date,
             'pelanggan' => $pelanggan,
-            'type' => $request->type,
+            'type'      => $request->type,
         ];
         return Excel::download(new ReportLaporanPiutangCurrentExport('report_ops.laporanPiutangCurrent.excel', $array), 'LaporanPiutangSaatIni.xlsx');
     }
 
     public function getData($request, $type)
     {
-        $date = $request->dateReport;
-        $idPelanggan = $request->id_pelanggan;
-        $idCabang = explode(',', $request->id_cabang);
+        $date              = $request->dateReport;
+        $idPelanggan       = $request->id_pelanggan;
+        $idCabang          = explode(',', $request->id_cabang);
         $transactionStatus = $request->transaction_status;
 
         $data = DB::table('saldo_transaksi as a')->Select(
@@ -130,9 +129,9 @@ class LaporanPiutangCurrentController extends Controller
             ->where('a.tanggal', '<=', $date);
         if ($transactionStatus != 'all') {
             if ($transactionStatus == '1') {
-                $data = $data->where(DB::raw('(a.total+a.uang_muka)-(a.bayar+a.uang_muka)'), 0);
+                $data = $data->where(DB::raw('ifnull((a.total+a.uang_muka)-(ifnull(a.bayar,0)+a.uang_muka),0)'), 0);
             } else {
-                $data = $data->where(DB::raw('(a.total+a.uang_muka)-(a.bayar+a.uang_muka)'), '<>', 0);
+                $data = $data->where(DB::raw('ifnull((a.total+a.uang_muka)-(ifnull(a.bayar,0)+a.uang_muka),0)'), '>', 0);
             }
         }
 
@@ -142,9 +141,9 @@ class LaporanPiutangCurrentController extends Controller
             $data->where('a.id_pelanggan', $idPelanggan);
         }
 
-        if ($type == 'print') {
-            $data = $data->orderBy('p2.tanggal_penjualan', 'asc');
-        }
+        // if ($type == 'print') {
+        $data = $data->orderBy('p2.tanggal_penjualan', 'desc');
+        // }
 
         if ($type == 'datatable') {
             $datatable = Datatables::of($data);
@@ -170,7 +169,7 @@ class LaporanPiutangCurrentController extends Controller
                 $query->whereRaw("ifnull(a.bayar+a.uang_muka,0.00) like ?", ["%{$keywords}%"]);
             })->filterColumn('aging', function ($query, $keyword) use ($date) {
                 $keywords = trim($keyword);
-                $q = "if(ifnull((a.total+a.uang_muka)-(ifnull(a.bayar,0)+a.uang_muka),0) <> 0,DATEDIFF(" . $date . ",DATE(DATE_ADD(p2.tanggal_penjualan, INTERVAL p2.tempo_hari_penjualan DAY))),0)";
+                $q        = "if(ifnull((a.total+a.uang_muka)-(ifnull(a.bayar,0)+a.uang_muka),0) <> 0,DATEDIFF(" . $date . ",DATE(DATE_ADD(p2.tanggal_penjualan, INTERVAL p2.tempo_hari_penjualan DAY))),0)";
                 $query->whereRaw($q . ' like ?', ["%{$keywords}%"]);
             });
 
@@ -184,11 +183,11 @@ class LaporanPiutangCurrentController extends Controller
 
     public function getJournal(Request $request)
     {
-        $idTransaksi = $request->id_transaksi;
+        $idTransaksi     = $request->id_transaksi;
         $transactionType = $request->transaction;
         if ($transactionType == 'down_payment') {
             $pembelian = DB::table('penjualan')->select('nomor_so_penjualan')->where('nama_penjualan', $idTransaksi)->first();
-            if (!$pembelian) {
+            if (! $pembelian) {
                 return response(['status' => 'error', 'message' => 'Penjualan tidak ditemukan'], 500);
             }
 
@@ -208,7 +207,7 @@ class LaporanPiutangCurrentController extends Controller
             ->where('jh.id_transaksi', null)
             ->get();
         $html = '';
-        $sum = 0;
+        $sum  = 0;
         foreach ($datas as $key => $data) {
             $link = route('transaction-general-ledger-show', $data->id_jurnal);
             $html .= '<tr><td class="text-center">' . ($key + 1) . '</td>';
