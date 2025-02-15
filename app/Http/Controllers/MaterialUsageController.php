@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\MasterQrCode;
@@ -37,14 +36,14 @@ class MaterialUsageController extends Controller
 
             $data = $data->orderBy('pemakaian_header.dt_created', 'desc');
 
-            $idUser = session()->get('user')['id_pengguna'];
+            $idUser     = session()->get('user')['id_pengguna'];
             $idGrupUser = session()->get('user')['id_grup_pengguna'];
             $filterUser = DB::table('pengguna')
                 ->where(function ($w) {
                     $w->where('id_grup_pengguna', session()->get('user')['id_grup_pengguna'])->orWhere('id_grup_pengguna', 1);
                 })
                 ->where('status_pengguna', '1')->pluck('id_pengguna')->toArray();
-            $accessVoid = getSetting('Pemakaian Void');
+            $accessVoid      = getSetting('Pemakaian Void');
             $arrayAccessVoid = explode(',', $accessVoid);
 
             return Datatables::of($data)
@@ -78,7 +77,7 @@ class MaterialUsageController extends Controller
 
         $cabang = session()->get('access_cabang');
         return view('ops.materialUsage.index', [
-            'cabang' => $cabang,
+            'cabang'    => $cabang,
             "pageTitle" => "SCA OPS | Pemakaian | List",
         ]);
     }
@@ -89,19 +88,19 @@ class MaterialUsageController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        $data = MaterialUsage::find($id);
-        $accessQC = getSetting('Pemakaian QC');
-        $cabang = session()->get('access_cabang');
+        $data      = MaterialUsage::find($id);
+        $accessQC  = getSetting('Pemakaian QC');
+        $cabang    = session()->get('access_cabang');
         $timbangan = DB::table('konfigurasi')->select('id_konfigurasi as id', 'nama_konfigurasi as text', 'keterangan_konfigurasi as value')
             ->where('id_kategori_konfigurasi', 5)->get();
         $types = DB::table('setting')->where('id_cabang', 1)->where('code', 'like', 'HPP Pemakaian %')->get();
         return view('ops.materialUsage.form', [
-            'data' => $data,
-            'cabang' => $cabang,
+            'data'      => $data,
+            'cabang'    => $cabang,
             "pageTitle" => "SCA OPS | Pemakaian | " . ($id == 0 ? 'Create' : 'Edit'),
             "timbangan" => $timbangan,
-            'accessQc' => in_array(session()->get('user')['id_grup_pengguna'], explode(',', $accessQC)) ? '1' : '0',
-            'types' => $types,
+            'accessQc'  => in_array(session()->get('user')['id_grup_pengguna'], explode(',', $accessQC)) ? '1' : '0',
+            'types'     => $types,
         ]);
     }
 
@@ -110,8 +109,8 @@ class MaterialUsageController extends Controller
         $data = MaterialUsage::find($id);
         try {
             DB::beginTransaction();
-            if (!$data) {
-                $data = new MaterialUsage;
+            if (! $data) {
+                $data   = new MaterialUsage;
                 $period = $this->checkPeriod($request->tanggal);
                 if ($period['result'] == false) {
                     return response()->json($period, 500);
@@ -132,8 +131,8 @@ class MaterialUsageController extends Controller
             $data->fill($request->except('is_qc'));
             if ($id == 0) {
                 $data->kode_pemakaian = MaterialUsage::createcode($request->id_cabang);
-                $data->user_created = session()->get('user')['id_pengguna'];
-                $data->is_qc = isset($request->is_qc) ? $request->is_qc : 0;
+                $data->user_created   = session()->get('user')['id_pengguna'];
+                $data->is_qc          = isset($request->is_qc) ? $request->is_qc : 0;
             } else {
                 $data->user_modified = session()->get('user')['id_pengguna'];
             }
@@ -154,8 +153,8 @@ class MaterialUsageController extends Controller
 
             DB::commit();
             return response()->json([
-                "result" => true,
-                "message" => "Data berhasil disimpan",
+                "result"   => true,
+                "message"  => "Data berhasil disimpan",
                 "redirect" => route('material_usage-entry', $data->id_pemakaian),
             ], 200);
         } catch (\Exception $e) {
@@ -163,7 +162,7 @@ class MaterialUsageController extends Controller
             Log::error("Error when save material usage");
             Log::error($e);
             return response()->json([
-                "result" => false,
+                "result"  => false,
                 "message" => "Data gagal tersimpan",
             ], 500);
         }
@@ -175,12 +174,12 @@ class MaterialUsageController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        $data = MaterialUsage::find($id);
+        $data     = MaterialUsage::find($id);
         $accessQC = getSetting('Pemakaian QC');
         return view('ops.materialUsage.detail', [
-            'data' => $data,
+            'data'      => $data,
             "pageTitle" => "SCA OPS | Pemakaian | Detail",
-            'accessQc' => in_array(session()->get('user')['id_grup_pengguna'], explode(',', $accessQC)) ? '1' : '0',
+            'accessQc'  => in_array(session()->get('user')['id_grup_pengguna'], explode(',', $accessQC)) ? '1' : '0',
         ]);
     }
 
@@ -191,9 +190,9 @@ class MaterialUsageController extends Controller
         }
 
         $data = MaterialUsage::find($id);
-        if (!$data) {
+        if (! $data) {
             return response()->json([
-                "result" => false,
+                "result"  => false,
                 "message" => "Data tidak ditemukan",
             ], 500);
         }
@@ -205,7 +204,7 @@ class MaterialUsageController extends Controller
 
         try {
             DB::beginTransaction();
-            $data->void = 1;
+            $data->void         = 1;
             $data->void_user_id = session()->get('user')['id_pengguna'];
             $data->save();
 
@@ -213,8 +212,8 @@ class MaterialUsageController extends Controller
 
             DB::commit();
             return response()->json([
-                "result" => true,
-                "message" => "Data berhasil dibatalkan",
+                "result"   => true,
+                "message"  => "Data berhasil dibatalkan",
                 "redirect" => route('material_usage'),
             ], 200);
         } catch (\Exception $e) {
@@ -222,7 +221,7 @@ class MaterialUsageController extends Controller
             Log::error("Error when void pemakaian");
             Log::error($e);
             return response()->json([
-                "result" => false,
+                "result"  => false,
                 "message" => "Data gagal dibatalkan",
             ], 500);
         }
@@ -232,8 +231,8 @@ class MaterialUsageController extends Controller
     {
         $idCabang = $request->id_cabang;
         $idGudang = $request->id_gudang;
-        $qrcode = $request->qrcode;
-        $isQc = $request->is_qc;
+        $qrcode   = $request->qrcode;
+        $isQc     = $request->is_qc;
 
         $data = DB::table('master_qr_code as mqc')
             ->select(
@@ -248,7 +247,8 @@ class MaterialUsageController extends Controller
                 DB::raw('IFNULL(weight_zak,0) as weight_zak'),
                 DB::raw('IFNULL(zak,0) as jumlah_zak'),
                 'mqc.status_qc_qr_code',
-                'id_rak'
+                'id_rak',
+                'mqc.status_master_qr_code'
             )
             ->leftJoin('barang', 'mqc.id_barang', '=', 'barang.id_barang')
             ->leftJoin('satuan_barang as sb', 'mqc.id_satuan_barang', '=', 'sb.id_satuan_barang')
@@ -257,31 +257,38 @@ class MaterialUsageController extends Controller
             ->where('mqc.id_gudang', $idGudang);
 
         $data = $data->where('kode_batang_master_qr_code', $qrcode)->first();
-        if (!$data) {
+        if (! $data) {
             return response()->json([
                 'message' => 'Barang tidak ditemukan',
-                'status' => 'error',
+                'status'  => 'error',
             ], 500);
         }
 
         if ($data->sisa_master_qr_code == 0) {
             return response()->json([
                 'message' => 'Barang sudah habis',
-                'status' => 'error',
+                'status'  => 'error',
             ], 500);
         }
 
         if ($data->id_rak) {
             return response()->json([
                 'message' => 'Barang masih dalam rak',
-                'status' => 'error',
+                'status'  => 'error',
+            ], 500);
+        }
+
+        if ($data->status_master_qr_code == '0') {
+            return response()->json([
+                'message' => 'Barang dalam perjalanan',
+                'status'  => 'error',
             ], 500);
         }
 
         if ($isQc == 0 && $data->status_qc_qr_code == 0) {
             return response()->json([
                 'message' => 'Barang belum di QC',
-                'status' => 'error',
+                'status'  => 'error',
             ], 500);
         }
 
@@ -292,9 +299,9 @@ class MaterialUsageController extends Controller
 
     public function reloadWeight(Request $request)
     {
-        $id = $request->id;
+        $id    = $request->id;
         $value = 0;
-        $data = DB::table('konfigurasi')
+        $data  = DB::table('konfigurasi')
             ->where('id_kategori_konfigurasi', 5)
             ->where('id_konfigurasi', $id)
             ->value('keterangan_konfigurasi');
@@ -314,7 +321,7 @@ class MaterialUsageController extends Controller
         }
 
         $data = MaterialUsage::where('id_pemakaian', $id)->first();
-        if (!$data) {
+        if (! $data) {
             return 'data tidak ditemukan';
         }
 
@@ -325,15 +332,15 @@ class MaterialUsageController extends Controller
 
     public function checkPeriod($date)
     {
-        if (!$date) {
+        if (! $date) {
             return ['result' => false, 'message' => 'Tanggal tidak ditemukan'];
         }
 
-        $year = date('Y', strtotime($date));
+        $year  = date('Y', strtotime($date));
         $month = date('m', strtotime($date));
 
         $data = DB::table('periode')->where('tahun_periode', $year)->where('bulan_periode', $month)->first();
-        if (!$data) {
+        if (! $data) {
             return ['result' => false, 'message' => 'Periode tidak ditemukan'];
         }
 
@@ -347,12 +354,12 @@ class MaterialUsageController extends Controller
     public function saveDetailEntry(Request $request, $id)
     {
         $data = MaterialUsage::find($id);
-        if (!$data) {
+        if (! $data) {
             return response()->json(['result' => false, 'message' => 'Pemakaian tidak ditemukan'], 500);
         }
 
         $stock = MasterQrCode::where('kode_batang_master_qr_code', $request->kode_batang)->first();
-        if (!$stock) {
+        if (! $stock) {
             return response()->json(['result' => false, 'message' => 'Stok tidak ditemukan'], 500);
         }
 
@@ -369,8 +376,8 @@ class MaterialUsageController extends Controller
 
         DB::commit();
         return response()->json([
-            "result" => true,
-            "message" => "Data berhasil disimpan",
+            "result"   => true,
+            "message"  => "Data berhasil disimpan",
             "redirect" => route('material_usage-entry', $id),
         ], 200);
     }
@@ -378,7 +385,7 @@ class MaterialUsageController extends Controller
     public function deleteDetail($parent, $id)
     {
         $data = MaterialUsage::where('id_pemakaian', $parent)->first();
-        if (!$data) {
+        if (! $data) {
             return response()->json(['result' => false, 'message' => 'Data tidak ditemukan'], 500);
         }
 
@@ -391,8 +398,8 @@ class MaterialUsageController extends Controller
 
         DB::commit();
         return response()->json([
-            "result" => true,
-            "message" => "Data berhasil diproses",
+            "result"   => true,
+            "message"  => "Data berhasil diproses",
             "redirect" => route('material_usage-entry', $parent),
         ], 200);
     }

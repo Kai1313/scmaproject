@@ -1,5 +1,4 @@
 <?php
-
 namespace App;
 
 use App\MasterQrCode;
@@ -10,7 +9,7 @@ use Log;
 
 class MoveBranch extends Model
 {
-    protected $table = 'pindah_barang';
+    protected $table      = 'pindah_barang';
     protected $primaryKey = 'id_pindah_barang';
 
     const CREATED_AT = 'dt_created';
@@ -176,8 +175,8 @@ class MoveBranch extends Model
     public static function createcodeCabang($id_cabang, $date)
     {
         $branchCode = DB::table('cabang')->where('id_cabang', $id_cabang)->first();
-        $string = 'TC.' . $branchCode->kode_cabang . '.' . date('ym', strtotime($date));
-        $check = DB::table('pindah_barang')->where('kode_pindah_barang', 'like', $string . '%')->count();
+        $string     = 'TC.' . $branchCode->kode_cabang . '.' . date('ym', strtotime($date));
+        $check      = DB::table('pindah_barang')->where('kode_pindah_barang', 'like', $string . '%')->count();
         $check += 1;
         $nol = '';
         for ($i = 0; $i < (4 - strlen((string) $check)); $i++) {
@@ -190,8 +189,8 @@ class MoveBranch extends Model
     public static function createcodeGudang($id_cabang)
     {
         $branchCode = DB::table('cabang')->where('id_cabang', $id_cabang)->first();
-        $string = 'TG.' . $branchCode->kode_cabang . '.' . date('ym');
-        $check = DB::table('pindah_barang')->where('kode_pindah_barang', 'like', $string . '%')->count();
+        $string     = 'TG.' . $branchCode->kode_cabang . '.' . date('ym');
+        $check      = DB::table('pindah_barang')->where('kode_pindah_barang', 'like', $string . '%')->count();
         $check += 1;
         $nol = '';
         for ($i = 0; $i < (4 - strlen((string) $check)); $i++) {
@@ -204,8 +203,8 @@ class MoveBranch extends Model
     public function removedetails($details, $type = 'in')
     {
         $idJenisTransaksi = $this->id_jenis_transaksi;
-        $detail = json_decode($details);
-        $ids = array_column($detail, 'id_pindah_barang_detail');
+        $detail           = json_decode($details);
+        $ids              = array_column($detail, 'id_pindah_barang_detail');
         foreach ($detail as $trash) {
             $selectTrash = MoveBranchDetail::where('id_pindah_barang', $this->id_pindah_barang)
                 ->where('id_pindah_barang_detail', $trash->id_pindah_barang_detail)
@@ -237,8 +236,8 @@ class MoveBranch extends Model
     public function savedetails($details, $type = 'in')
     {
         $idJenisTransaksi = $this->id_jenis_transaksi;
-        $detail = json_decode($details);
-        $arrayNew = [];
+        $detail           = json_decode($details);
+        $arrayNew         = [];
         try {
             foreach ($detail as $data) {
                 if ($data->id_pindah_barang_detail == '') {
@@ -247,25 +246,25 @@ class MoveBranch extends Model
                     // $check = MoveBranchDetail::where('id_pindah_barang', $this->id_pindah_barang)->where('qr_code', $data->qr_code)->first();
                     // if (!$check) {
                     $array = [
-                        'id_pindah_barang' => $this->id_pindah_barang,
-                        'id_barang' => $data->id_barang,
-                        'id_satuan_barang' => $data->id_satuan_barang,
-                        'qty' => $data->qty,
-                        'qr_code' => $data->qr_code,
-                        'sg' => $data->sg,
-                        'be' => $data->be,
-                        'ph' => $data->ph,
-                        'bentuk' => $data->bentuk,
-                        'warna' => $data->warna,
-                        'keterangan' => $data->keterangan,
-                        'status_diterima' => isset($data->status_diterima) ? $data->status_diterima : 0,
-                        'user_created' => session()->get('user')['id_pengguna'],
-                        'dt_created' => date('Y-m-d H:i:s'),
-                        'batch' => $data->batch,
+                        'id_pindah_barang'   => $this->id_pindah_barang,
+                        'id_barang'          => $data->id_barang,
+                        'id_satuan_barang'   => $data->id_satuan_barang,
+                        'qty'                => $data->qty,
+                        'qr_code'            => $data->qr_code,
+                        'sg'                 => $data->sg,
+                        'be'                 => $data->be,
+                        'ph'                 => $data->ph,
+                        'bentuk'             => $data->bentuk,
+                        'warna'              => $data->warna,
+                        'keterangan'         => $data->keterangan,
+                        'status_diterima'    => isset($data->status_diterima) ? $data->status_diterima : 0,
+                        'user_created'       => session()->get('user')['id_pengguna'],
+                        'dt_created'         => date('Y-m-d H:i:s'),
+                        'batch'              => $data->batch,
                         'tanggal_kadaluarsa' => $data->tanggal_kadaluarsa ? $data->tanggal_kadaluarsa : null,
-                        'zak' => $data->zak,
-                        'id_wrapper_zak' => $data->id_wrapper_zak,
-                        'weight_zak' => $data->weight_zak,
+                        'zak'                => $data->zak,
+                        'id_wrapper_zak'     => $data->id_wrapper_zak,
+                        'weight_zak'         => $data->weight_zak,
                     ];
                     $store = new MoveBranchDetail;
                     $store->fill($array);
@@ -274,12 +273,14 @@ class MoveBranch extends Model
                     $master = MasterQrCode::where('kode_batang_master_qr_code', $data->qr_code)->first();
                     if ($master) {
                         if ($type == 'in' && $data->status_diterima == 1) {
-                            $master->sisa_master_qr_code = $data->qty;
-                            $master->id_cabang = $this->id_cabang;
-                            $master->id_gudang = $this->id_gudang;
-                            $master->id_jenis_transaksi = $idJenisTransaksi;
+                            $master->sisa_master_qr_code   = $data->qty;
+                            $master->id_cabang             = $this->id_cabang;
+                            $master->id_gudang             = $this->id_gudang;
+                            $master->id_jenis_transaksi    = $idJenisTransaksi;
+                            $master->status_master_qr_code = '1';
                         } else {
-                            $master->sisa_master_qr_code = 0;
+                            $master->sisa_master_qr_code   = 0;
+                            $master->status_master_qr_code = '0';
                         }
 
                         $master->save();
@@ -287,35 +288,35 @@ class MoveBranch extends Model
 
                     if (in_array($idJenisTransaksi, ['21', '22'])) {
                         DB::table('kartu_stok')->insert([
-                            'id_gudang' => $this->id_gudang,
-                            'id_jenis_transaksi' => $idJenisTransaksi,
-                            'kode_kartu_stok' => $this->kode_pindah_barang,
-                            'id_barang' => $data->id_barang,
-                            'id_satuan_barang' => $data->id_satuan_barang,
-                            'nama_kartu_stok' => $this->id_pindah_barang,
-                            'nomor_kartu_stok' => $store->id_pindah_barang_detail,
-                            'tanggal_kartu_stok' => $this->tanggal_pindah_barang,
-                            'debit_kartu_stok' => $type == 'in' ? $store->qty : 0,
-                            'kredit_kartu_stok' => $type == 'out' ? $store->qty : 0,
+                            'id_gudang'                     => $this->id_gudang,
+                            'id_jenis_transaksi'            => $idJenisTransaksi,
+                            'kode_kartu_stok'               => $this->kode_pindah_barang,
+                            'id_barang'                     => $data->id_barang,
+                            'id_satuan_barang'              => $data->id_satuan_barang,
+                            'nama_kartu_stok'               => $this->id_pindah_barang,
+                            'nomor_kartu_stok'              => $store->id_pindah_barang_detail,
+                            'tanggal_kartu_stok'            => $this->tanggal_pindah_barang,
+                            'debit_kartu_stok'              => $type == 'in' ? $store->qty : 0,
+                            'kredit_kartu_stok'             => $type == 'out' ? $store->qty : 0,
                             'tanggal_kadaluarsa_kartu_stok' => $data->tanggal_kadaluarsa ? $data->tanggal_kadaluarsa : null,
-                            'mtotal_debit_kartu_stok' => 0,
-                            'mtotal_kredit_kartu_stok' => 0,
-                            'kode_batang_kartu_stok' => $data->qr_code,
-                            'kode_batang_lama_kartu_stok' => '',
-                            'rak_kartu_stok' => '',
-                            'batch_kartu_stok' => $data->batch,
-                            'id_perkiraan' => 34,
-                            'sg_kartu_stok' => $data->sg,
-                            'be_kartu_stok' => $data->be,
-                            'ph_kartu_stok' => $data->ph,
-                            'warna_kartu_stok' => $data->warna,
-                            'keterangan_kartu_stok' => $data->keterangan,
-                            'status_kartu_stok' => 1,
-                            'user_kartu_stok' => session()->get('user')['id_pengguna'],
-                            'date_kartu_stok' => date('Y-m-d H:i:s'),
-                            'zak' => $data->zak,
-                            'id_wrapper_zak' => $data->id_wrapper_zak,
-                            'weight_zak' => $data->weight_zak,
+                            'mtotal_debit_kartu_stok'       => 0,
+                            'mtotal_kredit_kartu_stok'      => 0,
+                            'kode_batang_kartu_stok'        => $data->qr_code,
+                            'kode_batang_lama_kartu_stok'   => '',
+                            'rak_kartu_stok'                => '',
+                            'batch_kartu_stok'              => $data->batch,
+                            'id_perkiraan'                  => 34,
+                            'sg_kartu_stok'                 => $data->sg,
+                            'be_kartu_stok'                 => $data->be,
+                            'ph_kartu_stok'                 => $data->ph,
+                            'warna_kartu_stok'              => $data->warna,
+                            'keterangan_kartu_stok'         => $data->keterangan,
+                            'status_kartu_stok'             => 1,
+                            'user_kartu_stok'               => session()->get('user')['id_pengguna'],
+                            'date_kartu_stok'               => date('Y-m-d H:i:s'),
+                            'zak'                           => $data->zak,
+                            'id_wrapper_zak'                => $data->id_wrapper_zak,
+                            'weight_zak'                    => $data->weight_zak,
                         ]);
                     }
 
@@ -326,8 +327,8 @@ class MoveBranch extends Model
                             ->where('kode_batang_kartu_stok', $data->qr_code)
                             ->where('nama_kartu_stok', $this->id_pindah_barang2)
                             ->update([
-                                'status_kartu_stok' => 1,
-                                'kode_kartu_stok' => $this->kode_pindah_barang,
+                                'status_kartu_stok'  => 1,
+                                'kode_kartu_stok'    => $this->kode_pindah_barang,
                                 'tanggal_kartu_stok' => $this->tanggal_pindah_barang,
                             ]);
                         // }
@@ -396,22 +397,22 @@ class MoveBranch extends Model
                 $explode = explode(";base64,", $media);
                 $findExt = explode("image/", $explode[0]);
 
-                $ext = $findExt[1];
+                $ext  = $findExt[1];
                 $name = uniqid();
 
-                $media = base64_decode($explode[1]);
+                $media    = base64_decode($explode[1]);
                 $mainpath = $name . '.' . $ext;
 
                 $img = \Image::make($media);
                 $img->save('asset/pindah_barang/' . $mainpath);
 
-                $m = new Media;
-                $m->id = $this->id_pindah_barang;
+                $m               = new Media;
+                $m->id           = $this->id_pindah_barang;
                 $m->lokasi_media = 'asset/pindah_barang/' . $mainpath;
                 $m->status_media = 1;
-                $m->tipe_media = 'pindah_barang';
-                $m->date_media = date('Y-m-d H:i:s');
-                $m->user_media = session()->get('user')['id_pengguna'];
+                $m->tipe_media   = 'pindah_barang';
+                $m->date_media   = date('Y-m-d H:i:s');
+                $m->user_media   = session()->get('user')['id_pengguna'];
                 $m->save();
             }
 
