@@ -196,6 +196,12 @@ function saveData(node, withNotif = true) {
             node.find('.handle-number-4').each(function (i, v) {
                 $(v).val(formatNumberNew($(v).val(), 4))
             })
+            if (data.responseJSON.errors) {
+                for (const key in data.responseJSON.errors) {
+                    console.log(key)
+                    $('[name="' + key + '"]').css('border-color', 'red')
+                }
+            }
 
             Swal.fire("Gagal Menyimpan Data. ", data.responseJSON.message, 'error')
         }

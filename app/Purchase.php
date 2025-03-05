@@ -1,5 +1,4 @@
 <?php
-
 namespace App;
 
 use App\Models\Master\Cabang;
@@ -9,9 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Purchase extends Model
 {
-    protected $table = 'pembelian';
+    protected $table      = 'pembelian';
     protected $primaryKey = 'id_pembelian';
-    public $timestamps = false;
+    public $timestamps    = false;
 
     protected $fillable = [
         'id_pcabang',
