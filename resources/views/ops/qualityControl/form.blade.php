@@ -221,28 +221,48 @@
                                     </div>
                                 </div>
                             </div>
-                            <label>Warna</label>
-                            <div class="form-group">
-                                <div class="input-group">
-                                    <input type="text" name="warna_pembelian_detail" class="form-control" readonly
-                                        value="{{ $data->warna_qc_barang }}">
-                                    <span class="input-group-addon">
-                                        <input type="checkbox" name="checkbox_warna" class="check-checkbox"
-                                            {{ $data->id && $data->warna_pembelian_detail == $data->warna_qc_barang ? 'checked' : '' }}
-                                            value="1">
-                                    </span>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label>Warna</label>
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <input type="text" name="warna_pembelian_detail" class="form-control"
+                                                readonly value="{{ $data->warna_qc_barang }}">
+                                            <span class="input-group-addon">
+                                                <input type="checkbox" name="checkbox_warna" class="check-checkbox"
+                                                    {{ $data->id && $data->warna_pembelian_detail == $data->warna_qc_barang ? 'checked' : '' }}
+                                                    value="1">
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                            <label>Bentuk</label>
-                            <div class="form-group">
-                                <div class="input-group">
-                                    <input type="text" name="bentuk_pembelian_detail" class="form-control" readonly
-                                        value="{{ $data->bentuk_qc_barang }}">
-                                    <span class="input-group-addon">
-                                        <input type="checkbox" name="checkbox_bentuk" class="check-checkbox"
-                                            {{ $data->id && $data->bentuk_pembelian_detail == $data->bentuk_qc_barang ? 'checked' : '' }}
-                                            value="1">
-                                    </span>
+                                <div class="col-md-4">
+                                    <label>Bentuk</label>
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <input type="text" name="bentuk_pembelian_detail" class="form-control"
+                                                readonly value="{{ $data->bentuk_qc_barang }}">
+                                            <span class="input-group-addon">
+                                                <input type="checkbox" name="checkbox_bentuk" class="check-checkbox"
+                                                    {{ $data->id && $data->bentuk_pembelian_detail == $data->bentuk_qc_barang ? 'checked' : '' }}
+                                                    value="1">
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label>Hasil Trial</label>
+                                    <div class="form-group" style="margin-bottom:0px;">
+                                        <select name="trial_pembelian_detail" class="form-control">
+                                            <option value="">Pilih Hasil</option>
+                                            <option value="1"
+                                                {{ $data->id && $data->trial_pembelian_detail == '1' ? 'selected' : '' }}>
+                                                OK</option>
+                                            <option value="0"
+                                                {{ $data->id && $data->trial_pembelian_detail == '0' ? 'selected' : '' }}>
+                                                Tidak OK</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
                             <label>Keterangan</label>
@@ -281,32 +301,11 @@
             checkRangeQc()
         })
 
-        function validatorModal(barang, id) {
-            let message = 'Lengkapi inputan yang diperlukan'
-            let valid = true
-            $('#modalEntry').find('.validate').each(function(i, v) {
-                $(v).parent().removeClass('has-error')
-                if ($(v).val() == '') {
-                    $(v).parent().addClass('has-error')
-                    valid = false
-                }
-
-                if ($(v).prop('name') == 'id_barang') {
-                    let findItem = details.filter(p => p.id_barang == $(v).val())
-                    if (findItem.length > 0 && id == '' && findItem[0].id_barang == barang && indexSelect < 0) {
-                        message = "Barang sudah ada dalam daftar"
-                        valid = false
-                    }
-                }
-            })
-
-            return {
-                'status': valid,
-                'message': message
-            }
-        }
-
         $('.check-checkbox').click(function() {
+            checkRangeQc()
+        })
+
+        $('[name="trial_pembelian_detail"]').change(function() {
             checkRangeQc()
         })
 
@@ -356,6 +355,16 @@
                     countError++
                 }
             })
+
+            let trial = $('[name="trial_pembelian_detail"]')
+            if (trial.parents('.form-group').find('label')) {
+                trial.parents('.form-group').find('label').remove()
+            }
+
+            if (trial.val() != 1) {
+                trial.after('<label class="label label-danger">Tidak Sesuai</label>')
+                countError++
+            }
 
             let selectArray = []
             if (countError > 0) {

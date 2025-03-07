@@ -43,6 +43,7 @@ class QcReceiptController extends Controller
                     'qc.warna_pembelian_detail',
                     'qc.keterangan_pembelian_detail',
                     'qc.bentuk_pembelian_detail',
+                    'qc.trial_pembelian_detail',
                     'qc.id as id_qc',
                     'pengguna.nama_pengguna',
                     'path',
@@ -81,6 +82,21 @@ class QcReceiptController extends Controller
                         return '<label class="label label-default">Belum di QC</label>';
                     }
                 })
+                ->editColumn('trial_pembelian_detail', function ($row) {
+                    if ($row->trial_pembelian_detail) {
+                        return $row->trial_pembelian_detail == '1' ? 'OK' : 'Tidak OK';
+                    }
+
+                    return '';
+                })
+                ->editColumn('status_qc', function ($row) {
+                    $index = $row->status_qc;
+                    if ($row->status_qc) {
+                        return '<label class="' . $this->arrayStatus[$index]['class'] . '">' . $this->arrayStatus[$index]['text'] . '</label>';
+                    } else {
+                        return '<label class="label label-default">Belum di QC</label>';
+                    }
+                })
                 ->editColumn('path', function ($row) use ($request) {
                     if ($request->show_img == "true") {
                         return '<img src="' . asset('asset/' . $row->path) . '" width="100">';
@@ -90,6 +106,10 @@ class QcReceiptController extends Controller
                 })
                 ->addColumn('action', function ($row) use ($encode) {
                     $btn = '<ul class="horizontal-list" style="min-width:0px;">';
+                    if ($row->status_qc) {
+                        // $btn .= '<li><a href="javascript:void(0)" data-id="' . $row->id_qc . '" class="btn btn-default btn-xs mr-1 mb-1 check-history"><i class="glyphicon glyphicon-time"></i></a></li>';
+                    }
+
                     if ($row->status_qc == 2 && in_array(session()->get('user')['id_grup_pengguna'], $encode)) {
                         $btn .= '<li><a href="' . route('qc_receipt-entry', $row->id_qc) . '" class="btn btn-warning btn-xs mr-1 mb-1">Revisi QC</a></li>';
                     }
@@ -188,7 +208,8 @@ class QcReceiptController extends Controller
                     'ph_pembelian_detail',
                     'warna_pembelian_detail',
                     'bentuk_pembelian_detail',
-                    'keterangan_pembelian_detail'
+                    'keterangan_pembelian_detail',
+                    'trial_pembelian_detail'
                 )
                 ->join('pembelian', 'qc.id_pembelian', 'pembelian.id_pembelian')
                 ->join('barang', 'qc.id_barang', 'barang.id_barang')
@@ -219,6 +240,7 @@ class QcReceiptController extends Controller
             'be_pembelian_detail'     => 'required',
             'ph_pembelian_detail'     => 'required',
             'tanggal_qc'              => 'required',
+            'trial_pembelian_detail'  => 'required',
         ];
 
         if ($request->status_qc == '2') {
@@ -249,6 +271,7 @@ class QcReceiptController extends Controller
                 $data->ph_pembelian_detail         = $request->ph_pembelian_detail;
                 $data->warna_pembelian_detail      = $request->checkbox_warna == 1 ? $request->warna_pembelian_detail : '';
                 $data->keterangan_pembelian_detail = $request->keterangan_pembelian_detail;
+                $data->trial_pembelian_detail      = $request->trial_pembelian_detail;
                 $data->user_id                     = session()->get('user')['id_pengguna'];
                 $data->save();
 
@@ -268,6 +291,7 @@ class QcReceiptController extends Controller
                     'created_at'                  => date('Y-m-d H:i:s'),
                     'qc_id'                       => $data->id,
                     'tanggal_qc'                  => $data->tanggal_qc,
+                    'trial_pembelian_detail'      => $request->trial_pembelian_detail,
                 ]);
 
                 $data->sg_pembelian_detail         = $request->sg_pembelian_detail;
@@ -280,6 +304,7 @@ class QcReceiptController extends Controller
                 $data->status_qc                   = $request->status_qc;
                 $data->reason                      = $request->reason;
                 $data->tanggal_qc                  = $request->tanggal_qc;
+                $data->trial_pembelian_detail      = $request->trial_pembelian_detail;
                 $data->save();
 
                 $data->updatePembelianDetail();

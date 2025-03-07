@@ -1,5 +1,4 @@
 <?php
-
 namespace App;
 
 use DB;
@@ -7,12 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class QualityControl extends Model
 {
-    protected $table = 'qc';
+    protected $table      = 'qc';
     protected $primaryKey = 'id';
-    public $timestamps = false;
+    public $timestamps    = false;
 
     protected $fillable = [
-        'id_cabang', 'id_pembelian', 'id_barang', 'id_satuan_barang', 'jumlah_pembelian_detail', 'tanggal_qc', 'status_qc', 'reason', 'sg_pembelian_detail', 'be_pembelian_detail', 'ph_pembelian_detail', 'warna_pembelian_detail', 'keterangan_pembelian_detail', 'bentuk_pembelian_detail', 'approval_date', 'approval_reason', 'approval_user_id', 'path', 'path2', 'user_id',
+        'id_cabang', 'id_pembelian', 'id_barang', 'id_satuan_barang', 'jumlah_pembelian_detail', 'tanggal_qc', 'status_qc', 'reason', 'sg_pembelian_detail', 'be_pembelian_detail', 'ph_pembelian_detail', 'warna_pembelian_detail', 'keterangan_pembelian_detail', 'bentuk_pembelian_detail', 'approval_date', 'approval_reason', 'approval_user_id', 'path', 'path2', 'user_id', 'trial_pembelian_detail',
     ];
 
     public function cabang()
@@ -39,11 +38,11 @@ class QualityControl extends Model
     {
         $purchase = PurchaseDetail::where('id_pembelian', $this->id_pembelian)->where('id_barang', $this->id_barang)->get();
         foreach ($purchase as $p) {
-            $p->sg_pembelian_detail = $this->sg_pembelian_detail;
-            $p->be_pembelian_detail = $this->be_pembelian_detail;
-            $p->ph_pembelian_detail = $this->ph_pembelian_detail;
-            $p->warna_pembelian_detail = $this->warna_pembelian_detail;
-            $p->bentuk_pembelian_detail = $this->bentuk_pembelian_detail;
+            $p->sg_pembelian_detail            = $this->sg_pembelian_detail;
+            $p->be_pembelian_detail            = $this->be_pembelian_detail;
+            $p->ph_pembelian_detail            = $this->ph_pembelian_detail;
+            $p->warna_pembelian_detail         = $this->warna_pembelian_detail;
+            $p->bentuk_pembelian_detail        = $this->bentuk_pembelian_detail;
             $p->keterangan_qc_pembelian_detail = $this->keterangan_pembelian_detail;
             $p->save();
 
@@ -51,24 +50,24 @@ class QualityControl extends Model
                 $w->where('kode_batang_lama_master_qr_code', $p->kode_batang_pembelian_detail)
                     ->orWhere('kode_batang_master_qr_code', $p->kode_batang_pembelian_detail);
             })->where('id_barang', $this->id_barang)->update([
-                'sg_master_qr_code' => $this->sg_pembelian_detail,
-                'be_master_qr_code' => $this->be_pembelian_detail,
-                'ph_master_qr_code' => $this->ph_pembelian_detail,
-                'warna_master_qr_code' => $this->warna_pembelian_detail,
-                'bentuk_master_qr_code' => $this->bentuk_pembelian_detail,
+                'sg_master_qr_code'            => $this->sg_pembelian_detail,
+                'be_master_qr_code'            => $this->be_pembelian_detail,
+                'ph_master_qr_code'            => $this->ph_pembelian_detail,
+                'warna_master_qr_code'         => $this->warna_pembelian_detail,
+                'bentuk_master_qr_code'        => $this->bentuk_pembelian_detail,
                 'keterangan_qc_master_qr_code' => $this->keterangan_pembelian_detail,
-                'status_qc_qr_code' => $this->status_qc,
-                'tanggal_qc_master_qr_code' => $this->tanggal_qc,
+                'status_qc_qr_code'            => $this->status_qc,
+                'tanggal_qc_master_qr_code'    => $this->tanggal_qc,
             ]);
 
             DB::table('kartu_stok')
                 ->where('kode_batang_lama_kartu_stok', $p->kode_batang_pembelian_detail)
                 ->orWhere('kode_batang_kartu_stok', $p->kode_batang_pembelian_detail)
                 ->update([
-                    'sg_kartu_stok' => $this->sg_pembelian_detail,
-                    'be_kartu_stok' => $this->be_pembelian_detail,
-                    'ph_kartu_stok' => $this->ph_pembelian_detail,
-                    'warna_kartu_stok' => $this->warna_pembelian_detail,
+                    'sg_kartu_stok'     => $this->sg_pembelian_detail,
+                    'be_kartu_stok'     => $this->be_pembelian_detail,
+                    'ph_kartu_stok'     => $this->ph_pembelian_detail,
+                    'warna_kartu_stok'  => $this->warna_pembelian_detail,
                     'bentuk_kartu_stok' => $this->bentuk_pembelian_detail,
                 ]);
         }
@@ -82,10 +81,10 @@ class QualityControl extends Model
             $explode = explode(";base64,", $req->image_path);
             $findExt = explode("image/", $explode[0]);
 
-            $ext = $findExt[1];
+            $ext  = $findExt[1];
             $name = uniqid();
 
-            $media = base64_decode($explode[1]);
+            $media    = base64_decode($explode[1]);
             $mainpath = $name . '.' . $ext;
 
             $img = \Image::make($media)->fit(150);

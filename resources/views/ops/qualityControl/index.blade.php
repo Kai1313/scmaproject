@@ -100,9 +100,9 @@
                                 Gambar
                             </label>
                         </span>
-                        <a href="{{ route('qc_receipt-entry') }}" class="btn btn-success pull-right btn-flat btn-sm mr-1">
+                        {{-- <a href="{{ route('qc_receipt-entry') }}" class="btn btn-success pull-right btn-flat btn-sm mr-1">
                             <i class="glyphicon glyphicon-plus"></i> Tambah QC Penerimaan Pembelian
-                        </a>
+                        </a> --}}
                     </div>
                 </div>
             </div>
@@ -121,12 +121,13 @@
                                 <th>PH</th>
                                 <th>Warna</th>
                                 <th>Bentuk</th>
+                                <th>Trial</th>
                                 <th>Status</th>
                                 <th>Keterangan</th>
                                 <th>Tanggal QC</th>
                                 <th>Alasan QC</th>
                                 <th>Otorisasi</th>
-                                {{-- <th>Alasan Persetujuan</th> --}}
+                                <th>Alasan Persetujuan</th>
                                 <th>Foto</th>
                             </tr>
                         </thead>
@@ -138,7 +139,7 @@
         </div>
     </div>
 
-    <div class="modal fade" id="modalEntry" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    {{-- <div class="modal fade" id="modalEntry" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -148,7 +149,7 @@
                 <form action="" class="post-action" method="post">
                     <div class="modal-body">
                         <div class="alert alert-danger" style="display:none;" id="alertModal">
-                            {{-- asd --}}
+                            asd
                         </div>
                         <table style="margin-bottom:10px;">
                             <tr>
@@ -180,7 +181,7 @@
                 </form>
             </div>
         </div>
-    </div>
+    </div> --}}
 @endsection
 
 @section('addedScripts')
@@ -237,78 +238,78 @@
             ajax: "{{ route('qc_receipt') }}?c=" + $('[name="id_cabang"]').val() + '&start_date=' + $(
                 '[name="start_date"]').val() + '&end_date=' + $('[name="end_date"]').val(),
             columns: [{
-                    data: 'action',
-                    name: 'action',
-                    orderable: false
-                }, {
-                    data: 'nama_pembelian',
-                    name: 'pembelian.nama_pembelian'
-                }, {
-                    data: 'nama_barang',
-                    name: 'barang.nama_barang',
-                }, {
-                    data: 'jumlah_pembelian_detail',
-                    name: 'jumlah_pembelian_detail',
-                    render: function(data) {
-                        return data ? formatNumber(data, 4) : 0
-                    },
-                    className: 'text-right'
-                }, {
-                    data: 'nama_satuan_barang',
-                    name: 'satuan_barang.nama_satuan_barang',
-                }, {
-                    data: 'sg_pembelian_detail',
-                    name: 'pembelian_detail.sg_pembelian_detail',
-                    render: function(data) {
-                        return data ? formatNumber(data, 4) : 0
-                    },
-                    className: 'text-right'
-                }, {
-                    data: 'be_pembelian_detail',
-                    name: 'pembelian_detail.be_pembelian_detail',
-                    render: function(data) {
-                        return data ? formatNumber(data, 4) : 0
-                    },
-                    className: 'text-right'
-                }, {
-                    data: 'ph_pembelian_detail',
-                    name: 'pembelian_detail.ph_pembelian_detail',
-                    render: function(data) {
-                        return data ? formatNumber(data, 4) : 0
-                    },
-                    className: 'text-right'
-                }, {
-                    data: 'warna_pembelian_detail',
-                    name: 'pembelian_detail.warna_pembelian_detail',
-                }, {
-                    data: 'bentuk_pembelian_detail',
-                    name: 'pembelian_detail.bentuk_pembelian_detail',
-                }, {
-                    data: 'status_qc',
-                    name: 'qc.status_qc',
-                    className: 'text-center'
-                }, {
-                    data: 'keterangan_pembelian_detail',
-                    name: 'pembelian_detail.keterangan_pembelian_detail',
-                }, {
-                    data: 'tanggal_qc',
-                    name: 'qc.tanggal_qc'
-                }, {
-                    data: 'reason',
-                    name: 'qc.reason',
-                }, {
-                    data: 'nama_pengguna',
-                    name: 'pengguna.nama_pengguna',
+                data: 'action',
+                name: 'action',
+                orderable: false
+            }, {
+                data: 'nama_pembelian',
+                name: 'pembelian.nama_pembelian'
+            }, {
+                data: 'nama_barang',
+                name: 'barang.nama_barang',
+            }, {
+                data: 'jumlah_pembelian_detail',
+                name: 'jumlah_pembelian_detail',
+                render: function(data) {
+                    return data ? formatNumber(data, 4) : 0
                 },
-                // {
-                //     data: 'approval_reason',
-                //     name: 'qc.approval_reason',
-                // }, 
-                {
-                    data: 'path',
-                    name: 'qc.path',
+                className: 'text-right'
+            }, {
+                data: 'nama_satuan_barang',
+                name: 'satuan_barang.nama_satuan_barang',
+            }, {
+                data: 'sg_pembelian_detail',
+                name: 'pembelian_detail.sg_pembelian_detail',
+                render: function(data) {
+                    return data ? formatNumber(data, 4) : 0
                 },
-            ]
+                className: 'text-right'
+            }, {
+                data: 'be_pembelian_detail',
+                name: 'pembelian_detail.be_pembelian_detail',
+                render: function(data) {
+                    return data ? formatNumber(data, 4) : 0
+                },
+                className: 'text-right'
+            }, {
+                data: 'ph_pembelian_detail',
+                name: 'pembelian_detail.ph_pembelian_detail',
+                render: function(data) {
+                    return data ? formatNumber(data, 4) : 0
+                },
+                className: 'text-right'
+            }, {
+                data: 'warna_pembelian_detail',
+                name: 'pembelian_detail.warna_pembelian_detail',
+            }, {
+                data: 'bentuk_pembelian_detail',
+                name: 'pembelian_detail.bentuk_pembelian_detail',
+            }, {
+                data: 'trial_pembelian_detail',
+                name: 'trial_pembelian_detail',
+            }, {
+                data: 'status_qc',
+                name: 'qc.status_qc',
+                className: 'text-center'
+            }, {
+                data: 'keterangan_pembelian_detail',
+                name: 'pembelian_detail.keterangan_pembelian_detail',
+            }, {
+                data: 'tanggal_qc',
+                name: 'qc.tanggal_qc'
+            }, {
+                data: 'reason',
+                name: 'qc.reason',
+            }, {
+                data: 'nama_pengguna',
+                name: 'pengguna.nama_pengguna',
+            }, {
+                data: 'approval_reason',
+                name: 'qc.approval_reason',
+            }, {
+                data: 'path',
+                name: 'qc.path',
+            }, ]
         });
 
         $('[name="id_cabang"],[name="start_date"],[name="end_date"],[name="id_barang"]').change(function() {
@@ -319,26 +320,26 @@
             changeFilter()
         })
 
-        $('body').on('click', '.btn-revision', function() {
-            $('#cover-spin').show()
-            let id = $(this).data('id')
-            $.ajax({
-                url: "{{ route('qc_receipt-find-data-qc') }}?id=" + id,
-                type: 'get',
-                success: function(res) {
-                    let modal = $('#modalEntry')
-                    modal.find('form').attr('action', res.urlToChangeStatus)
-                    modal.find('#kodePenerimaan').text(res.kodePenerimaan)
-                    modal.find('#namaBarang').text(res.namaBarang)
-                    modal.find('#jumlah').text(res.jumlah)
-                    $('#cover-spin').hide()
-                    $('#modalEntry').modal('show')
-                },
-                error: function(error) {
-                    $('#cover-spin').hide()
-                }
-            })
-        })
+        // $('body').on('click', '.btn-revision', function() {
+        //     $('#cover-spin').show()
+        //     let id = $(this).data('id')
+        //     $.ajax({
+        //         url: "{{ route('qc_receipt-find-data-qc') }}?id=" + id,
+        //         type: 'get',
+        //         success: function(res) {
+        //             let modal = $('#modalEntry')
+        //             modal.find('form').attr('action', res.urlToChangeStatus)
+        //             modal.find('#kodePenerimaan').text(res.kodePenerimaan)
+        //             modal.find('#namaBarang').text(res.namaBarang)
+        //             modal.find('#jumlah').text(res.jumlah)
+        //             $('#cover-spin').hide()
+        //             $('#modalEntry').modal('show')
+        //         },
+        //         error: function(error) {
+        //             $('#cover-spin').hide()
+        //         }
+        //     })
+        // })
 
         $('[name="show_image"]').change(function() {
             table.ajax.url("?c=" + $('[name="id_cabang"]').val() + '&start_date=' + $('[name="start_date"]').val() +
