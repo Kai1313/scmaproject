@@ -121,7 +121,7 @@
                                 <th>PH</th>
                                 <th>Warna</th>
                                 <th>Bentuk</th>
-                                <th>Trial</th>
+                                <th>Implementasi</th>
                                 <th>Status</th>
                                 <th>Keterangan</th>
                                 <th>Tanggal QC</th>
@@ -136,6 +136,43 @@
                     </table>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Riwayat Perubahan QC</h4>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Tanggal QC</th>
+                                <th>SG</th>
+                                <th>BE</th>
+                                <th>PH</th>
+                                <th>Warna</th>
+                                <th>Bentuk</th>
+                                <th>Implementasi</th>
+                                <th>Status</th>
+                                <th>Alasan QC</th>
+                                <th>Pengguna</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -286,7 +323,7 @@
                 name: 'pembelian_detail.bentuk_pembelian_detail',
             }, {
                 data: 'trial_pembelian_detail',
-                name: 'trial_pembelian_detail',
+                name: 'qc.trial_pembelian_detail',
             }, {
                 data: 'status_qc',
                 name: 'qc.status_qc',
@@ -355,5 +392,26 @@
 
             sessionStorage.setItem('qc_filter', JSON.stringify(defaultFilter));
         }
+
+        $('body').on('click', '.show-log', function() {
+            $('#cover-spin').show()
+            let id = $(this).data('id')
+            $.ajax({
+                url: '{{ route('qc_receipt-get-log') }}',
+                type: 'get',
+                data: {
+                    id: id
+                },
+                success: function(res) {
+                    $('#myModal').find('tbody').html(res.html)
+                    $('#cover-spin').hide()
+                    $('#myModal').modal()
+                },
+                error: function(error) {
+                    $('#cover-spin').hide()
+                    console.log(error)
+                }
+            })
+        })
     </script>
 @endsection

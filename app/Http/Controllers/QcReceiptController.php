@@ -82,6 +82,9 @@ class QcReceiptController extends Controller
                         return '<label class="label label-default">Belum di QC</label>';
                     }
                 })
+                ->editColumn('nama_barang', function ($row) {
+                    return '<a href="javascript:void(0)" data-id="' . $row->id_qc . '" class="show-log">' . $row->nama_barang . '</a>';
+                })
                 ->editColumn('trial_pembelian_detail', function ($row) {
                     if ($row->trial_pembelian_detail) {
                         return $row->trial_pembelian_detail == '1' ? 'OK' : 'Tidak OK';
@@ -121,7 +124,7 @@ class QcReceiptController extends Controller
                     $btn .= '</ul>';
                     return $btn;
                 })
-                ->rawColumns(['status_qc', 'action', 'path'])
+                ->rawColumns(['status_qc', 'action', 'path', 'nama_barang'])
                 ->make(true);
         }
 
@@ -467,5 +470,32 @@ class QcReceiptController extends Controller
         }
 
         return $datas;
+    }
+
+    public function getLogQc(Request $request)
+    {
+        $datas = DB::table('qc_log')->select('qc_log.*', 'pengguna.nama_pengguna')
+            ->join('pengguna', 'user_id', 'pengguna.id_pengguna')
+            ->where('qc_id', $request->id)->get();
+        $html = '';
+        foreach ($datas as $key => $data) {
+            $html .= '<tr><td>' . ($key + 1) . '</td>'
+            . '<td>' . $data->tanggal_qc . '</td>'
+            . '<td>' . $data->sg_pembelian_detail . '</td>'
+            . '<td>' . $data->be_pembelian_detail . '</td>'
+            . '<td>' . $data->ph_pembelian_detail . '</td>'
+            . '<td>' . $data->warna_pembelian_detail . '</td>'
+            . '<td>' . $data->bentuk_pembelian_detail . '</td>'
+            . '<td>' . ($data->trial_pembelian_detail == '1' ? 'OK' : 'Tidak OK') . '</td>'
+            . '<td>' . ($data->status_qc == '1' ? 'Passed' : 'Reject') . '</td>'
+            . '<td>' . $data->reason . '</td>'
+            . '<td>' . $data->nama_pengguna . '</td></tr>';
+        }
+
+        if (count($datas) == 0) {
+            $html .= '<tr><td colspan="10">Data tidak ditemukan</td></tr>';
+        }
+
+        return response()->json(['html' => $html], 200);
     }
 }

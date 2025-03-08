@@ -93,6 +93,7 @@ Route::prefix('qc_penerimaan_barang')->group(function () {
     Route::get('/find', 'QcReceiptController@findDataQc')->name('qc_receipt-find-data-qc');
     Route::post('/save-change-status/{id}', 'QcReceiptController@saveChangeStatus')->name('qc_receipt-save-change-status');
     Route::get('get-item', 'QcReceiptController@getItem')->name('qc_receipt-get-item');
+    Route::get('get-log-qc', 'QcReceiptController@getLogQc')->name('qc_receipt-get-log');
 });
 
 Route::prefix('kirim_ke_cabang')->group(function () {
@@ -447,27 +448,27 @@ Route::get('/dummyAjax', 'ClosingJournalController@dummyAjax')->name('dummy-ajax
 Route::get('/refresh-token', function () {
     $data = [
         "result" => true,
-        "token" => csrf_token(),
+        "token"  => csrf_token(),
     ];
     return $data;
 })->name('refresh-token');
 
 Route::get('tes-data', function () {
     $newQuery = \App\SaldoTransaksi::with(['pelanggan', 'penjualan'])->get();
-    $array = [];
+    $array    = [];
     foreach ($newQuery as $value) {
         $array[] = [
-            'id_transaksi' => $value->id_transaksi,
-            'kode_pelanggan' => $value->pelanggan ? $value->pelanggan->kode_pelanggan : null,
-            'nama_pelanggan' => $value->pelanggan ? $value->pelanggan->nama_pelanggan : null,
-            'tanggal_jurnal' => $value->jurnal_detail ? $value->jurnal_detail->jurnal_header : null,
+            'id_transaksi'      => $value->id_transaksi,
+            'kode_pelanggan'    => $value->pelanggan ? $value->pelanggan->kode_pelanggan : null,
+            'nama_pelanggan'    => $value->pelanggan ? $value->pelanggan->nama_pelanggan : null,
+            'tanggal_jurnal'    => $value->jurnal_detail ? $value->jurnal_detail->jurnal_header : null,
             'tanggal_penjualan' => $value->tanggal,
-            'aging' => $value->aging,
-            'top' => $value->penjualan ? $value->penjualan->tempo_hari_penjualan : null,
-            'bayar' => $value->bayar,
-            'mtotal_penjualan' => '',
-            'sisa' => $value->sisa,
-            'tanggal' => $value->tanggal,
+            'aging'             => $value->aging,
+            'top'               => $value->penjualan ? $value->penjualan->tempo_hari_penjualan : null,
+            'bayar'             => $value->bayar,
+            'mtotal_penjualan'  => '',
+            'sisa'              => $value->sisa,
+            'tanggal'           => $value->tanggal,
         ];
     }
     return $array;

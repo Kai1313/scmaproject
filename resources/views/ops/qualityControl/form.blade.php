@@ -251,7 +251,7 @@
                                     </div>
                                 </div>
                                 <div class="col-md-4">
-                                    <label>Hasil Trial</label>
+                                    <label>Hasil Implementasi</label>
                                     <div class="form-group" style="margin-bottom:0px;">
                                         <select name="trial_pembelian_detail" class="form-control">
                                             <option value="">Pilih Hasil</option>
