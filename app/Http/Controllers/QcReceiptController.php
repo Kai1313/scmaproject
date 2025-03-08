@@ -291,7 +291,8 @@ class QcReceiptController extends Controller
                     'created_at'                  => date('Y-m-d H:i:s'),
                     'qc_id'                       => $data->id,
                     'tanggal_qc'                  => $data->tanggal_qc,
-                    'trial_pembelian_detail'      => $request->trial_pembelian_detail,
+                    'trial_pembelian_detail'      => $data->trial_pembelian_detail,
+                    'path'                        => $data->path,
                 ]);
 
                 $data->sg_pembelian_detail         = $request->sg_pembelian_detail;
@@ -307,6 +308,7 @@ class QcReceiptController extends Controller
                 $data->trial_pembelian_detail      = $request->trial_pembelian_detail;
                 $data->save();
 
+                $data->uploadfile($request, $data);
                 $data->updatePembelianDetail();
             }
 
