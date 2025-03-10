@@ -226,11 +226,11 @@
                     </div>
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
                     {{-- @if (!$data || $data->approval_status == 0) --}}
-                    @if (!$data)
-                        <button class="btn btn-primary btn-flat pull-right" type="submit">
-                            <i class="glyphicon glyphicon-floppy-saved"></i> Simpan Data
-                        </button>
-                    @endif
+                    {{-- @if (!$data) --}}
+                    <button class="btn btn-primary btn-flat pull-right" type="submit">
+                        <i class="glyphicon glyphicon-floppy-saved"></i> Simpan Data
+                    </button>
+                    {{-- @endif --}}
                     <div style="margin-top:10px;color:red;">
                         <span>*</span> Upload gambar pendukung bisa di tambahkan disetiap detail barang
                         permintaan setelah disimpan data
