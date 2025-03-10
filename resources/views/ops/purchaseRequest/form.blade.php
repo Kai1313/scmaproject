@@ -225,7 +225,8 @@
                         </table>
                     </div>
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                    @if (!$data || $data->approval_status == 0)
+                    {{-- @if (!$data || $data->approval_status == 0) --}}
+                    @if (!$data)
                         <button class="btn btn-primary btn-flat pull-right" type="submit">
                             <i class="glyphicon glyphicon-floppy-saved"></i> Simpan Data
                         </button>
