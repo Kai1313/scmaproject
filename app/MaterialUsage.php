@@ -1,5 +1,4 @@
 <?php
-
 namespace App;
 
 use App\Models\Master\Cabang;
@@ -9,7 +8,7 @@ use Log;
 
 class MaterialUsage extends Model
 {
-    protected $table = 'pemakaian_header';
+    protected $table      = 'pemakaian_header';
     protected $primaryKey = 'id_pemakaian';
 
     const CREATED_AT = 'dt_created';
@@ -71,8 +70,8 @@ class MaterialUsage extends Model
     public static function createcode($id_cabang)
     {
         $branchCode = DB::table('cabang')->where('id_cabang', $id_cabang)->first();
-        $string = 'PM.' . $branchCode->kode_cabang . '.' . date('ym');
-        $check = DB::table('pemakaian_header')->where('kode_pemakaian', 'like', $string . '%')->count();
+        $string     = 'PM.' . $branchCode->kode_cabang . '.' . date('ym');
+        $check      = DB::table('pemakaian_header')->where('kode_pemakaian', 'like', $string . '%')->count();
         $check += 1;
         $nol = '';
         for ($i = 0; $i < (4 - strlen((string) $check)); $i++) {
@@ -85,15 +84,15 @@ class MaterialUsage extends Model
     public function checkStockDetails($details)
     {
         $arrayQrCode = [];
-        $arrayStock = [];
-        $detail = json_decode($details);
+        $arrayStock  = [];
+        $detail      = json_decode($details);
 
         foreach ($detail as $data) {
-            if (!isset($data->id_pemakaian)) {
+            if (! isset($data->id_pemakaian)) {
                 if (isset($arrayStock[$data->kode_batang])) {
                     $arrayStock[$data->kode_batang] = $arrayStock[$data->kode_batang] - $data->jumlah;
                 } else {
-                    $stock = MasterQrCode::where('kode_batang_master_qr_code', $data->kode_batang)->value('sisa_master_qr_code');
+                    $stock                          = MasterQrCode::where('kode_batang_master_qr_code', $data->kode_batang)->value('sisa_master_qr_code');
                     $arrayStock[$data->kode_batang] = $stock - $data->jumlah;
                 }
             }
@@ -108,7 +107,7 @@ class MaterialUsage extends Model
 
         if ($message != '') {
             return [
-                'result' => false,
+                'result'  => false,
                 'message' => 'QR Code ' . $message . ' stok tidak mencukupi',
             ];
         }
@@ -124,16 +123,16 @@ class MaterialUsage extends Model
 
             // foreach ($detail as $key => $data) {
             $array = [
-                'id_pemakaian' => $this->id_pemakaian,
-                'id_barang' => $data->id_barang,
+                'id_pemakaian'     => $this->id_pemakaian,
+                'id_barang'        => $data->id_barang,
                 'id_satuan_barang' => $data->id_satuan_barang,
-                'jumlah' => $data->jumlah,
-                'kode_batang' => $data->kode_batang,
-                'index' => count($this->details) + 1,
-                'weight' => 0,
-                'jumlah_zak' => $data->jumlah_zak,
-                'weight_zak' => $data->weight_zak,
-                'catatan' => $data->catatan,
+                'jumlah'           => $data->jumlah,
+                'kode_batang'      => $data->kode_batang,
+                'index'            => count($this->details) + 1,
+                'weight'           => 0,
+                'jumlah_zak'       => $data->jumlah_zak,
+                'weight_zak'       => $data->weight_zak,
+                'catatan'          => $data->catatan,
             ];
             $store = new MaterialUsageDetail;
             $store->fill($array);
@@ -142,52 +141,52 @@ class MaterialUsage extends Model
             $master = MasterQrCode::where('kode_batang_master_qr_code', $store->kode_batang)->first();
             if ($master) {
                 $master->sisa_master_qr_code = $master->sisa_master_qr_code - $store->jumlah;
-                $master->zak = ($master->zak ? $master->zak : 0) - $store->jumlah_zak;
-                $master->weight_zak = ($master->weight_zak ? $master->weight_zak : 0) - $store->weight_zak;
+                $master->zak                 = ($master->zak ? $master->zak : 0) - $store->jumlah_zak;
+                $master->weight_zak          = ($master->weight_zak ? $master->weight_zak : 0) - $store->weight_zak;
                 $master->save();
             }
 
             DB::table('kartu_stok')->insert([
-                'id_cabang' => $this->id_cabang,
-                'id_gudang' => $this->id_gudang,
-                'id_jenis_transaksi' => $idJenisTransaksi,
-                'kode_kartu_stok' => $this->kode_pemakaian,
-                'id_barang' => $store->id_barang,
-                'id_satuan_barang' => $store->id_satuan_barang,
-                'nama_kartu_stok' => $this->id_pemakaian,
-                'nomor_kartu_stok' => $store->index,
-                'tanggal_kartu_stok' => $this->tanggal,
-                'debit_kartu_stok' => 0,
-                'kredit_kartu_stok' => $store->jumlah,
+                'id_cabang'                     => $this->id_cabang,
+                'id_gudang'                     => $this->id_gudang,
+                'id_jenis_transaksi'            => $idJenisTransaksi,
+                'kode_kartu_stok'               => $this->kode_pemakaian,
+                'id_barang'                     => $store->id_barang,
+                'id_satuan_barang'              => $store->id_satuan_barang,
+                'nama_kartu_stok'               => $this->id_pemakaian,
+                'nomor_kartu_stok'              => $store->index,
+                'tanggal_kartu_stok'            => $this->tanggal,
+                'debit_kartu_stok'              => 0,
+                'kredit_kartu_stok'             => $store->jumlah,
                 'tanggal_kadaluarsa_kartu_stok' => $master->tanggal_expired_master_qr_code,
-                'mtotal_debit_kartu_stok' => 0,
-                'mtotal_kredit_kartu_stok' => 0,
-                'kode_batang_kartu_stok' => $store->kode_batang,
-                'kode_batang_lama_kartu_stok' => '',
-                'rak_kartu_stok' => '',
-                'batch_kartu_stok' => $master->batch_master_qr_code,
-                'id_perkiraan' => 34,
-                'sg_kartu_stok' => $master->sg_master_qr_code,
-                'be_kartu_stok' => $master->be_master_qr_code,
-                'ph_kartu_stok' => $master->ph_master_qr_code,
-                'warna_kartu_stok' => $master->warna_master_qr_code,
-                'keterangan_kartu_stok' => $this->catatan . ', ' . $data->catatan,
-                'status_kartu_stok' => 1,
-                'user_kartu_stok' => session()->get('user')['id_pengguna'],
-                'date_kartu_stok' => date('Y-m-d H:i:s'),
-                'zak' => $store->jumlah_zak,
-                'id_wrapper_zak' => $master->id_wrapper_zak,
-                'weight_zak' => $store->weight_zak,
-                'id_wrapper' => $master->id_wrapper,
-                'weight' => $master->weight,
-                'nett' => $store->jumlah - $master->weight - $store->weight_zak,
+                'mtotal_debit_kartu_stok'       => 0,
+                'mtotal_kredit_kartu_stok'      => 0,
+                'kode_batang_kartu_stok'        => $store->kode_batang,
+                'kode_batang_lama_kartu_stok'   => '',
+                'rak_kartu_stok'                => '',
+                'batch_kartu_stok'              => $master->batch_master_qr_code,
+                'id_perkiraan'                  => 34,
+                'sg_kartu_stok'                 => $master->sg_master_qr_code,
+                'be_kartu_stok'                 => $master->be_master_qr_code,
+                'ph_kartu_stok'                 => $master->ph_master_qr_code,
+                'warna_kartu_stok'              => $master->warna_master_qr_code,
+                'keterangan_kartu_stok'         => $this->catatan . ', ' . $data->catatan,
+                'status_kartu_stok'             => 1,
+                'user_kartu_stok'               => session()->get('user')['id_pengguna'],
+                'date_kartu_stok'               => date('Y-m-d H:i:s'),
+                'zak'                           => $store->jumlah_zak,
+                'id_wrapper_zak'                => $master->id_wrapper_zak,
+                'weight_zak'                    => $store->weight_zak,
+                'id_wrapper'                    => $master->id_wrapper,
+                'weight'                        => $master->weight,
+                'nett'                          => $store->jumlah - $master->weight - $store->weight_zak,
             ]);
             // }
             return ['result' => true];
         } catch (\Exception $e) {
             Log::error($e);
             return [
-                "result" => false,
+                "result"  => false,
                 "message" => "Data gagal disimpan",
             ];
         }
@@ -201,13 +200,14 @@ class MaterialUsage extends Model
                 $master = MasterQrCode::where('kode_batang_master_qr_code', $data->kode_batang)->first();
                 if ($master) {
                     $master->sisa_master_qr_code = $master->sisa_master_qr_code + $data->jumlah;
-                    $master->zak = ($master->zak ? $master->zak : 0) + $data->jumlah_zak;
-                    $master->weight_zak = ($master->weight_zak ? $master->weight_zak : 0) + $data->weight_zak;
+                    $master->zak                 = ($master->zak ? $master->zak : 0) + $data->jumlah_zak;
+                    $master->weight_zak          = ($master->weight_zak ? $master->weight_zak : 0) + $data->weight_zak;
                     $master->save();
                 }
 
                 DB::table('kartu_stok')->where('kode_kartu_stok', $this->kode_pemakaian)
                     ->where('kode_batang_kartu_stok', $data->kode_batang)
+                    ->where('nomor_kartu_stok', $data->index)
                     ->where('id_jenis_transaksi', 25)->delete();
 
                 MaterialUsageDetail::where('id_pemakaian', $this->id_pemakaian)->where('index', $id)->delete();
@@ -232,8 +232,8 @@ class MaterialUsage extends Model
                 $master = MasterQrCode::where('kode_batang_master_qr_code', $detail->kode_batang)->first();
                 if ($master) {
                     $master->sisa_master_qr_code = $master->sisa_master_qr_code + $detail->jumlah;
-                    $master->zak = ($master->zak ? $master->zak : 0) + $detail->jumlah_zak;
-                    $master->weight_zak = ($master->weight_zak ? $master->weight_zak : 0) + $detail->weight_zak;
+                    $master->zak                 = ($master->zak ? $master->zak : 0) + $detail->jumlah_zak;
+                    $master->weight_zak          = ($master->weight_zak ? $master->weight_zak : 0) + $detail->weight_zak;
                     $master->save();
                 }
 
@@ -246,7 +246,7 @@ class MaterialUsage extends Model
         } catch (\Exception $e) {
             Log::error($e);
             return [
-                "result" => false,
+                "result"  => false,
                 "message" => "Data batalkan",
             ];
         }
