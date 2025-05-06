@@ -97,6 +97,7 @@
                                 <th>Tanggal PO</th>
                                 <th>Kode PO</th>
                                 <th>Jumlah PO</th>
+                                <th>Supplier</th>
                                 <th>Keterangan</th>
                             </tr>
                         </thead>
@@ -172,8 +173,14 @@
                     data: 'jumlah_permintaan_pembelian_detail',
                     name: 'ppd.jumlah_permintaan_pembelian_detail',
                 }, {
+                    data: 'nama_pemasok',
+                    name: 'nama_pemasok',
+                }, {
                     data: 'notes',
                     name: 'pd.notes',
+                    render: function(data, type, row, meta) {
+                        return '<div style="width:300px;white-space: normal;">' + data + '</div>'
+                    }
                 }]
             });
         }
