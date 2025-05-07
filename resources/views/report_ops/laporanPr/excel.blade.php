@@ -45,6 +45,7 @@
                 <th style="border: #000000 solid thin;width:100px;text-align:center;font-weight:bold;">Tanggal PO</th>
                 <th style="border: #000000 solid thin;width:200px;text-align:center;font-weight:bold;">Kode PO</th>
                 <th style="border: #000000 solid thin;width:100px;text-align:center;font-weight:bold;">Jumlah PO</th>
+                <th style="border: #000000 solid thin;width:150px;text-align:center;font-weight:bold;">Supplier</th>
                 <th style="border: #000000 solid thin;width:200px;text-align:center;font-weight:bold;">Keterangan</th>
             </tr>
         </thead>
@@ -61,6 +62,7 @@
                     <td style="border: #000000 solid thin;">{{ $data->tanggal_permintaan_pembelian }}</td>
                     <td style="border: #000000 solid thin;">{{ $data->nama_permintaan_pembelian }}</td>
                     <td style="border: #000000 solid thin;">{{ $data->jumlah_permintaan_pembelian_detail }}</td>
+                    <td style="border: #000000 solid thin;">{{ $data->nama_pemasok }}</td>
                     <td style="border: #000000 solid thin;">{{ $data->notes }}</td>
                 </tr>
             @endforeach
