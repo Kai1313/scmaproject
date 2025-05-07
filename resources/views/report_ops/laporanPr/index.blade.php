@@ -174,7 +174,7 @@
                     name: 'ppd.jumlah_permintaan_pembelian_detail',
                 }, {
                     data: 'nama_pemasok',
-                    name: 'nama_pemasok',
+                    name: 'pemasok.nama_pemasok',
                 }, {
                     data: 'notes',
                     name: 'pd.notes',
