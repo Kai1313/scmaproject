@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Report;
 
 use App\Exports\ReportLaporanHutangCurrentExport;
@@ -23,7 +22,7 @@ class LaporanHutangCurrentController extends Controller
         }
 
         return view('report_ops.laporanHutangCurrent.index', [
-            "pageTitle" => "SCA OPS | Laporan Hutang Saat Ini | List",
+            "pageTitle"  => "SCA OPS | Laporan Hutang Saat Ini | List",
             'typeReport' => ['Rekap', 'Detail'],
         ]);
     }
@@ -34,13 +33,13 @@ class LaporanHutangCurrentController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        $data = $this->getData($request, 'print');
-        $date = $request->dateReport;
+        $data      = $this->getData($request, 'print');
+        $date      = $request->dateReport;
         $idPemasok = $request->id_pemasok;
-        $pemasok = 'Semua Pemasok';
+        $pemasok   = 'Semua Pemasok';
         if ($idPemasok != 'all') {
             $result = DB::table('pemasok')->where('id_pemasok', $idPemasok)->first();
-            if (!empty($result)) {
+            if (! empty($result)) {
                 $pemasok = "({$result->kode_pemasok}) {$result->nama_pemasok}";
             }
         }
@@ -56,11 +55,11 @@ class LaporanHutangCurrentController extends Controller
         }
 
         $array = [
-            "datas" => $data,
-            'cabang' => implode(', ', $sCabang),
-            'date' => $date,
+            "datas"   => $data,
+            'cabang'  => implode(', ', $sCabang),
+            'date'    => $date,
             'pemasok' => $pemasok,
-            'type' => $request->type,
+            'type'    => $request->type,
         ];
 
         $pdf = PDF::loadView('report_ops.laporanHutangCurrent.print', $array);
@@ -74,13 +73,13 @@ class LaporanHutangCurrentController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        $data = $this->getData($request, 'print');
-        $date = $request->dateReport;
+        $data      = $this->getData($request, 'print');
+        $date      = $request->dateReport;
         $idPemasok = $request->id_pemasok;
-        $pemasok = 'Semua Pemasok';
+        $pemasok   = 'Semua Pemasok';
         if ($idPemasok != 'all') {
             $result = DB::table('pemasok')->where('id_pemasok', $idPemasok)->first();
-            if (!empty($result)) {
+            if (! empty($result)) {
                 $pemasok = "({$result->kode_pemasok}) {$result->nama_pemasok}";
             }
         }
@@ -96,20 +95,20 @@ class LaporanHutangCurrentController extends Controller
         }
 
         $array = [
-            "datas" => $data,
-            'cabang' => implode(', ', $sCabang),
-            'date' => $date,
+            "datas"   => $data,
+            'cabang'  => implode(', ', $sCabang),
+            'date'    => $date,
             'pemasok' => $pemasok,
-            'type' => $request->type,
+            'type'    => $request->type,
         ];
         return Excel::download(new ReportLaporanHutangCurrentExport('report_ops.laporanHutangCurrent.excel', $array), 'LaporanHutangSaatIni.xlsx');
     }
 
     public function getData($request, $type)
     {
-        $date = $request->dateReport;
-        $idPemasok = $request->id_pemasok;
-        $idCabang = explode(',', $request->id_cabang);
+        $date              = $request->dateReport;
+        $idPemasok         = $request->id_pemasok;
+        $idCabang          = explode(',', $request->id_cabang);
         $transactionStatus = $request->transaction_status;
 
         $data = DB::table('saldo_transaksi as a')->Select(
@@ -131,9 +130,9 @@ class LaporanHutangCurrentController extends Controller
             ->where('a.tanggal', '<=', $date);
         if ($transactionStatus != 'all') {
             if ($transactionStatus == '1') {
-                $data = $data->where(DB::raw('(a.total+a.uang_muka)-(a.bayar+a.uang_muka)'), 0);
+                $data = $data->where(DB::raw('(ifnull(a.total,0)+ifnull(a.uang_muka,0))-(ifnull(a.bayar,0)+ifnull(a.uang_muka,0))'), 0);
             } else {
-                $data = $data->where(DB::raw('(a.total+a.uang_muka)-(a.bayar+a.uang_muka)'), '<>', 0);
+                $data = $data->where(DB::raw('(ifnull(a.total,0)+ifnull(a.uang_muka,0))-(ifnull(a.bayar,0)+ifnull(a.uang_muka,0))'), '<>', 0);
             }
         }
 
@@ -172,7 +171,7 @@ class LaporanHutangCurrentController extends Controller
                 $query->whereRaw("ifnull(a.bayar+a.uang_muka,0.00) like ?", ["%{$keywords}%"]);
             })->filterColumn('aging', function ($query, $keyword) use ($date) {
                 $keywords = trim($keyword);
-                $q = "if(ifnull((a.total+a.uang_muka)-(ifnull(a.bayar,0)+a.uang_muka),1) <> 0, DATEDIFF(" . $date . ",DATE(DATE_ADD(p2.tanggal_pembelian, INTERVAL p2.tempo_hari_pembelian DAY))),0)";
+                $q        = "if(ifnull((a.total+a.uang_muka)-(ifnull(a.bayar,0)+a.uang_muka),1) <> 0, DATEDIFF(" . $date . ",DATE(DATE_ADD(p2.tanggal_pembelian, INTERVAL p2.tempo_hari_pembelian DAY))),0)";
                 $query->whereRaw($q . ' like ?', ["%{$keywords}%"]);
             });
 
@@ -186,11 +185,11 @@ class LaporanHutangCurrentController extends Controller
 
     public function getJournal(Request $request)
     {
-        $idTransaksi = $request->id_transaksi;
+        $idTransaksi     = $request->id_transaksi;
         $transactionType = $request->transaction;
         if ($transactionType == 'down_payment') {
             $pembelian = DB::table('pembelian')->select('nomor_po_pembelian')->where('nama_pembelian', $idTransaksi)->first();
-            if (!$pembelian) {
+            if (! $pembelian) {
                 return response(['status' => 'error', 'message' => 'Penerimaan tidak ditemukan'], 500);
             }
 
@@ -210,7 +209,7 @@ class LaporanHutangCurrentController extends Controller
             ->where('jh.id_transaksi', null)
             ->get();
         $html = '';
-        $sum = 0;
+        $sum  = 0;
         foreach ($datas as $key => $data) {
             $link = route('transaction-general-ledger-show', $data->id_jurnal);
             $html .= '<tr><td class="text-center">' . ($key + 1) . '</td>';

@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\MoveBranch;
@@ -65,7 +64,7 @@ class ReceivedFromWarehouseController extends Controller
 
         $cabang = session()->get('access_cabang');
         return view('ops.receivedFromWarehouse.index', [
-            'cabang' => $cabang,
+            'cabang'    => $cabang,
             "pageTitle" => "SCA OPS | Terima Dari Gudang | List",
         ]);
     }
@@ -76,37 +75,37 @@ class ReceivedFromWarehouseController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        $data = MoveBranch::find($id);
+        $data   = MoveBranch::find($id);
         $cabang = session()->get('access_cabang');
         return view('ops.receivedFromWarehouse.form', [
-            'data' => $data,
-            'cabang' => $cabang,
+            'data'      => $data,
+            'cabang'    => $cabang,
             "pageTitle" => "SCA OPS | Terima Dari Gudang | Lihat",
         ]);
     }
 
     public function saveEntry(Request $request, $id = 0)
     {
-        $data = MoveBranch::find($id);
+        $data   = MoveBranch::find($id);
         $detail = json_decode($request->details);
         if (count($detail) <= 0) {
             return response()->json([
-                "result" => false,
+                "result"  => false,
                 "message" => "List barang tidak ditemukan",
             ], 500);
         }
 
         try {
             DB::beginTransaction();
-            if (!$data) {
+            if (! $data) {
                 $check = MoveBranch::where('id_jenis_transaksi', 24)->where('id_pindah_barang2', $request->id_pindah_barang2)->first();
                 if ($check) {
                     return response()->json([
-                        "result" => false,
+                        "result"  => false,
                         "message" => "Pindah barang sudah diterima dengan device lain",
                     ], 500);
                 } else {
-                    $data = new MoveBranch;
+                    $data   = new MoveBranch;
                     $period = $this->checkPeriod($request->tanggal_pindah_barang);
                     if ($period['result'] == false) {
                         return response()->json($period, 500);
@@ -121,10 +120,10 @@ class ReceivedFromWarehouseController extends Controller
 
             $data->fill($request->all());
             if ($id == 0) {
-                $data->kode_pindah_barang = MoveBranch::createcodeGudang($request->id_cabang, $request->tanggal_pindah_barang);
+                $data->kode_pindah_barang   = MoveBranch::createcodeGudang($request->id_cabang, $request->tanggal_pindah_barang);
                 $data->status_pindah_barang = 0;
-                $data->type = 1;
-                $data->user_created = session()->get('user')['id_pengguna'];
+                $data->type                 = 1;
+                $data->user_created         = session()->get('user')['id_pengguna'];
             } else {
                 $data->user_modified = session()->get('user')['id_pengguna'];
             }
@@ -139,15 +138,15 @@ class ReceivedFromWarehouseController extends Controller
                 $data->status_pindah_barang = 1;
                 $data->save();
 
-                $updateParent = MoveBranch::find($data->id_pindah_barang2);
+                $updateParent                       = MoveBranch::find($data->id_pindah_barang2);
                 $updateParent->status_pindah_barang = 1;
                 $updateParent->save();
             }
 
             DB::commit();
             return response()->json([
-                "result" => true,
-                "message" => "Data berhasil disimpan",
+                "result"   => true,
+                "message"  => "Data berhasil disimpan",
                 "redirect" => route('received_from_warehouse-entry', $data->id_pindah_barang),
             ], 200);
         } catch (\Exception $e) {
@@ -155,7 +154,7 @@ class ReceivedFromWarehouseController extends Controller
             Log::error("Error when save received from warehouse");
             Log::error($e);
             return response()->json([
-                "result" => false,
+                "result"  => false,
                 "message" => "Data gagal tersimpan",
             ], 500);
         }
@@ -169,7 +168,7 @@ class ReceivedFromWarehouseController extends Controller
 
         $data = MoveBranch::where('type', 1)->where('id_pindah_barang', $id)->first();
         return view('ops.receivedFromWarehouse.detail', [
-            'data' => $data,
+            'data'      => $data,
             "pageTitle" => "SCA OPS | Terima Dari Gudang | Detail",
         ]);
     }
@@ -182,16 +181,16 @@ class ReceivedFromWarehouseController extends Controller
             ->where('kode_pindah_barang', $request->qrcode)
 
             ->first();
-        if (!$data) {
+        if (! $data) {
             return response()->json([
-                'status' => 'error',
+                'status'  => 'error',
                 'message' => 'Kode tidak ditemukan',
             ], 500);
         }
 
         if ($data->status_pindah_barang == 1) {
             return response()->json([
-                'status' => 'error',
+                'status'  => 'error',
                 'message' => 'Pindah barang sudah diterima',
             ], 500);
         }
@@ -201,29 +200,29 @@ class ReceivedFromWarehouseController extends Controller
             ->first();
         if ($check) {
             return response()->json([
-                'status' => 'error',
+                'status'  => 'error',
                 'message' => 'Pindah barang sudah diterima',
             ], 500);
         }
 
         return response()->json([
-            'data' => $data,
+            'data'    => $data,
             'details' => $data->formatdetail,
-            'parent' => $data->parent,
+            'parent'  => $data->parent,
         ]);
     }
 
     public function checkPeriod($date)
     {
-        if (!$date) {
+        if (! $date) {
             return ['result' => false, 'message' => 'Tanggal tidak ditemukan'];
         }
 
-        $year = date('Y', strtotime($date));
+        $year  = date('Y', strtotime($date));
         $month = date('m', strtotime($date));
 
         $data = DB::table('periode')->where('tahun_periode', $year)->where('bulan_periode', $month)->first();
-        if (!$data) {
+        if (! $data) {
             return ['result' => false, 'message' => 'Periode tidak ditemukan'];
         }
 
@@ -237,7 +236,7 @@ class ReceivedFromWarehouseController extends Controller
     public function printQrcode(Request $request, $id)
     {
         $data = DB::table('pindah_barang')->where('id_pindah_barang', $id)->first();
-        if (!$data) {
+        if (! $data) {
             return abort(404);
         }
 
