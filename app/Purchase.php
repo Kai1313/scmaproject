@@ -87,16 +87,24 @@ class Purchase extends Model
                 DB::raw('sum(pembelian_detail.jumlah_pembelian_detail) as total_jumlah_purchase'),
                 'barang.nama_barang as text',
                 'pembelian_detail.id_satuan_barang',
-                'nama_satuan_barang',
+                'satuan_barang.nama_satuan_barang',
                 DB::raw('sum(jumlah_zak) as jumlah_zak'),
-                'master_wrapper.nama_wrapper',
-                'keterangan_pembelian_detail'
+                // 'master_wrapper.nama_wrapper',
+                'keterangan_pembelian_detail',
+                'sb.nama_satuan_barang as nama_wrapper'
             )
             ->leftJoin('barang', 'pembelian_detail.id_barang', '=', 'barang.id_barang')
             ->leftJoin('satuan_barang', 'pembelian_detail.id_satuan_barang', '=', 'satuan_barang.id_satuan_barang')
-            ->join('master_wrapper', function ($w) use ($branch) {
-                $w->on('pembelian_detail.id_wrapper_zak', '=', 'master_wrapper.id_wrapper')->where('master_wrapper.id_cabang', $branch);
+            ->leftJoin('isi_satuan_barang', function ($w) use ($branch) {
+                $w->on('isi_satuan_barang.id_barang', 'pembelian_detail.id_barang')
+                    ->where('satuan_wadah_isi_satuan_barang', '1')
+                    ->leftJoin('satuan_barang as sb', function ($q) use ($branch) {
+                        $q->on('isi_satuan_barang.id_satuan_barang', '=', 'sb.id_satuan_barang');
+                    });
             })
+        // ->join('master_wrapper', function ($w) use ($branch) {
+        //     $w->on('pembelian_detail.id_wrapper_zak', '=', 'master_wrapper.id_wrapper')->where('master_wrapper.id_cabang', $branch);
+        // })
             ->groupBy(['pembelian_detail.id_barang', 'keterangan_pembelian_detail']);
     }
 

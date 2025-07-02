@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Purchase;
@@ -12,7 +11,7 @@ class PurchaseReceiveController extends Controller
     public function printQrcode(Request $request, $id)
     {
         $data = DB::table('pembelian')->where('id_pembelian', $id)->first();
-        if (!$data) {
+        if (! $data) {
             return abort(404);
         }
 
@@ -35,8 +34,8 @@ class PurchaseReceiveController extends Controller
             ->where('pembelian_detail.id_pembelian', $id);
 
         if (isset($request->start) && isset($request->end)) {
-            $start = $request->start - 1;
-            $end = $request->end - $start;
+            $start   = $request->start - 1;
+            $end     = $request->end - $start;
             $details = $details->skip($start)->limit($end);
         } else {
             $details = $details->limit(20);
@@ -58,17 +57,17 @@ class PurchaseReceiveController extends Controller
     public function printData($id)
     {
         $data = Purchase::find($id);
-        if (!$data) {
+        if (! $data) {
             return 'data tidak ditemukan';
         }
         $month = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-        $pdf = PDF::loadView('ops.purchaseReceive.print_data', ['data' => $data, 'month' => $month]);
+        $pdf   = PDF::loadView('ops.purchaseReceive.print_data', ['data' => $data, 'month' => $month]);
         $pdf->setPaper('a5', 'landscape');
         $pdf->output();
         $dom_pdf = $pdf->getDomPDF();
-        $font = $dom_pdf->getFontMetrics()->get_font("sans-serif", "bold");
-        $canvas = $dom_pdf->get_canvas();
-        $canvas->page_text(518, 70.5, "{PAGE_NUM} dari {PAGE_COUNT}", $font, 9, array(0, 0, 0));
+        $font    = $dom_pdf->getFontMetrics()->get_font("sans-serif", "bold");
+        $canvas  = $dom_pdf->get_canvas();
+        $canvas->page_text(518, 70.5, "{PAGE_NUM} dari {PAGE_COUNT}", $font, 9, [0, 0, 0]);
 
         return $pdf->stream('Penerimaan barang.pdf');
     }
