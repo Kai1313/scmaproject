@@ -198,6 +198,10 @@
                 <div>
                     <label for="" style="margin:10px;border-bottom:1px solid gray;font-size:18px;">HASIL CHECKLIST
                         PEKERJAAN</label>
+                    <div class="pull-right">
+                        <input type="checkbox" name="check_all">
+                    </div>
+
                     @if ($status == '1')
                         <a href="{{ route('checklist-history', $data->id_jawaban_checklist_pekerjaan) }}"
                             class="show-history">Lihat Riwayat Pemeriksa</a>
@@ -368,5 +372,19 @@
                 })
             })
         @endif
+
+        $('[name="check_all"]').change(function() {
+            if ($(this).is(':checked')) {
+                $('[name="checklist_checker"]').prop('checked', true)
+                $('[name="checklist_checker"]').each(function(i, v) {
+                    $(this).change()
+                })
+            } else {
+                $('[name="checklist_checker"]').prop('checked', false)
+                $('[name="checklist_checker"]').each(function(i, v) {
+                    $(this).change()
+                })
+            }
+        })
     </script>
 @endsection
