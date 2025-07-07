@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Report;
 
 use App\Exports\ReportVisit;
@@ -20,9 +19,9 @@ class VisitController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        $idGrupUser = session()->get('user')['id_grup_pengguna'];
-        $sales = Salesman::where('pengguna_id', session()->get('user')['id_pengguna'])->first();
-        $activities = Visit::$progressIndicator;
+        $idGrupUser        = session()->get('user')['id_grup_pengguna'];
+        $sales             = Salesman::where('pengguna_id', session()->get('user')['id_pengguna'])->first();
+        $activities        = Visit::$progressIndicator;
         $initialActivities = Visit::$initialProgressIndicator;
         if ($request->ajax()) {
             if ($request->report_type == 'rekap') {
@@ -32,15 +31,15 @@ class VisitController extends Controller
             }
         }
 
-        $cabang = session()->get('access_cabang');
+        $cabang    = session()->get('access_cabang');
         $salesmans = Salesman::select('id_salesman as id', 'nama_salesman as text')->orderBy('nama_salesman', 'asc')->get();
         return view('ops.visit.report', [
-            "pageTitle" => "SCA OPS | Laporan Kunjungan | List",
-            "cabang" => $cabang,
-            'salesmans' => $salesmans,
-            'activities' => $activities,
-            'groupUser' => $idGrupUser,
-            'idUser' => $sales ? $sales->id_salesman : '0',
+            "pageTitle"         => "SCA OPS | Laporan Kunjungan | List",
+            "cabang"            => $cabang,
+            'salesmans'         => $salesmans,
+            'activities'        => $activities,
+            'groupUser'         => $idGrupUser,
+            'idUser'            => $sales ? $sales->id_salesman : '0',
             'initialActivities' => $initialActivities,
         ]);
     }
@@ -48,7 +47,7 @@ class VisitController extends Controller
     public function getDataRecap($type, $request, $activities)
     {
         $arrayF = ['sales' => 'salesman.nama_salesman', 'date' => 'visit.visit_date', 'customer' => 'pelanggan.nama_pelanggan'];
-        $data = Visit::select('visit.*', 'salesman.nama_salesman', 'pelanggan.nama_pelanggan')
+        $data   = Visit::select('visit.*', 'salesman.nama_salesman', 'pelanggan.nama_pelanggan')
             ->leftJoin('salesman', 'visit.id_salesman', 'salesman.id_salesman')
             ->leftJoin('pelanggan', 'visit.id_pelanggan', 'pelanggan.id_pelanggan')
         // ->where('visit.status', 2)
@@ -66,7 +65,7 @@ class VisitController extends Controller
             $data = $data->where('visit.id_pelanggan', $request->id_pelanggan);
         }
 
-        $data = $data->get();
+        $data      = $data->get();
         $ac_values = [];
         foreach ($data as $d) {
             $prog = explode(', ', $d->progress_ind);
@@ -78,7 +77,7 @@ class VisitController extends Controller
                 }
             }
 
-            if (!$d->progress_ind) {
+            if (! $d->progress_ind) {
                 if (isset($ac_values['BELUM VISIT'])) {
                     $ac_values['BELUM VISIT'] = $ac_values['BELUM VISIT'] += 1;
                 } else {
@@ -89,19 +88,19 @@ class VisitController extends Controller
 
         if ($type == 'view') {
             $mainData = (string) view('ops.visit.template-report', [
-                'datas' => $data,
+                'datas'      => $data,
                 'activities' => $activities,
-                'type' => 'main-data',
+                'type'       => 'main-data',
             ]);
 
             $recapData = (string) view('ops.visit.template-report', [
                 'recap' => $ac_values,
-                'type' => 'recap-data',
+                'type'  => 'recap-data',
             ]);
 
             return response()->json([
-                'result' => true,
-                'htmlMainData' => $mainData,
+                'result'        => true,
+                'htmlMainData'  => $mainData,
                 'htmlRecapData' => $recapData,
             ]);
         } else {
@@ -115,7 +114,7 @@ class VisitController extends Controller
     public function getDataDetail($type, $request)
     {
         $arrayF = ['sales' => 'salesman.nama_salesman', 'date' => 'visit.visit_date', 'customer' => 'pelanggan.nama_pelanggan'];
-        $data = Visit::select('visit.*', 'salesman.nama_salesman', 'pelanggan.nama_pelanggan')
+        $data   = Visit::select('visit.*', 'salesman.nama_salesman', 'pelanggan.nama_pelanggan')
             ->leftJoin('salesman', 'visit.id_salesman', 'salesman.id_salesman')
             ->leftJoin('pelanggan', 'visit.id_pelanggan', 'pelanggan.id_pelanggan')
             ->where('visit.status', '!=', 0);
@@ -134,7 +133,7 @@ class VisitController extends Controller
 
         $data = $data->orderBy($arrayF[$request->sort], $request->orderby)->orderBy('visit_code', $request->orderby);
         if ($type == 'view') {
-            return DataTables::of($data)->make(true);
+            return DataTables::of($data)->rawColumns(['visit_title', 'visit_desc', 'solusi'])->make(true);
         } else {
             return $data = $data->get();
         }
@@ -154,8 +153,8 @@ class VisitController extends Controller
         }
 
         $array = [
-            'result' => $result,
-            'req' => $request,
+            'result'     => $result,
+            'req'        => $request,
             'activities' => $activities,
         ];
 
@@ -165,7 +164,7 @@ class VisitController extends Controller
     public function getCustomer(Request $request)
     {
         $customerId = $request->search;
-        $datas = DB::table('pelanggan')->select('nama_pelanggan as text', 'id_pelanggan as id')
+        $datas      = DB::table('pelanggan')->select('nama_pelanggan as text', 'id_pelanggan as id')
             ->where(DB::raw('concat(nama_pelanggan," - ",alamat_pelanggan)'), 'like', '%' . $customerId . '%')
             ->where('status_pelanggan', '1')->orderBy('nama_pelanggan', 'asc')->limit(20)->get();
 
@@ -174,9 +173,9 @@ class VisitController extends Controller
 
     public function getFirstCustomer(Request $request)
     {
-        $id = $request->id;
+        $id   = $request->id;
         $data = Pelanggan::where('id_pelanggan', $id)->first();
-        if (!$data) {
+        if (! $data) {
             return response()->json(['status' => 'error', 'message' => 'Data pelanggan tidak ditemukan'], 500);
         }
 
