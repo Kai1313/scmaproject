@@ -2972,6 +2972,7 @@ class ApiController extends Controller
     public function transactionBalance(Request $req)
     {
         //param : tipe_transaksi,id_transaksi,tanggal,ref_id,catatan,target(supplier/customer),dpp,ppn,uang_muka,biaya,payment_status,discount,branch_id
+        Log::info($req->all());
         $data = TransactionBalance::where('id_transaksi', $req->id_transaksi)
             ->where('tipe_transaksi', $req->tipe_transaksi)
             ->first();
@@ -2979,8 +2980,9 @@ class ApiController extends Controller
             // DB::beginTransaction();
 
             if (isset($req->void) && ($req->void == '1' || $req->void == 1)) {
+                Log::info('proses void');
                 $data->delete();
-                DB::commit();
+                // DB::commit();
                 return response()->json([
                     "result"  => true,
                     "message" => "Data berhasil dihapus",
@@ -3006,13 +3008,15 @@ class ApiController extends Controller
             ];
 
             if (! $data) {
-                $data      = new transactionBalance;
+                Log::info('proses insert');
+                $data      = new TransactionBalance;
                 $remaining = $total;
 
                 $array['tipe_transaksi'] = $req->tipe_transaksi;
                 $array['id_transaksi']   = $req->id_transaksi;
                 $array['sisa']           = $remaining;
             } else {
+                Log::info('proses update');
                 $payment       = $data->bayar;
                 $remaining     = $total - $payment;
                 $array['sisa'] = $remaining;
