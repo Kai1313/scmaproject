@@ -198,9 +198,9 @@
                 <div>
                     <label for="" style="margin:10px;border-bottom:1px solid gray;font-size:18px;">HASIL CHECKLIST
                         PEKERJAAN</label>
-                    <div class="pull-right">
+                    {{-- <div class="pull-right">
                         <input type="checkbox" name="check_all">
-                    </div>
+                    </div> --}}
 
                     @if ($status == '1')
                         <a href="{{ route('checklist-history', $data->id_jawaban_checklist_pekerjaan) }}"
