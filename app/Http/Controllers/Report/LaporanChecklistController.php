@@ -479,6 +479,61 @@ class LaporanChecklistController extends Controller
         return view('report_ops.laporanChecklist.print_month', $array);
     }
 
+    public function printPlanMonth(Request $request)
+    {
+        $date  = $request->date;
+        $grup  = $request->grup;
+        $objek = $request->objek;
+
+        $year       = date('Y', strtotime($date));
+        $month      = date('m', strtotime($date));
+        $monthName  = ['januari', 'Februari', 'Meret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+        $group      = DB::table('grup_pengguna')->where('id_grup_pengguna', $grup)->first();
+        $count_date = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+        $object     = DB::table('objek_kerja')->where('id_objek_kerja', $objek)->first();
+
+        $datas = DB::table('jawaban_checklist_pekerjaan as jcp')
+            ->select('jcp.*', 'nama_grup_pengguna', 'p.nama_pengguna', 'nama_objek_kerja', 'pc.nama_pengguna as nama_pengguna_checker')
+            ->join('grup_pengguna as gp', 'jcp.id_grup_pengguna', 'gp.id_grup_pengguna')
+            ->join('pengguna as p', 'jcp.user_jawaban_checklist_pekerjaan', 'p.id_pengguna')
+            ->leftJoin('pengguna as pc', 'jcp.checker_jawaban_checklist_pekerjaan', 'pc.id_pengguna')
+            ->join('objek_kerja as ok', 'jcp.id_objek_kerja', 'ok.id_objek_kerja')
+            ->where('jcp.id_objek_kerja', $objek)
+            ->whereBetween('tanggal_jawaban_checklist_pekerjaan', [
+                date('Y-m', strtotime($date)) . '-01',
+                date('Y-m', strtotime($date)) . '-' . $count_date,
+            ])
+            ->where('jcp.id_grup_pengguna', $grup)
+            ->get();
+
+        $ar = [];
+        foreach ($datas as $data) {
+            for ($i = 1; $i <= 25; $i++) {
+                if ($data->{'pekerjaan' . $i . '_jawaban_checklist_pekerjaan'}) {
+                    $ar[$data->{'pekerjaan' . $i . '_jawaban_checklist_pekerjaan'} . '-' . (int) date('d', strtotime($data->tanggal_jawaban_checklist_pekerjaan))] = [
+                        'jawaban' => $data->{'jawaban' . $i . '_jawaban_checklist_pekerjaan'},
+                        'checker' => $data->{'checker' . $i . '_jawaban_checklist_pekerjaan'},
+                    ];
+                }
+            }
+        }
+
+        $checklist = DB::table('checklist_pekerjaan')->where('id_objek_kerja', $objek)->where('id_grup_pengguna', $grup)->pluck('id_pekerjaan');
+        $jobs      = DB::table('pekerjaan')->where('status_pekerjaan', '1')->whereIn('id_pekerjaan', $checklist)
+            ->pluck('nama_pekerjaan', 'id_pekerjaan');
+        $array = [
+            'month'      => $monthName[(int) $month - 1],
+            'year'       => $year,
+            'count_date' => $count_date,
+            'group'      => $group,
+            'jobs'       => $jobs,
+            'object'     => $object,
+            'answers'    => $ar,
+        ];
+
+        return view('report_ops.laporanChecklist.print_plan_month', $array);
+    }
+
     public function tes(Request $request)
     {
         $objek              = $request->objek;
