@@ -107,11 +107,11 @@
             @endphp
             <tr>
                 <td class="center">{{ $counter }}</td>
-                <td>{{ $job }}</td>
+                <td>{{ $job->nama_pekerjaan }}</td>
                 @for ($i = 1; $i <= $count_date; $i++)
-                    @if (isset($answers[$key . '-' . $i]) && $answers[$key . '-' . $i]['jawaban'] == '1')
+                    @if (isset($answers[$job->id_pekerjaan . '-' . $i]) && $answers[$job->id_pekerjaan . '-' . $i]['jawaban'] == '1')
                         <td class="center"
-                            style="{{ $answers[$key . '-' . $i]['checker'] == '1' ? 'background-color:#cbcbcb' : '' }}">
+                            style="{{ $answers[$job->id_pekerjaan . '-' . $i]['checker'] == '1' ? 'background-color:#cbcbcb' : '' }}">
                             <img src="{{ asset('images/check-icon.png') }}" alt="" style="width:15px;">
                         </td>
                     @else
