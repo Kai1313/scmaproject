@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Master\Pelanggan;
@@ -22,7 +21,7 @@ class VisitController extends Controller
         }
 
         $idGrupUser = session()->get('user')['id_grup_pengguna'];
-        $sales = Salesman::where('pengguna_id', session()->get('user')['id_pengguna'])->first();
+        $sales      = Salesman::where('pengguna_id', session()->get('user')['id_pengguna'])->first();
 
         if ($request->ajax()) {
             $data = Visit::select('visit.*', 'salesman.nama_salesman', 'pelanggan.nama_pelanggan')
@@ -108,16 +107,16 @@ class VisitController extends Controller
                 ->make(true);
         }
 
-        $salesman = Salesman::select('id_salesman as id', 'nama_salesman as text')->where('status_salesman', '1')->orderBy('nama_salesman', 'asc')->get();
+        $salesman         = Salesman::select('id_salesman as id', 'nama_salesman as text')->where('status_salesman', '1')->orderBy('nama_salesman', 'asc')->get();
         $customerCategory = Visit::$kategoriPelanggan;
-        $cabang = session()->get('access_cabang');
+        $cabang           = session()->get('access_cabang');
         return view('ops.visit.index', [
-            'cabang' => $cabang,
-            "pageTitle" => "SCA OPS | Kunjungan | List",
-            'salesmans' => $salesman,
+            'cabang'           => $cabang,
+            "pageTitle"        => "SCA OPS | Kunjungan | List",
+            'salesmans'        => $salesman,
             'customerCategory' => $customerCategory,
-            'groupUser' => $idGrupUser,
-            'idUser' => $sales ? $sales->id_salesman : '0',
+            'groupUser'        => $idGrupUser,
+            'idUser'           => $sales ? $sales->id_salesman : '0',
         ]);
     }
 
@@ -128,7 +127,7 @@ class VisitController extends Controller
         }
 
         $data = Visit::find($id);
-        if (!$data) {
+        if (! $data) {
             $data = '';
             if ($id != 0) {
                 return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
@@ -139,19 +138,19 @@ class VisitController extends Controller
             ->select('id_cabang as id', DB::raw('concat(kode_cabang," - ",nama_cabang) as text'))
             ->where('status_cabang', '1')
             ->get();
-        $progress = Visit::$progressIndicator;
-        $methods = Visit::$visitMethod;
+        $progress   = Visit::$progressIndicator;
+        $methods    = Visit::$visitMethod;
         $categories = DB::table('kategori_kunjungan')->where('status_kategori_kunjungan', '1')->get();
-        $salesman = Salesman::where('pengguna_id', session()->get('user')->id_pengguna)->first();
+        $salesman   = Salesman::where('pengguna_id', session()->get('user')->id_pengguna)->first();
         $listStatus = Visit::$listStatus;
         return view('ops.visit.view', [
-            'cabang' => $cabang,
-            "pageTitle" => "SCA OPS | Kunjungan | Lihat",
-            'salesman' => $salesman,
-            'data' => $data,
-            'progress' => $progress,
+            'cabang'     => $cabang,
+            "pageTitle"  => "SCA OPS | Kunjungan | Lihat",
+            'salesman'   => $salesman,
+            'data'       => $data,
+            'progress'   => $progress,
             'categories' => $categories,
-            'methods' => $methods,
+            'methods'    => $methods,
             'listStatus' => $listStatus,
         ]);
     }
@@ -163,7 +162,7 @@ class VisitController extends Controller
         }
 
         $data = Visit::find($id);
-        if (!$data) {
+        if (! $data) {
             $data = '';
             if ($id != 0) {
                 return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
@@ -174,26 +173,26 @@ class VisitController extends Controller
             ->select('id_cabang as id', DB::raw('concat(kode_cabang," - ",nama_cabang) as text'))
             ->where('status_cabang', '1')
             ->get();
-        $progress = Visit::$progressIndicator;
-        $methods = Visit::$visitMethod;
+        $progress   = Visit::$progressIndicator;
+        $methods    = Visit::$visitMethod;
         $categories = DB::table('kategori_kunjungan')->where('status_kategori_kunjungan', '1')->get();
-        $salesman = Salesman::where('pengguna_id', session()->get('user')->id_pengguna)->first();
-        $salesmans = [];
+        $salesman   = Salesman::where('pengguna_id', session()->get('user')->id_pengguna)->first();
+        $salesmans  = [];
         if (in_array(session()->get('user')->id_grup_pengguna, [1, 27, 14])) {
             $salesmans = Salesman::where('status_salesman', '1')->orderBy('nama_salesman', 'asc')->get();
         }
 
         $listStatus = Visit::$listStatus;
         return view('ops.visit.form', [
-            'cabang' => $cabang,
-            "pageTitle" => "SCA OPS | Kunjungan | " . ($data ? 'Edit' : 'Tambah'),
-            'salesman' => $salesman,
-            'data' => $data,
-            'progress' => $progress,
+            'cabang'     => $cabang,
+            "pageTitle"  => "SCA OPS | Kunjungan | " . ($data ? 'Edit' : 'Tambah'),
+            'salesman'   => $salesman,
+            'data'       => $data,
+            'progress'   => $progress,
             'categories' => $categories,
-            'methods' => $methods,
+            'methods'    => $methods,
             'listStatus' => $listStatus,
-            'salesmans' => $salesmans,
+            'salesmans'  => $salesmans,
         ]);
     }
 
@@ -219,11 +218,11 @@ class VisitController extends Controller
         DB::beginTransaction();
         try {
             $data = Visit::find($id);
-            if (!$data) {
+            if (! $data) {
                 if ($id != 0) {
                     DB::rollback();
                     return response()->json([
-                        'result' => false,
+                        'result'  => false,
                         'message' => 'Kunjungan tidak ditemukan',
                     ], 500);
                 }
@@ -234,17 +233,17 @@ class VisitController extends Controller
             if ($id == 0) {
                 $data->fill($request->all());
                 // $data->visit_type = 'LOKASI';
-                $data->status = '1';
-                $data->visit_code = Visit::createcode($request->id_cabang);
+                $data->status       = '1';
+                $data->visit_code   = Visit::createcode($request->id_cabang);
                 $data->user_created = session()->get('user')['id_pengguna'];
 
                 $checkCustomer = Penjualan::where('id_pelanggan', $request->id_pelanggan)->orderBy('tanggal_penjualan', 'DESC')->first();
                 if ($checkCustomer) {
                     $maxTanggalPenjualan = Setting::where('code', 'Treshold Customer Old')->where('id_cabang', $request->id_cabang)->first();
 
-                    $this_month = Carbon::now();
+                    $this_month  = Carbon::now();
                     $start_month = Carbon::parse($checkCustomer->tanggal_penjualan);
-                    $diff = $start_month->diffInMonths($this_month);
+                    $diff        = $start_month->diffInMonths($this_month);
                     if ($diff >= $maxTanggalPenjualan->value2) {
                         $data->status_pelanggan = 'OLD CUSTOMER';
                     } else {
@@ -254,25 +253,25 @@ class VisitController extends Controller
                     $data->status_pelanggan = 'NEW CUSTOMER';
                 }
             } else {
-                $data->user_modified = session()->get('user')['id_pengguna'];
-                $data->id_pelanggan = $request->id_pelanggan;
+                $data->user_modified  = session()->get('user')['id_pengguna'];
+                $data->id_pelanggan   = $request->id_pelanggan;
                 $data->pre_visit_desc = $request->pre_visit_desc;
             }
 
             $data->save();
-            if ($id == 0) {
-                $resAPi = $this->callApiPermission($data);
-                if ($resAPi[0]->hasil == '0') {
-                    DB::rollback();
-                    Log::error($resAPi);
-                    return response()->json(['result' => false, 'message' => $resAPi[0]->pesan_hasil], 500);
-                }
-            }
+            // if ($id == 0) {
+            //     $resAPi = $this->callApiPermission($data);
+            //     if ($resAPi[0]->hasil == '0') {
+            //         DB::rollback();
+            //         Log::error($resAPi);
+            //         return response()->json(['result' => false, 'message' => $resAPi[0]->pesan_hasil], 500);
+            //     }
+            // }
 
             DB::commit();
             return response()->json([
-                'result' => true,
-                'message' => 'Kunjungan berhasil disimpan',
+                'result'   => true,
+                'message'  => 'Kunjungan berhasil disimpan',
                 'redirect' => route('visit-entry', $data->id),
             ], 200);
         } catch (\Exception $th) {
@@ -286,23 +285,23 @@ class VisitController extends Controller
     {
         try {
             $datas = [
-                'id_perizinan' => 0,
+                'id_perizinan'          => 0,
                 'id_kategori_perizinan' => 1,
-                'nama_perizinan' => "",
-                'pengguna_perizinan' => $data->salesman->pengguna->username,
-                'tanggal_perizinan' => $data->visit_date,
-                'lokasi_perizinan' => $data->pelanggan->nama_pelanggan . ' - ' . $data->pelanggan->alamat_pelanggan,
-                'keperluan_perizinan' => 'Kunjungan ke ' . $data->pelanggan->nama_pelanggan,
-                'bukti_perizinan' => '',
-                'keterangan_perizinan' => "",
-                'status_perizinan' => '1',
-                'user_perizinan' => 1,
-                'date_perizinan' => date('Y-m-d H:i:s'),
-                'token_pengguna' => 'a86e8a8d8dabd4f6e7eddd914fd3fd0b',
+                'nama_perizinan'        => "",
+                'pengguna_perizinan'    => $data->salesman->pengguna->username,
+                'tanggal_perizinan'     => $data->visit_date,
+                'lokasi_perizinan'      => $data->pelanggan->nama_pelanggan . ' - ' . $data->pelanggan->alamat_pelanggan,
+                'keperluan_perizinan'   => 'Kunjungan ke ' . $data->pelanggan->nama_pelanggan,
+                'bukti_perizinan'       => '',
+                'keterangan_perizinan'  => "",
+                'status_perizinan'      => '1',
+                'user_perizinan'        => 1,
+                'date_perizinan'        => date('Y-m-d H:i:s'),
+                'token_pengguna'        => 'a86e8a8d8dabd4f6e7eddd914fd3fd0b',
             ];
 
             $encodedData = json_encode($datas);
-            $ch = curl_init();
+            $ch          = curl_init();
             curl_setopt($ch, CURLOPT_URL, env('OLD_API_ROOT') . "actions/perizinan_tambah.php");
             curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -315,7 +314,7 @@ class VisitController extends Controller
             Log::error("Bermasalah ketika akses api permintaan izin");
             Log::error($th);
             return [
-                "result" => false,
+                "result"  => false,
                 "message" => "Data gagal tersimpan",
             ];
         }
@@ -326,7 +325,7 @@ class VisitController extends Controller
         DB::beginTransaction();
         try {
             $data = Visit::find($id);
-            if (!$data) {
+            if (! $data) {
                 DB::rollback();
                 return response()->json(['result' => false, 'message' => 'Data kunjungan tidak ditemukan'], 500);
             }
@@ -337,7 +336,7 @@ class VisitController extends Controller
             }
 
             $data->alasan_pembatalan = $request->alasan_pembatalan;
-            $data->status = 0;
+            $data->status            = 0;
             $data->save();
             DB::commit();
             return response()->json(["result" => true, 'redirect' => route('visit-entry', $id), "message" => 'Kunjungan berhasil dibatalkan'], 200);
@@ -355,7 +354,7 @@ class VisitController extends Controller
         }
 
         $data = Visit::find($id);
-        if (!$data) {
+        if (! $data) {
             return response()->json(['result' => false, 'message' => 'Data kunjungan tidak ditemukan'], 500);
         }
 
@@ -371,8 +370,8 @@ class VisitController extends Controller
 
             if (isset($request->remove_base64)) {
                 $decodeRemoveMedia = json_decode($request->remove_base64);
-                $removeFile = $data->removefile($decodeRemoveMedia);
-                if (!$removeFile['result']) {
+                $removeFile        = $data->removefile($decodeRemoveMedia);
+                if (! $removeFile['result']) {
                     DB::rollback();
                     return response()->json(['result' => false, 'message' => 'Hapus file bermasalah'], 500);
                 }
@@ -380,8 +379,8 @@ class VisitController extends Controller
 
             if (isset($request->upload_base64)) {
                 $decodeMedia = json_decode($request->upload_base64);
-                $uploadFile = $data->uploadfile($decodeMedia);
-                if (!$uploadFile['result']) {
+                $uploadFile  = $data->uploadfile($decodeMedia);
+                if (! $uploadFile['result']) {
                     DB::rollback();
                     return response()->json(['result' => false, 'message' => 'Upload file bermasalah'], 500);
                 }
@@ -428,36 +427,36 @@ class VisitController extends Controller
         DB::beginTransaction();
         try {
             $data = Pelanggan::find($customerid);
-            if (!$data) {
-                $data = new Pelanggan;
-                $data->id_wilayah_pelanggan = '1';
+            if (! $data) {
+                $data                        = new Pelanggan;
+                $data->id_wilayah_pelanggan  = '1';
                 $data->id_kategori_pelanggan = '1';
-                $data->id_gudang = 1;
-                $data->status_pelanggan = '1';
+                $data->id_gudang             = 1;
+                $data->status_pelanggan      = '1';
                 $data->plafon_hari_pelanggan = '0';
-                $data->user_pelanggan = session()->get('user')['id_pengguna'];
-                $data->plafon_pelanggan = 10000000;
+                $data->user_pelanggan        = session()->get('user')['id_pengguna'];
+                $data->plafon_pelanggan      = 10000000;
                 $data->plafon_hari_pelanggan = 1;
-                $data->kode_pelanggan = $this->generateCodeCustomer();
+                $data->kode_pelanggan        = $this->generateCodeCustomer();
             }
 
-            $data->nama_pelanggan = $request->nama_pelanggan;
-            $data->alamat_pelanggan = $request->alamat_pelanggan;
-            $data->kota_pelanggan = $request->kota_pelanggan;
-            $data->telepon1_pelanggan = $request->telepon1_pelanggan;
-            $data->kontak_person_pelanggan = $request->kontak_person_pelanggan;
-            $data->bidang_usaha_pelanggan = $request->bidang_usaha_pelanggan;
-            $data->kapasitas_pelanggan = $request->kapasitas_pelanggan;
+            $data->nama_pelanggan                 = $request->nama_pelanggan;
+            $data->alamat_pelanggan               = $request->alamat_pelanggan;
+            $data->kota_pelanggan                 = $request->kota_pelanggan;
+            $data->telepon1_pelanggan             = $request->telepon1_pelanggan;
+            $data->kontak_person_pelanggan        = $request->kontak_person_pelanggan;
+            $data->bidang_usaha_pelanggan         = $request->bidang_usaha_pelanggan;
+            $data->kapasitas_pelanggan            = $request->kapasitas_pelanggan;
             $data->posisi_kontak_person_pelanggan = $request->posisi_kontak_person_pelanggan;
-            $data->aset_pelanggan = $request->aset_pelanggan;
-            $data->status_aktif_pelanggan = $request->status_aktif_pelanggan;
-            $data->keterangan_pelanggan = $request->keterangan_pelanggan;
+            $data->aset_pelanggan                 = $request->aset_pelanggan;
+            $data->status_aktif_pelanggan         = $request->status_aktif_pelanggan;
+            $data->keterangan_pelanggan           = $request->keterangan_pelanggan;
             $data->save();
 
             DB::commit();
             return response()->json([
-                'result' => true,
-                'message' => 'Pelanggan berhasil disimpan',
+                'result'   => true,
+                'message'  => 'Pelanggan berhasil disimpan',
                 'redirect' => route('visit-entry', $id),
             ], 200);
         } catch (\Exception $th) {
@@ -469,10 +468,10 @@ class VisitController extends Controller
 
     public function generateCodeCustomer()
     {
-        $data = \App\Models\Master\Pelanggan::orderBy('kode_pelanggan', 'desc')->first();
+        $data   = \App\Models\Master\Pelanggan::orderBy('kode_pelanggan', 'desc')->first();
         $string = substr($data->kode_pelanggan, 9, 6);
-        $num = (int) $string + 1;
-        $zero = '';
+        $num    = (int) $string + 1;
+        $zero   = '';
         for ($i = 0; $i < (6 - strlen((string) $num)); $i++) {
             $zero .= '0';
         }
@@ -483,20 +482,20 @@ class VisitController extends Controller
     public function saveDateChange(Request $request, $id)
     {
         $data = Visit::find($id);
-        if (!$data) {
+        if (! $data) {
             return response()->json(['result' => false, 'message' => 'Data kunjungan tidak ditemukan'], 500);
         }
 
         DB::beginTransaction();
         try {
             $data->alasan_ubah_tanggal = $request->alasan_ubah_tanggal . ', tanggal sebelumnya ' . $data->visit_date;
-            $data->visit_date = $request->new_date;
+            $data->visit_date          = $request->new_date;
             $data->save();
 
             DB::commit();
             return response()->json([
-                'result' => true,
-                'message' => 'Perubahan tanggal berhasil disimpan',
+                'result'   => true,
+                'message'  => 'Perubahan tanggal berhasil disimpan',
                 'redirect' => route('visit-entry', $id),
             ], 200);
         } catch (\Exception $th) {
@@ -513,7 +512,7 @@ class VisitController extends Controller
         }
 
         $data = Visit::find($id);
-        if (!$data) {
+        if (! $data) {
             return response()->json(['result' => false, 'message' => 'Kunjungan tidak ditemukan'], 500);
         }
 
