@@ -24,9 +24,17 @@
                 <div class="box box-primary">
                     <div class="box-header">
                         <h3 class="box-title">Jurnal Penyesuaian <span class="text-muted"></span></h3>
-                        <a href="{{ route('transaction-adjustment-ledger') }}"
-                            class="btn bg-navy btn-sm btn-default btn-flat pull-right"><span
-                                class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali</a>
+                        <div class="pull-right">
+                            @if ($data_jurnal_header->void == '1')
+                                <label class="label label-danger" style="font-size:14px;">VOID</label>
+                                pada {{ date('d/m/Y', strtotime($data_jurnal_header->dt_void)) }} oleh
+                                {{ $data_jurnal_header->userVoid->nama_pengguna }}
+                            @endif
+                            <a href="{{ route('transaction-adjustment-ledger') }}"
+                                class="btn bg-navy btn-sm btn-default btn-flat"><span
+                                    class="glyphicon glyphicon-arrow-left mr-1" aria-hidden="true"></span> Kembali</a>
+                        </div>
+
                     </div>
                     <div class="box-body">
                         <div class="row">

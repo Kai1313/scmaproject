@@ -1,38 +1,39 @@
 <?php
-
 namespace App\Models\Accounting;
 
-use App\SaldoTransaksi;
 use App\Cabang;
 use App\Models\Master\Slip;
+use App\Pengguna;
+use App\SaldoTransaksi;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 
 class JurnalHeader extends Model
 {
-    protected $table = 'jurnal_header';
+    protected $table      = 'jurnal_header';
     protected $primaryKey = 'id_jurnal';
-    const CREATED_AT = 'dt_created';
-    const UPDATED_AT = 'dt_modified';
+    const CREATED_AT      = 'dt_created';
+    const UPDATED_AT      = 'dt_modified';
 
-    function jurnalDetails()
+    public function jurnalDetails()
     {
         return $this->hasMany(JurnalDetail::class, 'id_jurnal', 'id_jurnal');
     }
 
-    function saldo_transaksi()
+    public function saldo_transaksi()
     {
         return $this->hasMany(SaldoTransaksi::class, 'id_transaksi', 'id_transaksi');
     }
 
-    public static function generateJournalCode($cabang, $jenis){
+    public static function generateJournalCode($cabang, $jenis)
+    {
         try {
             $ex = 0;
             do {
                 // Init data
                 $kodeCabang = Cabang::find($cabang);
-                $prefix = $kodeCabang->kode_cabang . "." . $jenis . "." . date("ym");
-    
+                $prefix     = $kodeCabang->kode_cabang . "." . $jenis . "." . date("ym");
+
                 // Check exist
                 $check = JurnalHeader::selectRaw("kode_jurnal,
                 CONCAT(SUBSTRING_INDEX(kode_jurnal, '.', 2), '.', LPAD(SUBSTRING_INDEX(kode_jurnal, '.', -1), 5, '0')) AS formatted_kode_jurnal")
@@ -68,15 +69,16 @@ class JurnalHeader extends Model
         }
     }
 
-    public static function generateJournalCodeWithSlip($cabang, $jenis, $slip){
+    public static function generateJournalCodeWithSlip($cabang, $jenis, $slip)
+    {
         try {
             $ex = 0;
             do {
                 // Init data
                 $kodeCabang = Cabang::find($cabang);
-                $kodeSlip = Slip::find($slip);
-                $prefix = $kodeCabang->kode_cabang . "." . $jenis . "." . $kodeSlip->kode_slip . "." . date("ym");
-    
+                $kodeSlip   = Slip::find($slip);
+                $prefix     = $kodeCabang->kode_cabang . "." . $jenis . "." . $kodeSlip->kode_slip . "." . date("ym");
+
                 // Check exist
                 $check = JurnalHeader::selectRaw("kode_jurnal,
                 CONCAT(SUBSTRING_INDEX(kode_jurnal, '.', 2), '.', LPAD(SUBSTRING_INDEX(kode_jurnal, '.', -1), 5, '0')) AS formatted_kode_jurnal")
@@ -110,5 +112,10 @@ class JurnalHeader extends Model
             Log::error("Error when generate journal code");
             Log::error($e);
         }
+    }
+
+    public function uservoid()
+    {
+        return $this->belongsTo(Pengguna::class, 'user_void', 'id_pengguna');
     }
 }
