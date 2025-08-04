@@ -185,6 +185,7 @@
                                 <th>Catatan Persetujuan</th>
                                 <th>Persetujuan</th>
                                 <th>Status</th>
+                                <th>Progress</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -265,6 +266,29 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="modalStatus" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content ">
+                <div class="modal-body">
+                    <h3><span id="item_name_status"></span></h3>
+                    <label>Progress</label>
+                    <div class="form-group">
+                        <select name="status" class="form-control">
+                            @foreach ($statuses as $ks => $s)
+                                <option value="{{ $ks }}">{{ $s }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <input type="hidden" name="index" class="clear-input">
+                    <input type="hidden" name="purchase_request_id" value="{{ $data->purchase_request_id }}">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-flat" data-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-primary save-edit-status btn-flat">Perbarui</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('addedScripts')
@@ -281,6 +305,7 @@
         let details = {!! $data ? $data->formatdetail : '[]' !!};
         let approval_header = {{ $data->approval_status }};
         let arrayAccess = {!! json_encode($arrayAccess) !!}
+        let statuses = {!! json_encode($statuses) !!}
         let idUser = '{{ $idUser }}'
         let changeStatusDetail = '{{ route('purchase-request-change-status-detail') }}';
         let urlGetStock = '{{ route('purchase-request-stock') }}'
@@ -315,7 +340,6 @@
                 data: 'notes',
                 name: 'notes',
                 render: function(data, type, row) {
-                    console.log(row)
                     return '<a href="' + urlToPo + '?id=' + row.purchase_request_id + '&index=' + row
                         .index + '" target="_blank">' + data +
                         '</a>'
@@ -348,6 +372,13 @@
                 name: 'status_data',
                 className: 'text-center'
             }, {
+                data: 'status',
+                name: 'status',
+                className: 'text-center',
+                render: function(data, type, row, meta) {
+                    return statuses[data] ?? '';
+                }
+            }, {
                 data: 'index',
                 className: 'text-center',
                 name: 'index',
@@ -377,6 +408,12 @@
                     }
 
                     if (row.approval_status == 1 && row.closed != 1) {
+                        btn +=
+                            '<a href="' + changeStatusDetail +
+                            '" class="btn btn-warning btn-xs mr-1 mb-1 edit-status" data-item="' +
+                            row.nama_barang +
+                            '" data-index="' + data +
+                            '"> Update Status</a></a>';
                         btn +=
                             '<a href="' + changeStatusDetail +
                             '" class="btn btn-default btn-xs mr-1 mb-1 btn-change-status-modal" data-item="' +
@@ -580,6 +617,44 @@
                 error: function(error) {
                     Swal.fire("Gagal Menyimpan Data. ", error.responseJSON.message, 'error')
                     $('#cover-spin').hide()
+                }
+            })
+        })
+
+        $('body').on('click', '.edit-status', function(e) {
+            e.preventDefault();
+            let url = $(this).prop('href')
+            let tempData = details[$(this).parents('tr').index()]
+            $('#item_name_status').text(tempData.nama_barang)
+            $('[name="index"]').val($(this).data('index'))
+            $('[name="status"]').val(tempData.status)
+            $('.save-edit-status').attr('data-url', url)
+            $('#modalStatus').modal();
+        })
+
+        $('.save-edit-status').click(function() {
+            $('#modalStatus').modal('hide');
+            let url = $(this).data('url')
+            $('#cover-spin').show()
+            $.ajax({
+                url: url,
+                type: 'post',
+                data: {
+                    'index': $('[name="index"]').val(),
+                    'purchase_request_id': $('[name="purchase_request_id"]').val(),
+                    'status': $('[name="status"]').val(),
+                },
+                success: function(data) {
+                    $('#cover-spin').hide()
+                    Swal.fire('Tersimpan!', data.message, 'success').then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = data.redirect;
+                        }
+                    })
+                },
+                error: function(error) {
+                    $('#cover-spin').hide()
+                    Swal.fire("Gagal", error.responseJSON.message, 'error')
                 }
             })
         })

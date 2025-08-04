@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Console\Commands;
 
 use App\Http\Controllers\ApiController;
@@ -41,26 +40,26 @@ class recalculateStokMin extends Command
     public function handle()
     {
         // $this->info('You call cron:stokMin command');
-        \Log::info(date("Y-m-d H:i:s") . ": MULAI KALKULASI STOK MINIMAL");
+        // \Log::info(date("Y-m-d H:i:s") . ": MULAI KALKULASI STOK MINIMAL");
         try {
             \DB::beginTransaction();
             $allStokMin = StokMin::all();
             foreach ($allStokMin as $rowItem) {
                 $resultCalculated = (new ApiController)->stokmin(new Request([
-                    'id' => $rowItem->id_barang,
+                    'id'        => $rowItem->id_barang,
                     'id_cabang' => $rowItem->id_cabang,
                 ]));
                 $rowItem->jumlah_stok_minimal_barang_gudang = $resultCalculated->getData()->total;
-                $rowItem->date_stok_minimal_barang_gudang = date("Y-m-d H:i:s");
+                $rowItem->date_stok_minimal_barang_gudang   = date("Y-m-d H:i:s");
                 $rowItem->save();
             }
             \DB::commit();
-            \Log::info(date("Y-m-d H:i:s") . ": SELESAI KALKULASI STOK MINIMAL");
+            // \Log::info(date("Y-m-d H:i:s") . ": SELESAI KALKULASI STOK MINIMAL");
         } catch (\Exception $e) {
             \DB::rollback();
             $message = "Error when storing stok minimal hitung";
-            \Log::error($message);
-            \Log::error($e);
+            // \Log::error($message);
+            // \Log::error($e);
         }
     }
 }

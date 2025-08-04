@@ -1,5 +1,4 @@
 <?php
-
 namespace App;
 
 use App\Models\Master\Cabang;
@@ -8,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class PurchaseRequest extends Model
 {
-    protected $table = 'purchase_request_header';
+    protected $table      = 'purchase_request_header';
     protected $primaryKey = 'purchase_request_id';
 
     protected $fillable = [
@@ -62,6 +61,7 @@ class PurchaseRequest extends Model
                 'approval_notes',
                 'approval_status',
                 'closed',
+                'status',
                 DB::raw('(case when closed = 0 then "Open" else "Closed" end) as status_data'),
                 DB::raw('if(barang.status_stok_barang = "1" ,
                     (case
@@ -85,18 +85,18 @@ class PurchaseRequest extends Model
     public function savedetails($details)
     {
         $detail = json_decode($details);
-        $array = [];
+        $array  = [];
         foreach ($detail as $data) {
             if ($data->old_index != '') {
                 $check = DB::table('purchase_request_detail')
                     ->where('purchase_request_id', $this->purchase_request_id)
                     ->where('index', $data->old_index)->first();
                 if ($check) {
-                    $check->index = $data->index;
-                    $check->id_barang = $data->id_barang;
+                    $check->index            = $data->index;
+                    $check->id_barang        = $data->id_barang;
                     $check->id_satuan_barang = $data->id_satuan_barang;
-                    $check->qty = $data->qty;
-                    $check->notes = $data->notes;
+                    $check->qty              = $data->qty;
+                    $check->notes            = $data->notes;
                     if ($data->status_stok_barang == '0') {
                         $check->stock = $data->stock;
                     }
@@ -117,17 +117,17 @@ class PurchaseRequest extends Model
         foreach ($array as $a) {
             DB::table('purchase_request_detail')->insert([
                 'purchase_request_id' => $a->purchase_request_id,
-                'index' => $a->index,
-                'id_barang' => $a->id_barang,
-                'id_satuan_barang' => $a->id_satuan_barang,
-                'qty' => $a->qty,
-                'notes' => $a->notes,
-                'approval_status' => isset($a->approval_status) ? $a->approval_status : 0,
-                'approval_user_id' => isset($a->approval_user_id) ? $a->approval_user_id : null,
-                'approval_date' => isset($a->approval_date) ? $a->approval_date : null,
-                'closed' => $a->closed,
-                'approval_notes' => isset($a->approval_notes) ? $a->approval_notes : null,
-                'stock' => $a->stock ? $a->stock : '0',
+                'index'               => $a->index,
+                'id_barang'           => $a->id_barang,
+                'id_satuan_barang'    => $a->id_satuan_barang,
+                'qty'                 => $a->qty,
+                'notes'               => $a->notes,
+                'approval_status'     => isset($a->approval_status) ? $a->approval_status : 0,
+                'approval_user_id'    => isset($a->approval_user_id) ? $a->approval_user_id : null,
+                'approval_date'       => isset($a->approval_date) ? $a->approval_date : null,
+                'closed'              => $a->closed,
+                'approval_notes'      => isset($a->approval_notes) ? $a->approval_notes : null,
+                'stock'               => $a->stock ? $a->stock : '0',
             ]);
         }
 
@@ -136,9 +136,9 @@ class PurchaseRequest extends Model
 
     public static function createcode($id_cabang)
     {
-        $arrayMonth = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
+        $arrayMonth  = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
         $startString = 'PR/SCMA' . ($id_cabang == 1 ? '-SBY' : '-JKT') . '/';
-        $endString = '/' . ($arrayMonth[date('n')]) . '/' . date('Y');
+        $endString   = '/' . ($arrayMonth[date('n')]) . '/' . date('Y');
 
         $check = \DB::table('purchase_request_header')->where('id_cabang', $id_cabang)->where('purchase_request_code', 'like', '%' . $endString . '%')->count();
         $check += 1;
@@ -176,9 +176,9 @@ class PurchaseRequest extends Model
                     ->where('purchase_request_id', $this->purchase_request_id)
                     ->where('index', $data->index)
                     ->update([
-                        'approval_status' => $this->approval_status,
+                        'approval_status'  => $this->approval_status,
                         'approval_user_id' => $this->approval_user_id,
-                        'approval_date' => $this->approval_date,
+                        'approval_date'    => $this->approval_date,
                     ]);
             }
         }

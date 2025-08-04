@@ -218,7 +218,7 @@
                                     <th>Satuan</th>
                                     <th>Catatan</th>
                                     <th>Stok</th>
-                                    {{-- <th>Status</th> --}}
+                                    <th>Progress</th>
                                     <th style="width:150px;">Action</th>
                                 </tr>
                             </thead>
@@ -340,6 +340,7 @@
 @section('externalScripts')
     <script>
         let branch = {!! json_encode($cabang) !!}
+        let statuses = {!! json_encode($statuses) !!}
         let details = {!! $data ? $data->formatdetail : '[]' !!};
         let detailSelect = []
         let count = 0
@@ -388,6 +389,13 @@
                     return formatNumber(data, 4)
                 },
                 className: 'text-right'
+            }, {
+                data: 'status',
+                name: 'status',
+                render: function(data) {
+                    return statuses[data] ?? '';
+                },
+                className: 'text-center'
             }, {
                 data: 'index',
                 className: 'text-center',

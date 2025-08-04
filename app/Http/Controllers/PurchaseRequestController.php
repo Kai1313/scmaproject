@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Media;
@@ -61,11 +60,11 @@ class PurchaseRequestController extends Controller
                 $data = $data->where('prh.approval_status', $request->approval_status);
             }
 
-            $data = $data->groupBy('prh.purchase_request_id')->orderBy('prh.dt_created', 'desc');
-            $access = DB::table('setting')->where('id_cabang', $request->c)->where('code', 'PR Approval')->first();
+            $data        = $data->groupBy('prh.purchase_request_id')->orderBy('prh.dt_created', 'desc');
+            $access      = DB::table('setting')->where('id_cabang', $request->c)->where('code', 'PR Approval')->first();
             $arrayAccess = explode(',', $access->value1);
 
-            $idUser = session()->get('user')['id_pengguna'];
+            $idUser     = session()->get('user')['id_pengguna'];
             $filterUser = DB::table('pengguna')
                 ->where(function ($w) {
                     $w->where('id_grup_pengguna', session()->get('user')['id_grup_pengguna'])->orWhere('id_grup_pengguna', 1);
@@ -104,12 +103,12 @@ class PurchaseRequestController extends Controller
                 ->make(true);
         }
 
-        $cabang = session()->get('access_cabang');
+        $cabang   = session()->get('access_cabang');
         $statuses = [['text' => 'Pending', 'id' => '0'], ['text' => 'Approve', 'id' => '1'], ['text' => 'Reject', 'id' => '2']];
         return view('ops.purchaseRequest.index', [
-            'cabang' => $cabang,
+            'cabang'    => $cabang,
             "pageTitle" => "SCA OPS | Permintaan Pembelian | List",
-            'statuses' => $statuses,
+            'statuses'  => $statuses,
         ]);
     }
 
@@ -119,13 +118,18 @@ class PurchaseRequestController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        $data = PurchaseRequest::find($id);
-        $cabang = session()->get('access_cabang');
+        $data     = PurchaseRequest::find($id);
+        $cabang   = session()->get('access_cabang');
+        $statuses = [
+            '0' => 'Belum Diproses', '1' => 'Menunggu Penawaran', '2' => 'Sudah Dipesan', '3' => 'Ditunda',
+        ];
+
         return view('ops.purchaseRequest.form', [
-            'data' => $data,
-            'cabang' => $cabang,
+            'data'        => $data,
+            'cabang'      => $cabang,
             'arrayStatus' => $this->arrayStatus,
-            "pageTitle" => "SCA OPS | Permintaan Pembelian | " . ($id == 0 ? 'Create' : 'Edit'),
+            "pageTitle"   => "SCA OPS | Permintaan Pembelian | " . ($id == 0 ? 'Create' : 'Edit'),
+            'statuses'    => $statuses,
         ]);
     }
 
@@ -134,8 +138,8 @@ class PurchaseRequestController extends Controller
         $data = PurchaseRequest::find($id);
         try {
             DB::beginTransaction();
-            if (!$data) {
-                $data = new PurchaseRequest;
+            if (! $data) {
+                $data   = new PurchaseRequest;
                 $period = $this->checkPeriod($request->purchase_request_date);
                 if ($period['result'] == false) {
                     return response()->json($period, 500);
@@ -148,7 +152,7 @@ class PurchaseRequestController extends Controller
 
                 if ($data->approval_status != 0) {
                     return response()->json([
-                        "result" => false,
+                        "result"  => false,
                         "message" => "Permintaan tidak bisa diperbarui karena telah disetujui / ditolak",
                     ]);
                 }
@@ -156,10 +160,10 @@ class PurchaseRequestController extends Controller
 
             $data->fill($request->all());
             if ($id == 0) {
-                $data->purchase_request_code = PurchaseRequest::createcode($request->id_cabang);
-                $data->approval_status = 0;
-                $data->user_created = session()->get('user')['id_pengguna'];
-                $data->void = 0;
+                $data->purchase_request_code    = PurchaseRequest::createcode($request->id_cabang);
+                $data->approval_status          = 0;
+                $data->user_created             = session()->get('user')['id_pengguna'];
+                $data->void                     = 0;
                 $data->purchase_request_user_id = session()->get('user')['id_pengguna'];
             } else {
                 $data->user_modified = session()->get('user')['id_pengguna'];
@@ -171,28 +175,28 @@ class PurchaseRequestController extends Controller
             $access = DB::table('setting')->where('code', 'PR Send WA')->first();
             if ($access && $access->value1 == '1') {
                 $group = DB::table('setting')->where('code', 'PR Notice')->first();
-                if (!$group) {
+                if (! $group) {
                     return response()->json(['status' => 'error', 'message' => 'Grup belum di seting'], 500);
                 }
 
                 $expolodeGroup = explode(',', $group->value1);
-                $userSendWa = DB::table('pengguna')
+                $userSendWa    = DB::table('pengguna')
                     ->select('nama_pengguna', 'telepon1_pengguna')
                     ->whereIn('id_grup_pengguna', $expolodeGroup)
                     ->where('status_pengguna', 1)->get();
                 $settingMessage = DB::table('setting')->where('code', 'Pesan Permintaan Beli')->first();
-                $strParam = [
+                $strParam       = [
                     '[[pembuat]]' => $data->pengguna->nama_pengguna,
-                    '[[code]]' => $data->purchase_request_code,
-                    '[[date]]' => date('d/m/Y'),
+                    '[[code]]'    => $data->purchase_request_code,
+                    '[[date]]'    => date('d/m/Y'),
                 ];
 
                 foreach ($userSendWa as $user) {
                     $trySend = 0;
                     do {
                         $messageText = replaceMessage($strParam, $settingMessage->value1);
-                        $send = $this->sendToWa($user->telepon1_pengguna, $messageText);
-                        $message = $send[0]->pesan_hasil;
+                        $send        = $this->sendToWa($user->telepon1_pengguna, $messageText);
+                        $message     = $send[0]->pesan_hasil;
                         $trySend++;
                     } while ($message != 'SUKSES INPUT DATA' && $trySend < 3);
                 }
@@ -200,8 +204,8 @@ class PurchaseRequestController extends Controller
 
             DB::commit();
             return response()->json([
-                "result" => true,
-                "message" => "Data berhasil disimpan",
+                "result"   => true,
+                "message"  => "Data berhasil disimpan",
                 "redirect" => route('purchase-request-entry', $data->purchase_request_id),
             ], 200);
         } catch (\Exception $e) {
@@ -209,7 +213,7 @@ class PurchaseRequestController extends Controller
             Log::error("Error when save purchase request");
             Log::error($e);
             return response()->json([
-                "result" => false,
+                "result"  => false,
                 "message" => $e->getMessage(),
             ], 500);
         }
@@ -221,17 +225,21 @@ class PurchaseRequestController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        $data = PurchaseRequest::find($id);
-        $access = DB::table('setting')->where('id_cabang', $data->id_cabang)->where('code', 'PR Approval')->value('value1');
+        $data        = PurchaseRequest::find($id);
+        $access      = DB::table('setting')->where('id_cabang', $data->id_cabang)->where('code', 'PR Approval')->value('value1');
         $arrayAccess = explode(',', $access);
-        $idUser = session()->get('user')['id_grup_pengguna'];
+        $idUser      = session()->get('user')['id_grup_pengguna'];
+        $statuses    = [
+            '0' => 'Belum Diproses', '1' => 'Menunggu Penawaran', '2' => 'Sudah Dipesan', '3' => 'Ditunda',
+        ];
 
         return view('ops.purchaseRequest.detail', [
-            'data' => $data,
-            'status' => $this->arrayStatus,
+            'data'        => $data,
+            'status'      => $this->arrayStatus,
             'arrayAccess' => $arrayAccess,
-            'idUser' => $idUser,
-            "pageTitle" => "SCA OPS | Permintaan Pembelian | Detail",
+            'idUser'      => $idUser,
+            "pageTitle"   => "SCA OPS | Permintaan Pembelian | Detail",
+            'statuses'    => $statuses,
         ]);
     }
 
@@ -242,9 +250,9 @@ class PurchaseRequestController extends Controller
         }
 
         $data = PurchaseRequest::find($id);
-        if (!$data) {
+        if (! $data) {
             return response()->json([
-                "result" => false,
+                "result"  => false,
                 "message" => "Data tidak ditemukan",
             ], 500);
         }
@@ -256,14 +264,14 @@ class PurchaseRequestController extends Controller
 
         try {
             DB::beginTransaction();
-            $data->void = 1;
+            $data->void         = 1;
             $data->void_user_id = session()->get('user')['id_pengguna'];
             $data->save();
 
             DB::commit();
             return response()->json([
-                "result" => true,
-                "message" => "Data berhasil dibatalkan",
+                "result"   => true,
+                "message"  => "Data berhasil dibatalkan",
                 "redirect" => route('purchase-request'),
             ], 200);
         } catch (\Exception $e) {
@@ -271,7 +279,7 @@ class PurchaseRequestController extends Controller
             Log::error("Error when void purchase request");
             Log::error($e);
             return response()->json([
-                "result" => false,
+                "result"  => false,
                 "message" => "Data gagal dibatalkan",
             ], 500);
         }
@@ -280,38 +288,38 @@ class PurchaseRequestController extends Controller
     public function autoWerehouse(Request $request)
     {
         $idCabang = $request->cabang;
-        $datas = DB::table('gudang')->select('id_gudang as id', 'nama_gudang as text')
+        $datas    = DB::table('gudang')->select('id_gudang as id', 'nama_gudang as text')
             ->where('id_cabang', $idCabang)
             ->where('status_gudang', 1)
             ->get();
         return response()->json([
             'result' => true,
-            'data' => $datas,
+            'data'   => $datas,
         ], 200);
     }
 
     public function autoItem(Request $request)
     {
         $search = $request->search;
-        $datas = DB::table('barang')
+        $datas  = DB::table('barang')
             ->select('id_barang as id', 'nama_barang as text', 'kode_barang', 'status_stok_barang')
             ->where('status_barang', 1)
             ->where('nama_barang', 'like', '%' . $search . '%')->orderBy('nama_barang', 'asc')->get();
 
         return response()->json([
             'result' => true,
-            'data' => $datas,
+            'data'   => $datas,
         ], 200);
     }
 
     public function autoSatuan(Request $request)
     {
-        $item = $request->item;
-        $cabang = $request->cabang;
-        $gudang = $request->gudang;
-        $allStock = $request->all_stock;
+        $item         = $request->item;
+        $cabang       = $request->cabang;
+        $gudang       = $request->gudang;
+        $allStock     = $request->all_stock;
         $checkAccount = DB::table('barang')->where('id_barang', $item)->first();
-        if (!$checkAccount) {
+        if (! $checkAccount) {
             return response()->json(['result' => false, 'message' => 'Barang tidak ditemukan'], 500);
         }
 
@@ -327,7 +335,7 @@ class PurchaseRequestController extends Controller
             ->where('satuan_jual_isi_satuan_barang', 1)
             ->where('satuan_wadah_isi_satuan_barang', 0)->get();
 
-        $messageStock = '0';
+        $messageStock      = '0';
         $messageSatuanStok = '';
         if ($cabang) {
             if ($allStock == '1') {
@@ -344,15 +352,15 @@ class PurchaseRequestController extends Controller
                 ->where('sisa_master_qr_code', '!=', 0)
                 ->groupBy('master_qr_code.id_barang')->first();
             if ($stok) {
-                $messageStock = $stok->stok;
+                $messageStock      = $stok->stok;
                 $messageSatuanStok = $stok->nama_satuan_barang;
             }
         }
 
         return response()->json([
-            'result' => true,
-            'satuan' => $satuan,
-            'stok' => $messageStock,
+            'result'      => true,
+            'satuan'      => $satuan,
+            'stok'        => $messageStock,
             'satuan_stok' => $messageSatuanStok,
         ], 200);
     }
@@ -360,24 +368,24 @@ class PurchaseRequestController extends Controller
     public function changeStatus($id, $type = 'approval')
     {
         $data = PurchaseRequest::find($id);
-        if (!$data) {
+        if (! $data) {
             return response()->json([
-                "result" => false,
+                "result"  => false,
                 "message" => "Data tidak ditemukan",
             ], 500);
         }
 
-        if (!in_array($type, ['approval', 'reject']) || $data->approval_status != 0) {
+        if (! in_array($type, ['approval', 'reject']) || $data->approval_status != 0) {
             return response()->json([
-                "result" => false,
+                "result"  => false,
                 "message" => "Data gagal diperbarui",
             ], 500);
         }
         try {
             DB::beginTransaction();
-            $data->approval_status = $type == 'approval' ? '1' : '2';
+            $data->approval_status  = $type == 'approval' ? '1' : '2';
             $data->approval_user_id = session()->get('user')['id_pengguna'];
-            $data->approval_date = date('Y-m-d H:i:s');
+            $data->approval_date    = date('Y-m-d H:i:s');
             $data->save();
             $data->saveStatusDetail();
 
@@ -388,18 +396,18 @@ class PurchaseRequestController extends Controller
                     ->where('id_pengguna', $data->user_created)
                     ->where('status_pengguna', 1)->get();
                 $settingMessage = DB::table('setting')->where('code', 'Pesan Persetujuan Beli')->first();
-                $strParam = [
+                $strParam       = [
                     '[[pembuat]]' => $data->pengguna->nama_pengguna,
-                    '[[code]]' => $data->purchase_request_code,
-                    '[[date]]' => date('d/m/Y'),
-                    '[[status]]' => $type == 'approval' ? 'disetujui' : 'ditolak',
+                    '[[code]]'    => $data->purchase_request_code,
+                    '[[date]]'    => date('d/m/Y'),
+                    '[[status]]'  => $type == 'approval' ? 'disetujui' : 'ditolak',
                 ];
                 foreach ($userSendWa as $user) {
                     $trySend = 0;
                     do {
                         $messageText = replaceMessage($strParam, $settingMessage->value1);
-                        $send = $this->sendToWa($user->telepon1_pengguna, $messageText);
-                        $message = $send[0]->pesan_hasil;
+                        $send        = $this->sendToWa($user->telepon1_pengguna, $messageText);
+                        $message     = $send[0]->pesan_hasil;
                         $trySend++;
                     } while ($message != 'SUKSES INPUT DATA' && $trySend < 3);
                 }
@@ -407,8 +415,8 @@ class PurchaseRequestController extends Controller
 
             DB::commit();
             return response()->json([
-                "result" => true,
-                "message" => "Data berhasil diperbarui",
+                "result"   => true,
+                "message"  => "Data berhasil diperbarui",
                 "redirect" => route('purchase-request'),
             ], 200);
         } catch (\Exception $e) {
@@ -416,7 +424,7 @@ class PurchaseRequestController extends Controller
             Log::error("Error when change status " . $type . " purchase request");
             Log::error($e);
             return response()->json([
-                "result" => false,
+                "result"  => false,
                 "message" => "Data gagal diperbarui",
             ], 500);
         }
@@ -438,17 +446,17 @@ class PurchaseRequestController extends Controller
     public function sendToWa($targetNumber, $message)
     {
         $token_pengguna = "fb176fda94ad70ec8cc65456d1d5906a";
-        $url = "https://wa.ptscma.co.id/actions/aaa_api_kirim_webhook.php";
-        $data = array(
-            "id_jenis_kirim" => 4,
+        $url            = "https://wa.ptscma.co.id/actions/aaa_api_kirim_webhook.php";
+        $data           = [
+            "id_jenis_kirim"       => 4,
             "nomor_pengirim_kirim" => '*',
-            "nomor_tujuan_kirim" => $targetNumber,
-            "token_pengguna" => $token_pengguna,
-            "pesan_kirim" => $message,
-            "gambar_kirim" => '',
-            "file_kirim" => '',
-            "base64_string" => '',
-        );
+            "nomor_tujuan_kirim"   => $targetNumber,
+            "token_pengguna"       => $token_pengguna,
+            "pesan_kirim"          => $message,
+            "gambar_kirim"         => '',
+            "file_kirim"           => '',
+            "base64_string"        => '',
+        ];
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
@@ -462,18 +470,19 @@ class PurchaseRequestController extends Controller
 
     public function changeStatusDetail(Request $request)
     {
-        $index = $request->index;
+        $index             = $request->index;
         $purchaseRequestId = $request->purchase_request_id;
-        $approvalNotes = $request->approval_notes;
-        $approvalStatus = $request->approval_status;
-        $qty = $request->qty;
+        $approvalNotes     = $request->approval_notes;
+        $approvalStatus    = $request->approval_status;
+        $qty               = $request->qty;
+        $status            = $request->status;
 
         $check = DB::table('purchase_request_detail')->where('purchase_request_id', $purchaseRequestId)
             ->where('index', $index)->first();
 
-        if (!$check) {
+        if (! $check) {
             return response()->json([
-                'result' => 'error',
+                'result'  => 'error',
                 'message' => 'Data tidak ditemukan',
             ], 500);
         }
@@ -487,35 +496,41 @@ class PurchaseRequestController extends Controller
 
         try {
             DB::beginTransaction();
-            DB::table('purchase_request_detail')->where('purchase_request_id', $purchaseRequestId)
-                ->where('index', $index)->update([
-                'approval_status' => $approvalStatus,
-                'approval_user_id' => session()->get('user')['id_pengguna'],
-                'approval_date' => date('Y-m-d H:i:s'),
-                'qty' => $qty,
-                'approval_notes' => $approvalNotes,
-            ]);
+            if ($status) {
+                DB::table('purchase_request_detail')->where('purchase_request_id', $purchaseRequestId)
+                    ->where('index', $index)->update(['status' => $status]);
 
-            $checkParent = $this->checkStatusParent($purchaseRequestId);
-            if ($checkParent['result'] == false) {
-                DB::rollback();
-                return response()->json([
-                    "result" => false,
-                    "message" => "Data gagal diperbarui",
-                ], 500);
+            } else {
+                DB::table('purchase_request_detail')->where('purchase_request_id', $purchaseRequestId)
+                    ->where('index', $index)->update([
+                    'approval_status'  => $approvalStatus,
+                    'approval_user_id' => session()->get('user')['id_pengguna'],
+                    'approval_date'    => date('Y-m-d H:i:s'),
+                    'qty'              => $qty,
+                    'approval_notes'   => $approvalNotes,
+                ]);
+
+                $checkParent = $this->checkStatusParent($purchaseRequestId);
+                if ($checkParent['result'] == false) {
+                    DB::rollback();
+                    return response()->json([
+                        "result"  => false,
+                        "message" => "Data gagal diperbarui",
+                    ], 500);
+                }
             }
 
             DB::commit();
             return response()->json([
-                "result" => true,
-                "message" => "Data berhasil diperbarui",
+                "result"   => true,
+                "message"  => "Data berhasil diperbarui",
                 "redirect" => route('purchase-request-view', $purchaseRequestId),
             ], 200);
         } catch (\Exception $th) {
             DB::rollback();
             Log::error($th);
             return response()->json([
-                "result" => false,
+                "result"  => false,
                 "message" => "Data gagal diperbarui",
             ], 500);
         }
@@ -524,16 +539,16 @@ class PurchaseRequestController extends Controller
     public function checkStatusParent($id)
     {
         $parent = PurchaseRequest::where('purchase_request_id', $id)->first();
-        if (!$parent) {
+        if (! $parent) {
             return [
-                "result" => false,
+                "result"  => false,
                 "message" => "Data parent tidak ditemukan",
             ];
         }
 
         $countApproval = 0;
-        $countReject = 0;
-        $totalRow = count($parent->details);
+        $countReject   = 0;
+        $totalRow      = count($parent->details);
         foreach ($parent->details as $detail) {
             if ($detail->approval_status == '1') {
                 $countApproval++;
@@ -545,9 +560,9 @@ class PurchaseRequestController extends Controller
         }
 
         if (($countApproval + $countReject) == $totalRow) {
-            $parent->approval_status = ($countApproval > 0) ? 1 : 2;
+            $parent->approval_status  = ($countApproval > 0) ? 1 : 2;
             $parent->approval_user_id = session()->get('user')['id_pengguna'];
-            $parent->approval_date = date('Y-m-d H:i:s');
+            $parent->approval_date    = date('Y-m-d H:i:s');
             $parent->save();
 
             $access = DB::table('setting')->where('id_cabang', $parent->id_cabang)->where('code', 'PR Send WA')->first();
@@ -557,18 +572,18 @@ class PurchaseRequestController extends Controller
                     ->where('id_pengguna', $parent->user_created)
                     ->where('status_pengguna', 1)->get();
                 $settingMessage = DB::table('setting')->where('code', 'Pesan Persetujuan Beli')->first();
-                $strParam = [
+                $strParam       = [
                     '[[pembuat]]' => $parent->pengguna->nama_pengguna,
-                    '[[code]]' => $parent->purchase_request_code,
-                    '[[date]]' => date('d/m/Y'),
-                    '[[status]]' => $parent->approval_status == '1' ? 'disetujui' : 'ditolak',
+                    '[[code]]'    => $parent->purchase_request_code,
+                    '[[date]]'    => date('d/m/Y'),
+                    '[[status]]'  => $parent->approval_status == '1' ? 'disetujui' : 'ditolak',
                 ];
                 foreach ($userSendWa as $user) {
                     $trySend = 0;
                     do {
                         $messageText = replaceMessage($strParam, $settingMessage->value1);
-                        $send = $this->sendToWa($user->telepon1_pengguna, $messageText);
-                        $message = $send[0]->pesan_hasil;
+                        $send        = $this->sendToWa($user->telepon1_pengguna, $messageText);
+                        $message     = $send[0]->pesan_hasil;
                         $trySend++;
                     } while ($message != 'SUKSES INPUT DATA' && $trySend < 3);
                 }
@@ -580,15 +595,15 @@ class PurchaseRequestController extends Controller
 
     public function checkPeriod($date)
     {
-        if (!$date) {
+        if (! $date) {
             return ['result' => false, 'message' => 'Tanggal tidak ditemukan'];
         }
 
-        $year = date('Y', strtotime($date));
+        $year  = date('Y', strtotime($date));
         $month = date('m', strtotime($date));
 
         $data = DB::table('periode')->where('tahun_periode', $year)->where('bulan_periode', $month)->first();
-        if (!$data) {
+        if (! $data) {
             return ['result' => false, 'message' => 'Periode tidak ditemukan'];
         }
 
@@ -602,7 +617,7 @@ class PurchaseRequestController extends Controller
     public function getStockWithProduction(Request $request)
     {
         $idBarang = $request->id_barang;
-        $datas = Production::select('nomor_referensi_produksi', 'tanggal_produksi', 'nama_produksi', 'keterangan_produksi')
+        $datas    = Production::select('nomor_referensi_produksi', 'tanggal_produksi', 'nama_produksi', 'keterangan_produksi')
             ->leftJoin('produksi_detail', 'produksi.id_produksi', 'produksi_detail.id_produksi')
             ->where('id_jenis_transaksi', 16)->where('produksi_detail.id_produksi_detail', null)->get();
         $array = [];
@@ -615,12 +630,12 @@ class PurchaseRequestController extends Controller
                 ->first();
             if ($bom) {
                 $array[] = [
-                    'tanggal' => $data->tanggal_produksi,
+                    'tanggal'       => $data->tanggal_produksi,
                     'kode_produksi' => $data->nama_produksi,
                     'nama_produksi' => $bom->keterangan_bom,
-                    'keterangan' => $data->keterangan_produksi,
-                    'qty' => $bom->jumlah_bom_detail,
-                    'satuan' => $bom->nama_satuan_barang,
+                    'keterangan'    => $data->keterangan_produksi,
+                    'qty'           => $bom->jumlah_bom_detail,
+                    'satuan'        => $bom->nama_satuan_barang,
                 ];
             }
         }
@@ -630,12 +645,12 @@ class PurchaseRequestController extends Controller
 
     public function getFileUpload(Request $request)
     {
-        $index = $request->index;
+        $index  = $request->index;
         $parent = $request->parent;
 
         $datas = Media::where('id', $parent)->where('nama_media', $index)->where('tipe_media', 'purchase_request')->get();
         $array = [];
-        $html = '';
+        $html  = '';
         foreach ($datas as $data) {
             $html .= '<div class="item-media">';
             $html .= '<a data-src="' . asset($data->lokasi_media) . '" data-fancybox="gallery"><img src="' . asset($data->lokasi_media) . '" style="width:100%;"></a>';
@@ -651,14 +666,14 @@ class PurchaseRequestController extends Controller
     public function postFileUpload(Request $request)
     {
         $data = PurchaseRequestDetail::where('purchase_request_id', $request->purchase_request_id)->where('index', $request->index)->first();
-        if (!$data) {
+        if (! $data) {
             return response()->json(['result' => false, 'message' => 'Data tidak ditemukan'], 500);
         }
 
         if (isset($request->remove_base64)) {
             $decodeRemoveMedia = json_decode($request->remove_base64);
-            $removeFile = $data->removefile($decodeRemoveMedia);
-            if (!$removeFile['result']) {
+            $removeFile        = $data->removefile($decodeRemoveMedia);
+            if (! $removeFile['result']) {
                 DB::rollback();
                 return response()->json(['result' => false, 'message' => 'Hapus file bermasalah'], 500);
             }
@@ -666,8 +681,8 @@ class PurchaseRequestController extends Controller
 
         if (isset($request->upload_base64)) {
             $decodeMedia = json_decode($request->upload_base64);
-            $uploadFile = $data->uploadfile($decodeMedia);
-            if (!$uploadFile['result']) {
+            $uploadFile  = $data->uploadfile($decodeMedia);
+            if (! $uploadFile['result']) {
                 DB::rollback();
                 return response()->json(['result' => false, 'message' => 'Upload file bermasalah'], 500);
             }
@@ -678,9 +693,9 @@ class PurchaseRequestController extends Controller
 
     public function linkToPo(Request $request)
     {
-        $id = $request->id;
+        $id    = $request->id;
         $index = $request->index;
-        $data = DB::table('permintaan_pembelian_detail')->where('purchase_request_id', $id)->where('index', $index)->first();
+        $data  = DB::table('permintaan_pembelian_detail')->where('purchase_request_id', $id)->where('index', $index)->first();
         if ($data) {
             return redirect()->to(env('OLD_URL_ROOT') . '#permintaan_pembelian&data_master2=' . $data->id_permintaan_pembelian);
         }
@@ -691,9 +706,9 @@ class PurchaseRequestController extends Controller
     public function voidApproval($id)
     {
         $data = PurchaseRequest::find($id);
-        if (!$data) {
+        if (! $data) {
             return response()->json([
-                "result" => false,
+                "result"  => false,
                 "message" => "Data tidak ditemukan",
             ], 500);
         }
@@ -706,35 +721,35 @@ class PurchaseRequestController extends Controller
                 ->whereRaw('pr.index = po.index')->get();
 
             if (count($detail) == 0) {
-                $data->approval_status = 0;
+                $data->approval_status  = 0;
                 $data->approval_user_id = null;
-                $data->approval_date = null;
+                $data->approval_date    = null;
                 $data->save();
 
                 foreach ($data->details as $details) {
                     PurchaseRequestDetail::where('purchase_request_id', $id)->where('index', $details->index)->update([
-                        'approval_status' => 0,
+                        'approval_status'  => 0,
                         'approval_user_id' => null,
-                        'approval_date' => null,
+                        'approval_date'    => null,
                     ]);
                 }
                 DB::commit();
                 return response()->json([
-                    "result" => true,
-                    "message" => "Data berhasil diperbarui",
+                    "result"   => true,
+                    "message"  => "Data berhasil diperbarui",
                     "redirect" => route('purchase-request'),
                 ], 200);
             } else {
                 DB::rollback();
                 return response()->json([
-                    "result" => false,
+                    "result"  => false,
                     "message" => "Data sudah terpakai di PO",
                 ], 500);
             }
         } catch (\Exception $th) {
             DB::rollback();
             return response()->json([
-                "result" => false,
+                "result"  => false,
                 "message" => $this->getMessage(),
             ], 500);
         }
