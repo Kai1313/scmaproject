@@ -287,7 +287,7 @@ class ApiController extends Controller
             return response()->json([
                 "result"    => false,
                 "code"      => 400,
-                "message"   => "Error when store Jurnal data",
+                "message"   => "Error when store Jurnal data, " . $e->getMessage(),
                 "exception" => $e,
             ], 400);
         }
@@ -511,7 +511,7 @@ class ApiController extends Controller
             return response()->json([
                 "result"    => false,
                 "code"      => 400,
-                "message"   => "Error when store Jurnal data",
+                "message"   => "Error when store Jurnal data, " . $e->getMessage(),
                 "exception" => $e,
             ], 400);
         }
@@ -991,7 +991,7 @@ class ApiController extends Controller
             return response()->json([
                 "result"    => false,
                 "code"      => 400,
-                "message"   => "Error when store Jurnal data",
+                "message"   => "Error when store Jurnal data, " . $e->getMessage(),
                 "exception" => $e,
             ], 400);
         }
@@ -1317,7 +1317,7 @@ class ApiController extends Controller
             return response()->json([
                 "result"    => false,
                 "code"      => 400,
-                "message"   => "Error when store Jurnal data",
+                "message"   => "Error when store Jurnal data, " . $e->getMessage(),
                 "exception" => $e,
             ], 400);
         }
@@ -1624,7 +1624,7 @@ class ApiController extends Controller
             return response()->json([
                 "result"    => false,
                 "code"      => 400,
-                "message"   => "Error when store Jurnal data",
+                "message"   => "Error when store Jurnal data, " . $e->getMessage(),
                 "exception" => $e,
             ], 400);
         }
@@ -2410,7 +2410,7 @@ class ApiController extends Controller
             return response()->json([
                 "result"    => false,
                 "code"      => 400,
-                "message"   => "Error when store Jurnal data",
+                "message"   => "Error when store Jurnal data, " . $e->getMessage(),
                 "exception" => $e,
             ], 400);
         }
@@ -2750,7 +2750,7 @@ class ApiController extends Controller
             return response()->json([
                 "result"    => false,
                 "code"      => 400,
-                "message"   => "Error when store Jurnal data",
+                "message"   => "Error when store Jurnal data, " . $e->getMessage(),
                 "exception" => $e,
             ], 400);
         }
@@ -2822,7 +2822,7 @@ class ApiController extends Controller
             return response()->json([
                 "result"    => false,
                 "code"      => 400,
-                "message"   => "Error when void Jurnal data",
+                "message"   => "Error when void Jurnal data, " . $e->getMessage(),
                 "exception" => $e,
             ], 400);
         }
@@ -3034,7 +3034,7 @@ class ApiController extends Controller
             // DB::rollback();
             return response()->json([
                 "result"  => false,
-                "message" => "Data gagal disimpan",
+                "message" => "Data gagal disimpan, " . $th->getMessage(),
             ], 500);
         }
     }
@@ -3252,7 +3252,7 @@ class ApiController extends Controller
             return true;
         } catch (\Exception $e) {
             DB::rollback();
-            $message = "Error when storing HPP Journal";
+            $message = "Error when storing HPP Journal, " . $e->getMessage();
             Log::error($message);
             Log::error($e);
             return false;
@@ -3765,7 +3765,7 @@ class ApiController extends Controller
             return true;
         } catch (\Exception $e) {
             DB::rollback();
-            $message = "Error when storing Journal Closing Pemakaian";
+            $message = "Error when storing Journal Closing Pemakaian, " . $e->getMessage();
             Log::error($message);
             Log::error($e);
             return false;
@@ -3966,7 +3966,7 @@ class ApiController extends Controller
             return true;
         } catch (\Exception $e) {
             DB::rollback();
-            $message = "Error when storing Journal Closing Retur Jual";
+            $message = "Error when storing Journal Closing Retur Jual, " . $e->getMessage();
             Log::error($message);
             Log::error($e);
             return false;
@@ -4004,7 +4004,7 @@ class ApiController extends Controller
             Log::error($th);
             return response()->json([
                 'status'  => 'error',
-                'message' => 'FCM token gagal disimpan',
+                'message' => 'FCM token gagal disimpan, ' . $th->getMessage(),
             ], 500);
         }
     }
@@ -4099,7 +4099,7 @@ class ApiController extends Controller
                     );
             }
         } catch (\Exception $e) {
-            $message = "Error when storing stok minimal hitung";
+            $message = "Error when storing stok minimal hitung, " . $e->getMessage();
             Log::error($message);
             Log::error($e);
         }
