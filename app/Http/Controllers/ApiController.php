@@ -2061,7 +2061,7 @@ class ApiController extends Controller
             return response()->json([
                 "result"    => false,
                 "code"      => 400,
-                "message"   => "Error when store Jurnal data",
+                "message"   => "Error when store Jurnal data, " . $e->getMessage(),
                 "exception" => $e,
             ], 400);
         }
