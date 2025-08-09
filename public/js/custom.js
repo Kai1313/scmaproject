@@ -1,9 +1,9 @@
 $(document).on('input', '.handle-number-4', function () {
     let str = $(this).val()
     if ((this).hasAttribute('data-max')) {
-        $(this).val(formatRupiah(str, 4, $(this)))
+        $(this).val(formatNumber(str, 4, $(this)))
     } else {
-        $(this).val(formatRupiah(str, 4))
+        $(this).val(formatNumber(str, 4))
     }
 })
 
@@ -18,7 +18,7 @@ $(document).on('input', '.handle-number-2', function () {
 
 $('.handle-number-4').each(function (i, v) {
     let val = $(v).val().replace('.', ',')
-    $(v).val(formatRupiah(val, 4))
+    $(v).val(formatNumber(val, 4))
 })
 
 $('.handle-number-2').each(function (i, v) {
@@ -40,9 +40,23 @@ $('select.select2').on('select2:closing', function (e) {
     })
 })
 
-function formatNumber(angka, lengthComa) {
-    angka = angka.toString().replace('.', ',')
-    return formatRupiah(angka, lengthComa)
+function formatNumber(number, prefix = 0) {
+    if (typeof number === 'string') {
+        if (number.includes(',')) {
+            let reg = number.match(/^([^,]*,[^,]*)/);
+            number = normalizeNumber(reg[0])
+        }
+    }
+
+    if (number == '0') {
+        return 0;
+    } else {
+        return new Intl.NumberFormat("id-ID", {
+            style: 'decimal',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: prefix
+        }).format(number);
+    }
 }
 
 function formatNumberNew(number, prefix = 0) {
