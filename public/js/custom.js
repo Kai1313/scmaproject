@@ -64,33 +64,52 @@ function formatNumberNew(number, prefix = 0) {
     }
 }
 
-function formatRupiah(angka, prefix, self = '') {
-    let labelMinus = ''
-    if (angka[0] == '-') {
-        labelMinus = '-'
+// function formatRupiah(angka, prefix, self = '') {
+//     let labelMinus = ''
+//     if (angka[0] == '-') {
+//         labelMinus = '-'
+//     }
+
+//     angka = angka.toString().replace(/^\,|^0/, '0').replace(/[^,\d]/g, '')
+//     let number_string = angka.toString()
+
+//     if (self && normalizeNumber(number_string) > self.data('max')) {
+//         number_string = self.data('max').toString()
+//     }
+
+//     let split = number_string.split(',');
+//     split[0] = '' + parseInt(split[0])
+//     let sisa = split[0].length % 3,
+//         rupiah = split[0].substr(0, sisa),
+//         ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+//     if (ribuan) {
+//         separator = sisa ? '.' : '';
+//         rupiah += separator + ribuan.join('.');
+//     }
+
+//     rupiah = split[1] != undefined ? labelMinus + rupiah + ',' + (split[1].length > prefix ? split[1].substring(0, prefix) :
+//         split[1]) : labelMinus + rupiah;
+//     return rupiah;
+// }
+
+function formatRupiah(number, prefix, self = '') {
+    if (typeof number === 'string') {
+        if (number.includes(',')) {
+            let reg = number.match(/^([^,]*,[^,]*)/);
+            number = normalizeNumber(reg[0])
+        }
     }
 
-    angka = angka.toString().replace(/^\,|^0/, '0').replace(/[^,\d]/g, '')
-    let number_string = angka.toString()
-
-    if (self && normalizeNumber(number_string) > self.data('max')) {
-        number_string = self.data('max').toString()
+    if (number == '0') {
+        return 0;
+    } else {
+        return new Intl.NumberFormat("id-ID", {
+            style: "currency",
+            currency: "IDR",
+            currencyDisplay: "code"
+        }).format(number).replace("IDR", '').trim();
     }
-
-    let split = number_string.split(',');
-    split[0] = '' + parseInt(split[0])
-    let sisa = split[0].length % 3,
-        rupiah = split[0].substr(0, sisa),
-        ribuan = split[0].substr(sisa).match(/\d{3}/gi);
-
-    if (ribuan) {
-        separator = sisa ? '.' : '';
-        rupiah += separator + ribuan.join('.');
-    }
-
-    rupiah = split[1] != undefined ? labelMinus + rupiah + ',' + (split[1].length > prefix ? split[1].substring(0, prefix) :
-        split[1]) : labelMinus + rupiah;
-    return rupiah;
 }
 
 function normalizeNumber(number) {

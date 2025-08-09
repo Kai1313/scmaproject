@@ -49,6 +49,11 @@
             </tr>
         </thead>
         <tbody>
+            @php
+                $mtotal_penjualanSum = 0;
+                $bayarSum = 0;
+                $sisaSum = 0;
+            @endphp
             @foreach ($datas as $key => $data)
                 <tr>
                     <td style="border: #000000 solid thin;">{{ $data->kode_pelanggan }}</td>
@@ -63,6 +68,21 @@
                     <td style="border: #000000 solid thin;">{{ $data->aging }}</td>
                 </tr>
             @endforeach
+            @php
+                $mtotal_penjualanSum += $data->mtotal_penjualan;
+                $bayarSum += $data->bayar;
+                $sisaSum += $data->sisa;
+            @endphp
+            <tr>
+                <td style="border: #000000 solid thin;background-color:#e0e0e0;" colspan="5">TOTAL</td>
+                <td style="border: #000000 solid thin;text-align:right;background-color:#e0e0e0;">
+                    {{ number_format($mtotal_penjualanSum, 2) }}</td>
+                <td style="border: #000000 solid thin;text-align:right;background-color:#e0e0e0;">
+                    {{ number_format($bayarSum, 2) }}</td>
+                <td style="border: #000000 solid thin;text-align:right;background-color:#e0e0e0;">
+                    {{ number_format($sisaSum, 2) }}</td>
+                <td style="border: #000000 solid thin;background-color:#e0e0e0;"></td>
+            </tr>
         </tbody>
     </table>
 </body>

@@ -13,6 +13,10 @@
             background-color: #e0e0e0;
             text-align: left;
         }
+
+        tfoot>tr>td {
+            background-color: #e0e0e0;
+        }
     </style>
 @endsection
 
@@ -112,6 +116,20 @@
                         </thead>
                         <tbody>
                         </tbody>
+                        <tfoot>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -152,6 +170,7 @@
         src="{{ asset('assets/bower_components/bootstrap-daterangepicker/daterangepicker.js') }}"></script>
     {{-- <script src="https://cdn.datatables.net/rowgroup/1.4.0/js/dataTables.rowGroup.min.js"></script> --}}
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ asset('js/sum-datatables.js') }}"></script>
     <script src="{{ asset('js/custom.js') }}"></script>
 @endsection
 
@@ -193,14 +212,31 @@
                 }, {
                     data: 'uang_muka',
                     name: 'a.uang_muka',
-                    render: function(data) {
-                        return data ? formatNumber(data, 2) : 0
+                    render: function(data, type, full, meta) {
+                        if (data && data > 0) {
+                            return "<a href='javascript:void(0)' data-id='" + full.transaction_code +
+                                "' class='show-payment' data-transaksi='down_payment'>" + (data ?
+                                    formatNumber(
+                                        data, 2) : 0) + "</a>"
+                        } else {
+                            return data ? formatNumber(data, 2) : '0,00'
+                        }
                     },
                     className: 'text-right'
                 }, {
                     data: 'bayar',
                     name: 'a.bayar',
-                    className: 'text-right'
+                    className: 'text-right',
+                    render: function(data, type, full, meta) {
+                        if (data) {
+                            return "<a href='javascript:void(0)' data-id='" + full.transaction_code +
+                                "' class='show-payment' data-transaksi='payment'>" + (data ?
+                                    formatNumber(
+                                        data, 2) : 0) + "</a>"
+                        } else {
+                            return data ? formatNumber(data, 2) : '0,00'
+                        }
+                    }
                 }, {
                     data: 'terbayar',
                     name: 'terbayar',
@@ -215,7 +251,15 @@
                         return data ? formatNumber(data, 2) : 0
                     },
                     className: 'text-right'
-                }]
+                }],
+                drawCallback: function() {
+                    var api = this.api();
+                    [5, 6, 7, 8, 9].forEach(function(v, i) {
+                        $(api.column(v).footer()).html(
+                            formatRupiah(api.column(v).data().sum())
+                        );
+                    })
+                }
             });
         }
     </script>

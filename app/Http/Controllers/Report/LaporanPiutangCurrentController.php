@@ -114,6 +114,7 @@ class LaporanPiutangCurrentController extends Controller
             'pe.kode_pelanggan',
             'pe.nama_pelanggan',
             'a.id_transaksi',
+            'a.id_transaksi as transaction_code',
             'p2.tanggal_penjualan',
             DB::raw('DATE_ADD(p2.tanggal_penjualan, INTERVAL p2.tempo_hari_penjualan DAY) as top'),
             DB::raw('(a.total + a.uang_muka) as mtotal_penjualan'),
@@ -147,11 +148,7 @@ class LaporanPiutangCurrentController extends Controller
 
         if ($type == 'datatable') {
             $datatable = Datatables::of($data);
-            $datatable = $datatable->editColumn('bayar', function ($row) {
-                return $row->bayar != 0 ? '<a href="javascript:void(0)" data-id="' . $row->id_transaksi . '" class="show-payment" data-transaksi="payment">' . formatNumber2($row->bayar, 2) . '</a>' : formatNumber2($row->bayar, 2);
-            })->editColumn('uang_muka', function ($row) {
-                return $row->uang_muka != 0 ? '<a href="javascript:void(0)" data-id="' . $row->id_transaksi . '" class="show-payment" data-transaksi="down_payment">' . formatNumber2($row->uang_muka, 2) . '</a>' : formatNumber2($row->uang_muka, 2);
-            })->editColumn('id_transaksi', function ($row) {
+            $datatable = $datatable->editColumn('id_transaksi', function ($row) {
                 return '<a href="' . env('OLD_URL_ROOT') . '#penjualan_faktur&data_master=' . $row->id_penjualan . '" target="_blank">' . $row->id_transaksi . '</a>';
             })->editColumn('aging', function ($row) {
                 return $row->aging != 0 ? $row->aging : '';
@@ -173,7 +170,7 @@ class LaporanPiutangCurrentController extends Controller
                 $query->whereRaw($q . ' like ?', ["%{$keywords}%"]);
             });
 
-            $datatable = $datatable->rawColumns(['bayar', 'id_transaksi', 'aging', 'uang_muka'])->make(true);
+            $datatable = $datatable->rawColumns(['id_transaksi', 'aging'])->make(true);
             return $datatable;
         }
 
