@@ -102,7 +102,7 @@ function formatRupiah(number, prefix, self = '') {
     }
 
     if (number == '0') {
-        return 0;
+        return '0,00';
     } else {
         return new Intl.NumberFormat("id-ID", {
             style: "currency",

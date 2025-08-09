@@ -62,25 +62,25 @@
                     <td style="border: #000000 solid thin;">{{ $data->tanggal_penjualan }}</td>
                     <td style="border: #000000 solid thin;">{{ $data->top }}</td>
                     <td style="border: #000000 solid thin;text-align:right;">
-                        {{ number_format($data->mtotal_penjualan, 2) }}</td>
-                    <td style="border: #000000 solid thin;text-align:right;">{{ number_format($data->bayar, 2) }}</td>
-                    <td style="border: #000000 solid thin;text-align:right;">{{ number_format($data->sisa, 2) }}</td>
+                        {{ $data->mtotal_penjualan }}</td>
+                    <td style="border: #000000 solid thin;text-align:right;">{{ $data->bayar }}</td>
+                    <td style="border: #000000 solid thin;text-align:right;">{{ $data->sisa }}</td>
                     <td style="border: #000000 solid thin;">{{ $data->aging }}</td>
                 </tr>
+                @php
+                    $mtotal_penjualanSum += $data->mtotal_penjualan;
+                    $bayarSum += $data->bayar;
+                    $sisaSum += $data->sisa;
+                @endphp
             @endforeach
-            @php
-                $mtotal_penjualanSum += $data->mtotal_penjualan;
-                $bayarSum += $data->bayar;
-                $sisaSum += $data->sisa;
-            @endphp
             <tr>
                 <td style="border: #000000 solid thin;background-color:#e0e0e0;" colspan="5">TOTAL</td>
                 <td style="border: #000000 solid thin;text-align:right;background-color:#e0e0e0;">
-                    {{ number_format($mtotal_penjualanSum, 2) }}</td>
+                    {{ $mtotal_penjualanSum }}</td>
                 <td style="border: #000000 solid thin;text-align:right;background-color:#e0e0e0;">
-                    {{ number_format($bayarSum, 2) }}</td>
+                    {{ $bayarSum }}</td>
                 <td style="border: #000000 solid thin;text-align:right;background-color:#e0e0e0;">
-                    {{ number_format($sisaSum, 2) }}</td>
+                    {{ $sisaSum }}</td>
                 <td style="border: #000000 solid thin;background-color:#e0e0e0;"></td>
             </tr>
         </tbody>

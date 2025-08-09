@@ -117,11 +117,11 @@ class LaporanPiutangCurrentController extends Controller
             'a.id_transaksi as transaction_code',
             'p2.tanggal_penjualan',
             DB::raw('DATE_ADD(p2.tanggal_penjualan, INTERVAL p2.tempo_hari_penjualan DAY) as top'),
-            DB::raw('(a.total + a.uang_muka) as mtotal_penjualan'),
+            DB::raw('(ifnull(a.total,0) + ifnull(a.uang_muka,0)) as mtotal_penjualan'),
             DB::raw('ifnull((a.total+a.uang_muka)-(ifnull(a.bayar,0)+a.uang_muka),0) as sisa'),
-            'a.bayar',
+            DB::raw('ifnull(a.bayar,0) as bayar'),
             DB::raw('if(ifnull((a.total+a.uang_muka)-(ifnull(a.bayar,0)+a.uang_muka),0) <> 0,DATEDIFF("' . $date . '",DATE(DATE_ADD(p2.tanggal_penjualan, INTERVAL p2.tempo_hari_penjualan DAY))),0) as aging'),
-            'a.uang_muka',
+            DB::raw('ifnull(a.uang_muka,0) as uang_muka'),
             DB::raw('ifnull(a.bayar+a.uang_muka,0.00) as terbayar'),
             'p2.id_penjualan'
         )
