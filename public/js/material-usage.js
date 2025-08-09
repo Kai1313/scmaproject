@@ -427,13 +427,13 @@ let validateModalForm = $('.post-action-modal').validate({
         jumlah_zak: {
             required: true,
             maxWithZero: function () {
-                return formatNumberNew(maxZakRemaining, 4);
+                return formatNumber(maxZakRemaining, 4);
             }
         },
         jumlah: {
             required: true,
             maxNotZero: function () {
-                return formatNumberNew(maxRemaining, 4);
+                return formatNumber(maxRemaining, 4);
             }
         }
     },
