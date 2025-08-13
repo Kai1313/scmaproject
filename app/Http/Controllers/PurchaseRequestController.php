@@ -501,15 +501,18 @@ class PurchaseRequestController extends Controller
                     ->where('index', $index)->update(['status' => $status]);
 
             } else {
+
                 $d = PurchaseRequestDetail::where('purchase_request_id', $purchaseRequestId)
                     ->where('index', $index)->first();
-                $d->approval_status  = $approvalStatus;
-                $d->approval_user_id = session()->get('user')['id_pengguna'];
-                $d->approval_date    = date('Y-m-d H:i:s');
-                $d->request_qty      = $d->qty;
-                $d->qty              = $qty;
-                $d->approval_notes   = $approvalNotes;
-                $d->save();
+                DB::table('purchase_request_detail')->where('purchase_request_id', $purchaseRequestId)
+                    ->where('index', $index)->update([
+                    'approval_status'  => $approvalStatus,
+                    'approval_user_id' => session()->get('user')['id_pengguna'],
+                    'approval_date'    => date('Y-m-d H:i:s'),
+                    'request_qty'      => $d->qty,
+                    'qty'              => $qty,
+                    'approval_notes'   => $approvalNotes,
+                ]);
 
                 $checkParent = $this->checkStatusParent($purchaseRequestId);
                 if ($checkParent['result'] == false) {
