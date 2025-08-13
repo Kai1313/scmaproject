@@ -11,7 +11,7 @@ class PurchaseRequest extends Model
     protected $primaryKey = 'purchase_request_id';
 
     protected $fillable = [
-        'id_cabang', 'purchase_request_code', 'purchase_request_date', 'id_gudang', 'purchase_request_estimation_date', 'purchase_request_user_id', 'user_created', 'user_modified', 'catatan', 'approval_status', 'approval_user_id', 'approval_date', 'void', 'void_user_id', 'is_all_stock',
+        'id_cabang', 'purchase_request_code', 'purchase_request_date', 'id_gudang', 'purchase_request_estimation_date', 'purchase_request_user_id', 'user_created', 'user_modified', 'catatan', 'approval_status', 'approval_user_id', 'approval_date', 'void', 'void_user_id', 'is_all_stock', 'request_qty',
     ];
 
     const CREATED_AT = 'dt_created';
