@@ -115,13 +115,14 @@ class LaporanHutangCurrentController extends Controller
             'pe.kode_pemasok',
             'pe.nama_pemasok',
             'a.id_transaksi',
+            'a.id_transaksi as transaction_code',
             'p2.tanggal_pembelian',
             DB::raw('DATE_ADD(p2.tanggal_pembelian, INTERVAL p2.tempo_hari_pembelian DAY) as top'),
-            DB::raw('(a.total + a.uang_muka) as mtotal_pembelian'),
+            DB::raw('(ifnull(a.total,0) + ifnull(a.uang_muka,0)) as mtotal_pembelian'),
             DB::raw('ifnull((a.total+a.uang_muka)-(ifnull(a.bayar,0)+a.uang_muka),1) as sisa'),
-            'a.bayar',
+            DB::raw('ifnull(a.bayar,0) as bayar'),
             DB::raw('if(ifnull((a.total+a.uang_muka)-(ifnull(a.bayar,0)+a.uang_muka),1) <> 0,DATEDIFF("' . $date . '",DATE(DATE_ADD(p2.tanggal_pembelian, INTERVAL p2.tempo_hari_pembelian DAY))),0) as aging'),
-            'a.uang_muka',
+            DB::raw('ifnull(a.uang_muka,0) as uang_muka'),
             DB::raw('ifnull(a.bayar+a.uang_muka,0.00) as terbayar'),
             'p2.id_pembelian'
         )
@@ -149,11 +150,7 @@ class LaporanHutangCurrentController extends Controller
 
         if ($type == 'datatable') {
             $datatable = Datatables::of($data);
-            $datatable = $datatable->editColumn('bayar', function ($row) {
-                return $row->bayar != 0 ? '<a href="javascript:void(0)" data-id="' . $row->id_transaksi . '" data-transaksi="payment" class="show-payment">' . formatNumber2($row->bayar, 2) . '</a>' : formatNumber2($row->bayar, 2);
-            })->editColumn('uang_muka', function ($row) {
-                return $row->uang_muka != 0 ? '<a href="javascript:void(0)" data-id="' . $row->id_transaksi . '" data-transaksi="down_payment" class="show-payment">' . formatNumber2($row->uang_muka, 2) . '</a>' : formatNumber2($row->uang_muka, 2);
-            })->editColumn('id_transaksi', function ($row) {
+            $datatable = $datatable->editColumn('id_transaksi', function ($row) {
                 return '<a href="' . env('OLD_URL_ROOT') . '#pembelian_invoice&data_master=' . $row->id_pembelian . '" target="_blank">' . $row->id_transaksi . '</a>';
             })->editColumn('aging', function ($row) {
                 return $row->aging != 0 ? $row->aging : '';
@@ -175,7 +172,7 @@ class LaporanHutangCurrentController extends Controller
                 $query->whereRaw($q . ' like ?', ["%{$keywords}%"]);
             });
 
-            $datatable = $datatable->rawColumns(['bayar', 'id_transaksi', 'aging', 'uang_muka'])->make(true);
+            $datatable = $datatable->rawColumns(['id_transaksi', 'aging'])->make(true);
             return $datatable;
         }
 

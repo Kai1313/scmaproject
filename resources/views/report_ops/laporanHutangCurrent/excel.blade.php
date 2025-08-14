@@ -48,6 +48,13 @@
             </tr>
         </thead>
         <tbody>
+            @php
+                $mtotal_pembelianSum = 0;
+                $uangMuka = 0;
+                $terbayar = 0;
+                $bayarSum = 0;
+                $sisaSum = 0;
+            @endphp
             @foreach ($datas as $key => $data)
                 <tr>
                     <td style="border: #000000 solid thin;">{{ $data->tanggal_pembelian }}</td>
@@ -55,16 +62,37 @@
                     <td style="border: #000000 solid thin;">{{ $data->nama_pemasok }}</td>
                     <td style="border: #000000 solid thin;">{{ $data->top }}</td>
                     <td style="border: #000000 solid thin;text-align:right;">
-                        {{ number_format($data->mtotal_pembelian, 2) }}</td>
-                    <td style="border: #000000 solid thin;text-align:right;">{{ number_format($data->uang_muka, 2) }}
+                        {{ $data->mtotal_pembelian }}</td>
+                    <td style="border: #000000 solid thin;text-align:right;">{{ $data->uang_muka }}
                     </td>
-                    <td style="border: #000000 solid thin;text-align:right;">{{ number_format($data->bayar, 2) }}</td>
-                    <td style="border: #000000 solid thin;text-align:right;">{{ number_format($data->terbayar, 2) }}
+                    <td style="border: #000000 solid thin;text-align:right;">{{ $data->bayar }}</td>
+                    <td style="border: #000000 solid thin;text-align:right;">{{ $data->terbayar }}
                     </td>
-                    <td style="border: #000000 solid thin;text-align:right;">{{ number_format($data->sisa, 2) }}</td>
+                    <td style="border: #000000 solid thin;text-align:right;">{{ $data->sisa }}</td>
                     <td style="border: #000000 solid thin;">{{ $data->aging }}</td>
                 </tr>
+                @php
+                    $mtotal_pembelianSum += $data->mtotal_pembelian;
+                    $bayarSum += $data->bayar;
+                    $sisaSum += $data->sisa;
+                    $uangMuka += $data->uang_muka;
+                    $terbayar += $data->terbayar;
+                @endphp
             @endforeach
+            <tr>
+                <td style="border: #000000 solid thin;background-color:#e0e0e0;" colspan="4">TOTAL</td>
+                <td style="border: #000000 solid thin;text-align:right;background-color:#e0e0e0;">
+                    {{ $mtotal_pembelianSum }}</td>
+                <td style="border: #000000 solid thin;text-align:right;background-color:#e0e0e0;">
+                    {{ $uangMuka }}</td>
+                <td style="border: #000000 solid thin;text-align:right;background-color:#e0e0e0;">
+                    {{ $bayarSum }}</td>
+                <td style="border: #000000 solid thin;text-align:right;background-color:#e0e0e0;">
+                    {{ $terbayar }}</td>
+                <td style="border: #000000 solid thin;text-align:right;background-color:#e0e0e0;">
+                    {{ $sisaSum }}</td>
+                <td style="border: #000000 solid thin;background-color:#e0e0e0;"></td>
+            </tr>
         </tbody>
     </table>
 </body>

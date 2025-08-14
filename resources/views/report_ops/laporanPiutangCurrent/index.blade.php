@@ -206,7 +206,7 @@
                     data: 'mtotal_penjualan',
                     name: 'a.total',
                     render: function(data) {
-                        return data ? formatNumber(data, 2) : 0
+                        return data ? formatRupiah(data) : '0.00'
                     },
                     className: 'text-right'
                 }, {
@@ -216,10 +216,10 @@
                         if (data && data > 0) {
                             return "<a href='javascript:void(0)' data-id='" + full.transaction_code +
                                 "' class='show-payment' data-transaksi='down_payment'>" + (data ?
-                                    formatNumber(
-                                        data, 2) : 0) + "</a>"
+                                    formatRupiah(
+                                        data) : 0) + "</a>"
                         } else {
-                            return data ? formatNumber(data, 2) : '0,00'
+                            return data ? formatRupiah(data) : '0,00'
                         }
                     },
                     className: 'text-right'
@@ -231,24 +231,24 @@
                         if (data) {
                             return "<a href='javascript:void(0)' data-id='" + full.transaction_code +
                                 "' class='show-payment' data-transaksi='payment'>" + (data ?
-                                    formatNumber(
-                                        data, 2) : 0) + "</a>"
+                                    formatRupiah(
+                                        data) : '0,00') + "</a>"
                         } else {
-                            return data ? formatNumber(data, 2) : '0,00'
+                            return data ? formatRupiah(data) : '0,00'
                         }
                     }
                 }, {
                     data: 'terbayar',
                     name: 'terbayar',
                     render: function(data) {
-                        return data ? formatNumber(data, 2) : 0
+                        return data ? formatRupiah(data) : 0
                     },
                     className: 'text-right'
                 }, {
                     data: 'sisa',
                     name: 'sisa',
                     render: function(data) {
-                        return data ? formatNumber(data, 2) : 0
+                        return data ? formatRupiah(data) : 0
                     },
                     className: 'text-right'
                 }],

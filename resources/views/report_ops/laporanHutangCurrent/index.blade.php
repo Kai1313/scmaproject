@@ -13,6 +13,10 @@
             background-color: #e0e0e0;
             text-align: left;
         }
+
+        tfoot>tr>td {
+            background-color: #e0e0e0;
+        }
     </style>
 @endsection
 
@@ -98,16 +102,30 @@
                                 <th>No. Faktur</th>
                                 <th>Nama Pemasok</th>
                                 <th>Jatuh Tempo</th>
+                                <th>Umur</th>
                                 <th>Nilai Faktur</th>
                                 <th>Uang Muka</th>
                                 <th>Pembayaran</th>
                                 <th>Total Terbayar</th>
                                 <th>Sisa</th>
-                                <th>Umur</th>
                             </tr>
                         </thead>
                         <tbody>
                         </tbody>
+                        <tfoot>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -147,6 +165,7 @@
     <script type="text/javascript"
         src="{{ asset('assets/bower_components/bootstrap-daterangepicker/daterangepicker.js') }}"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ asset('js/sum-datatables.js') }}"></script>
     <script src="{{ asset('js/custom.js') }}"></script>
 @endsection
 
@@ -175,39 +194,67 @@
                     data: 'top',
                     name: 'top',
                 }, {
+                    data: 'aging',
+                    name: 'aging',
+                    className: 'text-right'
+                }, {
                     data: 'mtotal_pembelian',
                     name: 'a.total',
                     render: function(data) {
-                        return data ? formatNumber(data, 2) : 0
+                        return data ? formatRupiah(data) : '0,00'
                     },
                     className: 'text-right'
                 }, {
                     data: 'uang_muka',
                     name: 'a.uang_muka',
+                    render: function(data, type, full, meta) {
+                        if (data && data > 0) {
+                            return "<a href='javascript:void(0)' data-id='" + full.transaction_code +
+                                "' class='show-payment' data-transaksi='down_payment'>" + (data ?
+                                    formatRupiah(
+                                        data) : '0,00') + "</a>"
+                        } else {
+                            return data ? formatRupiah(data) : '0,00'
+                        }
+                    },
                     className: 'text-right'
                 }, {
                     data: 'bayar',
                     name: 'a.bayar',
+                    render: function(data, type, full, meta) {
+                        if (data) {
+                            return "<a href='javascript:void(0)' data-id='" + full.transaction_code +
+                                "' class='show-payment' data-transaksi='payment'>" + (data ?
+                                    formatRupiah(
+                                        data) : '0,00') + "</a>"
+                        } else {
+                            return data ? formatRupiah(data) : '0,00'
+                        }
+                    },
                     className: 'text-right'
                 }, {
                     data: 'terbayar',
                     name: 'terbayar',
                     render: function(data) {
-                        return data ? formatNumber(data, 2) : 0
+                        return data ? formatRupiah(data) : '0,00'
                     },
                     className: 'text-right'
                 }, {
                     data: 'sisa',
                     name: 'sisa',
                     render: function(data) {
-                        return data ? formatNumber(data, 2) : 0
+                        return data ? formatRupiah(data) : '0,00'
                     },
                     className: 'text-right'
-                }, {
-                    data: 'aging',
-                    name: 'aging',
-                    className: 'text-right'
-                }, ]
+                }],
+                drawCallback: function() {
+                    var api = this.api();
+                    [5, 6, 7, 8, 9].forEach(function(v, i) {
+                        $(api.column(v).footer()).html(
+                            formatRupiah(api.column(v).data().sum())
+                        );
+                    })
+                }
             });
         }
     </script>
