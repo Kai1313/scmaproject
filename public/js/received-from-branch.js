@@ -359,7 +359,7 @@ function searchAsset(string) {
         success: function (res) {
             for (select in res.data) {
                 if (select == 'qty') {
-                    $('#' + select).text(formatNumber(res.data[select]))
+                    $('#' + select).text(formatNumber(res.data[select], 4))
                 } else {
                     $('#' + select).text(res.data[select])
                 }

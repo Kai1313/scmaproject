@@ -187,13 +187,13 @@
                 ajax: defaultUrlIndex + param,
                 columns: [{
                     data: 'tanggal_penjualan',
-                    name: 'p2.tanggal_penjualan',
+                    name: 'penjualan.tanggal_penjualan',
                 }, {
                     data: 'id_transaksi',
-                    name: 'a.id_transaksi',
+                    name: 'saldo_transaksi.id_transaksi',
                 }, {
                     data: 'nama_pelanggan',
-                    name: 'pe.nama_pelanggan',
+                    name: 'pelanggan.nama_pelanggan',
                     visible: true
                 }, {
                     data: 'top',
@@ -204,14 +204,14 @@
                     className: 'text-right'
                 }, {
                     data: 'mtotal_penjualan',
-                    name: 'a.total',
+                    name: 'total',
                     render: function(data) {
                         return data ? formatRupiah(data) : '0.00'
                     },
                     className: 'text-right'
                 }, {
                     data: 'uang_muka',
-                    name: 'a.uang_muka',
+                    name: 'uang_muka',
                     render: function(data, type, full, meta) {
                         if (data && data > 0) {
                             return "<a href='javascript:void(0)' data-id='" + full.transaction_code +
@@ -225,7 +225,7 @@
                     className: 'text-right'
                 }, {
                     data: 'bayar',
-                    name: 'a.bayar',
+                    name: 'bayar',
                     className: 'text-right',
                     render: function(data, type, full, meta) {
                         if (data) {

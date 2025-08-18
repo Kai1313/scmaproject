@@ -110,41 +110,82 @@ class LaporanPiutangCurrentController extends Controller
         $idCabang          = explode(',', $request->id_cabang);
         $transactionStatus = $request->transaction_status;
 
-        $data = DB::table('saldo_transaksi as a')->Select(
-            'pe.kode_pelanggan',
-            'pe.nama_pelanggan',
-            'a.id_transaksi',
-            'a.id_transaksi as transaction_code',
-            'p2.tanggal_penjualan',
-            DB::raw('DATE_ADD(p2.tanggal_penjualan, INTERVAL p2.tempo_hari_penjualan DAY) as top'),
-            DB::raw('(ifnull(a.total,0) + ifnull(a.uang_muka,0)) as mtotal_penjualan'),
-            DB::raw('ifnull((a.total+a.uang_muka)-(ifnull(a.bayar,0)+a.uang_muka),0) as sisa'),
-            DB::raw('ifnull(a.bayar,0) as bayar'),
-            DB::raw('if(ifnull((a.total+a.uang_muka)-(ifnull(a.bayar,0)+a.uang_muka),0) <> 0,DATEDIFF("' . $date . '",DATE(DATE_ADD(p2.tanggal_penjualan, INTERVAL p2.tempo_hari_penjualan DAY))),0) as aging'),
-            DB::raw('ifnull(a.uang_muka,0) as uang_muka'),
-            DB::raw('ifnull(a.bayar+a.uang_muka,0.00) as terbayar'),
-            'p2.id_penjualan'
+        $data = DB::table('saldo_transaksi')->select(
+            'pelanggan.kode_pelanggan',
+            'pelanggan.nama_pelanggan',
+            'saldo_transaksi.id_transaksi',
+            'saldo_transaksi.id_transaksi as transaction_code',
+            'penjualan.tanggal_penjualan',
+            'penjualan.id_penjualan',
+            DB::raw('DATE_ADD(penjualan.tanggal_penjualan, INTERVAL penjualan.tempo_hari_penjualan DAY) as top'),
+            DB::raw('ifnull(total,0) as mtotal_penjualan'),
+            DB::raw('ifnull(total-ifnull(sum(credit),0),0) as sisa'),
+            DB::raw('ifnull(sum(credit),0) as bayar'),
+            DB::raw('if(ifnull(total - sum(credit),0) <> 0,DATEDIFF("' . $date . '",DATE(DATE_ADD(penjualan.tanggal_penjualan, INTERVAL penjualan.tempo_hari_penjualan DAY))),0) as aging'),
+            DB::raw('0 as uang_muka'),
+            DB::raw('ifnull(sum(credit),0) as terbayar'),
         )
-            ->leftJoin('pelanggan as pe', 'pe.id_pelanggan', 'a.id_pelanggan')
-            ->leftJoin('penjualan as p2', 'a.id_transaksi', 'p2.nama_penjualan')
-            ->where('a.tanggal', '<=', $date);
+            ->join('jurnal_detail', 'saldo_transaksi.id_transaksi', 'jurnal_detail.id_transaksi')
+            ->join('jurnal_header', 'jurnal_detail.id_jurnal', 'jurnal_header.id_jurnal')
+            ->leftJoin('penjualan', 'saldo_transaksi.id_transaksi', 'penjualan.nama_penjualan')
+            ->leftJoin('pelanggan', 'penjualan.id_pelanggan', 'pelanggan.id_pelanggan')
+            ->whereIn('saldo_transaksi.tipe_transaksi', ['Penjualan', 'Retur Penjualan'])
+            ->where('saldo_transaksi.tanggal', '<=', $date)
+            ->where('jurnal_header.void', 0)
+            ->where('tanggal_jurnal', '<=', $date)
+            ->whereIn('saldo_transaksi.tipe_transaksi', ['Penjualan', 'Retur Penjualan'])
+            ->whereIn('penjualan.id_cabang', $idCabang);
+        if ($idPelanggan != 'all') {
+            $data->where('saldo_transaksi.id_pelanggan', $idPelanggan);
+        }
+
+        $data = $data->groupBy('saldo_transaksi.id_transaksi')
+            ->orderBy('penjualan.tanggal_penjualan', 'desc');
         if ($transactionStatus != 'all') {
             if ($transactionStatus == '1') {
-                $data = $data->where(DB::raw('ifnull((a.total+a.uang_muka)-(ifnull(a.bayar,0)+a.uang_muka),0)'), 0);
+                $data = $data->having(DB::raw('ifnull(mtotal_penjualan-terbayar,0)'), 0);
             } else {
-                $data = $data->where(DB::raw('ifnull((a.total+a.uang_muka)-(ifnull(a.bayar,0)+a.uang_muka),0)'), '>', 0);
+                $data = $data->having(DB::raw('ifnull(mtotal_penjualan-terbayar,0)'), '>', 0);
             }
         }
 
-        $data = $data->whereIn('a.tipe_transaksi', ['Penjualan', 'Retur Penjualan'])
-            ->whereIn('p2.id_cabang', $idCabang);
-        if ($idPelanggan != 'all') {
-            $data->where('a.id_pelanggan', $idPelanggan);
-        }
+        ////////////////
 
-        // if ($type == 'print') {
-        $data = $data->orderBy('p2.tanggal_penjualan', 'desc');
+        // $data = DB::table('saldo_transaksi as a')->Select(
+        //     'pe.kode_pelanggan',
+        //     'pe.nama_pelanggan',
+        //     'a.id_transaksi',
+        //     'a.id_transaksi as transaction_code',
+        //     'p2.tanggal_penjualan',
+        //     DB::raw('DATE_ADD(p2.tanggal_penjualan, INTERVAL p2.tempo_hari_penjualan DAY) as top'),
+        //     DB::raw('(ifnull(a.total,0) + ifnull(a.uang_muka,0)) as mtotal_penjualan'),
+        //     DB::raw('ifnull((a.total+a.uang_muka)-(ifnull(a.bayar,0)+a.uang_muka),0) as sisa'),
+        //     DB::raw('ifnull(a.bayar,0) as bayar'),
+        //     DB::raw('if(ifnull((a.total+a.uang_muka)-(ifnull(a.bayar,0)+a.uang_muka),0) <> 0,DATEDIFF("' . $date . '",DATE(DATE_ADD(p2.tanggal_penjualan, INTERVAL p2.tempo_hari_penjualan DAY))),0) as aging'),
+        //     DB::raw('ifnull(a.uang_muka,0) as uang_muka'),
+        //     DB::raw('ifnull(a.bayar+a.uang_muka,0.00) as terbayar'),
+        //     'p2.id_penjualan'
+        // )
+        //     ->leftJoin('pelanggan as pe', 'pe.id_pelanggan', 'a.id_pelanggan')
+        //     ->leftJoin('penjualan as p2', 'a.id_transaksi', 'p2.nama_penjualan')
+        //     ->where('a.tanggal', '<=', $date);
+        // if ($transactionStatus != 'all') {
+        //     if ($transactionStatus == '1') {
+        //         $data = $data->where(DB::raw('ifnull((a.total+a.uang_muka)-(ifnull(a.bayar,0)+a.uang_muka),0)'), 0);
+        //     } else {
+        //         $data = $data->where(DB::raw('ifnull((a.total+a.uang_muka)-(ifnull(a.bayar,0)+a.uang_muka),0)'), '>', 0);
+        //     }
         // }
+
+        // $data = $data->whereIn('a.tipe_transaksi', ['Penjualan', 'Retur Penjualan'])
+        //     ->whereIn('p2.id_cabang', $idCabang);
+        // if ($idPelanggan != 'all') {
+        //     $data->where('a.id_pelanggan', $idPelanggan);
+        // }
+
+        // // if ($type == 'print') {
+        // $data = $data->orderBy('p2.tanggal_penjualan', 'desc');
+        // // }
 
         if ($type == 'datatable') {
             $datatable = Datatables::of($data);
@@ -154,19 +195,19 @@ class LaporanPiutangCurrentController extends Controller
                 return $row->aging != 0 ? $row->aging : '';
             })->filterColumn('top', function ($query, $keyword) {
                 $keywords = trim($keyword);
-                $query->whereRaw("DATE_ADD(p2.tanggal_penjualan, INTERVAL p2.tempo_hari_penjualan DAY) like ?", ["%{$keywords}%"]);
+                $query->whereRaw("DATE_ADD(penjualan.tanggal_penjualan, INTERVAL penjualan.tempo_hari_penjualan DAY) like ?", ["%{$keywords}%"]);
             })->filterColumn('mtotal_penjualan', function ($query, $keyword) {
                 $keywords = trim($keyword);
-                $query->whereRaw("(a.total + a.uang_muka) like ?", ["%{$keywords}%"]);
+                $query->whereRaw("total like ?", ["%{$keywords}%"]);
             })->filterColumn('sisa', function ($query, $keyword) {
                 $keywords = trim($keyword);
-                $query->whereRaw("ifnull((a.total+a.uang_muka)-(a.bayar+a.uang_muka),0.00) like ?", ["%{$keywords}%"]);
+                $query->whereRaw("total like ?", ["%{$keywords}%"]);
             })->filterColumn('terbayar', function ($query, $keyword) {
                 $keywords = trim($keyword);
-                $query->whereRaw("ifnull(a.bayar+a.uang_muka,0.00) like ?", ["%{$keywords}%"]);
+                $query->whereRaw("total like ?", ["%{$keywords}%"]);
             })->filterColumn('aging', function ($query, $keyword) use ($date) {
                 $keywords = trim($keyword);
-                $q        = "if(ifnull((a.total+a.uang_muka)-(ifnull(a.bayar,0)+a.uang_muka),0) <> 0,DATEDIFF(" . $date . ",DATE(DATE_ADD(p2.tanggal_penjualan, INTERVAL p2.tempo_hari_penjualan DAY))),0)";
+                $q        = 'if(ifnull(total - sum(credit),0) <> 0,DATEDIFF("' . $date . '",DATE(DATE_ADD(penjualan.tanggal_penjualan, INTERVAL penjualan.tempo_hari_penjualan DAY))),0)';
                 $query->whereRaw($q . ' like ?', ["%{$keywords}%"]);
             });
 
