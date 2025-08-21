@@ -1,5 +1,34 @@
-$(document).on('input', '.handle-number-4', function () {
-    let str = $(this).val()
+// $(document).on("beforeinput", '.handle-number-2,.handle-number-4', function (e) {
+//     var currentValue = $(this).val();
+//     if (currentValue == '0') {
+//         $(this).val('')
+//     }
+// });
+let tempNominal = '';
+$(document).on('click', '.handle-number-2,.handle-number-4', function () {
+    let val = normalizeNumber($(this).val());
+    if (val == '0') {
+        $(this).val('')
+    } else {
+        $(this).val(val.toString().replace('.', ','))
+        tempNominal = val.toString().replace('.', ',')
+    }
+})
+
+$(document).on('blur', '.handle-number-2,.handle-number-4', function () {
+    if ($(this).val() == '') {
+        $(this).val('0')
+    } else {
+        if (tempNominal == $(this).val()) {
+            $(this).change()
+        }
+    }
+
+    tempNominal = ''
+})
+
+$(document).on('change', '.handle-number-4', function () {
+    let str = $(this).val() ? $(this).val() : 0
     if ((this).hasAttribute('data-max')) {
         $(this).val(formatNumber(str, 4, $(this)))
     } else {
@@ -7,8 +36,14 @@ $(document).on('input', '.handle-number-4', function () {
     }
 })
 
-$(document).on('input', '.handle-number-2', function () {
-    let str = $(this).val()
+$(document).on('input', '.handle-number-2,.handle-number-4', function () {
+    let angka = $(this).val()
+    angka = angka.toString().replace(/^\,|^0/, '0').replace(/[^,\d]/g, '')
+    $(this).val(angka)
+})
+
+$(document).on('change', '.handle-number-2', function () {
+    let str = $(this).val() ? $(this).val() : 0
     if ((this).hasAttribute('data-max')) {
         $(this).val(formatRupiah(str, 2, $(this)))
     } else {
