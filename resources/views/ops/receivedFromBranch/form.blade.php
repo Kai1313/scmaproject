@@ -377,5 +377,5 @@
         let urlReceivedFromBranchCode = '{{ route('received_from_branch-code') }}'
         let urlReceivedFromBranchDetailItem = '{{ route('received_from_branch-detail-item') }}'
     </script>
-    <script src="{{ asset('js/received-from-branch.js') }}"></script>
+    <script src="{{ asset('js/received-from-branch.js') }}?v={{ date('YmdHis') }}"></script>
 @endsection
