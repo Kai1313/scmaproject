@@ -175,10 +175,10 @@
                             <label>Deadline <span>*</span></label>
                             <div class="form-group">
                                 <input type="date" name="purchase_request_estimation_date"
-                                    value="{{ old('purchase_request_estimation_date', $data ? $data->purchase_request_estimation_date : date('Y-m-d')) }}"
+                                    value="{{ old('purchase_request_estimation_date', $data ? $data->purchase_request_estimation_date : date('Y-m-d', strtotime('+7 days'))) }}"
                                     class=" form-control" data-validation="[NOTEMPTY]"
                                     data-validation-message="Tanggal deadline tidak boleh kosong"
-                                    min="{{ date('Y-m-d') }}">
+                                    min="{{ $data ? $data->purchase_request_estimation_date : date('Y-m-d', strtotime('+7 days')) }}">
                             </div>
                         </div>
                         <div class="col-md-4">
