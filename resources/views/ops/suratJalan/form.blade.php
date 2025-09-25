@@ -373,6 +373,7 @@
 @section('externalScripts')
     <script>
         let details = {!! $data ? $data->details : '[]' !!};
+        $('[name="details"]').val(JSON.stringify(details))
         let deleteDetails = []
         let detailSelect = []
         let statusModal = 'create'
