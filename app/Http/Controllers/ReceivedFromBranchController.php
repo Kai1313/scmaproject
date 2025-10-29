@@ -89,7 +89,7 @@ class ReceivedFromBranchController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Data Tidak ditemukan"]);
         }
 
-        if ($data->id_jenis_transaksi != 22) {
+        if ($data && $data->id_jenis_transaksi != 22) {
             return view('exceptions.forbidden', ["pageTitle" => "Data Tidak ditemukan"]);
         }
 
