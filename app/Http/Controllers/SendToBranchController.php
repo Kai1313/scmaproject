@@ -108,7 +108,15 @@ class SendToBranchController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        $data           = MoveBranch::find($id);
+        $data = MoveBranch::find($id);
+        if ($id != 0 && ! $data) {
+            return view('exceptions.forbidden', ["pageTitle" => "Data Tidak ditemukan"]);
+        }
+
+        if ($data->id_jenis_transaksi != 21) {
+            return view('exceptions.forbidden', ["pageTitle" => "Data Tidak ditemukan"]);
+        }
+
         $qrcodeReceived = [];
         $dataReceived   = MoveBranch::where('id_pindah_barang2', $id)->first();
         if ($dataReceived) {
@@ -183,7 +191,15 @@ class SendToBranchController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        $data          = MoveBranch::where('type', 0)->where('id_pindah_barang', $id)->first();
+        $data = MoveBranch::where('type', 0)->where('id_pindah_barang', $id)->first();
+        if (! $data) {
+            return view('exceptions.forbidden', ["pageTitle" => "Data Tidak ditemukan"]);
+        }
+
+        if ($data->id_jenis_transaksi != 21) {
+            return view('exceptions.forbidden', ["pageTitle" => "Data Tidak ditemukan"]);
+        }
+
         $groupPengguna = DB::table('pengguna')->select(DB::raw('distinct(id_grup_pengguna)'))->where('id_pengguna', $data->user_created)->orWhere('id_grup_pengguna', 1)->get()->toArray();
         $groups        = [];
         foreach ($groupPengguna as $grup) {

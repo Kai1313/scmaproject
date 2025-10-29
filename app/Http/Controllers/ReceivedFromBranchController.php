@@ -84,7 +84,15 @@ class ReceivedFromBranchController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        $data   = MoveBranch::find($id);
+        $data = MoveBranch::find($id);
+        if ($id != 0 && ! $data) {
+            return view('exceptions.forbidden', ["pageTitle" => "Data Tidak ditemukan"]);
+        }
+
+        if ($data->id_jenis_transaksi != 22) {
+            return view('exceptions.forbidden', ["pageTitle" => "Data Tidak ditemukan"]);
+        }
+
         $cabang = session()->get('access_cabang');
         return view('ops.receivedFromBranch.form', [
             'data'      => $data,
@@ -167,6 +175,14 @@ class ReceivedFromBranchController extends Controller
         }
 
         $data = MoveBranch::where('type', 1)->where('id_pindah_barang', $id)->first();
+        if (! $data) {
+            return view('exceptions.forbidden', ["pageTitle" => "Data Tidak ditemukan"]);
+        }
+
+        if ($data->id_jenis_transaksi != 22) {
+            return view('exceptions.forbidden', ["pageTitle" => "Data Tidak ditemukan"]);
+        }
+
         return view('ops.receivedFromBranch.detail', [
             'data'      => $data,
             "pageTitle" => "SCA OPS | Terima Dari Cabang | Detail",
