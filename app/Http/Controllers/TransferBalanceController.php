@@ -52,7 +52,7 @@ class TransferBalanceController extends Controller
             $interval   = new DateInterval('P1M');
 
             $period   = new DatePeriod($start_date, $interval, $end_date);
-            $dataAkun = Akun::where("id_cabang", $id_cabang)->where("isshown", 1)->where('id_akun', '4')->get();
+            $dataAkun = Akun::where("id_cabang", $id_cabang)->where("isshown", 1)->get();
 
             DB::beginTransaction();
             foreach ($period as $date) {
