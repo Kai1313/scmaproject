@@ -10,7 +10,7 @@
                     <i class="glyphicon glyphicon-home"></i> <span>Beranda</span>
                 </a>
             </li>
-            @foreach ($datas as $data1)
+            {{-- @foreach ($datas as $data1)
                 @if (checkAccessMenu($data1->alias_menu))
                     @php
                         $active = '';
@@ -95,7 +95,7 @@
                         @endif
                     </li>
                 @endif
-            @endforeach
+            @endforeach --}}
         </ul>
     </section>
 </aside>
