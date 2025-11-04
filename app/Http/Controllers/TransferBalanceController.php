@@ -75,7 +75,6 @@ class TransferBalanceController extends Controller
                     $saldo = SaldoBalance::selectRaw("IFNULL(debet, 0) as saldo_debet, IFNULL(credit, 0) as saldo_kredit")
                         ->where("id_akun", $akun->id_akun)->where("id_cabang", $akun->id_cabang)
                         ->where("bulan", $month)->where("tahun", $year)->first();
-                    // dd($saldo);
 
                     $data_saldo_ledgers = JurnalDetail::selectRaw("SUM(IFNULL(jurnal_detail.debet, 0)) as debet, SUM(IFNULL(jurnal_detail.credit, 0)) as kredit")
                         ->join("jurnal_header", "jurnal_header.id_jurnal", "jurnal_detail.id_jurnal")
@@ -84,10 +83,7 @@ class TransferBalanceController extends Controller
                         ->where("jurnal_header.id_cabang", $akun->id_cabang)
                         ->where("jurnal_header.void", "0")
                         ->whereBetween("jurnal_header.tanggal_jurnal", [$startDatePeriod, $endDatePeriod])
-                    // ->where("jurnal_header.tanggal_jurnal", ">=", $startDatePeriod)
-                    // ->where("jurnal_header.tanggal_jurnal", "<=", $endDatePeriod)
                         ->groupBy("jurnal_detail.id_akun")->first();
-                    // dd($data_saldo_ledgers);
 
                     $saldo_debet  = ($saldo) ? $saldo->saldo_debet : 0;
                     $saldo_kredit = ($saldo) ? $saldo->saldo_kredit : 0;
@@ -96,7 +92,6 @@ class TransferBalanceController extends Controller
                     $debet  = ($data_saldo_ledgers) ? $data_saldo_ledgers->debet : 0;
                     $kredit = ($data_saldo_ledgers) ? $data_saldo_ledgers->kredit : 0;
                     // Log::info("saldo debet ".$debet." saldo kredit ".$kredit);
-                    // dd($saldo_debet, $saldo_kredit, $debet, $kredit);
                     $saldo_debet  = $saldo_debet + $debet;
                     $saldo_kredit = $saldo_kredit + $kredit;
                     $saldoAkhir   = (float) $saldo_debet - (float) $saldo_kredit;
