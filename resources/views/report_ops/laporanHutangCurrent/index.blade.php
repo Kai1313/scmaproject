@@ -180,6 +180,10 @@
                 serverSide: true,
                 ajax: defaultUrlIndex + param,
                 pageLength: 50,
+                lengthMenu: [
+                    [10, 25, 50, -1], // Opsi yang tersedia
+                    [10, 25, 50, 'All'] // Label untuk opsi
+                ],
                 columns: [{
                     data: 'tanggal_pembelian',
                     name: 'p2.tanggal_pembelian',

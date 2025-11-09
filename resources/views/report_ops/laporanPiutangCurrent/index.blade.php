@@ -184,6 +184,10 @@
                 processing: true,
                 serverSide: true,
                 pageLength: 50,
+                lengthMenu: [
+                    [10, 25, 50, -1], // Opsi yang tersedia
+                    [10, 25, 50, 'All'] // Label untuk opsi
+                ],
                 ajax: defaultUrlIndex + param,
                 columns: [{
                     data: 'tanggal_penjualan',

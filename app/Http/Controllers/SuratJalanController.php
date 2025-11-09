@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\SuratJalan;
@@ -31,10 +30,10 @@ class SuratJalanController extends Controller
                     $btn = '';
                     $btn .= '<a href="' . route('surat_jalan_umum-print-data', $row->id) . '" class="btn btn-default btn-xs mr-1 mb-1" target="_blank"><i class="fa fa-print"></i> Cetak</a>';
                     $btn .= '<a href="' . route('surat_jalan_umum-view', $row->id) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a>';
-                    $btn .= '<a href="' . route('surat_jalan_umum-show_image', $row->id) . '" class="btn btn-warning btn-xs mr-1 mb-1 show-modal-camera"><i class="glyphicon glyphicon-camera"></i> Foto</a>';
-                    if ($row->id_pengguna == session()->get('user')['id_pengguna']) {
-                        $btn .= '<a href="' . route('surat_jalan_umum-entry', $row->id) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a>';
-                    }
+                    $btn .= '<a href="' . route('surat_jalan_umum-show_image', $row->id) . '" class="btn btn-default btn-xs mr-1 mb-1 show-modal-camera"><i class="glyphicon glyphicon-camera"></i> Foto</a>';
+                    // if ($row->id_pengguna == session()->get('user')['id_pengguna']) {
+                    $btn .= '<a href="' . route('surat_jalan_umum-entry', $row->id) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a>';
+                    // }
 
                     if ($row->id_pengguna == session()->get('user')['id_pengguna'] && date('Y-m-d', strtotime($row->created_at)) == date('Y-m-d')) {
                         $btn .= '<a href="' . route('surat_jalan_umum-delete', $row->id) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Hapus</a>';
@@ -59,7 +58,7 @@ class SuratJalanController extends Controller
 
         $data = SuratJalan::find($id);
         return view('ops.suratJalan.form', [
-            'data' => $data,
+            'data'      => $data,
             "pageTitle" => "SCA OPS | Surat Jalan Umum | " . ($id == 0 ? 'Create' : 'Edit'),
         ]);
     }
@@ -67,15 +66,15 @@ class SuratJalanController extends Controller
     public function saveEntry(Request $request, $id = 0)
     {
         $data = SuratJalan::find($id);
-        if (!$data) {
+        if (! $data) {
             $data = new SuratJalan;
         } else {
-            if ($data->id_pengguna != session()->get('user')['id_pengguna']) {
-                return response()->json([
-                    "result" => false,
-                    "message" => "Tidak mendapat akses",
-                ], 500);
-            }
+            // if ($data->id_pengguna != session()->get('user')['id_pengguna']) {
+            //     return response()->json([
+            //         "result"  => false,
+            //         "message" => "Tidak mendapat akses",
+            //     ], 500);
+            // }
         }
 
         DB::beginTransaction();
@@ -83,8 +82,8 @@ class SuratJalanController extends Controller
             $data->fill($request->all());
             if ($id == 0) {
                 $data->no_surat_jalan = SuratJalan::createcode();
-                $data->jenis = 'surat_jalan_umum';
-                $data->id_pengguna = session()->get('user')['id_pengguna'];
+                $data->jenis          = 'surat_jalan_umum';
+                $data->id_pengguna    = session()->get('user')['id_pengguna'];
             }
 
             $data->save();
@@ -103,8 +102,8 @@ class SuratJalanController extends Controller
 
             DB::commit();
             return response()->json([
-                "result" => true,
-                "message" => "Data berhasil disimpan",
+                "result"   => true,
+                "message"  => "Data berhasil disimpan",
                 "redirect" => route('surat_jalan_umum-entry', $data->id),
             ], 200);
         } catch (\Exception $e) {
@@ -112,8 +111,8 @@ class SuratJalanController extends Controller
             Log::error("Error when save surat jalan umum");
             Log::error($e);
             return response()->json([
-                "result" => false,
-                "message" => "Data gagal tersimpan",
+                "result"  => false,
+                "message" => "Data gagal tersimpan " . $e->getMessage(),
             ], 500);
         }
     }
@@ -126,7 +125,7 @@ class SuratJalanController extends Controller
 
         $data = SuratJalan::find($id);
         return view('ops.suratJalan.detail', [
-            'data' => $data,
+            'data'      => $data,
             "pageTitle" => "SCA OPS | Surat Jalan Umum | Lihat",
         ]);
     }
@@ -135,29 +134,29 @@ class SuratJalanController extends Controller
     {
         if (checkAccessMenu('surat_jalan_umum', 'delete') == false) {
             return response()->json([
-                "result" => false,
+                "result"  => false,
                 "message" => "Tidak mendapatkan akses halaman",
             ], 500);
         }
 
         $data = SuratJalan::find($id);
-        if (!$data) {
+        if (! $data) {
             return response()->json([
-                "result" => false,
+                "result"  => false,
                 "message" => "Data tidak ditemukan",
             ], 500);
         }
 
         if (date('Y-m-d', strtotime($data->created_at)) != date('Y-m-d')) {
             return response()->json([
-                "result" => false,
+                "result"  => false,
                 "message" => "Hapus surat jalan bisa dihapus di hari yang sama dengan pembuatan",
             ], 500);
         }
 
         if ($data->id_pengguna != session()->get('user')['id_pengguna']) {
             return response()->json([
-                "result" => false,
+                "result"  => false,
                 "message" => "Tidak mendapat akses",
             ], 500);
         }
@@ -169,8 +168,8 @@ class SuratJalanController extends Controller
             $data->delete();
             DB::commit();
             return response()->json([
-                "result" => true,
-                "message" => "Data berhasil dihapus",
+                "result"   => true,
+                "message"  => "Data berhasil dihapus",
                 "redirect" => route('surat_jalan_umum'),
             ], 200);
         } catch (\Exception $e) {
@@ -178,7 +177,7 @@ class SuratJalanController extends Controller
             Log::error("Error ketika hapus surat jalan");
             Log::error($e);
             return response()->json([
-                "result" => false,
+                "result"  => false,
                 "message" => "Data gagal dihapus",
             ], 500);
         }
@@ -191,17 +190,17 @@ class SuratJalanController extends Controller
         }
 
         $data = SuratJalan::find($id);
-        if (!$data) {
+        if (! $data) {
             return 'data tidak ditemukan';
         }
         $month = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-        $pdf = PDF::loadView('ops.suratJalan.print', ['data' => $data, 'month' => $month]);
+        $pdf   = PDF::loadView('ops.suratJalan.print', ['data' => $data, 'month' => $month]);
         $pdf->setPaper('a5', 'landscape');
         $pdf->output();
         $dom_pdf = $pdf->getDomPDF();
-        $font = $dom_pdf->getFontMetrics()->get_font("sans-serif", "normal");
-        $canvas = $dom_pdf->get_canvas();
-        $canvas->page_text(518, 74, "{PAGE_NUM} dari {PAGE_COUNT}", $font, 9, array(0, 0, 0));
+        $font    = $dom_pdf->getFontMetrics()->get_font("sans-serif", "normal");
+        $canvas  = $dom_pdf->get_canvas();
+        $canvas->page_text(518, 74, "{PAGE_NUM} dari {PAGE_COUNT}", $font, 9, [0, 0, 0]);
 
         return $pdf->stream('Surat Jalan Umum ' . $data->no_surat_jalan . '.pdf');
     }
@@ -209,7 +208,7 @@ class SuratJalanController extends Controller
     public function saveImage(Request $request, $id)
     {
         $data = SuratJalan::find($id);
-        if (!$data) {
+        if (! $data) {
             return response()->json(['result' => false, 'message' => 'Data tidak ditemukan'], 500);
         }
 
@@ -224,7 +223,7 @@ class SuratJalanController extends Controller
     public function rmImage(Request $request, $id)
     {
         $data = SuratJalan::find($id);
-        if (!$data) {
+        if (! $data) {
             return response()->json(['result' => false, 'message' => 'Data tidak ditemukan'], 500);
         }
 
@@ -239,17 +238,17 @@ class SuratJalanController extends Controller
     public function showImage($id)
     {
         $data = SuratJalan::find($id);
-        if (!$data) {
+        if (! $data) {
             return response()->json(['result' => false, 'message' => 'Surat jalan tidak ditemukan'], 500);
         }
 
-        $medias = $data->medias;
-        $urlPhoto = route('surat_jalan_umum-save_image', $data->id);
+        $medias         = $data->medias;
+        $urlPhoto       = route('surat_jalan_umum-save_image', $data->id);
         $urlPhotoDelete = route('surat_jalan_umum-rm_image', $data->id);
         return response()->json([
-            'result' => true,
-            'datas' => $medias,
-            'urlPhoto' => $urlPhoto,
+            'result'         => true,
+            'datas'          => $medias,
+            'urlPhoto'       => $urlPhoto,
             'urlPhotoDelete' => $urlPhotoDelete,
         ], 200);
     }

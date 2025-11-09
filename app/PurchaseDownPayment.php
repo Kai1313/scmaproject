@@ -1,5 +1,4 @@
 <?php
-
 namespace App;
 
 use App\Models\Master\Cabang;
@@ -10,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class PurchaseDownPayment extends Model
 {
-    protected $table = 'uang_muka_pembelian';
+    protected $table      = 'uang_muka_pembelian';
     protected $primaryKey = 'id_uang_muka_pembelian';
 
     const CREATED_AT = 'dt_created';
@@ -28,8 +27,8 @@ class PurchaseDownPayment extends Model
     public static function createcode($id_cabang)
     {
         $branchCode = DB::table('cabang')->where('id_cabang', $id_cabang)->first();
-        $string = 'UMB.' . $branchCode->kode_cabang . '.' . date('ym');
-        $check = DB::table('uang_muka_pembelian')->where('kode_uang_muka_pembelian', 'like', $string . '%')->count();
+        $string     = 'UMB.' . $branchCode->kode_cabang . '.' . date('ym');
+        $check      = DB::table('uang_muka_pembelian')->where('kode_uang_muka_pembelian', 'like', $string . '%')->count();
         $check += 1;
         $nol = '';
         for ($i = 0; $i < (4 - strlen((string) $check)); $i++) {

@@ -2,9 +2,8 @@
 @section('header')
     <section class="content-header">
         <h1>
-            Forbidden
-            <small>You don't have access to this URL</small>
+            {{ $pageTitle }}
         </h1>
-        <a href="{{ env('OLD_URL_ROOT') }}" class="btn btn-default">Back to Welcome Page</a>
+        {{-- <a href="{{ env('OLD_URL_ROOT') }}" class="btn btn-default">Back to Welcome Page</a> --}}
     </section>
 @endsection

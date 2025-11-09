@@ -1,12 +1,11 @@
 <?php
-
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
 class MaterialUsageDetail extends Model
 {
-    protected $table = 'pemakaian_detail';
+    protected $table   = 'pemakaian_detail';
     public $timestamps = false;
 
     protected $fillable = [
