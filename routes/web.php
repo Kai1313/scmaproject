@@ -133,6 +133,21 @@ Route::prefix('terima_dari_gudang')->group(function () {
     Route::get('/print-qrcode/{id}', 'ReceivedFromWarehouseController@printQrcode')->name('receive_from_warehouse-print_qrcode');
 });
 
+Route::prefix('delivery_request', )->group(function () {
+    Route::get('/index/{user_id?}', 'DeliveryRequestController@index')->name('delivery_request');
+    Route::get('/entry/{id?}', 'DeliveryRequestController@entry')->name('delivery_request-entry');
+    Route::post('/save_entry/{id}', 'DeliveryRequestController@saveEntry')->name('delivery_request-save-entry');
+    Route::get('/view/{id}', 'DeliveryRequestController@viewData')->name('delivery_request-view');
+    Route::get('/delete/{id}', 'DeliveryRequestController@destroy')->name('delivery_request-delete');
+    Route::get('/auto_item', 'DeliveryRequestController@autoItem')->name('delivery-request-auto_item');
+    Route::get('/auto_item_units', 'DeliveryRequestController@getItemUnits')->name('delivery-request-auto_item_unit');
+    Route::post('approval-delivery/{id}', 'DeliveryRequestController@approvalDelivery')->name('delivery-request-approval');
+    // Route::get('/auto-qrcode', 'DeliveryRequestController@autoQRCode')->name('delivery_request-qrcode');
+    // Route::get('/print/{id}', 'DeliveryRequestController@printData')->name('delivery_request-print-data');
+    // Route::post('/save-detail/{id}', 'DeliveryRequestController@saveDetailEntry')->name('delivery_request-save-detail');
+    // Route::post('/delete-detail/{parent}/{id}', 'DeliveryRequestController@deleteDetail')->name('delivery_request-delete-detail');
+});
+
 Route::prefix('surat_jalan_umum')->group(function () {
     Route::get('/index/{user_id?}', 'SuratJalanController@index')->name('surat_jalan_umum');
     Route::get('/entry/{id?}', 'SuratJalanController@entry')->name('surat_jalan_umum-entry');

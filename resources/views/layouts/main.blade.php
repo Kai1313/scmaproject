@@ -172,6 +172,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
         .mb-3 {
             margin-bottom: 1.25rem;
         }
+
+        div:where(.swal2-container).swal2-center>.swal2-popup {
+            font-size: 14px;
+        }
     </style>
     <!-- AdminLTE Skins. We have chosen the skin-blue for this starter
             page. However, you can choose any other skin. Make sure you

@@ -266,7 +266,6 @@ function saveData(node, withNotif = true) {
             })
             if (data.responseJSON.errors) {
                 for (const key in data.responseJSON.errors) {
-                    console.log(key)
                     $('[name="' + key + '"]').css('border-color', 'red')
                 }
             }
