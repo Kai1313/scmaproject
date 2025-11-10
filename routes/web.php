@@ -133,7 +133,7 @@ Route::prefix('terima_dari_gudang')->group(function () {
     Route::get('/print-qrcode/{id}', 'ReceivedFromWarehouseController@printQrcode')->name('receive_from_warehouse-print_qrcode');
 });
 
-Route::prefix('delivery_request', )->group(function () {
+Route::prefix('delivery_request')->group(function () {
     Route::get('/index/{user_id?}', 'DeliveryRequestController@index')->name('delivery_request');
     Route::get('/entry/{id?}', 'DeliveryRequestController@entry')->name('delivery_request-entry');
     Route::post('/save_entry/{id}', 'DeliveryRequestController@saveEntry')->name('delivery_request-save-entry');
