@@ -581,7 +581,7 @@ class SendToBranchController extends Controller
         $data = DB::table('delivery_requests as pp')
             ->select(
                 'pp.id as id',
-                'pp.delivery_request_code as text',
+                'pp.delivery_request_code as text'
             )
             ->where('status', 1)->where('approval_status', 2)
             ->where('pp.destination_branch_id', $idCabangTujuan)
