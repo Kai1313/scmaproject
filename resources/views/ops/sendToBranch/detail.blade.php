@@ -101,6 +101,12 @@
                             </div>
                         </div>
                         <div class="row">
+                            <label class="col-md-4">No Permintaan</label>
+                            <div class="col-md-8">
+                                : {{ implode(', ', $deliveryRequests) }}
+                            </div>
+                        </div>
+                        <div class="row">
                             <label class="col-md-4">Keterangan</label>
                             <div class="col-md-8">
                                 : {{ $data->keterangan_pindah_barang }}

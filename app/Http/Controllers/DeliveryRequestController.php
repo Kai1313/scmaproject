@@ -13,9 +13,9 @@ class DeliveryRequestController extends Controller
 {
     public function index(Request $request)
     {
-        // if (checkUserSession($request, 'permintaan_pengiriman', 'show') == false) {
-        //     return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
-        // }
+        if (checkUserSession($request, 'delivery_request', 'show') == false) {
+            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+        }
 
         if ($request->ajax()) {
             $data = DeliveryRequest::select(
@@ -41,7 +41,7 @@ class DeliveryRequestController extends Controller
                 ->addColumn('action', function ($row) {
                     $btn = '';
                     $btn .= '<a href="' . route('delivery_request-view', $row->id) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a>';
-                    if ($row->approval_status == '1') {
+                    if ($row->approval_status == '1' && $row->created_by == session()->get('user')['id_pengguna']) {
                         $btn .= '<a href="' . route('delivery_request-entry', $row->id) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a>';
                         $btn .= '<a href="' . route('delivery_request-delete', $row->id) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Void</a>';
                     }
@@ -68,17 +68,19 @@ class DeliveryRequestController extends Controller
 
     public function entry($id = 0)
     {
-        // if (checkAccessMenu('purchase_requisitions', $id == 0 ? 'create' : 'edit') == false) {
-        //     return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
-        // }
+        if (checkAccessMenu('delivery_request', $id == 0 ? 'create' : 'edit') == false) {
+            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+        }
 
-        $data     = DeliveryRequest::find($id);
-        $branches = DB::table('cabang')->select('id_cabang as id', 'nama_cabang as text')->where('status_cabang', '1')->orderBy('nama_cabang', 'asc')->get();
+        $data          = DeliveryRequest::find($id);
+        $branches      = DB::table('cabang')->select('id_cabang as id', 'nama_cabang as text')->where('status_cabang', '1')->orderBy('nama_cabang', 'asc')->get();
+        $statusOptions = DeliveryRequest::statusOption();
 
         return view('ops.deliveryRequest.form', [
-            'data'      => $data,
-            'branches'  => $branches,
-            "pageTitle" => "SCA OPS | Permintaan Pengiriman | " . ($id == 0 ? 'Create' : 'Edit'),
+            'data'          => $data,
+            'branches'      => $branches,
+            'statusOptions' => $statusOptions,
+            "pageTitle"     => "SCA OPS | Permintaan Pengiriman | " . ($id == 0 ? 'Create' : 'Edit'),
         ]);
     }
 
@@ -128,7 +130,7 @@ class DeliveryRequestController extends Controller
     public function autoItem(Request $request)
     {
         try {
-            $search = $request->get('q');
+            $search = $request->get('search');
             $data   = Barang::select('id_barang as id', 'nama_barang as text')
                 ->where('status_barang', '1')
                 ->where(function ($query) use ($search) {
@@ -172,17 +174,11 @@ class DeliveryRequestController extends Controller
 
     public function viewData($id)
     {
-        // if (checkAccessMenu('purchase_requisitions', 'show') == false) {
-        //     return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
-        // }
+        if (checkAccessMenu('delivery_request', 'show') == false) {
+            return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
+        }
 
-        $data = DeliveryRequest::find($id);
-        // $access      = DB::table('setting')->where('id_cabang', $data->id_cabang)->where('code', 'DR Approval')->value('value1');
-        // $arrayAccess = explode(',', $access);
-        // $idUser      = session()->get('user')['id_grup_pengguna'];
-        // $statuses    = [
-        //     '0' => 'Belum Diproses', '1' => 'Menunggu Penawaran', '2' => 'Sudah Dipesan', '3' => 'Ditunda',
-        // ];
+        $data                  = DeliveryRequest::find($id);
         $statusOptions         = DeliveryRequest::statusOption();
         $approvalStatusOptions = DeliveryRequest::approvalStatusOption();
 
@@ -251,6 +247,32 @@ class DeliveryRequestController extends Controller
             ], 200);
         } catch (\Exception $e) {
             DB::rollback();
+            Log::error($e);
+            return response()->json(["result" => false, "message" => $e->getMessage()], 500);
+        }
+    }
+
+    public function destroy($id)
+    {
+        try {
+            $data = DeliveryRequest::find($id);
+            if (! $data) {
+                return response()->json(["result" => false, "message" => "Data tidak ditemukan"], 404);
+            }
+
+            if ($data->approval_status != '1') {
+                return response()->json(["result" => false, "message" => "Hanya permintaan pengiriman dengan status pending approval yang dapat di void"], 400);
+            }
+
+            $data->status = '0'; // set ke void
+            $data->save();
+
+            return response()->json([
+                "result"   => true,
+                "message"  => "Data berhasil divoid",
+                "redirect" => route('delivery_request'),
+            ], 200);
+        } catch (\Exception $e) {
             Log::error($e);
             return response()->json(["result" => false, "message" => $e->getMessage()], 500);
         }

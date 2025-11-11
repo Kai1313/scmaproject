@@ -3,6 +3,8 @@ namespace App;
 
 use App\MasterQrCode;
 use App\Models\Master\Cabang;
+use App\Models\Transaction\DeliveryRequest;
+use App\Models\Transaction\DeliveryRequestDetail;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 use Log;
@@ -37,6 +39,7 @@ class MoveBranch extends Model
         'void',
         'void_user_id',
         'id_produksi',
+        'id_permintaan_pengiriman',
     ];
 
     public function cabang()
@@ -226,6 +229,44 @@ class MoveBranch extends Model
                     ->where('kode_kartu_stok', $this->kode_pindah_barang)
                     ->delete();
 
+                // perbarui qty pengiriman di detail permintaan pengiriman sesuai qty yang discan
+                $deliveryRequest = DeliveryRequestDetail::whereIn('delivery_request_id', explode(',', $this->id_permintaan_pengiriman))
+                    ->where('status', '1')
+                    ->where('item_id', $trash->id_barang)
+                    ->get();
+
+                if (count($deliveryRequest) > 0) {
+                    $startQty = $trash->qty ?? 0;
+                    foreach ($deliveryRequest as $requestDetail) {
+                        if ($startQty <= $requestDetail->delivery_qty) {
+                            $requestDetail->delivery_qty -= $startQty;
+                            $startQty = 0;
+                        } else {
+                            $startQty -= $requestDetail->delivery_qty;
+                            $requestDetail->delivery_qty = 0;
+                        }
+
+                        $requestDetail->save();
+
+                        // cek jika semua qty di detail sudah terpenuhi, maka ubah status di permintaan pengiriman menjadi selesai (2)
+                        $checkRequestTransaction = DeliveryRequestDetail::where('delivery_request_id', $requestDetail->delivery_request_id)
+                            ->whereRaw('qty > delivery_qty')
+                            ->count();
+                        $isComplete = true;
+                        if ($checkRequestTransaction > 0) {
+                            $isComplete = false;
+                        }
+
+                        if ($isComplete) {
+                            DeliveryRequest::where('id', $requestDetail->delivery_request_id)
+                                ->update(['status' => 3]);
+                        } else {
+                            DeliveryRequest::where('id', $requestDetail->delivery_request_id)
+                                ->update(['status' => 2]);
+                        }
+                    }
+                }
+
                 $selectTrash->delete();
             }
         }
@@ -333,6 +374,53 @@ class MoveBranch extends Model
                             ]);
                         // }
                     }
+
+                    // perbarui qty pengiriman di detail permintaan pengiriman sesuai qty yang discan
+                    $deliveryRequest = DeliveryRequestDetail::whereIn('delivery_request_id', explode(',', $this->id_permintaan_pengiriman))
+                        ->where('status', '1')
+                        ->where('item_id', $data->id_barang)
+                        ->whereRaw('qty > delivery_qty')
+                        ->get();
+                    if (count($deliveryRequest) > 0) {
+                        $requestQty = $data->qty ?? 0;
+                        foreach ($deliveryRequest as $requestDetail) {
+                            $remainingQty = $requestDetail->qty - $requestDetail->delivery_qty;
+                            if ($requestQty <= $remainingQty) {
+                                $requestDetail->delivery_qty += $requestQty;
+                                $requestQty = 0;
+                            } else {
+                                $requestDetail->delivery_qty += $remainingQty;
+                                $requestQty -= $remainingQty;
+                            }
+
+                            $requestDetail->save();
+
+                            // cek jika semua qty di detail sudah terpenuhi, maka ubah status di permintaan pengiriman menjadi selesai (2)
+                            $checkRequestTransaction = DeliveryRequestDetail::where('delivery_request_id', $requestDetail->delivery_request_id)
+                                ->whereRaw('qty > delivery_qty')
+                                ->count();
+                            $isComplete = true;
+                            if ($checkRequestTransaction > 0) {
+                                $isComplete = false;
+                            }
+
+                            if ($isComplete) {
+                                DeliveryRequest::where('id', $requestDetail->delivery_request_id)
+                                    ->update(['status' => 3]);
+                            } else {
+                                DeliveryRequest::where('id', $requestDetail->delivery_request_id)
+                                    ->update(['status' => 2]);
+                            }
+                        }
+
+                        if ($requestQty > 0) {
+                            return [
+                                'status'  => 'error',
+                                'result'  => false,
+                                'message' => 'Qty pada barang ' . $data->nama_barang . ' melebihi dari permintaan pengiriman.',
+                            ];
+                        }
+                    }
                 }
                 // else {
                 //     $check->keterangan = $data->keterangan;
@@ -366,6 +454,44 @@ class MoveBranch extends Model
                 DB::table('kartu_stok')->where('kode_kartu_stok', $this->kode_pindah_barang)
                     ->where('kode_batang_kartu_stok', $detail->qr_code)
                     ->where('id_jenis_transaksi', $this->id_jenis_transaksi)->delete();
+
+                // perbarui qty pengiriman di detail permintaan pengiriman sesuai qty yang discan
+                $deliveryRequest = DeliveryRequestDetail::whereIn('delivery_request_id', explode(',', $this->id_permintaan_pengiriman))
+                    ->where('status', '1')
+                    ->where('item_id', $detail->id_barang)
+                    ->get();
+
+                if (count($deliveryRequest) > 0) {
+                    $startQty = $detail->qty ?? 0;
+                    foreach ($deliveryRequest as $requestDetail) {
+                        if ($startQty <= $requestDetail->delivery_qty) {
+                            $requestDetail->delivery_qty -= $startQty;
+                            $startQty = 0;
+                        } else {
+                            $startQty -= $requestDetail->delivery_qty;
+                            $requestDetail->delivery_qty = 0;
+                        }
+
+                        $requestDetail->save();
+
+                        // cek jika semua qty di detail sudah terpenuhi, maka ubah status di permintaan pengiriman menjadi selesai (2)
+                        $checkRequestTransaction = DeliveryRequestDetail::where('delivery_request_id', $requestDetail->delivery_request_id)
+                            ->whereRaw('qty > delivery_qty')
+                            ->count();
+                        $isComplete = true;
+                        if ($checkRequestTransaction > 0) {
+                            $isComplete = false;
+                        }
+
+                        if ($isComplete) {
+                            DeliveryRequest::where('id', $requestDetail->delivery_request_id)
+                                ->update(['status' => 3]);
+                        } else {
+                            DeliveryRequest::where('id', $requestDetail->delivery_request_id)
+                                ->update(['status' => 2]);
+                        }
+                    }
+                }
             }
 
             return ['status' => 'success'];

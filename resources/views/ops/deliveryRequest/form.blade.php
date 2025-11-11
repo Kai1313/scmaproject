@@ -149,31 +149,19 @@
                                     @endif
                                 </select>
                             </div>
-
-                            {{-- @if ($data)
-                                <div class="row">
-                                    <label class="col-md-3">Status</label>
-                                    <div class="col-md-5 form-group">
-                                        @if (isset($arrayStatus[$data->approval_status]))
-                                            <label class="{{ $arrayStatus[$data->approval_status]['class'] }}">
-                                                {{ $arrayStatus[$data->approval_status]['text'] }}
-                                            </label>
-                                        @endif
-                                    </div>
-                                </div>
-                            @endif --}}
                         </div>
                         <div class="col-md-4">
                             <label>Tanggal <span>*</span></label>
                             <div class="form-group">
                                 <input type="date" name="date"
-                                    value="{{ old('date', $data ? $data->date : date('Y-m-d')) }}" class="form-control">
+                                    value="{{ old('date', $data ? $data->date : date('Y-m-d')) }}" class="form-control"
+                                    min="{{ date('Y-m-d') }}">
                             </div>
                             <label>Estimasi Kedatangan <span>*</span></label>
                             <div class="form-group">
                                 <input type="date" name="estimated_delivery_date"
-                                    value="{{ old('estimated_delivery_date', $data ? $data->estimated_delivery_date : date('Y-m-d')) }}"
-                                    class="form-control">
+                                    value="{{ old('estimated_delivery_date', $data ? $data->estimated_delivery_date : date('Y-m-d', strtotime('+1 week'))) }}"
+                                    class="form-control" min="{{ old('date', $data ? $data->date : date('Y-m-d')) }}">
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -280,6 +268,7 @@
     <script>
         let branches = {!! json_encode($branches) !!}
         let details = {!! $data ? $data->formatdetail : '[]' !!};
+        let statusOptions = {!! json_encode($statusOptions) !!};
         let rmDetails = [];
         let detailSelect = []
         let statusModal = 'create'
@@ -327,9 +316,9 @@
             }, {
                 data: 'status',
                 name: 'status',
-                // render: function(data) {
-                //     return statuses[data] ?? '';
-                // },
+                render: function(data) {
+                    return statusOptions[data]?.label ?? '';
+                },
                 className: 'text-center'
             }, {
                 data: 'index',
@@ -362,7 +351,9 @@
                 keyboard: false
             })
 
-            $('[name="item_id"]').select2('open')
+            setTimeout(() => {
+                $('[name="item_id"]').select2('open')
+            }, 500);
         })
 
         $('[name="item_id"]').select2({

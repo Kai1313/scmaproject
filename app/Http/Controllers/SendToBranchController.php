@@ -125,12 +125,21 @@ class SendToBranchController extends Controller
 
         $cabang    = session()->get('access_cabang');
         $allCabang = DB::table('cabang')->select('id_cabang as id', 'nama_cabang as text')->where('status_cabang', 1)->get();
+
+        // pecah permintaan pengiriman yang sudah dipilih
+        $deliveryRequestExist = explode(',', $data ? $data->id_permintaan_pengiriman : []);
+        $deliveryRequests     = [];
+        if (count($deliveryRequestExist) > 0) {
+            $deliveryRequests = DB::table('delivery_requests')->whereIn('id', $deliveryRequestExist)->pluck('delivery_request_code', 'id')->toArray();
+        }
+
         return view('ops.sendToBranch.form', [
-            'data'           => $data,
-            'cabang'         => $cabang,
-            'allCabang'      => $allCabang,
-            "pageTitle"      => "SCA OPS | Kirim Ke Cabang | " . ($id == 0 ? 'Create' : 'Edit'),
-            'qrcodeReceived' => $qrcodeReceived,
+            'data'             => $data,
+            'cabang'           => $cabang,
+            'allCabang'        => $allCabang,
+            "pageTitle"        => "SCA OPS | Kirim Ke Cabang | " . ($id == 0 ? 'Create' : 'Edit'),
+            'qrcodeReceived'   => $qrcodeReceived,
+            'deliveryRequests' => $deliveryRequests,
         ]);
     }
 
@@ -160,6 +169,12 @@ class SendToBranchController extends Controller
                 $data->user_created         = session()->get('user')['id_pengguna'];
             } else {
                 $data->user_modified = session()->get('user')['id_pengguna'];
+            }
+
+            if ($request->id_permintaan_pengiriman) {
+                $data->id_permintaan_pengiriman = implode(',', $request->id_permintaan_pengiriman);
+            } else {
+                $data->id_permintaan_pengiriman = null;
             }
 
             $data->save();
@@ -206,10 +221,18 @@ class SendToBranchController extends Controller
             $groups[] = $grup->id_grup_pengguna;
         }
 
+        // pecah permintaan pengiriman yang sudah dipilih
+        $deliveryRequestExist = explode(',', $data ? $data->id_permintaan_pengiriman : []);
+        $deliveryRequests     = [];
+        if (count($deliveryRequestExist) > 0) {
+            $deliveryRequests = DB::table('delivery_requests')->whereIn('id', $deliveryRequestExist)->pluck('delivery_request_code', 'id')->toArray();
+        }
+
         return view('ops.sendToBranch.detail', [
-            'data'      => $data,
-            "pageTitle" => "SCA OPS | Kirim Ke Cabang | Lihat",
-            'isEdit'    => in_array(session()->get('user')['id_grup_pengguna'], $groups),
+            'data'             => $data,
+            "pageTitle"        => "SCA OPS | Kirim Ke Cabang | Lihat",
+            'isEdit'           => in_array(session()->get('user')['id_grup_pengguna'], $groups),
+            'deliveryRequests' => $deliveryRequests,
         ]);
     }
 
@@ -261,11 +284,30 @@ class SendToBranchController extends Controller
 
     public function autoQRCode(Request $request)
     {
-        $idCabang = $request->id_cabang;
-        $idGudang = $request->id_gudang;
-        $qrcode   = $request->qrcode;
-        $id       = $request->id;
-        $data     = DB::table('master_qr_code as mqc')
+        $idCabang               = $request->id_cabang;
+        $idGudang               = $request->id_gudang;
+        $qrcode                 = $request->qrcode;
+        $id                     = $request->id;
+        $idPermintaanPengiriman = $request->id_permintaan_pengiriman;
+
+        if ($idPermintaanPengiriman) {
+            $dataPermintaan = DB::table('delivery_request_details as drd')
+                ->select('mqc.kode_batang_master_qr_code')
+                ->join('master_qr_code as mqc', 'drd.item_id', 'mqc.id_barang')
+                ->whereIn('drd.delivery_request_id', $idPermintaanPengiriman)
+                ->where('mqc.kode_batang_master_qr_code', $qrcode)
+                ->first();
+
+            if (! $dataPermintaan) {
+                return response()->json([
+                    'status'  => 500,
+                    'data'    => null,
+                    'message' => 'Barang tidak ada dalam permintaan pengiriman',
+                ], 500);
+            }
+        }
+
+        $data = DB::table('master_qr_code as mqc')
             ->select(
                 'mqc.id_barang',
                 'nama_barang',
@@ -524,5 +566,33 @@ class SendToBranchController extends Controller
             'urlPhoto'       => $urlPhoto,
             'urlPhotoDelete' => $urlPhotoDelete,
         ], 200);
+    }
+
+    public function deliveryRequest(Request $request)
+    {
+        $search         = $request->search;
+        $idCabangTujuan = $request->id_cabang_tujuan;
+        $idCabangAsal   = $request->id_cabang_asal;
+
+        if (! $idCabangTujuan || ! $idCabangAsal) {
+            return response()->json(['result' => false, 'message' => 'Cabang asal dan tujuan harus diisi'], 500);
+        }
+
+        $data = DB::table('delivery_requests as pp')
+            ->select(
+                'pp.id as id',
+                'pp.delivery_request_code as text',
+            )
+            ->where('status', 1)->where('approval_status', 2)
+            ->where('pp.destination_branch_id', $idCabangTujuan)
+            ->where('pp.branch_id', $idCabangAsal)
+            ->where('pp.delivery_request_code', 'like', "%{$search}%")
+            ->orderBy('pp.delivery_request_code', 'asc')->get();
+
+        if (! $data) {
+            return response()->json(['result' => false, 'message' => 'Data tidak ditemukan'], 500);
+        }
+
+        return response()->json(['result' => true, 'data' => $data], 200);
     }
 }

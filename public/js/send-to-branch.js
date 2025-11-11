@@ -240,6 +240,7 @@ $('.btn-search').click(function () {
 })
 
 function searchAsset(string) {
+    console.log('searchAsset', string);
     $('#cover-spin').show()
     $.ajax({
         url: urlSearchQrcode,
@@ -248,7 +249,8 @@ function searchAsset(string) {
             id_cabang: $('[name="id_cabang"]').val(),
             id_gudang: $('[name="id_gudang"]').val(),
             qrcode: string,
-            id: sendId
+            id: sendId,
+            id_permintaan_pengiriman: $('[name="id_permintaan_pengiriman[]"]').val()
         },
         success: function (res) {
             for (select in res.data) {
@@ -358,4 +360,26 @@ $.extend($.validator.messages, {
     required: "Tidak boleh kosong",
     email: "Pastikan format email sudah benar",
     number: "Pastikan hanya angka",
+});
+
+$('[name="id_permintaan_pengiriman[]"]').select2({
+    ajax: {
+        url: urlDeliveryRequest,
+        dataType: 'json',
+        delay: 250,
+        data: function (params) {
+            return {
+                search: params.term,
+                id_cabang_tujuan: $('[name="id_cabang"]').val(),
+                id_cabang_asal: $('[name="id_cabang2"]').val(),
+            };
+        },
+        processResults: function (data) {
+            return {
+                results: data.data
+            };
+        },
+        cache: true
+    },
+    placeholder: 'Cari Permintaan Pengiriman',
 });

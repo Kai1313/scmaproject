@@ -60,7 +60,8 @@ class DeliveryRequest extends Model
     public static function statusOption()
     {
         return [
-            '1' => ['text' => 'Pending', 'label' => '<label class="label label-default">Pending</label>'],
+            '0' => ['text' => 'Batal', 'label' => '<label class="label label-danger">Batal</label>'],
+            '1' => ['text' => 'Menunggu Pengiriman', 'label' => '<label class="label label-default">Menunggu Pengiriman</label>'],
             '2' => ['text' => 'Terkirim Sebagian', 'label' => '<label class="label label-warning">Terkirim Sebagian</label>'],
             '3' => ['text' => 'Terkirim Semua', 'label' => '<label class="label label-success">Terkirim Semua</label>'],
         ];
@@ -69,7 +70,7 @@ class DeliveryRequest extends Model
     public static function createcode()
     {
         $endString = 'PKB/' . date('m') . '/' . date('Y');
-        $check     = DeliveryRequest::where('delivery_request_code', 'like', '%' . $endString)->count();
+        $check     = DeliveryRequest::where('delivery_request_code', 'like', $endString . '%')->count();
         $check += 1;
         $nol = '';
         for ($i = 0; $i < (3 - strlen((string) $check)); $i++) {

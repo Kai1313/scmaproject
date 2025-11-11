@@ -217,6 +217,14 @@
                                     @endif
                                 </select>
                             </div>
+                            <label>Permintaan Pengiriman</label>
+                            <div class="form-group">
+                                <select name="id_permintaan_pengiriman[]" class="form-control select2" multiple>
+                                    @foreach ($deliveryRequests as $id => $code)
+                                        <option value="{{ $id }}" selected>{{ $code }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                             <label>Keterangan</label>
                             <div class="form-group">
                                 <textarea name="keterangan_pindah_barang" class="form-control" rows="3">{{ old('keterangan_pindah_barang', $data ? $data->keterangan_pindah_barang : '') }}</textarea>
@@ -480,6 +488,7 @@
         let urlSearchQrcode = "{{ route('send_to_branch-qrcode') }}"
         let sendId = {{ $data ? $data->id_pindah_barang : 0 }}
         let urlDeleteDetail = '{{ route('send_to_branch-delete-detail', [$data ? $data->id_pindah_barang : 0, 0]) }}'
+        let urlDeliveryRequest = '{{ route('send_to_branch-delivery_request') }}'
         @if ($data)
             var urlPhoto = "{{ route('send_to_branch-save_image', $data->id_pindah_barang) }}";
             var urlPhotoDelete = "{{ route('send_to_branch-rm_image', $data->id_pindah_barang) }}";

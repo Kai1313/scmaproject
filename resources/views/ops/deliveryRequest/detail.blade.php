@@ -61,7 +61,12 @@
             <div class="box-header">
                 <h3 class="box-title">Lihat Permintaan Pengiriman</h3>
                 <div class="pull-right">
-                    @if ($data && $data->approval_status == '1')
+                    @if (
+                        $data &&
+                            $data->approval_status == '1' &&
+                            count($data->details) > 0 &&
+                            $data->created_by != session()->get('user')['id_pengguna']
+                    )
                         <a href="javascript:void(0)" class="btn btn-sm btn-default btn-flat " id="btn-approve">
                             <span class="glyphicon glyphicon-ok mr-1" aria-hidden="true"></span> Setujui Semua
                         </a>
@@ -178,7 +183,15 @@
             }, {
                 data: 'qty',
                 name: 'qty',
-                title: 'Jumlah',
+                title: 'Total Permintaan',
+                render: function(data) {
+                    return formatNumber(data, 4)
+                },
+                className: 'text-right'
+            }, {
+                data: 'delivery_qty',
+                name: 'delivery_qty',
+                title: 'Total Terkirim',
                 render: function(data) {
                     return formatNumber(data, 4)
                 },
@@ -208,11 +221,12 @@
                 width: '150px',
                 render: function(data, type, row, meta) {
                     let btn = ''
-                    if (row.approval_status == '1') {
+                    if (row.approval_status == '1' && {{ $data->created_by }} !=
+                        {{ session()->get('user')['id_pengguna'] }}) {
                         btn +=
-                            '<a href="javascript:void(0)" class="btn btn-success btn-xs mr-1 mb-1 approval" data-status="2">Setuju</a>';
+                            '<a href="javascript:void(0)" class="btn btn-success btn-xs mr-1 mb-1 approval" data-status="2"><i class="glyphicon glyphicon-ok"></i> Setuju</a>';
                         btn +=
-                            '<a href="javascript:void(0)" class="btn btn-danger btn-xs mr-1 mb-1 approval" data-status="0">Tolak</a>';
+                            '<a href="javascript:void(0)" class="btn btn-danger btn-xs mr-1 mb-1 approval" data-status="0"><i class="glyphicon glyphicon-remove"></i> Tolak</a>';
                     }
 
                     return btn;
