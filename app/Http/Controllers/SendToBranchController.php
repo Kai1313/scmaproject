@@ -127,7 +127,7 @@ class SendToBranchController extends Controller
         $allCabang = DB::table('cabang')->select('id_cabang as id', 'nama_cabang as text')->where('status_cabang', 1)->get();
 
         // pecah permintaan pengiriman yang sudah dipilih
-        $deliveryRequestExist = explode(',', $data ? $data->id_permintaan_pengiriman : []);
+        $deliveryRequestExist = explode(',', $data ? $data->id_permintaan_pengiriman : '');
         $deliveryRequests     = [];
         if (count($deliveryRequestExist) > 0) {
             $deliveryRequests = DB::table('delivery_requests')->whereIn('id', $deliveryRequestExist)->pluck('delivery_request_code', 'id')->toArray();
