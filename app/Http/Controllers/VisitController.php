@@ -435,7 +435,7 @@ class VisitController extends Controller
                 $data->status_pelanggan      = '1';
                 $data->plafon_hari_pelanggan = '0';
                 $data->user_pelanggan        = session()->get('user')['id_pengguna'];
-                $data->plafon_pelanggan      = 10000000;
+                $data->plafon_pelanggan      = 1100000;
                 $data->plafon_hari_pelanggan = 1;
                 $data->kode_pelanggan        = $this->generateCodeCustomer();
             }
