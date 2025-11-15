@@ -183,9 +183,9 @@ class LaporanPiutangCurrentController extends Controller
             $data->where('a.id_pelanggan', $idPelanggan);
         }
 
-        // if ($type == 'print') {
-        $data = $data->orderBy('p2.tanggal_penjualan', 'desc');
-        // }
+        if ($type == 'print') {
+            $data = $data->orderBy('p2.tanggal_penjualan', 'desc');
+        }
 
         if ($type == 'datatable') {
             $datatable = Datatables::of($data);
@@ -195,19 +195,19 @@ class LaporanPiutangCurrentController extends Controller
                 return $row->aging != 0 ? $row->aging : '';
             })->filterColumn('top', function ($query, $keyword) {
                 $keywords = trim($keyword);
-                $query->whereRaw("DATE_ADD(p2.tanggal_penjualan, INTERVAL p2.tempo_hari_penjualan DAY) like ?", ["%{$keywords}%"]);
+                $query->whereRaw("DATE_FORMAT(DATE_ADD(p2.tanggal_penjualan, INTERVAL p2.tempo_hari_penjualan DAY), '%Y-%m-%d') like ?", ["%{$keywords}%"]);
             })->filterColumn('mtotal_penjualan', function ($query, $keyword) {
                 $keywords = trim($keyword);
-                $query->whereRaw("total like ?", ["%{$keywords}%"]);
+                $query->whereRaw("(ifnull(a.total,0) + ifnull(a.uang_muka,0)) like ?", ["%{$keywords}%"]);
             })->filterColumn('sisa', function ($query, $keyword) {
                 $keywords = trim($keyword);
-                $query->whereRaw("total like ?", ["%{$keywords}%"]);
+                $query->whereRaw("ifnull((a.total+a.uang_muka)-(ifnull(a.bayar,0)+a.uang_muka),0) like ?", ["%{$keywords}%"]);
             })->filterColumn('terbayar', function ($query, $keyword) {
                 $keywords = trim($keyword);
-                $query->whereRaw("total like ?", ["%{$keywords}%"]);
+                $query->whereRaw("ifnull(a.bayar+a.uang_muka,0.00) like ?", ["%{$keywords}%"]);
             })->filterColumn('aging', function ($query, $keyword) use ($date) {
                 $keywords = trim($keyword);
-                $q        = 'if(ifnull(total - sum(credit),0) <> 0,DATEDIFF("' . $date . '",DATE(DATE_ADD(p2.tanggal_penjualan, INTERVAL p2.tempo_hari_penjualan DAY))),0)';
+                $q        = 'if(ifnull((a.total+a.uang_muka)-(ifnull(a.bayar,0)+a.uang_muka),0) <> 0,DATEDIFF("' . $date . '",DATE(DATE_ADD(p2.tanggal_penjualan, INTERVAL p2.tempo_hari_penjualan DAY))),0)';
                 $query->whereRaw($q . ' like ?', ["%{$keywords}%"]);
             });
 
