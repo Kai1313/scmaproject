@@ -195,7 +195,7 @@ class LaporanPiutangCurrentController extends Controller
                 return $row->aging != 0 ? $row->aging : '';
             })->filterColumn('top', function ($query, $keyword) {
                 $keywords = trim($keyword);
-                $query->whereRaw("DATE_ADD(penjualan.tanggal_penjualan, INTERVAL penjualan.tempo_hari_penjualan DAY) like ?", ["%{$keywords}%"]);
+                $query->whereRaw("DATE_ADD(p2.tanggal_penjualan, INTERVAL p2.tempo_hari_penjualan DAY) like ?", ["%{$keywords}%"]);
             })->filterColumn('mtotal_penjualan', function ($query, $keyword) {
                 $keywords = trim($keyword);
                 $query->whereRaw("total like ?", ["%{$keywords}%"]);
@@ -207,7 +207,7 @@ class LaporanPiutangCurrentController extends Controller
                 $query->whereRaw("total like ?", ["%{$keywords}%"]);
             })->filterColumn('aging', function ($query, $keyword) use ($date) {
                 $keywords = trim($keyword);
-                $q        = 'if(ifnull(total - sum(credit),0) <> 0,DATEDIFF("' . $date . '",DATE(DATE_ADD(penjualan.tanggal_penjualan, INTERVAL penjualan.tempo_hari_penjualan DAY))),0)';
+                $q        = 'if(ifnull(total - sum(credit),0) <> 0,DATEDIFF("' . $date . '",DATE(DATE_ADD(p2.tanggal_penjualan, INTERVAL p2.tempo_hari_penjualan DAY))),0)';
                 $query->whereRaw($q . ' like ?', ["%{$keywords}%"]);
             });
 
