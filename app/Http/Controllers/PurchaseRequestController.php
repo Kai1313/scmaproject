@@ -83,7 +83,7 @@ class PurchaseRequestController extends Controller
                             //     $btn .= '<li><a href="' . route('purchase-request-change-status', [$row->purchase_request_id, 'reject']) . '" class="btn btn-default btn-xs mr-1 mb-1 btn-change-status" data-param="menolak"><i class="fa fa-times"></i> Reject</a></li>';
                             // }
 
-                            if (in_array($idUser, $filterUser) || $idUser == $row->purchase_request_user_id) {
+                            if (in_array($idUser, $filterUser) && $idUser == $row->purchase_request_user_id) {
                                 $btn .= '<a href="' . route('purchase-request-entry', $row->purchase_request_id) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a>';
                                 $btn .= '<a href="' . route('purchase-request-delete', $row->purchase_request_id) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Void</a>';
                             }
