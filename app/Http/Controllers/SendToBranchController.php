@@ -130,16 +130,18 @@ class SendToBranchController extends Controller
         $deliveryRequestExist = explode(',', $data ? $data->id_permintaan_pengiriman : '');
         $deliveryRequests     = [];
         if (count($deliveryRequestExist) > 0) {
-            $deliveryRequests = DB::table('delivery_requests')->whereIn('id', $deliveryRequestExist)->pluck('delivery_request_code', 'id')->toArray();
+            $deliveryRequests = DB::table('delivery_requests')->whereIn('id', $deliveryRequestExist)->orWhere('status', '1')
+                ->pluck('delivery_request_code', 'id')->toArray();
         }
 
         return view('ops.sendToBranch.form', [
-            'data'             => $data,
-            'cabang'           => $cabang,
-            'allCabang'        => $allCabang,
-            "pageTitle"        => "SCA OPS | Kirim Ke Cabang | " . ($id == 0 ? 'Create' : 'Edit'),
-            'qrcodeReceived'   => $qrcodeReceived,
-            'deliveryRequests' => $deliveryRequests,
+            'data'                 => $data,
+            'cabang'               => $cabang,
+            'allCabang'            => $allCabang,
+            "pageTitle"            => "SCA OPS | Kirim Ke Cabang | " . ($id == 0 ? 'Create' : 'Edit'),
+            'qrcodeReceived'       => $qrcodeReceived,
+            'deliveryRequests'     => $deliveryRequests,
+            'deliveryRequestExist' => $deliveryRequestExist,
         ]);
     }
 

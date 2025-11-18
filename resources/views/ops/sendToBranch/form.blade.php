@@ -221,7 +221,9 @@
                             <div class="form-group">
                                 <select name="id_permintaan_pengiriman[]" class="form-control select2" multiple>
                                     @foreach ($deliveryRequests as $id => $code)
-                                        <option value="{{ $id }}" selected>{{ $code }}</option>
+                                        <option value="{{ $id }}"
+                                            {{ in_array($id, $deliveryRequestExist) ? 'selected' : '' }}>
+                                            {{ $code }}</option>
                                     @endforeach
                                 </select>
                             </div>
