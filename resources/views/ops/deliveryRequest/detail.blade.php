@@ -81,6 +81,12 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="row">
+                            <label class="col-md-3">Kode Transaksi</label>
+                            <div class="col-md-9">
+                                : {{ $data ? $data->delivery_request_code : '' }}
+                            </div>
+                        </div>
+                        <div class="row">
                             <label class="col-md-3">Cabang Peminta</label>
                             <div class="col-md-9">
                                 : {{ $data ? $data->branch->nama_cabang : '' }}
@@ -122,9 +128,15 @@
                     </div>
                     <div class="col-md-4">
                         <div class="row">
-                            <label class="col-md-4">Kode Transaksi</label>
+                            <label class="col-md-4">Dibuat Oleh</label>
                             <div class="col-md-8">
-                                : {{ $data ? $data->delivery_request_code : '' }}
+                                : {{ $data && $data->createdBy ? $data->createdBy->nama_pengguna : '' }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label class="col-md-4">Disetujui Oleh</label>
+                            <div class="col-md-8">
+                                : {{ $data && $data->approvedBy ? $data->approvedBy->nama_pengguna : '' }}
                             </div>
                         </div>
                         <div class="row">
@@ -164,6 +176,7 @@
         let details = {!! $data ? $data->formatdetail : '[]' !!};
         let statusOptions = {!! json_encode($statusOptions) !!};
         let approvalStatusOptions = {!! json_encode($approvalStatusOptions) !!};
+        let statusDetailOptions = {!! json_encode($statusDetailOptions) !!};
 
         var resDataTable = $('#table-detail').DataTable({
             destroy: true,
@@ -197,6 +210,14 @@
                 },
                 className: 'text-right'
             }, {
+                data: 'delivery_qty',
+                name: 'delivery_qty',
+                title: 'Jumlah Terkirim',
+                render: function(data) {
+                    return formatNumber(data, 4)
+                },
+                className: 'text-right'
+            }, {
                 data: 'nama_satuan_barang',
                 name: 'nama_satuan_barang',
                 title: 'Satuan'
@@ -211,6 +232,14 @@
                 className: 'text-center',
                 render: function(data, type, row) {
                     return approvalStatusOptions[data] ? approvalStatusOptions[data]['label'] : '-';
+                }
+            }, {
+                data: 'status',
+                name: 'status',
+                title: 'Status',
+                className: 'text-center',
+                render: function(data, type, row) {
+                    return statusDetailOptions[data] ? statusDetailOptions[data]['label'] : '-';
                 }
             }, {
                 data: null,

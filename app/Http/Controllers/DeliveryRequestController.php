@@ -181,12 +181,14 @@ class DeliveryRequestController extends Controller
         $data                  = DeliveryRequest::find($id);
         $statusOptions         = DeliveryRequest::statusOption();
         $approvalStatusOptions = DeliveryRequest::approvalStatusOption();
+        $statusDetailOptions   = DeliveryRequestDetail::statusOption();
 
         return view('ops.deliveryRequest.detail', [
             'data'                  => $data,
             "pageTitle"             => "SCA OPS | Permintaan Pengiriman | Detail",
             'statusOptions'         => $statusOptions,
             'approvalStatusOptions' => $approvalStatusOptions,
+            'statusDetailOptions'   => $statusDetailOptions,
         ]);
     }
 

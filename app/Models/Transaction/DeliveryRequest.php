@@ -2,6 +2,7 @@
 namespace App\Models\Transaction;
 
 use App\Cabang;
+use App\Pengguna;
 use Illuminate\Database\Eloquent\Model;
 use Log;
 
@@ -52,7 +53,7 @@ class DeliveryRequest extends Model
     {
         return [
             '0' => ['text' => 'Tolak', 'label' => '<label class="label label-danger">Tolak</label>'],
-            '1' => ['text' => 'Pending', 'label' => '<label class="label label-warning">Pending</label>'],
+            '1' => ['text' => 'Menunggu Persetujuan', 'label' => '<label class="label label-warning">Menunggu Persetujuan</label>'],
             '2' => ['text' => 'Setuju', 'label' => '<label class="label label-success">Setuju</label>'],
         ];
     }
@@ -124,5 +125,15 @@ class DeliveryRequest extends Model
             Log::error($e);
             return ['result' => false, 'message' => 'Failed to remove delivery request details.'];
         }
+    }
+
+    public function createdBy()
+    {
+        return $this->belongsTo(Pengguna::class, 'created_by');
+    }
+
+    public function approvedBy()
+    {
+        return $this->belongsTo(Pengguna::class, 'approved_by');
     }
 }
