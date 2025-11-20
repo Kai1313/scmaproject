@@ -424,3 +424,42 @@ $('[name="id_permintaan_pengiriman[]"]').select2({
     },
     placeholder: 'Cari Permintaan Pengiriman',
 });
+
+$('.btn-delivery-request').on('click', function () {
+    $('#cover-spin').show()
+    $.ajax({
+        url: urlGetItemDeliveryRequest,
+        type: 'get',
+        data: {
+            id_permintaan_pengiriman: $('[name="id_permintaan_pengiriman[]"]').val()
+        },
+        success: function (res) {
+            let htmlContent = ''
+            if (res.data.length > 0) {
+                for (let i = 0; i < res.data.length; i++) {
+                    htmlContent += `<tr>
+                        <td>${i + 1}</td>
+                        <td>${res.data[i].delivery_request_code}</td>
+                        <td>${res.data[i].nama_barang}</td>
+                        <td>${res.data[i].nama_satuan_barang}</td>
+                        <td class="text-right">${formatNumberNew(res.data[i].qty, 4)}</td>
+                        <td class="text-right">${formatNumberNew(res.data[i].delivery_qty, 4)}</td>
+                        <td class="text-right">${formatNumberNew(res.data[i].qty - res.data[i].delivery_qty, 4)}</td>
+                    </tr>`
+                }
+            } else {
+                htmlContent = `<tr><td colspan="6" class="text-center">Data tidak ditemukan</td></tr>`
+            }
+
+            $('#table-modal-delivery-request tbody').html(htmlContent)
+            $('#modalDeliveryRequest').modal('show')
+            $('#cover-spin').hide()
+        },
+        error: function (error) {
+            $('#cover-spin').hide()
+            let textError = error.hasOwnProperty('responseJSON') ? error.responseJSON.message : error
+                .statusText
+            Swal.fire("Gagal Mengambil Data. ", textError, 'error')
+        }
+    })
+});

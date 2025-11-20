@@ -256,6 +256,10 @@
                             <button class="btn btn-info add-entry btn-flat pull-right btn-sm" type="button">
                                 <i class="glyphicon glyphicon-plus"></i> Tambah Barang
                             </button>
+                            <button class="btn btn-default btn-delivery-request btn-flat pull-right btn-sm" type="button"
+                                style="margin-right:10px;">
+                                Cek Permintaan Pengiriman
+                            </button>
                         </div>
                     </div>
                     <div class="table-responsive">
@@ -466,6 +470,35 @@
             </div>
         </div>
     @endif
+
+    <div class="modal fade" id="modalDeliveryRequest" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn btn-default pull-right btn-sm" data-dismiss="modal">Tutup</button>
+                    <h4 class="modal-title">Daftar Barang Permintaan Pengiriman</h4>
+                </div>
+                <div class="modal-body">
+                    <table id="table-modal-delivery-request" class="table">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Kode Permintaan</th>
+                                <th>Nama Barang</th>
+                                <th>Satuan</th>
+                                <th>Qty Diminta</th>
+                                <th>Qty Dikirim</th>
+                                <th>Selisih</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
 @endsection
 
 @section('addedScripts')
@@ -491,6 +524,7 @@
         let sendId = {{ $data ? $data->id_pindah_barang : 0 }}
         let urlDeleteDetail = '{{ route('send_to_branch-delete-detail', [$data ? $data->id_pindah_barang : 0, 0]) }}'
         let urlDeliveryRequest = '{{ route('send_to_branch-delivery_request') }}'
+        let urlGetItemDeliveryRequest = '{{ route('send_to_branch-get_item_delivery_request') }}'
         @if ($data)
             var urlPhoto = "{{ route('send_to_branch-save_image', $data->id_pindah_barang) }}";
             var urlPhotoDelete = "{{ route('send_to_branch-rm_image', $data->id_pindah_barang) }}";

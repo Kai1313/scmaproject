@@ -111,6 +111,7 @@ Route::prefix('kirim_ke_cabang')->group(function () {
     Route::get('/rm-image/{id}', 'SendToBranchController@rmImage')->name('send_to_branch-rm_image');
     Route::get('/show-image/{id}', 'SendToBranchController@showImage')->name('send_to_branch-show_image');
     Route::get('/delivery_request', 'SendToBranchController@deliveryRequest')->name('send_to_branch-delivery_request');
+    Route::get('/get_item_delivery_request', 'SendToBranchController@getItemDeliveryRequest')->name('send_to_branch-get_item_delivery_request');
 });
 
 Route::prefix('terima_dari_cabang')->group(function () {

@@ -597,4 +597,34 @@ class SendToBranchController extends Controller
 
         return response()->json(['result' => true, 'data' => $data], 200);
     }
+
+    public function getItemDeliveryRequest(Request $request)
+    {
+        $idDeliveryRequest = $request->id_permintaan_pengiriman;
+
+        if (! $idDeliveryRequest) {
+            return response()->json(['result' => false, 'message' => 'Permintaan pengiriman harus diisi'], 500);
+        }
+
+        $data = DB::table('delivery_request_details as drd')
+            ->select(
+                'b.nama_barang as nama_barang',
+                's.nama_satuan_barang as nama_satuan_barang',
+                'drd.qty as qty',
+                'drd.delivery_qty as delivery_qty',
+                'drd.desc',
+                'pp.delivery_request_code'
+            )
+            ->join('delivery_requests as pp', 'drd.delivery_request_id', 'pp.id')
+            ->join('barang as b', 'drd.item_id', 'b.id_barang')
+            ->join('satuan_barang as s', 'drd.unit_id', 's.id_satuan_barang')
+            ->whereIn('drd.delivery_request_id', $idDeliveryRequest)
+            ->orderBy('b.nama_barang', 'asc')->get();
+
+        if (count($data) == 0) {
+            return response()->json(['result' => false, 'message' => 'Data tidak ditemukan'], 500);
+        }
+
+        return response()->json(['result' => true, 'data' => $data], 200);
+    }
 }
