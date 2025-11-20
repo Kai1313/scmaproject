@@ -379,7 +379,7 @@ class MoveBranch extends Model
                     $deliveryRequest = DeliveryRequestDetail::whereIn('delivery_request_id', explode(',', $this->id_permintaan_pengiriman))
                         ->where('status', '1')
                         ->where('item_id', $data->id_barang)
-                        ->whereRaw('qty > delivery_qty')
+                    // ->whereRaw('qty > delivery_qty')
                         ->get();
                     if (count($deliveryRequest) > 0) {
                         $requestQty = $data->qty ?? 0;
@@ -395,7 +395,8 @@ class MoveBranch extends Model
 
                             $requestDetail->save();
 
-                            // cek jika semua qty di detail sudah terpenuhi, maka ubah status di permintaan pengiriman menjadi selesai (2)
+                            // cek jika semua qty di detail sudah terpenuhi, maka ubah status di permintaan pengiriman menjadi selesai (3)
+                            // kalau diterima sebagian tetap status dikirim (2)
                             $checkRequestTransaction = DeliveryRequestDetail::where('delivery_request_id', $requestDetail->delivery_request_id)
                                 ->whereRaw('qty > delivery_qty')
                                 ->count();
@@ -414,11 +415,13 @@ class MoveBranch extends Model
                         }
 
                         if ($requestQty > 0) {
-                            return [
-                                'status'  => 'error',
-                                'result'  => false,
-                                'message' => 'Qty pada barang ' . $data->nama_barang . ' melebihi dari permintaan pengiriman.',
-                            ];
+                            $deliveryRequest[count($deliveryRequest) - 1]->delivery_qty += $requestQty;
+                            $deliveryRequest[count($deliveryRequest) - 1]->save();
+                            // return [
+                            //     'status'  => 'error',
+                            //     'result'  => false,
+                            //     'message' => 'Qty pada barang ' . $data->nama_barang . ' melebihi dari permintaan pengiriman.',
+                            // ];
                         }
                     }
                 }

@@ -210,14 +210,6 @@
                 },
                 className: 'text-right'
             }, {
-                data: 'delivery_qty',
-                name: 'delivery_qty',
-                title: 'Jumlah Terkirim',
-                render: function(data) {
-                    return formatNumber(data, 4)
-                },
-                className: 'text-right'
-            }, {
                 data: 'nama_satuan_barang',
                 name: 'nama_satuan_barang',
                 title: 'Satuan'
