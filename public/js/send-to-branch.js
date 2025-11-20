@@ -6,6 +6,12 @@ let deleteDetails = []
 let detailSelect = []
 let statusModal = 'create'
 
+// Prevent double search execution
+let isSearching = false;
+let lastSearch = '';
+let scanTrigger = false;
+let keyupTimer = null;
+
 $('[name="details"]').val(JSON.stringify(details))
 
 var resDataTable = $('#table-detail').DataTable({
@@ -227,16 +233,47 @@ function deleteDetail(url) {
 }
 
 
-$("[name='search-qrcode']").on('keyup', function (e) {
-    if ($("[name='search-qrcode']").val().trim().length == 10) {
-        $('.btn-search').click()
-    }
+$("[name='search-qrcode']").off('keyup').on('keyup', function (e) {
+    const val = $(this).val().trim();
+    if (keyupTimer) clearTimeout(keyupTimer);
+
+    keyupTimer = setTimeout(() => {
+        if (val.length === 10 && !scanTrigger) {
+            console.log('Trigger search from keyboard');
+            triggerSearch(val);
+        }
+        scanTrigger = false; // reset flag
+    }, 200);
 });
 
-$('.btn-search').click(function () {
-    let self = $('[name="search-qrcode"]').val().trim()
+// Fungsi inti pencarian - hindari duplikasi
+function triggerSearch(qrcodeValue) {
+    if (!qrcodeValue) return;
+
+    // Hindari eksekusi ganda karena binding berulang atau klik cepat
+    if (isSearching) {
+        console.log('Search ignored: still processing');
+        return;
+    }
+
+    // Hindari pencarian ulang nilai yang sama dalam waktu singkat
+    if (qrcodeValue === lastSearch) {
+        console.log('Search ignored: same value');
+        return;
+    }
+
+    isSearching = true;
+    lastSearch = qrcodeValue;
     html5QrcodeScanner.clear();
-    searchAsset(self)
+    searchAsset(qrcodeValue);
+}
+
+// Pastikan handler click tunggal
+$('.btn-search').off('click').on('click', function (e) {
+    e.preventDefault();
+    const val = $('[name="search-qrcode"]').val().trim();
+    console.log('Search button clicked:', val);
+    triggerSearch(val);
 })
 
 function searchAsset(string) {
@@ -268,6 +305,7 @@ function searchAsset(string) {
             $('[name="search-qrcode"]').val('')
             $('.result-form').show()
             $('#cover-spin').hide()
+            isSearching = false; // Release lock
         },
         error: function (error) {
             let textError = error.hasOwnProperty('responseJSON') ? error.responseJSON.message : error
@@ -276,13 +314,16 @@ function searchAsset(string) {
             html5QrcodeScanner.render(onScanSuccess, onScanError);
             $('.result-form').hide()
             $('#cover-spin').hide()
+            isSearching = false; // Release lock
         }
     })
 }
 
 function onScanSuccess(decodedText, decodedResult) {
-    $('[name="search-qrcode"]').val(decodedText)
-    $('.btn-search').click()
+    console.log('QR Scan detected:', decodedText);
+    $('[name="search-qrcode"]').val(decodedText);
+    scanTrigger = true; // Set flag bahwa scan yang memicu
+    triggerSearch(decodedText); // Panggil fungsi langsung, bukan .click()
 }
 
 function onScanError(errorMessage) {
