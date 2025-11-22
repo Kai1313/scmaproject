@@ -377,6 +377,8 @@
         let deleteDetails = []
         let detailSelect = []
         let statusModal = 'create'
+        let indexEdit = -1
+
         @if ($data)
             var urlPhoto = "{{ route('surat_jalan_umum-save_image', $data->id) }}";
             var urlPhotoDelete = "{{ route('surat_jalan_umum-rm_image', $data->id) }}";
@@ -404,7 +406,8 @@
             if (statusModal == 'create') {
                 details.push(newObj)
             } else if (statusModal == 'edit') {
-                details[newObj.index - 1] = newObj
+
+                details[indexEdit] = newObj
             }
 
             table.clear().rows.add(details).draw()
@@ -488,6 +491,7 @@
 
             modal.modal('show')
             statusModal = 'edit'
+            indexEdit = index
         })
 
         $('body').on('click', '.delete-entry', function() {
