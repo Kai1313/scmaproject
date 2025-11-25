@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Route;
 Route::post('login', 'ApiController@login');
 Route::post('store_fcm_token', 'ApiController@storeFcmToken');
 
+Route::post('submit_ai_detection', 'Report\AIDetectionController@submitAIDetection');
+
 Route::group(['middleware' => ['auth:api']], function () {
     Route::get('profile', 'ApiController@profile');
     Route::post('logout', 'ApiController@logout');

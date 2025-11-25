@@ -234,6 +234,8 @@ Route::get('purchase-receive/print/{id}', 'PurchaseReceiveController@printData')
 Route::get('stok_minimal/excel/{id}/{id_cabang}', 'StokMinHistoryController@getExcel')->name('stok_minimal-excel');
 
 Route::namespace('Report')->group(function () {
+    Route::get('ai_detection/index/{user_id?}', 'AIDetectionController@index')->name('ai_detection-index');
+
     Route::prefix('laporan_qc_penerimaan')->group(function () {
         Route::get('index/{user_id?}', 'QcReceivedController@index')->name('report_qc-index');
         Route::get('print', 'QcReceivedController@print')->name('report_qc-print');
