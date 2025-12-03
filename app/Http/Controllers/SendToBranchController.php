@@ -585,7 +585,7 @@ class SendToBranchController extends Controller
                 'pp.id as id',
                 'pp.delivery_request_code as text'
             )
-            ->where('status', 1)->where('approval_status', 2)
+            ->whereIn('status', [1, 2])->where('approval_status', 2)
             ->where('pp.destination_branch_id', $idCabangTujuan)
             ->where('pp.branch_id', $idCabangAsal)
             ->where('pp.delivery_request_code', 'like', "%{$search}%")
