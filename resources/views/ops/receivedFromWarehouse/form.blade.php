@@ -111,7 +111,8 @@
                                 <input type="text" name="tanggal_pindah_barang"
                                     value="{{ old('tanggal_pindah_barang', $data ? $data->tanggal_pindah_barang : date('Y-m-d')) }}"
                                     class="form-control datepicker" data-validation="[NOTEMPTY]"
-                                    data-validation-message="Tanggal penerimaan tidak boleh kosong" readonly>
+                                    data-validation-message="Tanggal penerimaan tidak boleh kosong"
+                                    {{ $data ? 'readonly' : '' }}>
                             </div>
                         </div>
                         <div class="col-md-4">
