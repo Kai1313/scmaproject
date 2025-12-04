@@ -175,7 +175,7 @@
                 width: 150
             }, {
                 data: 'nama_pengguna',
-                name: 'nama_pengguna',
+                name: 'pengguna.nama_pengguna',
                 width: 100
             }, {
                 data: 'keterangan',
