@@ -250,7 +250,7 @@
 
                     if (row.delivery_qty > 0) {
                         btn +=
-                            '<a href="javascript:void(0)" class="btn btn-success btn-xs mr-1 mb-1 btn-complete" data-id="' +
+                            '<a href="javascript:void(0)" class="btn btn-default btn-xs mr-1 mb-1 btn-complete" data-id="' +
                             row.id + '">Sesuai ?</a>';
                     } else {
                         if (row.approval_status == '1' && {{ $data->created_by }} !=
