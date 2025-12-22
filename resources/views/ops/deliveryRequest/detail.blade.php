@@ -177,6 +177,7 @@
         let statusOptions = {!! json_encode($statusOptions) !!};
         let approvalStatusOptions = {!! json_encode($approvalStatusOptions) !!};
         let statusDetailOptions = {!! json_encode($statusDetailOptions) !!};
+        let verifyRoute = '{{ route('delivery-request-verify', 0) }}'
 
         var resDataTable = $('#table-detail').DataTable({
             destroy: true,
@@ -242,12 +243,23 @@
                 width: '150px',
                 render: function(data, type, row, meta) {
                     let btn = ''
-                    if (row.approval_status == '1' && {{ $data->created_by }} !=
-                        {{ session()->get('user')['id_pengguna'] }}) {
+                    console.log(row);
+                    if (row.status == '2' || row.approval_status == '1') {
+                        return '-';
+                    }
+
+                    if (row.delivery_qty > 0) {
                         btn +=
-                            '<a href="javascript:void(0)" class="btn btn-success btn-xs mr-1 mb-1 approval" data-status="2"><i class="glyphicon glyphicon-ok"></i> Setuju</a>';
-                        btn +=
-                            '<a href="javascript:void(0)" class="btn btn-danger btn-xs mr-1 mb-1 approval" data-status="0"><i class="glyphicon glyphicon-remove"></i> Tolak</a>';
+                            '<a href="javascript:void(0)" class="btn btn-success btn-xs mr-1 mb-1 btn-complete" data-id="' +
+                            row.id + '">Sesuai ?</a>';
+                    } else {
+                        if (row.approval_status == '1' && {{ $data->created_by }} !=
+                            {{ session()->get('user')['id_pengguna'] }}) {
+                            btn +=
+                                '<a href="javascript:void(0)" class="btn btn-success btn-xs mr-1 mb-1 approval" data-status="2"><i class="glyphicon glyphicon-ok"></i> Setuju</a>';
+                            btn +=
+                                '<a href="javascript:void(0)" class="btn btn-danger btn-xs mr-1 mb-1 approval" data-status="0"><i class="glyphicon glyphicon-remove"></i> Tolak</a>';
+                        }
                     }
 
                     return btn;
@@ -334,6 +346,42 @@
                             );
                         }
                     });
+                }
+            });
+        });
+
+        $('body').on('click', '.btn-complete', function() {
+            let id = $(this).data('id');
+            let index = resDataTable.row($(this).parents('tr')).index();
+            // show verification
+            swal.fire({
+                title: 'Konfirmasi',
+                text: 'Jumlah pengiriman sudah sesuai dengan permintaan?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Sesuai',
+                cancelButtonText: 'Belum'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: verifyRoute.replace('0', id),
+                        method: 'POST',
+                        success: function(response) {
+                            details[index].status = '2' // Set status to 'Sesuai'
+
+                            // Update the details input and refresh table
+                            $('[name="details"]').val(JSON.stringify(details));
+                            resDataTable.clear().rows.add(details).draw();
+                        },
+                        error: function(xhr, status, error) {
+                            swal.fire({
+                                title: 'Gagal',
+                                text: 'Terjadi kesalahan saat memperbarui status pengiriman.',
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    })
                 }
             });
         });

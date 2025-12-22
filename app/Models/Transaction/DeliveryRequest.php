@@ -36,7 +36,7 @@ class DeliveryRequest extends Model
             ->select('delivery_request_details.*', 'barang.nama_barang', 'satuan_barang.nama_satuan_barang')
             ->join('barang', 'delivery_request_details.item_id', 'barang.id_barang')
             ->join('satuan_barang', 'delivery_request_details.unit_id', 'satuan_barang.id_satuan_barang')
-            ->where('status', '1');
+            ->where('status', '!=', '0');
     }
 
     public function branch()

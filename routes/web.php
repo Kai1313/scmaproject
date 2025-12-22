@@ -144,6 +144,7 @@ Route::prefix('delivery_request')->group(function () {
     Route::get('/auto_item', 'DeliveryRequestController@autoItem')->name('delivery-request-auto_item');
     Route::get('/auto_item_units', 'DeliveryRequestController@getItemUnits')->name('delivery-request-auto_item_unit');
     Route::post('approval-delivery/{id}', 'DeliveryRequestController@approvalDelivery')->name('delivery-request-approval');
+    Route::post('verify-delivery/{id}', 'DeliveryRequestController@verifyDelivery')->name('delivery-request-verify');
     // Route::get('/auto-qrcode', 'DeliveryRequestController@autoQRCode')->name('delivery_request-qrcode');
     // Route::get('/print/{id}', 'DeliveryRequestController@printData')->name('delivery_request-print-data');
     // Route::post('/save-detail/{id}', 'DeliveryRequestController@saveDetailEntry')->name('delivery_request-save-detail');

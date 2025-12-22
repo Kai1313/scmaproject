@@ -37,8 +37,8 @@ class DeliveryRequestDetail extends Model
     public static function statusOption()
     {
         return [
-            '1' => ['text' => 'Terbuka', 'label' => '<label class="label label-success">Terbuka</label>'],
-            '2' => ['text' => 'Tertutup', 'label' => '<label class="label label-default">Tertutup</label>'],
+            '1' => ['text' => 'Terbuka', 'label' => '<label class="label label-default">Terbuka</label>'],
+            '2' => ['text' => 'Terpenuhi', 'label' => '<label class="label label-success">Terpenuhi</label>'],
         ];
     }
 }

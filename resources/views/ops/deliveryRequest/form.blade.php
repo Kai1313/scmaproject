@@ -183,9 +183,11 @@
                 <div class="box-header">
                     <h3 class="box-title">Detil Barang</h3>
                     {{-- @if (!$data || $data->approval_status == 0) --}}
-                    <button class="btn btn-info add-entry btn-flat pull-right btn-sm" type="button">
-                        <i class="glyphicon glyphicon-plus"></i> Tambah Barang
-                    </button>
+                    @if (!$data || $data->approval_status == '1')
+                        <button class="btn btn-info add-entry btn-flat pull-right btn-sm" type="button">
+                            <i class="glyphicon glyphicon-plus"></i> Tambah Barang
+                        </button>
+                    @endif
                     {{-- @endif --}}
                 </div>
                 <div class="box-body">
@@ -196,19 +198,23 @@
                             <thead>
                                 <tr>
                                     <th>Nama Barang</th>
-                                    <th>Jumlah</th>
-                                    <th>Satuan</th>
+                                    <th style="width:100px;">Satuan</th>
+                                    <th style="width:100px;">Jumlah</th>
+                                    <th style="width:100px;">Diterima</th>
                                     <th>Keterangan</th>
-                                    <th>Status</th>
+                                    <th style="width:150px;">Status</th>
                                     <th style="width:150px;">Action</th>
                                 </tr>
                             </thead>
                         </table>
                     </div>
-                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                    <button class="btn btn-primary btn-flat pull-right" type="submit">
-                        <i class="glyphicon glyphicon-floppy-saved"></i> Simpan Data
-                    </button>
+                    @if (!$data || ($data && in_array($data->approval_status, ['1'])))
+                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                        <button class="btn btn-primary btn-flat pull-right" type="submit">
+                            <i class="glyphicon glyphicon-floppy-saved"></i> Simpan Data
+                        </button>
+                    @endif
+
                 </div>
             </div>
         </form>
@@ -269,6 +275,7 @@
         let branches = {!! json_encode($branches) !!}
         let details = {!! $data ? $data->formatdetail : '[]' !!};
         let statusOptions = {!! json_encode($statusOptions) !!};
+        let statusDetailOptions = {!! json_encode($statusDetailOptions) !!};
         let rmDetails = [];
         let detailSelect = []
         let statusModal = 'create'
@@ -301,6 +308,10 @@
                 data: 'nama_barang',
                 name: 'nama_barang'
             }, {
+                data: 'nama_satuan_barang',
+                name: 'nama_satuan_barang',
+                className: 'text-center'
+            }, {
                 data: 'qty',
                 name: 'qty',
                 render: function(data) {
@@ -308,8 +319,12 @@
                 },
                 className: 'text-right'
             }, {
-                data: 'nama_satuan_barang',
-                name: 'nama_satuan_barang'
+                data: 'delivery_qty',
+                name: 'delivery_qty',
+                render: function(data) {
+                    return formatNumber(data, 4)
+                },
+                className: 'text-right'
             }, {
                 data: 'desc',
                 name: 'desc'
@@ -317,7 +332,7 @@
                 data: 'status',
                 name: 'status',
                 render: function(data) {
-                    return statusOptions[data]?.label ?? '';
+                    return statusDetailOptions[data] ? statusDetailOptions[data]['label'] : '-';
                 },
                 className: 'text-center'
             }, {
@@ -327,10 +342,17 @@
                 searchable: false,
                 render: function(data, type, row, meta) {
                     let btn = ''
-                    btn +=
-                        '<a href="javascript:void(0)" class="btn btn-warning btn-xs mr-1 mb-1 edit-entry"><i class="glyphicon glyphicon-pencil"></i></a>';
-                    btn +=
-                        '<a href="javascript:void(0)" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1 delete-entry"><i class="glyphicon glyphicon-trash"></i></a>';
+                    if (row.status == '2') {
+                        return '-';
+                    }
+
+                    if (row.delivery_qty == 0) {
+                        btn +=
+                            '<a href="javascript:void(0)" class="btn btn-warning btn-xs mr-1 mb-1 edit-entry"><i class="glyphicon glyphicon-pencil"></i></a>';
+                        btn +=
+                            '<a href="javascript:void(0)" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1 delete-entry"><i class="glyphicon glyphicon-trash"></i></a>';
+                    }
+
                     return btn;
                 }
             }]
@@ -815,6 +837,42 @@
                         .removeClass('error-border').addClass('success-border');
                 }
             }
+        });
+
+        $('body').on('click', '.btn-complete', function() {
+            let id = $(this).data('id');
+            // show verification
+            swal.fire({
+                title: 'Konfirmasi',
+                text: 'Jumlah pengiriman sudah sesuai dengan permintaan?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Sesuai',
+                cancelButtonText: 'Belum'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '{{ route('delivery-request-verify', $data ? $data->id : 0) }}',
+                        method: 'POST',
+                        success: function(response) {
+                            let rowIndex = resDataTable.row($(this).parents('tr')).index();
+                            details[rowIndex].status = '2' // Set status to 'Sesuai'
+
+                            // Update the details input and refresh table
+                            $('[name="details"]').val(JSON.stringify(details));
+                            resDataTable.clear().rows.add(details).draw();
+                        },
+                        error: function(xhr, status, error) {
+                            swal.fire({
+                                title: 'Gagal',
+                                text: 'Terjadi kesalahan saat memperbarui status pengiriman.',
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    })
+                }
+            });
         });
     </script>
 @endsection

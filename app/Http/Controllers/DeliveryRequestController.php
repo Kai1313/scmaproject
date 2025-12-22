@@ -41,9 +41,16 @@ class DeliveryRequestController extends Controller
                 ->addColumn('action', function ($row) {
                     $btn = '';
                     $btn .= '<a href="' . route('delivery_request-view', $row->id) . '" class="btn btn-info btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-search"></i> Lihat</a>';
-                    if ($row->approval_status == '1' && $row->created_by == session()->get('user')['id_pengguna']) {
-                        $btn .= '<a href="' . route('delivery_request-entry', $row->id) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a>';
-                        $btn .= '<a href="' . route('delivery_request-delete', $row->id) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Void</a>';
+                    if ($row->created_by == session()->get('user')['id_pengguna']) {
+                        if (in_array($row->approval_status, ['1'])) {
+                            $btn .= '<a href="' . route('delivery_request-entry', $row->id) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a>';
+                            $btn .= '<a href="' . route('delivery_request-delete', $row->id) . '" class="btn btn-danger btn-xs btn-destroy mr-1 mb-1"><i class="glyphicon glyphicon-trash"></i> Void</a>';
+                        }
+
+                        if (in_array($row->approval_status, ['2']) && $row->status == '1') {
+                            $btn .= '<a href="' . route('delivery_request-entry', $row->id) . '" class="btn btn-warning btn-xs mr-1 mb-1"><i class="glyphicon glyphicon-pencil"></i> Ubah</a>';
+                        }
+
                     }
 
                     return $btn;
@@ -72,15 +79,17 @@ class DeliveryRequestController extends Controller
             return view('exceptions.forbidden', ["pageTitle" => "Forbidden"]);
         }
 
-        $data          = DeliveryRequest::find($id);
-        $branches      = DB::table('cabang')->select('id_cabang as id', 'nama_cabang as text')->where('status_cabang', '1')->orderBy('nama_cabang', 'asc')->get();
-        $statusOptions = DeliveryRequest::statusOption();
+        $data                = DeliveryRequest::find($id);
+        $branches            = DB::table('cabang')->select('id_cabang as id', 'nama_cabang as text')->where('status_cabang', '1')->orderBy('nama_cabang', 'asc')->get();
+        $statusOptions       = DeliveryRequest::statusOption();
+        $statusDetailOptions = DeliveryRequestDetail::statusOption();
 
         return view('ops.deliveryRequest.form', [
-            'data'          => $data,
-            'branches'      => $branches,
-            'statusOptions' => $statusOptions,
-            "pageTitle"     => "SCA OPS | Permintaan Pengiriman | " . ($id == 0 ? 'Create' : 'Edit'),
+            'data'                => $data,
+            'branches'            => $branches,
+            'statusOptions'       => $statusOptions,
+            'statusDetailOptions' => $statusDetailOptions,
+            "pageTitle"           => "SCA OPS | Permintaan Pengiriman | " . ($id == 0 ? 'Create' : 'Edit'),
         ]);
     }
 
@@ -276,6 +285,27 @@ class DeliveryRequestController extends Controller
             ], 200);
         } catch (\Exception $e) {
             Log::error($e);
+            return response()->json(["result" => false, "message" => $e->getMessage()], 500);
+        }
+    }
+
+    public function verifyDelivery($id)
+    {
+        try {
+            // cek data permintaan pengiriman berdasarkan id
+            $deliveryRequestDetail = DeliveryRequestDetail::find($id);
+            if (! $deliveryRequestDetail) {
+                return response()->json(["result" => false, "message" => "Detail permintaan pengiriman tidak ditemukan"], 404);
+            }
+
+            DB::beginTransaction();
+            $deliveryRequestDetail->status = '2';
+            $deliveryRequestDetail->save();
+            DB::commit();
+            return response()->json(["result" => true, "message" => "Data berhasil disimpan"], 200);
+        } catch (\Exception $e) {
+            Log::error($e);
+            DB::rollback();
             return response()->json(["result" => false, "message" => $e->getMessage()], 500);
         }
     }
