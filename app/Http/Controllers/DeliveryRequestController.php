@@ -301,6 +301,17 @@ class DeliveryRequestController extends Controller
             DB::beginTransaction();
             $deliveryRequestDetail->status = '2';
             $deliveryRequestDetail->save();
+
+            //cek semua detail sudah terpenuhi atau belum
+            $totalDetails     = DeliveryRequestDetail::where('delivery_request_id', $deliveryRequestDetail->delivery_request_id)->count();
+            $fulfilledDetails = DeliveryRequestDetail::where('delivery_request_id', $deliveryRequestDetail->delivery_request_id)->where('status', '2')->count();
+            if ($totalDetails == $fulfilledDetails) {
+                //jika semua detail terpenuhi, update status permintaan pengiriman menjadi terpenuhi
+                $deliveryRequest         = DeliveryRequest::find($deliveryRequestDetail->delivery_request_id);
+                $deliveryRequest->status = '3';
+                $deliveryRequest->save();
+            }
+
             DB::commit();
             return response()->json(["result" => true, "message" => "Data berhasil disimpan"], 200);
         } catch (\Exception $e) {
