@@ -397,21 +397,21 @@ class MoveBranch extends Model
 
                             // cek jika semua qty di detail sudah terpenuhi, maka ubah status di permintaan pengiriman menjadi selesai (3)
                             // kalau diterima sebagian tetap status dikirim (2)
-                            $checkRequestTransaction = DeliveryRequestDetail::where('delivery_request_id', $requestDetail->delivery_request_id)
-                                ->whereRaw('qty > delivery_qty')
-                                ->count();
-                            $isComplete = true;
-                            if ($checkRequestTransaction > 0) {
-                                $isComplete = false;
-                            }
+                            // $checkRequestTransaction = DeliveryRequestDetail::where('delivery_request_id', $requestDetail->delivery_request_id)
+                            //     ->whereRaw('qty > delivery_qty')
+                            //     ->count();
+                            // $isComplete = true;
+                            // if ($checkRequestTransaction > 0) {
+                            //     $isComplete = false;
+                            // }
 
-                            if ($isComplete) {
-                                DeliveryRequest::where('id', $requestDetail->delivery_request_id)
-                                    ->update(['status' => 3]);
-                            } else {
-                                DeliveryRequest::where('id', $requestDetail->delivery_request_id)
-                                    ->update(['status' => 2]);
-                            }
+                            // if ($isComplete) {
+                            //     DeliveryRequest::where('id', $requestDetail->delivery_request_id)
+                            //         ->update(['status' => 3]);
+                            // } else {
+                            DeliveryRequest::where('id', $requestDetail->delivery_request_id)
+                                ->update(['status' => 2]);
+                            // }
                         }
 
                         if ($requestQty > 0) {
