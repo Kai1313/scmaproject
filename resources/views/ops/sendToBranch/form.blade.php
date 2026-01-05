@@ -539,6 +539,6 @@
 
         Fancybox.bind('[data-fancybox="lightbox"]');
     </script>
-    <script src="{{ asset('js/send-to-branch.js') }}"></script>
+    <script src="{{ asset('js/send-to-branch.js') }}?t={{ time() }}"></script>
     <script src="{{ asset('js/camera.js') }}?t={{ time() }}"></script>
 @endsection
