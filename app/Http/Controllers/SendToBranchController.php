@@ -291,6 +291,11 @@ class SendToBranchController extends Controller
         $qrcode                 = $request->qrcode;
         $id                     = $request->id;
         $idPermintaanPengiriman = $request->id_permintaan_pengiriman;
+        $out_of_request         = $request->out_of_request;
+
+        if ($out_of_request == 1) {
+            $idPermintaanPengiriman = null;
+        }
 
         if ($idPermintaanPengiriman) {
             $dataPermintaan = DB::table('delivery_request_details as drd')

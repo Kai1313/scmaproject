@@ -292,6 +292,10 @@
                 <div class="modal-content">
                     <div class="modal-body">
                         <div id="reader" style="margin-bottom:10px;"></div>
+                        <label>
+                            <input type="checkbox" name="out_of_request" id="out_of_request" value="1"> Diluar
+                            Permintaan
+                        </label>
                         <div class="form-group">
                             <div class="input-group">
                                 <input type="text" name="search-qrcode" class="form-control"

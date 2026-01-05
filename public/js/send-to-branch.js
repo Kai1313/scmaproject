@@ -150,6 +150,7 @@ function getGudang(data) {
 }
 
 $('.add-entry').click(function () {
+    $('#out_of_request').prop('checked', false);
     detailSelect = []
     $('#modalEntry').find('input,select,textarea').each(function (i, v) {
         $(v).val('').trigger('change')
@@ -257,22 +258,22 @@ function triggerSearch(qrcodeValue) {
     }
 
     // Hindari pencarian ulang nilai yang sama dalam waktu singkat
-    if (qrcodeValue === lastSearch) {
-        console.log('Search ignored: same value');
-        return;
-    }
+    // if (qrcodeValue === lastSearch) {
+    //     console.log('Search ignored: same value');
+    //     return;
+    // }
 
     isSearching = true;
     lastSearch = qrcodeValue;
     html5QrcodeScanner.clear();
+    // console.log('Triggering search for:', qrcodeValue);
     searchAsset(qrcodeValue);
 }
 
 // Pastikan handler click tunggal
 $('.btn-search').off('click').on('click', function (e) {
     e.preventDefault();
-    const val = $('[name="search-qrcode"]').val().trim();
-    console.log('Search button clicked:', val);
+    let val = $('[name="search-qrcode"]').val().trim();
     triggerSearch(val);
 })
 
@@ -287,7 +288,8 @@ function searchAsset(string) {
             id_gudang: $('[name="id_gudang"]').val(),
             qrcode: string,
             id: sendId,
-            id_permintaan_pengiriman: $('[name="id_permintaan_pengiriman[]"]').val()
+            id_permintaan_pengiriman: $('[name="id_permintaan_pengiriman[]"]').val(),
+            out_of_request: $('#out_of_request').is(':checked') ? 1 : 0
         },
         success: function (res) {
             for (select in res.data) {
